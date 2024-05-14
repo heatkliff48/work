@@ -1,0 +1,126 @@
+.App {
+  text-align: center;
+}
+
+.nav_wrapper {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 70px;
+  padding: 0px 30px;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(34, 192, 42, 0.294);
+  background-image: linear-gradient(0deg, #82af6f, transparent);
+  font-weight: 700;
+}
+
+.nav_left_wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.nav_right_wrapper {
+  width: 30%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 30px;
+}
+.nav_logo {
+  width: 50px;
+}
+.nav_name {
+  margin-left: 10px;
+  font-size: 20pt;
+  font-weight: bold;
+}
+.nav_link_wrapper {
+  width: 30%;
+  display: flex;
+  text-decoration: none;
+  padding: 10px 10px;
+  color: black;
+  justify-content: center;
+}
+.nav_link {
+  width: 100%;
+  text-align: center;
+}
+.p_nav {
+  color: white;
+  text-decoration: underline;
+}
+.nav_link_wrapper :hover {
+  background-color: #82af6f;
+}
+
+.login_wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 800px;
+}
+
+.login_topic {
+  color: black;
+  font-weight: 700;
+  font-size: 40pt;
+}
+
+.login_form_wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.login_form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+}
+
+label {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  font-size: 16pt;
+}
+
+.login_input {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16pt;
+  border-radius: 5px;
+  border: 1px solid black;
+}
+
+.login_button {
+  font-size: 14pt;
+  margin: 0px;
+  border: 2px solid black;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  color: white;
+  min-width: 50px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #82af6f;
+}
+.login_button:focus {
+  outline: none;
+}
+.login_button:hover {
+  background-color: rgba(34, 192, 42, 0.294);
+}

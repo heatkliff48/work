@@ -1,0 +1,9 @@
+DB_USER = danil
+DB_NAME = work
+DB_PASS = 111
+DB_ADDRES = 127.0.0.1
+SECRET = mlkfdamfdskjnfsgnjk
+CLIENT_URL=http://localhost:3000
+SALT = 10
+ACCESS_TOKEN_SECRET=access_alexey
+REFRESH_TOKEN_SECRET=refresh_alexey

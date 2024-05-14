@@ -1,0 +1,14 @@
+curl -X POST -H "Content-Type: application/json" -d '{"username":"AGS", "password":"password"}' http://localhost:3000/register
+
+
+curl -X POST -H "Content-Type: application/json" -d '{"username":"baublock", "password":"password"}' http://localhost:3000/login
+
+
+curl -X POST -H "Content-Type: application/json" -d '{"username":"user1", "password":"password"}' http://localhost:3000/register
+
+
+curl -X POST -H "Content-Type: application/json" -d '{"username":"user1", "password":"baublock"}' http://localhost:3000/login
+
+
+curl -X POST -H "Content-Type: application/json" -d '{"username":"user", "password":"password"}' http://localhost:3000/register
+
