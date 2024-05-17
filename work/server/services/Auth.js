@@ -1,36 +1,40 @@
-const dotenv = require ('dotenv');
-const bcrypt = require ('bcryptjs');
-const jwt = require ('jsonwebtoken');
-const TokenService = require ('./Token.js');
-const { NotFound, Forbidden, Conflict } = require ('../utils/Errors.js');
-const RefreshSessionsRepository = require ('../repositories/RefreshSession.js');
-const UserRepository = require ('../repositories/User.js');
-const { ACCESS_TOKEN_EXPIRATION } = require ('../constants.js');
+const dotenv = require('dotenv');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const TokenService = require('./Token.js');
+const { NotFound, Forbidden, Conflict } = require('../utils/Errors.js');
+const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
+const UserRepository = require('../repositories/User.js');
+const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 
 class AuthService {
-  static async signIn({ userName, password, fingerprint }) {}
+  static async signIn({ username, password, fingerprint }) {}
 
-  static async signUp({ userName, email, password, fingerprint, role }) {
+  static async signUp({ username, email, password, fingerprint, role }) {
     const userData = await UserRepository.getUserData(email);
-
     if (userData) throw new Conflict('Пользователь с такой почтой уже существует.');
 
-    const hashedPassword = bcrypt.hashSync(password, process.env.SALT);
+    const hashedPassword = bcrypt.hashSync(password, 8);
+
     const { id } = await UserRepository.createUser({
-      userName,
+      username,
       email,
       hashedPassword,
       role,
     });
-    const payload = { id, email, role };
+
+    const payload = { id, username, email };
 
     const accessToken = await TokenService.generateAccessToken(payload);
     const refreshToken = await TokenService.generateRefreshToken(payload);
-    await RefreshSessionsRepository.createRefreshSession(
-      id,
-      refreshToken,
-      fingerprint
-    );
+
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
     return {
       accessToken,
       refreshToken,

@@ -10,10 +10,7 @@ function NavBar() {
 
   return (
     <div className="nav_wrapper">
-      <div className="nav_left_wrapper">
-        <div className="nav_logo">{/* <img src={sipit} alt="sipit" /> */}</div>
-        <div className="nav_name"></div>
-      </div>
+      <div className="nav_left_wrapper"></div>
       <div className="nav_right_wrapper">
         {user && (
           <div className="nav_link_wrapper">

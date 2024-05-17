@@ -12,15 +12,11 @@ const PORT = 3001;
 
 const app = express();
 
-// Подключаем middleware morgan с режимом логирования "dev", чтобы для каждого HTTP-запроса на сервер в консоль выводилась информация об этом запросе.
-app.use(morgan('dev'));
-// Подключаем middleware, которое позволяет читать содержимое body из HTTP-запросов типа POST, PUT и DELETE.
-app.use(express.urlencoded({ extended: true }));
-// Подключаем middleware, которое позволяет читать переменные JavaScript, сохранённые в формате JSON в body HTTP-запроса.
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
-// CORS - это пакет node.js для предоставления промежуточного программного обеспечения Connect / Express, которое можно использовать для включения CORS с различными параметрами.
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({ credentials: true, origin: process.env.ORIGIN }));
+app.use(morgan('dev'));
 
 app.use(
   Fingerprint({

@@ -1,6 +1,7 @@
 const { ErrorUtils, Unprocessable } = require('./Errors.js');
 
-module.exports = errorAnalys = async (req, res, next, schema) => {
+const errorAnalys = async (req, res, next, schema) => {
+
   try {
     if (schema) {
       await schema.validate(req);
@@ -14,3 +15,4 @@ module.exports = errorAnalys = async (req, res, next, schema) => {
     );
   }
 };
+module.exports = errorAnalys
