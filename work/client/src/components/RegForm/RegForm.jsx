@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser } from '../redux/actions/userAction';
-import { signUpSchema } from './validtionSchemas';
+import { signUpSchema } from '../validitionSchemas/validtionSchemas';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 const defaultValues = {
-  userName: '',
+  username: '',
   password: '',
   role: 1,
 };
@@ -45,6 +45,7 @@ function RegForm() {
 
   const submitForm = async (e) => {
     e.preventDefault();
+
     dispatch(addUser(formInput));
   };
 
@@ -79,7 +80,7 @@ function RegForm() {
             type="password"
             id="password"
             name="password"
-            value={formInput.password}
+            value={formInput.name}
             onChange={inputChange}
           />
           <br />

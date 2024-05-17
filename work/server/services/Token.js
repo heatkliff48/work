@@ -5,15 +5,17 @@ dotenv.config();
 
 class TokenService {
   static async generateAccessToken(payload) {
-    return await jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+    const acccessToken = await jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '30m',
     });
+    return acccessToken;
   }
 
   static async generateRefreshToken(payload) {
-    return await jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+    const refreshToken = await jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
       expiresIn: '15d',
     });
+    return refreshToken;
   }
 
   static async checkAccess(req, _, next) {}

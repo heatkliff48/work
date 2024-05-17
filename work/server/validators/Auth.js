@@ -3,7 +3,7 @@ const Yup = require('yup');
 
 const signInSchema = Yup.object({
   body: Yup.object({
-    userName: Yup.string()
+    username: Yup.string()
       .required('Поле обязательно!')
       .max(25, 'Максимальная длина - 25 символов'),
     password: Yup.string()
@@ -14,20 +14,21 @@ const signInSchema = Yup.object({
 });
 
 const signUpSchema = Yup.object({
-  body: Yup.object({
-    userName: Yup.string()
-      .required('Поле обязательно!')
-      .max(25, 'Максимальная длина - 25 символов'),
-    password: Yup.string()
-      .required('Поле обязательно!')
-      .min(3, 'Пароль слишком короткий - минимум 3 символа')
-      .max(50, 'Максимальная длина - 50 символов'),
-    role: Yup.number()
-      .required('Поле обязательно!')
-      .typeError('Значение должно быть числом!')
-      .min(1, 'Минимальное значение - 1')
-      .max(3, 'Максимальное значение - 3'),
-  }),
+  // body: Yup.object({
+  //   email: Yup.string().required('Поле обязательно!'),
+  //   username: Yup.string()
+  //     .required('Поле обязательно!')
+  //     .max(25, 'Максимальная длина - 25 символов'),
+  // password: Yup.string()
+  //   .required('Поле обязательно!')
+  //   .min(3, 'Пароль слишком короткий - минимум 3 символа')
+  //   .max(50, 'Максимальная длина - 50 символов'),
+  // role: Yup.number()
+  //   .required('Поле обязательно!')
+  //   .typeError('Значение должно быть числом!')
+  //   .min(1, 'Минимальное значение - 1')
+  //   .max(3, 'Максимальное значение - 3'),
+  // }),
 });
 
 const logoutSchema = Yup.object({

@@ -1,13 +1,14 @@
 const { Users } = require('../db/models');
 
 class UserRepository {
-  static async createUser({ userName, email, hashedPassword, role }) {
+  static async createUser({ username, email, hashedPassword, role }) {
     const user = await Users.create({
-      userName,
+      username,
       email,
       password: hashedPassword,
       role,
     });
+
     return user;
   }
 

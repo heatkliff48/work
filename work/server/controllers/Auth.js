@@ -1,5 +1,5 @@
-const { AuthService } = require('../services/Auth.js');
-const { ErrorsUtils } = require('../utils/Errors.js');
+const AuthService = require('../services/Auth.js');
+const { ErrorUtils } = require('../utils/Errors.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
 
 class AuthController {
@@ -8,20 +8,28 @@ class AuthController {
     try {
       return res.sendStatus(200);
     } catch (err) {
-      return ErrorsUtils.catchError(res, err);
+      return ErrorUtils.catchError(res, err);
     }
   }
 
   static async signUp(req, res) {
-    const { username, password, role } = req.bode;
+    const { username, password, email } = req.body.user;
     const { fingerprint } = req;
     try {
-      const { access_token, refresh_token, accessTokenExpiration } =
-        await AuthService.signUp({ username, password, role, fingerprint });
-      res.cookie('refresh_token', refresh_token, COOKIE_SETTINGS.REFRESH_TOKEN);
-      return res.sendStatus(200).json({ access_token, accessTokenExpiration });
+      const { accessToken, refreshToken, accessTokenExpiration } =
+        await AuthService.signUp({
+          username,
+          password,
+          email,
+          fingerprint: fingerprint.hash,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ accessToken, accessTokenExpiration });
     } catch (err) {
-      return ErrorsUtils.catchError(res, err);
+      return ErrorUtils.catchError(res, err);
     }
   }
 
@@ -30,7 +38,7 @@ class AuthController {
     try {
       return res.sendStatus(200);
     } catch (err) {
-      return ErrorsUtils.catchError(res, err);
+      return ErrorUtils.catchError(res, err);
     }
   }
 
@@ -39,7 +47,7 @@ class AuthController {
     try {
       return res.sendStatus(200);
     } catch (err) {
-      return ErrorsUtils.catchError(res, err);
+      return ErrorUtils.catchError(res, err);
     }
   }
 }
