@@ -2,29 +2,23 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser } from '../redux/actions/userAction';
-import { signUpSchema } from '../validitionSchemas/validtionSchemas';
-import { yupResolver } from '@hookform/resolvers/yup';
+// import { signUpSchema } from '../validitionSchemas/validtionSchemas';
+// import { yupResolver } from '@hookform/resolvers/yup';
 
-const defaultValues = {
-  username: '',
-  password: '',
-  role: 1,
-};
-
-const rolesList = [
-  {
-    id: 1,
-    title: 'Администратор',
-  },
-  {
-    id: 2,
-    title: 'Модератор',
-  },
-  {
-    id: 3,
-    title: 'Пользователь',
-  },
-];
+// const rolesList = [
+//   {
+//     id: 1,
+//     title: 'Администратор',
+//   },
+//   {
+//     id: 2,
+//     title: 'Модератор',
+//   },
+//   {
+//     id: 3,
+//     title: 'Пользователь',
+//   },
+// ];
 
 function RegForm() {
   const [formInput, setForm] = useState({});
@@ -37,7 +31,7 @@ function RegForm() {
     if (user) {
       navigate('/');
     }
-  }, [user]);
+  }, [navigate, user]);
 
   const inputChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -45,7 +39,6 @@ function RegForm() {
 
   const submitForm = async (e) => {
     e.preventDefault();
-
     dispatch(addUser(formInput));
   };
 

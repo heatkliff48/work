@@ -1,14 +1,31 @@
+const { where } = require('sequelize');
 const { Refresh_session } = require('../db/models');
+const { JsonWebTokenError } = require('jsonwebtoken');
 
 class RefreshSessionRepository {
-  static async getRefreshSession(refreshToken) {}
+  static async getRefreshSession(refreshToken) {
+    const refresh_token = await Refresh_session.findOne({
+      where: {
+        refresh_token: refreshToken,
+      },
+    });
+
+    if (!refresh_token) return null;
+
+    return refresh_token;
+  }
 
   static async createRefreshSession({ user_id, refresh_token, finger_print }) {
-
     await Refresh_session.create({ user_id, refresh_token, finger_print });
   }
 
-  static async deleteRefreshSession(refreshToken) {}
+  static async deleteRefreshSession(refreshToken) {
+    await Refresh_session.destroy({
+      where: {
+        refresh_token: refreshToken,
+      },
+    });
+  }
 }
 
 module.exports = RefreshSessionRepository;

@@ -29,7 +29,7 @@ function NavBar() {
             <div
               className="nav_link"
               onClick={() => {
-                navigate('/login');
+                navigate('/sign-in');
               }}
             >
               <p className="p_nav">Войти</p>
@@ -41,7 +41,7 @@ function NavBar() {
             <div
               className="nav_link"
               onClick={() => {
-                navigate('/registration');
+                navigate('/sign-up');
               }}
             >
               <p className="p_nav">Регистрация</p>
@@ -60,7 +60,7 @@ function NavBar() {
               onClick={() => {
                 window.localStorage.clear();
                 dispatch(delUser());
-                navigate('/');
+                navigate('/login');
               }}
             >
               <p className="p_nav">Выйти</p>

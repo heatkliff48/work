@@ -46,7 +46,7 @@ function LoginForm() {
             type="password"
             id="password"
             name="password"
-            value={formInput.password}
+            value={formInput.name}
             onChange={inputChange}
           />
           <br />
