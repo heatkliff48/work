@@ -19,6 +19,13 @@ class TokenService {
   }
 
   static async checkAccess(req, _, next) {}
+
+  static async verifyAccessToken(accessToken) {
+    return await jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+  }
+  static async verifyRefreshToken(refreshToken) {
+    return await jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+  }
 }
 
 module.exports = TokenService;

@@ -7,6 +7,8 @@ import {
   GET_LOGIN_USER,
 } from '../types/userTypes';
 import axios from 'axios';
+import inMemoryJWT from '../../../services/inMemoryJWT';
+import showErrorMessage from '../../Utils/showErrorMessage';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -14,13 +16,31 @@ const url = axios.create({
 });
 
 const addUser = (user) => {
-  return url.post('/auth/sign-up', { user }).then((res) => res.data);
+  return url
+    .post('/auth/sign-up', { user })
+    .then((res) => {
+      const { accessToken, accessTokenExpiration } = res.data;
+
+      inMemoryJWT.setToken(accessToken, accessTokenExpiration);
+      return res.data.user;
+    })
+    .catch(showErrorMessage);
 };
 const loginUser = (user) => {
-  return url.post('/sign-in', { user }).then((res) => res.data);
+  return url
+    .post('/auth/sign-in', { user })
+    .then((res) => {
+      const { accessToken, accessTokenExpiration } = res.data;
+
+      inMemoryJWT.setToken(accessToken, accessTokenExpiration);
+      return res.data.user;
+    })
+    .catch(showErrorMessage);
 };
 const delUser = () => {
-  return url('/logout').then((res) => res.data);
+  return url
+    .post('/auth/logout')
+    .then(() => inMemoryJWT.deleteToken().catch(showErrorMessage));
 };
 
 function* addUserWatcher(action) {
@@ -36,6 +56,7 @@ function* addUserWatcher(action) {
 function* loginUserWatcher(action) {
   try {
     const user = yield call(loginUser, action.payload);
+    console.log('USer LOGIN', user);
     yield put({ type: ADD_USER, payload: user });
   } catch (err) {
     yield put({ type: ADD_USER, payload: null });
