@@ -118,7 +118,7 @@ function Products() {
   const user = useSelector((state) => state.user);
 
   const products = useSelector((state) => state.products);
-  console.log('PRODUCTS', products);
+  // console.log('PRODUCTS', products);
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => MOCK_DATA, []);
 

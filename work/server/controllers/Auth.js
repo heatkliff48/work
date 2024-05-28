@@ -6,7 +6,6 @@ class AuthController {
   static async signIn(req, res) {
     const { password, email } = req.body.user;
     const { fingerprint } = req;
-    
     try {
       const { accessToken, refreshToken, accessTokenExpiration, user } =
         await AuthService.signIn({
@@ -20,6 +19,7 @@ class AuthController {
         .status(200)
         .json({ user, accessToken, accessTokenExpiration });
     } catch (err) {
+      console.log('>>>>>>>>>>>>CONTROLLER ERROR<<<<<<<<<<<<', err);
       return ErrorUtils.catchError(res, err);
     }
   }
