@@ -5,7 +5,6 @@ dotenv.config();
 
 class TokenService {
   static async generateAccessToken(payload) {
-    console.log('>>>>>>>>>>>>PAYLOAD', payload);
     const acccessToken = await jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '30m',
     });

@@ -30,7 +30,9 @@ const loginUser = (user) => {
   return url
     .post('/auth/sign-in', { user })
     .then((res) => {
-      // const { accessToken, accessTokenExpiration } = res.data;
+      const { accessToken, accessTokenExpiration } = res.data;
+
+      inMemoryJWT.setToken(accessToken, accessTokenExpiration);
       return res.data.user;
     })
     .catch(showErrorMessage);

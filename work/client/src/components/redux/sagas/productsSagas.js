@@ -12,8 +12,7 @@ const url = axios.create({
 url.interceptors.request.use(
   (config) => {
     const accessToken = inMemoryJWT.getToken();
-
-    if (!accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
+    if (accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
 
     return config;
   },
@@ -34,7 +33,7 @@ const getAllProducts = (user) => {
 
 function* getAllProductsWatcher(action) {
   try {
-    console.log('GET ALL PROD WATCH', action.payload);
+    // console.log('GET ALL PROD WATCH', action.payload);
     const products = yield call(getAllProducts, action.payload);
 
     yield put({ type: ALL_PRODUCTS, payload: products });
