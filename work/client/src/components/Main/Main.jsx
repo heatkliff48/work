@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Table from '../Table/Table';
+import Products from '../Products/Products';
 
 function Main() {
   // const url = axios.create({
@@ -17,10 +17,11 @@ function Main() {
     if (!user) {
       navigate('/sign-in');
     }
+    
   }, [navigate, user]);
   return (
     <div>
-      <Table />
+      <Products />
     </div>
   );
 }

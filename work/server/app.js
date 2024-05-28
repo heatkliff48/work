@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const Fingerprint = require('express-fingerprint');
 const AuthRootRouter = require('./router/Auth.js');
+const ProductRootRouter = require('./router/Product.js');
 const TokenService = require('./services/Token.js');
 const cookieParser = require('cookie-parser');
 
@@ -25,6 +26,7 @@ app.use(
 );
 
 app.use('/auth', AuthRootRouter);
+app.use('/products', TokenService.checkAccess, ProductRootRouter);
 
 const start = async () => {
   try {

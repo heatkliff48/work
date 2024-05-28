@@ -6,6 +6,7 @@ class AuthController {
   static async signIn(req, res) {
     const { password, email } = req.body.user;
     const { fingerprint } = req;
+    
     try {
       const { accessToken, refreshToken, accessTokenExpiration, user } =
         await AuthService.signIn({
@@ -48,6 +49,7 @@ class AuthController {
     const refreshToken = req.cookies.refreshToken;
     try {
       await AuthService.logOut(refreshToken);
+      res.locals.user = null;
 
       return res.clearCookie('refreshToken').sendStatus(200);
     } catch (err) {
