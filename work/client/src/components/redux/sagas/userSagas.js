@@ -30,9 +30,7 @@ const loginUser = (user) => {
   return url
     .post('/auth/sign-in', { user })
     .then((res) => {
-      const { accessToken, accessTokenExpiration } = res.data;
-
-      inMemoryJWT.setToken(accessToken, accessTokenExpiration);
+      // const { accessToken, accessTokenExpiration } = res.data;
       return res.data.user;
     })
     .catch(showErrorMessage);
@@ -56,7 +54,7 @@ function* addUserWatcher(action) {
 function* loginUserWatcher(action) {
   try {
     const user = yield call(loginUser, action.payload);
-    console.log('USer LOGIN', user);
+    window.localStorage.setItem('user', JSON.stringify(user));
     yield put({ type: ADD_USER, payload: user });
   } catch (err) {
     yield put({ type: ADD_USER, payload: null });
@@ -66,7 +64,6 @@ function* loginUserWatcher(action) {
 function* delUserWatcher() {
   try {
     yield call(delUser);
-
     yield put({ type: DEL_USER, payload: null });
   } catch (err) {
     yield put({ type: DEL_USER, payload: null });

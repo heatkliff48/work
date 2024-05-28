@@ -9,7 +9,7 @@ function NavBar() {
   const dispatch = useDispatch();
 
   return (
-    <div className="nav_wrapper">
+    <nav className="nav_wrapper">
       <div className="nav_left_wrapper"></div>
       <div className="nav_right_wrapper">
         {user && (
@@ -60,7 +60,7 @@ function NavBar() {
               onClick={() => {
                 window.localStorage.clear();
                 dispatch(delUser());
-                navigate('/login');
+                navigate('/sign-in');
               }}
             >
               <p className="p_nav">Выйти</p>
@@ -68,7 +68,7 @@ function NavBar() {
           </div>
         )}
       </div>
-    </div>
+    </nav>
   );
 }
 

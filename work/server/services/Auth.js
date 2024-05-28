@@ -1,4 +1,3 @@
-const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const TokenService = require('./Token.js');
@@ -80,7 +79,7 @@ class AuthService {
     await RefreshSessionsRepository.deleteRefreshSession(refreshToken);
   }
 
-  static async refresh({ fingerprint, currentRefreshToken }) {
+  static async refresh({ currentRefreshToken, fingerprint }) {
     if (!currentRefreshToken) {
       throw new Unauthorized();
     }
@@ -90,7 +89,7 @@ class AuthService {
 
     if (!refreshSession) throw new Unauthorized();
 
-    if (refreshSession.finger_print !== fingerprint) throw new Forbidden();
+    if (refreshSession.finger_print !== fingerprint.hash) throw new Forbidden();
 
     await RefreshSessionsRepository.deleteRefreshSession(currentRefreshToken);
   }

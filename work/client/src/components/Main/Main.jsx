@@ -1,26 +1,27 @@
-import axios from 'axios';
+// import axios from 'axios';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import Products from '../Products/Products';
 
 function Main() {
-  const url = axios.create({
-    baseURL: process.env.REACT_APP_URL,
-    withCredentials: true,
-  });
+  // const url = axios.create({
+  //   baseURL: process.env.REACT_APP_URL,
+  //   withCredentials: true,
+  // });
 
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    console.log('USER', user);
     if (!user) {
-      navigate('/sign-up');
+      navigate('/sign-in');
     }
+    
   }, [navigate, user]);
   return (
     <div>
-      <p>HELLO WORLD!!!</p>
+      <Products />
     </div>
   );
 }

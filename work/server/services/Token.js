@@ -5,6 +5,7 @@ dotenv.config();
 
 class TokenService {
   static async generateAccessToken(payload) {
+    console.log('>>>>>>>>>>>>PAYLOAD', payload);
     const acccessToken = await jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '30m',
     });
@@ -18,7 +19,20 @@ class TokenService {
     return refreshToken;
   }
 
-  static async checkAccess(req, _, next) {}
+  static async checkAccess(req, _, next) {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')?.[1];
+
+    if (!token) next(new Unauthorized());
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+      console.log(err, user);
+      if (err) next(new Forbidden(err));
+
+      req.user = user;
+      next();
+    });
+  }
 
   static async verifyAccessToken(accessToken) {
     return await jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);

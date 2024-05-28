@@ -9,9 +9,7 @@ class RefreshSessionRepository {
         refresh_token: refreshToken,
       },
     });
-
     if (!refresh_token) return null;
-
     return refresh_token;
   }
 
