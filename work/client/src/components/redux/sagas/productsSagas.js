@@ -17,9 +17,9 @@ const url = axios.create({
 
 url.interceptors.request.use(
   (config) => {
-    const accessToken = useState((state) => state.jwt);
 
-    if (!accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
+    const accessToken = inMemoryJWT.getToken();
+    if (accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
 
     return config;
   },
@@ -51,7 +51,7 @@ const addNewProduct = (product) => {
 
 function* getAllProductsWatcher(action) {
   try {
-    // console.log('GET ALL PxROD WATCH', action.payload);
+    // console.log('GET ALL PROD WATCH', action.payload);
     const products = yield call(getAllProducts, action.payload);
 
     yield put({ type: ALL_PRODUCTS, payload: products });

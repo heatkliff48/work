@@ -116,7 +116,8 @@ const MOCK_DATA = [
 
 function Products() {
   const dispatch = useDispatch();
-  // const products = useSelector((state) => state.products);
+
+  // const products = useSelector((state) => state.products)
   // console.log('PRODUCTS', products);
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => MOCK_DATA, []);
