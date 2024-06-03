@@ -2,28 +2,32 @@ import './App.css';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import LoginForm from './components/LoginForm/LoginForm';
 import Main from './components/Main/Main';
-// import { useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import NavBar from './components/NavBar/NavBar';
 import RegForm from './components/RegForm/RegForm';
 // import ProtectedRoute from './components/ProtectRoute/ProtectRoute';
 import { SnackbarProvider } from 'notistack';
 import axios from 'axios';
 import { useEffect } from 'react';
-import inMemoryJWT from './services/inMemoryJWT';
+// import inMemoryJWT from './services/inMemoryJWT';
+import { setToken } from './components/redux/actions/jwtAction';
 
 function App() {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const url = axios.create({
     baseURL: process.env.REACT_APP_URL,
     withCredentials: true,
   });
 
   useEffect(() => {
-    url.post('/auth/refresh').then((res)=>{
-      const { accessToken, accessTokenExpiration } = res.data;
-      inMemoryJWT.setToken(accessToken, accessTokenExpiration)
-    }).catch(()=>{})
-  }, []);
+    url
+      .post('/auth/refresh')
+      .then((res) => {
+        const { accessToken, accessTokenExpiration } = res.data;
+        dispatch(setToken(accessToken, accessTokenExpiration));
+      })
+      .catch(() => {});
+  }, [dispatch, url]);
 
   return (
     <>

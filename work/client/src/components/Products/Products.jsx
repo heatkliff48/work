@@ -3,6 +3,9 @@ import { useEffect, useMemo } from 'react';
 import { useTable } from 'react-table';
 import './products.css';
 import { getAllProducts } from '../redux/actions/productsAction';
+import { setModalWindow } from '../redux/actions/modalAction';
+import ModalWindow from '../ModalWindow/ModalWindow';
+import { SET_MODAL } from '../redux/types/modalTypes';
 export const COLUMNS = [
   {
     Header: 'Id',
@@ -109,16 +112,12 @@ const MOCK_DATA = [
     country: 'Америка',
     phone: '1111111',
   },
-
-  
 ];
 
 function Products() {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
-
-  const products = useSelector((state) => state.products);
-  console.log('PRODUCTS', products);
+  // const products = useSelector((state) => state.products);
+  // console.log('PRODUCTS', products);
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => MOCK_DATA, []);
 
@@ -131,32 +130,36 @@ function Products() {
     tableInstance;
 
   useEffect(() => {
-    dispatch(getAllProducts(user));
+    dispatch(getAllProducts());
   }, []);
   return (
-    <table {...getTableProps()}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-              })}
+    <>
+      <ModalWindow />
+      <table {...getTableProps()}>
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+              ))}
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map((cell) => {
+                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <button onClick={() => dispatch(setModalWindow(true))}>Add product new</button>
+    </>
   );
 }
 export default Products;
