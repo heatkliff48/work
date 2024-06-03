@@ -1,8 +1,13 @@
-import { GET_ALL_PRODUCTS } from '../types/productsTypes';
+import { ADD_NEW_PRODUCT, GET_ALL_PRODUCTS } from '../types/productsTypes';
 
-export const getAllProducts = (user) => {
+export const getAllProducts = () => {
   return {
     type: GET_ALL_PRODUCTS,
-    payload: user,
+  };
+};
+export const addNewProduct = (data) => {
+  return {
+    type: ADD_NEW_PRODUCT,
+    payload: data,
   };
 };

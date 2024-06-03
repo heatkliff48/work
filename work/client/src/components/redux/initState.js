@@ -1,6 +1,8 @@
 const initState = {
-  user: null,
-  products: null,
+  user: [],
+  products: [],
+  modal: false,
+  jwt: null,
 };
 
 export default initState;

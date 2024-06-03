@@ -2,7 +2,13 @@ import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import inMemoryJWT from '../../../services/inMemoryJWT';
 import showErrorMessage from '../../Utils/showErrorMessage';
-import { ALL_PRODUCTS, GET_ALL_PRODUCTS } from '../types/productsTypes';
+import {
+  ADD_NEW_PRODUCT,
+  ALL_PRODUCTS,
+  GET_ALL_PRODUCTS,
+  NEW_PRODUCT,
+} from '../types/productsTypes';
+import { useState } from 'react';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -11,6 +17,7 @@ const url = axios.create({
 
 url.interceptors.request.use(
   (config) => {
+
     const accessToken = inMemoryJWT.getToken();
     if (accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
 
@@ -19,9 +26,20 @@ url.interceptors.request.use(
   (err) => Promise.reject(err)
 );
 
-const getAllProducts = (user) => {
+const getAllProducts = () => {
   return url
-    .post('/products/all', { user })
+    .get('/products/all')
+    .then((res) => {
+      const { accessToken, accessTokenExpiration } = res.data;
+
+      inMemoryJWT.setToken(accessToken, accessTokenExpiration);
+      return res.data.products;
+    })
+    .catch(showErrorMessage);
+};
+const addNewProduct = (product) => {
+  return url
+    .post('/products/add', { product })
     .then((res) => {
       const { accessToken, accessTokenExpiration } = res.data;
 
@@ -41,9 +59,19 @@ function* getAllProductsWatcher(action) {
     yield put({ type: ALL_PRODUCTS, payload: null });
   }
 }
+function* addNewProductWatcher(action) {
+  try {
+    const products = yield call(addNewProduct, action.payload);
+
+    yield put({ type: NEW_PRODUCT, payload: products });
+  } catch (err) {
+    yield put({ type: NEW_PRODUCT, payload: null });
+  }
+}
 
 function* productsWatcher() {
   yield takeLatest(GET_ALL_PRODUCTS, getAllProductsWatcher);
+  yield takeLatest(ADD_NEW_PRODUCT, addNewProductWatcher);
 }
 
 export default productsWatcher;
