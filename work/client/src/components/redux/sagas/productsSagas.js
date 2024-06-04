@@ -56,7 +56,7 @@ function* getAllProductsWatcher(action) {
 
     yield put({ type: ALL_PRODUCTS, payload: products });
   } catch (err) {
-    yield put({ type: ALL_PRODUCTS, payload: null });
+    yield put({ type: ALL_PRODUCTS, payload: [] });
   }
 }
 function* addNewProductWatcher(action) {
@@ -65,7 +65,7 @@ function* addNewProductWatcher(action) {
 
     yield put({ type: NEW_PRODUCT, payload: products });
   } catch (err) {
-    yield put({ type: NEW_PRODUCT, payload: null });
+    yield put({ type: NEW_PRODUCT, payload: [] });
   }
 }
 

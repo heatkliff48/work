@@ -5,7 +5,6 @@ import './products.css';
 import { getAllProducts } from '../redux/actions/productsAction';
 import { setModalWindow } from '../redux/actions/modalAction';
 import ModalWindow from '../ModalWindow/ModalWindow';
-import { SET_MODAL } from '../redux/types/modalTypes';
 export const COLUMNS = [
   {
     Header: 'Id',
@@ -100,27 +99,12 @@ export const COLUMNS = [
     accessor: 'coefficientOfFree',
   },
 ];
-const MOCK_DATA = [
-  {
-    id: 1,
-    first_name: 'Alice',
-    last_name: 'Johnson',
-    email: 'dgeibel0@twitter.com',
-    gender: 'Male',
-    date_of_birth: '1990-05-12',
-    age: 25,
-    country: 'Америка',
-    phone: '1111111',
-  },
-];
 
 function Products() {
   const dispatch = useDispatch();
-
-  // const products = useSelector((state) => state.products)
-  // console.log('PRODUCTS', products);
+  const products = useSelector((state) => state.products);
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => MOCK_DATA, []);
+  const data = useMemo(() => products, []);
 
   const tableInstance = useTable({
     columns,
@@ -131,11 +115,12 @@ function Products() {
     tableInstance;
 
   useEffect(() => {
+    console.log('PRODUCTS');
     dispatch(getAllProducts());
-  }, []);
+  }, [dispatch]);
   return (
     <>
-      <ModalWindow />
+      <ModalWindow list={COLUMNS} />
       <table {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (

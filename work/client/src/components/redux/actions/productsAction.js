@@ -1,13 +1,13 @@
-import { ADD_NEW_PRODUCT, GET_ALL_PRODUCTS } from '../types/productsTypes';
+import { ADD_NEW_PRODUCT, GET_ALL_PRODUCTS, NEW_PRODUCT } from '../types/productsTypes';
 
 export const getAllProducts = () => {
   return {
     type: GET_ALL_PRODUCTS,
   };
 };
-export const addNewProduct = (data) => {
+export const addNewProduct = (product) => {
   return {
-    type: ADD_NEW_PRODUCT,
-    payload: data,
+    type: NEW_PRODUCT,
+    payload: product,
   };
 };

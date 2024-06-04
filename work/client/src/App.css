@@ -1,4 +1,3 @@
-
 .App {
   text-align: center;
 }
@@ -123,4 +122,18 @@ label {
 }
 .login_button:hover {
   background-color: rgba(34, 192, 42, 0.294);
+}
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-content: center;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.item_select {
+  width: 50%;
+  padding: 10px;
 }
