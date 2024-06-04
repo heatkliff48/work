@@ -88,6 +88,65 @@ app.post('/products', async(req, res) => {
   }
 })
 
+// app.post('/products', async(req, res) => {
+//   const { 
+//     version,
+//     density,
+//     form,
+//     certificate,
+//     width,
+//     lengths,
+//     height,
+//     tradingMark,
+//     m3,
+//     m2,
+//     m,
+//     widthInArray,
+//     m3InArray,
+//     densityInDryMax,
+//     dinsityInDryDef,
+//     humidity,
+//     densityHumidityMax,
+//     densityHuminityDef,
+//     weightMax,
+//     weightDef,
+//     normOfBrack,
+//     coefficientOfFree
+//   } = req.body;
+
+//   try {
+//     const product = await Products.create({
+//       version,
+//       density,
+//       form,
+//       certificate,
+//       width,
+//       lengths,
+//       height,
+//       tradingMark,
+//       m3,
+//       m2,
+//       m,
+//       widthInArray,
+//       m3InArray,
+//       densityInDryMax,
+//       dinsityInDryDef,
+//       humidity,
+//       densityHumidityMax,
+//       densityHuminityDef,
+//       weightMax,
+//       weightDef,
+//       normOfBrack,
+//       coefficientOfFree
+//     })
+
+//     return res.json(product)
+//   } catch (err) {
+//     console.log(err)
+//     return res.status(500).json(err)
+//   }
+// })
+
 const start = async () => {
   try {
     app.listen(PORT, () => {
