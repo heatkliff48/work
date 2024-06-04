@@ -26,33 +26,21 @@ class ProductService {
     };
   }
 
-  static async addNewProduct({ username, email, password, fingerprint, role }) {
-    const userData = await UserRepository.getUserData(email);
-    if (userData) {
-      throw new Conflict('Пользователь с такой почтой уже существует.');
-    }
-
-    const hashedPassword = bcrypt.hashSync(password, 8);
-
-    const user = await UserRepository.createUser({
-      username,
-      email,
-      hashedPassword,
-      role,
-    });
-
-    const payload = { id: user.id, username, email };
+  static async addNewProduct({ id, username, email, fingerprint, product }) {
+    const products = await ProductsRepository.addNewProductData(product);
+    const payload = { id, username, email };
 
     const accessToken = await TokenService.generateAccessToken(payload);
     const refreshToken = await TokenService.generateRefreshToken(payload);
 
     await RefreshSessionsRepository.createRefreshSession({
-      user_id: user.id,
+      user_id: id,
       refresh_token: refreshToken,
       finger_print: fingerprint,
     });
+
     return {
-      user,
+      products,
       accessToken,
       refreshToken,
       accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,

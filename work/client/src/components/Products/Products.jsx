@@ -102,9 +102,9 @@ export const COLUMNS = [
 
 function Products() {
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.products);
+  const products = useSelector((state) => state.products).filter((el) => el != null);
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => products, []);
+  const data = useMemo(() => products, [products]);
 
   const tableInstance = useTable({
     columns,
@@ -115,7 +115,6 @@ function Products() {
     tableInstance;
 
   useEffect(() => {
-    console.log('PRODUCTS');
     dispatch(getAllProducts());
   }, [dispatch]);
   return (
