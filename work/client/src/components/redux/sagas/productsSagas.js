@@ -8,7 +8,7 @@ import {
   GET_ALL_PRODUCTS,
   NEW_PRODUCT,
 } from '../types/productsTypes';
-import { useState } from 'react';
+// import { useState } from 'react';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -51,7 +51,6 @@ const addNewProduct = (product) => {
 
 function* getAllProductsWatcher(action) {
   try {
-    // console.log('GET ALL PROD WATCH', action.payload);
     const products = yield call(getAllProducts, action.payload);
 
     yield put({ type: ALL_PRODUCTS, payload: products });
@@ -61,6 +60,7 @@ function* getAllProductsWatcher(action) {
 }
 function* addNewProductWatcher(action) {
   try {
+    console.log(action.payload);
     const products = yield call(addNewProduct, action.payload);
 
     yield put({ type: NEW_PRODUCT, payload: products });
