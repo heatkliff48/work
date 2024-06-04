@@ -6,7 +6,30 @@ class ProductController {
   static async getAllProduct(req, res) {
     const fingerprint = req.fingerprint.hash;
 
-    const { id, username, email } = req.user;
+    const { 
+      version,
+      density,
+      form,
+      certificate,
+      width,
+      lengths,
+      height,
+      tradingMark,
+      m3,
+      m2,
+      m,
+      widthInArray,
+      m3InArray,
+      densityInDryMax,
+      dinsityInDryDef,
+      humidity,
+      densityHumidityMax,
+      densityHuminityDef,
+      weightMax,
+      weightDef,
+      normOfBrack,
+      coefficientOfFree
+    } = req.product;
     try {
       const { accessToken, refreshToken, accessTokenExpiration, products } =
         await ProductService.getAllProduct({ id, username, email, fingerprint });
