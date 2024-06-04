@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       density: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       form: {
         type: Sequelize.STRING
@@ -22,52 +22,52 @@ module.exports = {
         type: Sequelize.STRING
       },
       width: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       lengths: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       height: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       tradingMark: {
         type: Sequelize.STRING
       },
       m3: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       m2: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       m: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       widthInArray: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       m3InArray: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       densityInDryMax: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       dinsityInDryDef: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       humidity: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       densityHumidityMax: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       densityHuminityDef: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       weightMax: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       weightDef: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT
       },
       normOfBrack: {
         type: Sequelize.INTEGER

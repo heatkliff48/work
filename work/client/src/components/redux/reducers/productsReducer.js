@@ -4,6 +4,7 @@ export const productsReducer = (products = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case ALL_PRODUCTS: {
+      console.log('PRODUCTREDUCER', payload);
       return payload;
     }
     case NEW_PRODUCT: {

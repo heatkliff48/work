@@ -10,7 +10,6 @@ class ProductController {
       const { accessToken, refreshToken, accessTokenExpiration, products } =
         await ProductService.getAllProduct({ id, username, email, fingerprint });
 
-      console.log('ProductController>>>>>>>>>>', products);
       return res
         .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
         .status(200)
@@ -21,42 +20,18 @@ class ProductController {
   }
 
   static async addProduct(req, res) {
-    console.log('ReQ.BODY', req.body);
-    const {
-      version,
-      density,
-      form,
-      certificate,
-      width,
-      lengths,
-      height,
-      tradingMark,
-      m3,
-      m2,
-      m,
-      widthInArray,
-      m3InArray,
-      densityInDryMax,
-      dinsityInDryDef,
-      humidity,
-      densityHumidityMax,
-      densityHuminityDef,
-      weightMax,
-      weightDef,
-      normOfBrack,
-      coefficientOfFree,
-    } = req.body.products;
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;
+    const { product } = req.body;
 
     try {
-
       const { accessToken, refreshToken, accessTokenExpiration, products } =
         await ProductService.addNewProduct({
           id,
           username,
           email,
-          fingerprint: fingerprint.hash,
+          fingerprint,
+          product,
         });
       return res
         .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)

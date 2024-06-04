@@ -6,6 +6,10 @@ class ProductsRepository {
 
     return products;
   }
+  static async addNewProductData(newProduct) {
+    const product = await Products.create(newProduct);
+    return product;
+  }
 }
 
 module.exports = ProductsRepository;

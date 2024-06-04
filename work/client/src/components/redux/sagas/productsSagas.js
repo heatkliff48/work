@@ -17,7 +17,6 @@ const url = axios.create({
 
 url.interceptors.request.use(
   (config) => {
-
     const accessToken = inMemoryJWT.getToken();
     if (accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
 
@@ -33,6 +32,7 @@ const getAllProducts = () => {
       const { accessToken, accessTokenExpiration } = res.data;
 
       inMemoryJWT.setToken(accessToken, accessTokenExpiration);
+      console.log('ProductsSaga', res.data.products);
       return res.data.products;
     })
     .catch(showErrorMessage);
