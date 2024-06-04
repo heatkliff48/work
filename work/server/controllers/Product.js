@@ -5,8 +5,24 @@ const { COOKIE_SETTINGS } = require('../constants.js');
 class ProductController {
   static async getAllProduct(req, res) {
     const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration, products } =
+        await ProductService.getAllProduct({ id, username, email, fingerprint });
 
-    const { 
+      console.log('ProductController>>>>>>>>>>', products);
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ products, accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async addProduct(req, res) {
+    console.log('ReQ.BODY', req.body);
+    const {
       version,
       density,
       form,
@@ -28,13 +44,20 @@ class ProductController {
       weightMax,
       weightDef,
       normOfBrack,
-      coefficientOfFree
-    } = req.product;
-    try {
-      const { accessToken, refreshToken, accessTokenExpiration, products } =
-        await ProductService.getAllProduct({ id, username, email, fingerprint });
+      coefficientOfFree,
+    } = req.body.products;
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
 
-      console.log('ProductController>>>>>>>>>>', products);
+    try {
+
+      const { accessToken, refreshToken, accessTokenExpiration, products } =
+        await ProductService.addNewProduct({
+          id,
+          username,
+          email,
+          fingerprint: fingerprint.hash,
+        });
       return res
         .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
         .status(200)
@@ -42,26 +65,6 @@ class ProductController {
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
-  }
-
-  static async addProduct(req, res) {
-    // const { username, password, email } = req.body.user;
-    // const { fingerprint } = req;
-    // try {
-    //   const { accessToken, refreshToken, accessTokenExpiration, user } =
-    //     await ProductService.signUp({
-    //       username,
-    //       password,
-    //       email,
-    //       fingerprint: fingerprint.hash,
-    //     });
-    //   return res
-    //     .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-    //     .status(200)
-    //     .json({ user, accessToken, accessTokenExpiration });
-    // } catch (err) {
-    //   return ErrorUtils.catchError(res, err);
-    // }
   }
 
   // static async delProduct(req, res) {

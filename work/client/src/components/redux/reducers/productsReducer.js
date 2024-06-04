@@ -4,7 +4,7 @@ export const productsReducer = (products = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case ALL_PRODUCTS: {
-      return payload ?? products;
+      return payload;
     }
     case NEW_PRODUCT: {
       return [...products, payload];

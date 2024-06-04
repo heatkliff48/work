@@ -27,66 +27,66 @@ app.use(
 );
 
 app.use('/auth', AuthRootRouter);
-//app.use('/products', TokenService.checkAccess, ProductRootRouter);
+app.use('/products', TokenService.checkAccess, ProductRootRouter);
 
-app.post('/products', async(req, res) => {
-  const { 
-    version,
-    density,
-    form,
-    certificate,
-    width,
-    lengths,
-    height,
-    tradingMark,
-    m3,
-    m2,
-    m,
-    widthInArray,
-    m3InArray,
-    densityInDryMax,
-    dinsityInDryDef,
-    humidity,
-    densityHumidityMax,
-    densityHuminityDef,
-    weightMax,
-    weightDef,
-    normOfBrack,
-    coefficientOfFree
-  } = req.body;
+// app.post('/products', async(req, res) => {
+//   const { 
+//     version,
+//     density,
+//     form,
+//     certificate,
+//     width,
+//     lengths,
+//     height,
+//     tradingMark,
+//     m3,
+//     m2,
+//     m,
+//     widthInArray,
+//     m3InArray,
+//     densityInDryMax,
+//     dinsityInDryDef,
+//     humidity,
+//     densityHumidityMax,
+//     densityHuminityDef,
+//     weightMax,
+//     weightDef,
+//     normOfBrack,
+//     coefficientOfFree
+//   } = req.body;
 
-  try {
-    const product = await Products.create({
-      version,
-      density,
-      form,
-      certificate,
-      width,
-      lengths,
-      height,
-      tradingMark,
-      m3,
-      m2,
-      m,
-      widthInArray,
-      m3InArray,
-      densityInDryMax,
-      dinsityInDryDef,
-      humidity,
-      densityHumidityMax,
-      densityHuminityDef,
-      weightMax,
-      weightDef,
-      normOfBrack,
-      coefficientOfFree
-    })
+//   try {
+//     const product = await Products.create({
+//       version,
+//       density,
+//       form,
+//       certificate,
+//       width,
+//       lengths,
+//       height,
+//       tradingMark,
+//       m3,
+//       m2,
+//       m,
+//       widthInArray,
+//       m3InArray,
+//       densityInDryMax,
+//       dinsityInDryDef,
+//       humidity,
+//       densityHumidityMax,
+//       densityHuminityDef,
+//       weightMax,
+//       weightDef,
+//       normOfBrack,
+//       coefficientOfFree
+//     })
 
-    return res.json(product)
-  } catch (err) {
-    console.log(err)
-    return res.status(500).json(err)
-  }
-})
+//     return res.json(product)
+//   } catch (err) {
+//     console.log(err)
+//     return res.status(500).json(err)
+//   }
+// })
 
 // app.post('/products', async(req, res) => {
 //   const { 
