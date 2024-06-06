@@ -19,7 +19,6 @@ class AuthController {
         .status(200)
         .json({ user, accessToken, accessTokenExpiration });
     } catch (err) {
-      console.log('>>>>>>>>>>>>CONTROLLER ERROR<<<<<<<<<<<<', err);
       return ErrorUtils.catchError(res, err);
     }
   }
@@ -49,7 +48,6 @@ class AuthController {
     const refreshToken = req.cookies.refreshToken;
     try {
       await AuthService.logOut(refreshToken);
-      res.locals.user = null;
 
       return res.clearCookie('refreshToken').sendStatus(200);
     } catch (err) {

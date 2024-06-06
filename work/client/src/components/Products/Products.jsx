@@ -102,6 +102,7 @@ export const COLUMNS = [
 
 function Products() {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   const products = useSelector((state) => state.products).filter((el) => el != null);
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => products, [products]);
@@ -115,28 +116,44 @@ function Products() {
     tableInstance;
 
   useEffect(() => {
-    dispatch(getAllProducts());
-  }, [dispatch]);
+    dispatch(getAllProducts(user));
+  }, []);
   return (
     <>
       <ModalWindow list={COLUMNS} />
       <table {...getTableProps()}>
         <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-              ))}
-            </tr>
-          ))}
+          {headerGroups.map((headerGroup) => {
+            const { key, ...restProps } = headerGroup.getHeaderGroupProps();
+            return (
+              <tr key={key} {...restProps}>
+                {headerGroup.headers.map((column) => {
+                  const { key, ...restProps } = column.getHeaderProps();
+                  return (
+                    <th key={key} {...restProps}>
+                      {column.render('Header')}
+                    </th>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </thead>
-        <tbody {...getTableBodyProps()}>
+        <tbody key={getTableBodyProps().key} {...getTableBodyProps()}>
           {rows.map((row) => {
             prepareRow(row);
+            const { key, ...restProps } = row.getRowProps();
+
             return (
-              <tr {...row.getRowProps()}>
+              <tr key={key} {...restProps}>
                 {row.cells.map((cell) => {
-                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
+                  const { key, ...restProps } = cell.getCellProps();
+
+                  return (
+                    <td key={key} {...restProps}>
+                      {cell.render('Cell')}
+                    </td>
+                  );
                 })}
               </tr>
             );

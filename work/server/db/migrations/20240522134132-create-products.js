@@ -48,16 +48,16 @@ module.exports = {
       m3InArray: {
         type: Sequelize.FLOAT
       },
-      densityInDryMax: {
+      densityDryMax: {
         type: Sequelize.FLOAT
       },
-      dinsityInDryDef: {
+      densityDryDef: {
         type: Sequelize.FLOAT
       },
       humidity: {
         type: Sequelize.FLOAT
       },
-      densityHumidityMax: {
+      densityHuminityMax: {
         type: Sequelize.FLOAT
       },
       densityHuminityDef: {

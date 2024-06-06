@@ -4,23 +4,17 @@ import Select from 'react-select';
 import { setModalWindow } from '../redux/actions/modalAction';
 import { useEffect, useState } from 'react';
 import { addNewProduct } from '../redux/actions/productsAction';
+import UpdateModalWindow from './UpdateModalWindow';
+import { setUpdateModalWindow } from '../redux/actions/modalUpdateAction';
 
 const ModalWindow = ({ list }) => {
-  const [m3Value, setM3Value] = useState(0);
-  const [m2Value, setM2Value] = useState(0);
-  const [mValue, setMValue] = useState(0);
-  const [widthInArrayValue, setWidthInArrayValue] = useState(0);
-  const [m3InArrayValue, setM3InArrayValue] = useState(0);
-  const [densityDryMaxValue, setDensityDryMaxValue] = useState(0);
-  const [densityDryDefValue, setDensityDryDefValue] = useState(0);
-  const [densityHuminityMaxValue, setDensityHuminityMaxValue] = useState(0);
-  const [densityHuminityDefValue, setDensityHuminityDefValue] = useState(0);
-  const [weightMaxValue, setWeightMaxValue] = useState(0);
-  const [weightDefValue, setWeightDefValue] = useState(0);
-
   const [value, setValue] = useState('default');
   const [formInput, setForm] = useState({});
+  const [haveMath, setHaveMath] = useState({});
+  const [trMark, setTrMark] = useState('');
   const modal = useSelector((state) => state.modal);
+  const user = useSelector((state) => state.user);
+  const products = useSelector((state) => state.products);
   const dispatch = useDispatch();
 
   const selectValue = {
@@ -37,26 +31,6 @@ const ModalWindow = ({ list }) => {
     ],
   };
 
-  const haveMath = {
-    m3: { value: m3Value, func: setM3Value },
-    m2: { value: m2Value, func: setM2Value },
-    m: { value: mValue, func: setMValue },
-    widthInArray: { value: widthInArrayValue, func: setWidthInArrayValue },
-    m3InArray: { value: m3InArrayValue, func: setM3InArrayValue },
-    densityDryMax: { value: densityDryMaxValue, func: setDensityDryMaxValue },
-    densityDryDef: { value: densityDryDefValue, func: setDensityDryDefValue },
-    densityHuminityMax: {
-      value: densityHuminityMaxValue,
-      func: setDensityHuminityMaxValue,
-    },
-    densityHuminityDef: {
-      value: densityHuminityDefValue,
-      func: setDensityHuminityDefValue,
-    },
-    weightMax: { value: weightMaxValue, func: setWeightMaxValue },
-    weightDef: { value: weightDefValue, func: setWeightDefValue },
-  };
-
   const inputChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -66,132 +40,175 @@ const ModalWindow = ({ list }) => {
     setForm((prev) => ({ ...prev, [key]: v.value }));
   };
 
+  const updateProductHandler = () => {
+    for (let i = 0; i < products.length; i++) {
+      if (
+        formInput.density == products[i].density &&
+        formInput.form == products[i].form &&
+        formInput.width == products[i].width &&
+        formInput.height == products[i].height &&
+        formInput.lengths == products[i].lengths &&
+        formInput.certificate == products[i].certificate
+      ) {
+        dispatch(setUpdateModalWindow(true));
+      } else {
+        dispatch(addNewProduct({ product: formInput, user }));
+      }
+    }
+  };
+
   const getValue = (selVal) =>
     value ? selectValue[selVal].find((e) => e.value === value) : '';
 
+  const calculateValues = (formInput) => {
+    const values = {};
+    const updateFuncs = {};
+
+    // Вычисление m3
+    if (formInput['lengths'] && formInput['height'] && formInput['width']) {
+      values.m3 =
+        Math.floor(1200 / formInput['lengths']) *
+        Math.floor(1000 / formInput['height']) *
+        Math.floor(1500 / formInput['width']) *
+        ((formInput['lengths'] * formInput['height'] * formInput['width']) /
+          Math.pow(10, 9));
+      updateFuncs.m3 = (value) => setForm((prev) => ({ ...prev, m3: value }));
+    }
+
+    // Вычисление m2
+    if (values.m3 && formInput['width']) {
+      values.m2 = values.m3 / (formInput['width'] / 1000);
+      updateFuncs.m2 = (value) => setForm((prev) => ({ ...prev, m2: value }));
+    }
+
+    // Вычисление m
+    if (values.m2 && formInput['height']) {
+      values.m = values.m2 / (formInput['height'] / 1000);
+      updateFuncs.m = (value) => setForm((prev) => ({ ...prev, m: value }));
+    }
+
+    // Вычисление widthInArray
+    if (formInput['width']) {
+      values.widthInArray = Math.floor(1500 / formInput['width']);
+      updateFuncs.widthInArray = (value) =>
+        setForm((prev) => ({ ...prev, widthInArray: value }));
+    }
+
+    // Вычисление m3InArray
+    if (
+      formInput['lengths'] &&
+      formInput['height'] &&
+      formInput['width'] &&
+      values.widthInArray
+    ) {
+      values.m3InArray =
+        Math.floor(600 / formInput['lengths']) *
+        Math.floor(6000 / formInput['height']) *
+        values.widthInArray *
+        ((formInput['lengths'] * formInput['height'] * formInput['width']) /
+          Math.pow(10, 9));
+      updateFuncs.m3InArray = (value) =>
+        setForm((prev) => ({ ...prev, m3InArray: value }));
+    }
+
+    // Вычисление densityDryMax
+    if (formInput['density']) {
+      values.densityDryMax = formInput['density'] * 1.25;
+      updateFuncs.densityDryMax = (value) =>
+        setForm((prev) => ({ ...prev, densityDryMax: value }));
+    }
+
+    // Вычисление densityDryDef
+    if (formInput['density']) {
+      values.densityDryDef = formInput['density'] * 1.05;
+      updateFuncs.densityDryDef = (value) =>
+        setForm((prev) => ({ ...prev, densityDryDef: value }));
+    }
+
+    // Вычисление densityHuminityMax
+    if (formInput['humidity'] && values.densityDryMax) {
+      values.densityHuminityMax =
+        (1.05 + formInput['humidity']) * values.densityDryMax;
+      updateFuncs.densityHuminityMax = (value) =>
+        setForm((prev) => ({ ...prev, densityHuminityMax: value }));
+    }
+
+    // Вычисление densityHuminityDef
+    if (formInput['humidity'] && values.densityDryDef) {
+      values.densityHuminityDef = (1 + formInput['humidity']) * values.densityDryDef;
+      updateFuncs.densityHuminityDef = (value) =>
+        setForm((prev) => ({ ...prev, densityHuminityDef: value }));
+    }
+
+    // Вычисление weightMax
+    if (values.densityHuminityMax && values.m3) {
+      values.weightMax = values.densityHuminityMax * values.m3 + 23;
+      updateFuncs.weightMax = (value) =>
+        setForm((prev) => ({ ...prev, weightMax: value }));
+    }
+
+    // Вычисление weightDef
+    if (values.densityHuminityDef && values.m3) {
+      values.weightDef = values.densityHuminityDef * values.m3 + 23;
+      updateFuncs.weightDef = (value) =>
+        setForm((prev) => ({ ...prev, weightDef: value }));
+    }
+
+    return { values, updateFuncs };
+  };
+
+  const treadingMarkHandler = () => {
+    if (formInput.density < 200) {
+      setTrMark('SA-TEC');
+    } else if (formInput.density >= 200 && formInput.density < 360) {
+      setTrMark('Termeco');
+    } else if (formInput.density >= 360 && formInput.density < 460) {
+      setTrMark('Utilitas');
+    } else {
+      setTrMark('Silenso');
+    }
+
+    if (formInput.form === 'U-block') {
+      setTrMark('U-TEC');
+    } else if (formInput.form === 'Lintel') {
+      setTrMark('L-TEC');
+    } else if (formInput.form === 'Forjado') {
+      setTrMark('Forja-TEC');
+    }
+  };
+
   useEffect(() => {
-    setM3Value(() => {
-      if (formInput['lengths'] && formInput['height'] && formInput['width']) {
-        let result =
-          Math.floor(1200 / formInput['lengths']) *
-          Math.floor(1000 / formInput['height']) *
-          Math.floor(1500 / formInput['width']) *
-          ((formInput['lengths'] * formInput['height'] * formInput['width']) /
-            Math.pow(10, 9));
-        setForm((prev) => ({ ...prev, m3: result }));
-        return result;
-      }
-      return 0;
-    });
-    setM2Value(() => {
-      if (m3Value && formInput['width']) {
-        let result = m3Value / (formInput['width'] / 1000);
-        setForm((prev) => ({ ...prev, m2: result }));
-        return result;
-      }
-      return 0;
-    });
-    setMValue(() => {
-      if (m2Value && formInput['height']) {
-        let result = m2Value / (formInput['height'] / 1000);
-        setForm((prev) => ({ ...prev, m: result }));
-        return result;
-      }
-      return 0;
-    });
-    setWidthInArrayValue(() => {
-      if (formInput['width']) {
-        let result = Math.floor(1500 / formInput['width']);
-        setForm((prev) => ({ ...prev, widthInArray: result }));
-        return result;
-      }
+    treadingMarkHandler();
+    setForm(trMark);
+  }, [formInput.density, formInput.form]);
 
-      return 0;
-    });
-    setM3InArrayValue(() => {
-      if (
-        formInput['lengths'] &&
-        formInput['height'] &&
-        formInput['width'] &&
-        widthInArrayValue
-      ) {
-        let result =
-          Math.floor(600 / formInput['lengths']) *
-          Math.floor(6000 / formInput['height']) *
-          widthInArrayValue *
-          ((formInput['lengths'] * formInput['height'] * formInput['width']) /
-            Math.pow(10, 9));
-        setForm((prev) => ({ ...prev, m3InArray: result }));
-        return result;
-      }
+  useEffect(() => {
+    const { values, updateFuncs } = calculateValues(formInput);
+    const newHaveMath = {};
 
-      return 0;
+    Object.keys(values).forEach((key) => {
+      newHaveMath[key] = {
+        value: values[key],
+        func: updateFuncs[key],
+      };
     });
-    setDensityDryMaxValue(() => {
-      if (formInput['density']) {
-        let result = formInput['density'] * 1.25;
-        setForm((prev) => ({ ...prev, densityDryMax: result }));
-        return result;
-      }
-      return 0;
+
+    setHaveMath(newHaveMath);
+    Object.keys(updateFuncs).forEach((key) => {
+      updateFuncs[key](values[key]);
     });
-    setDensityDryDefValue(() => {
-      if (formInput['density']) {
-        let result = formInput['density'] * 1.05;
-        setForm((prev) => ({ ...prev, densityDryDef: result }));
-        return result;
-      }
-      return 0;
-    });
-    setDensityHuminityMaxValue(() => {
-      if (formInput['humidity'] && densityDryMaxValue) {
-        let result = (1.05 + formInput['humidity']) * densityDryMaxValue;
-        setForm((prev) => ({ ...prev, densityHuminityMax: result }));
-        return result;
-      }
-      return 0;
-    });
-    setDensityHuminityDefValue(() => {
-      if (formInput['humidity'] && densityDryDefValue) {
-        let result = (1 + formInput['humidity']) * densityDryDefValue;
-        setForm((prev) => ({ ...prev, densityHuminityDef: result }));
-        return result;
-      }
-      return 0;
-    });
-    setWeightMaxValue(() => {
-      if (densityHuminityMaxValue && m3Value) {
-        let result = densityHuminityMaxValue * m3Value + 23;
-        setForm((prev) => ({ ...prev, weightMax: result }));
-        return result;
-      }
-      return 0;
-    });
-    setWeightDefValue(() => {
-      if (densityHuminityDefValue && m3Value) {
-        let result = densityHuminityDefValue * m3Value + 23;
-        setForm((prev) => ({ ...prev, weightDef: result }));
-        return result;
-      }
-      return 0;
-    });
-  }, [
-    densityDryDefValue,
-    densityDryMaxValue,
-    densityHuminityDefValue,
-    densityHuminityMaxValue,
-    formInput,
-    m2Value,
-    m3Value,
-    widthInArrayValue,
-  ]);
+  }, [formInput]);
 
   return (
     <div>
+      <UpdateModalWindow />
       <Modal
         isOpen={modal}
         toggle={() => {
           dispatch(setModalWindow(!modal));
+          setForm({});
+          setTrMark('');
+          setHaveMath({});
         }}
       >
         <ModalHeader
@@ -204,9 +221,36 @@ const ModalWindow = ({ list }) => {
         <div className="item">
           {list.map((el) => {
             if (el.accessor === 'id') return;
-            if (selectValue[el.accessor]) {
+            if (el.accessor === 'version') {
+              return (
+                <div className="item_topic">
+                  <ModalBody key={el.id}>{el.Header}:</ModalBody>
+                  <input
+                    type="text"
+                    id={el.accessor}
+                    name={el.accessor}
+                    value={trMark}
+                    readOnly
+                  />
+                </div>
+              );
+            } else if (el.accessor === 'tradingMark') {
+              return (
+                <div className="item_topic">
+                  <ModalBody key={el.id}>{el.Header}:</ModalBody>
+                  <input
+                    type="text"
+                    id={el.accessor}
+                    name={el.accessor}
+                    value={trMark}
+                    readOnly
+                  />
+                </div>
+              );
+            } else if (selectValue[el.accessor]) {
               return (
                 <div className="item_select">
+                  <ModalBody key={el.id}>{el.Header}:</ModalBody>
                   <Select
                     key={el.id}
                     value={getValue(el.accessor)}
@@ -218,8 +262,7 @@ const ModalWindow = ({ list }) => {
                   />
                 </div>
               );
-            }
-            if (haveMath[el.accessor]) {
+            } else if (haveMath[el.accessor]) {
               return (
                 <div className="item_topic">
                   <ModalBody key={el.id}>{el.Header}:</ModalBody>
@@ -228,23 +271,22 @@ const ModalWindow = ({ list }) => {
                     id={el.accessor}
                     name={el.accessor}
                     value={haveMath[el.accessor].value}
-                    readOnly
                   />
                 </div>
               );
-            }
-            return (
-              <div className="item_topic">
-                <ModalBody key={el.id}>{el.Header}:</ModalBody>
-                <input
-                  type="text"
-                  id={el.accessor}
-                  name={el.accessor}
-                  value={formInput[el.accessor] || ''}
-                  onChange={inputChange}
-                />
-              </div>
-            );
+            } else
+              return (
+                <div className="item_topic">
+                  <ModalBody key={el.id}>{el.Header}:</ModalBody>
+                  <input
+                    type="text"
+                    id={el.accessor}
+                    name={el.accessor}
+                    value={formInput[el.accessor] || ''}
+                    onChange={inputChange}
+                  />
+                </div>
+              );
           })}
         </div>
 
@@ -252,7 +294,7 @@ const ModalWindow = ({ list }) => {
           <Button
             color="primary"
             onClick={() => {
-              dispatch(addNewProduct(formInput));
+              updateProductHandler();
               setForm({});
               dispatch(setModalWindow(!modal));
             }}
