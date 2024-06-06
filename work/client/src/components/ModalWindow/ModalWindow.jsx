@@ -1,19 +1,25 @@
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
-import { setModalWindow } from '../redux/actions/modalAction';
 import { useEffect, useState } from 'react';
 import { addNewProduct } from '../redux/actions/productsAction';
 import UpdateModalWindow from './UpdateModalWindow';
-import { setUpdateModalWindow } from '../redux/actions/modalUpdateAction';
+import { useProductContext } from '../contexts/Context';
 
 const ModalWindow = ({ list }) => {
   const [value, setValue] = useState('default');
   const [formInput, setForm] = useState({});
   const [haveMath, setHaveMath] = useState({});
   const [trMark, setTrMark] = useState('');
-  const [version, setVersion] = useState(1);
-  const modal = useSelector((state) => state.modal);
+  const {
+    version,
+    setPromProduct,
+    modal,
+    setModal,
+    modalUpdate,
+    setModalUpdate,
+    promProduct,
+  } = useProductContext();
   const user = useSelector((state) => state.user);
   const products = useSelector((state) => state.products);
   const dispatch = useDispatch();
@@ -41,7 +47,16 @@ const ModalWindow = ({ list }) => {
     setForm((prev) => ({ ...prev, [key]: v.value }));
   };
 
+  const clearData = () => {
+    setHaveMath({});
+    setTrMark('');
+    setValue('default');
+    setForm({});
+  };
+
   const updateProductHandler = () => {
+    let upd = false;
+
     for (let i = 0; i < products.length; i++) {
       if (
         formInput.density == products[i].density &&
@@ -51,11 +66,12 @@ const ModalWindow = ({ list }) => {
         formInput.lengths == products[i].lengths &&
         formInput.certificate == products[i].certificate
       ) {
-        dispatch(setUpdateModalWindow(true));
-      } else {
-        dispatch(addNewProduct({ product: formInput, user }));
+        upd = true;
+        setPromProduct({ ...formInput, id: products[i].id });
+        setModalUpdate(!modalUpdate);
       }
     }
+    if (!upd) dispatch(addNewProduct({ product: formInput, user }));
   };
 
   const getValue = (selVal) =>
@@ -112,7 +128,6 @@ const ModalWindow = ({ list }) => {
         setForm((prev) => ({ ...prev, m3InArray: value }));
     }
 
-    // Вычисление densityDryMax
     if (formInput['density']) {
       values.densityDryMax = formInput['density'] * 1.25;
       updateFuncs.densityDryMax = (value) =>
@@ -165,8 +180,10 @@ const ModalWindow = ({ list }) => {
       setTrMark('Termeco');
     } else if (formInput.density >= 360 && formInput.density < 460) {
       setTrMark('Utilitas');
-    } else {
+    } else if (formInput.density > 460) {
       setTrMark('Silenso');
+    } else {
+      setTrMark('');
     }
 
     if (formInput.form === 'U-block') {
@@ -180,7 +197,7 @@ const ModalWindow = ({ list }) => {
 
   useEffect(() => {
     treadingMarkHandler();
-    setForm(trMark);
+    setForm((prev) => ({ ...prev, tradingMark: trMark }));
   }, [formInput.density, formInput.form]);
 
   useEffect(() => {
@@ -204,21 +221,21 @@ const ModalWindow = ({ list }) => {
     setForm((prev) => ({ ...prev, version }));
   }, [version]);
 
+
   return (
     <div>
-      <UpdateModalWindow product={formInput} />
+      {modalUpdate && <UpdateModalWindow />}
       <Modal
         isOpen={modal}
         toggle={() => {
-          dispatch(setModalWindow(!modal));
-          setForm({});
-          setTrMark('');
-          setHaveMath({});
+          setModal(!modal);
+          clearData();
         }}
       >
         <ModalHeader
           toggle={() => {
-            dispatch(setModalWindow(!modal));
+            setModal(!modal);
+            clearData();
           }}
         >
           New product
@@ -300,8 +317,8 @@ const ModalWindow = ({ list }) => {
             color="primary"
             onClick={() => {
               updateProductHandler();
-              setForm({});
-              dispatch(setModalWindow(!modal));
+              clearData();
+              setModal(!modal);
             }}
           >
             Add

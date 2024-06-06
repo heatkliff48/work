@@ -42,6 +42,30 @@ class ProductController {
     }
   }
 
+  static async updateProduct(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.body.user;
+    const { product } = req.body;
+
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration, products } =
+        await ProductService.updateProduct({
+          id,
+          username,
+          email,
+          fingerprint,
+          product,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ products, accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   // static async delProduct(req, res) {
   //   const { fingerprint } = req;
   //   const refreshToken = req.cookies.refreshToken;
