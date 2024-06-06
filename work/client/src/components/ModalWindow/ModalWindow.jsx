@@ -12,6 +12,7 @@ const ModalWindow = ({ list }) => {
   const [formInput, setForm] = useState({});
   const [haveMath, setHaveMath] = useState({});
   const [trMark, setTrMark] = useState('');
+  const [version, setVersion] = useState(1);
   const modal = useSelector((state) => state.modal);
   const user = useSelector((state) => state.user);
   const products = useSelector((state) => state.products);
@@ -199,9 +200,13 @@ const ModalWindow = ({ list }) => {
     });
   }, [formInput]);
 
+  useEffect(() => {
+    setForm((prev) => ({ ...prev, version }));
+  }, [version]);
+
   return (
     <div>
-      <UpdateModalWindow />
+      <UpdateModalWindow product={formInput} />
       <Modal
         isOpen={modal}
         toggle={() => {
@@ -229,7 +234,7 @@ const ModalWindow = ({ list }) => {
                     type="text"
                     id={el.accessor}
                     name={el.accessor}
-                    value={trMark}
+                    value={version}
                     readOnly
                   />
                 </div>

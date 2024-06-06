@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { addNewProduct } from '../redux/actions/productsAction';
 import { setUpdateModalWindow } from '../redux/actions/modalUpdateAction';
 
-function UpdateModalWindow() {
+function UpdateModalWindow({ product }) {
   const modalUpdate = useSelector((state) => state.modalUpdate);
   const dispatch = useDispatch();
+  console.log(product);
 
   return (
     <div>
@@ -21,9 +22,12 @@ function UpdateModalWindow() {
             dispatch(setUpdateModalWindow(!modalUpdate));
           }}
         >
-          1 === 1
+          Внимание
         </modalUpdateHeader>
-        <ModalBody>kek</ModalBody>
+        <ModalBody>
+          Продукт с такими параметрами уже существует. Можете обновить или вернуться
+          назад.
+        </ModalBody>
         <ModalFooter>
           <Button
             color="primary"
@@ -31,7 +35,15 @@ function UpdateModalWindow() {
               dispatch(setUpdateModalWindow(!modalUpdate));
             }}
           >
-            cancel
+            Назад
+          </Button>
+          <Button
+            color="primary"
+            onClick={() => {
+              dispatch(setUpdateModalWindow(!modalUpdate));
+            }}
+          >
+            Обновить
           </Button>
         </ModalFooter>
       </Modal>
