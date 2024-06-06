@@ -3,3 +3,6 @@ export const ALL_PRODUCTS = 'ALL_PRODUCTS';
 
 export const ADD_NEW_PRODUCT = 'ADD_NEW_PRODUCT';
 export const NEW_PRODUCT = 'NEW_PRODUCT';
+
+export const NEED_UPDATE_PRODUCT = 'NEED_UPDATE_PRODUCT';
+export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';

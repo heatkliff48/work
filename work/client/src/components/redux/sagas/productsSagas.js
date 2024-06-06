@@ -5,7 +5,9 @@ import {
   ADD_NEW_PRODUCT,
   ALL_PRODUCTS,
   GET_ALL_PRODUCTS,
+  NEED_UPDATE_PRODUCT,
   NEW_PRODUCT,
+  UPDATE_PRODUCT,
 } from '../types/productsTypes';
 import { setToken } from '../actions/jwtAction';
 
@@ -38,6 +40,16 @@ const getAllProducts = (user) => {
     })
     .catch(showErrorMessage);
 };
+
+const updateProducts = ({ product, user }) => {
+  return url
+    .post('/products/upd', { product, user })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
 const addNewProduct = ({ product, user }) => {
   return url
     .post('/products/add', { product, user })
@@ -58,6 +70,18 @@ function* getAllProductsWatcher(action) {
     yield put({ type: ALL_PRODUCTS, payload: [] });
   }
 }
+
+function* updateProductWatcher(action) {
+  try {
+    const data = yield call(updateProducts, action.payload);
+
+    yield put({ type: UPDATE_PRODUCT, payload: data.products });
+    yield put(setToken(data.accessToken, data.accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: UPDATE_PRODUCT, payload: [] });
+  }
+}
+
 function* addNewProductWatcher(action) {
   try {
     console.log(action.payload);
@@ -76,6 +100,7 @@ function* addNewProductWatcher(action) {
 function* productsWatcher() {
   yield takeLatest(GET_ALL_PRODUCTS, getAllProductsWatcher);
   yield takeLatest(ADD_NEW_PRODUCT, addNewProductWatcher);
+  yield takeLatest(NEED_UPDATE_PRODUCT, updateProductWatcher);
 }
 
 export default productsWatcher;

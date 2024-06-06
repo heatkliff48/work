@@ -28,8 +28,27 @@ class ProductService {
 
   static async addNewProduct({ id, username, email, fingerprint, product }) {
     const products = await ProductsRepository.addNewProductData(product);
-    console.log('>>>>>>>>>>>>>>PRODUCTS add<<<<<<<<<<<<', products);
+    const payload = { id, username, email };
 
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      products,
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
+  static async updateProduct({ id, username, email, fingerprint, product }) {
+    const products = await ProductsRepository.updateProductData(product);
     const payload = { id, username, email };
 
     const accessToken = await TokenService.generateAccessToken(payload);

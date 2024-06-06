@@ -3,8 +3,8 @@ import { useEffect, useMemo } from 'react';
 import { useTable } from 'react-table';
 import './products.css';
 import { getAllProducts } from '../redux/actions/productsAction';
-import { setModalWindow } from '../redux/actions/modalAction';
 import ModalWindow from '../ModalWindow/ModalWindow';
+import { useProductContext } from '../contexts/Context';
 export const COLUMNS = [
   {
     Header: 'Id',
@@ -102,8 +102,9 @@ export const COLUMNS = [
 
 function Products() {
   const dispatch = useDispatch();
+  const { modal, setModal, modalUpdate } = useProductContext();
   const user = useSelector((state) => state.user);
-  const products = useSelector((state) => state.products).filter((el) => el != null);
+  const products = useSelector((state) => state.products);
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => products, [products]);
 
@@ -117,7 +118,8 @@ function Products() {
 
   useEffect(() => {
     dispatch(getAllProducts(user));
-  }, []);
+    console.log('PRODUCT', products);
+  }, [modalUpdate]);
   return (
     <>
       <ModalWindow list={COLUMNS} />
@@ -160,7 +162,7 @@ function Products() {
           })}
         </tbody>
       </table>
-      <button onClick={() => dispatch(setModalWindow(true))}>Add product new</button>
+      <button onClick={() => setModal(!modal)}>Add product new</button>
     </>
   );
 }

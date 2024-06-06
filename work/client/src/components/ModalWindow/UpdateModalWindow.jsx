@@ -1,29 +1,49 @@
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
-import { addNewProduct } from '../redux/actions/productsAction';
-import { setUpdateModalWindow } from '../redux/actions/modalUpdateAction';
+import { updateProduct } from '../redux/actions/productsAction';
+import { useProductContext } from '../contexts/Context';
 
-function UpdateModalWindow({ product }) {
-  const modalUpdate = useSelector((state) => state.modalUpdate);
+function UpdateModalWindow() {
+  const user = useSelector((state) => state.user);
+  const {
+    promProduct,
+    setPromProduct,
+    modalUpdate,
+    setModalUpdate,
+    modal,
+    setModal,
+  } = useProductContext();
+  const productData = useSelector((state) => state.products).filter(
+    (el) => el.id === promProduct.id
+  )[0];
   const dispatch = useDispatch();
-  console.log(product);
+
+  const updateHadler = () => {
+    const updProduct = { ...promProduct, version: productData.version + 1 };
+
+    dispatch(updateProduct({ product: updProduct, user }));
+    setPromProduct({});
+  };
+
+  const backHadler = () => {
+    setPromProduct((prev) => ({ ...prev, width: 0, certificate: '' }));
+  };
 
   return (
     <div>
       <Modal
         isOpen={modalUpdate}
         toggle={() => {
-          dispatch(setUpdateModalWindow(!modalUpdate));
+          setModalUpdate(!modalUpdate);
         }}
       >
-        <modalUpdateHeader
+        <ModalHeader
           toggle={() => {
-            dispatch(setUpdateModalWindow(!modalUpdate));
+            setModalUpdate(!modalUpdate);
           }}
         >
           Внимание
-        </modalUpdateHeader>
+        </ModalHeader>
         <ModalBody>
           Продукт с такими параметрами уже существует. Можете обновить или вернуться
           назад.
@@ -32,7 +52,9 @@ function UpdateModalWindow({ product }) {
           <Button
             color="primary"
             onClick={() => {
-              dispatch(setUpdateModalWindow(!modalUpdate));
+              backHadler();
+              setModalUpdate(!modalUpdate);
+              setModal(!modal);
             }}
           >
             Назад
@@ -40,7 +62,8 @@ function UpdateModalWindow({ product }) {
           <Button
             color="primary"
             onClick={() => {
-              dispatch(setUpdateModalWindow(!modalUpdate));
+              updateHadler();
+              setModalUpdate(!modalUpdate);
             }}
           >
             Обновить
