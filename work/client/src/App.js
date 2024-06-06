@@ -9,7 +9,6 @@ import RegForm from './components/RegForm/RegForm';
 import { SnackbarProvider } from 'notistack';
 import axios from 'axios';
 import { useEffect } from 'react';
-// import inMemoryJWT from './services/inMemoryJWT';
 import { setToken } from './components/redux/actions/jwtAction';
 
 function App() {

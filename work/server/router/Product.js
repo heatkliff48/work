@@ -4,7 +4,7 @@ const ProductController = require('../controllers/Product.js');
 
 const router = Router();
 
-router.get('/all', ProductController.getAllProduct);
+router.post('/all', ProductController.getAllProduct);
 router.post('/add', ProductController.addProduct);
 
 // router.post('/del', ProductController.delProduct);

@@ -28,6 +28,8 @@ class ProductService {
 
   static async addNewProduct({ id, username, email, fingerprint, product }) {
     const products = await ProductsRepository.addNewProductData(product);
+    console.log('>>>>>>>>>>>>>>PRODUCTS add<<<<<<<<<<<<', products);
+
     const payload = { id, username, email };
 
     const accessToken = await TokenService.generateAccessToken(payload);
