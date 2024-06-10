@@ -26,9 +26,8 @@ export const productsReducer = (products = [], action) => {
       return products;
     }
     case UPDATE_PRODUCT: {
-      const updProduct = payload[1];
       const updateProducts = products.map((el) => {
-        if (el.id === updProduct.id) return updProduct;
+        if (el.id === payload.id) return payload;
         return el;
       });
 

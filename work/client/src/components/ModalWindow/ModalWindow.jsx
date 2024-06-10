@@ -4,7 +4,7 @@ import Select from 'react-select';
 import { useEffect, useState } from 'react';
 import { addNewProduct } from '../redux/actions/productsAction';
 import UpdateModalWindow from './UpdateModalWindow';
-import { useProductContext } from '../contexts/Context';
+import { useProjectContext } from '../contexts/Context';
 
 const ModalWindow = ({ list }) => {
   const [value, setValue] = useState('default');
@@ -18,8 +18,7 @@ const ModalWindow = ({ list }) => {
     setModal,
     modalUpdate,
     setModalUpdate,
-    promProduct,
-  } = useProductContext();
+  } = useProjectContext();
   const user = useSelector((state) => state.user);
   const products = useSelector((state) => state.products);
   const dispatch = useDispatch();
@@ -220,7 +219,6 @@ const ModalWindow = ({ list }) => {
   useEffect(() => {
     setForm((prev) => ({ ...prev, version }));
   }, [version]);
-
 
   return (
     <div>

@@ -8,15 +8,17 @@ import { addUser } from '../redux/actions/userAction';
 // const rolesList = [
 //   {
 //     id: 1,
-//     title: 'Администратор',
+//     title: 'Администратор', //имеет доступ к регформе для выставления ролей и изенения ролей у пользователей (не у себя) нужен журнал изменений
+//
 //   },
 //   {
 //     id: 2,
-//     title: 'Модератор',
+//     title: 'Руководитель призводства', //
 //   },
+
 //   {
 //     id: 3,
-//     title: 'Пользователь',
+//     title: 'Пользователь', //
 //   },
 // ];
 
@@ -35,7 +37,6 @@ function RegForm() {
 
   const inputChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-
   };
 
   const submitForm = async (e) => {

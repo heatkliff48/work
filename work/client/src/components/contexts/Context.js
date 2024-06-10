@@ -1,16 +1,17 @@
 import { createContext, useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
 
-const ProductContext = createContext();
+const ProjectContext = createContext();
 
-const ProductContextProvider = ({ children }) => {
+const ProjectContextProvider = ({ children }) => {
   const [promProduct, setPromProduct] = useState({});
   const [version, setVersion] = useState(1);
   const [modal, setModal] = useState(false);
   const [modalUpdate, setModalUpdate] = useState(false);
-  const products = useSelector((state) => state.products);
+  const [modalAddClient, setModalAddClient] = useState(false);
+  const [currentClientID, setClientID] = useState(1);
+
   return (
-    <ProductContext.Provider
+    <ProjectContext.Provider
       value={{
         promProduct,
         setPromProduct,
@@ -19,14 +20,18 @@ const ProductContextProvider = ({ children }) => {
         setModal,
         modalUpdate,
         setModalUpdate,
+        currentClientID,
+        setClientID,
+        modalAddClient,
+        setModalAddClient,
       }}
     >
       {children}
-    </ProductContext.Provider>
+    </ProjectContext.Provider>
   );
 };
 
-export default ProductContextProvider;
+export default ProjectContextProvider;
 
-const useProductContext = () => useContext(ProductContext);
-export { useProductContext };
+const useProjectContext = () => useContext(ProjectContext);
+export { useProjectContext };

@@ -10,7 +10,7 @@ import { SnackbarProvider } from 'notistack';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { setToken } from './components/redux/actions/jwtAction';
-import ProductContextProvider from './components/contexts/Context';
+import ProjectContextProvider from './components/contexts/Context';
 
 function App() {
   const dispatch = useDispatch();
@@ -30,7 +30,7 @@ function App() {
   }, [dispatch, url]);
 
   return (
-    <ProductContextProvider>
+    <ProjectContextProvider>
       <div className="wrapper">
         <SnackbarProvider />
         <NavBar />
@@ -42,7 +42,7 @@ function App() {
         </Routes>
         <SnackbarProvider />
       </div>
-    </ProductContextProvider>
+    </ProjectContextProvider>
   );
 }
 

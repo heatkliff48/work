@@ -5,9 +5,9 @@ const morgan = require('morgan');
 const Fingerprint = require('express-fingerprint');
 const AuthRootRouter = require('./router/Auth.js');
 const ProductRootRouter = require('./router/Product.js');
+const ClientsRootRouter = require('./router/Clients.js');
 const TokenService = require('./services/Token.js');
 const cookieParser = require('cookie-parser');
-const { Products } = require('./db/models');
 
 dotenv.config();
 const PORT = 3001;
@@ -29,6 +29,7 @@ app.use(
 app.use('/auth', AuthRootRouter);
 // app.use('/products', TokenService.checkAccess, ProductRootRouter);
 app.use('/products', ProductRootRouter);
+app.use('/clients', ClientsRootRouter);
 
 const start = async () => {
   try {
