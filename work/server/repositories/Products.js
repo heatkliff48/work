@@ -11,11 +11,13 @@ class ProductsRepository {
     return product;
   }
   static async updateProductData(updProduct) {
-    const updateProduct = await Products.update(updProduct, {
-      where: { id: updProduct.id },
-      returning: true,
-      plain: true,
-    });
+    // const updateProduct = await Products.update(updProduct, {
+    //   where: { id: updProduct.id },
+    //   returning: true,
+    //   plain: true,
+    // });
+    const updateProduct = await Products.create(updProduct);
+
     return updateProduct;
   }
 }

@@ -4,7 +4,7 @@ import { useTable } from 'react-table';
 import './products.css';
 import { getAllProducts } from '../redux/actions/productsAction';
 import ModalWindow from '../ModalWindow/ModalWindow';
-import { useProductContext } from '../contexts/Context';
+import { useProjectContext } from '../contexts/Context';
 export const COLUMNS = [
   {
     Header: 'Id',
@@ -102,7 +102,7 @@ export const COLUMNS = [
 
 function Products() {
   const dispatch = useDispatch();
-  const { modal, setModal, modalUpdate } = useProductContext();
+  const { modal, setModal, modalUpdate } = useProjectContext();
   const user = useSelector((state) => state.user);
   const products = useSelector((state) => state.products);
   const columns = useMemo(() => COLUMNS, []);

@@ -1,7 +1,7 @@
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateProduct } from '../redux/actions/productsAction';
-import { useProductContext } from '../contexts/Context';
+import { useProjectContext } from '../contexts/Context';
 
 function UpdateModalWindow() {
   const user = useSelector((state) => state.user);
@@ -12,7 +12,7 @@ function UpdateModalWindow() {
     setModalUpdate,
     modal,
     setModal,
-  } = useProductContext();
+  } = useProjectContext();
   const productData = useSelector((state) => state.products).filter(
     (el) => el.id === promProduct.id
   )[0];
@@ -20,6 +20,7 @@ function UpdateModalWindow() {
 
   const updateHadler = () => {
     const updProduct = { ...promProduct, version: productData.version + 1 };
+    console.log('UPDATE HANDLER', updProduct);
 
     dispatch(updateProduct({ product: updProduct, user }));
     setPromProduct({});

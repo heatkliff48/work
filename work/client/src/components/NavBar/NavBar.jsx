@@ -49,7 +49,10 @@ function NavBar() {
           </div>
         )}
         <div className="nav_link_wrapper">
-          <div className="nav_link">
+          <div
+            className="nav_link"
+            onClick={() => (window.location.href = 'http://localhost:3002/')}
+          >
             <p className="p_nav">Контакты</p>
           </div>
         </div>
