@@ -16,14 +16,22 @@ const url = axios.create({
   withCredentials: true,
 });
 
+
 // function* getAccessTokenFromStore() {
-//   const accessToken = yield select((state) => state.jwt);
+//   console.log('getAccessTokenFromStore');
+//   const accessTokenEffect = yield select((state) => state.jwt);
+//   const accessToken = accessTokenEffect;
+//   console.log('getAccessTokenFromStore>>>>>>>>>>', accessToken);
 //   return accessToken;
 // }
 
 // url.interceptors.request.use(
 //   async (config) => {
-//     const accessToken = await getAccessTokenFromStore().next().value;
+//     console.log('url.interceptors.request');
+//     const accessTokenGenerator = getAccessTokenFromStore();
+//     const accessToken = yield accessTokenGenerator.next().value;
+//     console.log('url.interceptors.request', accessToken);
+//     console.log('CONFIG', config);
 
 //     if (accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
 
@@ -58,6 +66,7 @@ const addNewProduct = ({ product, user }) => {
     })
     .catch(showErrorMessage);
 };
+
 
 function* getAllProductsWatcher(action) {
   try {

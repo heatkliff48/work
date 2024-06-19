@@ -2,8 +2,7 @@ import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
-import { GET_ALL_CLIENTS, ALL_CLIENTS, NEW_CLIENTS } from '../types/clientsTypes';
-import { ADD_NEW_PRODUCT } from '../types/productsTypes';
+import { GET_ALL_CLIENTS, ALL_CLIENTS, NEW_CLIENTS, ADD_NEW_CLIENTS } from '../types/clientsTypes';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -72,7 +71,7 @@ function* addNewClientWatcher(action) {
 
 function* clientsWatcher() {
   yield takeLatest(GET_ALL_CLIENTS, getAllClientsWatcher);
-  yield takeLatest(ADD_NEW_PRODUCT, addNewClientWatcher);
+  yield takeLatest(ADD_NEW_CLIENTS, addNewClientWatcher);
 }
 
 export default clientsWatcher;

@@ -56,7 +56,7 @@ function* loginUserWatcher(action) {
       loginUser,
       action.payload
     );
-    window.localStorage.setItem('user', JSON.stringify(user));
+    // window.localStorage.setItem('user', JSON.stringify(user));
     yield put({ type: ADD_USER, payload: user });
     yield put(setToken({ accessToken, accessTokenExpiration }));
   } catch (err) {
