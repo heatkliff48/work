@@ -21,7 +21,6 @@ function Main() {
   }, [navigate, user]);
   return (
     <div>
-      
       <Products />
     </div>
   );

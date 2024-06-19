@@ -29,7 +29,7 @@ app.use(
 app.use('/auth', AuthRootRouter);
 // app.use('/products', TokenService.checkAccess, ProductRootRouter);
 app.use('/products', ProductRootRouter);
-app.use('/clients', ClientsRootRouter);
+// app.use('/clients', ClientsRootRouter);
 
 const start = async () => {
   try {

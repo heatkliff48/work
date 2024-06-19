@@ -7,85 +7,93 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+      },
+      article: {
+        allowNull: false,
+        primaryKey: true,
+        type: Sequelize.STRING,
       },
       version: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       density: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       form: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       certificate: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       width: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       lengths: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       height: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       tradingMark: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       m3: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       m2: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       m: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       widthInArray: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       m3InArray: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       densityDryMax: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       densityDryDef: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       humidity: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       densityHuminityMax: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       densityHuminityDef: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       weightMax: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       weightDef: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       normOfBrack: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT,
       },
       coefficientOfFree: {
-        type: Sequelize.INTEGER
+        type: Sequelize.FLOAT,
+      },
+      price: {
+        type: Sequelize.FLOAT,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Products');
-  }
+  },
 };

@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   Products.init(
     {
       version: DataTypes.INTEGER,
+      article: DataTypes.STRING,
       density: DataTypes.INTEGER,
       form: DataTypes.STRING,
       certificate: DataTypes.STRING,
@@ -33,8 +34,9 @@ module.exports = (sequelize, DataTypes) => {
       densityHuminityDef: DataTypes.FLOAT,
       weightMax: DataTypes.FLOAT,
       weightDef: DataTypes.FLOAT,
-      normOfBrack: DataTypes.INTEGER,
-      coefficientOfFree: DataTypes.INTEGER,
+      normOfBrack: DataTypes.FLOAT,
+      coefficientOfFree: DataTypes.FLOAT,
+      price: DataTypes.FLOAT,
     },
     {
       sequelize,

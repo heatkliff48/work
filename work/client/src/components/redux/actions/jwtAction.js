@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SET_GWT_TOKEN } from '../types/jwtTypes';
+import { SET_JWT_TOKEN } from '../types/jwtTypes';
 
 let refreshTimeoutId = null;
 const url = axios.create({
@@ -20,10 +20,11 @@ export const refreshToken = (expiration) => async (dispatch, getState) => {
   }, timeoutTrigger);
 };
 export const setToken = (payload) => async (dispatch, getState) => {
-  if (payload?.accessTokenExpiration)
+  if (payload?.accessTokenExpiration) {
     dispatch(refreshToken(payload?.accessTokenExpiration));
+  }
   return {
-    type: SET_GWT_TOKEN,
+    type: SET_JWT_TOKEN,
     payload: payload?.accessToken,
   };
 };

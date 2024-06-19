@@ -1,2 +1,1 @@
-export const SET_GWT_TOKEN = 'SET_GWT_TOKEN';
-
+export const SET_JWT_TOKEN = 'SET_JWT_TOKEN';
