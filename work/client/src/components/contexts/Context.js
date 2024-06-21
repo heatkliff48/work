@@ -1,17 +1,14 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
-import { getAllProducts } from '../redux/actions/productsAction';
+import { createContext, useContext, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const ProjectContext = createContext();
 
 const ProjectContextProvider = ({ children }) => {
-  const dispatch = useDispatch();
   const COLUMNS = [
     {
       Header: 'Id',
       accessor: 'id',
-      disableSortBy: true,
+      sortType: 'number',
     },
     {
       Header: 'Article',
@@ -135,7 +132,8 @@ const ProjectContextProvider = ({ children }) => {
       sortType: 'number',
     },
   ];
-  const [promProduct, setPromProduct] = useState({});
+  const [promProduct, setPromProduct] = useState(null);
+  const [productCardData, setProductCardData] = useState({});
   const [version, setVersion] = useState(1);
   const [modal, setModal] = useState(false);
   const [modalUpdate, setModalUpdate] = useState(false);
@@ -143,9 +141,6 @@ const ProjectContextProvider = ({ children }) => {
   const [modalProductCard, setModalProductCard] = useState(false);
   const [currentClientID, setClientID] = useState(1);
   const products = useSelector((state) => state.products);
-  const user = useSelector((state) => state.user);
-  const location = useLocation();
-  console.log('CONTEXT PROD', products);
   const latestProducts = useMemo(() => {
     const newProducts = products.reduce((acc, product) => {
       const { article, version } = product;
@@ -163,14 +158,7 @@ const ProjectContextProvider = ({ children }) => {
     return newProducts;
   }, [products]);
 
-  console.log('LATEST', latestProducts);
   latestProducts?.sort((a, b) => a.id - b.id);
-
-  useEffect(() => {
-    if (location.pathname === '/') {
-      dispatch(getAllProducts(user));
-    }
-  }, [dispatch, user, location.pathname]);
 
   return (
     <ProjectContext.Provider
@@ -190,6 +178,8 @@ const ProjectContextProvider = ({ children }) => {
         setModalProductCard,
         COLUMNS,
         latestProducts,
+        productCardData,
+        setProductCardData,
       }}
     >
       {children}

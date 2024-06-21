@@ -16,7 +16,6 @@ const url = axios.create({
   withCredentials: true,
 });
 
-
 // function* getAccessTokenFromStore() {
 //   console.log('getAccessTokenFromStore');
 //   const accessTokenEffect = yield select((state) => state.jwt);
@@ -67,7 +66,6 @@ const addNewProduct = ({ product, user }) => {
     .catch(showErrorMessage);
 };
 
-
 function* getAllProductsWatcher(action) {
   try {
     const data = yield call(getAllProducts, action.payload);
@@ -93,7 +91,6 @@ function* updateProductWatcher(action) {
 
 function* addNewProductWatcher(action) {
   try {
-    console.log(action.payload);
     const { products, accessToken, accessTokenExpiration } = yield call(
       addNewProduct,
       action.payload
