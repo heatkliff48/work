@@ -1,10 +1,13 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useSortBy, useTable } from 'react-table';
 import './products.css';
+import { getAllProducts } from '../redux/actions/productsAction';
 
 import ModalWindow from '../ModalWindow/ModalWindow';
 import { useProjectContext } from '../contexts/Context';
+import ProductCardModal from '../ProductCardModal/ProductCardModal';
+import { useDispatch, useSelector } from 'react-redux';
 
 function Products() {
   const {
@@ -14,9 +17,12 @@ function Products() {
     latestProducts,
     modalProductCard,
     setModalProductCard,
+    setProductCardData,
   } = useProjectContext();
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => latestProducts, [latestProducts]);
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const sortTypes = {
     // Функция сортировки для строковых значений
@@ -47,14 +53,23 @@ function Products() {
     tableInstance;
 
   const handleRowClick = (row) => {
-    // Здесь вы можете выполнить любые действия, необходимые для открытия модального окна
-    // Например, установить состояние модального окна или передать данные строки в модальное окно
-    // setModalProductCard(!modalProductCard);
+    setProductCardData(row.original);
+    setModalProductCard(!modalProductCard);
   };
+
+  useEffect(() => {
+    dispatch(getAllProducts(user));
+  }, [dispatch, user]);
 
   return (
     <>
-      <ModalWindow list={COLUMNS} />
+      <ModalWindow
+        list={COLUMNS}
+        formData={null}
+        isOpen={modal}
+        toggle={() => setModal(!modal)}
+      />
+      <ProductCardModal />
       <h1>Sortable Table</h1>
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}

@@ -17,7 +17,6 @@ function Main() {
     if (!user) {
       navigate('/sign-in');
     }
-    
   }, [navigate, user]);
   return (
     <div>

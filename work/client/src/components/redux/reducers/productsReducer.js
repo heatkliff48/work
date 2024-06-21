@@ -5,7 +5,7 @@ export const productsReducer = (products = [], action) => {
   switch (type) {
     case ALL_PRODUCTS: {
       const productsArr = [];
-      if (payload.length === 0) return products;
+      if (payload.length === 0) return [];
 
       for (let i = 0; i < payload.length; i++) {
         if (!payload[i]?.version) {

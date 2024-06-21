@@ -20,7 +20,6 @@ function UpdateModalWindow() {
 
   const updateHadler = () => {
     const updProduct = { ...promProduct, version: productData.version + 1 };
-    console.log('UPDATE HANDLER', updProduct);
 
     dispatch(updateProduct({ product: updProduct, user }));
     setPromProduct({});

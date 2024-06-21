@@ -24,10 +24,10 @@ const addUser = (user) => {
     .catch(showErrorMessage);
 };
 const loginUser = (user) => {
+
   return url
     .post('/auth/sign-in', { user })
     .then((res) => {
-      console.log('LOGIN', res.data);
       return res.data;
     })
     .catch(showErrorMessage);
@@ -42,6 +42,7 @@ function* addUserWatcher(action) {
       addUser,
       action.payload
     );
+    console.log('USER SAGA', user);
     window.localStorage.setItem('user', JSON.stringify(user));
     yield put(setToken({ accessToken, accessTokenExpiration }));
     yield put({ type: ADD_USER, payload: user });
@@ -56,6 +57,8 @@ function* loginUserWatcher(action) {
       loginUser,
       action.payload
     );
+    console.log('USER SAGA', user);
+
     // window.localStorage.setItem('user', JSON.stringify(user));
     yield put({ type: ADD_USER, payload: user });
     yield put(setToken({ accessToken, accessTokenExpiration }));

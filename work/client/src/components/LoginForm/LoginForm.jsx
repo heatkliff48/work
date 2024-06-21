@@ -55,7 +55,6 @@ function LoginForm() {
           </button>
         </form>
       </div>
-      {/* <p>{message}</p> */}
     </div>
   );
 }

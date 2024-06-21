@@ -10,8 +10,13 @@ export const getAllProducts = (user) => {
     payload: user,
   };
 };
+
 export const addNewProduct = ({ product, user }) => {
-  let newArticle = `T.${product.form}${product.certificate}${product.density}${product.width}${product.height}${product.lengths}`; // T.NORMALC500200600250  без версии
+  let newArticle = `T.${product.form?.toUpperCase()}${product.certificate?.substr(
+    1,
+    1
+  )}${product.density}${product.width}${product.height}${product.lengths}`; // T.NORMALC500200600250  без версии
+
   product.article = newArticle;
 
   return {
@@ -21,6 +26,14 @@ export const addNewProduct = ({ product, user }) => {
 };
 
 export const updateProduct = ({ product, user }) => {
+  let newArticle = `T.${product.form?.toUpperCase()}${product.certificate?.substr(
+    1,
+    1
+  )}${product.density}${product.width}${product.height}${product.lengths}`; // T.NORMALC500200600250  без версии
+
+  product.article = newArticle;
+  delete product.id;
+
   return {
     type: NEED_UPDATE_PRODUCT,
     payload: { product, user },
