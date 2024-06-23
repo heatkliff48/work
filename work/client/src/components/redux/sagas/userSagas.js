@@ -24,7 +24,6 @@ const addUser = (user) => {
     .catch(showErrorMessage);
 };
 const loginUser = (user) => {
-
   return url
     .post('/auth/sign-in', { user })
     .then((res) => {
@@ -58,7 +57,6 @@ function* loginUserWatcher(action) {
       action.payload
     );
     console.log('USER SAGA', user);
-
     // window.localStorage.setItem('user', JSON.stringify(user));
     yield put({ type: ADD_USER, payload: user });
     yield put(setToken({ accessToken, accessTokenExpiration }));

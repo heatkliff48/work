@@ -141,11 +141,13 @@ const ProjectContextProvider = ({ children }) => {
   const [modalProductCard, setModalProductCard] = useState(false);
   const [currentClientID, setClientID] = useState(1);
   const products = useSelector((state) => state.products);
+  const [stayDefault, setStayDefault] = useState(true);
+
   const latestProducts = useMemo(() => {
+    // console.log('MEMO CONTEXT', products);
     const newProducts = products.reduce((acc, product) => {
       const { article, version } = product;
       const existingProduct = acc.find((p) => p.article === article);
-
       if (!existingProduct) {
         acc.push(product);
       } else if (version > existingProduct.version) {
@@ -166,6 +168,7 @@ const ProjectContextProvider = ({ children }) => {
         promProduct,
         setPromProduct,
         version,
+        setVersion,
         modal,
         setModal,
         modalUpdate,
@@ -180,6 +183,8 @@ const ProjectContextProvider = ({ children }) => {
         latestProducts,
         productCardData,
         setProductCardData,
+        stayDefault,
+        setStayDefault,
       }}
     >
       {children}

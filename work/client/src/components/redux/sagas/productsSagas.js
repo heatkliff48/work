@@ -81,6 +81,8 @@ function* getAllProductsWatcher(action) {
 function* updateProductWatcher(action) {
   try {
     const data = yield call(updateProducts, action.payload);
+    console.log('PROD UPDATE SAGA', data);
+
 
     yield put({ type: UPDATE_PRODUCT, payload: data.products });
     yield put(setToken(data.accessToken, data.accessTokenExpiration));

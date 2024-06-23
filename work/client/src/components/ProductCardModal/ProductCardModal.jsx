@@ -68,7 +68,7 @@ const ProductCardModal = React.memo(() => {
 
   const getSelectedOption = (accessor) => {
     if (!productCardData[accessor]) return null;
-    return productByVersicon.find(
+    return productByVersicon?.find(
       (option) => option.value === productCardData[accessor].toString()
     );
   };
@@ -98,11 +98,11 @@ const ProductCardModal = React.memo(() => {
 
     const lastVers = lva.reduce((max, product) => {
       return product.version > max ? product.version : max;
-    }, 0);
+    }, 1);
 
     setLastVersion(lastVers);
     setProductByVersicon(prodArrVers);
-  }, [productCardData.article]);
+  }, [productCardData, products]);
 
   return (
     <div>
@@ -115,7 +115,7 @@ const ProductCardModal = React.memo(() => {
               <div className="product_article">{productCardData.article}</div>
             </div>
             <div>
-              <div>Last versiom: {lastVersion}</div>
+              <div>Last version: {lastVersion}</div>
               <div>
                 <Select
                   onChange={handleSelectChange}

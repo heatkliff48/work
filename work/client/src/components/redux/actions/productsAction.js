@@ -13,7 +13,7 @@ export const getAllProducts = (user) => {
 
 export const addNewProduct = ({ product, user }) => {
   let newArticle = `T.${product.form?.toUpperCase()}${product.certificate?.substr(
-    1,
+    0,
     1
   )}${product.density}${product.width}${product.height}${product.lengths}`; // T.NORMALC500200600250  без версии
 
@@ -26,12 +26,6 @@ export const addNewProduct = ({ product, user }) => {
 };
 
 export const updateProduct = ({ product, user }) => {
-  let newArticle = `T.${product.form?.toUpperCase()}${product.certificate?.substr(
-    1,
-    1
-  )}${product.density}${product.width}${product.height}${product.lengths}`; // T.NORMALC500200600250  без версии
-
-  product.article = newArticle;
   delete product.id;
 
   return {
