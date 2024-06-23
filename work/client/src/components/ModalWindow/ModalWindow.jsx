@@ -10,12 +10,16 @@ import InputField from '../InputField/InputField';
 const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   const {
     version,
+    setVersion,
     promProduct,
     setPromProduct,
     modal,
     setModal,
     modalUpdate,
     setModalUpdate,
+    stayDefault,
+    setStayDefault,
+    setModalProductCard,
   } = useProjectContext();
   const [value, setValue] = useState('default');
   const [formInput, setFormInput] = useState({});
@@ -53,6 +57,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   };
 
   const handleInputChange = useCallback((e) => {
+    setStayDefault(false);
     setFormInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }, []);
 
@@ -69,29 +74,23 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   };
 
   const updateProductHandler = () => {
-    const isExistingProduct = products.some(
-      (product) =>
-        product.density === formInput.density &&
-        product.form === formInput.form &&
-        product.width === formInput.width &&
-        product.height === formInput.height &&
-        product.lengths === formInput.lengths &&
-        product.certificate === formInput.certificate
-    );
+    const prodArticle = `T.${formInput.form?.toUpperCase()}${formInput.certificate?.substr(
+      0,
+      1
+    )}${formInput.density}${formInput.width}${formInput.height}${formInput.lengths}`;
+    const isExistingProduct = products.some((product) => {
+      return product.article === prodArticle;
+    });
 
     if (isExistingProduct) {
       const existingProduct = products.find(
-        (product) =>
-          product.density === formInput.density &&
-          product.form === formInput.form &&
-          product.width === formInput.width &&
-          product.height === formInput.height &&
-          product.lengths === formInput.lengths &&
-          product.certificate === formInput.certificate
+        (product) => product.article === prodArticle
       );
-      setPromProduct({ ...formInput, id: existingProduct.id });
+      setPromProduct({ ...formInput, id: existingProduct.id, article: prodArticle });
       setModalUpdate(!modalUpdate);
     } else {
+      setModal(!modal);
+      setModalProductCard(false);
       dispatch(addNewProduct({ product: formInput, user }));
     }
   };
@@ -137,14 +136,13 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
 
       // Вычисление m3
       if (formInput?.lengths && formInput?.height && formInput?.width) {
-        values.m3 =
+        values.m3 = (
           Math.floor(1200 / formInput?.lengths) *
           Math.floor(1000 / formInput?.height) *
           Math.floor(1500 / formInput?.width) *
-          (
-            (formInput?.lengths * formInput?.height * formInput?.width) /
-            Math.pow(10, 9)
-          ).toFixed(2);
+          ((formInput?.lengths * formInput?.height * formInput?.width) /
+            Math.pow(10, 9))
+        ).toFixed(2);
         updateFuncs.m3 = (value) => setFormInput((prev) => ({ ...prev, m3: value }));
       }
 
@@ -174,14 +172,13 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
         formInput?.width &&
         values.widthInArray
       ) {
-        values.m3InArray =
+        values.m3InArray = (
           Math.floor(600 / formInput?.lengths) *
           Math.floor(6000 / formInput?.height) *
           values.widthInArray *
-          (
-            (formInput?.lengths * formInput?.height * formInput?.width) /
-            Math.pow(10, 9)
-          ).toFixed(2);
+          ((formInput?.lengths * formInput?.height * formInput?.width) /
+            Math.pow(10, 9))
+        ).toFixed(2);
         updateFuncs.m3InArray = (value) =>
           setFormInput((prev) => ({ ...prev, m3InArray: value }));
       }
@@ -295,6 +292,22 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   }, [memoizedNewHaveMath]);
 
   useEffect(() => {
+    const extractedValues = Object.entries(memoizedNewHaveMath).reduce(
+      (acc, [key, { value }]) => {
+        acc[key] = value;
+        return acc;
+      },
+      {}
+    );
+
+    setFormInput((prev) => ({
+      ...prev,
+      ...extractedValues,
+    }));
+  }, [memoizedNewHaveMath]);
+
+  useEffect(() => {
+    if (!stayDefault) return;
     if (formData) {
       setFormInput(formData);
     } else if (promProduct) {
@@ -314,10 +327,16 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
         ...extractedValues,
       }));
     }
-  }, [formData, memoizedDefaultValues, memoizedNewHaveMath]);
+  }, []);
 
   useEffect(() => {
-    setFormInput((prev) => ({ ...prev, version }));
+    console.log('FORM DDATA', formData);
+    if (formData) {
+      setFormInput((prev) => ({ ...prev, version: formData.version }));
+      setVersion(formData.version);
+    } else {
+      setFormInput((prev) => ({ ...prev, version }));
+    }
   }, [version]);
 
   return (
@@ -403,6 +422,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
             color="primary"
             onClick={() => {
               updateProductHandler();
+              setStayDefault(true);
               clearData();
               setModal(!modal);
             }}

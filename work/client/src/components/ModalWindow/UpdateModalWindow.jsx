@@ -12,17 +12,22 @@ function UpdateModalWindow() {
     setModalUpdate,
     modal,
     setModal,
+    setStayDefault,
+    setModalProductCard,
   } = useProjectContext();
-  const productData = useSelector((state) => state.products).filter(
-    (el) => el.id === promProduct.id
-  )[0];
   const dispatch = useDispatch();
+
+  const productData = useSelector((state) => state.products).findLast(
+    (el) => el.article === promProduct.article
+  );
 
   const updateHadler = () => {
     const updProduct = { ...promProduct, version: productData.version + 1 };
-
+    setStayDefault(true);
     dispatch(updateProduct({ product: updProduct, user }));
     setPromProduct({});
+    setModal(false)
+    setModalProductCard(false)
   };
 
   const backHadler = () => {

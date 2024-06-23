@@ -8,6 +8,7 @@ import ModalWindow from '../ModalWindow/ModalWindow';
 import { useProjectContext } from '../contexts/Context';
 import ProductCardModal from '../ProductCardModal/ProductCardModal';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function Products() {
   const {
@@ -23,6 +24,7 @@ function Products() {
   const data = useMemo(() => latestProducts, [latestProducts]);
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const sortTypes = {
     // Функция сортировки для строковых значений
@@ -58,7 +60,11 @@ function Products() {
   };
 
   useEffect(() => {
-    dispatch(getAllProducts(user));
+    if (user) {
+      dispatch(getAllProducts(user));
+    } else {
+      navigate('/sign-in');
+    }
   }, [dispatch, user]);
 
   return (
