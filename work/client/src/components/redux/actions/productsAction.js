@@ -4,32 +4,32 @@ import {
   NEED_UPDATE_PRODUCT,
 } from '../types/productsTypes';
 
-export const getAllProducts = (user) => {
+export const getAllProducts = () => {
   return {
     type: GET_ALL_PRODUCTS,
-    payload: user,
   };
 };
 
-export const addNewProduct = ({ product, user }) => {
+export const addNewProduct = ({ product }) => {
   let newArticle = `T.${product.form?.toUpperCase()}${product.certificate?.substr(
     0,
     1
   )}${product.density}${product.width}${product.height}${product.lengths}`; // T.NORMALC500200600250  без версии
 
   product.article = newArticle;
+  delete product.id;
 
   return {
     type: ADD_NEW_PRODUCT,
-    payload: { product, user },
+    payload: { product },
   };
 };
 
-export const updateProduct = ({ product, user }) => {
+export const updateProduct = ({ product }) => {
   delete product.id;
 
   return {
     type: NEED_UPDATE_PRODUCT,
-    payload: { product, user },
+    payload: { product },
   };
 };

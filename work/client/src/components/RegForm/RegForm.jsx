@@ -2,29 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser } from '../redux/actions/userAction';
-// import { signUpSchema } from '../validitionSchemas/validtionSchemas';
-// import { yupResolver } from '@hookform/resolvers/yup';
-
-// const rolesList = [
-//   {
-//     id: 1,
-//     title: 'Администратор', //имеет доступ к регформе для выставления ролей и изенения ролей у пользователей (не у себя) нужен журнал изменений
-//
-//   },
-//   {
-//     id: 2,
-//     title: 'Руководитель призводства', //
-//   },
-
-//   {
-//     id: 3,
-//     title: 'Пользователь', //
-//   },
-// ];
+import { getAllRoles } from '../redux/actions/rolesAction';
+import { useProjectContext } from '../contexts/Context';
 
 function RegForm() {
+  const { roleTable } = useProjectContext();
   const [formInput, setForm] = useState({});
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
@@ -33,6 +16,7 @@ function RegForm() {
     if (user) {
       navigate('/');
     }
+    dispatch(getAllRoles());
   }, [navigate, user]);
 
   const inputChange = (e) => {
@@ -41,6 +25,7 @@ function RegForm() {
 
   const submitForm = async (e) => {
     e.preventDefault();
+    console.log('REG FORM', formInput);
     dispatch(addUser(formInput));
   };
 
@@ -55,7 +40,7 @@ function RegForm() {
             type="text"
             id="email"
             name="email"
-            value={formInput.name}
+            value={formInput.email || ''}
             onChange={inputChange}
           />
           <br />
@@ -65,9 +50,25 @@ function RegForm() {
             type="text"
             id="username"
             name="username"
-            value={formInput.name}
+            value={formInput.username || ''}
             onChange={inputChange}
           />
+          <br />
+          <label htmlFor="role">Role</label>
+          <select
+            className="login_input"
+            id="role"
+            name="role"
+            value={formInput.role_id || ''}
+            onChange={inputChange}
+          >
+            <option value="">Select a role</option>
+            {roleTable.map((role) => (
+              <option key={role.id} value={role.id}>
+                {role.role_name}
+              </option>
+            ))}
+          </select>
           <br />
           <label htmlFor="password">Password</label>
           <input
@@ -75,7 +76,7 @@ function RegForm() {
             type="password"
             id="password"
             name="password"
-            value={formInput.name}
+            value={formInput.password || ''}
             onChange={inputChange}
           />
           <br />

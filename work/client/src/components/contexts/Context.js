@@ -1,5 +1,6 @@
-import { createContext, useContext, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllRoles } from '../redux/actions/rolesAction';
 
 const ProjectContext = createContext();
 
@@ -132,6 +133,8 @@ const ProjectContextProvider = ({ children }) => {
       sortType: 'number',
     },
   ];
+  const dispatch = useDispatch();
+
   const [promProduct, setPromProduct] = useState(null);
   const [productCardData, setProductCardData] = useState({});
   const [version, setVersion] = useState(1);
@@ -139,9 +142,19 @@ const ProjectContextProvider = ({ children }) => {
   const [modalUpdate, setModalUpdate] = useState(false);
   const [modalAddClient, setModalAddClient] = useState(false);
   const [modalProductCard, setModalProductCard] = useState(false);
+  const [modalRoleCard, setModalRoleCard] = useState(false);
+  const [roleId, setRoleId] = useState(0);
   const [currentClientID, setClientID] = useState(1);
-  const products = useSelector((state) => state.products);
   const [stayDefault, setStayDefault] = useState(true);
+  const [userAccess, setUserAccess] = useState({ canRead: false, canWrite: false });
+  const user = useSelector((state) => state.user);
+  const products = useSelector((state) => state.products);
+  const roles = useSelector((state) => state.roles);
+
+  const roleTable = [
+    { id: 1, role_name: 'Production Manager' },
+    { id: 2, role_name: 'Head of Sales Department' },
+  ];
 
   const latestProducts = useMemo(() => {
     // console.log('MEMO CONTEXT', products);
@@ -161,6 +174,33 @@ const ProjectContextProvider = ({ children }) => {
   }, [products]);
 
   latestProducts?.sort((a, b) => a.id - b.id);
+
+  useEffect(() => {
+    //сделать диспатч чек юзер на нахождение юзера в бд
+    if (!user) return;
+    dispatch(getAllRoles());
+  }, [dispatch, user, modalRoleCard]);
+
+  const checkUserAccess = (user, roles, pageName) => {
+    const userRole = roles.find((role) => role.id == user.role);
+
+    // if (!userRole || !userRole.isActive) {
+    //   return { canRead: false, canWrite: false };
+    // }
+
+    const pagePermissions = userRole?.PageAndRolesArray.find(
+      (page) => page.page_name === pageName
+    );
+
+    if (!pagePermissions) {
+      return { canRead: false, canWrite: false };
+    }
+
+    return {
+      canRead: pagePermissions.PageAndRoles.read,
+      canWrite: pagePermissions.PageAndRoles.write,
+    };
+  };
 
   return (
     <ProjectContext.Provider
@@ -185,6 +225,15 @@ const ProjectContextProvider = ({ children }) => {
         setProductCardData,
         stayDefault,
         setStayDefault,
+        modalRoleCard,
+        setModalRoleCard,
+        roleId,
+        setRoleId,
+        roles,
+        checkUserAccess,
+        userAccess,
+        setUserAccess,
+        roleTable,
       }}
     >
       {children}

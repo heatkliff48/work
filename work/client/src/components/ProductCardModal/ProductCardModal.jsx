@@ -1,4 +1,4 @@
-import React, { useEffect, useState, version } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -23,14 +23,11 @@ const ProductCardModal = React.memo(() => {
     COLUMNS,
     productCardData,
     setProductCardData,
-    modal,
-    setModal,
   } = useProjectContext();
   const [lastVersion, setLastVersion] = useState(1);
   const [isModalWindowOpen, setIsModalWindowOpen] = useState(false);
   const [productByVersicon, setProductByVersicon] = useState({});
   const [selectedVersion, setSelectedVersion] = useState(null);
-  const user = useSelector((state) => state.user);
   const products = useSelector((state) => state.products);
   const dispatch = useDispatch();
 

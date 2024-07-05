@@ -19,6 +19,10 @@ function Products() {
     modalProductCard,
     setModalProductCard,
     setProductCardData,
+    roles,
+    checkUserAccess,
+    userAccess,
+    setUserAccess,
   } = useProjectContext();
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => latestProducts, [latestProducts]);
@@ -55,17 +59,32 @@ function Products() {
     tableInstance;
 
   const handleRowClick = (row) => {
-    setProductCardData(row.original);
-    setModalProductCard(!modalProductCard);
+    if (userAccess.canRead) {
+      setProductCardData(row.original);
+      setModalProductCard(!modalProductCard);
+    }
   };
 
   useEffect(() => {
-    if (user) {
-      dispatch(getAllProducts(user));
-    } else {
-      navigate('/sign-in');
+    if (userAccess.canRead) {
+      dispatch(getAllProducts());
     }
-  }, [dispatch, user]);
+  }, [dispatch, userAccess.canRead]);
+
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Products');
+      setUserAccess(access);
+
+      if (!access.canRead) {
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+      }
+    }
+  }, [user, roles]);
+
+  if (!userAccess.canRead) {
+    return <div>У вас нет прав для просмотра этой страницы.</div>;
+  }
 
   return (
     <>
@@ -133,7 +152,9 @@ function Products() {
             })}
           </tbody>
         </table>
-        <button onClick={() => setModal(!modal)}>Add product new</button>
+        {userAccess.canWrite && (
+          <button onClick={() => setModal(!modal)}>Add product new</button>
+        )}
       </div>
     </>
   );

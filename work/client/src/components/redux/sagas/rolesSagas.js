@@ -2,7 +2,12 @@ import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
-import { GET_ALL_CLIENTS, ALL_CLIENTS, NEW_CLIENTS, ADD_NEW_CLIENTS } from '../types/clientsTypes';
+import {
+  ALL_ROLES,
+  GET_ALL_ROLES,
+  NEED_UPDATE_ROLE,
+  UPDATE_ROLE,
+} from '../types/rolesTypes';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -26,58 +31,61 @@ url.interceptors.request.use(
   }
 );
 
-const getAllClients = (user) => {
+const getRoles = () => {
   return url
-    .post('/clients/all', { user })
+    .get('/roles')
     .then((res) => {
       return res.data;
     })
     .catch(showErrorMessage);
 };
 
-const addNewClient = ({ client, user }) => {
+const updateRole = ({ updRole }) => {
   return url
-    .post('/clients/add', { client, user })
+    .post('/roles/upd', { updRole })
     .then((res) => {
       return res.data;
     })
     .catch(showErrorMessage);
 };
 
-function* getAllClientsWatcher(action) {
+function* getAllRolesWatcher() {
   try {
-    const { clients, accessToken, accessTokenExpiration } = yield call(getAllClients, action.payload);
+    const { roles, accessToken, accessTokenExpiration } = yield call(
+      getRoles,
+    );
+
+    console.log("PAGES SAGA", roles);
 
     window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: ALL_CLIENTS, payload: clients });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    yield put(setToken({ accessToken, accessTokenExpiration }));
+    yield put({ type: ALL_ROLES, payload: roles });
   } catch (err) {
-    yield put({ type: ALL_CLIENTS, payload: [] });
+    yield put({ type: ALL_ROLES, payload: [] });
   }
 }
 
-function* addNewClientWatcher(action) {
+function* updateRolesWatcher(action) {
   try {
-    console.log(action.payload);
-    const { clients, accessToken, accessTokenExpiration } = yield call(
-      addNewClient,
+    const { updRoleData, accessToken, accessTokenExpiration } = yield call(
+      updateRole,
       action.payload
     );
 
-    console.log('FROM BACK', clients);
+    console.log('Role UPDATE SAGA', updRoleData);
     window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: NEW_CLIENTS, payload: clients });
+    yield put({ type: UPDATE_ROLE, payload: updRoleData });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
-    yield put({ type: NEW_CLIENTS, payload: [] });
+    yield put({ type: UPDATE_ROLE, payload: [] });
   }
 }
 
-function* clientsWatcher() {
-  yield takeLatest(GET_ALL_CLIENTS, getAllClientsWatcher);
-  yield takeLatest(ADD_NEW_CLIENTS, addNewClientWatcher);
+function* rolesWatcher() {
+  yield takeLatest(GET_ALL_ROLES, getAllRolesWatcher);
+  yield takeLatest(NEED_UPDATE_ROLE, updateRolesWatcher);
 }
 
-export default clientsWatcher;
+export default rolesWatcher;

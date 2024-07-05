@@ -27,7 +27,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   const [trMark, setTrMark] = useState('');
   const [articleId, setArticleId] = useState(-1);
   const [defaultValues, setDefaultValues] = useState({});
-  const user = useSelector((state) => state.user);
   const products = useSelector((state) => state.products);
   const dispatch = useDispatch();
 
@@ -69,8 +68,12 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   const getSelectedOption = (accessor) => {
     const options = selectOptions[accessor];
     if (!options) return null;
-    const defaultOption = options[0]; // Получаем первый элемент массива
-    return defaultOption;
+    const selectedOption = options.find(
+      (option) => option.value === formData?.[accessor]
+    );
+
+    // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
+    return selectedOption || options[0];
   };
 
   const updateProductHandler = () => {
@@ -91,7 +94,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
     } else {
       setModal(!modal);
       setModalProductCard(false);
-      dispatch(addNewProduct({ product: formInput, user }));
+      dispatch(addNewProduct({ product: formInput }));
     }
   };
 
@@ -424,7 +427,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
               updateProductHandler();
               setStayDefault(true);
               clearData();
-              setModal(!modal);
             }}
           >
             Add
