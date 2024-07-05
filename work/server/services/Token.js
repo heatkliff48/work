@@ -19,8 +19,8 @@ class TokenService {
   }
 
   static async checkAccess(req, _, next) {
-    console.log(">>>>>>.CHECK.<<<<<<<<");
     const authHeader = req.headers.authorization;
+    console.log('>>>>>>.CHECK.<<<<<<<<', authHeader);
     const token = authHeader?.split(' ')?.[1];
 
     if (!token) next(new Unauthorized());
@@ -30,7 +30,7 @@ class TokenService {
       if (err) next(new Forbidden(err));
 
       req.user = user;
-      console.log(">>>>>>.NEXT.<<<<<<<<");
+      console.log('>>>>>>.NEXT.<<<<<<<<', req.user);
       next();
     });
   }

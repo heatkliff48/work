@@ -164,3 +164,75 @@ label {
   justify-content: space-between;
   align-items: center;
 }
+.roles-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.roles-header, .role-row {
+  display: flex;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.roles-header {
+  font-weight: bold;
+  background-color: #f0f0f0;
+}
+
+.role-name, .role-active {
+  flex: 1;
+}
+
+.role-name {
+  flex: 2;
+}
+
+.role-active {
+  text-align: center;
+}
+
+.role-modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.role-header {
+  align-self: flex-start;
+}
+
+.permissions-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.table-header, .table-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.table-header {
+  font-weight: bold;
+}
+
+.table-header div, .table-row div {
+  flex: 1;
+  text-align: center;
+}
+
+.table-header div:first-child, .table-row div:first-child {
+  flex: 2;
+  text-align: left;
+}
+
+.modal-footer {
+  justify-content: flex-end;
+}
+

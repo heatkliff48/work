@@ -1,8 +1,7 @@
 // import axios from 'axios';
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Products from '../Products/Products';
+import { useSelector } from 'react-redux';
 
 function Main() {
   // const url = axios.create({
@@ -15,12 +14,14 @@ function Main() {
 
   useEffect(() => {
     if (!user) {
-      navigate('/sign-in');
+      navigate('/sign-it');
     }
   }, [navigate, user]);
+
   return (
     <div>
-      <Products />
+      <p>MAIN PAGE</p>
+      <button onClick={() => navigate('/products')}>Products</button>
     </div>
   );
 }

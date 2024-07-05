@@ -17,6 +17,18 @@ function NavBar() {
             <div
               className="nav_link"
               onClick={() => {
+                navigate('/roles');
+              }}
+            >
+              <p className="p_nav">Roles</p>
+            </div>
+          </div>
+        )}
+        {user && (
+          <div className="nav_link_wrapper">
+            <div
+              className="nav_link"
+              onClick={() => {
                 navigate('/');
               }}
             >

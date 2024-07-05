@@ -16,76 +16,78 @@ const url = axios.create({
   withCredentials: true,
 });
 
-// function* getAccessTokenFromStore() {
-//   console.log('getAccessTokenFromStore');
-//   const accessTokenEffect = yield select((state) => state.jwt);
-//   const accessToken = accessTokenEffect;
-//   console.log('getAccessTokenFromStore>>>>>>>>>>', accessToken);
-//   return accessToken;
-// }
+url.interceptors.request.use(
+  async (config) => {
+    const accessToken = window.localStorage.getItem('jwt');
 
-// url.interceptors.request.use(
-//   async (config) => {
-//     console.log('url.interceptors.request');
-//     const accessTokenGenerator = getAccessTokenFromStore();
-//     const accessToken = yield accessTokenGenerator.next().value;
-//     console.log('url.interceptors.request', accessToken);
-//     console.log('CONFIG', config);
+    if (accessToken) {
+      config.headers['Authorization'] = `Bearer ${accessToken}`;
+    }
 
-//     if (accessToken) config.headers['Authorization'] = `Bearer ${accessToken}`;
+    console.log('Interceptor: Final config', config);
+    return config;
+  },
+  (error) => {
+    console.log('Interceptor: Request error', error);
+    return Promise.reject(error);
+  }
+);
 
-//     return config;
-//   },
-//   (err) => Promise.reject(err)
-// );
-
-const getAllProducts = (user) => {
+const getAllProducts = () => {
   return url
-    .post('/products/all', { user })
+    .get('/products/all')
     .then((res) => {
       return res.data;
     })
     .catch(showErrorMessage);
 };
 
-const updateProducts = ({ product, user }) => {
+const updateProducts = ({ product }) => {
   return url
-    .post('/products/upd', { product, user })
+    .post('/products/upd', { product })
     .then((res) => {
       return res.data;
     })
     .catch(showErrorMessage);
 };
 
-const addNewProduct = ({ product, user }) => {
+const addNewProduct = ({ product }) => {
   return url
-    .post('/products/add', { product, user })
+    .post('/products/add', { product })
     .then((res) => {
       return res.data;
     })
     .catch(showErrorMessage);
 };
 
-function* getAllProductsWatcher(action) {
+function* getAllProductsWatcher() {
   try {
-    const data = yield call(getAllProducts, action.payload);
-    console.log('PROD SAGA', data);
+    const { products, accessToken, accessTokenExpiration } = yield call(
+      getAllProducts
+    );
+    console.log('PROD SAGA', products);
 
-    yield put({ type: ALL_PRODUCTS, payload: data.products });
-    yield put(setToken(data.accessToken, data.accessTokenExpiration));
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: ALL_PRODUCTS, payload: products });
+    yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
+    console.error('Error in getAllProductsWatcher:', err);
     yield put({ type: ALL_PRODUCTS, payload: [] });
   }
 }
 
 function* updateProductWatcher(action) {
   try {
-    const data = yield call(updateProducts, action.payload);
-    console.log('PROD UPDATE SAGA', data);
+    const { products, accessToken, accessTokenExpiration } = yield call(
+      updateProducts,
+      action.payload
+    );
+    console.log('PROD UPDATE SAGA', products);
+    window.localStorage.setItem('jwt', accessToken);
 
-
-    yield put({ type: UPDATE_PRODUCT, payload: data.products });
-    yield put(setToken(data.accessToken, data.accessTokenExpiration));
+    yield put({ type: UPDATE_PRODUCT, payload: products });
+    yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: UPDATE_PRODUCT, payload: [] });
   }
@@ -98,6 +100,8 @@ function* addNewProductWatcher(action) {
       action.payload
     );
     console.log('FROM BACK', products);
+    window.localStorage.setItem('jwt', accessToken);
+
     yield put({ type: NEW_PRODUCT, payload: products });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {

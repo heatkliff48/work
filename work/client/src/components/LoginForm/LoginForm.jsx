@@ -5,7 +5,6 @@ import { loginUser } from '../redux/actions/userAction';
 
 function LoginForm() {
   const [formInput, setForm] = useState({});
-  // const [message, setMessage] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);

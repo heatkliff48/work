@@ -24,7 +24,7 @@ class AuthController {
   }
 
   static async signUp(req, res) {
-    const { username, password, email } = req.body.user;
+    const { username, password, email, role } = req.body.user;
     const { fingerprint } = req;
     try {
       const { accessToken, refreshToken, accessTokenExpiration, user } =
@@ -32,6 +32,7 @@ class AuthController {
           username,
           password,
           email,
+          role,
           fingerprint: fingerprint.hash,
         });
       return res

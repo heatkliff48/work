@@ -5,8 +5,7 @@ const { COOKIE_SETTINGS } = require('../constants.js');
 class ProductController {
   static async getAllProduct(req, res) {
     const fingerprint = req.fingerprint.hash;
-    console.log('>>>>>>>>>>>>>>>REQ<<<<<<<<<<<<<<<', req.body);
-    const { id, username, email } = req.body.user;
+    const { id, username, email } = req.user;
     try {
       const { accessToken, refreshToken, accessTokenExpiration, products } =
         await ProductService.getAllProduct({ id, username, email, fingerprint });
@@ -22,7 +21,7 @@ class ProductController {
 
   static async addProduct(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.body.user;
+    const { id, username, email } = req.user;
     const { product } = req.body;
 
     try {
@@ -45,7 +44,7 @@ class ProductController {
 
   static async updateProduct(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.body.user;
+    const { id, username, email } = req.user;
     const { product } = req.body;
 
     try {

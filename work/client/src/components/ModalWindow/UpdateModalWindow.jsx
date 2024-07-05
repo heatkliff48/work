@@ -4,7 +4,6 @@ import { updateProduct } from '../redux/actions/productsAction';
 import { useProjectContext } from '../contexts/Context';
 
 function UpdateModalWindow() {
-  const user = useSelector((state) => state.user);
   const {
     promProduct,
     setPromProduct,
@@ -14,6 +13,7 @@ function UpdateModalWindow() {
     setModal,
     setStayDefault,
     setModalProductCard,
+    modalProductCard,
   } = useProjectContext();
   const dispatch = useDispatch();
 
@@ -24,10 +24,10 @@ function UpdateModalWindow() {
   const updateHadler = () => {
     const updProduct = { ...promProduct, version: productData.version + 1 };
     setStayDefault(true);
-    dispatch(updateProduct({ product: updProduct, user }));
+    dispatch(updateProduct({ product: updProduct }));
     setPromProduct({});
-    setModal(false)
-    setModalProductCard(false)
+    setModal(!modal);
+    setModalProductCard(!modalProductCard);
   };
 
   const backHadler = () => {

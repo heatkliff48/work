@@ -36,6 +36,7 @@ const delUser = () => {
 };
 
 function* addUserWatcher(action) {
+  console.log("USER WATCHER", action);
   try {
     const { user, accessToken, accessTokenExpiration } = yield call(
       addUser,
@@ -43,6 +44,7 @@ function* addUserWatcher(action) {
     );
     console.log('USER SAGA', user);
     window.localStorage.setItem('user', JSON.stringify(user));
+    window.localStorage.setItem('jwt', accessToken);
     yield put(setToken({ accessToken, accessTokenExpiration }));
     yield put({ type: ADD_USER, payload: user });
   } catch (err) {
@@ -57,7 +59,9 @@ function* loginUserWatcher(action) {
       action.payload
     );
     console.log('USER SAGA', user);
-    // window.localStorage.setItem('user', JSON.stringify(user));
+    window.localStorage.setItem('user', JSON.stringify(user));
+    window.localStorage.setItem('jwt', accessToken);
+  
     yield put({ type: ADD_USER, payload: user });
     yield put(setToken({ accessToken, accessTokenExpiration }));
   } catch (err) {

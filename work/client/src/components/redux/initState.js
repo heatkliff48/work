@@ -3,6 +3,8 @@ const initState = {
   products: [],
   jwt: null,
   clients: [],
+  roles: [],
+  pages: [],
 };
 
 export default initState;
