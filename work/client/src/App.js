@@ -31,7 +31,7 @@ function App() {
         dispatch(setToken(accessToken, accessTokenExpiration));
       })
       .catch(() => {});
-  }, [dispatch, url]);
+  }, [ url]);
 
   // useEffect(() => {
   //   //сделать диспатч чек юзер на нахождение юзера в бд

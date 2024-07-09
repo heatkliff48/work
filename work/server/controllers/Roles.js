@@ -44,6 +44,30 @@ class RolesController {
     }
   }
 
+  static async updateActiveRoles(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    const { updActiveRole } = req.body;
+
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration, updActiveRoleData } =
+        await RolesService.updateActiveRoles({
+          id,
+          username,
+          email,
+          fingerprint,
+          updActiveRole,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ updActiveRoleData, accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async getPagesList(req, res) {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;

@@ -179,7 +179,7 @@ const ProjectContextProvider = ({ children }) => {
     //сделать диспатч чек юзер на нахождение юзера в бд
     if (!user) return;
     dispatch(getAllRoles());
-  }, [dispatch, user, modalRoleCard]);
+  }, [user, modalRoleCard]);
 
   const checkUserAccess = (user, roles, pageName) => {
     const userRole = roles.find((role) => role.id == user.role);
