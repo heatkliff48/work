@@ -65,6 +65,7 @@ function* getAllProductsWatcher() {
     const { products, accessToken, accessTokenExpiration } = yield call(
       getAllProducts
     );
+
     console.log('PROD SAGA', products);
 
     window.localStorage.setItem('jwt', accessToken);

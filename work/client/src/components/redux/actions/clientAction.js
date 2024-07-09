@@ -1,14 +1,13 @@
 import { ADD_NEW_CLIENTS, GET_ALL_CLIENTS } from '../types/clientsTypes';
 
-export const getAllClients = (user) => {
+export const getAllClients = () => {
   return {
     type: GET_ALL_CLIENTS,
-    payload: user,
   };
 };
-export const addClient = ({ client, user }) => {
+export const addClient = ({ client }) => {
   return {
     type: ADD_NEW_CLIENTS,
-    payload: { client, user },
+    payload: { client },
   };
 };
