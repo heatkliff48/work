@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useProjectContext } from '../contexts/Context';
 import ModalRole from './ModalRole';
+import { updateRoleActive } from '../redux/actions/rolesAction';
 
 function Roles() {
   const { modalRoleCard, setModalRoleCard, setRoleId, roles, updateRole } =
@@ -25,9 +26,8 @@ function Roles() {
   };
 
   const handleSaveRoles = () => {
-    updatedRoles.forEach((role) => {
-      updateRole(role);
-    });
+    console.log('updatedRoles', updatedRoles);
+    dispatch(updateRoleActive({ updActiveRole: updatedRoles }));
   };
 
   return (

@@ -47,6 +47,27 @@ class RolesService {
     };
   }
 
+  static async updateActiveRoles({ id, username, email, fingerprint, updActiveRole }) {
+    const updActiveRoleData = await RolesRepository.updateActiveRolesData(updActiveRole);
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      updActiveRoleData,
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
   static async getPagesList({ id, username, email, fingerprint }) {
     const pages = await RolesRepository.getPagesListData();
     const payload = { id, username, email };

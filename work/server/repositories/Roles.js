@@ -67,6 +67,22 @@ class RolesRepository {
     return results;
   }
 
+  static async updateActiveRolesData(updActiveRole) {
+    const updActiveRoleData = [];
+
+    for (const updRole of updActiveRole) {
+      const updatedRole = await Roles.update(updRole, {
+        where: { id: updRole.id },
+        returning: true,
+        plain: true,
+      });
+
+      updActiveRoleData.push(updatedRole[1]); // Добавляем обновленную роль в массив
+    }
+
+    return updActiveRoleData;
+  }
+
   static async getPagesListData() {
     const pages = await Pages.findAll();
     return pages;

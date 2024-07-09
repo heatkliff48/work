@@ -26,6 +26,8 @@ class TokenService {
     if (!token) next(new Unauthorized());
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+      console.log('>>>>>>.JWT.<<<<<<<<', user);
+
       console.log(err, user);
       if (err) next(new Forbidden(err));
 

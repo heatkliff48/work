@@ -6,7 +6,9 @@ import {
   ALL_ROLES,
   GET_ALL_ROLES,
   NEED_UPDATE_ROLE,
+  NEED_UPDATE_ROLE_ACTIVE,
   UPDATE_ROLE,
+  UPDATE_ROLE_ACTIVE,
 } from '../types/rolesTypes';
 
 const url = axios.create({
@@ -49,13 +51,20 @@ const updateRole = ({ updRole }) => {
     .catch(showErrorMessage);
 };
 
+const updateRoleActive = ({ updActiveRole }) => {
+  return url
+    .post('/roles/upd/active', { updActiveRole })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
 function* getAllRolesWatcher() {
   try {
-    const { roles, accessToken, accessTokenExpiration } = yield call(
-      getRoles,
-    );
+    const { roles, accessToken, accessTokenExpiration } = yield call(getRoles);
 
-    console.log("PAGES SAGA", roles);
+    console.log('PAGES SAGA', roles);
 
     window.localStorage.setItem('jwt', accessToken);
 
@@ -73,7 +82,6 @@ function* updateRolesWatcher(action) {
       action.payload
     );
 
-    console.log('Role UPDATE SAGA', updRoleData);
     window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: UPDATE_ROLE, payload: updRoleData });
@@ -83,9 +91,28 @@ function* updateRolesWatcher(action) {
   }
 }
 
+function* updateRolesActiveWatcher(action) {
+
+  try {
+    const { updActiveRoleData, accessToken, accessTokenExpiration } = yield call(
+      updateRoleActive,
+      action.payload
+    );
+
+    console.log('Role UPDATE active SAGA', updActiveRoleData);
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: UPDATE_ROLE_ACTIVE, payload: updActiveRoleData });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: UPDATE_ROLE_ACTIVE, payload: [] });
+  }
+}
+
 function* rolesWatcher() {
   yield takeLatest(GET_ALL_ROLES, getAllRolesWatcher);
   yield takeLatest(NEED_UPDATE_ROLE, updateRolesWatcher);
+  yield takeLatest(NEED_UPDATE_ROLE_ACTIVE, updateRolesActiveWatcher);
 }
 
 export default rolesWatcher;

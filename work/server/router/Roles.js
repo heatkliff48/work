@@ -6,5 +6,6 @@ const router = Router();
 router.get('/', RolesController.getAllRoles);
 router.get('/pages', RolesController.getPagesList);
 router.post('/upd', RolesController.updateRoles);
+router.post('/upd/active', RolesController.updateActiveRoles);
 
 module.exports = router;

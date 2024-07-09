@@ -1,4 +1,4 @@
-import { ALL_ROLES, UPDATE_ROLE } from '../types/rolesTypes';
+import { ALL_ROLES, UPDATE_ROLE, UPDATE_ROLE_ACTIVE } from '../types/rolesTypes';
 
 export const rolesReducer = (roles = [], action) => {
   const { type, payload } = action;
@@ -38,6 +38,10 @@ export const rolesReducer = (roles = [], action) => {
       console.log('updRole', updRole);
 
       return updRole;
+    }
+
+    case UPDATE_ROLE_ACTIVE: {
+      return payload;
     }
 
     default:

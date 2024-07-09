@@ -69,7 +69,7 @@ function Products() {
     if (userAccess.canRead) {
       dispatch(getAllProducts());
     }
-  }, [dispatch, userAccess.canRead]);
+  }, [userAccess.canRead]);
 
   useEffect(() => {
     if (user && roles.length > 0) {
