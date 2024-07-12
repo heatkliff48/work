@@ -14,7 +14,7 @@ import ProjectContextProvider from './components/contexts/Context';
 import Roles from './components/Roles/Roles';
 import Products from './components/Products/Products';
 import ClientsInfo from './components/Clients/ClientsInfo/ClientsInfo';
-import { checkUser } from './components/redux/actions/userAction';
+// import { checkUser } from './components/redux/actions/userAction';
 import Orders from './components/Orders/Orders';
 export const IdContext = createContext();
 
