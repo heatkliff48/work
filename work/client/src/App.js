@@ -8,15 +8,19 @@ import RegForm from './components/RegForm/RegForm';
 // import ProtectedRoute from './components/ProtectRoute/ProtectRoute';
 import { SnackbarProvider } from 'notistack';
 import axios from 'axios';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, createContext, useState } from 'react';
 import { setToken } from './components/redux/actions/jwtAction';
 import ProjectContextProvider from './components/contexts/Context';
 import Roles from './components/Roles/Roles';
 import Products from './components/Products/Products';
+import ClientsInfo from './components/Clients/ClientsInfo/ClientsInfo';
+
+export const IdContext = createContext();
 
 function App() {
   const dispatch = useDispatch();
   const isCheckedAuth = useRef(false);
+  const [currentClientID, setClientID] = useState(1);
 
   const url = axios.create({
     baseURL: process.env.REACT_APP_URL,
@@ -48,14 +52,21 @@ function App() {
       <div className="wrapper">
         <SnackbarProvider />
         <NavBar />
+        <IdContext.Provider value={[currentClientID, setClientID]}>
         <Routes>
           <Route path="/" element={<Main />} />
           <Route path="/products" element={<Products />} />
           <Route path="/roles" element={<Roles />} />
           <Route path="/sign-up" element={<RegForm />} />
           <Route path="/sign-in" element={<LoginForm />} />
+
+          
+          <Route path="/clients" element={<ClientsInfo/>} /> 
+          
+
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>
+        </IdContext.Provider>
         <SnackbarProvider />
       </div>
     </ProjectContextProvider>
