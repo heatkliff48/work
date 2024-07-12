@@ -21,8 +21,6 @@ url.interceptors.request.use(
     if (accessTokenFront) {
       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
     }
-
-    console.log('Interceptor: Final config', config);
     return config;
   },
   (error) => {
@@ -74,7 +72,6 @@ function* addNewClientWatcher(action) {
       action.payload
     );
 
-    console.log('FROM BACK', clients);
     window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_CLIENTS, payload: clients });

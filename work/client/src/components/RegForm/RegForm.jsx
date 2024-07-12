@@ -8,9 +8,19 @@ import { useProjectContext } from '../contexts/Context';
 function RegForm() {
   const { roleTable } = useProjectContext();
   const [formInput, setForm] = useState({});
+  const [curRoleName, setCurRoleName] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+
+  const inputChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const submitForm = async (e) => {
+    e.preventDefault();
+    dispatch(addUser(formInput));
+  };
 
   useEffect(() => {
     if (user) {
@@ -19,15 +29,10 @@ function RegForm() {
     dispatch(getAllRoles());
   }, [navigate, user]);
 
-  const inputChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const submitForm = async (e) => {
-    e.preventDefault();
-    console.log('REG FORM', formInput);
-    dispatch(addUser(formInput));
-  };
+  useEffect(() => {
+    const selectedRole = roleTable.find((role) => role.id === formInput.role_id);
+    setCurRoleName(selectedRole?.role_name || 'Select Role');
+  }, [formInput.role_id]);
 
   return (
     <div className="login_wrapper">
@@ -59,10 +64,9 @@ function RegForm() {
             className="login_input"
             id="role"
             name="role"
-            value={formInput.role_id || ''}
             onChange={inputChange}
           >
-            <option value="">Select a role</option>
+            <option value="">{curRoleName}</option>
             {roleTable.map((role) => (
               <option key={role.id} value={role.id}>
                 {role.role_name}

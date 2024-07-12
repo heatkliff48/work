@@ -23,8 +23,6 @@ url.interceptors.request.use(
     if (accessTokenFront) {
       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
     }
-
-    console.log('Interceptor: Final config', config);
     return config;
   },
   (error) => {
@@ -67,8 +65,6 @@ function* getAllProductsWatcher() {
       getAllProducts
     );
 
-    console.log('PROD SAGA', products);
-
     window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ALL_PRODUCTS, payload: products });
@@ -86,7 +82,6 @@ function* updateProductWatcher(action) {
       updateProducts,
       action.payload
     );
-    console.log('PROD UPDATE SAGA', products);
     window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: UPDATE_PRODUCT, payload: products });
@@ -103,7 +98,6 @@ function* addNewProductWatcher(action) {
       addNewProduct,
       action.payload
     );
-    console.log('FROM BACK', products);
     window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_PRODUCT, payload: products });

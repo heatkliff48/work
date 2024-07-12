@@ -14,6 +14,7 @@ import ProjectContextProvider from './components/contexts/Context';
 import Roles from './components/Roles/Roles';
 import Products from './components/Products/Products';
 import { checkUser } from './components/redux/actions/userAction';
+import Orders from './components/Orders/Orders';
 
 function App() {
   const dispatch = useDispatch();
@@ -56,6 +57,7 @@ function App() {
           <Route path="/roles" element={<Roles />} />
           <Route path="/sign-up" element={<RegForm />} />
           <Route path="/sign-in" element={<LoginForm />} />
+          <Route path="/orders" element={<Orders />} />
           {/* <Route path="/addNewOrder" element={<LoginForm />} /> */}
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>

@@ -17,8 +17,6 @@ function ModalRole() {
   }, []);
 
   useEffect(() => {
-    console.log('ROLE', role);
-    console.log('PAGE', pages);
     if (role && pages) {
       const rolePermissions = role.PageAndRolesArray || [];
       setPermissions(

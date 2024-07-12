@@ -333,7 +333,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   }, []);
 
   useEffect(() => {
-    console.log('FORM DDATA', formData);
     if (formData) {
       setFormInput((prev) => ({ ...prev, version: formData.version }));
       setVersion(formData.version);

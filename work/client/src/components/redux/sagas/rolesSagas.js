@@ -24,7 +24,6 @@ url.interceptors.request.use(
       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
     }
 
-    console.log('Interceptor: Final config', config);
     return config;
   },
   (error) => {
@@ -65,8 +64,6 @@ function* getAllRolesWatcher() {
     accessTokenFront = yield select((state) => state.jwt);
 
     const { roles, accessToken, accessTokenExpiration } = yield call(getRoles);
-
-    console.log('PAGES SAGA', roles);
 
     window.localStorage.setItem('jwt', accessToken);
 

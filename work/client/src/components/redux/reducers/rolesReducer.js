@@ -8,7 +8,6 @@ export const rolesReducer = (roles = [], action) => {
     }
 
     case UPDATE_ROLE: {
-      console.log('UPD REDUCER', payload);
       if (!payload || payload.length === 0) return roles;
       const updRole = roles.map((role) => {
         if (role.id === payload[0].role_id) {
@@ -35,7 +34,6 @@ export const rolesReducer = (roles = [], action) => {
         }
         return role; // Возвращаем неизмененную роль, если id не совпадает
       });
-      console.log('updRole', updRole);
 
       return updRole;
     }

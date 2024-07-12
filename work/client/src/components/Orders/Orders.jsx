@@ -1,47 +1,16 @@
 import { useEffect, useMemo } from 'react';
-import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
-import { useSortBy, useTable } from 'react-table';
 import { useProjectContext } from '../contexts/Context';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import Table from '../Table/Table';
 
 function Orders() {
   const { COLUMNS_ORDERS, roles, checkUserAccess, userAccess, setUserAccess } =
     useProjectContext();
   const list_of_orders = useSelector((state) => state.orders);
-  const columns = useMemo(() => COLUMNS_ORDERS, []);
-  const data = useMemo(() => list_of_orders, [list_of_orders]);
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const sortTypes = {
-    // Функция сортировки для строковых значений
-    string: (rowA, rowB, columnId, desc) => {
-      const a = rowA.values[columnId];
-      const b = rowB.values[columnId];
-
-      // Используем метод localeCompare для сравнения строк
-      // с учетом локали (в данном случае 'en' - английский язык)
-      const comparison = a.localeCompare(b, 'en');
-
-      // Если desc (сортировка по убыванию) равно true,
-      // инвертируем результат сравнения
-      return desc ? -comparison : comparison;
-    },
-  };
-
-  const tableInstance = useTable(
-    {
-      columns,
-      data,
-      sortTypes,
-    },
-    useSortBy
-  );
-
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
 
   // const handleRowClick = (row) => {
   //   if (userAccess.canRead) {
@@ -56,101 +25,33 @@ function Orders() {
   //   }
   // }, [userAccess.canRead]);
 
-  useEffect(() => {
-    if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Products');
-      setUserAccess(access);
+  // useEffect(() => {
+  //   if (user && roles.length > 0) {
+  //     const access = checkUserAccess(user, roles, 'Products');
+  //     setUserAccess(access);
 
-      if (!access.canRead) {
-        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
-      }
-    }
-  }, [user, roles]);
+  //     if (!access.canRead) {
+  //       navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+  //     }
+  //   }
+  // }, [user, roles]);
 
-  if (!userAccess.canRead) {
-    return <div>У вас нет прав для просмотра этой страницы.</div>;
-  }
+  // if (!userAccess.canRead) {
+  //   return <div>У вас нет прав для просмотра этой страницы.</div>;
+  // }
 
   return (
     <>
-      {/* <ModalWindow
-        list={COLUMNS}
-        formData={null}
-        isOpen={modal}
-        toggle={() => setModal(!modal)}
+      <Table
+        COLUMN_DATA={COLUMNS_ORDERS}
+        dataOfTable={list_of_orders}
+        // userAccess={userAccess}
+        onClickButton={() => {
+          navigate('/addNewOrder');
+        }}
+        buttonText={'Add new order'}
+        tableName={'Orders'}
       />
-      <ProductCardModal /> */}
-      <h1>Sortable Table</h1>
-      <div className="table-wrapper">
-        {/* к разметке надо привыкнуть :) */}
-        <table {...getTableProps()}>
-          <thead>
-            {headerGroups.map((hG) => {
-              const { key, ...restProps } = hG.getHeaderGroupProps();
-              return (
-                <tr key={key} {...restProps}>
-                  {hG.headers.map((col) => {
-                    const { key, ...restProps } = col.getHeaderProps(
-                      col.getSortByToggleProps()
-                    );
-                    return (
-                      <th key={key} {...restProps}>
-                        {col.render('Header')}{' '}
-                        {/* если колонка является сортируемой, рендерим рядом с заголовком соответствующую иконку в зависимости от того, включена ли сортировка, а также на основе порядка сортировки */}
-                        {col.canSort && (
-                          <span>
-                            {col.isSorted ? (
-                              col.isSortedDesc ? (
-                                <BiSortUp />
-                              ) : (
-                                <BiSortDown />
-                              )
-                            ) : (
-                              <BiSortAlt2 />
-                            )}
-                          </span>
-                        )}
-                      </th>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {rows.map((row) => {
-              prepareRow(row);
-              const { key, ...restProps } = row.getRowProps();
-              return (
-                <tr
-                  key={key}
-                  {...restProps}
-                  // onClick={() => handleRowClick(row)}
-                >
-                  {row.cells.map((cell) => {
-                    const { key, ...restProps } = cell.getCellProps();
-
-                    return (
-                      <td key={key} {...restProps}>
-                        {cell.render('Cell')}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        {userAccess.canWrite && (
-          <button
-            onClick={() => {
-              navigate('/addNewOrder');
-            }}
-          >
-            Add product order
-          </button>
-        )}
-      </div>
     </>
   );
 }
