@@ -47,7 +47,7 @@ function Orders() {
         dataOfTable={list_of_orders}
         // userAccess={userAccess}
         onClickButton={() => {
-          navigate('/addNewOrder');
+          navigate('/addClientOrder');
         }}
         buttonText={'Add new order'}
         tableName={'Orders'}
