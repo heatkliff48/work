@@ -135,22 +135,47 @@ const ProjectContextProvider = ({ children }) => {
   ];
 
   const COLUMNS_ORDERS = [
-    // {
-    //   Header: 'Article',
-    //   accessor: 'article',
-    //   disableSortBy: true,
-    // },
+    {
+      Header: 'Article',
+      accessor: 'article',
+      disableSortBy: true,
+    },
     {
       Header: 'Clients name',
       accessor: 'clients_name',
       sortType: 'string',
     },
-    // {
-    //   Header: 'Form',
-    //   accessor: 'form',
-    //   defaultValue: 'Normal',
-    //   sortType: 'string',
-    // },
+    {
+      Header: 'Quantity, m2',
+      accessor: 'quantity_m2',
+      sortType: 'number',
+    },
+    {
+      Header: 'Quantity in palet',
+      accessor: 'quantity_palet',
+      sortType: 'number',
+    },
+    {
+      Header: 'Real quantity',
+      accessor: 'quantity_real',
+      sortType: 'number',
+    },
+    {
+      Header: 'Price, m2',
+      accessor: 'price_m2',
+      sortType: 'number',
+    },
+    {
+      Header: 'Discount',
+      accessor: 'discount',
+      sortType: 'number',
+      defaultValue: 0,
+    },
+    {
+      Header: 'Final price',
+      accessor: 'final_price',
+      sortType: 'number',
+    },
   ];
 
   const dispatch = useDispatch();
@@ -177,7 +202,6 @@ const ProjectContextProvider = ({ children }) => {
   ];
 
   const latestProducts = useMemo(() => {
-    // console.log('MEMO CONTEXT', products);
     const newProducts = products.reduce((acc, product) => {
       const { article, version } = product;
       const existingProduct = acc.find((p) => p.article === article);

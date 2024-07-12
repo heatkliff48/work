@@ -20,22 +20,23 @@ class TokenService {
 
   static async checkAccess(req, _, next) {
     const authHeader = req.headers?.authorization;
+    console.log('>>>>>>.URL.<<<<<<<<', req.url);
     console.log('>>>>>>.CHECK.<<<<<<<<', authHeader);
     const token = authHeader?.split(' ')?.[1];
-    console.log('req.path.startsWith', req.path);
-    // Проверяем, является ли запрос запросом для пользователя
-    const isUserRequest =
-      req.path.startsWith('/sign-up') ||
-      req.path.startsWith('/sign-in') ||
-      req.path.startsWith('/loguut');
+
+    // Массив путей, которые не требуют токена
+    const noTokenPaths = ['/sign-up', '/sign-in', '/logout', '/refresh'];
+
+    // Проверяем, является ли запрос запросом, который не требует токена
+    const isNoTokenRequest = noTokenPaths.some((path) => req.path.includes(path));
 
     if (!token) {
-      // Если токен отсутствует, проверяем, является ли запрос запросом для пользователя
-      if (isUserRequest) {
-        // Если это запрос для пользователя, разрешаем доступ без токена
+      // Если токен отсутствует, проверяем, является ли запрос запросом, который не требует токена
+      if (isNoTokenRequest) {
+        // Если это запрос, который не требует токена, разрешаем доступ без токена
         next();
       } else {
-        // Если это не запрос для пользователя, отклоняем запрос
+        // Если это не запрос, который не требует токена, отклоняем запрос
         next(new Unauthorized());
       }
     } else {
@@ -45,7 +46,7 @@ class TokenService {
           next(new Forbidden(err));
         } else {
           req.user = user;
-          console.log('>>>>>>.NEXT.<<<<<<<<', req.user);
+          console.log('>>>>>>.REQ USER.<<<<<<<<', req.user);
           next();
         }
       });

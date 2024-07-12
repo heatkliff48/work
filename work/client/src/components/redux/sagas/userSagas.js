@@ -28,8 +28,6 @@ url.interceptors.request.use(
     if (isCheckUserRequest && accessTokenFront) {
       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
     }
-
-    console.log('Interceptor: Final config', config);
     return config;
   },
   (error) => {
@@ -78,8 +76,6 @@ function* addUserWatcher(action) {
       action.payload
     );
 
-    console.log('USER SAGA', user);
-
     window.localStorage.setItem('user', JSON.stringify(user));
     window.localStorage.setItem('jwt', accessToken);
     yield put(setToken({ accessToken, accessTokenExpiration }));
@@ -98,8 +94,6 @@ function* loginUserWatcher(action) {
       action.payload
     );
 
-    console.log('USER SAGA', user);
-
     window.localStorage.setItem('user', JSON.stringify(user));
     window.localStorage.setItem('jwt', accessToken);
 
@@ -115,8 +109,6 @@ function* checkUserWatcher(action) {
     accessTokenFront = yield select((state) => state.jwt);
 
     const { user, accessToken, accessTokenExpiration } = yield call(checkUser);
-
-    console.log('USER SAGA', user);
 
     window.localStorage.setItem('user', JSON.stringify(user));
     window.localStorage.setItem('jwt', accessToken);

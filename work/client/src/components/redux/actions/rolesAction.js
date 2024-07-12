@@ -18,7 +18,6 @@ export const updateRoles = ({ updRole }) => {
 };
 
 export const updateRoleActive = ({ updActiveRole }) => {
-  console.log('ACTION', updActiveRole);
   return {
     type: NEED_UPDATE_ROLE_ACTIVE,
     payload: { updActiveRole },

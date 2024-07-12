@@ -23,7 +23,7 @@ export const setToken = (payload) => async (dispatch, getState) => {
   if (payload?.accessTokenExpiration) {
     dispatch(refreshToken(payload?.accessTokenExpiration));
   }
-  console.log('setToken');
+
   dispatch({
     type: SET_JWT_TOKEN,
     payload: payload?.accessToken,

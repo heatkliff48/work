@@ -14,13 +14,9 @@ class RolesRepository {
 
   static async updateRolesData(updRole) {
     const results = [];
-
-    console.log('>>>>>>>', updRole);
-
     const { id: role_id, PageAndRolesArray } = updRole;
 
     for (const pageData of PageAndRolesArray) {
-      console.log('pageData', pageData);
       const { id: page_id, PageAndRoles: pageAndRolesData } = pageData;
 
       // Проверяем, существует ли pageAndRolesData и имеет ли он свойства write и read
@@ -37,8 +33,6 @@ class RolesRepository {
         where: { page_id, role_id },
       });
 
-      console.log('>>>>>>updateRolesData 2 <<<<<<', existingPageAndRoles);
-
       let updRoleData;
 
       if (!existingPageAndRoles) {
@@ -48,7 +42,6 @@ class RolesRepository {
           write,
           read,
         });
-        console.log('>>>>>>updateRolesData 3 <<<<<<', updRoleData);
       } else {
         [, updRoleData] = await PageAndRoles.update(
           { write, read },
@@ -58,12 +51,10 @@ class RolesRepository {
             plain: true,
           }
         );
-        console.log('>>>>>>updateRolesData 4 <<<<<<', updRoleData);
       }
 
       results.push(updRoleData);
     }
-    console.log('>>>>>>>>>>>>>>>> RESULTS', results);
     return results;
   }
 

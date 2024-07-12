@@ -26,7 +26,6 @@ class AuthService {
       username: userData.username,
       email: userData.email,
       role: userData.role,
-
     };
     const accessToken = await TokenService.generateAccessToken(payload);
     const refreshToken = await TokenService.generateRefreshToken(payload);
@@ -83,7 +82,6 @@ class AuthService {
     const accessToken = await TokenService.generateAccessToken(payload);
     const refreshToken = await TokenService.generateRefreshToken(payload);
 
-
     await RefreshSessionsRepository.createRefreshSession({
       user_id: user.id,
       refresh_token: refreshToken,
@@ -105,6 +103,7 @@ class AuthService {
     if (!currentRefreshToken) {
       throw new Unauthorized();
     }
+
     const refreshSession = await RefreshSessionsRepository.getRefreshSession(
       currentRefreshToken
     );
