@@ -14,6 +14,7 @@
     "dotenv": "^16.3.1",
     "notistack": "^3.0.1",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.10.4",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.2",
     "react-icons": "^5.2.1",
@@ -59,5 +60,8 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+  },
+  "imports": {
+        "#*": "./src/*"
   }
 }

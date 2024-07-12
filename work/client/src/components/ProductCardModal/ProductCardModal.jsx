@@ -93,7 +93,7 @@ const ProductCardModal = React.memo(() => {
 
     const lva = products?.filter((el) => el.article === searchArticle);
 
-    const lastVers = lva.reduce((max, product) => {
+    const lastVers = lva?.reduce((max, product) => {
       return product.version > max ? product.version : max;
     }, 1);
 

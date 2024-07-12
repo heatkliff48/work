@@ -1,8 +1,8 @@
 module.exports = {
   development: {
-    username: 'danil',
-    password: '111',
-    database: 'work',
+    username: 'postgres',
+    password: null,
+    database: 'sequelize_test',
     host: '127.0.0.1',
     dialect: 'postgres',
   },

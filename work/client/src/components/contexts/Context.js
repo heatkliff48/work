@@ -202,7 +202,8 @@ const ProjectContextProvider = ({ children }) => {
   ];
 
   const latestProducts = useMemo(() => {
-    const newProducts = products.reduce((acc, product) => {
+    // console.log('MEMO CONTEXT', products);
+    const newProducts = products?.reduce((acc, product) => {
       const { article, version } = product;
       const existingProduct = acc.find((p) => p.article === article);
       if (!existingProduct) {

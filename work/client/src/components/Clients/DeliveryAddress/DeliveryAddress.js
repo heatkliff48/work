@@ -1,0 +1,56 @@
+import React, { Fragment, useEffect, useState, useContext } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction';
+import { ClientContext } from '#components/Clients/ClientsInfo/ClientsInfo';
+
+const DeliveryAddress = () => {
+    const [currentClient, setCurrentClient] = useContext(ClientContext);
+
+    const dispatch = useDispatch();
+    const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
+
+    useEffect(() => {
+        dispatch(getAllDeliveryAddresses(currentClient.id));
+    }, [currentClient.id]);
+
+    return (
+    <Fragment>
+        {" "}
+        <table className="table mt-5 table-bordered text-center table-striped table-hover"
+        align="left">
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>street</th>
+                <th>additional_info</th>
+                <th>city</th>
+                <th>zip_code</th>
+                <th>province</th>
+                <th>country</th>
+                <th>phone_number</th>
+                <th>email</th>
+            </tr>
+            </thead>
+            <tbody>
+                {deliveryAddresses?.map(entrie => {
+                    if (!entrie) return
+                    return <tr>
+                            <td>{entrie?.id}</td>
+                            <td>{entrie?.street}</td>
+                            <td>{entrie?.additional_info}</td>
+                            <td>{entrie?.city}</td>
+                            <td>{entrie?.zip_code}</td>
+                            <td>{entrie?.province}</td>
+                            <td>{entrie?.country}</td>
+                            <td>{entrie?.phone_number}</td>
+                            <td>{entrie?.email}</td>
+                        </tr>
+                    })}
+
+            </tbody>
+        </table>
+    </Fragment>
+    );
+};
+
+export default DeliveryAddress;
