@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Table from '../Table/Table';
 
-function Orders() {
+function AddProductOrder() {
   const { COLUMNS_ORDERS, latestProducts } = useProjectContext();
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -25,4 +25,4 @@ function Orders() {
     </>
   );
 }
-export default Orders;
+export default AddProductOrder;
