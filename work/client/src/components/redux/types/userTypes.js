@@ -7,4 +7,5 @@ export const GET_DEL_USER = 'GET_DEL_USER';
 export const GET_LOGIN_USER = 'GET_LOGIN_USER';
 export const LOGIN_USER = 'LOGIN_USER';
 
+export const GET_CHECK_USER = 'GET_CHECK_USER';
 export const CHECK_USER = 'CHECK_USER';

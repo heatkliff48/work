@@ -11,6 +11,8 @@ import {
 } from '../types/productsTypes';
 import { setToken } from '../actions/jwtAction';
 
+let accessTokenFront;
+
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
@@ -18,10 +20,8 @@ const url = axios.create({
 
 url.interceptors.request.use(
   async (config) => {
-    const accessToken = window.localStorage.getItem('jwt');
-
-    if (accessToken) {
-      config.headers['Authorization'] = `Bearer ${accessToken}`;
+    if (accessTokenFront) {
+      config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
     }
 
     console.log('Interceptor: Final config', config);
@@ -62,6 +62,7 @@ const addNewProduct = ({ product }) => {
 
 function* getAllProductsWatcher() {
   try {
+    accessTokenFront = yield select(state => state.jwt);
     const { products, accessToken, accessTokenExpiration } = yield call(
       getAllProducts
     );
@@ -80,6 +81,7 @@ function* getAllProductsWatcher() {
 
 function* updateProductWatcher(action) {
   try {
+    accessTokenFront = yield select(state => state.jwt);
     const { products, accessToken, accessTokenExpiration } = yield call(
       updateProducts,
       action.payload
@@ -96,6 +98,7 @@ function* updateProductWatcher(action) {
 
 function* addNewProductWatcher(action) {
   try {
+    accessTokenFront = yield select(state => state.jwt);
     const { products, accessToken, accessTokenExpiration } = yield call(
       addNewProduct,
       action.payload

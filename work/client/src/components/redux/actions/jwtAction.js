@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SET_JWT_TOKEN } from '../types/jwtTypes';
+import { DELETE_JWT_TOKEN, SET_JWT_TOKEN } from '../types/jwtTypes';
 
 let refreshTimeoutId = null;
 const url = axios.create({
@@ -23,12 +23,14 @@ export const setToken = (payload) => async (dispatch, getState) => {
   if (payload?.accessTokenExpiration) {
     dispatch(refreshToken(payload?.accessTokenExpiration));
   }
-  return {
+  console.log('setToken');
+  dispatch({
     type: SET_JWT_TOKEN,
     payload: payload?.accessToken,
-  };
+  });
 };
+
 export const deleteToken = () => async (dispatch, getState) => {
   if (refreshTimeoutId) clearInterval(refreshTimeoutId);
-  dispatch(setToken(null));
+  dispatch({ type: DELETE_JWT_TOKEN });
 };

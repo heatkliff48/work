@@ -25,6 +25,8 @@ class AuthService {
       id: userData.id,
       username: userData.username,
       email: userData.email,
+      role: userData.role,
+
     };
     const accessToken = await TokenService.generateAccessToken(payload);
     const refreshToken = await TokenService.generateRefreshToken(payload);
@@ -57,7 +59,7 @@ class AuthService {
       role,
     });
 
-    const payload = { id: user.id, username, email };
+    const payload = { id: user.id, username, email, role };
 
     const accessToken = await TokenService.generateAccessToken(payload);
     const refreshToken = await TokenService.generateRefreshToken(payload);
@@ -69,6 +71,26 @@ class AuthService {
     });
     return {
       user,
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
+  static async checkUser({ username, email, fingerprint, role }) {
+    const payload = { id: user.id, username, email, role };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: user.id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
       accessToken,
       refreshToken,
       accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,

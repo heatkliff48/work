@@ -13,10 +13,13 @@ import { setToken } from './components/redux/actions/jwtAction';
 import ProjectContextProvider from './components/contexts/Context';
 import Roles from './components/Roles/Roles';
 import Products from './components/Products/Products';
+import { checkUser } from './components/redux/actions/userAction';
 
 function App() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isCheckedAuth = useRef(false);
+  const user = useSelector((state) => state.user);
 
   const url = axios.create({
     baseURL: process.env.REACT_APP_URL,
@@ -31,17 +34,16 @@ function App() {
         dispatch(setToken(accessToken, accessTokenExpiration));
       })
       .catch(() => {});
-  }, [ url]);
+  }, [url]);
 
-  // useEffect(() => {
-  //   //сделать диспатч чек юзер на нахождение юзера в бд
+  useEffect(() => {
+    //сделать диспатч чек юзер на нахождение юзера в бд
+    // dispatch(checkUser());
 
-  //   // if (isCheckedAuth && !user) {
-  //   //   navigate('/sign-in');
-  //   // }
-  //   dispatch(getAllRoles());
-  //   console.log("object");
-  // }, [dispatch, user]);
+    if (isCheckedAuth && !user) {
+      navigate('/sign-in');
+    }
+  }, []);
 
   return (
     <ProjectContextProvider>
@@ -54,6 +56,7 @@ function App() {
           <Route path="/roles" element={<Roles />} />
           <Route path="/sign-up" element={<RegForm />} />
           <Route path="/sign-in" element={<LoginForm />} />
+          {/* <Route path="/addNewOrder" element={<LoginForm />} /> */}
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>
         <SnackbarProvider />

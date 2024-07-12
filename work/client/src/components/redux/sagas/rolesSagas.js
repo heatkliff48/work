@@ -1,4 +1,4 @@
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { put, call, takeLatest, select } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
@@ -11,6 +11,8 @@ import {
   UPDATE_ROLE_ACTIVE,
 } from '../types/rolesTypes';
 
+let accessTokenFront
+
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
@@ -18,10 +20,8 @@ const url = axios.create({
 
 url.interceptors.request.use(
   async (config) => {
-    const accessToken = window.localStorage.getItem('jwt');
-
-    if (accessToken) {
-      config.headers['Authorization'] = `Bearer ${accessToken}`;
+    if (accessTokenFront) {
+      config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
     }
 
     console.log('Interceptor: Final config', config);
@@ -62,6 +62,8 @@ const updateRoleActive = ({ updActiveRole }) => {
 
 function* getAllRolesWatcher() {
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     const { roles, accessToken, accessTokenExpiration } = yield call(getRoles);
 
     console.log('PAGES SAGA', roles);
@@ -77,6 +79,8 @@ function* getAllRolesWatcher() {
 
 function* updateRolesWatcher(action) {
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     const { updRoleData, accessToken, accessTokenExpiration } = yield call(
       updateRole,
       action.payload
@@ -92,8 +96,9 @@ function* updateRolesWatcher(action) {
 }
 
 function* updateRolesActiveWatcher(action) {
-
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     const { updActiveRoleData, accessToken, accessTokenExpiration } = yield call(
       updateRoleActive,
       action.payload

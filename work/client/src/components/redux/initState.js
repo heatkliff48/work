@@ -1,10 +1,11 @@
 const initState = {
-  user: [],
+  user: {},
   products: [],
   jwt: null,
   clients: [],
   roles: [],
   pages: [],
+  orders: [],
 };
 
 export default initState;

@@ -4,6 +4,7 @@ import productsWatcher from './productsSagas';
 import clientsWatcher from './clientsSagas';
 import rolesWatcher from './rolesSagas';
 import pagesWatcher from './pagesSagas';
+import ordersWatcher from './ordersSagas';
 export default function* rootSaga() {
   yield all([
     userWatcher(),
@@ -11,5 +12,6 @@ export default function* rootSaga() {
     clientsWatcher(),
     rolesWatcher(),
     pagesWatcher(),
+    ordersWatcher(),
   ]);
 }
