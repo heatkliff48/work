@@ -1,6 +1,6 @@
 import {
-  CHECK_USER,
   GET_ADD_USER,
+  GET_CHECK_USER,
   GET_DEL_USER,
   GET_LOGIN_USER,
 } from '../types/userTypes';
@@ -20,7 +20,7 @@ export const loginUser = (user) => {
 };
 export const checkUser = () => {
   return {
-    type: CHECK_USER,
+    type: GET_CHECK_USER,
   };
 };
 export const delUser = () => {

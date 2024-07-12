@@ -10,7 +10,7 @@ export const userReducer = (user = null, action) => {
       return payload;
     }
     case CHECK_USER: {
-      return JSON.parse(window.localStorage.getItem('user')) ?? null;
+      return payload;
     }
     case LOGIN_USER: {
       return payload;

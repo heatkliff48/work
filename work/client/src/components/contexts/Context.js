@@ -133,6 +133,26 @@ const ProjectContextProvider = ({ children }) => {
       sortType: 'number',
     },
   ];
+
+  const COLUMNS_ORDERS = [
+    // {
+    //   Header: 'Article',
+    //   accessor: 'article',
+    //   disableSortBy: true,
+    // },
+    {
+      Header: 'Clients name',
+      accessor: 'clients_name',
+      sortType: 'string',
+    },
+    // {
+    //   Header: 'Form',
+    //   accessor: 'form',
+    //   defaultValue: 'Normal',
+    //   sortType: 'string',
+    // },
+  ];
+
   const dispatch = useDispatch();
 
   const [promProduct, setPromProduct] = useState(null);
@@ -205,6 +225,8 @@ const ProjectContextProvider = ({ children }) => {
   return (
     <ProjectContext.Provider
       value={{
+        COLUMNS,
+        COLUMNS_ORDERS,
         promProduct,
         setPromProduct,
         version,
@@ -219,7 +241,6 @@ const ProjectContextProvider = ({ children }) => {
         setModalAddClient,
         modalProductCard,
         setModalProductCard,
-        COLUMNS,
         latestProducts,
         productCardData,
         setProductCardData,

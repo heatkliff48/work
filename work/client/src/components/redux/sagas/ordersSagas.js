@@ -3,11 +3,11 @@ import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
 import {
-  GET_ALL_CLIENTS,
-  ALL_CLIENTS,
-  NEW_CLIENTS,
-  ADD_NEW_CLIENTS,
-} from '../types/clientsTypes';
+  ADD_NEW_ORDER,
+  GET_ORDERS_LIST,
+  NEW_ORDER,
+  ORDERS_LIST,
+} from '../types/ordersTypes';
 
 let accessTokenFront;
 
@@ -31,62 +31,63 @@ url.interceptors.request.use(
   }
 );
 
-const getAllClients = () => {
+const getAllOrders = () => {
   return url
-    .get('/clients/all')
+    .get('/orders')
     .then((res) => {
       return res.data;
     })
     .catch(showErrorMessage);
 };
 
-const addNewClient = ({ client }) => {
+const addNewOrder = ({ order }) => {
   return url
-    .post('/clients/add', { client })
+    .post('/orders/add', { order })
     .then((res) => {
       return res.data;
     })
     .catch(showErrorMessage);
 };
 
-function* getAllClientsWatcher(action) {
+function* getOrdersListWatcher() {
   try {
-    accessTokenFront = yield select(state => state.jwt);
-    const { clients, accessToken, accessTokenExpiration } = yield call(
-      getAllClients
-    );
+    accessTokenFront = yield select((state) => state.jwt);
+    const { orders, accessToken, accessTokenExpiration } = yield call(getAllOrders);
+
+    console.log('ORDERS SAGA', orders);
 
     window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: ALL_CLIENTS, payload: clients });
+    yield put({ type: ORDERS_LIST, payload: orders });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
-    yield put({ type: ALL_CLIENTS, payload: [] });
+    console.error('Error in getAllProductsWatcher:', err);
+    yield put({ type: ORDERS_LIST, payload: [] });
   }
 }
 
-function* addNewClientWatcher(action) {
+function* addNewOrderWatcher(action) {
   try {
-    accessTokenFront = yield select(state => state.jwt);
+    accessTokenFront = yield select((state) => state.jwt);
 
-    const { clients, accessToken, accessTokenExpiration } = yield call(
-      addNewClient,
+    const { orders, accessToken, accessTokenExpiration } = yield call(
+      addNewOrder,
       action.payload
     );
 
-    console.log('FROM BACK', clients);
+    console.log('Orders FROM BACK', orders);
     window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: NEW_CLIENTS, payload: clients });
+    yield put({ type: NEW_ORDER, payload: orders });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
-    yield put({ type: NEW_CLIENTS, payload: [] });
+    yield put({ type: NEW_ORDER, payload: [] });
   }
 }
 
-function* clientsWatcher() {
-  yield takeLatest(GET_ALL_CLIENTS, getAllClientsWatcher);
-  yield takeLatest(ADD_NEW_CLIENTS, addNewClientWatcher);
+function* ordersWatcher() {
+  yield takeLatest(GET_ORDERS_LIST, getOrdersListWatcher);
+  yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
 }
 
-export default clientsWatcher;
+export default ordersWatcher;

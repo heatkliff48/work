@@ -44,6 +44,29 @@ class AuthController {
     }
   }
 
+  static async checkUser(req, res) {
+    const { username, email, role } = req.user;
+    const { fingerprint } = req;
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration } =
+        await AuthService.checkUser({
+          username,
+          email,
+          role,
+          fingerprint: fingerprint.hash,
+        });
+
+      const user = req.user ?? {};
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ user, accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async logOut(req, res) {
     const { fingerprint } = req;
     const refreshToken = req.cookies.refreshToken;

@@ -1,8 +1,10 @@
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { put, call, takeLatest, select } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
 import { ALL_PAGES, GET_ALL_PAGES } from '../types/rolesTypes';
+
+let accessTokenFront
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -11,10 +13,8 @@ const url = axios.create({
 
 url.interceptors.request.use(
   async (config) => {
-    const accessToken = window.localStorage.getItem('jwt');
-
-    if (accessToken) {
-      config.headers['Authorization'] = `Bearer ${accessToken}`;
+    if (accessTokenFront) {
+      config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
     }
 
     console.log('Interceptor: Final config', config);
@@ -37,6 +37,7 @@ const getPagesList = () => {
 
 function* getAllPagesWatcher() {
   try {
+    accessTokenFront = yield select(state => state.jwt);
     const { pages, accessToken, accessTokenExpiration } = yield call(
       getPagesList,
     );

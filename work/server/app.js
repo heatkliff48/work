@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const Fingerprint = require('express-fingerprint');
 const AuthRootRouter = require('./router/Auth.js');
 const ProductRootRouter = require('./router/Product.js');
+const OrdersRootRouter = require('./router/Orders.js');
 const ClientsRootRouter = require('./router/Clients.js');
 const RolesRootRouter = require('./router/Roles.js');
 const TokenService = require('./services/Token.js');
@@ -27,11 +28,11 @@ app.use(
   })
 );
 
-app.use('/auth', AuthRootRouter);
+app.use('/auth', TokenService.checkAccess, AuthRootRouter);
 app.use('/products', TokenService.checkAccess, ProductRootRouter);
-// app.use('/products', ProductRootRouter);
 app.use('/roles', TokenService.checkAccess, RolesRootRouter);
-// app.use('/roles', RolesRootRouter);
+app.use('/orders', TokenService.checkAccess, OrdersRootRouter);
+
 // app.use('/clients', ClientsRootRouter);
 
 const start = async () => {

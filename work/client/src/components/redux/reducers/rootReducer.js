@@ -5,6 +5,7 @@ import { jwtReducer } from './jwtReducer';
 import { clientsReducer } from './clientsReducer';
 import { rolesReducer } from './rolesReducer';
 import { pagesReducer } from './pagesReducer';
+import { ordersReducer } from './orderReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -13,4 +14,5 @@ export const rootReducer = combineReducers({
   clients: clientsReducer,
   roles: rolesReducer,
   pages: pagesReducer,
+  orders: ordersReducer,
 });
