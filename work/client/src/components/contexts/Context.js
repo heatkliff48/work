@@ -136,6 +136,29 @@ const ProjectContextProvider = ({ children }) => {
 
   const COLUMNS_ORDERS = [
     {
+      Header: 'Id',
+      accessor: 'id',
+      sortType: 'number',
+    },
+    {
+      Header: 'Article',
+      accessor: 'article',
+      disableSortBy: true,
+    },
+    {
+      Header: 'Clients name',
+      accessor: 'clients_name',
+      sortType: 'string',
+    },
+    {
+      Header: 'Clients name',
+      accessor: 'clients_name',
+      sortType: 'string',
+    },
+  ];
+
+  const COLUMNS_ORDER_PRODUCT = [
+    {
       Header: 'Article',
       accessor: 'article',
       disableSortBy: true,
@@ -252,6 +275,7 @@ const ProjectContextProvider = ({ children }) => {
       value={{
         COLUMNS,
         COLUMNS_ORDERS,
+        COLUMNS_ORDER_PRODUCT,
         promProduct,
         setPromProduct,
         version,

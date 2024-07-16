@@ -16,6 +16,8 @@ import Products from './components/Products/Products';
 import ClientsInfo from './components/Clients/ClientsInfo/ClientsInfo';
 // import { checkUser } from './components/redux/actions/userAction';
 import Orders from './components/Orders/Orders';
+import AddClientOrder from '#components/Orders/AddClientOrder.jsx';
+import AddProductOrder from '#components/Orders/AddProductOrder.jsx';
 export const IdContext = createContext();
 
 function App() {
@@ -55,20 +57,20 @@ function App() {
         <SnackbarProvider />
         <NavBar />
         <IdContext.Provider value={[currentClientID, setClientID]}>
-        <IdContext.Provider value={[currentClientID, setClientID]}>
-        <Routes>
-          <Route path="/" element={<Main />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/roles" element={<Roles />} />
-          <Route path="/sign-up" element={<RegForm />} />
-          <Route path="/sign-in" element={<LoginForm />} />
-          <Route path="/clients" element={<ClientsInfo/>} /> 
-          <Route path="/orders" element={<Orders />} />
-          {/* <Route path="/addClientOrder" element={<AddClientOrder />} /> */}
-          {/* <Route path="/addClientOrder" element={<AddClientOrder />} /> */}
-          <Route path="*" element={<Navigate to={'sign-in'} />} />
-        </Routes>
-        </IdContext.Provider>
+          <IdContext.Provider value={[currentClientID, setClientID]}>
+            <Routes>
+              <Route path="/" element={<Main />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/roles" element={<Roles />} />
+              <Route path="/sign-up" element={<RegForm />} />
+              <Route path="/sign-in" element={<LoginForm />} />
+              <Route path="/clients" element={<ClientsInfo />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/addClientOrder" element={<AddClientOrder />} />
+              <Route path="/addProductOrder" element={<AddProductOrder />} />
+              <Route path="*" element={<Navigate to={'sign-in'} />} />
+            </Routes>
+          </IdContext.Provider>
         </IdContext.Provider>
         <SnackbarProvider />
       </div>
