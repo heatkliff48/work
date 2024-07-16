@@ -2,14 +2,30 @@ import { put, call, takeLatest, select } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
-import { GET_ALL_CLIENTS, ALL_CLIENTS, NEW_CLIENTS, ADD_NEW_CLIENT, NEED_UPDATE_CLIENT, UPDATE_CLIENT,
-  ONE_LEGAL_ADDRESS, NEW_LEGAL_ADDRESS, NEED_UPDATE_LEGAL_ADDRESS, UPDATE_LEGAL_ADDRESS,
-  ADD_CLIENTS_LEGAL_ADDRESS, GET_CLIENTS_LEGAL_ADDRESS,
-  GET_ALL_DELIVERY_ADDRESSES, ALL_DELIVERY_ADDRESSES,
-  ADD_DELIVERY_ADDRESSES, NEW_DELIVERY_ADDRESSES,
-  GET_ALL_CONTACT_INFO, ALL_CONTACT_INFO,
-  ADD_CONTACT_INFO, NEW_CONTACT_INFO
- } from '../types/clientsTypes';
+import {
+  GET_ALL_CLIENTS,
+  ALL_CLIENTS,
+  NEW_CLIENTS,
+  ADD_NEW_CLIENT,
+  NEED_UPDATE_CLIENT,
+  UPDATE_CLIENT,
+  ONE_LEGAL_ADDRESS,
+  NEW_LEGAL_ADDRESS,
+  NEED_UPDATE_LEGAL_ADDRESS,
+  UPDATE_LEGAL_ADDRESS,
+  ADD_CLIENTS_LEGAL_ADDRESS,
+  GET_CLIENTS_LEGAL_ADDRESS,
+  GET_ALL_DELIVERY_ADDRESSES,
+  ALL_DELIVERY_ADDRESSES,
+  ADD_DELIVERY_ADDRESSES,
+  NEW_DELIVERY_ADDRESSES,
+  GET_ALL_CONTACT_INFO,
+  ALL_CONTACT_INFO,
+  ADD_CONTACT_INFO,
+  NEW_CONTACT_INFO,
+} from '../types/clientsTypes';
+
+let accessTokenFront;
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -42,7 +58,7 @@ const addNewClient = ({ client }) => {
   return url
     .post('/clients', { client })
     .then((res) => {
-      console.log(res.data)
+      console.log(res.data);
       return res.data;
     })
     .catch(showErrorMessage);
@@ -70,14 +86,14 @@ const addNewLegalAddress = ({ legalAddress }) => {
   return url
     .post('/clientsAddress', { legalAddress })
     .then((res) => {
-      console.log(res.data)
+      console.log(res.data);
       return res.data;
     })
     .catch(showErrorMessage);
 };
 
 const updateLegalAddress = ({ legalAddress }) => {
-  console.log('UPDATE SAGA START', legalAddress)
+  console.log('UPDATE SAGA START', legalAddress);
   return url
     .post(`/clientsAddress/update/${legalAddress.c_id}`, { legalAddress })
     .then((res) => {
@@ -100,7 +116,7 @@ const addNewDeliveryAddress = ({ deliveryAddress }) => {
   return url
     .post('/deliveryAddress', { deliveryAddress })
     .then((res) => {
-      console.log(res.data)
+      console.log(res.data);
       return res.data;
     })
     .catch(showErrorMessage);
@@ -108,11 +124,11 @@ const addNewDeliveryAddress = ({ deliveryAddress }) => {
 
 // Contact Info
 const getAllContactInfo = (currentClientID) => {
-  console.log('SAGA START', currentClientID)
+  console.log('SAGA START', currentClientID);
   return url
     .get(`/clientsContactInfo/${currentClientID}`)
     .then((res) => {
-      console.log('GET CONTACT', res.data)
+      console.log('GET CONTACT', res.data);
       return res.data;
     })
     .catch(showErrorMessage);
@@ -122,7 +138,7 @@ const addNewContactInfo = ({ contactInfo }) => {
   return url
     .post('/clientsContactInfo', { contactInfo })
     .then((res) => {
-      console.log(res.data)
+      console.log(res.data);
       return res.data;
     })
     .catch(showErrorMessage);
@@ -132,7 +148,10 @@ const addNewContactInfo = ({ contactInfo }) => {
 
 function* getAllClientsWatcher(action) {
   try {
-    const { allClients, accessToken, accessTokenExpiration } = yield call(getAllClients);
+    accessTokenFront = yield select((state) => state.jwt);
+    const { allClients, accessToken, accessTokenExpiration } = yield call(
+      getAllClients
+    );
 
     window.localStorage.setItem('jwt', accessToken);
 
@@ -145,6 +164,8 @@ function* getAllClientsWatcher(action) {
 
 function* addNewClientWatcher(action) {
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     console.log(action.payload);
     const { client, accessToken, accessTokenExpiration } = yield call(
       addNewClient,
@@ -161,6 +182,8 @@ function* addNewClientWatcher(action) {
 
 function* updateClientWorker(action) {
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     const { client, accessToken, accessTokenExpiration } = yield call(
       updateClient,
       action.payload
@@ -176,6 +199,8 @@ function* updateClientWorker(action) {
 
 function* getLegalAddressWorker(action) {
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     const { legalAddress, accessToken, accessTokenExpiration } = yield call(
       getLegalAddress,
       action.payload
@@ -192,6 +217,8 @@ function* getLegalAddressWorker(action) {
 
 function* addNewLegalAddressWorker(action) {
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     console.log(action.payload);
     const { legalAddress, accessToken, accessTokenExpiration } = yield call(
       addNewLegalAddress,
@@ -209,6 +236,8 @@ function* addNewLegalAddressWorker(action) {
 
 function* updateLegalAddressWorker(action) {
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     const { legalAddress, accessToken, accessTokenExpiration } = yield call(
       updateLegalAddress,
       action.payload
@@ -224,6 +253,8 @@ function* updateLegalAddressWorker(action) {
 
 function* getAllDeliveryAddressesWorker(action) {
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     const { deliveryAddresses, accessToken, accessTokenExpiration } = yield call(
       getAllDeliveryAddresses,
       action.payload
@@ -240,6 +271,8 @@ function* getAllDeliveryAddressesWorker(action) {
 
 function* addNewDeliveryAddressWorker(action) {
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     console.log(action.payload);
     const { deliveryAddress, accessToken, accessTokenExpiration } = yield call(
       addNewDeliveryAddress,
@@ -256,8 +289,10 @@ function* addNewDeliveryAddressWorker(action) {
 }
 
 function* getAllContactInfoWorker(action) {
-  console.log('SAGA WORKER', action.payload)
+  console.log('SAGA WORKER', action.payload);
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     const { contactInfo, accessToken, accessTokenExpiration } = yield call(
       getAllContactInfo,
       action.payload
@@ -265,7 +300,7 @@ function* getAllContactInfoWorker(action) {
 
     window.localStorage.setItem('jwt', accessToken);
 
-    console.log('SAGA CONTACT', contactInfo)
+    console.log('SAGA CONTACT', contactInfo);
 
     yield put({ type: ALL_CONTACT_INFO, payload: contactInfo });
     yield put(setToken(accessToken, accessTokenExpiration));
@@ -276,6 +311,8 @@ function* getAllContactInfoWorker(action) {
 
 function* addNewContactInfoWorker(action) {
   try {
+    accessTokenFront = yield select((state) => state.jwt);
+
     console.log(action.payload);
     const { contactInfo, accessToken, accessTokenExpiration } = yield call(
       addNewContactInfo,

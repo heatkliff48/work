@@ -25,7 +25,7 @@ function Products() {
     setUserAccess,
   } = useProjectContext();
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => latestProducts??[], [latestProducts]);
+  const data = useMemo(() => latestProducts ?? [], [latestProducts]);
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -76,7 +76,7 @@ function Products() {
       const access = checkUserAccess(user, roles, 'Products');
       setUserAccess(access);
 
-      console.log(access)
+      console.log(access);
 
       if (!access.canRead) {
         navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
