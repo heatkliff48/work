@@ -1,9 +1,9 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { Fragment, useEffect, useState, useContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { addNewDeliveryAddress } from '#components/redux/actions/clientAction';
-import { ClientContext } from '#components/Clients/ClientsInfo/ClientsInfo';
+import { useProjectContext } from '#components/contexts/Context.js';
 
 function DeliveryAddressModal(props) {
   const [street, setStreet] = useState("")
@@ -14,7 +14,7 @@ function DeliveryAddressModal(props) {
   const [country, setCountry] = useState("")
   const [phone_number, setPhone] = useState("")
   const [email, setEmail] = useState("")
-  const [currentClient, setCurrentClient] = useContext(ClientContext);
+  const { currentClient } = useProjectContext();
 
   const dispatch = useDispatch();
 
@@ -215,24 +215,3 @@ function ShowDeliveryAddressModal() {
 }
 
 export default ShowDeliveryAddressModal;
-
-/*
-
-          <div className="md:flex md:items-center mb-6">
-            <div className="md:w-1/3">
-              <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" for="version">
-                Client's ID
-              </label>
-            </div>
-            <div className="md:w-2/3">
-              <input 
-                className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" 
-                id="c_id" 
-                type="text" 
-                value={c_id} 
-                onChange={e => setCID(e.target.value)} 
-              />
-            </div>
-          </div>
-
-*/
