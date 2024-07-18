@@ -83,6 +83,7 @@ const getLegalAddress = (currentClientID) => {
 };
 
 const addNewLegalAddress = ({ legalAddress }) => {
+
   return url
     .post('/clientsAddress', { legalAddress })
     .then((res) => {
@@ -166,7 +167,6 @@ function* addNewClientWatcher(action) {
   try {
     accessTokenFront = yield select((state) => state.jwt);
 
-    console.log(action.payload);
     const { client, accessToken, accessTokenExpiration } = yield call(
       addNewClient,
       action.payload
@@ -219,7 +219,6 @@ function* addNewLegalAddressWorker(action) {
   try {
     accessTokenFront = yield select((state) => state.jwt);
 
-    console.log(action.payload);
     const { legalAddress, accessToken, accessTokenExpiration } = yield call(
       addNewLegalAddress,
       action.payload

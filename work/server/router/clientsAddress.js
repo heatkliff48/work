@@ -1,170 +1,184 @@
-const clientsAddress = require("express").Router()
+const clientsAddress = require('express').Router();
 const { ClientLegalAddress } = require('../db/models');
 const TokenService = require('../services/Token.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
 
-clientsAddress.post('/', async(req,res) => {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+clientsAddress.post('/', async (req, res) => {
+  const fingerprint = req.fingerprint.hash;
+  const { id, username, email } = req.user;
 
-    try {
-        const {
-            street, 
-            additional_info, 
-            city,
-            zip_code,
-            province,
-            country,
-            phone_number,
-            email
-        } = req.body.legalAddress;
-        const legalAddress = await ClientLegalAddress.create({
-                street, 
-                additional_info, 
-                city,
-                zip_code,
-                province,
-                country,
-                phone_number,
-                email
-        }
-        );
+  try {
+    const {
+      street,
+      additional_info,
+      city,
+      zip_code,
+      province,
+      country,
+      phone_number,
+      email,
+    } = req.body;
 
-        const payload = { id, username, email };
-        const accessToken = await TokenService.generateAccessToken(payload);
-        const refreshToken = await TokenService.generateRefreshToken(payload);
+    const legalAddress = await ClientLegalAddress.create({
+      street,
+      additional_info,
+      city,
+      zip_code,
+      province,
+      country,
+      phone_number,
+      email,
+    });
 
-        await RefreshSessionsRepository.createRefreshSession({
-        user_id: id,
-        refresh_token: refreshToken,
-        finger_print: fingerprint,
-        });
+    const payload = { id, username, email };
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-        return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ legalAddress, accessToken, accessTokenExpiration: ACCESS_TOKEN_EXPIRATION});
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
 
-        //res.json(clientsAddress);
-    } catch (err) {
-        console.error(err.message);
-    }
-})
+    return res
+      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      .status(200)
+      .json({
+        legalAddress,
+        accessToken,
+        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+      });
 
-clientsAddress.get('/', async(req,res) => {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
-    try {
-        const legalAddress = await ClientLegalAddress.findAll();
-        
-        const payload = { id, username, email };
-        const accessToken = await TokenService.generateAccessToken(payload);
-        const refreshToken = await TokenService.generateRefreshToken(payload);
+clientsAddress.get('/', async (req, res) => {
+  const fingerprint = req.fingerprint.hash;
+  const { id, username, email } = req.user;
 
-        await RefreshSessionsRepository.createRefreshSession({
-        user_id: id,
-        refresh_token: refreshToken,
-        finger_print: fingerprint,
-        });
+  try {
+    const legalAddress = await ClientLegalAddress.findAll();
 
-        return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ legalAddress, accessToken, accessTokenExpiration: ACCESS_TOKEN_EXPIRATION});
+    const payload = { id, username, email };
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-        //res.json(clientsAddress);
-    } catch (err) {
-        console.error(err.message);
-    }
-})
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
 
-clientsAddress.get('/:c_id', async(req,res) => {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    return res
+      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      .status(200)
+      .json({
+        legalAddress,
+        accessToken,
+        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+      });
 
-    try {
-        const {c_id} = req.params;
-        const legalAddress = await ClientLegalAddress.findOne({
-            where: {
-                id: c_id,
-            },
-        });
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
-        const payload = { id, username, email };
-        const accessToken = await TokenService.generateAccessToken(payload);
-        const refreshToken = await TokenService.generateRefreshToken(payload);
+clientsAddress.get('/:c_id', async (req, res) => {
+  const fingerprint = req.fingerprint.hash;
+  const { id, username, email } = req.user;
 
-        await RefreshSessionsRepository.createRefreshSession({
-        user_id: id,
-        refresh_token: refreshToken,
-        finger_print: fingerprint,
-        });
+  try {
+    const { c_id } = req.params;
+    const legalAddress = await ClientLegalAddress.findOne({
+      where: {
+        id: c_id,
+      },
+    });
 
-        return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ legalAddress, accessToken, accessTokenExpiration: ACCESS_TOKEN_EXPIRATION});
+    const payload = { id, username, email };
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-        // res.json(clientsAddress);
-    } catch (err) {
-        console.error(err.message);
-    }
-})
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
 
-clientsAddress.post('/update/:c_id', async(req,res) => {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    return res
+      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      .status(200)
+      .json({
+        legalAddress,
+        accessToken,
+        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+      });
 
-    try {
-        const {
-            c_id,
-            street, 
-            additional_info, 
-            city,
-            zip_code,
-            province,
-            country,
-            phone_number,
-            c_email
-        } = req.body.legalAddress;
-        console.log('BACK END UPDATE LEGAL ADDRESS', req.body.legalAddress.id, req.body.legalAddress)
-        const legalAddress = await ClientLegalAddress.update({
-                street, 
-                additional_info, 
-                city,
-                zip_code,
-                province,
-                country,
-                phone_number,
-                email: c_email
-            },
-            {where: {
-                id: c_id,
-            },}
-        );
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
-        const payload = { id, username, email };
-        const accessToken = await TokenService.generateAccessToken(payload);
-        const refreshToken = await TokenService.generateRefreshToken(payload);
+clientsAddress.post('/update/:c_id', async (req, res) => {
+  const fingerprint = req.fingerprint.hash;
+  const { id, username, email } = req.user;
 
-        await RefreshSessionsRepository.createRefreshSession({
-        user_id: id,
-        refresh_token: refreshToken,
-        finger_print: fingerprint,
-        });
+  try {
+    const {
+      c_id,
+      street,
+      additional_info,
+      city,
+      zip_code,
+      province,
+      country,
+      phone_number,
+      c_email,
+    } = req.body.legalAddress;
 
-        return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ legalAddress, accessToken, accessTokenExpiration: ACCESS_TOKEN_EXPIRATION});
+    const legalAddress = await ClientLegalAddress.update(
+      {
+        street,
+        additional_info,
+        city,
+        zip_code,
+        province,
+        country,
+        phone_number,
+        email: c_email,
+      },
+      {
+        where: {
+          id: c_id,
+        },
+      }
+    );
 
-        //res.json(clientsAddress);
-    } catch (err) {
-        console.error(err.message);
-    }
-})
+    const payload = { id, username, email };
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-module.exports = clientsAddress
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return res
+      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      .status(200)
+      .json({
+        legalAddress,
+        accessToken,
+        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+      });
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+module.exports = clientsAddress;

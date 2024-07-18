@@ -17,8 +17,6 @@ export const addNewClient = ({ client }) => {
 };
 
 export const updateClient = ({ client }) => {
-  //delete client.id;
-
   return {
     type: NEED_UPDATE_CLIENT,
     payload: { client }
