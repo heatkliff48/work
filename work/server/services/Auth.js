@@ -49,7 +49,7 @@ class AuthService {
       throw new Conflict('Пользователь с такой почтой уже существует.');
     }
 
-    const hashedPassword = bcrypt.hashSync(password, 8);
+    const hashedPassword = bcrypt.hashSync(password, process.env.SALT);
 
     const user = await UserRepository.createUser({
       username,

@@ -108,7 +108,6 @@ function Table({
         <button onClick={onClickButton}>{buttonText}</button>
         {/* )} */}
       </div>
-      <div>There place for vac and other huiny</div>
     </>
   );
 }

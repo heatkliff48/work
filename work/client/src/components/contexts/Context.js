@@ -1,6 +1,15 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllRoles } from '../redux/actions/rolesAction';
+import { useNavigate } from 'react-router-dom';
+// import { checkUser } from './components/redux/actions/userAction';
 
 const ProjectContext = createContext();
 
@@ -150,11 +159,6 @@ const ProjectContextProvider = ({ children }) => {
       accessor: 'clients_name',
       sortType: 'string',
     },
-    {
-      Header: 'Clients name',
-      accessor: 'clients_name',
-      sortType: 'string',
-    },
   ];
 
   const COLUMNS_ORDER_PRODUCT = [
@@ -202,6 +206,7 @@ const ProjectContextProvider = ({ children }) => {
   ];
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [promProduct, setPromProduct] = useState(null);
   const [productCardData, setProductCardData] = useState({});
@@ -218,6 +223,7 @@ const ProjectContextProvider = ({ children }) => {
   const user = useSelector((state) => state.user);
   const products = useSelector((state) => state.products);
   const roles = useSelector((state) => state.roles);
+  const isCheckedAuth = useRef(false);
 
   const roleTable = [
     { id: 1, role_name: 'Production Manager' },
@@ -243,12 +249,6 @@ const ProjectContextProvider = ({ children }) => {
 
   latestProducts?.sort((a, b) => a.id - b.id);
 
-  useEffect(() => {
-    //сделать диспатч чек юзер на нахождение юзера в бд
-    if (!user) return;
-    dispatch(getAllRoles());
-  }, [user, modalRoleCard]);
-
   const checkUserAccess = (user, roles, pageName) => {
     const userRole = roles.find((role) => role.id == user.role);
 
@@ -269,6 +269,22 @@ const ProjectContextProvider = ({ children }) => {
       canWrite: pagePermissions.PageAndRoles.write,
     };
   };
+
+  useEffect(() => {
+    //сделать диспатч чек юзер на нахождение юзера в бд
+    if (!user) return;
+    dispatch(getAllRoles());
+  }, [user, modalRoleCard]);
+
+  useEffect(() => {
+    //сделать диспатч чек юзер на нахождение юзера в бд
+    // dispatch(checkUser());
+
+    if (isCheckedAuth && !user) {
+      console.log('MAIN APP', user);
+      navigate('/sign-in');
+    }
+  }, []);
 
   return (
     <ProjectContext.Provider

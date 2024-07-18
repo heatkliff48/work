@@ -52,6 +52,7 @@ function Orders() {
         buttonText={'Add new order'}
         tableName={'Orders'}
       />
+      <div>There place for vac and other huiny</div>
     </>
   );
 }
