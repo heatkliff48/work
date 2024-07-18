@@ -36,11 +36,8 @@ app.use('/auth', TokenService.checkAccess, AuthRootRouter);
 app.use('/products', TokenService.checkAccess, ProductRootRouter);
 app.use('/roles', TokenService.checkAccess, RolesRootRouter);
 app.use('/orders', TokenService.checkAccess, OrdersRootRouter);
-
-// app.use('/clients', ClientsRootRouter);
 app.use('/clients', TokenService.checkAccess, clientsRouter);
 app.use('/clientsAddress', TokenService.checkAccess, clientsAddress);
-app.use('/clientsAddress/:c_id', TokenService.checkAccess, clientsAddress);
 app.use('/deliveryAddress', TokenService.checkAccess, deliveryAddress);
 app.use('/clientsContactInfo', TokenService.checkAccess, clientsContactInfo);
 

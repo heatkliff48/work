@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState, useContext, createContext } from 'react';
+import React, { Fragment, useEffect, useState, createContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import MydModalWithGrid from './ClientFullModal.js';
 import ShowClientsModal from './ClientsInfoModal.js';
@@ -8,7 +8,6 @@ export const ClientContext = createContext();
 
 const ClientsInfo = () => {
   const [modalShow, setModalShow] = useState(false);
-
   const [currentClient, setCurrentClient] = useState({});
 
   const dispatch = useDispatch();
@@ -42,11 +41,6 @@ const ClientsInfo = () => {
           </tr>
         </thead>
         <tbody>
-          {/* <tr>
-                    <td>John</td>
-                    <td>Doe</td>
-                    <td>john@example.com</td>
-                </tr> */}
           {clients?.map((entrie) => {
             if (!entrie) return;
             return (

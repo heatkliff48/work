@@ -205,6 +205,56 @@ const ProjectContextProvider = ({ children }) => {
     },
   ];
 
+  const clients_info_table = [
+    {
+      Header: 'Client`s Name',
+      accessor: 'c_name',
+    },
+    {
+      Header: 'TIN',
+      accessor: 'tin',
+    },
+    {
+      Header: 'Category',
+      accessor: 'category',
+    },
+  ];
+
+  const clients_legal_address_table = [
+    {
+      Header: 'Street',
+      accessor: 'street',
+    },
+    {
+      Header: 'Additional info',
+      accessor: 'additional_info',
+    },
+    {
+      Header: 'City',
+      accessor: 'city',
+    },
+    {
+      Header: 'ZIP code',
+      accessor: 'zip_code',
+    },
+    {
+      Header: 'Province',
+      accessor: 'province',
+    },
+    {
+      Header: 'Country',
+      accessor: 'country',
+    },
+    {
+      Header: 'Phone number',
+      accessor: 'phone_number',
+    },
+    {
+      Header: 'Email',
+      accessor: 'email',
+    },
+  ];
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -231,7 +281,6 @@ const ProjectContextProvider = ({ children }) => {
   ];
 
   const latestProducts = useMemo(() => {
-    // console.log('MEMO CONTEXT', products);
     const newProducts = products?.reduce((acc, product) => {
       const { article, version } = product;
       const existingProduct = acc.find((p) => p.article === article);
@@ -320,6 +369,8 @@ const ProjectContextProvider = ({ children }) => {
         userAccess,
         setUserAccess,
         roleTable,
+        clients_info_table,
+        clients_legal_address_table,
       }}
     >
       {children}

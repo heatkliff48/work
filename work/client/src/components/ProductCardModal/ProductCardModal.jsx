@@ -29,7 +29,7 @@ const ProductCardModal = React.memo(() => {
   const [productByVersicon, setProductByVersicon] = useState({});
   const [selectedVersion, setSelectedVersion] = useState(null);
   const products = useSelector((state) => state.products);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const memoizedArticle = (prod) => {
     let newArticle = '';
