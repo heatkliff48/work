@@ -9,7 +9,6 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllRoles } from '../redux/actions/rolesAction';
 import { useNavigate } from 'react-router-dom';
-// import { checkUser } from './components/redux/actions/userAction';
 
 const ProjectContext = createContext();
 
@@ -145,18 +144,23 @@ const ProjectContextProvider = ({ children }) => {
 
   const COLUMNS_ORDERS = [
     {
-      Header: 'Id',
-      accessor: 'id',
-      sortType: 'number',
-    },
-    {
       Header: 'Article',
       accessor: 'article',
       disableSortBy: true,
     },
     {
-      Header: 'Clients name',
-      accessor: 'clients_name',
+      Header: 'Name of owner',
+      accessor: 'owner',
+      sortType: 'string',
+    },
+    {
+      Header: 'Delivery address',
+      accessor: 'del_adr_id',
+      sortType: 'string',
+    },
+    {
+      Header: 'Status of order',
+      accessor: 'stetus',
       sortType: 'string',
     },
   ];
@@ -166,11 +170,6 @@ const ProjectContextProvider = ({ children }) => {
       Header: 'Article',
       accessor: 'article',
       disableSortBy: true,
-    },
-    {
-      Header: 'Clients name',
-      accessor: 'clients_name',
-      sortType: 'string',
     },
     {
       Header: 'Quantity, m2',
@@ -195,7 +194,6 @@ const ProjectContextProvider = ({ children }) => {
     {
       Header: 'Discount',
       accessor: 'discount',
-      sortType: 'number',
       defaultValue: 0,
     },
     {

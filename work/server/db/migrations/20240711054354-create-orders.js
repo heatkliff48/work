@@ -14,17 +14,17 @@ module.exports = {
       },
       owner: {
         type: Sequelize.INTEGER,
-        references: {
-          model: 'ClientCards',
-          key: 'id',
-        },
+        // references: {
+        //   model: 'ClientCards',
+        //   key: 'id',
+        // },
       },
       del_adr_id: {
         type: Sequelize.INTEGER,
-        references: {
-          model: 'DeliverylAddresses',
-          key: 'id',
-        },
+        // references: {
+        //   model: 'DeliverylAddresses',
+        //   key: 'id',
+        // },
       },
       status: {
         type: Sequelize.STRING,

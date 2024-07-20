@@ -31,6 +31,6 @@ export const setToken = (payload) => async (dispatch, getState) => {
 };
 
 export const deleteToken = () => async (dispatch, getState) => {
-  if (refreshTimeoutId) clearInterval(refreshTimeoutId);
+  if (refreshTimeoutId) clearTimeout(refreshTimeoutId);
   dispatch({ type: DELETE_JWT_TOKEN });
 };

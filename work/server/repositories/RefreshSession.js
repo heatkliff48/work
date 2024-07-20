@@ -18,7 +18,7 @@ class RefreshSessionRepository {
   }
 
   static async deleteRefreshSession(refreshToken) {
-    await Refresh_session.destroy({
+    const deleteToken = await Refresh_session.destroy({
       where: {
         refresh_token: refreshToken,
       },

@@ -84,11 +84,16 @@ class AuthController {
     const currentRefreshToken = req.cookies.refreshToken;
 
     try {
-      await AuthService.refresh({
-        currentRefreshToken,
-        fingerprint,
-      });
-      return res.sendStatus(200);
+      const { accessToken, refreshToken, accessTokenExpiration } =
+        await AuthService.refresh({
+          currentRefreshToken,
+          fingerprint,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

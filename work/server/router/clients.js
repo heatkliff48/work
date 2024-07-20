@@ -1,9 +1,8 @@
 const clientsRouter = require('express').Router();
-//const pool = require("../db");
-const { Client } = require('../db/models');
+const { Clients } = require('../db/models');
 const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
+const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
 
 clientsRouter.get('/', async (req, res) => {
@@ -11,7 +10,7 @@ clientsRouter.get('/', async (req, res) => {
   const { id, username, email } = req.user;
 
   try {
-    const allClients = await Client.findAll({
+    const allClients = await Clients.findAll({
       order: [['id', 'ASC']],
     });
     console.log('GET CLIENTS', allClients);
@@ -40,12 +39,13 @@ clientsRouter.get('/', async (req, res) => {
 });
 
 clientsRouter.post('/', async (req, res) => {
+  console.log('POST CLIENTS', req.body.client);
   const fingerprint = req.fingerprint.hash;
   const { id, username, email } = req.user;
-  const { c_name, tin, category } = req.body;
-  
+  const { c_name, tin, category } = req.body.client;
+
   try {
-    const client = await Client.create({
+    const client = await Clients.create({
       c_name,
       tin,
       category,
@@ -76,7 +76,7 @@ clientsRouter.get('/:id', async (req, res) => {
   const { id, username, email } = req.user;
 
   try {
-    const lastID = await Client.findOne({
+    const lastID = await Clients.findOne({
       attributes: ['id'],
       order: [['id', 'DESC']],
     });
@@ -110,7 +110,7 @@ clientsRouter.post('/update/:c_id', async (req, res) => {
 
   try {
     //const {c_id} = req.params;
-    const client = await Client.update(
+    const client = await Clients.update(
       {
         c_name,
         tin,

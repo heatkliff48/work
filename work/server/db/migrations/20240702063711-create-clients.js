@@ -2,34 +2,33 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('ClientCards', {
+    await queryInterface.createTable('Clients', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING,
+      c_name: {
+        type: Sequelize.TEXT
       },
       tin: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT
       },
       category: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
-      },
+        type: Sequelize.DATE
+      }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ClientCards');
-  },
+    await queryInterface.dropTable('Clients');
+  }
 };
-
