@@ -1,3 +1,4 @@
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const TokenService = require('./Token.js');
@@ -49,7 +50,7 @@ class AuthService {
       throw new Conflict('Пользователь с такой почтой уже существует.');
     }
 
-    const hashedPassword = bcrypt.hashSync(password, process.env.SALT);
+    const hashedPassword = bcrypt.hashSync(password, 8);
 
     const user = await UserRepository.createUser({
       username,
@@ -104,15 +105,27 @@ class AuthService {
       throw new Unauthorized();
     }
 
+    const userData = await TokenService.verifyRefreshToken(currentRefreshToken);
+
     const refreshSession = await RefreshSessionsRepository.getRefreshSession(
       currentRefreshToken
     );
 
-    if (!refreshSession) throw new Unauthorized();
+    if (!userData || !refreshSession) throw new Unauthorized();
 
     if (refreshSession.finger_print !== fingerprint.hash) throw new Forbidden();
 
     await RefreshSessionsRepository.deleteRefreshSession(currentRefreshToken);
+
+    const user = await UserRepository.getUserData(userData.email);
+    const accessToken = await TokenService.generateAccessToken({ ...user });
+    const refreshToken = await TokenService.generateRefreshToken({ ...user });
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
   }
 }
 

@@ -20,10 +20,10 @@ class TokenService {
 
   static async checkAccess(req, _, next) {
     const authHeader = req.headers?.authorization;
-    console.log('>>>>>>.URL.<<<<<<<<', req.url);
-    console.log('>>>>>>.CHECK.<<<<<<<<', authHeader);
     const token = authHeader?.split(' ')?.[1];
 
+    console.log('>>>>>>.URL.<<<<<<<<', req.url);
+    console.log('>>>>>>.CHECK.<<<<<<<<', token);
     // Массив путей, которые не требуют токена
     const noTokenPaths = ['/sign-up', '/sign-in', '/logout', '/refresh'];
 
@@ -43,6 +43,7 @@ class TokenService {
       jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) {
           // Если токен недействителен, отклоняем запрос
+          console.error('ERROR', err);
           next(new Forbidden(err));
         } else {
           req.user = user;
