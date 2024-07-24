@@ -3,22 +3,27 @@ import { useDispatch, useSelector } from 'react-redux';
 import MydModalWithGrid from './ClientFullModal.js';
 import ShowClientsModal from './ClientsInfoModal.js';
 import { getAllClients } from '#components/redux/actions/clientAction';
+import { useProjectContext } from '#components/contexts/Context.js';
 
 export const ClientContext = createContext();
 
 const ClientsInfo = () => {
   const [modalShow, setModalShow] = useState(false);
-  const [currentClient, setCurrentClient] = useState({});
+  const { currentClient, setCurrentClient } = useProjectContext();
+  //const [currentClient, setCurrentClient] = useState({});
 
   const dispatch = useDispatch();
   const clients = useSelector((state) => state.clients);
 
   useEffect(() => {
     dispatch(getAllClients());
+    console.log('CLIENTS LIST',clients)
   }, []);
 
   const clientHandler = (id) => {
     const client = clients.filter((el) => el.id === id)[0];
+    console.log('CURR CLIENT ID',id)
+    console.log('CLIENT',client)
     setCurrentClient(client);
     setModalShow(true)
   };
@@ -26,7 +31,7 @@ const ClientsInfo = () => {
   return (
     <Fragment>
       {' '}
-      <ClientContext.Provider value={[currentClient, setCurrentClient]}>
+      {/* <ClientContext.Provider value={[currentClient, setCurrentClient]}> */}
       <ShowClientsModal />
       <table
         className="table mt-5 table-bordered text-center table-striped table-hover"
@@ -63,7 +68,7 @@ const ClientsInfo = () => {
         show={modalShow}
         onHide={() => setModalShow(false)}
       />
-      </ClientContext.Provider>
+      {/* </ClientContext.Provider> */}
     </Fragment>
   );
 };

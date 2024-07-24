@@ -14,8 +14,8 @@ import Roles from './components/Roles/Roles';
 import Products from './components/Products/Products';
 import ClientsInfo from './components/Clients/ClientsInfo/ClientsInfo';
 import Orders from './components/Orders/Orders';
-import AddClientOrder from '#components/Orders/AddClientOrder.jsx';
-import AddProductOrder from '#components/Orders/AddProductOrder.jsx';
+// import AddClientOrder from '#components/Orders/AddClientOrder.jsx';
+// import AddProductOrder from '#components/Orders/AddProductOrder.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -48,8 +48,8 @@ function App() {
           <Route path="/sign-in" element={<LoginForm />} />
           <Route path="/clients" element={<ClientsInfo />} />
           <Route path="/orders" element={<Orders />} />
-          <Route path="/addClientOrder" element={<AddClientOrder />} />
-          <Route path="/addProductOrder" element={<AddProductOrder />} />
+          {/* <Route path="/addClientOrder" element={<AddClientOrder />} />
+          <Route path="/addProductOrder" element={<AddProductOrder />} /> */}
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>
         <SnackbarProvider />

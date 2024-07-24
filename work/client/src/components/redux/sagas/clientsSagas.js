@@ -223,13 +223,13 @@ function* addNewLegalAddressWorker(action) {
       addNewLegalAddress,
       action.payload
     );
-
+    console.log('LEGAL ADDRESS SAGA WORKER', legalAddress)
     window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: NEW_LEGAL_ADDRESS, payload: legalAddress });
+    yield put({ type: ONE_LEGAL_ADDRESS, payload: legalAddress });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
-    yield put({ type: NEW_LEGAL_ADDRESS, payload: [] });
+    yield put({ type: ONE_LEGAL_ADDRESS, payload: [] });
   }
 }
 
@@ -243,10 +243,10 @@ function* updateLegalAddressWorker(action) {
     );
     window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: UPDATE_LEGAL_ADDRESS, payload: legalAddress });
+    yield put({ type: ONE_LEGAL_ADDRESS, payload: legalAddress });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
-    yield put({ type: UPDATE_LEGAL_ADDRESS, payload: [] });
+    yield put({ type: ONE_LEGAL_ADDRESS, payload: [] });
   }
 }
 

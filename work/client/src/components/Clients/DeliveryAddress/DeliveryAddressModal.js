@@ -34,6 +34,15 @@ function DeliveryAddressModal(props) {
             email
           };
           dispatch(addNewDeliveryAddress({deliveryAddress}))
+          props.onHide();
+          setStreet("")
+          setAddInfo("")
+          setCity("")
+          setZIP("")
+          setProvince("")
+          setCountry("")
+          setPhone("")
+          setEmail("")
       } catch (err) {
           console.error(err.message);
       }

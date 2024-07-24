@@ -30,6 +30,7 @@ export const getLegalAddress = (currentClientID) => {
   };
 };
 export const addNewLegalAddress = ({ legalAddress }) => {
+  console.log('LEGAL ADDRESS ACTION', legalAddress)
   return {
     type: ADD_CLIENTS_LEGAL_ADDRESS,
     payload: { legalAddress },

@@ -21,18 +21,19 @@ export const clientsReducer = (clients = [], action) => {
   }
 };
 
-export const legalAddressReducer = (legalAddress = [], action) => {
+export const legalAddressReducer = (legalAddress = {}, action) => {
   const { type, payload } = action;
   switch (type) {
     case ONE_LEGAL_ADDRESS: {
       return payload;
     }
-    case NEW_LEGAL_ADDRESS: {
-      return [...legalAddress, payload];
-    }
-    case UPDATE_LEGAL_ADDRESS: {
-      return [...legalAddress, payload];
-    }
+    // case NEW_LEGAL_ADDRESS: {
+    //   console.log('LEGAL ADDRESS REDUCER', payload)
+    //   return [...legalAddress, payload];
+    // }
+    // case UPDATE_LEGAL_ADDRESS: {
+    //   return [...legalAddress, payload];
+    // }
     default:
       return legalAddress;
   }
