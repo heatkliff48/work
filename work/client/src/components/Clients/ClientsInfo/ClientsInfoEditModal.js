@@ -1,6 +1,6 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -24,7 +24,7 @@ function ClientsEditModal(props) {
   const [country, setCountry] = useState('');
   const [phone_number, setPhone] = useState('');
   const [c_email, setEmail] = useState('');
-  const { currentClient } = useProjectContext();
+  const { currentClient, setCurrentClient } = useProjectContext();
 
   const dispatch = useDispatch();
 
@@ -298,7 +298,7 @@ function ClientsEditModal(props) {
       </Modal.Body>
       <Modal.Footer>
         <button form="addProductModal">Edit Client</button>
-        <Button>Close</Button>
+        <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>
   );

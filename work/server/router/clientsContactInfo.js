@@ -1,5 +1,5 @@
 const clientsContactInfo = require("express").Router()
-const { ContactInfo } = require('../db/models')
+const { ContactInfos } = require('../db/models')
 const TokenService = require('../services/Token.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
@@ -24,7 +24,7 @@ clientsContactInfo.post('/', async(req,res) => {
             linkedin,
             social
         } = req.body.contactInfo;
-        const contactInfo = await ContactInfo.create({
+        const contactInfo = await ContactInfos.create({
             id: currentClientID,
             first_name, 
             last_name, 
@@ -66,7 +66,7 @@ clientsContactInfo.get('/', async(req,res) => {
     const { id, username, email } = req.user;
 
     try {
-        const clientsContactInfo = await ContactInfo.findAll();
+        const clientsContactInfo = await ContactInfos.findAll();
         res.json(clientsContactInfo);
     } catch (err) {
         console.error(err.message);
@@ -79,7 +79,7 @@ clientsContactInfo.get('/:c_id', async(req,res) => {
     
     try {
         const {c_id} = req.params;
-        const contactInfo = await ContactInfo.findAll({
+        const contactInfo = await ContactInfos.findAll({
             where: {
                 id: c_id,
             },

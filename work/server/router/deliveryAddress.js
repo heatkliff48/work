@@ -1,5 +1,5 @@
 const deliveryAddress = require("express").Router()
-const { DeliveryAddress } = require('../db/models')
+const { DeliveryAddresses } = require('../db/models')
 const TokenService = require('../services/Token.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
@@ -21,7 +21,7 @@ deliveryAddress.post('/', async(req,res) => {
             phone_number,
             email
         } = req.body.deliveryAddress;
-        const deliveryAddress = await DeliveryAddress.create({
+        const deliveryAddress = await DeliveryAddresses.create({
             id: currentClientID,
             street, 
             additional_info, 
@@ -59,7 +59,7 @@ deliveryAddress.post('/', async(req,res) => {
 
 deliveryAddress.get('/', async(req,res) => {
     try {
-        const clientsDeliveryAddresses = await DeliveryAddress.findAll();
+        const clientsDeliveryAddresses = await DeliveryAddresses.findAll();
         res.json(clientsDeliveryAddresses);
     } catch (err) {
         console.error(err.message);
@@ -72,7 +72,7 @@ deliveryAddress.get('/:c_id', async(req,res) => {
 
     try {
         const {c_id} = req.params;
-        const deliveryAddresses = await DeliveryAddress.findAll({
+        const deliveryAddresses = await DeliveryAddresses.findAll({
             where: {
                 id: c_id,
             },

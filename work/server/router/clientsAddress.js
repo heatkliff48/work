@@ -1,5 +1,5 @@
 const clientsAddress = require('express').Router();
-const { ClientLegalAddress } = require('../db/models');
+const { ClientLegalAddresses } = require('../db/models');
 const TokenService = require('../services/Token.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
@@ -19,9 +19,9 @@ clientsAddress.post('/', async (req, res) => {
       country,
       phone_number,
       email,
-    } = req.body;
+    } = req.body.legalAddress;
 
-    const legalAddress = await ClientLegalAddress.create({
+    const legalAddress = await ClientLegalAddresses.create({
       street,
       additional_info,
       city,
@@ -61,7 +61,7 @@ clientsAddress.get('/', async (req, res) => {
   const { id, username, email } = req.user;
 
   try {
-    const legalAddress = await ClientLegalAddress.findAll();
+    const legalAddress = await ClientLegalAddresses.findAll();
 
     const payload = { id, username, email };
     const accessToken = await TokenService.generateAccessToken(payload);
@@ -93,7 +93,7 @@ clientsAddress.get('/:c_id', async (req, res) => {
 
   try {
     const { c_id } = req.params;
-    const legalAddress = await ClientLegalAddress.findOne({
+    const legalAddress = await ClientLegalAddresses.findOne({
       where: {
         id: c_id,
       },
@@ -140,7 +140,7 @@ clientsAddress.post('/update/:c_id', async (req, res) => {
       c_email,
     } = req.body.legalAddress;
 
-    const legalAddress = await ClientLegalAddress.update(
+    const legalAddress = await ClientLegalAddresses.update(
       {
         street,
         additional_info,

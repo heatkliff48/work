@@ -272,6 +272,8 @@ const ProjectContextProvider = ({ children }) => {
   const products = useSelector((state) => state.products);
   const roles = useSelector((state) => state.roles);
   const isCheckedAuth = useRef(false);
+  const [currentClient, setCurrentClient] = useState({});
+
 
   const roleTable = [
     { id: 1, role_name: 'Production Manager' },
@@ -369,6 +371,8 @@ const ProjectContextProvider = ({ children }) => {
         roleTable,
         clients_info_table,
         clients_legal_address_table,
+        currentClient, 
+        setCurrentClient,
       }}
     >
       {children}

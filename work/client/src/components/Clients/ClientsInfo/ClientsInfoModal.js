@@ -32,6 +32,10 @@ function ClientsModal(props) {
 
     dispatch(addNewClient({ client: clientInput }));
     dispatch(addNewLegalAddress({ legalAddress: clientLegalAddressInput }));
+    // setModalShow(false);
+    props.onHide();
+    setClientInput({});
+    setClientLegalAddressInput({});
   };
 
   return (

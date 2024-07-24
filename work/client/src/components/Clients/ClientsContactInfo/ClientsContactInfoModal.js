@@ -41,6 +41,18 @@ function ClientsContactInfoModal(props) {
         social,
       };
       dispatch(addNewContactInfo({ contactInfo }));
+      props.onHide();
+      setFirstName('');
+      setLastName('');
+      setAddress('');
+      setPosition('');
+      setRole('');
+      setPhoneOffice('');
+      setPhoneMobile('');
+      setPhoneMessenger('');
+      setEmail('');
+      setLinkedin('');
+      setSocial('');
     } catch (err) {
       console.error(err.message);
     }
