@@ -38,7 +38,7 @@ const getAllOrders = () => {
     .catch(showErrorMessage);
 };
 
-const addNewOrder = ({ order }) => {
+const addNewOrder = (order) => {
   return url
     .post('/orders/add', { order })
     .then((res) => {
@@ -68,17 +68,18 @@ function* addNewOrderWatcher(action) {
   try {
     accessTokenFront = yield select((state) => state.jwt);
 
-    const { orders, accessToken, accessTokenExpiration } = yield call(
+    const { newOrder, accessToken, accessTokenExpiration } = yield call(
       addNewOrder,
       action.payload
     );
 
-    console.log('Orders FROM BACK', orders);
+    console.log('Orders FROM BACK', newOrder);
     window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: NEW_ORDER, payload: orders });
+    yield put({ type: NEW_ORDER, payload: newOrder });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
+    console.error(err);
     yield put({ type: NEW_ORDER, payload: [] });
   }
 }

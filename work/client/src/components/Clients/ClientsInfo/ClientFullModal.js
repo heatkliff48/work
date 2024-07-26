@@ -16,7 +16,6 @@ import { useProjectContext } from '#components/contexts/Context.js';
 function MydModalWithGrid({ show, onHide }) {
   const { currentClient } = useProjectContext();
 
-  console.log('CURRENT CLIENT', currentClient);
   return (
     <Modal
       show={show}

@@ -3,7 +3,7 @@ const initState = {
   products: [],
   jwt: null,
   clients: [],
-  legalAdress: {},
+  legalAddress: {},
   deliveryAddresses: [],
   contactInfo: [],
   roles: [],

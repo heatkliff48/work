@@ -28,7 +28,6 @@ export const legalAddressReducer = (legalAddress = {}, action) => {
       return payload;
     }
     // case NEW_LEGAL_ADDRESS: {
-    //   console.log('LEGAL ADDRESS REDUCER', payload)
     //   return [...legalAddress, payload];
     // }
     // case UPDATE_LEGAL_ADDRESS: {

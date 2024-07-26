@@ -1,7 +1,7 @@
+const morgan = require('morgan');
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const morgan = require('morgan');
+require('dotenv').config();
 const Fingerprint = require('express-fingerprint');
 const AuthRootRouter = require('./router/Auth.js');
 const ProductRootRouter = require('./router/Product.js');
@@ -15,7 +15,6 @@ const clientsAddress = require('./router/clientsAddress');
 const deliveryAddress = require('./router/deliveryAddress');
 const clientsContactInfo = require('./router/clientsContactInfo');
 
-dotenv.config();
 const PORT = 3001;
 
 const app = express();

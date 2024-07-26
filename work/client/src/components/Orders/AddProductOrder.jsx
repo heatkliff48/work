@@ -1,27 +1,61 @@
-import { useEffect, useMemo } from 'react';
-import { useProjectContext } from '../contexts/Context';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useOrderContext } from '../contexts/OrderContext';
 import Table from '../Table/Table';
+import AddProductOrderModal from './AddProductOrderModal';
+import { addNewOrder } from '#components/redux/actions/ordersAction.js';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function AddProductOrder() {
-  const { COLUMNS_ORDERS, latestProducts } = useProjectContext();
-  const user = useSelector((state) => state.user);
+  const {
+    COLUMNS_ORDER_PRODUCT,
+    productListOrder = [],
+    productModalOrder,
+    setProductModalOrder,
+    setProductOfOrder,
+    newOrder,
+    setNewOrder,
+  } = useOrderContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const addOrder = async () => {
+    dispatch(addNewOrder(newOrder));
+    navigate('/orders')
+  };
+
+  useEffect(() => {
+    if (!newOrder?.article) navigate('/orders');
+    if (productListOrder.length === 0) return;
+    setNewOrder((prev) => ({ ...prev, productList: productListOrder }));
+
+    setProductOfOrder({});
+  }, [productListOrder]);
+
   return (
     <>
+      <AddProductOrderModal
+        isOpen={productModalOrder}
+        toggle={() => setProductModalOrder(!productModalOrder)}
+      />
       <Table
-        COLUMN_DATA={COLUMNS_ORDERS}
-        dataOfTable={latestProducts}
+        COLUMN_DATA={COLUMNS_ORDER_PRODUCT}
+        dataOfTable={productListOrder}
         // userAccess={userAccess}
         onClickButton={() => {
-          navigate('/addClientOrder');
+          setProductModalOrder(!productModalOrder);
         }}
-        buttonText={'Add new order'}
-        tableName={'Orders'}
+        buttonText={'Add product'}
+        tableName={`Adding products to an order`}
+        handleRowClick={(row) => {}}
       />
+      <button
+        onClick={() => {
+          addOrder();
+        }}
+      >
+        Finish Order
+      </button>
     </>
   );
 }

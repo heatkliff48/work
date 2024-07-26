@@ -22,26 +22,36 @@ class OrdersController {
   static async addNewOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;
-    const { order } = req.body;
+    const {
+      article,
+      //  del_adr_id,
+      owner,
+      status,
+      productList,
+    } = req.body.order;
 
     try {
       const { accessToken, refreshToken, accessTokenExpiration, newOrder } =
-        await ProductService.addNewProduct({
+        await OrdersService.addNewOrder({
           id,
           username,
           email,
           fingerprint,
-          order,
+          article,
+          // del_adr_id,
+          owner,
+          status,
+          productList,
         });
+
       return res
         .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
         .status(200)
-        .json({ order: newOrder, accessToken, accessTokenExpiration });
+        .json({ newOrder, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
   }
-
 }
 
 module.exports = OrdersController;

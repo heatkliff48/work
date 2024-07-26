@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class ContactInfos extends Model {
     /**
@@ -11,46 +9,49 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ Clients }) {
       // define association here
-      this.belongsTo(Clients, { foreignKey: 'id' })
+      this.belongsTo(Clients, { foreignKey: 'id' });
     }
   }
-  ContactInfos.init({
-    first_name: {
-      type: DataTypes.STRING,
+  ContactInfos.init(
+    {
+      first_name: {
+        type: DataTypes.STRING,
+      },
+      last_name: {
+        type: DataTypes.STRING,
+      },
+      address: {
+        type: DataTypes.STRING,
+      },
+      formal_position: {
+        type: DataTypes.STRING,
+      },
+      role_in_the_org: {
+        type: DataTypes.STRING,
+      },
+      phone_number_office: {
+        type: DataTypes.STRING,
+      },
+      phone_number_mobile: {
+        type: DataTypes.STRING,
+      },
+      phone_number_messenger: {
+        type: DataTypes.STRING,
+      },
+      email: {
+        type: DataTypes.STRING,
+      },
+      linkedin: {
+        type: DataTypes.STRING,
+      },
+      social: {
+        type: DataTypes.STRING,
+      },
     },
-    last_name: {
-      type: DataTypes.STRING,
-    },
-    address: {
-      type: DataTypes.STRING,
-    },
-    formal_position: {
-      type: DataTypes.STRING,
-    },
-    role_in_the_org: {
-      type: DataTypes.STRING,
-    },
-    phone_number_office: {
-      type: DataTypes.STRING,
-    },
-    phone_number_mobile: {
-      type: DataTypes.STRING,
-    },
-    phone_number_messenger: {
-      type: DataTypes.STRING,
-    },
-    email: {
-      type: DataTypes.STRING,
-    },
-    linkedin: {
-      type: DataTypes.STRING,
-    },
-    social: {
-      type: DataTypes.STRING,
-    },
-  }, {
-    sequelize,
-    modelName: 'ContactInfos',
-  });
+    {
+      sequelize,
+      modelName: 'ContactInfos',
+    }
+  );
   return ContactInfos;
 };

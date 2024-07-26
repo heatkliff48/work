@@ -23,6 +23,24 @@ module.exports = {
           key: 'id',
         },
       },
+      quantity_m2: {
+        type: Sequelize.INTEGER,
+      },
+      quantity_palet: {
+        type: Sequelize.INTEGER,
+      },
+      quantity_real: {
+        type: Sequelize.INTEGER,
+      },
+      price_m2: {
+        type: Sequelize.FLOAT,
+      },
+      discount: {
+        type: Sequelize.INTEGER,
+      },
+      final_price: {
+        type: Sequelize.FLOAT,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
