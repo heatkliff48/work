@@ -413,8 +413,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
                 el={el}
                 inputValue={formInput}
                 inputValueChange={handleInputChange}
-                articleId={articleId}
-                setArticleId={setArticleId}
               />
             );
           })}

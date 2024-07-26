@@ -26,8 +26,24 @@ class OrdersService {
     };
   }
 
-  static async addNewOrder({ id, username, email, fingerprint, order }) {
-    const newOrder = await OrdersRepository.addNewOrderData(order);
+  static async addNewOrder({
+    id,
+    username,
+    email,
+    fingerprint,
+    article,
+    // del_adr_id,
+    owner,
+    status,
+    productList,
+  }) {
+    const newOrder = await OrdersRepository.addNewOrderData({
+      article,
+      // del_adr_id,
+      owner,
+      status,
+      productList,
+    });
     const payload = { id, username, email };
 
     const accessToken = await TokenService.generateAccessToken(payload);

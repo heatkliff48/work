@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction';
 import { useProjectContext } from '#components/contexts/Context.js';
 
-const DeliveryAddress = () => {
+const DeliveryAddress = ({ clickFunk = null }) => {
   const { currentClient } = useProjectContext();
 
   const dispatch = useDispatch();
@@ -37,7 +37,13 @@ const DeliveryAddress = () => {
           {deliveryAddresses?.map((entrie) => {
             if (!entrie) return;
             return (
-              <tr>
+              <tr
+                onClick={() => {
+                  if (!clickFunk) return;
+
+                  clickFunk(entrie.id);
+                }}
+              >
                 <td>{entrie?.id}</td>
                 <td>{entrie?.street}</td>
                 <td>{entrie?.additional_info}</td>

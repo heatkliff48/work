@@ -17,13 +17,10 @@ const ClientsInfo = () => {
 
   useEffect(() => {
     dispatch(getAllClients());
-    console.log('CLIENTS LIST',clients)
   }, []);
 
   const clientHandler = (id) => {
     const client = clients.filter((el) => el.id === id)[0];
-    console.log('CURR CLIENT ID',id)
-    console.log('CLIENT',client)
     setCurrentClient(client);
     setModalShow(true)
   };

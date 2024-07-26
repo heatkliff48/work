@@ -1,16 +1,25 @@
-import { useEffect, useMemo } from 'react';
-import { useProjectContext } from '../contexts/Context';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Table from '../Table/Table';
+import AddClientOrderModal from './AddClientOrderModal';
+import { useOrderContext } from '../contexts/OrderContext';
+import { useEffect } from 'react';
 
-function Orders() {
-  const { COLUMNS_ORDERS, roles, checkUserAccess, userAccess, setUserAccess } =
-    useProjectContext();
-  const list_of_orders = useSelector((state) => state.orders);
-  const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+function OrdersTable() {
+  const {
+    COLUMNS_ORDERS,
+    clientModalOrder,
+    setClientModalOrder,
+    setProductOfOrder,
+    setProductListOrder,
+    setNewOrder,
+  } = useOrderContext();
+  const orders = useSelector((state) => state.orders);
+
+
+  // const user = useSelector((state) => state.user);
+  // const dispatch = useDispatch();
+  // const navigate = useNavigate();
 
   // const handleRowClick = (row) => {
   //   if (userAccess.canRead) {
@@ -21,7 +30,6 @@ function Orders() {
 
   // useEffect(() => {
   //   if (userAccess.canRead) {
-  //     dispatch(getAllProducts());
   //   }
   // }, [userAccess.canRead]);
 
@@ -40,20 +48,31 @@ function Orders() {
   //   return <div>У вас нет прав для просмотра этой страницы.</div>;
   // }
 
+  useEffect(() => {
+    setProductListOrder([]);
+    setProductOfOrder({});
+    setNewOrder({});
+  }, []);
+
   return (
     <>
+      <AddClientOrderModal
+        isOpen={clientModalOrder}
+        toggle={() => setClientModalOrder(!clientModalOrder)}
+      />
       <Table
         COLUMN_DATA={COLUMNS_ORDERS}
-        dataOfTable={list_of_orders}
+        dataOfTable={orders}
         // userAccess={userAccess}
         onClickButton={() => {
-          navigate('/addClientOrder');
+          setClientModalOrder(!clientModalOrder);
         }}
         buttonText={'Add new order'}
         tableName={'Orders'}
+        handleRowClick={(row) => {}}
       />
       <div>There place for vac and other huiny</div>
     </>
   );
 }
-export default Orders;
+export default OrdersTable;

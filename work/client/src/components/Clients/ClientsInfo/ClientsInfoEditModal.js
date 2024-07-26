@@ -49,7 +49,6 @@ function ClientsEditModal(props) {
       phone_number,
       c_email,
     };
-    console.log('before dispatch legal', legalAddress);
     dispatch(updateLegalAddress({ legalAddress }));
   };
 

@@ -58,7 +58,6 @@ const addNewClient = ({ client }) => {
   return url
     .post('/clients', { client })
     .then((res) => {
-      console.log(res.data);
       return res.data;
     })
     .catch(showErrorMessage);
@@ -94,7 +93,6 @@ const addNewLegalAddress = ({ legalAddress }) => {
 };
 
 const updateLegalAddress = ({ legalAddress }) => {
-  console.log('UPDATE SAGA START', legalAddress);
   return url
     .post(`/clientsAddress/update/${legalAddress.c_id}`, { legalAddress })
     .then((res) => {
@@ -125,11 +123,9 @@ const addNewDeliveryAddress = ({ deliveryAddress }) => {
 
 // Contact Info
 const getAllContactInfo = (currentClientID) => {
-  console.log('SAGA START', currentClientID);
   return url
     .get(`/clientsContactInfo/${currentClientID}`)
     .then((res) => {
-      console.log('GET CONTACT', res.data);
       return res.data;
     })
     .catch(showErrorMessage);

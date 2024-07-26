@@ -3,12 +3,13 @@ import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useSortBy, useTable } from 'react-table';
 
 function Table({
-  COLUMN_DATA,
-  dataOfTable,
+  COLUMN_DATA = [],
+  dataOfTable = [],
   // userAccess,
   onClickButton,
-  buttonText,
-  tableName,
+  buttonText = '',
+  tableName = 'Table',
+  handleRowClick,
 }) {
   const columns = useMemo(() => COLUMN_DATA, []);
   const data = useMemo(() => dataOfTable, [dataOfTable]);
@@ -40,6 +41,8 @@ function Table({
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     tableInstance;
+
+  const haveButton = buttonText.trim() == '';
 
   return (
     <>
@@ -85,11 +88,7 @@ function Table({
               prepareRow(row);
               const { key, ...restProps } = row.getRowProps();
               return (
-                <tr
-                  key={key}
-                  {...restProps}
-                  // onClick={() => handleRowClick(row)}
-                >
+                <tr key={key} {...restProps} onClick={() => handleRowClick(row)}>
                   {row.cells.map((cell) => {
                     const { key, ...restProps } = cell.getCellProps();
 
@@ -105,7 +104,7 @@ function Table({
           </tbody>
         </table>
         {/* {userAccess.canWrite && ( */}
-        <button onClick={onClickButton}>{buttonText}</button>
+        {!haveButton && <button onClick={onClickButton}>{buttonText}</button>}
         {/* )} */}
       </div>
     </>

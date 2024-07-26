@@ -142,67 +142,6 @@ const ProjectContextProvider = ({ children }) => {
     },
   ];
 
-  const COLUMNS_ORDERS = [
-    {
-      Header: 'Article',
-      accessor: 'article',
-      disableSortBy: true,
-    },
-    {
-      Header: 'Name of owner',
-      accessor: 'owner',
-      sortType: 'string',
-    },
-    {
-      Header: 'Delivery address',
-      accessor: 'del_adr_id',
-      sortType: 'string',
-    },
-    {
-      Header: 'Status of order',
-      accessor: 'stetus',
-      sortType: 'string',
-    },
-  ];
-
-  const COLUMNS_ORDER_PRODUCT = [
-    {
-      Header: 'Article',
-      accessor: 'article',
-      disableSortBy: true,
-    },
-    {
-      Header: 'Quantity, m2',
-      accessor: 'quantity_m2',
-      sortType: 'number',
-    },
-    {
-      Header: 'Quantity in palet',
-      accessor: 'quantity_palet',
-      sortType: 'number',
-    },
-    {
-      Header: 'Real quantity',
-      accessor: 'quantity_real',
-      sortType: 'number',
-    },
-    {
-      Header: 'Price, m2',
-      accessor: 'price_m2',
-      sortType: 'number',
-    },
-    {
-      Header: 'Discount',
-      accessor: 'discount',
-      defaultValue: 0,
-    },
-    {
-      Header: 'Final price',
-      accessor: 'final_price',
-      sortType: 'number',
-    },
-  ];
-
   const clients_info_table = [
     {
       Header: 'Client`s Name',
@@ -252,7 +191,7 @@ const ProjectContextProvider = ({ children }) => {
       accessor: 'email',
     },
   ];
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -339,8 +278,6 @@ const ProjectContextProvider = ({ children }) => {
     <ProjectContext.Provider
       value={{
         COLUMNS,
-        COLUMNS_ORDERS,
-        COLUMNS_ORDER_PRODUCT,
         promProduct,
         setPromProduct,
         version,
