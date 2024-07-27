@@ -25,7 +25,7 @@ clientsContactInfo.post('/', async(req,res) => {
             social
         } = req.body.contactInfo;
         const contactInfo = await ContactInfos.create({
-            id: currentClientID,
+            client_id: currentClientID,
             first_name, 
             last_name, 
             address,

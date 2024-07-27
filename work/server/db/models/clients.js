@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
     }) {
       // define association here
       this.hasMany(ClientLegalAddresses, { foreignKey: 'id' });
-      this.hasMany(DeliveryAddresses, { foreignKey: 'id' });
-      this.hasMany(ContactInfos, { foreignKey: 'id' });
+      this.hasMany(DeliveryAddresses, { foreignKey: 'client_id' });
+      this.hasMany(ContactInfos, { foreignKey: 'client_id' });
       this.hasMany(Orders, { foreignKey: 'id' });
     }
   }

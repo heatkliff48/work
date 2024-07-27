@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   ContactInfos.init(
     {
+      client_id: {
+        allowNull: false,
+        type: DataTypes.INTEGER
+      },
       first_name: {
         type: DataTypes.STRING,
       },
