@@ -11,7 +11,7 @@ const ClientsContactInfo = () => {
 
   useEffect(() => {
     dispatch(getAllContactInfo(currentClient.id));
-  }, [currentClient.id]);
+  }, [currentClient]);
 
   return (
     <Fragment>

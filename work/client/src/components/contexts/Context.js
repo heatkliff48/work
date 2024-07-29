@@ -212,6 +212,7 @@ const ProjectContextProvider = ({ children }) => {
   const roles = useSelector((state) => state.roles);
   const isCheckedAuth = useRef(false);
   const [currentClient, setCurrentClient] = useState({});
+  const [currentDelivery, setCurrentDelivery] = useState();
 
 
   const roleTable = [
@@ -310,6 +311,8 @@ const ProjectContextProvider = ({ children }) => {
         clients_legal_address_table,
         currentClient, 
         setCurrentClient,
+        currentDelivery,
+        setCurrentDelivery,
       }}
     >
       {children}

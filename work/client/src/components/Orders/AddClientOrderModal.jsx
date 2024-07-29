@@ -30,17 +30,17 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     return orderArticle;
   };
 
-  const addClientOrderHendler = async (e, owner_id) => {
+  const addClientOrderHendler = async (e, owner) => {
     e.preventDefault();
     const article = getOrderArticle();
 
     setNewOrder({
       article,
-      owner: owner_id,
+      owner: owner.id,
       // del_adr_id, //добавить логику добавления адреса
       status: status_table.NotReady,
     });
-    setCurrentClient(owner_id);
+    setCurrentClient(owner);
   };
 
   const deliveryAddressHendler = (addressId) => {
@@ -86,7 +86,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                       <tr
                         key={entrie.id}
                         onClick={(e) => {
-                          addClientOrderHendler(e, entrie.id);
+                          addClientOrderHendler(e, entrie);
                         }}
                       >
                         <td>{entrie?.c_name}</td>
