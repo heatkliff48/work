@@ -11,7 +11,11 @@ module.exports = {
       },
       client_id: {
         allowNull: false,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Clients',
+          key: 'id',
+        },
       },
       first_name: {
         type: Sequelize.TEXT
