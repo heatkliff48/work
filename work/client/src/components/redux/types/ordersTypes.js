@@ -3,3 +3,6 @@ export const ORDERS_LIST = 'ORDERS_LIST';
 
 export const ADD_NEW_ORDER = 'ADD_NEW_ORDER';
 export const NEW_ORDER = 'NEW_ORDER';
+
+export const GET_PRODUCTS_OF_ORDER = 'GET_PRODUCTS_OF_ORDER';
+export const PRODUCTS_OF_ORDER = 'PRODUCTS_OF_ORDER';
