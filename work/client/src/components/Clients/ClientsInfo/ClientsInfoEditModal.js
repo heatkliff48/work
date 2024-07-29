@@ -4,7 +4,7 @@ import React, { useState, useContext } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   updateClient,
   updateLegalAddress,
@@ -13,18 +13,21 @@ import './styles.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 
 function ClientsEditModal(props) {
-  const [c_name, setName] = useState('');
-  const [tin, setTIN] = useState('');
-  const [category, setCategory] = useState('');
-  const [street, setStreet] = useState('');
-  const [additional_info, setAddInfo] = useState('');
-  const [city, setCity] = useState('');
-  const [zip_code, setZIP] = useState('');
-  const [province, setProvince] = useState('');
-  const [country, setCountry] = useState('');
-  const [phone_number, setPhone] = useState('');
-  const [c_email, setEmail] = useState('');
   const { currentClient, setCurrentClient } = useProjectContext();
+  const legalAddress = useSelector((state) => state.legalAddress);
+
+  const [c_name, setName] = useState(currentClient?.c_name);
+  const [tin, setTIN] = useState(currentClient?.tin);
+  const [category, setCategory] = useState(currentClient?.category);
+  const [street, setStreet] = useState(legalAddress?.street);
+  const [additional_info, setAddInfo] = useState(legalAddress?.additional_info);
+  const [city, setCity] = useState(legalAddress?.city);
+  const [zip_code, setZIP] = useState(legalAddress?.zip_code);
+  const [province, setProvince] = useState(legalAddress?.province);
+  const [country, setCountry] = useState(legalAddress?.country);
+  const [phone_number, setPhone] = useState(legalAddress?.phone_number);
+  const [c_email, setEmail] = useState(legalAddress?.email);
+  
 
   const dispatch = useDispatch();
 
@@ -37,6 +40,7 @@ function ClientsEditModal(props) {
       tin,
       category,
     };
+
     dispatch(updateClient({ client }));
     const legalAddress = {
       c_id,
@@ -50,6 +54,7 @@ function ClientsEditModal(props) {
       c_email,
     };
     dispatch(updateLegalAddress({ legalAddress }));
+    props.onHide();
   };
 
   return (

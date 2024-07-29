@@ -120,9 +120,11 @@ clientsRouter.post('/update/:c_id', async (req, res) => {
         where: {
           id: c_id,
         },
+        returning: true,
+        plain: true,
       }
     );
-
+    
     const payload = { id, username, email };
     const accessToken = await TokenService.generateAccessToken(payload);
     const refreshToken = await TokenService.generateRefreshToken(payload);

@@ -14,7 +14,14 @@ export const clientsReducer = (clients = [], action) => {
       return [...clients, payload];
     }
     case UPDATE_CLIENT: {
-      return [...clients, payload];
+      const updateClient = clients.map((el) => {
+        console.log('PAYLOAD CLIENT UPDATE',payload)
+        if (el.id === payload[1].id) return payload[1];
+        return el;
+      });
+      console.log('CLIENT UPDATE',updateClient)
+      return updateClient;
+      // return [...clients, payload];
     }
     default:
       return clients;
@@ -31,7 +38,11 @@ export const legalAddressReducer = (legalAddress = {}, action) => {
     //   return [...legalAddress, payload];
     // }
     // case UPDATE_LEGAL_ADDRESS: {
-    //   return [...legalAddress, payload];
+    //   const updateLegalAddress = legalAddress.map((el) => {
+    //     if (el.id === payload.id) return payload;
+    //     return el;
+    //   });
+    //   return updateLegalAddress;
     // }
     default:
       return legalAddress;

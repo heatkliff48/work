@@ -11,7 +11,7 @@ const ClientsAddress = () => {
 
   useEffect(() => {
     dispatch(getLegalAddress(currentClient.id));
-  }, [currentClient.id]);
+  }, [currentClient]);
 
   return (
     <Fragment>
