@@ -155,6 +155,8 @@ clientsAddress.post('/update/:c_id', async (req, res) => {
         where: {
           id: c_id,
         },
+        returning: true,
+        plain: true,
       }
     );
 

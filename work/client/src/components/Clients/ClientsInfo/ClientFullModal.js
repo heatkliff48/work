@@ -12,15 +12,31 @@ import ClientsContactInfo from '../ClientsContactInfo/ClientsContactInfo';
 import ShowClientsContactInfoModal from '../ClientsContactInfo/ClientsContactInfoModal';
 import ShowClientsEditModal from './ClientsInfoEditModal';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+
 
 function MydModalWithGrid({ show, onHide }) {
-  const { currentClient } = useProjectContext();
+  const clients = useSelector((state) => state.clients);
+  const legalAddress = useSelector((state) => state.legalAddress);
+  const { currentClient, setCurrentClient } = useProjectContext();
+
+  useEffect(() => {
+    if (JSON.stringify(currentClient) === '{}'){
+      return
+    }
+    const client = clients.filter((el) => el.id === currentClient.id)[0];
+    setCurrentClient(client);
+
+    
+  }, [clients]);
 
   return (
     <Modal
       show={show}
       aria-labelledby="contained-modal-title-vcenter"
       dialogClassName="modal-auto-size"
+      onHide={onHide}
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
