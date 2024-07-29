@@ -39,6 +39,7 @@ export const rolesReducer = (roles = [], action) => {
     }
 
     case UPDATE_ROLE_ACTIVE: {
+      console.log('REDUCER', payload);
       return payload;
     }
 

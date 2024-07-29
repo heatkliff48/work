@@ -87,7 +87,6 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
 
     setProductListOrder((prev) => [...prev, productOfOrder]);
-    console.log('PRODUCT OF ORDER', productOfOrder);
     toggle();
   };
 

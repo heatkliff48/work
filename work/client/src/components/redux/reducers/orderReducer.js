@@ -7,7 +7,6 @@ export const ordersReducer = (orders = [], action) => {
       return payload;
     }
     case NEW_ORDER: {
-
       return [...orders, payload];
     }
     default:

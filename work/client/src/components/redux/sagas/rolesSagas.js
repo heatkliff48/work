@@ -101,7 +101,6 @@ function* updateRolesActiveWatcher(action) {
       action.payload
     );
 
-    console.log('Role UPDATE active SAGA', updActiveRoleData);
     window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: UPDATE_ROLE_ACTIVE, payload: updActiveRoleData });

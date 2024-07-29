@@ -5,8 +5,7 @@ import ModalRole from './ModalRole';
 import { updateRoleActive } from '../redux/actions/rolesAction';
 
 function Roles() {
-  const { modalRoleCard, setModalRoleCard, setRoleId, roles } =
-    useProjectContext();
+  const { modalRoleCard, setModalRoleCard, setRoleId, roles } = useProjectContext();
   const dispatch = useDispatch();
   const [updatedRoles, setUpdatedRoles] = useState(roles);
 
