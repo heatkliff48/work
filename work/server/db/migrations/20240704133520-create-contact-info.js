@@ -5,7 +5,17 @@ module.exports = {
     await queryInterface.createTable('ContactInfos', {
       id: {
         allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
         type: Sequelize.INTEGER
+      },
+      client_id: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Clients',
+          key: 'id',
+        },
       },
       first_name: {
         type: Sequelize.TEXT

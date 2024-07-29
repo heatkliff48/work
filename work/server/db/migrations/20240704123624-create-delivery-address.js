@@ -5,7 +5,17 @@ module.exports = {
     await queryInterface.createTable('DeliveryAddresses', {
       id: {
         allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
         type: Sequelize.INTEGER
+      },
+      client_id: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Clients',
+          key: 'id',
+        },
       },
       street: {
         type: Sequelize.TEXT

@@ -23,6 +23,7 @@ const ClientsContactInfo = () => {
         <thead>
           <tr>
             <th>id</th>
+            <th>client id</th>
             <th>first_name</th>
             <th>last_name</th>
             <th>address</th>
@@ -42,6 +43,7 @@ const ClientsContactInfo = () => {
             return (
               <tr>
                 <td>{entrie?.id}</td>
+                <td>{entrie?.client_id}</td>
                 <td>{entrie?.first_name}</td>
                 <td>{entrie?.last_name}</td>
                 <td>{entrie?.address}</td>

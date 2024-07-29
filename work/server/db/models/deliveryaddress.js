@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   DeliveryAddresses.init({
+    client_id: {
+      allowNull: false,
+      type: DataTypes.INTEGER
+    },
     street: {
       type: DataTypes.STRING,
     },

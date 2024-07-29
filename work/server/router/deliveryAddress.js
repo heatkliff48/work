@@ -22,7 +22,7 @@ deliveryAddress.post('/', async(req,res) => {
             email
         } = req.body.deliveryAddress;
         const deliveryAddress = await DeliveryAddresses.create({
-            id: currentClientID,
+            client_id: currentClientID,
             street, 
             additional_info, 
             city,
