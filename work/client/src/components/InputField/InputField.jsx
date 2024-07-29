@@ -20,7 +20,6 @@ const InputField = React.memo(({ el, inputValue, inputValueChange }) => {
     value = Math.max(Number(min), Math.min(Number(max), Number(value)));
 
     setVal(value);
-    console.log('VALUE_CHANGE', value)
   };
   return (
     <div className="item_topic">

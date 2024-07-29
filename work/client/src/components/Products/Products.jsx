@@ -76,7 +76,7 @@ function Products() {
       const access = checkUserAccess(user, roles, 'Products');
       setUserAccess(access);
 
-      console.log(access);
+      console.log('access', access);
 
       if (!access.canRead) {
         navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение

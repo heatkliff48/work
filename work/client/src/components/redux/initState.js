@@ -9,6 +9,7 @@ const initState = {
   roles: [],
   pages: [],
   orders: [],
+  produstsOfOrders: [],
 };
 
 export default initState;
