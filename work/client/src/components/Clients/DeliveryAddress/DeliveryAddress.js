@@ -4,14 +4,21 @@ import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction'
 import { useProjectContext } from '#components/contexts/Context.js';
 
 const DeliveryAddress = ({ clickFunk = null }) => {
-  const { currentClient } = useProjectContext();
+  const { currentClient, currentDelivery, setCurrentDelivery } = useProjectContext();
 
   const dispatch = useDispatch();
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
 
   useEffect(() => {
-    dispatch(getAllDeliveryAddresses(currentClient.id));
-  }, [currentClient.id]);
+    // dispatch(getAllDeliveryAddresses());
+    // dispatch(getAllDeliveryAddresses(currentClient.id));
+    console.log(deliveryAddresses, 'DELIVERY ADDRESSES')
+    const deliveryAdress = deliveryAddresses.filter((el) => el.id === currentClient.id);
+    
+    setCurrentDelivery(deliveryAdress);
+    console.log(currentClient, 'CURRENT CLIENT')
+    console.log(currentDelivery, 'CURRENT DELIVERY ADDRESS')
+  }, []);
 
   return (
     <Fragment>
@@ -35,7 +42,7 @@ const DeliveryAddress = ({ clickFunk = null }) => {
           </tr>
         </thead>
         <tbody>
-          {deliveryAddresses?.map((entrie) => {
+          {currentDelivery?.map((entrie) => {
             if (!entrie) return;
             return (
               <tr

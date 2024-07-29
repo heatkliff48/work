@@ -4,12 +4,14 @@ import MydModalWithGrid from './ClientFullModal.js';
 import ShowClientsModal from './ClientsInfoModal.js';
 import { getAllClients } from '#components/redux/actions/clientAction';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction';
 
 export const ClientContext = createContext();
 
 const ClientsInfo = () => {
   const [modalShow, setModalShow] = useState(false);
   const { currentClient, setCurrentClient } = useProjectContext();
+
   //const [currentClient, setCurrentClient] = useState({});
 
   const dispatch = useDispatch();
@@ -17,10 +19,11 @@ const ClientsInfo = () => {
 
   useEffect(() => {
     dispatch(getAllClients());
+    dispatch(getAllDeliveryAddresses());
   }, []);
 
   const clientHandler = (id) => {
-    const client = clients.filter((el) => el.id === id)[0];
+    const client = clients.find((el) => el.id === id);
     setCurrentClient(client);
     setModalShow(true)
   };

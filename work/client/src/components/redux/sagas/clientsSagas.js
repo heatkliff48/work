@@ -102,9 +102,9 @@ const updateLegalAddress = ({ legalAddress }) => {
 };
 
 // delivery address
-const getAllDeliveryAddresses = (currentClientID) => {
+const getAllDeliveryAddresses = () => {
   return url
-    .get(`/deliveryAddress/${currentClientID}`)
+    .get(`/deliveryAddress`)
     .then((res) => {
       return res.data;
     })
@@ -251,8 +251,7 @@ function* getAllDeliveryAddressesWorker(action) {
     accessTokenFront = yield select((state) => state.jwt);
 
     const { deliveryAddresses, accessToken, accessTokenExpiration } = yield call(
-      getAllDeliveryAddresses,
-      action.payload
+      getAllDeliveryAddresses
     );
 
     window.localStorage.setItem('jwt', accessToken);

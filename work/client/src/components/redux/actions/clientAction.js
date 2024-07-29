@@ -45,10 +45,9 @@ export const updateLegalAddress = ({ legalAddress }) => {
   };
 };
 
-export const getAllDeliveryAddresses = (currentClientID) => {
+export const getAllDeliveryAddresses = () => {
   return {
-    type: GET_ALL_DELIVERY_ADDRESSES,
-    payload: currentClientID,
+    type: GET_ALL_DELIVERY_ADDRESSES
   };
 };
 
