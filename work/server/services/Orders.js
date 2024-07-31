@@ -32,14 +32,14 @@ class OrdersService {
     email,
     fingerprint,
     article,
-    // del_adr_id,
+    del_adr_id,
     owner,
     status,
     productList,
   }) {
     const newOrder = await OrdersRepository.addNewOrderData({
       article,
-      // del_adr_id,
+      del_adr_id,
       owner,
       status,
       productList,
@@ -57,6 +57,29 @@ class OrdersService {
 
     return {
       newOrder,
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
+  static async getProductsOfOrder({ id, username, email, fingerprint, order_id }) {
+    const product_list = await OrdersRepository.getProductsOfOrder({
+      order_id,
+    });
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      product_list,
       accessToken,
       refreshToken,
       accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,

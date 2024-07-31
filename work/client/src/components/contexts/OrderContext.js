@@ -1,3 +1,4 @@
+import { getOrders } from '#components/redux/actions/ordersAction.js';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -67,21 +68,27 @@ const OrderContextProvider = ({ children }) => {
   ];
 
   const status_table = {
-    NotReady: 'NotReady',
-    InProcess: 'InProcess',
+    NotReady: 'Not ready',
+    InProcess: 'In process',
     Ready: 'Ready',
   };
 
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   // const navigate = useNavigate();
 
+  const [orderModal, setOrderModal] = useState(false);
   const [clientModalOrder, setClientModalOrder] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
   const [productListOrder, setProductListOrder] = useState([]);
   const [productOfOrder, setProductOfOrder] = useState({});
   const [newOrder, setNewOrder] = useState();
+  const [ordersDataList, setOrdersDataList] = useState([]);
+  const [orderCartData, setOrderCartData] = useState({});
 
   const list_of_orders = useSelector((state) => state.orders);
+  useEffect(() => {
+    dispatch(getOrders());
+  }, []);
 
   return (
     <OrderContext.Provider
@@ -100,6 +107,12 @@ const OrderContextProvider = ({ children }) => {
         status_table,
         productOfOrder,
         setProductOfOrder,
+        ordersDataList,
+        setOrdersDataList,
+        orderModal,
+        setOrderModal,
+        orderCartData,
+        setOrderCartData,
       }}
     >
       {children}

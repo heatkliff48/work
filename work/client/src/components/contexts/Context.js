@@ -239,11 +239,11 @@ const ProjectContextProvider = ({ children }) => {
   latestProducts?.sort((a, b) => a.id - b.id);
 
   const checkUserAccess = (user, roles, pageName) => {
-    const userRole = roles.find((role) => role.id == user.role);
+    const userRole = roles.find((role) => role.id === user.role);
 
-    // if (!userRole || !userRole.isActive) {
-    //   return { canRead: false, canWrite: false };
-    // }
+    if (!userRole || !userRole.isActive) {
+      return { canRead: false, canWrite: false };
+    }
 
     const pagePermissions = userRole?.PageAndRolesArray.find(
       (page) => page.page_name === pageName

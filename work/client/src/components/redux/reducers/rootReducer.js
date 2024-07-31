@@ -2,15 +2,16 @@ import { combineReducers } from 'redux';
 import { userReducer } from './userReducer';
 import { productsReducer } from './productsReducer';
 import { jwtReducer } from './jwtReducer';
-import { 
+import {
   clientsReducer,
-  legalAddressReducer, 
+  legalAddressReducer,
   deliveryAddressesReducer,
-  contactInfoReducer
+  contactInfoReducer,
 } from './clientsReducer';
 import { rolesReducer } from './rolesReducer';
 import { pagesReducer } from './pagesReducer';
 import { ordersReducer } from './orderReducer';
+import { productsOfOrdersReducer } from './productsOfOrders';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -23,4 +24,5 @@ export const rootReducer = combineReducers({
   roles: rolesReducer,
   pages: pagesReducer,
   orders: ordersReducer,
+  produstsOfOrders: productsOfOrdersReducer,
 });

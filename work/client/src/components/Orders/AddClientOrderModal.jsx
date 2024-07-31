@@ -3,7 +3,6 @@ import { Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { useSelector } from 'react-redux';
 import { useOrderContext } from '../contexts/OrderContext';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import { useProjectContext } from '#components/contexts/Context.js';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress.js';
 
@@ -14,6 +13,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     newOrder,
     setNewOrder,
     status_table,
+    list_of_orders,
   } = useOrderContext();
   const { setCurrentClient } = useProjectContext();
 
@@ -23,10 +23,15 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   let haveClient = useMemo(() => newOrder?.article ?? false, [newOrder?.article]);
 
   const getOrderArticle = () => {
+    let versionNumber = '0001';
     const year = new Date().getFullYear().toString().slice(-2);
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
-    const uuid = uuidv4();
-    const orderArticle = `Z0000${year}${month}${uuid}`;
+    const day = new Date().getDate();
+
+    const articleId = list_of_orders.length === 0 ? 1 : list_of_orders.length + 1;
+    versionNumber = `0000000${articleId}`.slice(-8);
+
+    const orderArticle = `Z0000${day}${month}${year}${versionNumber}`;
     return orderArticle;
   };
 
@@ -37,7 +42,6 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setNewOrder({
       article,
       owner: owner.id,
-      // del_adr_id, //добавить логику добавления адреса
       status: status_table.NotReady,
     });
     setCurrentClient(owner);
@@ -72,9 +76,9 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
             >
               <thead>
                 <tr>
-                  <th>c_name</th>
-                  <th>tin</th>
-                  <th>category</th>
+                  <th key={'c_name'}>c_name</th>
+                  <th key={'tin'}>tin</th>
+                  <th key={'category'}>category</th>
                 </tr>
               </thead>
 
