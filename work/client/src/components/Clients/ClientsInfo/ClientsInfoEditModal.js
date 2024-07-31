@@ -1,6 +1,7 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { useState, useContext } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import Select from 'react-select';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -13,9 +14,15 @@ import './styles.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 
 function ClientsEditModal(props) {
-  const { currentClient, setCurrentClient } = useProjectContext();
+  const {
+    currentClient,
+    setCurrentClient,
+    clients_info_table,
+    clients_legal_address_table,
+  } = useProjectContext();
   const legalAddress = useSelector((state) => state.legalAddress);
 
+  const [clientInput, setClientInput] = useState(currentClient);
   const [c_name, setName] = useState(currentClient?.c_name);
   const [tin, setTIN] = useState(currentClient?.tin);
   const [category, setCategory] = useState(currentClient?.category);
@@ -27,7 +34,37 @@ function ClientsEditModal(props) {
   const [country, setCountry] = useState(legalAddress?.country);
   const [phone_number, setPhone] = useState(legalAddress?.phone_number);
   const [c_email, setEmail] = useState(legalAddress?.email);
-  
+
+  const categoryOptions = [
+    { value: 'category 1', label: 'Category 1' },
+    { value: 'category 2', label: 'Category 2' },
+    { value: 'category 3', label: 'Category 3' },
+  ];
+
+  const handleClientInputChange = useCallback((e) => {
+    setClientInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }, []);
+
+  const handleSelectChange = (selectedOption) => {
+    setClientInput((prev) => ({ ...prev, category: selectedOption.value }));
+    setCategory(selectedOption.value);
+  };
+
+  const getSelectedOption = (accessor) => {
+    const options = categoryOptions;
+    if (!options) return null;
+    const categoryOption = options.find((option) => option.value === accessor);
+    // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
+    return categoryOption || options[0];
+  };
+
+  useEffect(() => {
+    setClientInput((prev) => ({
+      ...prev,
+      category: getSelectedOption(currentClient?.category).value,
+    }));
+    setCategory(clientInput.category);
+  }, [props.show]);
 
   const dispatch = useDispatch();
 
@@ -132,13 +169,22 @@ function ClientsEditModal(props) {
                     </label>
                   </div>
                   <div className="md:w-2/3">
-                    <input
+                    <Select
+                      defaultValue={getSelectedOption(currentClient?.category)}
+                      onChange={(v) => {
+                        handleSelectChange(v);
+                        // setCategory(v.value)
+                        // console.log('category inside select onChange', category)
+                      }}
+                      options={categoryOptions}
+                    />
+                    {/* <input
                       className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                       id="category"
                       type="text"
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                    />
+                    /> */}
                   </div>
                 </div>
               </Col>

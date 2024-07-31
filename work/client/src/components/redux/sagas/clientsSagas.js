@@ -82,11 +82,9 @@ const getLegalAddress = (currentClientID) => {
 };
 
 const addNewLegalAddress = ({ legalAddress }) => {
-
   return url
     .post('/clientsAddress', { legalAddress })
     .then((res) => {
-      console.log(res.data);
       return res.data;
     })
     .catch(showErrorMessage);
@@ -115,7 +113,6 @@ const addNewDeliveryAddress = ({ deliveryAddress }) => {
   return url
     .post('/deliveryAddress', { deliveryAddress })
     .then((res) => {
-      console.log(res.data);
       return res.data;
     })
     .catch(showErrorMessage);
@@ -135,7 +132,6 @@ const addNewContactInfo = ({ contactInfo }) => {
   return url
     .post('/clientsContactInfo', { contactInfo })
     .then((res) => {
-      console.log(res.data);
       return res.data;
     })
     .catch(showErrorMessage);
@@ -219,7 +215,6 @@ function* addNewLegalAddressWorker(action) {
       addNewLegalAddress,
       action.payload
     );
-    console.log('LEGAL ADDRESS SAGA WORKER', legalAddress)
     window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ONE_LEGAL_ADDRESS, payload: legalAddress });
@@ -267,7 +262,6 @@ function* addNewDeliveryAddressWorker(action) {
   try {
     accessTokenFront = yield select((state) => state.jwt);
 
-    console.log(action.payload);
     const { deliveryAddress, accessToken, accessTokenExpiration } = yield call(
       addNewDeliveryAddress,
       action.payload
@@ -283,7 +277,6 @@ function* addNewDeliveryAddressWorker(action) {
 }
 
 function* getAllContactInfoWorker(action) {
-  console.log('SAGA WORKER', action.payload);
   try {
     accessTokenFront = yield select((state) => state.jwt);
 
@@ -293,8 +286,6 @@ function* getAllContactInfoWorker(action) {
     );
 
     window.localStorage.setItem('jwt', accessToken);
-
-    console.log('SAGA CONTACT', contactInfo);
 
     yield put({ type: ALL_CONTACT_INFO, payload: contactInfo });
     yield put(setToken(accessToken, accessTokenExpiration));
@@ -307,7 +298,6 @@ function* addNewContactInfoWorker(action) {
   try {
     accessTokenFront = yield select((state) => state.jwt);
 
-    console.log(action.payload);
     const { contactInfo, accessToken, accessTokenExpiration } = yield call(
       addNewContactInfo,
       action.payload

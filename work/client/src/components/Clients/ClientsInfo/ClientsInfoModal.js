@@ -1,6 +1,7 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import Select from 'react-select';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -14,11 +15,32 @@ function ClientsModal(props) {
   const [clientInput, setClientInput] = useState({});
   const [clientLegalAddressInput, setClientLegalAddressInput] = useState({});
 
+  const categoryOptions = [
+    { value: 'category 1', label: 'Category 1' },
+    { value: 'category 2', label: 'Category 2' },
+    { value: 'category 3', label: 'Category 3' },
+  ];
+
   const dispatch = useDispatch();
 
   const handleClientInputChange = useCallback((e) => {
     setClientInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }, []);
+
+  const handleSelectChange = (selectedOption, key) => {
+    // setValue(selectedOption.value);
+    setClientInput((prev) => ({ ...prev, [key]: selectedOption.value }));
+  };
+
+  const getSelectedOption = (accessor) => {
+    const options = categoryOptions;
+    if (!options) return null;
+    const categoryOption = options.find(
+      (option) => option.value === clientInput?.[accessor]
+    );
+    // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
+    return categoryOption || options[0];
+  };
 
   const handleClientLegalAddressInputChange = useCallback((e) => {
     setClientLegalAddressInput((prev) => ({
@@ -26,6 +48,11 @@ function ClientsModal(props) {
       [e.target.name]: e.target.value,
     }));
   }, []);
+
+  useEffect(() => {
+    setClientInput((prev) => ({ ...prev, category: categoryOptions[0].value }));
+    console.log(props.show, 'props.modalShow');
+  }, [props.show]);
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
@@ -52,7 +79,7 @@ function ClientsModal(props) {
       <Modal.Body>
         <Container>
           <form
-            id="addProductModal"
+            id="addClientModel"
             className="w-full max-w-sm"
             onSubmit={(e) => {
               onSubmitForm(e);
@@ -72,14 +99,24 @@ function ClientsModal(props) {
                       </label>
                     </div>
                     <div className="md:w-2/3">
-                      <input
-                        className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                        id={el.accessor}
-                        name={el.accessor}
-                        type="text"
-                        value={clientInput[el.accessor] || ''}
-                        onChange={(e) => handleClientInputChange(e)}
-                      />
+                      {el.accessor === 'category' ? (
+                        <Select
+                          defaultValue={getSelectedOption(el.accessor)}
+                          onChange={(v) => {
+                            handleSelectChange(v, el.accessor);
+                          }}
+                          options={categoryOptions}
+                        />
+                      ) : (
+                        <input
+                          className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                          id={el.accessor}
+                          name={el.accessor}
+                          type="text"
+                          value={clientInput[el.accessor] || ''}
+                          onChange={(e) => handleClientInputChange(e)}
+                        />
+                      )}
                     </div>
                   </div>
                 </Col>
@@ -113,7 +150,7 @@ function ClientsModal(props) {
         </Container>
       </Modal.Body>
       <Modal.Footer>
-        <button form="addProductModal">Add Client</button>
+        <button form="addClientModel">Add Client</button>
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>
