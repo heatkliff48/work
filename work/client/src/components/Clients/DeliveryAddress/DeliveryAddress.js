@@ -13,12 +13,11 @@ const DeliveryAddress = ({ clickFunk = null }) => {
     // dispatch(getAllDeliveryAddresses());
     // dispatch(getAllDeliveryAddresses(currentClient.id));
     console.log(deliveryAddresses, 'DELIVERY ADDRESSES')
-    const deliveryAdress = deliveryAddresses.filter((el) => el.id === currentClient.id);
-    
+    const deliveryAdress = deliveryAddresses.filter((el) => el.client_id === currentClient.id);
     setCurrentDelivery(deliveryAdress);
     console.log(currentClient, 'CURRENT CLIENT')
     console.log(currentDelivery, 'CURRENT DELIVERY ADDRESS')
-  }, []);
+  }, [deliveryAddresses, currentClient]);
 
   return (
     <Fragment>
