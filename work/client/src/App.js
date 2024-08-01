@@ -15,6 +15,7 @@ import ClientsInfo from './components/Clients/ClientsInfo/ClientsInfo';
 import AddProductOrder from '#components/Orders/AddProductOrder.jsx';
 import OrdersTable from '#components/Orders/OrdersTable.jsx';
 import MainContextProvider from '#components/contexts/MainContex.js';
+import OrderCart from '#components/Orders/OrderCart.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -47,6 +48,7 @@ function App() {
             <Route path="/sign-in" element={<LoginForm />} />
             <Route path="/clients" element={<ClientsInfo />} />
             <Route path="/orders" element={<OrdersTable />} />
+            <Route path="/order_card" element={<OrderCart />} />
             <Route path="/addProductOrder" element={<AddProductOrder />} />
             <Route path="*" element={<Navigate to={'sign-in'} />} />
           </Routes>

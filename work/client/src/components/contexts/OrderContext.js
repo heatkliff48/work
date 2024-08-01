@@ -76,7 +76,6 @@ const OrderContextProvider = ({ children }) => {
   const dispatch = useDispatch();
   // const navigate = useNavigate();
 
-  const [orderModal, setOrderModal] = useState(false);
   const [clientModalOrder, setClientModalOrder] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
   const [productListOrder, setProductListOrder] = useState([]);
@@ -109,8 +108,6 @@ const OrderContextProvider = ({ children }) => {
         setProductOfOrder,
         ordersDataList,
         setOrdersDataList,
-        orderModal,
-        setOrderModal,
         orderCartData,
         setOrderCartData,
       }}

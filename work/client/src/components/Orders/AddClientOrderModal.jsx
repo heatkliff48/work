@@ -1,5 +1,5 @@
 import React, { Fragment, useMemo } from 'react';
-import { Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useSelector } from 'react-redux';
 import { useOrderContext } from '../contexts/OrderContext';
 import { useNavigate } from 'react-router-dom';
@@ -47,6 +47,11 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setCurrentClient(owner);
   };
 
+  const backHanddler = () => {
+    setNewOrder({});
+    setCurrentClient({});
+  };
+
   const deliveryAddressHendler = (addressId) => {
     setNewOrder((prev) => ({ ...prev, del_adr_id: addressId }));
     setClientModalOrder(!clientModalOrder);
@@ -56,8 +61,21 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
 
   return (
     <div>
-      <Modal isOpen={isOpen} toggle={toggle}>
-        <ModalHeader toggle={toggle}>
+      <Modal
+        isOpen={isOpen}
+        toggle={() => {
+          setNewOrder({});
+          setCurrentClient({});
+          toggle();
+        }}
+      >
+        <ModalHeader
+          toggle={() => {
+            setNewOrder({});
+            setCurrentClient({});
+            toggle();
+          }}
+        >
           {haveClient ? (
             <p>Select delivery address</p>
           ) : (
@@ -104,6 +122,9 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
             </table>
           )}
         </Fragment>
+        <ModalFooter>
+          {haveClient ? <button onClick={backHanddler}>back</button> : <></>}
+        </ModalFooter>
       </Modal>
     </div>
   );
