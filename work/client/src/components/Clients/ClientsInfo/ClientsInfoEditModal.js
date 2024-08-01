@@ -1,6 +1,8 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import React, { useState, useCallback, useEffect } from 'react';
+import { PhoneInput } from 'react-international-phone';
+import 'react-international-phone/style.css';
 import Select from 'react-select';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -23,6 +25,7 @@ function ClientsEditModal(props) {
   const legalAddress = useSelector((state) => state.legalAddress);
 
   const [clientInput, setClientInput] = useState(currentClient);
+  const [clientLegalAddressInput, setClientLegalAddressInput] = useState({});
   const [c_name, setName] = useState(currentClient?.c_name);
   const [tin, setTIN] = useState(currentClient?.tin);
   const [category, setCategory] = useState(currentClient?.category);
@@ -41,8 +44,9 @@ function ClientsEditModal(props) {
     { value: 'category 3', label: 'Category 3' },
   ];
 
-  const handleClientInputChange = useCallback((e) => {
-    setClientInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleClientPhoneInput = useCallback((phone) => {
+    // setClientLegalAddressInput((prev) => ({ ...prev, phone_number: phone }));
+    setPhone(phone);
   }, []);
 
   const handleSelectChange = (selectedOption) => {
@@ -64,6 +68,7 @@ function ClientsEditModal(props) {
       category: getSelectedOption(currentClient?.category).value,
     }));
     setCategory(clientInput.category);
+    setPhone(legalAddress?.phone_number || '');
   }, [props.show]);
 
   const dispatch = useDispatch();
@@ -315,12 +320,10 @@ function ClientsEditModal(props) {
                 </label>
               </div>
               <div className="md:w-2/3">
-                <input
-                  className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                  id="phone_number"
-                  type="text"
+                <PhoneInput
+                  // defaultCountry="es"
                   value={phone_number}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(phone) => handleClientPhoneInput(phone)}
                 />
               </div>
             </div>
