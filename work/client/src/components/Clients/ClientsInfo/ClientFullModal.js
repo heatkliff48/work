@@ -18,7 +18,6 @@ import { useSelector } from 'react-redux';
 
 function MydModalWithGrid({ show, onHide }) {
   const clients = useSelector((state) => state.clients);
-  const legalAddress = useSelector((state) => state.legalAddress);
   const { currentClient, setCurrentClient } = useProjectContext();
 
   useEffect(() => {

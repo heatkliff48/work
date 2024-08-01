@@ -5,7 +5,7 @@ import AddClientOrderModal from './AddClientOrderModal';
 import { useOrderContext } from '../contexts/OrderContext';
 import { useEffect } from 'react';
 import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction.js';
-import OrderCartModal from './OrderCartModal';
+
 import {
   getOrders,
   getProductsOfOrders,
@@ -22,8 +22,6 @@ function OrdersTable() {
     ordersDataList,
     setOrdersDataList,
     setOrderCartData,
-    orderModal,
-    setOrderModal,
   } = useOrderContext();
   const orders = useSelector((state) => state.orders);
   const clients = useSelector((state) => state.clients);
@@ -32,7 +30,7 @@ function OrdersTable() {
   const dispatch = useDispatch();
 
   // const user = useSelector((state) => state.user);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   // const handleRowClick = (row) => {
   //   if (userAccess.canRead) {
@@ -76,6 +74,8 @@ function OrdersTable() {
       owner: client,
       deliveryAddress,
     };
+
+    localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
     setOrderCartData(currentOrder);
   };
 
@@ -119,7 +119,6 @@ function OrdersTable() {
         isOpen={clientModalOrder}
         toggle={() => setClientModalOrder(!clientModalOrder)}
       />
-      {orderModal && <OrderCartModal />}{' '}
       <Table
         COLUMN_DATA={COLUMNS_ORDERS}
         dataOfTable={ordersDataList}
@@ -132,7 +131,7 @@ function OrdersTable() {
         handleRowClick={(row) => {
           getCurrentOrderInfoHandler(row.original);
           dispatch(getProductsOfOrders(row.original.id));
-          setOrderModal(!orderModal);
+          navigate('/order_card');
         }}
       />
       <div>There place for vac and other huiny</div>

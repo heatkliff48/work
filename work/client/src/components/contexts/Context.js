@@ -13,6 +13,36 @@ import { useNavigate } from 'react-router-dom';
 const ProjectContext = createContext();
 
 const ProjectContextProvider = ({ children }) => {
+  const displayNames = {
+    quantity_m2: 'Quantity, m2',
+    quantity_palet: 'Quantity of palet',
+    quantity_real: 'Real quantity',
+    price_m2: 'Price, m2',
+    discount: 'Discount, %',
+    final_price: 'Final price',
+    c_name: 'Name of owner',
+    tin: 'TIN',
+    category: 'Category',
+    street: 'Street',
+    additional_info: 'Additional info',
+    city: 'City',
+    zip_code: 'Zip code',
+    province: 'Province',
+    country: 'Country',
+    phone_number: 'Phone number',
+    email: 'E-mail',
+    first_name: 'First name',
+    last_name: 'Last name',
+    address: 'Address',
+    formal_position: 'Formal position',
+    role_in_the_org: 'Role',
+    phone_number_office: 'Phone number office',
+    phone_number_mobile: 'Phone number mobile',
+    phone_number_messenger: 'Phone number messenger',
+    linkedin: 'Linkedin',
+    social: 'Social',
+  };
+
   const COLUMNS = [
     {
       Header: 'Id',
@@ -214,7 +244,6 @@ const ProjectContextProvider = ({ children }) => {
   const [currentClient, setCurrentClient] = useState({});
   const [currentDelivery, setCurrentDelivery] = useState();
 
-
   const roleTable = [
     { id: 1, role_name: 'Production Manager' },
     { id: 2, role_name: 'Head of Sales Department' },
@@ -279,6 +308,7 @@ const ProjectContextProvider = ({ children }) => {
     <ProjectContext.Provider
       value={{
         COLUMNS,
+        displayNames,
         promProduct,
         setPromProduct,
         version,
@@ -309,7 +339,7 @@ const ProjectContextProvider = ({ children }) => {
         roleTable,
         clients_info_table,
         clients_legal_address_table,
-        currentClient, 
+        currentClient,
         setCurrentClient,
         currentDelivery,
         setCurrentDelivery,

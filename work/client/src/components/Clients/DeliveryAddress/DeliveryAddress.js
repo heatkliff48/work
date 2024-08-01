@@ -1,22 +1,17 @@
 import React, { Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction';
 import { useProjectContext } from '#components/contexts/Context.js';
 
 const DeliveryAddress = ({ clickFunk = null }) => {
   const { currentClient, currentDelivery, setCurrentDelivery } = useProjectContext();
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
 
   useEffect(() => {
-    // dispatch(getAllDeliveryAddresses());
-    // dispatch(getAllDeliveryAddresses(currentClient.id));
-    console.log(deliveryAddresses, 'DELIVERY ADDRESSES')
     const deliveryAdress = deliveryAddresses.filter((el) => el.client_id === currentClient.id);
     setCurrentDelivery(deliveryAdress);
-    console.log(currentClient, 'CURRENT CLIENT')
-    console.log(currentDelivery, 'CURRENT DELIVERY ADDRESS')
+
   }, [deliveryAddresses, currentClient]);
 
   return (

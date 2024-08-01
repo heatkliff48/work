@@ -8,6 +8,8 @@ import { useDispatch } from 'react-redux';
 import { addNewClient, addNewLegalAddress } from '../../redux/actions/clientAction';
 import './styles.css';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { PhoneInput } from 'react-international-phone';
+import 'react-international-phone/style.css';
 
 function ClientsModal(props) {
   const { clients_info_table, clients_legal_address_table } = useProjectContext();
@@ -18,6 +20,10 @@ function ClientsModal(props) {
 
   const handleClientInputChange = useCallback((e) => {
     setClientInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }, []);
+
+  const handleClientPhoneInput = useCallback((phone) => {
+    setClientLegalAddressInput((prev) => ({ ...prev, phone_number: phone }));
   }, []);
 
   const handleClientLegalAddressInputChange = useCallback((e) => {
@@ -87,28 +93,49 @@ function ClientsModal(props) {
             </Row>
 
             <h3>Client's legal address</h3>
-            {clients_legal_address_table.map((el) => (
-              <div className="md:flex md:items-center mb-6" key={el.id}>
-                <div className="md:w-1/3">
-                  <label
-                    className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
-                    for="version"
-                  >
-                    {el.Header}
-                  </label>
+            {clients_legal_address_table.map((el) => {
+              if (el.accessor === 'phone_number') {
+                return (
+                  <>
+                    <div className="md:w-1/3">
+                      <label
+                        className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                        for="version"
+                      >
+                        {el.Header}
+                      </label>
+                    </div>
+                    <PhoneInput
+                      defaultCountry="ua"
+                      value={clientInput[el.accessor] || ''}
+                      onChange={(phone) => handleClientPhoneInput(phone)}
+                    />
+                  </>
+                );
+              }
+              return (
+                <div className="md:flex md:items-center mb-6" key={el.id}>
+                  <div className="md:w-1/3">
+                    <label
+                      className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                      for="version"
+                    >
+                      {el.Header}
+                    </label>
+                  </div>
+                  <div className="md:w-2/3" key={el.id}>
+                    <input
+                      className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                      id={el.accessor}
+                      name={el.accessor}
+                      type="text"
+                      value={clientLegalAddressInput[el.accessor] || ''}
+                      onChange={(e) => handleClientLegalAddressInputChange(e)}
+                    />
+                  </div>
                 </div>
-                <div className="md:w-2/3" key={el.id}>
-                  <input
-                    className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                    id={el.accessor}
-                    name={el.accessor}
-                    type="text"
-                    value={clientLegalAddressInput[el.accessor] || ''}
-                    onChange={(e) => handleClientLegalAddressInputChange(e)}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </form>
         </Container>
       </Modal.Body>
