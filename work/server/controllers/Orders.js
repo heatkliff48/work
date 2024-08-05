@@ -62,10 +62,82 @@ class OrdersController {
           fingerprint,
         });
 
-        return res
+      return res
         .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
         .status(200)
         .json({ product_list, accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getUpdateProductsOfOrder(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    const { newProductsOfOrder } = req.body;
+
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration } =
+        await OrdersService.getUpdateProductsOfOrder({
+          newProductsOfOrder,
+          id,
+          username,
+          email,
+          fingerprint,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getDeleteProductOfOrder(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    const { product_id } = req.body;
+
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration } =
+        await OrdersService.getDeleteProductOfOrder({
+          product_id,
+          id,
+          username,
+          email,
+          fingerprint,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getDeleteOrder(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    const { order_id } = req.body;
+
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration } =
+        await OrdersService.getDeleteOrder({
+          order_id,
+          id,
+          username,
+          email,
+          fingerprint,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

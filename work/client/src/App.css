@@ -321,6 +321,7 @@ label {
   margin-bottom: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  padding: 1rem;
 }
 
 .product-table {
@@ -335,6 +336,10 @@ label {
 }
 
 .product-row td {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
   padding: 8px;
   text-align: left;
   border-bottom: 1px solid #ddd;

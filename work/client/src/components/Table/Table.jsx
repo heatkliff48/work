@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useSortBy, useTable } from 'react-table';
+import { Button } from 'reactstrap';
 
 function Table({
   COLUMN_DATA = [],

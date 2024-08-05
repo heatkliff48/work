@@ -45,6 +45,47 @@ class OrdersRepository {
 
     return product_list;
   }
+
+  static async getUpdateProductsOfOrder(newProductsOfOrder) {
+    const { order_id, productList } = newProductsOfOrder;
+    for (let i = 0; i < productList.length; i++) {
+      const {
+        product_id,
+        quantity_m2,
+        quantity_palet,
+        quantity_real,
+        price_m2,
+        discount,
+        final_price,
+      } = productList[i];
+
+      await OrdersProducts.create({
+        order_id,
+        product_id,
+        quantity_m2,
+        quantity_palet,
+        quantity_real,
+        price_m2,
+        discount,
+        final_price,
+      });
+    }
+
+    return;
+  }
+
+  static async getDeleteProductOfOrder({ product_id }) {
+    await OrdersProducts.destroy({ where: { id: product_id } });
+
+    return;
+  }
+
+  static async getDeleteOrder({ order_id }) {
+    await OrdersProducts.destroy({ where: { order_id } });
+    await Orders.destroy({ where: { id: order_id } });
+
+    return;
+  }
 }
 
 module.exports = OrdersRepository;

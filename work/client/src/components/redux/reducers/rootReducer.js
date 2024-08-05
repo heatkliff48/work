@@ -11,7 +11,7 @@ import {
 import { rolesReducer } from './rolesReducer';
 import { pagesReducer } from './pagesReducer';
 import { ordersReducer } from './orderReducer';
-import { productsOfOrdersReducer } from './productsOfOrders';
+import { productsOfOrdersReducer } from './productsOfOrdersReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -24,5 +24,5 @@ export const rootReducer = combineReducers({
   roles: rolesReducer,
   pages: pagesReducer,
   orders: ordersReducer,
-  produstsOfOrders: productsOfOrdersReducer,
+  productsOfOrders: productsOfOrdersReducer,
 });

@@ -85,6 +85,82 @@ class OrdersService {
       accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
     };
   }
+
+  static async getUpdateProductsOfOrder({
+    id,
+    username,
+    email,
+    fingerprint,
+    newProductsOfOrder,
+  }) {
+    await OrdersRepository.getUpdateProductsOfOrder(newProductsOfOrder);
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
+  static async getDeleteProductOfOrder({
+    id,
+    username,
+    email,
+    fingerprint,
+    product_id,
+  }) {
+    await OrdersRepository.getDeleteProductOfOrder({
+      product_id,
+    });
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
+  static async getDeleteOrder({ id, username, email, fingerprint, order_id }) {
+    await OrdersRepository.getDeleteOrder({
+      order_id,
+    });
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
 }
 
 module.exports = OrdersService;
