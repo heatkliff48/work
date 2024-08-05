@@ -2,7 +2,10 @@ import { useDispatch } from 'react-redux';
 import { useOrderContext } from '../contexts/OrderContext';
 import Table from '../Table/Table';
 import AddProductOrderModal from './AddProductOrderModal';
-import { addNewOrder } from '#components/redux/actions/ordersAction.js';
+import {
+  addNewOrder,
+  getUpdateProductOfOrders,
+} from '#components/redux/actions/ordersAction.js';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,13 +18,26 @@ function AddProductOrder() {
     setProductOfOrder,
     newOrder,
     setNewOrder,
+    list_of_orders,
   } = useOrderContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const addOrder = async () => {
-    dispatch(addNewOrder(newOrder));
-    navigate('/orders')
+    const haveOrderClient = list_of_orders.find(
+      (el) => el.article === newOrder.article
+    );
+    haveOrderClient
+      ? dispatch(
+          getUpdateProductOfOrders({
+            newProductsOfOrder: {
+              order_id: haveOrderClient.id,
+              ...newOrder,
+            },
+          })
+        )
+      : dispatch(addNewOrder(newOrder));
+    navigate('/orders');
   };
 
   useEffect(() => {

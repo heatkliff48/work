@@ -1,175 +1,100 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { Button } from 'reactstrap';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useDispatch, useSelector } from 'react-redux';
-
-//         <ModalHeader toggle={() => setOrderModal(!orderModal)}>
-//           Order Card: {orderCartData.article}
-//         </ModalHeader>
-
-//         <ModalBody className="item">
-//           <div className="order-info-container">
-// <div className="client-info">
-//   <h4>Client Information</h4>
-//   {Object.entries(orderCartData.owner || {})
-//     .filter(
-//       ([key]) =>
-//         ![
-//           'id',
-//           'order_id',
-//           'product_id',
-//           'createdAt',
-//           'updatedAt',
-//         ].includes(key)
-//     )
-//     .map(([key, value]) => (
-//       <p key={key}>
-//         {displayNames[key] || key}: {value}
-//       </p>
-//     ))}
-// </div>
-
-//             <div className="delivery-info">
-//               <h4>Delivery Address</h4>
-//               {Object.entries(orderCartData.deliveryAddress || {})
-//                 .filter(
-//                   ([key]) =>
-//                     ![
-//                       'id',
-//                       'client_id',
-//                       'product_id',
-//                       'createdAt',
-//                       'updatedAt',
-//                     ].includes(key)
-//                 )
-//                 .map(([key, value]) => (
-//                   <p key={key}>
-//                     {displayNames[key] || key}: {value}
-//                   </p>
-//                 ))}
-//             </div>
-//           </div>
-
-//           <div>
-//             <h4>Products info</h4>
-//             {productListOrder.map((product) => (
-//               <div className="product-info" key={product.id}>
-//                 {Object.entries(product || {})
-//                   .filter(
-//                     ([key]) =>
-//                       ![
-//                         'id',
-//                         'order_id',
-//                         'product_id',
-//                         'createdAt',
-//                         'updatedAt',
-//                       ].includes(key)
-//                   )
-//                   .map(([key, value]) => (
-//                     <p key={key}>
-//                       {displayNames[key] || key}: {value}
-//                     </p>
-//                   ))}
-//               </div>
-//             ))}
-//           </div>
-//           {/* Место для таблицы с продукцией заказа */}
-//         </ModalBody>
-//         <ModalFooter>
-//           <div className="product_card">
-//             <Button color="primary" onClick={() => console.log('cool')}>
-//               log
-//             </Button>
-//             <Button color="primary" disabled>
-//               Add
-//             </Button>
-//           </div>
-//         </ModalFooter>
-//       </Modal>
-//     </div>
-//   );
-// });
+import { useNavigate } from 'react-router-dom';
+import { useProjectContext } from '#components/contexts/Context.js';
+import {
+  deleteOrder,
+  getDeleteProductOfOrder,
+} from '#components/redux/actions/ordersAction.js';
 
 const OrderCart = React.memo(() => {
-  const { orderCartData, setOrderCartData } = useOrderContext();
+  const { orderCartData, setOrderCartData, setNewOrder } = useOrderContext();
+  const { displayNames } = useProjectContext();
+  const productListOrder = useSelector((state) => state.productsOfOrders);
+  const products = useSelector((state) => state.products);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // const dispatch = useDispatch();
-  const productListOrder = useSelector((state) => state.produstsOfOrders);
+  const filterKeys = useMemo(
+    () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
+    []
+  );
 
-  const displayNames = {
-    quantity_m2: 'Quantity, m2',
-    quantity_palet: 'Quantity of palet',
-    quantity_real: 'Real quantity',
-    price_m2: 'Price, m2',
-    discount: 'Discount, %',
-    final_price: 'Final price',
-    c_name: 'Name of owner',
-    tin: 'TIN',
-    category: 'Category',
-    street: 'Street',
-    additional_info: 'Additional info',
-    city: 'City',
-    zip_code: 'Zip code',
-    province: 'Province',
-    country: 'Country',
-    phone_number: 'Phone number',
-    email: 'E-mail',
-  };
+  const filterAndMapData = useCallback(
+    (data, filterKeys) =>
+      Object.entries(data || {})
+        .filter(([key]) => !filterKeys.includes(key))
+        .map(([key, value]) => {
+          if (!key) return;
+          return (
+            <div className="data-text" key={key}>
+              <p>
+                {displayNames[key] || key}: {value}
+              </p>
+            </div>
+          );
+        }),
+    [orderCartData]
+  );
 
-  const deleteOrderHandler = () => {};
+  const addProductArticleToOrderList = useCallback(
+    (productListOrder, products) => {
+      return productListOrder?.map((orderProduct) => {
+        const product = products?.find((p) => p.id === orderProduct?.product_id);
+        if (product) {
+          return {
+            product_article: product.article,
+            ...orderProduct,
+          };
+        }
+        return orderProduct;
+      });
+    },
+    [productListOrder, products]
+  );
+
+  const updatedProductListOrder = addProductArticleToOrderList(
+    productListOrder,
+    products
+  );
 
   useEffect(() => {
-    if (Object.keys(orderCartData).length === 0)
-      setOrderCartData(JSON.parse(localStorage.getItem('orderCartData')));
-  }, []);
+    if (Object.keys(orderCartData).length === 0) {
+      const storedData = JSON.parse(localStorage.getItem('orderCartData'));
+      if (storedData) setOrderCartData(storedData);
+    }
+  }, [orderCartData, setOrderCartData]);
 
   return (
     <div className="page-container">
-      <h4>Order Card: {orderCartData.article}</h4>
+      <h4>Order Card: {orderCartData?.article}</h4>
 
       <div className="header-container">
         <div className="owner-info">
           <h4>Client Information</h4>
-          {Object.entries(orderCartData.owner || {})
-            .filter(
-              ([key]) =>
-                !['id', 'order_id', 'product_id', 'createdAt', 'updatedAt'].includes(
-                  key
-                )
-            )
-            .map(([key, value]) => (
-              <p key={key}>
-                {displayNames[key] || key}: {value}
-              </p>
-            ))}
+          {filterAndMapData(orderCartData?.owner, filterKeys)}
         </div>
         <div className="contact-info">
           <div className="contact-text">
             <h4>Contact Person</h4>
-            {Object.entries(orderCartData.owner || {})
-              .filter(
-                ([key]) =>
-                  ![
-                    'id',
-                    'order_id',
-                    'product_id',
-                    'createdAt',
-                    'updatedAt',
-                  ].includes(key)
-              )
-              .map(([key, value]) => (
-                <p key={key}>
-                  {displayNames[key] || key}: {value}
-                </p>
-              ))}
+            {filterAndMapData(orderCartData?.owner, filterKeys)}
           </div>
           <Button>Edit</Button>
         </div>
-        <Button>Delete Order</Button>
+        <Button
+          onClick={() => {
+            dispatch(deleteOrder(orderCartData?.id));
+            navigate('/orders');
+          }}
+        >
+          Delete Order
+        </Button>
       </div>
       <div className="delivery-address">
         <h4>Delivery Address</h4>
-        {/* Render delivery address */}
+        {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
         <Button>Edit</Button>
       </div>
       <table className="product-table">
@@ -177,14 +102,34 @@ const OrderCart = React.memo(() => {
           <tr>{/* Render table headers */}</tr>
         </thead>
         <tbody>
-          {productListOrder.map((product) => (
+          {updatedProductListOrder?.map((product) => (
             <tr key={product.id} className="product-row">
-              {/* Render product information */}
               <td>
-                <Button onClick={deleteOrderHandler}>Delete</Button>
+                {filterAndMapData(product, filterKeys)}
+                <Button
+                  onClick={() => {
+                    dispatch(getDeleteProductOfOrder(product.id));
+                  }}
+                >
+                  Delete
+                </Button>
               </td>
             </tr>
           ))}
+          <Button
+            onClick={() => {
+              setNewOrder((prev) => ({
+                ...prev,
+                article: orderCartData.article,
+                owner: orderCartData.owner.id,
+                status: orderCartData.status,
+                del_adr_id: orderCartData.deliveryAddress.id,
+              }));
+              navigate('/addProductOrder');
+            }}
+          >
+            Add product
+          </Button>
         </tbody>
       </table>
     </div>

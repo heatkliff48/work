@@ -4,11 +4,17 @@ import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
 import {
   ADD_NEW_ORDER,
+  DELETE_ORDER,
+  DELETE_PRODUCT_OF_ORDER,
+  GET_DELETE_ORDER,
+  GET_DELETE_PRODUCT_OF_ORDER,
   GET_ORDERS_LIST,
   GET_PRODUCTS_OF_ORDER,
+  GET_UPDATE_PRODUCTS_OF_ORDER,
   NEW_ORDER,
   ORDERS_LIST,
   PRODUCTS_OF_ORDER,
+  UPDATE_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
 let accessTokenFront;
@@ -49,9 +55,36 @@ const addNewOrder = (order) => {
     .catch(showErrorMessage);
 };
 
-const getPrroductsOfOrder = (order_id) => {
+const getProductsOfOrder = (order_id) => {
   return url
     .post('/orders/products', { order_id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getUpdateProductsOfOrder = (newProductsOfOrder) => {
+  return url
+    .post('/orders/products/add', newProductsOfOrder)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getDeleteProductOfOrder = (product_id) => {
+  return url
+    .post('/orders/delete/product', { product_id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getDeleteOrder = (order_id) => {
+  return url
+    .post('/orders/delete', { order_id })
     .then((res) => {
       return res.data;
     })
@@ -82,7 +115,6 @@ function* addNewOrderWatcher(action) {
       action.payload
     );
 
-    console.log('Orders FROM BACK', newOrder);
     window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_ORDER, payload: newOrder });
@@ -93,12 +125,12 @@ function* addNewOrderWatcher(action) {
   }
 }
 
-function* getPrroductsOfOrderWatcher(action) {
+function* getProductsOfOrderWatcher(action) {
   try {
     accessTokenFront = yield select((state) => state.jwt);
 
     const { product_list, accessToken, accessTokenExpiration } = yield call(
-      getPrroductsOfOrder,
+      getProductsOfOrder,
       action.payload
     );
 
@@ -112,10 +144,78 @@ function* getPrroductsOfOrderWatcher(action) {
   }
 }
 
+function* getUpdateProductsOfOrderWatcher(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+    console.log('getUpdateProductsOfOrderWatcher', payload);
+
+    const { accessToken, accessTokenExpiration } = yield call(
+      getUpdateProductsOfOrder,
+      payload
+    );
+
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({
+      type: UPDATE_PRODUCTS_OF_ORDER,
+      payload: payload.newProductsOfOrder,
+    });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: UPDATE_PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
+function* getDeleteProductOfOrderWatcher(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    const { accessToken, accessTokenExpiration } = yield call(
+      getDeleteProductOfOrder,
+      payload
+    );
+
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: DELETE_PRODUCT_OF_ORDER, payload });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: DELETE_PRODUCT_OF_ORDER, payload: [] });
+  }
+}
+
+function* getDeleteOrderWatcher(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+
+    const { payload } = action;
+
+    const { accessToken, accessTokenExpiration } = yield call(
+      getDeleteOrder,
+      payload
+    );
+
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: DELETE_ORDER, payload });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: DELETE_ORDER, payload: [] });
+  }
+}
+
 function* ordersWatcher() {
   yield takeLatest(GET_ORDERS_LIST, getOrdersListWatcher);
   yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
-  yield takeLatest(GET_PRODUCTS_OF_ORDER, getPrroductsOfOrderWatcher);
+  yield takeLatest(GET_PRODUCTS_OF_ORDER, getProductsOfOrderWatcher);
+  yield takeLatest(GET_UPDATE_PRODUCTS_OF_ORDER, getUpdateProductsOfOrderWatcher);
+  yield takeLatest(GET_DELETE_PRODUCT_OF_ORDER, getDeleteProductOfOrderWatcher);
+  yield takeLatest(GET_DELETE_ORDER, getDeleteOrderWatcher);
 }
 
 export default ordersWatcher;
