@@ -88,23 +88,24 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
               <DeliveryAddress clickFunk={deliveryAddressHendler} />
             </>
           ) : (
-            <table
-              className="table mt-5 table-bordered text-center table-striped table-hover"
-              align="left"
-            >
-              <thead>
-                <tr>
-                  <th key={'c_name'}>c_name</th>
-                  <th key={'tin'}>tin</th>
-                  <th key={'category'}>category</th>
-                </tr>
-              </thead>
+            <ModalBody>
+              <div></div>
+              <table
+                className="table mt-5 table-bordered text-center table-striped table-hover"
+                align="left"
+              >
+                <thead>
+                  <tr>
+                    <th key={'c_name'}>c_name</th>
+                    <th key={'tin'}>tin</th>
+                    <th key={'category'}>category</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {list_of_clients?.map((entrie) => {
-                  if (!entrie) return;
-                  return (
-                    <ModalBody>
+                <tbody>
+                  {list_of_clients?.map((entrie) => {
+                    if (!entrie) return;
+                    return (
                       <tr
                         key={entrie.id}
                         onClick={(e) => {
@@ -115,11 +116,11 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                         <td>{entrie?.tin}</td>
                         <td>{entrie?.category}</td>
                       </tr>
-                    </ModalBody>
-                  );
-                })}
-              </tbody>
-            </table>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </ModalBody>
           )}
         </Fragment>
         <ModalFooter>

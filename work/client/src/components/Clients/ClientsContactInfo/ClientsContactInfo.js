@@ -3,15 +3,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllContactInfo } from '#components/redux/actions/clientAction';
 import { useProjectContext } from '#components/contexts/Context.js';
 
-const ClientsContactInfo = () => {
-  const { currentClient } = useProjectContext();
+const ClientsContactInfo = ({ clickFunk = null }) => {
+  const { currentClient, currentContact, setCurrentContact } = useProjectContext();
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const contactInfo = useSelector((state) => state.contactInfo);
 
   useEffect(() => {
-    dispatch(getAllContactInfo(currentClient.id));
-  }, [currentClient]);
+    // dispatch(getAllContactInfo(currentClient.id));
+    const currentContactInfo = contactInfo.filter(
+      (el) => el.client_id === currentClient.id
+    );
+    setCurrentContact(currentContactInfo);
+  }, [contactInfo, currentClient]);
 
   return (
     <Fragment>
@@ -38,10 +42,16 @@ const ClientsContactInfo = () => {
           </tr>
         </thead>
         <tbody>
-          {contactInfo?.map((entrie) => {
+          {currentContact?.map((entrie) => {
             if (!entrie) return;
             return (
-              <tr>
+              <tr
+                onClick={() => {
+                  if (!clickFunk) return;
+
+                  clickFunk(entrie.id);
+                }}
+              >
                 <td>{entrie?.id}</td>
                 <td>{entrie?.client_id}</td>
                 <td>{entrie?.first_name}</td>

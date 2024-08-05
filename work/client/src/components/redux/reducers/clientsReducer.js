@@ -1,8 +1,15 @@
-import { ALL_CLIENTS, NEW_CLIENTS, UPDATE_CLIENT,
-  ONE_LEGAL_ADDRESS, NEW_LEGAL_ADDRESS, UPDATE_LEGAL_ADDRESS,
-  ALL_DELIVERY_ADDRESSES, NEW_DELIVERY_ADDRESSES,
-  ALL_CONTACT_INFO, NEW_CONTACT_INFO
- } from '../types/clientsTypes';
+import {
+  ALL_CLIENTS,
+  NEW_CLIENTS,
+  UPDATE_CLIENT,
+  ONE_LEGAL_ADDRESS,
+  NEW_LEGAL_ADDRESS,
+  UPDATE_LEGAL_ADDRESS,
+  ALL_DELIVERY_ADDRESSES,
+  NEW_DELIVERY_ADDRESSES,
+  ALL_CONTACT_INFO,
+  NEW_CONTACT_INFO,
+} from '../types/clientsTypes';
 
 export const clientsReducer = (clients = [], action) => {
   const { type, payload } = action;
@@ -15,11 +22,9 @@ export const clientsReducer = (clients = [], action) => {
     }
     case UPDATE_CLIENT: {
       const updateClient = clients.map((el) => {
-        console.log('PAYLOAD CLIENT UPDATE',payload)
         if (el.id === payload[1].id) return payload[1];
         return el;
       });
-      console.log('CLIENT UPDATE',updateClient)
       return updateClient;
       // return [...clients, payload];
     }

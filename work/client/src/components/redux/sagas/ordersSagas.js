@@ -15,6 +15,10 @@ import {
   ORDERS_LIST,
   PRODUCTS_OF_ORDER,
   UPDATE_PRODUCTS_OF_ORDER,
+  UPDATE_CONTACT_OF_ORDER,
+  NEW_CONTACT_OF_ORDER,
+  UPDATE_DELIVERY_OF_ORDER,
+  NEW_DELIVERY_OF_ORDER,
 } from '../types/ordersTypes';
 
 let accessTokenFront;
@@ -85,6 +89,24 @@ const getDeleteProductOfOrder = (product_id) => {
 const getDeleteOrder = (order_id) => {
   return url
     .post('/orders/delete', { order_id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updateContactOfOrder = ({ newContactOfOrder }) => {
+  return url
+    .post('/orders/update/contact', { newContactOfOrder })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updateDeliveryOfOrder = ({ newDeliveryOfOrder }) => {
+  return url
+    .post('/orders/update/contact', { newDeliveryOfOrder })
     .then((res) => {
       return res.data;
     })
@@ -209,6 +231,40 @@ function* getDeleteOrderWatcher(action) {
   }
 }
 
+function* updateContactOfOrderWorker(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+
+    const { newContactOfOrder, accessToken, accessTokenExpiration } = yield call(
+      updateContactOfOrder,
+      action.payload
+    );
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: NEW_CONTACT_OF_ORDER, payload: newContactOfOrder });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: NEW_CONTACT_OF_ORDER, payload: [] });
+  }
+}
+
+function* updateDeliveryOfOrderWorker(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+
+    const { newDeliveryOfOrder, accessToken, accessTokenExpiration } = yield call(
+      updateContactOfOrder,
+      action.payload
+    );
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: NEW_DELIVERY_OF_ORDER, payload: newDeliveryOfOrder });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: NEW_DELIVERY_OF_ORDER, payload: [] });
+  }
+}
+
 function* ordersWatcher() {
   yield takeLatest(GET_ORDERS_LIST, getOrdersListWatcher);
   yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
@@ -216,6 +272,8 @@ function* ordersWatcher() {
   yield takeLatest(GET_UPDATE_PRODUCTS_OF_ORDER, getUpdateProductsOfOrderWatcher);
   yield takeLatest(GET_DELETE_PRODUCT_OF_ORDER, getDeleteProductOfOrderWatcher);
   yield takeLatest(GET_DELETE_ORDER, getDeleteOrderWatcher);
+  yield takeLatest(UPDATE_CONTACT_OF_ORDER, updateContactOfOrderWorker);
+  yield takeLatest(UPDATE_DELIVERY_OF_ORDER, updateDeliveryOfOrderWorker);
 }
 
 export default ordersWatcher;

@@ -254,6 +254,7 @@ const ProjectContextProvider = ({ children }) => {
   const isCheckedAuth = useRef(false);
   const [currentClient, setCurrentClient] = useState({});
   const [currentDelivery, setCurrentDelivery] = useState();
+  const [currentContact, setCurrentContact] = useState();
 
   const roleTable = [
     { id: 1, role_name: 'Production Manager' },
@@ -354,6 +355,8 @@ const ProjectContextProvider = ({ children }) => {
         setCurrentClient,
         currentDelivery,
         setCurrentDelivery,
+        currentContact,
+        setCurrentContact,
       }}
     >
       {children}
