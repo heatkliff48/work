@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useSelector } from 'react-redux';
 import { useOrderContext } from '../contexts/OrderContext';
@@ -19,6 +19,9 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
 
   const navigate = useNavigate();
   const list_of_clients = useSelector((state) => state.clients);
+
+  const [searchFilter, setSearchFilter] = useState('');
+  const [listFiltered, setListFiltered] = useState(list_of_clients);
 
   let haveClient = useMemo(() => newOrder?.article ?? false, [newOrder?.article]);
 
@@ -59,6 +62,15 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     navigate('/addProductOrder');
   };
 
+  const filterHandler = (e) => {
+    setSearchFilter(e.target.value);
+    console.log('list_of_clients', list_of_clients);
+    let filtered = list_of_clients.filter((el) =>
+      el.c_name?.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    setListFiltered(filtered);
+  };
+
   return (
     <div>
       <Modal
@@ -89,7 +101,15 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
             </>
           ) : (
             <ModalBody>
-              <div></div>
+              <div>
+                {/* для поиска */}
+                <input
+                  value={searchFilter}
+                  onChange={(e) => {
+                    filterHandler(e);
+                  }}
+                />
+              </div>
               <table
                 className="table mt-5 table-bordered text-center table-striped table-hover"
                 align="left"
@@ -103,7 +123,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                 </thead>
 
                 <tbody>
-                  {list_of_clients?.map((entrie) => {
+                  {listFiltered?.map((entrie) => {
                     if (!entrie) return;
                     return (
                       <tr
