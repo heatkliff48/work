@@ -66,6 +66,8 @@ const ProjectContextProvider = ({ children }) => {
       accessor: 'density',
       defaultValue: 500,
       sortType: 'number',
+      min: 80,
+      max: 800,
     },
     {
       Header: 'Form',
@@ -84,18 +86,24 @@ const ProjectContextProvider = ({ children }) => {
       accessor: 'width',
       defaultValue: 200,
       sortType: 'number',
+      min: 50,
+      max: 500,
     },
     {
       Header: 'Lengths, mm',
       accessor: 'lengths',
       defaultValue: 600,
       sortType: 'number',
+      min: 400,
+      max: 3000,
     },
     {
       Header: 'Height, mm',
       accessor: 'height',
       defaultValue: 250,
       sortType: 'number',
+      min: 100,
+      max: 1000,
     },
     {
       Header: 'Trading Mark',
@@ -135,6 +143,8 @@ const ProjectContextProvider = ({ children }) => {
       accessor: 'humidity',
       defaultValue: 30,
       sortType: 'number',
+      min: 0,
+      max: 100,
     },
     {
       Header: 'Density wet max, kg/m³',

@@ -16,6 +16,9 @@ function ClientsModal(props) {
   const { clients_info_table, clients_legal_address_table } = useProjectContext();
   const [clientInput, setClientInput] = useState({});
   const [clientLegalAddressInput, setClientLegalAddressInput] = useState({});
+  const regexp = new RegExp(`^[0-9]*$`);
+  const isValid = (value) => value !== '' && value !== '-';
+  const [valid, setValid] = useState(isValid(clientLegalAddressInput.zip_code));
 
   const categoryOptions = [
     { value: 'category 1', label: 'Category 1' },
@@ -146,6 +149,20 @@ function ClientsModal(props) {
                       defaultCountry="es"
                       value={clientInput[el.accessor] || ''}
                       onChange={(phone) => handleClientPhoneInput(phone)}
+                    />
+                  ) : el.accessor === 'zip_code' ? (
+                    <input
+                      className={valid ? '' : 'invalid'}
+                      id={el.accessor}
+                      name={el.accessor}
+                      type="text"
+                      value={clientLegalAddressInput[el.accessor] || ''}
+                      // onKeyPress={(e) => !/[0-9]/.test(e.key) && e.preventDefault()}
+                      onChange={(e) => {
+                        if (regexp.test(e.target.value)) {
+                          handleClientLegalAddressInputChange(e);
+                        }
+                      }}
                     />
                   ) : (
                     <input
