@@ -4,7 +4,10 @@ import MydModalWithGrid from './ClientFullModal.js';
 import ShowClientsModal from './ClientsInfoModal.js';
 import { getAllClients } from '#components/redux/actions/clientAction';
 import { useProjectContext } from '#components/contexts/Context.js';
-import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction';
+import {
+  getAllDeliveryAddresses,
+  getAllContactInfo,
+} from '#components/redux/actions/clientAction';
 
 export const ClientContext = createContext();
 
@@ -20,12 +23,13 @@ const ClientsInfo = () => {
   useEffect(() => {
     dispatch(getAllClients());
     dispatch(getAllDeliveryAddresses());
+    dispatch(getAllContactInfo());
   }, []);
 
   const clientHandler = (id) => {
     const client = clients.find((el) => el.id === id);
     setCurrentClient(client);
-    setModalShow(true)
+    setModalShow(true);
   };
 
   return (
@@ -64,10 +68,7 @@ const ClientsInfo = () => {
           })}
         </tbody>
       </table>
-      <MydModalWithGrid
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-      />
+      <MydModalWithGrid show={modalShow} onHide={() => setModalShow(false)} />
       {/* </ClientContext.Provider> */}
     </Fragment>
   );

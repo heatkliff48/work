@@ -119,9 +119,9 @@ const addNewDeliveryAddress = ({ deliveryAddress }) => {
 };
 
 // Contact Info
-const getAllContactInfo = (currentClientID) => {
+const getAllContactInfo = () => {
   return url
-    .get(`/clientsContactInfo/${currentClientID}`)
+    .get(`/clientsContactInfo`)
     .then((res) => {
       return res.data;
     })
@@ -248,7 +248,6 @@ function* getAllDeliveryAddressesWorker(action) {
     const { deliveryAddresses, accessToken, accessTokenExpiration } = yield call(
       getAllDeliveryAddresses
     );
-
     window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ALL_DELIVERY_ADDRESSES, payload: deliveryAddresses });
@@ -281,10 +280,8 @@ function* getAllContactInfoWorker(action) {
     accessTokenFront = yield select((state) => state.jwt);
 
     const { contactInfo, accessToken, accessTokenExpiration } = yield call(
-      getAllContactInfo,
-      action.payload
+      getAllContactInfo
     );
-
     window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ALL_CONTACT_INFO, payload: contactInfo });

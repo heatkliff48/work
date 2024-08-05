@@ -8,6 +8,8 @@ import {
   deleteOrder,
   getDeleteProductOfOrder,
 } from '#components/redux/actions/ordersAction.js';
+import ShowOrderDeliveryEditModal from './OrderCartDeliveryEditModal.jsx';
+import ShowOrderContactEditModal from './OrderCartContactEditModal.jsx';
 
 const OrderCart = React.memo(() => {
   const { orderCartData, setOrderCartData, setNewOrder } = useOrderContext();
@@ -81,7 +83,7 @@ const OrderCart = React.memo(() => {
             <h4>Contact Person</h4>
             {filterAndMapData(orderCartData?.owner, filterKeys)}
           </div>
-          <Button>Edit</Button>
+          <ShowOrderContactEditModal />
         </div>
         <Button
           onClick={() => {
@@ -95,7 +97,7 @@ const OrderCart = React.memo(() => {
       <div className="delivery-address">
         <h4>Delivery Address</h4>
         {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
-        <Button>Edit</Button>
+        <ShowOrderDeliveryEditModal />
       </div>
       <table className="product-table">
         <thead>

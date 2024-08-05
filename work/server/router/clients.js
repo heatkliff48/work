@@ -13,7 +13,6 @@ clientsRouter.get('/', async (req, res) => {
     const allClients = await Clients.findAll({
       order: [['id', 'ASC']],
     });
-    console.log('GET CLIENTS', allClients);
 
     const payload = { id, username, email };
     const accessToken = await TokenService.generateAccessToken(payload);
@@ -39,7 +38,6 @@ clientsRouter.get('/', async (req, res) => {
 });
 
 clientsRouter.post('/', async (req, res) => {
-  console.log('POST CLIENTS', req.body.client);
   const fingerprint = req.fingerprint.hash;
   const { id, username, email } = req.user;
   const { c_name, tin, category } = req.body.client;
@@ -124,7 +122,7 @@ clientsRouter.post('/update/:c_id', async (req, res) => {
         plain: true,
       }
     );
-    
+
     const payload = { id, username, email };
     const accessToken = await TokenService.generateAccessToken(payload);
     const refreshToken = await TokenService.generateRefreshToken(payload);

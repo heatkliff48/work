@@ -9,9 +9,10 @@ const DeliveryAddress = ({ clickFunk = null }) => {
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
 
   useEffect(() => {
-    const deliveryAdress = deliveryAddresses.filter((el) => el.client_id === currentClient.id);
-    setCurrentDelivery(deliveryAdress);
-
+    const deliveryAddress = deliveryAddresses.filter(
+      (el) => el.client_id === currentClient.id
+    );
+    setCurrentDelivery(deliveryAddress);
   }, [deliveryAddresses, currentClient]);
 
   return (
