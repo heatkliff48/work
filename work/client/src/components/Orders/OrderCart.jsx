@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import { Button } from 'reactstrap';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,12 +10,25 @@ import {
 } from '#components/redux/actions/ordersAction.js';
 import ShowOrderDeliveryEditModal from './OrderCartDeliveryEditModal.jsx';
 import ShowOrderContactEditModal from './OrderCartContactEditModal.jsx';
+import AddProductOrderModal from './AddProductOrderModal.jsx';
 
 const OrderCart = React.memo(() => {
-  const { orderCartData, setOrderCartData, setNewOrder } = useOrderContext();
+  const {
+    orderCartData,
+    setOrderCartData,
+    setNewOrder,
+    getCurrentOrderInfoHandler,
+    list_of_orders,
+    productModalOrder,
+    setProductModalOrder,
+  } = useOrderContext();
   const { displayNames } = useProjectContext();
+
   const productListOrder = useSelector((state) => state.productsOfOrders);
   const products = useSelector((state) => state.products);
+
+  const [vatValue, setVatValue] = useState({ vat_euro: 0, vat_result: 0 });
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -54,13 +67,42 @@ const OrderCart = React.memo(() => {
         return orderProduct;
       });
     },
-    [productListOrder, products]
+    [productListOrder]
   );
 
-  const updatedProductListOrder = addProductArticleToOrderList(
-    productListOrder,
-    products
-  );
+  const updatedProductListOrder = useMemo(() => {
+    return addProductArticleToOrderList(productListOrder, products);
+  }, [productListOrder]);
+
+  const handleInputChange = (e) => {
+    setVatValue((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  useEffect(() => {
+    const final_price_product = updatedProductListOrder.reduce(
+      (acc, el) => acc + el.final_price,
+      0
+    );
+    if (!final_price_product || !vatValue.vat_procent) {
+      setVatValue((prev) => ({
+        ...prev,
+        vat_result: 0,
+      }));
+    } else {
+      const vat_euro = (vatValue.vat_procent * final_price_product) / 100;
+
+      const vat_result = (final_price_product + vat_euro).toFixed(2);
+
+      setVatValue((prev) => ({
+        ...prev,
+        vat_result,
+        vat_euro,
+      }));
+    }
+  }, [updatedProductListOrder, vatValue.vat_procent]);
 
   useEffect(() => {
     if (Object.keys(orderCartData).length === 0) {
@@ -69,72 +111,110 @@ const OrderCart = React.memo(() => {
     }
   }, [orderCartData, setOrderCartData]);
 
-  return (
-    <div className="page-container">
-      <h4>Order Card: {orderCartData?.article}</h4>
+  useEffect(() => {
+    getCurrentOrderInfoHandler(orderCartData);
+  }, [list_of_orders]);
 
-      <div className="header-container">
-        <div className="owner-info">
-          <h4>Client Information</h4>
-          {filterAndMapData(orderCartData?.owner, filterKeys)}
-        </div>
-        <div className="contact-info">
-          <div className="contact-text">
-            <h4>Contact Person</h4>
+  return (
+    <>
+      {productModalOrder && (
+        <AddProductOrderModal
+          isOpen={productModalOrder}
+          toggle={() => setProductModalOrder(!productModalOrder)}
+        />
+      )}
+      <div className="page-container">
+        <h4>Order Card: {orderCartData?.article}</h4>
+
+        <div className="header-container">
+          <div className="owner-info">
+            <h4>Client Information</h4>
             {filterAndMapData(orderCartData?.owner, filterKeys)}
           </div>
-          <ShowOrderContactEditModal />
-        </div>
-        <Button
-          onClick={() => {
-            dispatch(deleteOrder(orderCartData?.id));
-            navigate('/orders');
-          }}
-        >
-          Delete Order
-        </Button>
-      </div>
-      <div className="delivery-address">
-        <h4>Delivery Address</h4>
-        {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
-        <ShowOrderDeliveryEditModal />
-      </div>
-      <table className="product-table">
-        <thead>
-          <tr>{/* Render table headers */}</tr>
-        </thead>
-        <tbody>
-          {updatedProductListOrder?.map((product) => (
-            <tr key={product.id} className="product-row">
-              <td>
-                {filterAndMapData(product, filterKeys)}
-                <Button
-                  onClick={() => {
-                    dispatch(getDeleteProductOfOrder(product.id));
-                  }}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
+          <div className="contact-info">
+            <div className="contact-text">
+              <h4>Contact Person</h4>
+              {filterAndMapData(orderCartData?.contactInfo, filterKeys)}
+            </div>
+            <ShowOrderContactEditModal />
+          </div>
           <Button
             onClick={() => {
-              setNewOrder((prev) => ({
-                ...prev,
-                article: orderCartData.article,
-                owner: orderCartData.owner.id,
-                status: orderCartData.status,
-                del_adr_id: orderCartData.deliveryAddress.id,
-              }));
-              navigate('/addProductOrder');
+              dispatch(deleteOrder(orderCartData?.id));
+              navigate('/orders');
             }}
           >
-            Add product
+            Delete Order
           </Button>
-        </tbody>
-      </table>
-    </div>
+        </div>
+        <div className="delivery-address">
+          <h4>Delivery Address</h4>
+          {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
+          <ShowOrderDeliveryEditModal />
+        </div>
+        <table className="product-table">
+          <thead>
+            <tr>Products</tr>
+          </thead>
+          <tbody>
+            {updatedProductListOrder?.map((product) => (
+              <tr key={product?.id} className="product-row">
+                <td>
+                  {filterAndMapData(product, filterKeys)}
+                  <Button
+                    onClick={() => {
+                      dispatch(getDeleteProductOfOrder(product?.id));
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))}
+            <Button
+              onClick={() => {
+                setNewOrder((prev) => ({
+                  ...prev,
+                  article: orderCartData.article,
+                  owner: orderCartData.owner.id,
+                  status: orderCartData.status,
+                  del_adr_id: orderCartData.deliveryAddress.id,
+                }));
+                setProductModalOrder(!productModalOrder);
+              }}
+            >
+              Add product
+            </Button>
+          </tbody>
+        </table>
+        <div className="vat_container">
+          <div className="vat_procent">
+            <div>
+              <p>VAT, %</p>
+              <input
+                type="text"
+                id="vat_procent"
+                name="vat_procent"
+                value={vatValue.vat_procent}
+                onChange={(e) => {
+                  handleInputChange(e);
+                }}
+              />
+            </div>
+          </div>
+          <div className="vat_euro">
+            <div>
+              <p>VAT, EURO</p>
+              <p>{vatValue.vat_euro}</p>
+            </div>
+          </div>
+          <div className="vat_result">
+            <p>Result</p>
+            <p>{vatValue.vat_result}</p>
+          </div>
+        </div>
+      </div>
+    </>
   );
 });
 

@@ -4,6 +4,8 @@ import { useOrderContext } from '../contexts/OrderContext';
 import { useProjectContext } from '#components/contexts/Context.js';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
+import { getUpdateProductOfOrders } from '#components/redux/actions/ordersAction.js';
+import { useDispatch } from 'react-redux';
 
 const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -11,14 +13,20 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     COLUMNS_ORDER_PRODUCT,
     productOfOrder,
     setProductOfOrder,
+    list_of_orders,
+    newOrder,
   } = useOrderContext();
   const { COLUMNS, latestProducts } = useProjectContext();
 
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const dispatch = useDispatch();
 
   const haveProduct = useMemo(
     () => productOfOrder?.product_id ?? false,
     [productOfOrder?.product_id]
+  );
+  const haveOrderClient = list_of_orders.find(
+    (el) => el.article === newOrder.article
   );
 
   const handlerAddProductOrder = useCallback((row) => {
@@ -33,6 +41,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const quantity_palet_value = useMemo(() => {
+    if (!selectedProduct) return;
     if (!productOfOrder?.quantity_m2) productOfOrder.quantity_m2 = 0;
     const result = Math.ceil(
       productOfOrder?.quantity_m2 / (selectedProduct?.m2 || 1)
@@ -77,7 +86,30 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     return result;
   }, [price_m2_value, quantity_real_value, productOfOrder?.discount]);
 
-  const addProductInList = async () => {
+  // const addProductInList = async () => {
+  //   setProductOfOrder((prev) => ({
+  //     ...prev,
+  //     quantity_palet: quantity_palet_value,
+  //     quantity_real: quantity_real_value,
+  //     price_m2: price_m2_value,
+  //     final_price: final_price_value,
+  //   }));
+
+  //   setProductListOrder((prev) => [...prev, productOfOrder]);
+  //   toggle();
+  // };
+
+  // const addProductInOrder = async () => {
+  //   dispatch(
+  //     getUpdateProductOfOrders({
+  //       newProductsOfOrder: {
+  //         order_id: haveOrderClient.id,
+  //       },
+  //     })
+  //   );
+  // };
+
+  const addProductOrder = async () => {
     setProductOfOrder((prev) => ({
       ...prev,
       quantity_palet: quantity_palet_value,
@@ -87,6 +119,18 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
 
     setProductListOrder((prev) => [...prev, productOfOrder]);
+
+    if (haveOrderClient) {
+      dispatch(
+        getUpdateProductOfOrders({
+          newProductsOfOrder: {
+            order_id: haveOrderClient.id,
+            productList: [productOfOrder],
+          },
+        })
+      );
+      setProductOfOrder({});
+    }
     toggle();
   };
 
@@ -197,7 +241,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
           )}
         </ModalBody>
         <ModalFooter>
-          <button onClick={addProductInList}>Add product</button>
+          <button onClick={addProductOrder}>Add product</button>
         </ModalFooter>
       </Modal>
     </div>

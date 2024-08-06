@@ -1,31 +1,25 @@
 import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Modal from 'react-bootstrap/Modal';
-import Row from 'react-bootstrap/Row';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress';
+import { updateDeliveryOfOrder } from '#components/redux/actions/ordersAction.js';
 
 function OrderDeliveryEditModal({ show, onHide }) {
-  const { currentClient, setCurrentClient, currentDelivery, setCurrentDelivery } =
-    useProjectContext();
-  const { orderCartData, setOrderCartData, setNewOrder } = useOrderContext();
+  const { setCurrentClient } = useProjectContext();
+  const { orderCartData } = useOrderContext();
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
+  const dispatch = useDispatch();
 
   const deliveryAddressHendler = (addressId) => {
-    // const deliveryAdress = deliveryAddresses.filter(
-    //   (el) => el.client_id === addressId
-    // );
-    // setOrderCartData((prev) => ({ ...prev, deliveryAddress: deliveryAdress }));
-    console.log('orderCartData.owner', orderCartData.owner);
-    console.log('addressId', addressId);
-    console.log('deliveryAddresses', deliveryAddresses[addressId - 1]);
-
-    // ЗДЕСЬ БЕРЕТСЯ ID АДРЕСА ДОСТАВКИ
+    dispatch(
+      updateDeliveryOfOrder({ address_id: addressId, order_id: orderCartData.id })
+    );
+    onHide();
   };
 
   useEffect(() => {

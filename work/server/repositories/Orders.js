@@ -6,11 +6,19 @@ class OrdersRepository {
     const orders = await Orders.findAll();
     return orders;
   }
-  static async addNewOrderData({ article, del_adr_id, owner, status, productList }) {
+  static async addNewOrderData({
+    article,
+    del_adr_id,
+    contact_id,
+    owner,
+    status,
+    productList,
+  }) {
     const order = await Orders.create({
       article,
       owner,
       del_adr_id,
+      contact_id,
       status,
     });
 
@@ -71,6 +79,16 @@ class OrdersRepository {
       });
     }
 
+    return;
+  }
+
+  static async getUpdateContactInfoOrder({ contact_id, order_id }) {
+    await Orders.update({ contact_id }, { where: { id: order_id } });
+    return;
+  }
+
+  static async getUpdateDeliveryAddressOrder({ address_id, order_id }) {
+    await Orders.update({ del_adr_id: address_id }, { where: { id: order_id } });
     return;
   }
 

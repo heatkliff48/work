@@ -13,9 +13,7 @@ export const ClientContext = createContext();
 
 const ClientsInfo = () => {
   const [modalShow, setModalShow] = useState(false);
-  const { currentClient, setCurrentClient } = useProjectContext();
-
-  //const [currentClient, setCurrentClient] = useState({});
+  const { currentClient, setCurrentClient } = useProjectContext();;
 
   const dispatch = useDispatch();
   const clients = useSelector((state) => state.clients);
