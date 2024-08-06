@@ -95,18 +95,18 @@ const getDeleteOrder = (order_id) => {
     .catch(showErrorMessage);
 };
 
-const updateContactOfOrder = ({ newContactOfOrder }) => {
+const updateContactOfOrder = (newContactOfOrder) => {
   return url
-    .post('/orders/update/contact', { newContactOfOrder })
+    .post('/orders/update/contact', newContactOfOrder)
     .then((res) => {
       return res.data;
     })
     .catch(showErrorMessage);
 };
 
-const updateDeliveryOfOrder = ({ newDeliveryOfOrder }) => {
+const updateDeliveryOfOrder = (newDeliveryOfOrder) => {
   return url
-    .post('/orders/update/contact', { newDeliveryOfOrder })
+    .post('/orders/update/delivery_address', newDeliveryOfOrder)
     .then((res) => {
       return res.data;
     })
@@ -170,7 +170,6 @@ function* getUpdateProductsOfOrderWatcher(action) {
   try {
     accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
-    console.log('getUpdateProductsOfOrderWatcher', payload);
 
     const { accessToken, accessTokenExpiration } = yield call(
       getUpdateProductsOfOrder,
@@ -234,14 +233,15 @@ function* getDeleteOrderWatcher(action) {
 function* updateContactOfOrderWorker(action) {
   try {
     accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
 
-    const { newContactOfOrder, accessToken, accessTokenExpiration } = yield call(
+    const { accessToken, accessTokenExpiration } = yield call(
       updateContactOfOrder,
-      action.payload
+      payload
     );
     window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: NEW_CONTACT_OF_ORDER, payload: newContactOfOrder });
+    yield put({ type: NEW_CONTACT_OF_ORDER, payload });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_CONTACT_OF_ORDER, payload: [] });
@@ -251,14 +251,15 @@ function* updateContactOfOrderWorker(action) {
 function* updateDeliveryOfOrderWorker(action) {
   try {
     accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
 
-    const { newDeliveryOfOrder, accessToken, accessTokenExpiration } = yield call(
-      updateContactOfOrder,
+    const { accessToken, accessTokenExpiration } = yield call(
+      updateDeliveryOfOrder,
       action.payload
     );
     window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: NEW_DELIVERY_OF_ORDER, payload: newDeliveryOfOrder });
+    yield put({ type: NEW_DELIVERY_OF_ORDER, payload });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_DELIVERY_OF_ORDER, payload: [] });

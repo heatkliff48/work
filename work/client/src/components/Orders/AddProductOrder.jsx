@@ -24,19 +24,21 @@ function AddProductOrder() {
   const navigate = useNavigate();
 
   const addOrder = async () => {
-    const haveOrderClient = list_of_orders.find(
-      (el) => el.article === newOrder.article
-    );
-    haveOrderClient
-      ? dispatch(
-          getUpdateProductOfOrders({
-            newProductsOfOrder: {
-              order_id: haveOrderClient.id,
-              ...newOrder,
-            },
-          })
-        )
-      : dispatch(addNewOrder(newOrder));
+    // const haveOrderClient = list_of_orders.find(
+    //   (el) => el.article === newOrder.article
+    // );
+
+    // haveOrderClient
+    //   ? dispatch(
+    //       getUpdateProductOfOrders({
+    //         newProductsOfOrder: {
+    //           order_id: haveOrderClient.id,
+    //           ...newOrder,
+    //         },
+    //       })
+    //     )
+    // :
+    dispatch(addNewOrder(newOrder));
     navigate('/orders');
   };
 
@@ -50,10 +52,12 @@ function AddProductOrder() {
 
   return (
     <>
-      <AddProductOrderModal
-        isOpen={productModalOrder}
-        toggle={() => setProductModalOrder(!productModalOrder)}
-      />
+      {productModalOrder && (
+        <AddProductOrderModal
+          isOpen={productModalOrder}
+          toggle={() => setProductModalOrder(!productModalOrder)}
+        />
+      )}
       <Table
         COLUMN_DATA={COLUMNS_ORDER_PRODUCT}
         dataOfTable={productListOrder}

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Table from '../Table/Table';
 import AddClientOrderModal from './AddClientOrderModal';
 import { useOrderContext } from '../contexts/OrderContext';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction.js';
 
 import {
@@ -14,6 +14,7 @@ import {
 function OrdersTable() {
   const {
     COLUMNS_ORDERS,
+    getCurrentOrderInfoHandler,
     clientModalOrder,
     setClientModalOrder,
     setProductOfOrder,
@@ -21,7 +22,6 @@ function OrdersTable() {
     setNewOrder,
     ordersDataList,
     setOrdersDataList,
-    setOrderCartData,
   } = useOrderContext();
   const orders = useSelector((state) => state.orders);
   const clients = useSelector((state) => state.clients);
@@ -58,26 +58,6 @@ function OrdersTable() {
   // if (!userAccess.canRead) {
   //   return <div>У вас нет прав для просмотра этой страницы.</div>;
   // }
-
-  const getCurrentOrderInfoHandler = (order_info) => {
-    const order = orders.find((el) => el.id === order_info.id);
-    const client = clients.find((client) => client.id === order.owner);
-    const deliveryAddress = deliveryAddresses.find(
-      (address) =>
-        address.id === order.del_adr_id && address.client_id === order.owner
-    );
-
-    const currentOrder = {
-      id: order.id,
-      article: order.article,
-      status: order.status,
-      owner: client,
-      deliveryAddress,
-    };
-
-    localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
-    setOrderCartData(currentOrder);
-  };
 
   useEffect(() => {
     if (orders && clients && deliveryAddresses) {

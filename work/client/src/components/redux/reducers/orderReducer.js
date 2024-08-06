@@ -20,10 +20,18 @@ export const ordersReducer = (orders = [], action) => {
       return result;
     }
     case NEW_CONTACT_OF_ORDER: {
-      return payload;
+      const { contact_id, order_id } = payload;
+      return orders.map((order) => {
+        if (order.id === order_id) return { ...order, contact_id };
+        return order;
+      });
     }
     case NEW_DELIVERY_OF_ORDER: {
-      return payload;
+      const { address_id, order_id } = payload;
+      return orders.map((order) => {
+        if (order.id === order_id) return { ...order, del_adr_id: address_id };
+        return order;
+      });
     }
     default:
       return orders;

@@ -76,6 +76,7 @@ const OrderContextProvider = ({ children }) => {
   const dispatch = useDispatch();
   // const navigate = useNavigate();
 
+  const [currentOrder, setCurrentOrder] = useState();
   const [clientModalOrder, setClientModalOrder] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
   const [productListOrder, setProductListOrder] = useState([]);
@@ -85,15 +86,45 @@ const OrderContextProvider = ({ children }) => {
   const [orderCartData, setOrderCartData] = useState({});
 
   const list_of_orders = useSelector((state) => state.orders);
+  const clients = useSelector((state) => state.clients);
+  const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
+  const contactInfos = useSelector((state) => state.contactInfo);
+
   useEffect(() => {
     dispatch(getOrders());
   }, []);
 
+  const getCurrentOrderInfoHandler = (order_info) => {
+    const order = list_of_orders.find((el) => el.id === order_info.id);
+    const client = clients.find((client) => client.id === order?.owner);
+    const deliveryAddress = deliveryAddresses.find(
+      (address) =>
+        address.id === order?.del_adr_id && address.client_id === order?.owner
+    );
+    const contactInfo = contactInfos.find(
+      (contact) =>
+        contact.id === order?.contact_id && contact.client_id === order?.owner
+    );
+
+    const currentOrder = {
+      id: order.id,
+      article: order.article,
+      status: order.status,
+      owner: client,
+      deliveryAddress,
+      contactInfo,
+    };
+
+    localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
+    setOrderCartData(currentOrder);
+  };
   return (
     <OrderContext.Provider
       value={{
         COLUMNS_ORDERS,
         COLUMNS_ORDER_PRODUCT,
+        currentOrder,
+        setCurrentOrder,
         clientModalOrder,
         setClientModalOrder,
         productModalOrder,
@@ -110,6 +141,7 @@ const OrderContextProvider = ({ children }) => {
         setOrdersDataList,
         orderCartData,
         setOrderCartData,
+        getCurrentOrderInfoHandler,
       }}
     >
       {children}

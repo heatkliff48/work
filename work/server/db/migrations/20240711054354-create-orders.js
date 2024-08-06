@@ -26,6 +26,13 @@ module.exports = {
         //   key: 'id',
         // },
       },
+      contact_id: {
+        type: Sequelize.INTEGER,
+        // references: {
+        //   model: 'DeliveryAddresses',
+        //   key: 'id',
+        // },
+      },
       status: {
         type: Sequelize.STRING,
       },

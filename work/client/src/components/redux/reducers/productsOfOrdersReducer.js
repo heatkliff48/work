@@ -11,7 +11,7 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
       return payload;
     }
     case UPDATE_PRODUCTS_OF_ORDER: {
-      return [...productsOfOrders, payload.newProductsOfOrder.productList];
+      return [...productsOfOrders, ...payload?.productList];
     }
     case DELETE_PRODUCT_OF_ORDER: {
       const result = productsOfOrders.filter((el) => el.id !== payload);

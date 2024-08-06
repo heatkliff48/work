@@ -5,6 +5,7 @@ import { useOrderContext } from '../contexts/OrderContext';
 import { useNavigate } from 'react-router-dom';
 import { useProjectContext } from '#components/contexts/Context.js';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress.js';
+import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo.js';
 
 const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -24,6 +25,10 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const [listFiltered, setListFiltered] = useState(list_of_clients);
 
   let haveClient = useMemo(() => newOrder?.article ?? false, [newOrder?.article]);
+  let haveAdddress = useMemo(
+    () => newOrder?.del_adr_id ?? false,
+    [newOrder?.del_adr_id]
+  );
 
   const getOrderArticle = () => {
     let versionNumber = '0001';
@@ -55,16 +60,19 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setCurrentClient({});
   };
 
-  const deliveryAddressHendler = (addressId) => {
-    setNewOrder((prev) => ({ ...prev, del_adr_id: addressId }));
+  const contactInfoHendler = (contactId) => {
+    setNewOrder((prev) => ({ ...prev, contact_id: contactId }));
     setClientModalOrder(!clientModalOrder);
     haveClient = false;
+    haveAdddress = false;
     navigate('/addProductOrder');
+  };
+  const deliveryAddressHendler = (addressId) => {
+    setNewOrder((prev) => ({ ...prev, del_adr_id: addressId }));
   };
 
   const filterHandler = (e) => {
     setSearchFilter(e.target.value);
-    console.log('list_of_clients', list_of_clients);
     let filtered = list_of_clients.filter((el) =>
       el.c_name?.toLowerCase().includes(e.target.value.toLowerCase())
     );
@@ -89,20 +97,28 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
           }}
         >
           {haveClient ? (
-            <p>Select delivery address</p>
+            haveAdddress ? (
+              <p>Select contact person</p>
+            ) : (
+              <p>Select delivery address</p>
+            )
           ) : (
             <p>Select the client who is placing the order</p>
           )}
         </ModalHeader>
         <Fragment>
           {haveClient ? (
-            <>
-              <DeliveryAddress clickFunk={deliveryAddressHendler} />
-            </>
+            haveAdddress ? (
+              <ClientsContactInfo clickFunk={contactInfoHendler} />
+            ) : (
+              <>
+                <DeliveryAddress clickFunk={deliveryAddressHendler} />
+              </>
+            )
           ) : (
             <ModalBody>
               <div>
-                {/* для поиска */}
+                <h4>Search</h4>
                 <input
                   value={searchFilter}
                   onChange={(e) => {

@@ -1,27 +1,25 @@
 import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Modal from 'react-bootstrap/Modal';
-import Row from 'react-bootstrap/Row';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo';
+import { updateContactOfOrder } from '#components/redux/actions/ordersAction.js';
 
 function OrderContactEditModal({ show, onHide }) {
-  const { currentClient, setCurrentClient, currentContact, setCurrentContact } =
-    useProjectContext();
-  const { orderCartData, setOrderCartData, setNewOrder } = useOrderContext();
+  const { setCurrentClient } = useProjectContext();
+  const { orderCartData } = useOrderContext();
   const contactInfo = useSelector((state) => state.contactInfo);
+  const dispatch = useDispatch();
 
-  const deliveryAddressHendler = (contactId) => {
-    console.log('orderCartData.owner', orderCartData.owner);
-    console.log('contactId', contactId);
-    console.log('contactInfo', contactInfo[contactId - 1]); // тут берется объект контакта по айди, которое получается по нажатию на строку в таблице
-
-    // ЗДЕСЬ БЕРЕТСЯ ID КОНТАКТА
+  const contacInfoHendler = (contactId) => {
+    dispatch(
+      updateContactOfOrder({ contact_id: contactId, order_id: orderCartData?.id })
+    );
+    onHide();
   };
 
   useEffect(() => {
@@ -42,7 +40,7 @@ function OrderContactEditModal({ show, onHide }) {
       </Modal.Header>
       <Modal.Body className="grid-example">
         <Container>
-          <ClientsContactInfo clickFunk={deliveryAddressHendler} />
+          <ClientsContactInfo clickFunk={contacInfoHendler} />
         </Container>
       </Modal.Body>
       <Modal.Footer>

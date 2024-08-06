@@ -6,9 +6,6 @@ const InputField = React.memo(({ el, inputValue, inputValueChange }) => {
   const [inputDirty, setInputDirty] = useState(false);
   const [inputError, setInputError] = useState("This field can't be empty");
 
-  const [val, setVal] = useState(0);
-  const [internalValue, setInternalValue] = useState(inputValue[el.accessor]);
-
   const isValid = (value) => value !== '' && value !== '-';
 
   const [valid, setValid] = useState(
@@ -22,7 +19,6 @@ const InputField = React.memo(({ el, inputValue, inputValueChange }) => {
     if (!e.target.value) {
       setInputError("This field can't be empty");
     } else if (parseInt(e.target.value) < parseInt(e.target.min)) {
-      //e.target.value = e.target.min;
       setInputError(`Must be higher than ${e.target.min}`);
     } else if (parseInt(e.target.value) > parseInt(e.target.max)) {
       setInputError(`Must be lower than ${e.target.max}`);
@@ -45,28 +41,10 @@ const InputField = React.memo(({ el, inputValue, inputValueChange }) => {
         name={el.accessor}
         value={inputValue[el.accessor] || ''}
         onChange={(e) => {
-          if (regexp.test(e.target.value)) {
-            // setInternalValue(e.target.value);
-            // let newValid = isValid(e.target.value, el.min, el.max);
-            // setValid(newValid);
-            // if (newValid) {
-            inputChangeHandler(e);
-            // }
-          }
-          // inputValueChange(e);
+          if (regexp.test(e.target.value)) inputChangeHandler(e);
         }}
         onBlur={(e) => {
           setInputDirty(true);
-          // blurHandler(e);
-
-          // if (internalValue < el.min) {
-          //   setInternalValue(el.min);
-          // } else if (internalValue > el.max) {
-          //   setInternalValue(el.max);
-          // } else {
-          //   setInternalValue(inputValue[el.accessor]);
-          // }
-          // setValid(true);
         }}
       />
     </div>

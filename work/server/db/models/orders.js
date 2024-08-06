@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       article: DataTypes.STRING,
       owner: DataTypes.INTEGER,
       del_adr_id: DataTypes.INTEGER,
+      contact_id: DataTypes.INTEGER,
       status: DataTypes.STRING,
     },
     {

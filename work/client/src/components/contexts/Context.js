@@ -286,7 +286,7 @@ const ProjectContextProvider = ({ children }) => {
       return { canRead: false, canWrite: false };
     }
 
-    const pagePermissions = userRole?.PageAndRolesArray.find(
+    const pagePermissions = userRole?.PageAndRolesArray?.find(
       (page) => page.page_name === pageName
     );
 

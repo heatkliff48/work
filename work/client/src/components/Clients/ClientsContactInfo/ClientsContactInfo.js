@@ -1,18 +1,16 @@
 import React, { Fragment, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllContactInfo } from '#components/redux/actions/clientAction';
+import { useSelector } from 'react-redux';
+
 import { useProjectContext } from '#components/contexts/Context.js';
 
 const ClientsContactInfo = ({ clickFunk = null }) => {
   const { currentClient, currentContact, setCurrentContact } = useProjectContext();
 
-  // const dispatch = useDispatch();
   const contactInfo = useSelector((state) => state.contactInfo);
 
   useEffect(() => {
-    // dispatch(getAllContactInfo(currentClient.id));
     const currentContactInfo = contactInfo.filter(
-      (el) => el.client_id === currentClient.id
+      (el) => el.client_id === currentClient?.id
     );
     setCurrentContact(currentContactInfo);
   }, [contactInfo, currentClient]);

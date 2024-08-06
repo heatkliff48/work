@@ -33,6 +33,7 @@ class OrdersService {
     fingerprint,
     article,
     del_adr_id,
+    contact_id,
     owner,
     status,
     productList,
@@ -40,6 +41,7 @@ class OrdersService {
     const newOrder = await OrdersRepository.addNewOrderData({
       article,
       del_adr_id,
+      contact_id,
       owner,
       status,
       productList,
@@ -94,6 +96,62 @@ class OrdersService {
     newProductsOfOrder,
   }) {
     await OrdersRepository.getUpdateProductsOfOrder(newProductsOfOrder);
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
+  static async getUpdateContactInfoOfOrder({
+    id,
+    username,
+    email,
+    fingerprint,
+    contact_id,
+    order_id,
+  }) {
+    await OrdersRepository.getUpdateContactInfoOrder({ contact_id, order_id });
+
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
+  static async getUpdateDeliveryAddressOrder({
+    id,
+    username,
+    email,
+    fingerprint,
+    address_id,
+    order_id,
+  }) {
+    await OrdersRepository.getUpdateDeliveryAddressOrder({ address_id, order_id });
+
     const payload = { id, username, email };
 
     const accessToken = await TokenService.generateAccessToken(payload);
