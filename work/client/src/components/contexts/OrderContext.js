@@ -79,11 +79,11 @@ const OrderContextProvider = ({ children }) => {
   const [currentOrder, setCurrentOrder] = useState();
   const [clientModalOrder, setClientModalOrder] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
-  const [productListOrder, setProductListOrder] = useState([]);
   const [productOfOrder, setProductOfOrder] = useState({});
   const [newOrder, setNewOrder] = useState();
   const [ordersDataList, setOrdersDataList] = useState([]);
   const [orderCartData, setOrderCartData] = useState({});
+  const [isOrderReady, setIsOrderReady] = useState(false);
 
   const list_of_orders = useSelector((state) => state.orders);
   const clients = useSelector((state) => state.clients);
@@ -92,10 +92,10 @@ const OrderContextProvider = ({ children }) => {
 
   useEffect(() => {
     dispatch(getOrders());
-  }, []);
+  }, [dispatch, isOrderReady]);
 
   const getCurrentOrderInfoHandler = (order_info) => {
-    const order = list_of_orders.find((el) => el.id === order_info.id);
+    const order = list_of_orders.find((el) => el.article === order_info?.article);
     const client = clients.find((client) => client.id === order?.owner);
     const deliveryAddress = deliveryAddresses.find(
       (address) =>
@@ -107,9 +107,9 @@ const OrderContextProvider = ({ children }) => {
     );
 
     const currentOrder = {
-      id: order.id,
-      article: order.article,
-      status: order.status,
+      id: order?.id,
+      article: order?.article,
+      status: order?.status,
       owner: client,
       deliveryAddress,
       contactInfo,
@@ -118,6 +118,7 @@ const OrderContextProvider = ({ children }) => {
     localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
     setOrderCartData(currentOrder);
   };
+  
   return (
     <OrderContext.Provider
       value={{
@@ -129,8 +130,6 @@ const OrderContextProvider = ({ children }) => {
         setClientModalOrder,
         productModalOrder,
         setProductModalOrder,
-        productListOrder,
-        setProductListOrder,
         newOrder,
         setNewOrder,
         list_of_orders,
@@ -142,6 +141,8 @@ const OrderContextProvider = ({ children }) => {
         orderCartData,
         setOrderCartData,
         getCurrentOrderInfoHandler,
+        isOrderReady,
+        setIsOrderReady,
       }}
     >
       {children}

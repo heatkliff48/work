@@ -6,14 +6,7 @@ class OrdersRepository {
     const orders = await Orders.findAll();
     return orders;
   }
-  static async addNewOrderData({
-    article,
-    del_adr_id,
-    contact_id,
-    owner,
-    status,
-    productList,
-  }) {
+  static async addNewOrderData({ article, del_adr_id, contact_id, owner, status }) {
     const order = await Orders.create({
       article,
       owner,
@@ -21,29 +14,6 @@ class OrdersRepository {
       contact_id,
       status,
     });
-
-    for (let i = 0; i < productList.length; i++) {
-      const {
-        product_id,
-        quantity_m2,
-        quantity_palet,
-        quantity_real,
-        price_m2,
-        discount,
-        final_price,
-      } = productList[i];
-
-      await OrdersProducts.create({
-        order_id: order.id,
-        product_id,
-        quantity_m2,
-        quantity_palet,
-        quantity_real,
-        price_m2,
-        discount,
-        final_price,
-      });
-    }
 
     return order;
   }
@@ -55,29 +25,28 @@ class OrdersRepository {
   }
 
   static async getUpdateProductsOfOrder(newProductsOfOrder) {
-    const { order_id, productList } = newProductsOfOrder;
-    for (let i = 0; i < productList.length; i++) {
-      const {
-        product_id,
-        quantity_m2,
-        quantity_palet,
-        quantity_real,
-        price_m2,
-        discount,
-        final_price,
-      } = productList[i];
+    const { order_id, productOfOrder } = newProductsOfOrder;
 
-      await OrdersProducts.create({
-        order_id,
-        product_id,
-        quantity_m2,
-        quantity_palet,
-        quantity_real,
-        price_m2,
-        discount,
-        final_price,
-      });
-    }
+    const {
+      product_id,
+      quantity_m2,
+      quantity_palet,
+      quantity_real,
+      price_m2,
+      discount,
+      final_price,
+    } = productOfOrder;
+
+    await OrdersProducts.create({
+      order_id,
+      product_id,
+      quantity_m2,
+      quantity_palet,
+      quantity_real,
+      price_m2,
+      discount,
+      final_price,
+    });
 
     return;
   }

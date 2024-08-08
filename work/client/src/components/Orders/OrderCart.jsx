@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useCallback, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { Button } from 'reactstrap';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,6 +12,7 @@ import {
 import ShowOrderDeliveryEditModal from './OrderCartDeliveryEditModal.jsx';
 import ShowOrderContactEditModal from './OrderCartContactEditModal.jsx';
 import AddProductOrderModal from './AddProductOrderModal.jsx';
+import PrintContent from './PrintOrder.jsx'; // Импортируем созданный компонент
 
 const OrderCart = React.memo(() => {
   const {
@@ -27,7 +29,11 @@ const OrderCart = React.memo(() => {
   const productListOrder = useSelector((state) => state.productsOfOrders);
   const products = useSelector((state) => state.products);
 
-  const [vatValue, setVatValue] = useState({ vat_euro: 0, vat_result: 0 });
+  const [vatValue, setVatValue] = useState({
+    vat_procent: 21,
+    vat_euro: 0,
+    vat_result: 0,
+  });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -93,9 +99,7 @@ const OrderCart = React.memo(() => {
       }));
     } else {
       const vat_euro = (vatValue.vat_procent * final_price_product) / 100;
-
       const vat_result = (final_price_product + vat_euro).toFixed(2);
-
       setVatValue((prev) => ({
         ...prev,
         vat_result,
@@ -112,8 +116,37 @@ const OrderCart = React.memo(() => {
   }, [orderCartData, setOrderCartData]);
 
   useEffect(() => {
-    getCurrentOrderInfoHandler(orderCartData);
-  }, [list_of_orders]);
+    const storedData = JSON.parse(localStorage.getItem('orderCartData'));
+    if (storedData) {
+      setOrderCartData(storedData);
+    }
+    console.log('storedData', storedData);
+    localStorage.setItem('orderCartData', JSON.stringify(storedData));
+  }, []);
+
+  // const printOrder = useCallback(() => {
+  //   const printWindow = window.open('', '', 'width=800,height=600');
+  //   printWindow.document.write(
+  //     '<html><head><title>Print Order</title></head><body><div id="print-root"></div></body></html>'
+  //   );
+  //   printWindow.document.close();
+
+  //   printWindow.onload = () => {
+  //     console.log('onload');
+  //     const root = ReactDOM.createRoot(
+  //       printWindow.document.getElementById('print-root')
+  //     );
+  //     console.log('root', root);
+  //     root.render(
+  //       <PrintContent
+  //         orderCartData={orderCartData}
+  //         updatedProductListOrder={updatedProductListOrder}
+  //         displayNames={displayNames}
+  //         filterKeys={filterKeys}
+  //       />
+  //     );
+  //   };
+  // }, [orderCartData, updatedProductListOrder, displayNames, filterKeys]);
 
   return (
     <>
@@ -124,6 +157,7 @@ const OrderCart = React.memo(() => {
         />
       )}
       <div className="page-container">
+        {/* <Button onClick={printOrder}>PDF</Button> */}
         <h4>Order Card: {orderCartData?.article}</h4>
 
         <div className="header-container">
@@ -217,5 +251,4 @@ const OrderCart = React.memo(() => {
     </>
   );
 });
-
 export default OrderCart;

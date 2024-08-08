@@ -36,7 +36,6 @@ class OrdersService {
     contact_id,
     owner,
     status,
-    productList,
   }) {
     const newOrder = await OrdersRepository.addNewOrderData({
       article,
@@ -44,7 +43,6 @@ class OrdersService {
       contact_id,
       owner,
       status,
-      productList,
     });
     const payload = { id, username, email };
 

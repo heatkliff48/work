@@ -18,7 +18,6 @@ function OrdersTable() {
     clientModalOrder,
     setClientModalOrder,
     setProductOfOrder,
-    setProductListOrder,
     setNewOrder,
     ordersDataList,
     setOrdersDataList,
@@ -88,17 +87,18 @@ function OrdersTable() {
 
   useEffect(() => {
     //CLEAR data
-    setProductListOrder([]);
     setProductOfOrder({});
     setNewOrder({});
   }, []);
 
   return (
     <>
-      <AddClientOrderModal
-        isOpen={clientModalOrder}
-        toggle={() => setClientModalOrder(!clientModalOrder)}
-      />
+      {clientModalOrder && (
+        <AddClientOrderModal
+          isOpen={clientModalOrder}
+          toggle={() => setClientModalOrder(!clientModalOrder)}
+        />
+      )}
       <Table
         COLUMN_DATA={COLUMNS_ORDERS}
         dataOfTable={ordersDataList}
