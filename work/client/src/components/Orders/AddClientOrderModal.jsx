@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { Fragment, useMemo, useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useSelector } from 'react-redux';
 import { useOrderContext } from '../contexts/OrderContext';
@@ -6,6 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import { useProjectContext } from '#components/contexts/Context.js';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress.js';
 import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo.js';
+import ShowClientsModal from '#components/Clients/ClientsInfo/ClientsInfoModal.js';
+import ShowDeliveryAddressModal from '#components/Clients/DeliveryAddress/DeliveryAddressModal';
+import ShowClientsContactInfoModal from '#components/Clients/ClientsContactInfo/ClientsContactInfoModal';
 
 const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -22,7 +25,8 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const list_of_clients = useSelector((state) => state.clients);
 
   const [searchFilter, setSearchFilter] = useState('');
-  const [listFiltered, setListFiltered] = useState(list_of_clients);
+  const [listOfClientsFiltered, setListOfClientsFiltered] =
+    useState(list_of_clients);
 
   let haveClient = useMemo(() => newOrder?.article ?? false, [newOrder?.article]);
   let haveAdddress = useMemo(
@@ -53,6 +57,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
       status: status_table.NotReady,
     });
     setCurrentClient(owner);
+    setSearchFilter('');
   };
 
   const backHanddler = () => {
@@ -71,13 +76,28 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setNewOrder((prev) => ({ ...prev, del_adr_id: addressId }));
   };
 
-  const filterHandler = (e) => {
+  const filterListOfClientsHandler = (e) => {
     setSearchFilter(e.target.value);
     let filtered = list_of_clients.filter((el) =>
       el.c_name?.toLowerCase().includes(e.target.value.toLowerCase())
     );
-    setListFiltered(filtered);
+    setListOfClientsFiltered(filtered);
   };
+
+  // const filterListOfDeliveryHandler = (e) => {
+  //   setSearchFilter(e.target.value);
+  //   let filtered = list_of_clients.filter((el) =>
+  //     el.c_name?.toLowerCase().includes(e.target.value.toLowerCase())
+  //   );
+  //   setListOfClientsFiltered(filtered);
+  // };
+
+  useEffect(() => {
+    let filtered = list_of_clients.filter((el) =>
+      el.c_name?.toLowerCase().includes(searchFilter.toLowerCase())
+    );
+    setListOfClientsFiltered(filtered);
+  }, [list_of_clients]);
 
   return (
     <div>
@@ -109,20 +129,31 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
         <Fragment>
           {haveClient ? (
             haveAdddress ? (
-              <ClientsContactInfo clickFunk={contactInfoHendler} />
+              <>
+                <ShowClientsContactInfoModal />
+                <ClientsContactInfo
+                  clickFunk={contactInfoHendler}
+                  showSearch={true}
+                />
+              </>
             ) : (
               <>
-                <DeliveryAddress clickFunk={deliveryAddressHendler} />
+                <ShowDeliveryAddressModal />
+                <DeliveryAddress
+                  clickFunk={deliveryAddressHendler}
+                  showSearch={true}
+                />
               </>
             )
           ) : (
             <ModalBody>
+              <ShowClientsModal />
               <div>
-                <h4>Search</h4>
+                <h4>Search clients</h4>
                 <input
                   value={searchFilter}
                   onChange={(e) => {
-                    filterHandler(e);
+                    filterListOfClientsHandler(e);
                   }}
                 />
               </div>
@@ -139,7 +170,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                 </thead>
 
                 <tbody>
-                  {listFiltered?.map((entrie) => {
+                  {listOfClientsFiltered?.map((entrie) => {
                     if (!entrie) return;
                     return (
                       <tr
