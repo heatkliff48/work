@@ -105,14 +105,6 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     }
   }, [isOrderReady]);
 
-  // const filterListOfDeliveryHandler = (e) => {
-  //   setSearchFilter(e.target.value);
-  //   let filtered = list_of_clients.filter((el) =>
-  //     el.c_name?.toLowerCase().includes(e.target.value.toLowerCase())
-  //   );
-  //   setListOfClientsFiltered(filtered);
-  // };
-
   useEffect(() => {
     let filtered = list_of_clients.filter((el) =>
       el.c_name?.toLowerCase().includes(searchFilter.toLowerCase())
