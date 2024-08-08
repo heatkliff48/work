@@ -1,11 +1,13 @@
+import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import React, { Fragment, useMemo, useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useOrderContext } from '../contexts/OrderContext';
 import { useNavigate } from 'react-router-dom';
 import { useProjectContext } from '#components/contexts/Context.js';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress.js';
 import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo.js';
+import { addNewOrder } from '#components/redux/actions/ordersAction.js';
 import ShowClientsModal from '#components/Clients/ClientsInfo/ClientsInfoModal.js';
 import ShowDeliveryAddressModal from '#components/Clients/DeliveryAddress/DeliveryAddressModal';
 import ShowClientsContactInfoModal from '#components/Clients/ClientsContactInfo/ClientsContactInfoModal';
@@ -18,9 +20,13 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setNewOrder,
     status_table,
     list_of_orders,
+    getCurrentOrderInfoHandler,
+    isOrderReady,
+    setIsOrderReady,
   } = useOrderContext();
   const { setCurrentClient } = useProjectContext();
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const list_of_clients = useSelector((state) => state.clients);
 
@@ -67,11 +73,8 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
 
   const contactInfoHendler = (contactId) => {
     setNewOrder((prev) => ({ ...prev, contact_id: contactId }));
-    setClientModalOrder(!clientModalOrder);
-    haveClient = false;
-    haveAdddress = false;
-    navigate('/addProductOrder');
   };
+
   const deliveryAddressHendler = (addressId) => {
     setNewOrder((prev) => ({ ...prev, del_adr_id: addressId }));
   };
@@ -84,13 +87,23 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setListOfClientsFiltered(filtered);
   };
 
-  // const filterListOfDeliveryHandler = (e) => {
-  //   setSearchFilter(e.target.value);
-  //   let filtered = list_of_clients.filter((el) =>
-  //     el.c_name?.toLowerCase().includes(e.target.value.toLowerCase())
-  //   );
-  //   setListOfClientsFiltered(filtered);
-  // };
+  useEffect(() => {
+    if (newOrder?.contact_id && newOrder?.del_adr_id) {
+      setIsOrderReady(true);
+    } else {
+      setIsOrderReady(false);
+    }
+  }, [newOrder?.contact_id, newOrder?.del_adr_id]);
+
+  useEffect(() => {
+    if (isOrderReady) {
+      dispatch(addNewOrder(newOrder));
+      getCurrentOrderInfoHandler(newOrder);
+      setClientModalOrder(!clientModalOrder);
+      setNewOrder({});
+      setCurrentClient({});
+    }
+  }, [isOrderReady]);
 
   useEffect(() => {
     let filtered = list_of_clients.filter((el) =>

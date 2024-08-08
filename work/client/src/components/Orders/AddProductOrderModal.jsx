@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useOrderContext } from '../contexts/OrderContext';
 import { useProjectContext } from '#components/contexts/Context.js';
@@ -9,7 +9,6 @@ import { useDispatch } from 'react-redux';
 
 const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
-    setProductListOrder,
     COLUMNS_ORDER_PRODUCT,
     productOfOrder,
     setProductOfOrder,
@@ -86,29 +85,6 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     return result;
   }, [price_m2_value, quantity_real_value, productOfOrder?.discount]);
 
-  // const addProductInList = async () => {
-  //   setProductOfOrder((prev) => ({
-  //     ...prev,
-  //     quantity_palet: quantity_palet_value,
-  //     quantity_real: quantity_real_value,
-  //     price_m2: price_m2_value,
-  //     final_price: final_price_value,
-  //   }));
-
-  //   setProductListOrder((prev) => [...prev, productOfOrder]);
-  //   toggle();
-  // };
-
-  // const addProductInOrder = async () => {
-  //   dispatch(
-  //     getUpdateProductOfOrders({
-  //       newProductsOfOrder: {
-  //         order_id: haveOrderClient.id,
-  //       },
-  //     })
-  //   );
-  // };
-
   const addProductOrder = async () => {
     setProductOfOrder((prev) => ({
       ...prev,
@@ -118,14 +94,12 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       final_price: final_price_value,
     }));
 
-    setProductListOrder((prev) => [...prev, productOfOrder]);
-
     if (haveOrderClient) {
       dispatch(
         getUpdateProductOfOrders({
           newProductsOfOrder: {
             order_id: haveOrderClient.id,
-            productList: [productOfOrder],
+            productOfOrder,
           },
         })
       );

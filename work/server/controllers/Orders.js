@@ -22,7 +22,7 @@ class OrdersController {
   static async addNewOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;
-    const { article, del_adr_id, contact_id, owner, status, productList } =
+    const { article, del_adr_id, contact_id, owner, status } =
       req.body.order;
 
     try {
@@ -37,7 +37,6 @@ class OrdersController {
           contact_id,
           owner,
           status,
-          productList,
         });
 
       return res
