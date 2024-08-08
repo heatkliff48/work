@@ -1,23 +1,46 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 
-const DeliveryAddress = ({ clickFunk = null }) => {
+const DeliveryAddress = ({ clickFunk = null, showSearch = false }) => {
   const { currentClient, currentDelivery, setCurrentDelivery } = useProjectContext();
 
-  // const dispatch = useDispatch();
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
+
+  const [searchFilter, setSearchFilter] = useState('');
+  const [listOfDeliveryFiltered, setListOfDeliveryFiltered] =
+    useState(currentDelivery);
 
   useEffect(() => {
     const deliveryAddress = deliveryAddresses.filter(
       (el) => el.client_id === currentClient.id
     );
-    setCurrentDelivery(deliveryAddress);
+    setListOfDeliveryFiltered(deliveryAddress);
   }, [deliveryAddresses, currentClient]);
+
+  const filterListOfDeliveryHandler = (e) => {
+    setSearchFilter(e.target.value);
+    let filtered = deliveryAddresses.filter((el) => {
+      if (el.client_id === currentClient.id) {
+        return el.city?.toLowerCase().includes(e.target.value.toLowerCase());
+      }
+    });
+    setListOfDeliveryFiltered(filtered);
+  };
 
   return (
     <Fragment>
-      {' '}
+      {showSearch == true && (
+        <div>
+          <h4>Search delivery address</h4>
+          <input
+            value={searchFilter}
+            onChange={(e) => {
+              filterListOfDeliveryHandler(e);
+            }}
+          />
+        </div>
+      )}
       <table
         className="table mt-5 table-bordered text-center table-striped table-hover"
         align="left"
@@ -37,7 +60,7 @@ const DeliveryAddress = ({ clickFunk = null }) => {
           </tr>
         </thead>
         <tbody>
-          {currentDelivery?.map((entrie) => {
+          {listOfDeliveryFiltered?.map((entrie) => {
             if (!entrie) return;
             return (
               <tr

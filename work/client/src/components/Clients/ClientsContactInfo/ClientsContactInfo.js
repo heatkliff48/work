@@ -1,23 +1,46 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-
 import { useProjectContext } from '#components/contexts/Context.js';
 
-const ClientsContactInfo = ({ clickFunk = null }) => {
+const ClientsContactInfo = ({ clickFunk = null, showSearch = false }) => {
   const { currentClient, currentContact, setCurrentContact } = useProjectContext();
 
   const contactInfo = useSelector((state) => state.contactInfo);
+
+  const [searchFilter, setSearchFilter] = useState('');
+  const [listOfContactsFiltered, setListOfContactsFiltered] =
+    useState(currentContact);
 
   useEffect(() => {
     const currentContactInfo = contactInfo.filter(
       (el) => el.client_id === currentClient?.id
     );
-    setCurrentContact(currentContactInfo);
+    setListOfContactsFiltered(currentContactInfo);
   }, [contactInfo, currentClient]);
+
+  const filterListOfContactsHandler = (e) => {
+    setSearchFilter(e.target.value);
+    let filtered = contactInfo.filter((el) => {
+      if (el.client_id === currentClient.id) {
+        return el.last_name?.toLowerCase().includes(e.target.value.toLowerCase());
+      }
+    });
+    setListOfContactsFiltered(filtered);
+  };
 
   return (
     <Fragment>
-      {' '}
+      {showSearch == true && (
+        <div>
+          <h4>Search delivery address</h4>
+          <input
+            value={searchFilter}
+            onChange={(e) => {
+              filterListOfContactsHandler(e);
+            }}
+          />
+        </div>
+      )}
       <table
         className="table mt-5 table-bordered text-center table-striped table-hover"
         align="left"
@@ -40,7 +63,7 @@ const ClientsContactInfo = ({ clickFunk = null }) => {
           </tr>
         </thead>
         <tbody>
-          {currentContact?.map((entrie) => {
+          {listOfContactsFiltered?.map((entrie) => {
             if (!entrie) return;
             return (
               <tr
