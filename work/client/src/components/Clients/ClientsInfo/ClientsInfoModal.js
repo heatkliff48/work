@@ -21,9 +21,13 @@ function ClientsModal(props) {
   const [valid, setValid] = useState(isValid(clientLegalAddressInput.zip_code));
 
   const categoryOptions = [
-    { value: 'category 1', label: 'Category 1' },
-    { value: 'category 2', label: 'Category 2' },
-    { value: 'category 3', label: 'Category 3' },
+    { value: 'developers', label: 'Developers' },
+    { value: 'property_developers', label: 'Property Developers' },
+    { value: 'architects', label: 'Architects' },
+    { value: 'dealers', label: 'Dealers' },
+    { value: 'retail_chains', label: 'Retail Chains' },
+    { value: 'private_client', label: 'Private Client' },
+    { value: 'government_developer', label: 'Government Developer' },
   ];
 
   const dispatch = useDispatch();

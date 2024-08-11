@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
-import React, { Fragment, useMemo, useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOrderContext } from '../contexts/OrderContext';
