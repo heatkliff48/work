@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
-import { useSortBy, useTable } from 'react-table';
+import { useTable, useGlobalFilter, useSortBy } from 'react-table';
 import './products.css';
 import { getAllProducts } from '../redux/actions/productsAction';
 
@@ -9,6 +9,7 @@ import { useProjectContext } from '../contexts/Context';
 import ProductCardModal from '../ProductCardModal/ProductCardModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { GlobalFilterInput } from '#components/Table/GlobalFilterInput';
 
 function Products() {
   const {
@@ -52,11 +53,20 @@ function Products() {
       data,
       sortTypes,
     },
+    useGlobalFilter,
     useSortBy
   );
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    preGlobalFilteredRows,
+    setGlobalFilter,
+    state,
+  } = tableInstance;
 
   const handleRowClick = (row) => {
     if (userAccess.canRead) {
@@ -100,6 +110,11 @@ function Products() {
       <h1>Sortable Table</h1>
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}
+        <GlobalFilterInput
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          setGlobalFilter={setGlobalFilter}
+          globalFilter={state.globalFilter}
+        />
         <table {...getTableProps()}>
           <thead>
             {headerGroups.map((hG) => {
