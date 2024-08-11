@@ -13,10 +13,13 @@ export const ClientContext = createContext();
 
 const ClientsInfo = () => {
   const [modalShow, setModalShow] = useState(false);
-  const { currentClient, setCurrentClient } = useProjectContext();;
+  const { currentClient, setCurrentClient } = useProjectContext();
 
   const dispatch = useDispatch();
   const clients = useSelector((state) => state.clients);
+
+  const [searchFilter, setSearchFilter] = useState('');
+  const [listOfClientsFiltered, setListOfClientsFiltered] = useState(clients);
 
   useEffect(() => {
     dispatch(getAllClients());
@@ -30,11 +33,35 @@ const ClientsInfo = () => {
     setModalShow(true);
   };
 
+  const filterListOfClientsHandler = (e) => {
+    setSearchFilter(e.target.value);
+    let filtered = clients.filter((el) =>
+      el.c_name?.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    setListOfClientsFiltered(filtered);
+  };
+
+  useEffect(() => {
+    let filtered = clients.filter((el) =>
+      el.c_name?.toLowerCase().includes(searchFilter.toLowerCase())
+    );
+    setListOfClientsFiltered(filtered);
+  }, [clients]);
+
   return (
     <Fragment>
       {' '}
       {/* <ClientContext.Provider value={[currentClient, setCurrentClient]}> */}
       <ShowClientsModal />
+      <div>
+        <h4>Search clients</h4>
+        <input
+          value={searchFilter}
+          onChange={(e) => {
+            filterListOfClientsHandler(e);
+          }}
+        />
+      </div>
       <table
         className="table mt-5 table-bordered text-center table-striped table-hover"
         align="left"
@@ -48,7 +75,7 @@ const ClientsInfo = () => {
           </tr>
         </thead>
         <tbody>
-          {clients?.map((entrie) => {
+          {listOfClientsFiltered?.map((entrie) => {
             if (!entrie) return;
             return (
               <tr
