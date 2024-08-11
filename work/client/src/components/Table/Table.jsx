@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
-import { useSortBy, useTable } from 'react-table';
+import { useTable, useGlobalFilter, useSortBy } from 'react-table';
 import { Button } from 'reactstrap';
+import { GlobalFilterInput } from './GlobalFilterInput';
 
 function Table({
   COLUMN_DATA = [],
@@ -37,11 +38,20 @@ function Table({
       data,
       sortTypes,
     },
+    useGlobalFilter,
     useSortBy
   );
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    preGlobalFilteredRows,
+    setGlobalFilter,
+    state,
+  } = tableInstance;
 
   const haveButton = buttonText.trim() == '';
 
@@ -50,6 +60,11 @@ function Table({
       <h1>Sortable Table Of {tableName}</h1>
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}
+        <GlobalFilterInput
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          setGlobalFilter={setGlobalFilter}
+          globalFilter={state.globalFilter}
+        />
         <table {...getTableProps()}>
           <thead>
             {headerGroups.map((hG) => {
