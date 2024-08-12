@@ -4,6 +4,7 @@ import {
   GET_DELETE_PRODUCT_OF_ORDER,
   GET_ORDERS_LIST,
   GET_PRODUCTS_OF_ORDER,
+  GET_UPDATE_PRODUCT_INFO_OF_ORDER,
   GET_UPDATE_PRODUCTS_OF_ORDER,
   UPDATE_CONTACT_OF_ORDER,
   UPDATE_DELIVERY_OF_ORDER,
@@ -37,6 +38,13 @@ export const getUpdateProductOfOrders = (newProductsOfOrder) => {
   };
 };
 
+export const getUpdateProductInfoOfOrders = (productOfOrder) => {
+  return {
+    type: GET_UPDATE_PRODUCT_INFO_OF_ORDER,
+    payload: productOfOrder,
+  };
+};
+
 export const getDeleteProductOfOrder = (product_id) => {
   return {
     type: GET_DELETE_PRODUCT_OF_ORDER,
@@ -66,7 +74,6 @@ export const updateDeliveryOfOrder = (newDeliveryOfOrder) => {
 };
 
 export const updateOrderStatus = (orderStatus) => {
-
   return {
     type: UPDATE_STATUS_OF_ORDER,
     payload: orderStatus,

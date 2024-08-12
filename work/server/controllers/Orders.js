@@ -95,6 +95,30 @@ class OrdersController {
     }
   }
 
+  static async getUpdateProductInfoOfOrder(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    const productOfOrder = req.body;
+
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration } =
+        await OrdersService.getUpdateProductInfoOfOrder({
+          productOfOrder,
+          id,
+          username,
+          email,
+          fingerprint,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async getUpdateContactInfoOfOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;

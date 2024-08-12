@@ -21,6 +21,8 @@ import {
   NEW_DELIVERY_OF_ORDER,
   UPDATE_STATUS_OF_ORDER,
   STATUS_OF_ORDER,
+  GET_UPDATE_PRODUCT_INFO_OF_ORDER,
+  UPDATE_PRODUCT_INFO_OF_ORDER,
 } from '../types/ordersTypes';
 
 let accessTokenFront;
@@ -73,6 +75,15 @@ const getProductsOfOrder = (order_id) => {
 const getUpdateProductsOfOrder = (newProductsOfOrder) => {
   return url
     .post('/orders/products/add', newProductsOfOrder)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getUpdateProductInfoOfOrder = (productOfOrder) => {
+  return url
+    .post('/orders/product/update/info', productOfOrder)
     .then((res) => {
       return res.data;
     })
@@ -174,6 +185,29 @@ function* getProductsOfOrderWatcher(action) {
   } catch (err) {
     console.error(err);
     yield put({ type: PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
+function* getUpdateProductInfoOfOrderWatcher(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    const { accessToken, accessTokenExpiration } = yield call(
+      getUpdateProductInfoOfOrder,
+      payload
+    );
+
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({
+      type: UPDATE_PRODUCT_INFO_OF_ORDER,
+      payload: payload,
+    });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: UPDATE_PRODUCT_INFO_OF_ORDER, payload: [] });
   }
 }
 
@@ -300,6 +334,10 @@ function* ordersWatcher() {
   yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
   yield takeLatest(GET_PRODUCTS_OF_ORDER, getProductsOfOrderWatcher);
   yield takeLatest(GET_UPDATE_PRODUCTS_OF_ORDER, getUpdateProductsOfOrderWatcher);
+  yield takeLatest(
+    GET_UPDATE_PRODUCT_INFO_OF_ORDER,
+    getUpdateProductInfoOfOrderWatcher
+  );
   yield takeLatest(GET_DELETE_PRODUCT_OF_ORDER, getDeleteProductOfOrderWatcher);
   yield takeLatest(GET_DELETE_ORDER, getDeleteOrderWatcher);
   yield takeLatest(UPDATE_CONTACT_OF_ORDER, updateContactOfOrderWorker);

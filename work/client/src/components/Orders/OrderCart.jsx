@@ -10,9 +10,10 @@ import {
   getDeleteProductOfOrder,
   updateOrderStatus,
 } from '#components/redux/actions/ordersAction.js';
-import ShowOrderDeliveryEditModal from './OrderCartDeliveryEditModal.jsx';
-import ShowOrderContactEditModal from './OrderCartContactEditModal.jsx';
-import AddProductOrderModal from './AddProductOrderModal.jsx';
+import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
+import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
+import AddProductOrderModal from './modal/AddProductOrderModal.jsx';
+import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
 // import { BiCycling } from 'react-icons/bi';
 // import PrintContent from './PrintContent.jsx'; // Импортируем созданный компонент
 
@@ -25,11 +26,15 @@ const OrderCart = React.memo(() => {
     list_of_orders,
     productModalOrder,
     setProductModalOrder,
+    setProductOfOrder,
+    setSelectedProduct,
+    productInfoModalOrder,
+    setProductInfoModalOrder,
   } = useOrderContext();
   const { displayNames } = useProjectContext();
+  const { latestProducts } = useProjectContext();
 
   const productListOrder = useSelector((state) => state.productsOfOrders);
-  const products = useSelector((state) => state.products);
 
   const [vatValue, setVatValue] = useState({
     vat_procent: 21,
@@ -63,9 +68,11 @@ const OrderCart = React.memo(() => {
   );
 
   const addProductArticleToOrderList = useCallback(
-    (productListOrder, products) => {
+    (productListOrder, latestProducts) => {
       return productListOrder?.map((orderProduct) => {
-        const product = products?.find((p) => p.id === orderProduct?.product_id);
+        const product = latestProducts?.find(
+          (p) => p.id === orderProduct?.product_id
+        );
         if (product) {
           return {
             product_article: product.article,
@@ -79,7 +86,7 @@ const OrderCart = React.memo(() => {
   );
 
   const updatedProductListOrder = useMemo(() => {
-    return addProductArticleToOrderList(productListOrder, products);
+    return addProductArticleToOrderList(productListOrder, latestProducts);
   }, [productListOrder]);
 
   const handleInputChange = (e) => {
@@ -89,11 +96,19 @@ const OrderCart = React.memo(() => {
     }));
   };
 
-  useEffect(() => {
-    const final_price_product = updatedProductListOrder.reduce(
-      (acc, el) => acc + el.final_price,
-      0
+  const onProductClickHandler = (sel_prod) => {
+    const product = latestProducts.find(
+      (el) => el.article === sel_prod.product_article
     );
+    setSelectedProduct(product);
+    setProductOfOrder({ ...sel_prod, product_id: product?.id });
+    setProductInfoModalOrder(!productInfoModalOrder);
+  };
+
+  useEffect(() => {
+    const final_price_product =
+      updatedProductListOrder.reduce((acc, el) => acc + el?.final_price, 0) || 0;
+
     if (!final_price_product || !vatValue.vat_procent) {
       setVatValue((prev) => ({
         ...prev,
@@ -154,6 +169,12 @@ const OrderCart = React.memo(() => {
 
   return (
     <>
+      {productInfoModalOrder && (
+        <OrderProductCardInfoModal
+          isOpen={productInfoModalOrder}
+          toggle={() => setProductInfoModalOrder(!productInfoModalOrder)}
+        />
+      )}
       {productModalOrder && (
         <AddProductOrderModal
           isOpen={productModalOrder}
@@ -197,7 +218,11 @@ const OrderCart = React.memo(() => {
           <tbody>
             {updatedProductListOrder?.map((product) => (
               <tr key={product?.id} className="product-row">
-                <td>
+                <td
+                  onClick={() => {
+                    onProductClickHandler(product);
+                  }}
+                >
                   {filterAndMapData(product, filterKeys)}
                   <Button
                     onClick={() => {

@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { useOrderContext } from '../contexts/OrderContext';
+import { useOrderContext } from '../../contexts/OrderContext';
 import { useProjectContext } from '#components/contexts/Context.js';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
@@ -12,18 +12,21 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     COLUMNS_ORDER_PRODUCT,
     productOfOrder,
     setProductOfOrder,
+    setSelectedProduct,
     list_of_orders,
     newOrder,
+    selectedProduct,
   } = useOrderContext();
   const { COLUMNS, latestProducts } = useProjectContext();
 
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  // const [selectedProduct, setSelectedProduct] = useState(null);
   const dispatch = useDispatch();
 
   const haveProduct = useMemo(
     () => productOfOrder?.product_id ?? false,
     [productOfOrder?.product_id]
   );
+
   const haveOrderClient = list_of_orders.find(
     (el) => el.article === newOrder.article
   );
@@ -86,14 +89,6 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   }, [price_m2_value, quantity_real_value, productOfOrder?.discount]);
 
   const addProductOrder = async () => {
-    setProductOfOrder((prev) => ({
-      ...prev,
-      quantity_palet: quantity_palet_value,
-      quantity_real: quantity_real_value,
-      price_m2: price_m2_value,
-      final_price: final_price_value,
-    }));
-
     if (haveOrderClient) {
       dispatch(
         getUpdateProductOfOrders({
