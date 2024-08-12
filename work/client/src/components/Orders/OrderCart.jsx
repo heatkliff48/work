@@ -13,7 +13,7 @@ import {
 import ShowOrderDeliveryEditModal from './OrderCartDeliveryEditModal.jsx';
 import ShowOrderContactEditModal from './OrderCartContactEditModal.jsx';
 import AddProductOrderModal from './AddProductOrderModal.jsx';
-import { BiCycling } from 'react-icons/bi';
+// import { BiCycling } from 'react-icons/bi';
 // import PrintContent from './PrintContent.jsx'; // Импортируем созданный компонент
 
 const OrderCart = React.memo(() => {
