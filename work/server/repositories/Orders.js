@@ -61,6 +61,11 @@ class OrdersRepository {
     return;
   }
 
+  static async getUpdateStatusOrder({ order_id, status }) {
+    await Orders.update({ status }, { where: { id: order_id } });
+    return;
+  }
+
   static async getDeleteProductOfOrder({ product_id }) {
     await OrdersProducts.destroy({ where: { id: product_id } });
 

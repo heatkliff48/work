@@ -8,18 +8,20 @@ import { useProjectContext } from '#components/contexts/Context.js';
 import {
   deleteOrder,
   getDeleteProductOfOrder,
+  updateOrderStatus,
 } from '#components/redux/actions/ordersAction.js';
 import ShowOrderDeliveryEditModal from './OrderCartDeliveryEditModal.jsx';
 import ShowOrderContactEditModal from './OrderCartContactEditModal.jsx';
 import AddProductOrderModal from './AddProductOrderModal.jsx';
-import PrintContent from './PrintOrder.jsx'; // Импортируем созданный компонент
+// import { BiCycling } from 'react-icons/bi';
+// import PrintContent from './PrintContent.jsx'; // Импортируем созданный компонент
 
 const OrderCart = React.memo(() => {
   const {
     orderCartData,
     setOrderCartData,
     setNewOrder,
-    getCurrentOrderInfoHandler,
+    status_list,
     list_of_orders,
     productModalOrder,
     setProductModalOrder,
@@ -109,20 +111,22 @@ const OrderCart = React.memo(() => {
   }, [updatedProductListOrder, vatValue.vat_procent]);
 
   useEffect(() => {
-    if (Object.keys(orderCartData).length === 0) {
-      const storedData = JSON.parse(localStorage.getItem('orderCartData'));
-      if (storedData) setOrderCartData(storedData);
-    }
-  }, [orderCartData, setOrderCartData]);
-
-  useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem('orderCartData'));
+
+    const updatedOrderCartData = list_of_orders.find(
+      (order) => order.id === storedData.id
+    );
+
     if (storedData) {
       setOrderCartData(storedData);
     }
-    console.log('storedData', storedData);
+
+    if (updatedOrderCartData && updatedOrderCartData !== orderCartData) {
+      setOrderCartData((prev) => ({ ...prev, status: updatedOrderCartData.status }));
+    }
+
     localStorage.setItem('orderCartData', JSON.stringify(storedData));
-  }, []);
+  }, [list_of_orders]);
 
   // const printOrder = useCallback(() => {
   //   const printWindow = window.open('', '', 'width=800,height=600');
@@ -221,30 +225,51 @@ const OrderCart = React.memo(() => {
             </Button>
           </tbody>
         </table>
-        <div className="vat_container">
-          <div className="vat_procent">
-            <div>
-              <p>VAT, %</p>
-              <input
-                type="text"
-                id="vat_procent"
-                name="vat_procent"
-                value={vatValue.vat_procent}
-                onChange={(e) => {
-                  handleInputChange(e);
-                }}
-              />
+        <div className="footer_data">
+          <div className="vat_container">
+            <div className="vat_procent">
+              <div>
+                <p>VAT, %</p>
+                <input
+                  type="text"
+                  id="vat_procent"
+                  name="vat_procent"
+                  value={vatValue.vat_procent}
+                  onChange={(e) => {
+                    handleInputChange(e);
+                  }}
+                />
+              </div>
+            </div>
+            <div className="vat_euro">
+              <div>
+                <p>VAT, EURO</p>
+                <p>{vatValue.vat_euro}</p>
+              </div>
+            </div>
+            <div className="vat_result">
+              <p>Result</p>
+              <p>{vatValue.vat_result}</p>
             </div>
           </div>
-          <div className="vat_euro">
-            <div>
-              <p>VAT, EURO</p>
-              <p>{vatValue.vat_euro}</p>
-            </div>
-          </div>
-          <div className="vat_result">
-            <p>Result</p>
-            <p>{vatValue.vat_result}</p>
+          <div className="status-table">
+            {status_list.map((item) => (
+              <div key={item.accessor} className="status-row">
+                <div className="header">{item.Header}</div>
+                <input
+                  type="checkbox"
+                  checked={item.accessor === orderCartData?.status}
+                  onChange={() =>
+                    dispatch(
+                      updateOrderStatus({
+                        order_id: orderCartData?.id,
+                        status: item.accessor,
+                      })
+                    )
+                  }
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>

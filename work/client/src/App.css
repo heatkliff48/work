@@ -344,10 +344,42 @@ label {
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
+
+.footer_data {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .vat_container {
   display: flex;
   justify-content: space-around;
   align-items: flex-start;
-  width: 100%;
+  width: 50%;
   height: 4rem;
+}
+
+.status-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-left: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+.header {
+  width: 50%;
+}
+
+input[type='checkbox'] {
+  margin-left: auto;
 }

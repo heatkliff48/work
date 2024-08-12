@@ -17,7 +17,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setClientModalOrder,
     newOrder,
     setNewOrder,
-    status_table,
+    status_list,
     list_of_orders,
     getCurrentOrderInfoHandler,
     isOrderReady,
@@ -26,7 +26,6 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const { setCurrentClient } = useProjectContext();
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const list_of_clients = useSelector((state) => state.clients);
 
   const [searchFilter, setSearchFilter] = useState('');
@@ -59,7 +58,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setNewOrder({
       article,
       owner: owner.id,
-      status: status_table.NotReady,
+      status: status_list[0].accessor,
     });
     setCurrentClient(owner);
     setSearchFilter('');

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useProjectContext } from '../contexts/Context';
 import ModalRole from './ModalRole';
-import { updateRoleActive } from '../redux/actions/rolesAction';
+import { getAllRoles, updateRoleActive } from '../redux/actions/rolesAction';
 
 function Roles() {
   const { modalRoleCard, setModalRoleCard, setRoleId, roles } = useProjectContext();
@@ -15,18 +15,22 @@ function Roles() {
   };
 
   const handleCheckboxChange = (id, isActive) => {
-    const updatedRoles = roles.map((role) => {
+    const result = updatedRoles.map((role) => {
       if (role.id === id) {
         return { ...role, isActive };
       }
-      return role;
+      return { ...role };
     });
-    setUpdatedRoles(updatedRoles);
+    setUpdatedRoles(result);
   };
 
   const handleSaveRoles = () => {
     dispatch(updateRoleActive({ updActiveRole: updatedRoles }));
   };
+
+  useEffect(() => {
+    dispatch(getAllRoles());
+  }, []);
 
   return (
     <>
