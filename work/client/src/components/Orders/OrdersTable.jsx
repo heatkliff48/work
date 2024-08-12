@@ -1,10 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Table from '../Table/Table';
-import AddClientOrderModal from './AddClientOrderModal';
+import AddClientOrderModal from './modal/AddClientOrderModal';
 import { useOrderContext } from '../contexts/OrderContext';
 import { useCallback, useEffect } from 'react';
-import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction.js';
 
 import {
   getOrders,

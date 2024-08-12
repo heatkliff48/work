@@ -112,6 +112,32 @@ class OrdersService {
     };
   }
 
+  static async getUpdateProductInfoOfOrder({
+    id,
+    username,
+    email,
+    fingerprint,
+    productOfOrder,
+  }) {
+    await OrdersRepository.getUpdateProductInfoOfOrder(productOfOrder);
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
   static async getUpdateContactInfoOfOrder({
     id,
     username,

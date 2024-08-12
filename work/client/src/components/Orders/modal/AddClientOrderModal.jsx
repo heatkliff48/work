@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { useOrderContext } from '../contexts/OrderContext';
+import { useOrderContext } from '../../contexts/OrderContext';
 import { useNavigate } from 'react-router-dom';
 import { useProjectContext } from '#components/contexts/Context.js';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress.js';

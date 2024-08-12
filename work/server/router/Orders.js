@@ -9,6 +9,7 @@ router.post('/products', OrdersController.getProductsOfOrder);
 router.post('/delete', OrdersController.getDeleteOrder);
 router.post('/delete/product', OrdersController.getDeleteProductOfOrder);
 router.post('/products/add', OrdersController.getUpdateProductsOfOrder);
+router.post('/product/update/info', OrdersController.getUpdateProductInfoOfOrder);
 router.post('/update/contact', OrdersController.getUpdateContactInfoOfOrder);
 router.post(
   '/update/delivery_address',

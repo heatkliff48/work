@@ -51,6 +51,35 @@ class OrdersRepository {
     return;
   }
 
+  static async getUpdateProductInfoOfOrder(productOfOrder) {
+    console.log('>>>>>>>>>>>>productOfOrder', productOfOrder);
+    const {
+      product_id,
+      order_id,
+      quantity_m2,
+      quantity_palet,
+      quantity_real,
+      price_m2,
+      discount,
+      final_price,
+    } = productOfOrder;
+
+    await OrdersProducts.update(
+      {
+        order_id,
+        product_id,
+        quantity_m2,
+        quantity_palet,
+        quantity_real,
+        price_m2,
+        discount,
+        final_price,
+      },
+      { where: { id: productOfOrder.id } }
+    );
+    return;
+  }
+
   static async getUpdateContactInfoOrder({ contact_id, order_id }) {
     await Orders.update({ contact_id }, { where: { id: order_id } });
     return;

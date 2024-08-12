@@ -8,12 +8,8 @@ import {
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import {
-  DropdownFilter,
-  TextSearchFilter,
-  NumberRangeColumnFilter,
-} from '#components/Table/filters';
+// import { useNavigate } from 'react-router-dom';
+import { DropdownFilter } from '#components/Table/filters';
 
 const OrderContext = createContext();
 
@@ -84,6 +80,8 @@ const OrderContextProvider = ({ children }) => {
   const [currentOrder, setCurrentOrder] = useState();
   const [clientModalOrder, setClientModalOrder] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
+  const [productInfoModalOrder, setProductInfoModalOrder] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [productOfOrder, setProductOfOrder] = useState({});
   const [newOrder, setNewOrder] = useState();
   const [ordersDataList, setOrdersDataList] = useState([]);
@@ -178,6 +176,10 @@ const OrderContextProvider = ({ children }) => {
         getCurrentOrderInfoHandler,
         isOrderReady,
         setIsOrderReady,
+        selectedProduct,
+        setSelectedProduct,
+        productInfoModalOrder,
+        setProductInfoModalOrder,
       }}
     >
       {children}
