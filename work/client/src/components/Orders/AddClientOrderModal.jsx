@@ -98,8 +98,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
       dispatch(addNewOrder(newOrder));
       getCurrentOrderInfoHandler(newOrder);
       setClientModalOrder(!clientModalOrder);
-      setNewOrder({});
-      setCurrentClient({});
+      setIsOrderReady(false);
     }
   }, [isOrderReady]);
 

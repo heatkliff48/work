@@ -25,7 +25,7 @@
 .nav_right_wrapper {
   width: 30%;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   padding-right: 30px;
 }
