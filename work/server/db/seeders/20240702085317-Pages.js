@@ -16,6 +16,16 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          page_name: 'Orders',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          page_name: 'Orders_status',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );

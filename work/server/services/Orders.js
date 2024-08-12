@@ -168,6 +168,34 @@ class OrdersService {
     };
   }
 
+  static async getUpdateStatusOrder({
+    id,
+    username,
+    email,
+    fingerprint,
+    status,
+    order_id,
+  }) {
+    await OrdersRepository.getUpdateStatusOrder({ status, order_id });
+
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
   static async getDeleteProductOfOrder({
     id,
     username,

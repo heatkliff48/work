@@ -30,6 +30,10 @@ app.use(
     parameters: [Fingerprint.useragent, Fingerprint.acceptHeaders],
   })
 );
+app.get('/checkServerStatus', (req, res) => {
+  console.log('<<<<<<<<<<<<<<<<<<CHECK>>>>>>>>>>>>>>>>>>');
+  res.sendStatus(200); 
+});
 
 app.use('/auth', TokenService.checkAccess, AuthRootRouter);
 app.use('/products', TokenService.checkAccess, ProductRootRouter);

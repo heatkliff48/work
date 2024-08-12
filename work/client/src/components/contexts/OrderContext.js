@@ -1,5 +1,12 @@
 import { getOrders } from '#components/redux/actions/ordersAction.js';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -73,15 +80,7 @@ const OrderContextProvider = ({ children }) => {
     },
   ];
 
-  const status_table = {
-    NotReady: 'Not ready',
-    InProcess: 'In process',
-    Ready: 'Ready',
-  };
-
   const dispatch = useDispatch();
-  // const navigate = useNavigate();
-
   const [currentOrder, setCurrentOrder] = useState();
   const [clientModalOrder, setClientModalOrder] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
@@ -100,26 +99,61 @@ const OrderContextProvider = ({ children }) => {
     dispatch(getOrders());
   }, [dispatch, isOrderReady]);
 
-  const getCurrentOrderInfoHandler = (order_info) => {
-    const order = list_of_orders.find((el) => el.article === order_info?.article);
-    const client = clients.find((client) => client.id === order?.owner);
-    const deliveryAddress = deliveryAddresses.find(
-      (address) =>
-        address.id === order?.del_adr_id && address.client_id === order?.owner
-    );
-    const contactInfo = contactInfos.find(
-      (contact) =>
-        contact.id === order?.contact_id && contact.client_id === order?.owner
-    );
+  const getCurrentOrderInfoHandler = useCallback(
+    (order_info) => {
+      const order = list_of_orders.find((el) => el.article === order_info?.article);
+      const client = clients.find((client) => client.id === order?.owner);
+      const deliveryAddress = deliveryAddresses.find(
+        (address) =>
+          address.id === order?.del_adr_id && address.client_id === order?.owner
+      );
+      const contactInfo = contactInfos.find(
+        (contact) =>
+          contact.id === order?.contact_id && contact.client_id === order?.owner
+      );
 
-    const currentOrder = {
-      id: order?.id,
-      article: order?.article,
-      status: order?.status,
-      owner: client,
-      deliveryAddress,
-      contactInfo,
-    };
+      const currentOrder = {
+        id: order?.id,
+        article: order?.article,
+        status: order?.status,
+        owner: client,
+        deliveryAddress,
+        contactInfo,
+      };
+
+      localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
+      setOrderCartData(currentOrder);
+      console.log('currentOrder', currentOrder);
+    },
+    [list_of_orders, clients, deliveryAddresses]
+  );
+
+  const status_list = [
+    {
+      Header: 'Order approved',
+      accessor: 'approved',
+    },
+    {
+      Header: 'The order is accepted by the client',
+      accessor: 'accepted',
+    },
+    {
+      Header: 'The order is allowed to be transferred to production',
+      accessor: 'transferred',
+    },
+    {
+      Header: 'The order has been completed',
+      accessor: 'completed',
+    },
+    {
+      Header: 'Shipment allowed',
+      accessor: 'shipment',
+    },
+    {
+      Header: 'Order shipped',
+      accessor: 'shipped',
+    },
+  ];
 
     localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
     setOrderCartData(currentOrder);
@@ -139,7 +173,7 @@ const OrderContextProvider = ({ children }) => {
         newOrder,
         setNewOrder,
         list_of_orders,
-        status_table,
+        status_list,
         productOfOrder,
         setProductOfOrder,
         ordersDataList,

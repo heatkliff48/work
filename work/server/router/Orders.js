@@ -14,5 +14,6 @@ router.post(
   '/update/delivery_address',
   OrdersController.getUpdateDeliveryAddressOrder
 );
+router.post('/update/status', OrdersController.getUpdateStatusOrder);
 
 module.exports = router;

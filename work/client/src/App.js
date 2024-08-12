@@ -18,11 +18,27 @@ import OrderCart from '#components/Orders/OrderCart.jsx';
 
 function App() {
   const dispatch = useDispatch();
-
   const url = axios.create({
     baseURL: process.env.REACT_APP_URL,
     withCredentials: true,
   });
+
+  // // Проверяем статус сервера
+  // const checkServerStatus = () => {
+  //   url
+  //     .get('/checkServerStatus')
+  //     .then((response) => {
+  //       console.log('response');
+  //       if (!response.ok) {
+  //         window.location.replace('/sign-in');
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error checking server status:', error);
+  //     });
+  // };
+
+  // setInterval(checkServerStatus, 5000);
 
   useEffect(() => {
     url
@@ -36,23 +52,23 @@ function App() {
 
   return (
     <MainContextProvider>
-        <div className="wrapper">
-          <SnackbarProvider />
-          <NavBar />
-          <Routes>
-            <Route path="/" element={<Main />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/roles" element={<Roles />} />
-            <Route path="/sign-up" element={<RegForm />} />
-            <Route path="/sign-in" element={<LoginForm />} />
-            <Route path="/clients" element={<ClientsInfo />} />
-            <Route path="/orders" element={<OrdersTable />} />
-            <Route path="/order_card" element={<OrderCart />} />
+      <div className="wrapper">
+        <SnackbarProvider />
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<Main />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/roles" element={<Roles />} />
+          <Route path="/sign-up" element={<RegForm />} />
+          <Route path="/sign-in" element={<LoginForm />} />
+          <Route path="/clients" element={<ClientsInfo />} />
+          <Route path="/orders" element={<OrdersTable />} />
+          <Route path="/order_card" element={<OrderCart />} />
 
-            <Route path="*" element={<Navigate to={'sign-in'} />} />
-          </Routes>
-          <SnackbarProvider />
-        </div>
+          <Route path="*" element={<Navigate to={'sign-in'} />} />
+        </Routes>
+        <SnackbarProvider />
+      </div>
     </MainContextProvider>
   );
 }

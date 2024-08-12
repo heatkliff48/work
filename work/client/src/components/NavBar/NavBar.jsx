@@ -48,18 +48,6 @@ function NavBar() {
             </div>
           </div>
         )}
-        {!user && (
-          <div className="nav_link_wrapper">
-            <div
-              className="nav_link"
-              onClick={() => {
-                navigate('/sign-up');
-              }}
-            >
-              <p className="p_nav">Регистрация</p>
-            </div>
-          </div>
-        )}
         <div className="nav_link_wrapper">
           <div
             className="nav_link"
