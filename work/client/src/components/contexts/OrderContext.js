@@ -2,6 +2,11 @@ import { getOrders } from '#components/redux/actions/ordersAction.js';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import {
+  DropdownFilter,
+  TextSearchFilter,
+  NumberRangeColumnFilter,
+} from '#components/Table/filters';
 
 const OrderContext = createContext();
 
@@ -25,6 +30,7 @@ const OrderContextProvider = ({ children }) => {
     {
       Header: 'Status of order',
       accessor: 'status',
+      Filter: DropdownFilter,
       sortType: 'string',
     },
   ];
@@ -118,7 +124,7 @@ const OrderContextProvider = ({ children }) => {
     localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
     setOrderCartData(currentOrder);
   };
-  
+
   return (
     <OrderContext.Provider
       value={{

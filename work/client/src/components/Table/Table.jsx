@@ -3,6 +3,7 @@ import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
 import { Button } from 'reactstrap';
 import { GlobalFilterInput } from './GlobalFilterInput';
+import { matchSorter } from 'match-sorter';
 
 function Table({
   COLUMN_DATA = [],
@@ -15,6 +16,25 @@ function Table({
 }) {
   const columns = useMemo(() => COLUMN_DATA, []);
   const data = useMemo(() => dataOfTable, [dataOfTable]);
+
+  const defaultColumn = useMemo(
+    () => ({
+      // Let's set up our default Filter UI
+      Filter: '',
+    }),
+    []
+  );
+
+  function matchSorterFn(rows, id, filterValue) {
+    return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] });
+  }
+
+  const filterTypes = useMemo(
+    () => ({
+      rankedMatchSorter: matchSorterFn,
+    }),
+    []
+  );
 
   const sortTypes = {
     // Функция сортировки для строковых значений
@@ -36,9 +56,12 @@ function Table({
     {
       columns,
       data,
+      defaultColumn,
+      filterTypes,
       sortTypes,
     },
     useGlobalFilter,
+    useFilters,
     useSortBy
   );
 
@@ -57,7 +80,7 @@ function Table({
 
   return (
     <>
-      <h1>Sortable Table Of {tableName}</h1>
+      <h1>Table Of {tableName}</h1>
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}
         <GlobalFilterInput
@@ -77,7 +100,7 @@ function Table({
                     );
                     return (
                       <th key={key} {...restProps}>
-                        {col.render('Header')}{' '}
+                        {col.render('Header')}
                         {/* если колонка является сортируемой, рендерим рядом с заголовком соответствующую иконку в зависимости от того, включена ли сортировка, а также на основе порядка сортировки */}
                         {col.canSort && (
                           <span>
@@ -92,6 +115,8 @@ function Table({
                             )}
                           </span>
                         )}
+                        {/* Render the columns filter UI */}
+                        <div>{col.canFilter ? col.render('Filter') : null}</div>
                       </th>
                     );
                   })}

@@ -8,19 +8,12 @@ import {
   getAllDeliveryAddresses,
   getAllContactInfo,
 } from '#components/redux/actions/clientAction';
-import Table from '#components/Table/Table';
 
 export const ClientContext = createContext();
 
 const ClientsInfo = () => {
   const [modalShow, setModalShow] = useState(false);
-  const {
-    currentClient,
-    setCurrentClient,
-    clients_info_table,
-    clientsDataList,
-    setClientsDataList,
-  } = useProjectContext();
+  const { currentClient, setCurrentClient } = useProjectContext();
 
   const dispatch = useDispatch();
   const clients = useSelector((state) => state.clients);
@@ -52,7 +45,7 @@ const ClientsInfo = () => {
     let filtered = clients.filter((el) =>
       el.c_name?.toLowerCase().includes(searchFilter.toLowerCase())
     );
-    setClientsDataList(filtered);
+    setListOfClientsFiltered(filtered);
   }, [clients]);
 
   return (
@@ -60,20 +53,7 @@ const ClientsInfo = () => {
       {' '}
       {/* <ClientContext.Provider value={[currentClient, setCurrentClient]}> */}
       <ShowClientsModal />
-      <Table
-        COLUMN_DATA={clients_info_table}
-        dataOfTable={clientsDataList}
-        // userAccess={userAccess}
-        // onClickButton={() => {
-        //   setClientModalOrder(!clientModalOrder);
-        // }}
-        // buttonText={'Add new order'}
-        tableName={'Clients'}
-        handleRowClick={(row) => {
-          clientHandler(row.original.id);
-        }}
-      />
-      {/* <div>
+      <div>
         <h4>Search clients</h4>
         <input
           value={searchFilter}
@@ -112,7 +92,7 @@ const ClientsInfo = () => {
             );
           })}
         </tbody>
-      </table> */}
+      </table>
       <MydModalWithGrid show={modalShow} onHide={() => setModalShow(false)} />
       {/* </ClientContext.Provider> */}
     </Fragment>
