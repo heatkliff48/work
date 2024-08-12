@@ -123,7 +123,6 @@ const OrderContextProvider = ({ children }) => {
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
       setOrderCartData(currentOrder);
-      console.log('currentOrder', currentOrder);
     },
     [list_of_orders, clients, deliveryAddresses]
   );
@@ -154,10 +153,6 @@ const OrderContextProvider = ({ children }) => {
       accessor: 'shipped',
     },
   ];
-
-    localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
-    setOrderCartData(currentOrder);
-  };
 
   return (
     <OrderContext.Provider
