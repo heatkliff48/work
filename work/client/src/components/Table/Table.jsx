@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
-import { useTable, useGlobalFilter, useSortBy } from 'react-table';
+import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
 import { Button } from 'reactstrap';
 import { GlobalFilterInput } from './GlobalFilterInput';
 

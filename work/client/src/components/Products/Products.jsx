@@ -1,15 +1,15 @@
 import { useEffect, useMemo } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
-import { useTable, useGlobalFilter, useSortBy } from 'react-table';
+import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
 import './products.css';
 import { getAllProducts } from '../redux/actions/productsAction';
-
 import ModalWindow from '../ModalWindow/ModalWindow';
 import { useProjectContext } from '../contexts/Context';
 import ProductCardModal from '../ProductCardModal/ProductCardModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { GlobalFilterInput } from '#components/Table/GlobalFilterInput';
+import { matchSorter } from 'match-sorter';
 
 function Products() {
   const {
@@ -27,6 +27,26 @@ function Products() {
   } = useProjectContext();
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => latestProducts ?? [], [latestProducts]);
+
+  const defaultColumn = useMemo(
+    () => ({
+      // Let's set up our default Filter UI
+      Filter: '',
+    }),
+    []
+  );
+
+  function matchSorterFn(rows, id, filterValue) {
+    return matchSorter(rows, filterValue, { keys: [(row) => row.values[id]] });
+  }
+
+  const filterTypes = useMemo(
+    () => ({
+      rankedMatchSorter: matchSorterFn,
+    }),
+    []
+  );
+
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -51,9 +71,12 @@ function Products() {
     {
       columns,
       data,
+      defaultColumn,
+      filterTypes,
       sortTypes,
     },
     useGlobalFilter,
+    useFilters,
     useSortBy
   );
 
@@ -127,7 +150,9 @@ function Products() {
                     );
                     return (
                       <th key={key} {...restProps}>
-                        {col.render('Header')}{' '}
+                        {col.render('Header')}
+                        {/* Render the columns filter UI */}
+                        <div>{col.canFilter ? col.render('Filter') : null}</div>
                         {/* если колонка является сортируемой, рендерим рядом с заголовком соответствующую иконку в зависимости от того, включена ли сортировка, а также на основе порядка сортировки */}
                         {col.canSort && (
                           <span>
