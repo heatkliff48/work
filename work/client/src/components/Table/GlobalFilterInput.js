@@ -14,7 +14,7 @@ export function GlobalFilterInput({
 
   return (
     <span>
-      Search: {''}
+      Global search: {''}
       <input
         value={value || ''}
         onChange={(e) => {

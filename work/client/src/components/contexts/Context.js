@@ -58,6 +58,7 @@ const ProjectContextProvider = ({ children }) => {
     {
       Header: 'Article',
       accessor: 'article',
+      Filter: TextSearchFilter,
       disableSortBy: true,
     },
 
@@ -81,12 +82,14 @@ const ProjectContextProvider = ({ children }) => {
       Header: 'Form',
       accessor: 'form',
       defaultValue: 'Normal',
+      Filter: DropdownFilter,
       sortType: 'string',
     },
     {
       Header: 'Certificate',
       accessor: 'certificate',
       defaultValue: 'CE',
+      Filter: DropdownFilter,
       sortType: 'string',
     },
     {
@@ -206,6 +209,7 @@ const ProjectContextProvider = ({ children }) => {
     {
       Header: 'Client`s Name',
       accessor: 'c_name',
+      Filter: TextSearchFilter,
     },
     {
       Header: 'TIN',
@@ -214,6 +218,7 @@ const ProjectContextProvider = ({ children }) => {
     {
       Header: 'Category',
       accessor: 'category',
+      Filter: DropdownFilter,
     },
   ];
 
@@ -271,6 +276,7 @@ const ProjectContextProvider = ({ children }) => {
   const products = useSelector((state) => state.products);
   const roles = useSelector((state) => state.roles);
   const isCheckedAuth = useRef(false);
+  const [clientsDataList, setClientsDataList] = useState([]);
   const [currentClient, setCurrentClient] = useState({});
   const [currentDelivery, setCurrentDelivery] = useState();
   const [currentContact, setCurrentContact] = useState();
@@ -377,6 +383,8 @@ const ProjectContextProvider = ({ children }) => {
         setCurrentDelivery,
         currentContact,
         setCurrentContact,
+        clientsDataList,
+        setClientsDataList,
       }}
     >
       {children}

@@ -9,6 +9,11 @@ import {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import {
+  DropdownFilter,
+  TextSearchFilter,
+  NumberRangeColumnFilter,
+} from '#components/Table/filters';
 
 const OrderContext = createContext();
 
@@ -32,6 +37,7 @@ const OrderContextProvider = ({ children }) => {
     {
       Header: 'Status of order',
       accessor: 'status',
+      Filter: DropdownFilter,
       sortType: 'string',
     },
   ];
@@ -148,6 +154,10 @@ const OrderContextProvider = ({ children }) => {
       accessor: 'shipped',
     },
   ];
+
+    localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
+    setOrderCartData(currentOrder);
+  };
 
   return (
     <OrderContext.Provider

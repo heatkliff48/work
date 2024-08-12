@@ -151,8 +151,6 @@ function Products() {
                     return (
                       <th key={key} {...restProps}>
                         {col.render('Header')}
-                        {/* Render the columns filter UI */}
-                        <div>{col.canFilter ? col.render('Filter') : null}</div>
                         {/* если колонка является сортируемой, рендерим рядом с заголовком соответствующую иконку в зависимости от того, включена ли сортировка, а также на основе порядка сортировки */}
                         {col.canSort && (
                           <span>
@@ -167,6 +165,8 @@ function Products() {
                             )}
                           </span>
                         )}
+                        {/* Render the columns filter UI */}
+                        <div>{col.canFilter ? col.render('Filter') : null}</div>
                       </th>
                     );
                   })}
