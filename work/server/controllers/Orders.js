@@ -22,8 +22,7 @@ class OrdersController {
   static async addNewOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;
-    const { article, del_adr_id, contact_id, owner, status } =
-      req.body.order;
+    const { article, del_adr_id, contact_id, owner, status } = req.body.order;
 
     try {
       const { accessToken, refreshToken, accessTokenExpiration, newOrder } =
@@ -120,6 +119,7 @@ class OrdersController {
       return ErrorUtils.catchError(res, err);
     }
   }
+
   static async getUpdateDeliveryAddressOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;
@@ -129,6 +129,31 @@ class OrdersController {
       const { accessToken, refreshToken, accessTokenExpiration } =
         await OrdersService.getUpdateDeliveryAddressOrder({
           address_id,
+          order_id,
+          id,
+          username,
+          email,
+          fingerprint,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getUpdateStatusOrder(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    const { status, order_id } = req.body;
+
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration } =
+        await OrdersService.getUpdateStatusOrder({
+          status,
           order_id,
           id,
           username,

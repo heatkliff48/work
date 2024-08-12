@@ -7,6 +7,7 @@ import {
   GET_UPDATE_PRODUCTS_OF_ORDER,
   UPDATE_CONTACT_OF_ORDER,
   UPDATE_DELIVERY_OF_ORDER,
+  UPDATE_STATUS_OF_ORDER,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -61,5 +62,13 @@ export const updateDeliveryOfOrder = (newDeliveryOfOrder) => {
   return {
     type: UPDATE_DELIVERY_OF_ORDER,
     payload: newDeliveryOfOrder,
+  };
+};
+
+export const updateOrderStatus = (orderStatus) => {
+
+  return {
+    type: UPDATE_STATUS_OF_ORDER,
+    payload: orderStatus,
   };
 };

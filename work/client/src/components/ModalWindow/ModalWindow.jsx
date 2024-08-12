@@ -48,11 +48,12 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   );
 
   const clearData = () => {
-    setHaveMath({});
     setTrMark('');
     setValue('default');
     setFormInput(defaultValues);
     setArticleId(-1);
+    const newHaveMath = memoizedNewHaveMath;
+    setHaveMath(newHaveMath);
   };
 
   const handleInputChange = useCallback((e) => {
@@ -291,25 +292,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   }, [formInput.density, formInput.form, trMark]);
 
   useEffect(() => {
-    setHaveMath(memoizedNewHaveMath);
-  }, [memoizedNewHaveMath]);
-
-  useEffect(() => {
-    const extractedValues = Object.entries(memoizedNewHaveMath).reduce(
-      (acc, [key, { value }]) => {
-        acc[key] = value;
-        return acc;
-      },
-      {}
-    );
-
-    setFormInput((prev) => ({
-      ...prev,
-      ...extractedValues,
-    }));
-  }, [memoizedNewHaveMath]);
-
-  useEffect(() => {
     if (!stayDefault) return;
     if (formData) {
       setFormInput(formData);
@@ -331,6 +313,25 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
       }));
     }
   }, []);
+
+  useEffect(() => {
+    setHaveMath(memoizedNewHaveMath);
+  }, [memoizedNewHaveMath]);
+
+  useEffect(() => {
+    const extractedValues = Object.entries(memoizedNewHaveMath).reduce(
+      (acc, [key, { value }]) => {
+        acc[key] = value;
+        return acc;
+      },
+      {}
+    );
+
+    setFormInput((prev) => ({
+      ...prev,
+      ...extractedValues,
+    }));
+  }, [memoizedNewHaveMath]);
 
   useEffect(() => {
     if (formData) {

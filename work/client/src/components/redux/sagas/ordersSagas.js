@@ -19,6 +19,8 @@ import {
   NEW_CONTACT_OF_ORDER,
   UPDATE_DELIVERY_OF_ORDER,
   NEW_DELIVERY_OF_ORDER,
+  UPDATE_STATUS_OF_ORDER,
+  STATUS_OF_ORDER,
 } from '../types/ordersTypes';
 
 let accessTokenFront;
@@ -107,6 +109,15 @@ const updateContactOfOrder = (newContactOfOrder) => {
 const updateDeliveryOfOrder = (newDeliveryOfOrder) => {
   return url
     .post('/orders/update/delivery_address', newDeliveryOfOrder)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updateStatusOfOrder = (orderStatus) => {
+  return url
+    .post('/orders/update/status', orderStatus)
     .then((res) => {
       return res.data;
     })
@@ -255,7 +266,7 @@ function* updateDeliveryOfOrderWorker(action) {
 
     const { accessToken, accessTokenExpiration } = yield call(
       updateDeliveryOfOrder,
-      action.payload
+      payload
     );
     window.localStorage.setItem('jwt', accessToken);
 
@@ -263,6 +274,24 @@ function* updateDeliveryOfOrderWorker(action) {
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_DELIVERY_OF_ORDER, payload: [] });
+  }
+}
+
+function* updateStatusOfOrderWorker(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    const { accessToken, accessTokenExpiration } = yield call(
+      updateStatusOfOrder,
+      payload
+    );
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: STATUS_OF_ORDER, payload });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: STATUS_OF_ORDER, payload: [] });
   }
 }
 
@@ -275,6 +304,7 @@ function* ordersWatcher() {
   yield takeLatest(GET_DELETE_ORDER, getDeleteOrderWatcher);
   yield takeLatest(UPDATE_CONTACT_OF_ORDER, updateContactOfOrderWorker);
   yield takeLatest(UPDATE_DELIVERY_OF_ORDER, updateDeliveryOfOrderWorker);
+  yield takeLatest(UPDATE_STATUS_OF_ORDER, updateStatusOfOrderWorker);
 }
 
 export default ordersWatcher;
