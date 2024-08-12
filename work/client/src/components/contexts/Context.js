@@ -9,6 +9,11 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllRoles } from '../redux/actions/rolesAction';
 import { useNavigate } from 'react-router-dom';
+import {
+  DropdownFilter,
+  TextSearchFilter,
+  NumberRangeColumnFilter,
+} from '#components/Table/filters.js';
 
 const ProjectContext = createContext();
 
@@ -66,6 +71,8 @@ const ProjectContextProvider = ({ children }) => {
       Header: 'Density, kg/m³',
       accessor: 'density',
       defaultValue: 500,
+      Filter: NumberRangeColumnFilter,
+      filter: 'between',
       sortType: 'number',
       min: 80,
       max: 800,
@@ -86,6 +93,8 @@ const ProjectContextProvider = ({ children }) => {
       Header: 'Width, mm',
       accessor: 'width',
       defaultValue: 200,
+      Filter: NumberRangeColumnFilter,
+      filter: 'between',
       sortType: 'number',
       min: 50,
       max: 500,
@@ -94,6 +103,8 @@ const ProjectContextProvider = ({ children }) => {
       Header: 'Lengths, mm',
       accessor: 'lengths',
       defaultValue: 600,
+      Filter: NumberRangeColumnFilter,
+      filter: 'between',
       sortType: 'number',
       min: 400,
       max: 3000,
@@ -102,6 +113,8 @@ const ProjectContextProvider = ({ children }) => {
       Header: 'Height, mm',
       accessor: 'height',
       defaultValue: 250,
+      Filter: NumberRangeColumnFilter,
+      filter: 'between',
       sortType: 'number',
       min: 100,
       max: 1000,
@@ -143,6 +156,8 @@ const ProjectContextProvider = ({ children }) => {
       Header: 'Humidity, %',
       accessor: 'humidity',
       defaultValue: 30,
+      Filter: NumberRangeColumnFilter,
+      filter: 'between',
       sortType: 'number',
       min: 0,
       max: 100,
@@ -167,6 +182,8 @@ const ProjectContextProvider = ({ children }) => {
       Header: 'Norm of defect, %',
       accessor: 'normOfBrack',
       defaultValue: 2,
+      Filter: NumberRangeColumnFilter,
+      filter: 'between',
       sortType: 'number',
     },
     {
@@ -179,6 +196,8 @@ const ProjectContextProvider = ({ children }) => {
       Header: 'Price per m³',
       accessor: 'price',
       defaultValue: 0,
+      Filter: NumberRangeColumnFilter,
+      filter: 'between',
       sortType: 'number',
     },
   ];
