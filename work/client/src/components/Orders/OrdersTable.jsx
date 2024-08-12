@@ -10,6 +10,7 @@ import {
   getOrders,
   getProductsOfOrders,
 } from '#components/redux/actions/ordersAction.js';
+import { useProjectContext } from '#components/contexts/Context.js';
 
 function OrdersTable() {
   const {
@@ -22,6 +23,7 @@ function OrdersTable() {
     ordersDataList,
     setOrdersDataList,
   } = useOrderContext();
+  const { setCurrentClient } = useProjectContext();
   const orders = useSelector((state) => state.orders);
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
@@ -81,7 +83,6 @@ function OrdersTable() {
   }, [orders, clients, deliveryAddresses]);
 
   useEffect(() => {
-    dispatch(getAllDeliveryAddresses);
     dispatch(getOrders());
   }, [deliveryAddresses]);
 
@@ -89,7 +90,8 @@ function OrdersTable() {
     //CLEAR data
     setProductOfOrder({});
     setNewOrder({});
-  }, []);
+    setCurrentClient({});
+  }, [clientModalOrder]);
 
   return (
     <>
@@ -114,7 +116,6 @@ function OrdersTable() {
           navigate('/order_card');
         }}
       />
-      <div>There place for vac and other huiny</div>
     </>
   );
 }

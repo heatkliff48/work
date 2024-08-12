@@ -64,7 +64,6 @@ function ClientsModal(props) {
 
   useEffect(() => {
     setClientInput((prev) => ({ ...prev, category: categoryOptions[0].value }));
-    console.log(props.show, 'props.modalShow');
   }, [props.show]);
 
   const onSubmitForm = async (e) => {
