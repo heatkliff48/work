@@ -3,17 +3,17 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const Fingerprint = require('express-fingerprint');
+const TokenService = require('./services/Token.js');
+const cookieParser = require('cookie-parser');
 const AuthRootRouter = require('./router/Auth.js');
 const ProductRootRouter = require('./router/Product.js');
 const OrdersRootRouter = require('./router/Orders.js');
-// const ClientsRootRouter = require('./router/Clients.js');
 const RolesRootRouter = require('./router/Roles.js');
-const TokenService = require('./services/Token.js');
-const cookieParser = require('cookie-parser');
 const clientsRouter = require('./router/clients.js');
 const clientsAddress = require('./router/clientsAddress');
 const deliveryAddress = require('./router/deliveryAddress');
 const clientsContactInfo = require('./router/clientsContactInfo');
+const WarehouseRootRouter = require('./router/Warehouse.js');
 
 const PORT = 3001;
 
@@ -32,7 +32,7 @@ app.use(
 );
 app.get('/checkServerStatus', (req, res) => {
   console.log('<<<<<<<<<<<<<<<<<<CHECK>>>>>>>>>>>>>>>>>>');
-  res.sendStatus(200); 
+  res.sendStatus(200);
 });
 
 app.use('/auth', TokenService.checkAccess, AuthRootRouter);
@@ -43,6 +43,7 @@ app.use('/clients', TokenService.checkAccess, clientsRouter);
 app.use('/clientsAddress', TokenService.checkAccess, clientsAddress);
 app.use('/deliveryAddress', TokenService.checkAccess, deliveryAddress);
 app.use('/clientsContactInfo', TokenService.checkAccess, clientsContactInfo);
+app.use('/warehouse', TokenService.checkAccess, WarehouseRootRouter);
 
 const start = async () => {
   try {

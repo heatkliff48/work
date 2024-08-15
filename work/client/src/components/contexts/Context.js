@@ -14,6 +14,8 @@ import {
   TextSearchFilter,
   NumberRangeColumnFilter,
 } from '#components/Table/filters.js';
+import { getAllProducts } from '#components/redux/actions/productsAction.js';
+import { getAllWarehouse } from '#components/redux/actions/warehouseAction.js';
 
 const ProjectContext = createContext();
 
@@ -330,6 +332,8 @@ const ProjectContextProvider = ({ children }) => {
     //сделать диспатч чек юзер на нахождение юзера в бд
     if (!user) return;
     dispatch(getAllRoles());
+    dispatch(getAllProducts());
+    dispatch(getAllWarehouse());
   }, [user, modalRoleCard]);
 
   useEffect(() => {

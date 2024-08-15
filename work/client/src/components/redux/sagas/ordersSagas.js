@@ -145,7 +145,7 @@ function* getOrdersListWatcher() {
     yield put({ type: ORDERS_LIST, payload: orders });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
-    console.error('Error in getAllProductsWatcher:', err);
+    console.error('Error:', err);
     yield put({ type: ORDERS_LIST, payload: [] });
   }
 }
