@@ -76,6 +76,33 @@ const OrderContextProvider = ({ children }) => {
     },
   ];
 
+  const status_list = [
+    {
+      Header: 'Order approved',
+      accessor: 'approved',
+    },
+    {
+      Header: 'The order is accepted by the client',
+      accessor: 'accepted',
+    },
+    {
+      Header: 'The order is allowed to be transferred to production',
+      accessor: 'transferred',
+    },
+    {
+      Header: 'The order has been completed',
+      accessor: 'completed',
+    },
+    {
+      Header: 'Shipment allowed',
+      accessor: 'shipment',
+    },
+    {
+      Header: 'Order shipped',
+      accessor: 'shipped',
+    },
+  ];
+
   const dispatch = useDispatch();
   const [currentOrder, setCurrentOrder] = useState();
   const [clientModalOrder, setClientModalOrder] = useState(false);
@@ -124,33 +151,6 @@ const OrderContextProvider = ({ children }) => {
     },
     [list_of_orders, clients, deliveryAddresses]
   );
-
-  const status_list = [
-    {
-      Header: 'Order approved',
-      accessor: 'approved',
-    },
-    {
-      Header: 'The order is accepted by the client',
-      accessor: 'accepted',
-    },
-    {
-      Header: 'The order is allowed to be transferred to production',
-      accessor: 'transferred',
-    },
-    {
-      Header: 'The order has been completed',
-      accessor: 'completed',
-    },
-    {
-      Header: 'Shipment allowed',
-      accessor: 'shipment',
-    },
-    {
-      Header: 'Order shipped',
-      accessor: 'shipped',
-    },
-  ];
 
   return (
     <OrderContext.Provider

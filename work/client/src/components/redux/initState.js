@@ -10,6 +10,7 @@ const initState = {
   pages: [],
   orders: [],
   productsOfOrders: [],
+  warehouse: [],
 };
 
 export default initState;

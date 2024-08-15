@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useOrderContext } from '../../contexts/OrderContext';
-import { useProjectContext } from '#components/contexts/Context.js';
 import InputField from '#components/InputField/InputField.jsx';
-import Table from '#components/Table/Table.jsx';
 import { getUpdateProductInfoOfOrders } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 
