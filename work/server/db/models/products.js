@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       density: DataTypes.INTEGER,
       form: DataTypes.STRING,
       certificate: DataTypes.STRING,
+      /** new block */
+      placeOfProduction: DataTypes.STRING,
+      typeOfPackaging: DataTypes.STRING,
+      /** new block */
       width: DataTypes.FLOAT,
       lengths: DataTypes.FLOAT,
       height: DataTypes.FLOAT,
