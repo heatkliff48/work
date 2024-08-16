@@ -3,9 +3,9 @@ import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
 import './products.css';
 import { getAllProducts } from '../redux/actions/productsAction';
-import ModalWindow from '../ModalWindow/ModalWindow';
+import ModalWindow from './modal/ModalWindow';
 import { useProjectContext } from '../contexts/Context';
-import ProductCardModal from '../ProductCardModal/ProductCardModal';
+import ProductCardModal from './modal/ProductCardModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { GlobalFilterInput } from '#components/Table/GlobalFilterInput';
@@ -123,13 +123,15 @@ function Products() {
 
   return (
     <>
-      <ModalWindow
-        list={COLUMNS}
-        formData={null}
-        isOpen={modal}
-        toggle={() => setModal(!modal)}
-      />
-      <ProductCardModal />
+      {modal && (
+        <ModalWindow
+          list={COLUMNS}
+          formData={null}
+          isOpen={modal}
+          toggle={() => setModal(!modal)}
+        />
+      )}
+      {modalProductCard && <ProductCardModal />}
       <h1>Sortable Table</h1>
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}

@@ -1,7 +1,7 @@
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateProduct } from '../redux/actions/productsAction';
-import { useProjectContext } from '../contexts/Context';
+import { useProjectContext } from '#components/contexts/Context.js';
+import { updateProduct } from '#components/redux/actions/productsAction.js';
 
 function UpdateModalWindow() {
   const {

@@ -81,6 +81,20 @@ const ProjectContextProvider = ({ children }) => {
       max: 800,
     },
     {
+      Header: 'Place of production',
+      accessor: 'placeOfProduction',
+      defaultValue: 'Spain',
+      Filter: DropdownFilter,
+      sortType: 'string',
+    },
+    {
+      Header: 'Type of packaging',
+      accessor: 'typeOfPackaging',
+      defaultValue: 'Reusable',
+      Filter: DropdownFilter,
+      sortType: 'string',
+    },
+    {
       Header: 'Form',
       accessor: 'form',
       defaultValue: 'Normal',

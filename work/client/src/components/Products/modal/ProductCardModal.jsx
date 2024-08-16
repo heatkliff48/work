@@ -12,9 +12,9 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { useProjectContext } from '../contexts/Context';
-import ModalWindow from '../ModalWindow/ModalWindow';
+import { useSelector } from 'react-redux';
+import { useProjectContext } from '#components/contexts/Context.js';
+import ModalWindow from './ModalWindow';
 
 const ProductCardModal = React.memo(() => {
   const {
@@ -26,20 +26,37 @@ const ProductCardModal = React.memo(() => {
   } = useProjectContext();
   const [lastVersion, setLastVersion] = useState(1);
   const [isModalWindowOpen, setIsModalWindowOpen] = useState(false);
-  const [productByVersicon, setProductByVersicon] = useState({});
+  const [productByVersion, setProductByVersion] = useState();
   const [selectedVersion, setSelectedVersion] = useState(null);
   const products = useSelector((state) => state.products);
-  // const dispatch = useDispatch();
 
   const memoizedArticle = (prod) => {
+    const {
+      form,
+      certificate,
+      width,
+      height,
+      lengths,
+      density,
+      version,
+      placeOfProduction,
+      typeOfPackaging,
+    } = prod;
+
     let newArticle = '';
     let versionNumber = '0001';
 
-    versionNumber = `000${prod.version}`.slice(-4);
+    versionNumber = `000${version}`.slice(-4);
+    const miniWidth = width?.toString().slice(0, 2);
+    const miniHeight = height?.toString().slice(0, 2);
+    const miniLengths = lengths?.toString().slice(0, 2);
+    const miniPlaceOfProduction = placeOfProduction?.slice(0, 1);
+    const miniTypeOfPackaging = typeOfPackaging?.slice(0, 1);
 
-    newArticle = `T.${prod.form?.toUpperCase()}${prod.certificate?.substr(0, 1)}${
-      prod.density
-    }${prod.width}${prod.height}${prod.lengths}${versionNumber}`;
+    newArticle = `T.${form?.toUpperCase()}${certificate?.substr(
+      0,
+      1
+    )}${miniPlaceOfProduction}${miniTypeOfPackaging}0${density}${miniWidth}${miniHeight}${miniLengths}${versionNumber}`;
 
     return newArticle;
   };
@@ -65,8 +82,9 @@ const ProductCardModal = React.memo(() => {
 
   const getSelectedOption = (accessor) => {
     if (!productCardData[accessor]) return null;
-    return productByVersicon?.find(
-      (option) => option.value === productCardData[accessor].toString()
+
+    return productByVersion?.find(
+      (option) => option.value === productCardData[accessor]?.toString()
     );
   };
 
@@ -98,7 +116,7 @@ const ProductCardModal = React.memo(() => {
     }, 1);
 
     setLastVersion(lastVers);
-    setProductByVersicon(prodArrVers);
+    setProductByVersion(prodArrVers);
   }, [productCardData, products]);
 
   return (
@@ -116,7 +134,7 @@ const ProductCardModal = React.memo(() => {
               <div>
                 <Select
                   onChange={handleSelectChange}
-                  options={productByVersicon}
+                  options={productByVersion}
                   value={getSelectedOption('version')}
                 />
               </div>

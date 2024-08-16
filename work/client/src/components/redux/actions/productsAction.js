@@ -11,12 +11,6 @@ export const getAllProducts = () => {
 };
 
 export const addNewProduct = ({ product }) => {
-  let newArticle = `T.${product.form?.toUpperCase()}${product.certificate?.substr(
-    0,
-    1
-  )}${product.density}${product.width}${product.height}${product.lengths}`; // T.NORMALC500200600250  без версии
-
-  product.article = newArticle;
   delete product.id;
 
   return {

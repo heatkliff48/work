@@ -16,6 +16,7 @@ export const getAllClients = () => {
     type: GET_ALL_CLIENTS,
   };
 };
+
 export const addNewClient = ({ client }) => {
   return {
     type: ADD_NEW_CLIENT,

@@ -26,6 +26,14 @@ module.exports = {
       certificate: {
         type: Sequelize.STRING,
       },
+      /** new block */
+      placeOfProduction: {
+        type: Sequelize.STRING,
+      },
+      typeOfPackaging: {
+        type: Sequelize.STRING,
+      },
+      /** new block */
       width: {
         type: Sequelize.FLOAT,
       },

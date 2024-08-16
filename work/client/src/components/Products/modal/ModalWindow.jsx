@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
-import { addNewProduct } from '../redux/actions/productsAction';
+import InputField from '../../InputField/InputField';
 import UpdateModalWindow from './UpdateModalWindow';
-import { useProjectContext } from '../contexts/Context';
-import InputField from '../InputField/InputField';
+import { useProjectContext } from '#components/contexts/Context.js';
+import { addNewProduct } from '#components/redux/actions/productsAction.js';
 
 const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   const {
@@ -43,6 +43,15 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
         { value: 'CE', label: 'CE' },
         { value: 'DAU', label: 'DAU' },
       ],
+      placeOfProduction: [
+        { value: 'Spain', label: 'Spain' },
+        { value: 'Türkiye', label: 'Türkiye' },
+      ],
+      typeOfPackaging: [
+        { value: 'Reusable', label: 'REU' },
+        { value: 'Disposable', label: 'DIS' },
+        { value: 'Marine', label: 'MAR' },
+      ],
     }),
     []
   );
@@ -78,10 +87,29 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   };
 
   const updateProductHandler = () => {
-    const prodArticle = `T.${formInput.form?.toUpperCase()}${formInput.certificate?.substr(
+    const {
+      form,
+      certificate,
+      width,
+      height,
+      lengths,
+      density,
+
+      placeOfProduction,
+      typeOfPackaging,
+    } = formInput;
+
+    const miniWidth = width?.toString().slice(0, 2);
+    const miniHeight = height?.toString().slice(0, 2);
+    const miniLengths = lengths?.toString().slice(0, 2);
+    const miniPlaceOfProduction = placeOfProduction?.slice(0, 1);
+    const miniTypeOfPackaging = typeOfPackaging?.slice(0, 1);
+
+    const prodArticle = `T.${form?.toUpperCase()}${certificate?.substr(
       0,
       1
-    )}${formInput.density}${formInput.width}${formInput.height}${formInput.lengths}`;
+    )}${miniPlaceOfProduction}${miniTypeOfPackaging}0${density}${miniWidth}${miniHeight}${miniLengths}`;
+
     const isExistingProduct = products.some((product) => {
       return product.article === prodArticle;
     });
@@ -95,7 +123,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
     } else {
       setModal(!modal);
       setModalProductCard(false);
-      dispatch(addNewProduct({ product: formInput }));
+      dispatch(addNewProduct({ product: { ...formInput, article: prodArticle } }));
     }
   };
 
