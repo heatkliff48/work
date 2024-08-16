@@ -51,6 +51,32 @@ const ProjectContextProvider = ({ children }) => {
     social: 'Social',
   };
 
+  const selectOptions = useMemo(
+    () => ({
+      form: [
+        { value: 'normal', label: 'Normal' },
+        { value: 'U-block', label: 'U-block' },
+        { value: 'Lintel', label: 'Lintel' },
+        { value: 'O-block', label: 'O-block' },
+        { value: 'Forjado', label: 'Forjado' },
+      ],
+      certificate: [
+        { value: 'CE', label: 'CE' },
+        { value: 'DAU', label: 'DAU' },
+      ],
+      placeOfProduction: [
+        { value: 0, label: 'Spain' },
+        { value: 1, label: 'Türkiye' },
+      ],
+      typeOfPackaging: [
+        { value: 0, label: 'Reusable' },
+        { value: 1, label: 'Disposable' },
+        { value: 2, label: 'Marine' },
+      ],
+    }),
+    []
+  );
+
   const COLUMNS = [
     {
       Header: 'Id',
@@ -363,6 +389,7 @@ const ProjectContextProvider = ({ children }) => {
   return (
     <ProjectContext.Provider
       value={{
+        selectOptions,
         COLUMNS,
         displayNames,
         promProduct,

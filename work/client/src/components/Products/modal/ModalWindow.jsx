@@ -20,8 +20,8 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
     stayDefault,
     setStayDefault,
     setModalProductCard,
+    selectOptions,
   } = useProjectContext();
-  const [value, setValue] = useState('default');
   const [formInput, setFormInput] = useState({});
   const [haveMath, setHaveMath] = useState({});
   const [trMark, setTrMark] = useState('');
@@ -30,35 +30,8 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   const products = useSelector((state) => state.products);
   const dispatch = useDispatch();
 
-  const selectOptions = useMemo(
-    () => ({
-      form: [
-        { value: 'normal', label: 'Normal' },
-        { value: 'U-block', label: 'U-block' },
-        { value: 'Lintel', label: 'Lintel' },
-        { value: 'O-block', label: 'O-block' },
-        { value: 'Forjado', label: 'Forjado' },
-      ],
-      certificate: [
-        { value: 'CE', label: 'CE' },
-        { value: 'DAU', label: 'DAU' },
-      ],
-      placeOfProduction: [
-        { value: 'Spain', label: 'Spain' },
-        { value: 'Türkiye', label: 'Türkiye' },
-      ],
-      typeOfPackaging: [
-        { value: 'Reusable', label: 'REU' },
-        { value: 'Disposable', label: 'DIS' },
-        { value: 'Marine', label: 'MAR' },
-      ],
-    }),
-    []
-  );
-
   const clearData = () => {
     setTrMark('');
-    setValue('default');
     setFormInput(defaultValues);
     setArticleId(-1);
     const newHaveMath = memoizedNewHaveMath;
@@ -70,22 +43,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
     setFormInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }, []);
 
-  const handleSelectChange = (selectedOption, key) => {
-    setValue(selectedOption.value);
-    setFormInput((prev) => ({ ...prev, [key]: selectedOption.value }));
-  };
-
-  const getSelectedOption = (accessor) => {
-    const options = selectOptions[accessor];
-    if (!options) return null;
-    const selectedOption = options.find(
-      (option) => option.value === formData?.[accessor]
-    );
-
-    // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
-    return selectedOption || options[0];
-  };
-
   const updateProductHandler = () => {
     const {
       form,
@@ -94,7 +51,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
       height,
       lengths,
       density,
-
       placeOfProduction,
       typeOfPackaging,
     } = formInput;
@@ -102,13 +58,13 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
     const miniWidth = width?.toString().slice(0, 2);
     const miniHeight = height?.toString().slice(0, 2);
     const miniLengths = lengths?.toString().slice(0, 2);
-    const miniPlaceOfProduction = placeOfProduction?.slice(0, 1);
-    const miniTypeOfPackaging = typeOfPackaging?.slice(0, 1);
+    const miniPlaceOfProduction = placeOfProduction?.toString().slice(0, 1);
+    const miniTypeOfPackaging = typeOfPackaging?.toString().slice(0, 1);
 
-    const prodArticle = `T.${form?.toUpperCase()}${certificate?.substr(
+    const prodArticle = `T.${form?.toUpperCase()}${miniPlaceOfProduction}${miniTypeOfPackaging}0${certificate?.substr(
       0,
       1
-    )}${miniPlaceOfProduction}${miniTypeOfPackaging}0${density}${miniWidth}${miniHeight}${miniLengths}`;
+    )}${density}${miniWidth}${miniHeight}${miniLengths}`;
 
     const isExistingProduct = products.some((product) => {
       return product.article === prodArticle;
@@ -124,6 +80,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
       setModal(!modal);
       setModalProductCard(false);
       dispatch(addNewProduct({ product: { ...formInput, article: prodArticle } }));
+      clearData();
     }
   };
 
@@ -373,8 +330,21 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   return (
     <div>
       {modalUpdate && <UpdateModalWindow />}
-      <Modal isOpen={isOpen} toggle={toggle}>
-        <ModalHeader toggle={toggle}>New product</ModalHeader>
+      <Modal
+        isOpen={isOpen}
+        toggle={() => {
+          clearData();
+          toggle();
+        }}
+      >
+        <ModalHeader
+          toggle={() => {
+            clearData();
+            toggle();
+          }}
+        >
+          New product
+        </ModalHeader>
         <div className="item_content">
           {list.map((el) => {
             if (el.accessor === 'id' || el.accessor === 'article') return null;
@@ -407,15 +377,18 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
               );
             }
             if (selectOptions[el.accessor]) {
+              let selOpt = selectOptions[el.accessor][0];
               return (
                 <div className="item_select" key={el.id}>
                   <ModalBody>{el.Header}:</ModalBody>
                   <Select
-                    defaultValue={getSelectedOption(el.accessor)}
-                    onChange={(v) => {
+                    defaultValue={selOpt}
+                    onChange={(option) => {
                       if (articleId < 0) setArticleId(el.id);
-                      handleSelectChange(v, el.accessor);
-                      setFormInput((prev) => ({ ...prev, [el.accessor]: v.value })); // Обновляем formInput
+                      setFormInput((prev) => ({
+                        ...prev,
+                        [el.accessor]: option.value,
+                      }));
                     }}
                     options={selectOptions[el.accessor]}
                   />

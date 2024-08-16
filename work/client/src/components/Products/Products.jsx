@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
 import './products.css';
@@ -24,9 +24,11 @@ function Products() {
     checkUserAccess,
     userAccess,
     setUserAccess,
+    selectOptions,
   } = useProjectContext();
+  const [product_table, setProductTable] = useState();
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => latestProducts ?? [], [latestProducts]);
+  const data = useMemo(() => product_table ?? [], [product_table]);
 
   const defaultColumn = useMemo(
     () => ({
@@ -116,6 +118,25 @@ function Products() {
       }
     }
   }, [user, roles]);
+
+  useEffect(() => {
+    const newProductList = latestProducts.map((prod) => {
+      const newPlaceOfProduction = selectOptions.placeOfProduction.find(
+        (opt) => opt.value == prod.placeOfProduction
+      );
+      const newTypeOfPackaging = selectOptions.typeOfPackaging.find(
+        (opt) => opt.value == prod.typeOfPackaging
+      );
+      
+      return {
+        ...prod,
+        placeOfProduction: newPlaceOfProduction?.label,
+        typeOfPackaging: newTypeOfPackaging?.label,
+      };
+    });
+
+    setProductTable(newProductList);
+  }, [latestProducts]);
 
   if (!userAccess.canRead) {
     return <div>У вас нет прав для просмотра этой страницы.</div>;
