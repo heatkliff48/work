@@ -60,7 +60,7 @@ const addNewProduct = ({ product }) => {
 
 function* getAllProductsWatcher() {
   try {
-    accessTokenFront = yield select(state => state.jwt);
+    accessTokenFront = yield select((state) => state.jwt);
     const { products, accessToken, accessTokenExpiration } = yield call(
       getAllProducts
     );
@@ -77,7 +77,7 @@ function* getAllProductsWatcher() {
 
 function* updateProductWatcher(action) {
   try {
-    accessTokenFront = yield select(state => state.jwt);
+    accessTokenFront = yield select((state) => state.jwt);
     const { products, accessToken, accessTokenExpiration } = yield call(
       updateProducts,
       action.payload
@@ -93,7 +93,7 @@ function* updateProductWatcher(action) {
 
 function* addNewProductWatcher(action) {
   try {
-    accessTokenFront = yield select(state => state.jwt);
+    accessTokenFront = yield select((state) => state.jwt);
     const { products, accessToken, accessTokenExpiration } = yield call(
       addNewProduct,
       action.payload
