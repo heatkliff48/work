@@ -5,6 +5,7 @@ import {
   NEW_CONTACT_OF_ORDER,
   NEW_DELIVERY_OF_ORDER,
   STATUS_OF_ORDER,
+  DATA_SHIP_ORDER,
 } from '../types/ordersTypes';
 
 export const ordersReducer = (orders = [], action) => {
@@ -16,6 +17,18 @@ export const ordersReducer = (orders = [], action) => {
 
     case NEW_ORDER: {
       return [...orders, payload];
+    }
+
+    case DATA_SHIP_ORDER: {
+      console.log('DATA_SHIP_ORDER', payload);
+      const { order_id, shipping_date } = payload;
+      const result = orders.map((order) => {
+        if (order.id === order_id) {
+          return { ...order, shipping_date };
+        }
+        return order;
+      });
+      return result;
     }
 
     case DELETE_ORDER: {

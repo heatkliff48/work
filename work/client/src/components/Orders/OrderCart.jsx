@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useCallback, useState } from 'react';
-import ReactDOM from 'react-dom';
+import 'react-datepicker/dist/react-datepicker.css';
+import DatePicker from 'react-datepicker';
+// import ReactDOM from 'react-dom';
 import { Button } from 'reactstrap';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
 import {
+  addDataShipOrder,
   deleteOrder,
   getDeleteProductOfOrder,
   updateOrderStatus,
@@ -36,6 +39,10 @@ const OrderCart = React.memo(() => {
 
   const productListOrder = useSelector((state) => state.productsOfOrders);
 
+  const [dataValue, setDataValue] = useState(new Date());
+  const [formatDataValue, setFormatDataValue] = useState(null);
+  const [daysUntilShipping, setDaysUntilShipping] = useState(null);
+  const [selectedShippingDate, setSelectedShippingDate] = useState(null);
   const [vatValue, setVatValue] = useState({
     vat_procent: 21,
     vat_euro: 0,
@@ -49,6 +56,10 @@ const OrderCart = React.memo(() => {
     () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
     []
   );
+
+  const haveShipDate = useMemo(() => {
+    return orderCartData?.shipping_date ?? false;
+  }, [orderCartData]);
 
   const filterAndMapData = useCallback(
     (data, filterKeys) =>
@@ -66,6 +77,37 @@ const OrderCart = React.memo(() => {
         }),
     [orderCartData]
   );
+
+  const handleDateChange = useCallback(
+    (date) => {
+      const currentDate = new Date();
+      if (date < currentDate) {
+        alert('Выбранная дата не может быть меньше текущей даты');
+        return;
+      }
+      setDataValue(date);
+      const formattedDate = date.toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+      setFormatDataValue(formattedDate);
+      setSelectedShippingDate(date);
+    },
+    [dataValue]
+  );
+
+  const handleDayBeforShipping = useCallback(() => {
+    const currentDate = new Date();
+    const shippingDateString = orderCartData?.shipping_date;
+
+    // Преобразование строки в формате "23.08.2024" в объект Date
+    const shippingDate = new Date(shippingDateString.split('.').reverse().join('-'));
+
+    const timeDiff = shippingDate.getTime() - currentDate.getTime();
+    const daysUntil = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return daysUntil;
+  }, [orderCartData?.shipping_date]);
 
   const addProductArticleToOrderList = useCallback(
     (productListOrder, latestProducts) => {
@@ -252,29 +294,44 @@ const OrderCart = React.memo(() => {
         </table>
         <div className="footer_data">
           <div className="vat_container">
-            <div className="vat_procent">
-              <div>
-                <p>VAT, %</p>
-                <input
-                  type="text"
-                  id="vat_procent"
-                  name="vat_procent"
-                  value={vatValue.vat_procent}
-                  onChange={(e) => {
-                    handleInputChange(e);
-                  }}
+            <div className="vat">
+              <div className="vat_procent">
+                <div>
+                  <p>VAT, %</p>
+                  <input
+                    type="text"
+                    id="vat_procent"
+                    name="vat_procent"
+                    value={vatValue.vat_procent}
+                    onChange={(e) => {
+                      handleInputChange(e);
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="vat_euro">
+                <div>
+                  <p>VAT, EURO</p>
+                  <p>{vatValue.vat_euro}</p>
+                </div>
+              </div>
+              <div className="vat_result">
+                <p>Result</p>
+                <p>{vatValue.vat_result}</p>
+              </div>
+            </div>
+            <div className="shippind_date">
+              {haveShipDate ? (
+                <p>
+                  Дата отправки: {haveShipDate} ({handleDayBeforShipping()} дней до отправки)
+                </p>
+              ) : (
+                <DatePicker
+                  selected={dataValue}
+                  onChange={(date) => handleDateChange(date)}
+                  dateFormat="dd.MM.yyyy"
                 />
-              </div>
-            </div>
-            <div className="vat_euro">
-              <div>
-                <p>VAT, EURO</p>
-                <p>{vatValue.vat_euro}</p>
-              </div>
-            </div>
-            <div className="vat_result">
-              <p>Result</p>
-              <p>{vatValue.vat_result}</p>
+              )}
             </div>
           </div>
           <div className="status-table">
@@ -284,14 +341,30 @@ const OrderCart = React.memo(() => {
                 <input
                   type="checkbox"
                   checked={item.accessor === orderCartData?.status}
-                  onChange={() =>
+                  onChange={() => {
+                    const order_id = orderCartData?.id;
+                    if (
+                      item.accessor !== status_list[0].accessor &&
+                      !selectedShippingDate
+                    ) {
+                      alert('Пожалуйста, выберите дату отправки');
+                      return;
+                    }
+                    if (item.accessor === status_list[1].accessor) {
+                      dispatch(
+                        addDataShipOrder({
+                          order_id,
+                          shipping_date: formatDataValue,
+                        })
+                      );
+                    }
                     dispatch(
                       updateOrderStatus({
-                        order_id: orderCartData?.id,
+                        order_id,
                         status: item.accessor,
                       })
-                    )
-                  }
+                    );
+                  }}
                 />
               </div>
             ))}

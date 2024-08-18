@@ -47,6 +47,30 @@ class OrdersController {
     }
   }
 
+  static async addShippingDateOrder(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    const date = req.body;
+
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration } =
+        await OrdersService.addShippingDateOrder({
+          id,
+          username,
+          email,
+          fingerprint,
+          date,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async getProductsOfOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;

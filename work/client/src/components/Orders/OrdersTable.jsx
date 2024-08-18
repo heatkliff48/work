@@ -62,6 +62,7 @@ function OrdersTable() {
   useEffect(() => {
     if (orders && clients && deliveryAddresses) {
       const newArray = orders.map((order) => {
+        const { id, article, status, shipping_date } = order;
         const client = clients.find((client) => client.id === order.owner);
         const deliveryAddress = deliveryAddresses.find(
           (address) =>
@@ -69,11 +70,12 @@ function OrdersTable() {
         );
 
         return {
-          id: order.id,
-          article: order.article,
-          status: order.status,
+          id,
+          article,
+          status,
           owner: client ? client.c_name : '',
           del_adr_id: deliveryAddress ? deliveryAddress.street : '',
+          shipping_date,
         };
       });
 

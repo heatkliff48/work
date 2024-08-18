@@ -23,6 +23,8 @@ import {
   STATUS_OF_ORDER,
   GET_UPDATE_PRODUCT_INFO_OF_ORDER,
   UPDATE_PRODUCT_INFO_OF_ORDER,
+  DATA_SHIP_ORDER,
+  ADD_DATA_SHIP_ORDER,
 } from '../types/ordersTypes';
 
 let accessTokenFront;
@@ -57,6 +59,15 @@ const getAllOrders = () => {
 const addNewOrder = (order) => {
   return url
     .post('/orders/add', { order })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addDataShipOrder = (date) => {
+  return url
+    .post('/orders/date', date)
     .then((res) => {
       return res.data;
     })
@@ -166,6 +177,26 @@ function* addNewOrderWatcher(action) {
   } catch (err) {
     console.error(err);
     yield put({ type: NEW_ORDER, payload: [] });
+  }
+}
+
+function* addDataShipOrderWatcher(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    const { accessToken, accessTokenExpiration } = yield call(
+      addDataShipOrder,
+      payload
+    );
+
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: DATA_SHIP_ORDER, payload });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: DATA_SHIP_ORDER, payload: [] });
   }
 }
 
@@ -332,6 +363,7 @@ function* updateStatusOfOrderWorker(action) {
 function* ordersWatcher() {
   yield takeLatest(GET_ORDERS_LIST, getOrdersListWatcher);
   yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
+  yield takeLatest(ADD_DATA_SHIP_ORDER, addDataShipOrderWatcher);
   yield takeLatest(GET_PRODUCTS_OF_ORDER, getProductsOfOrderWatcher);
   yield takeLatest(GET_UPDATE_PRODUCTS_OF_ORDER, getUpdateProductsOfOrderWatcher);
   yield takeLatest(

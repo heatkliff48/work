@@ -1,4 +1,5 @@
 import {
+  ADD_DATA_SHIP_ORDER,
   ADD_NEW_ORDER,
   GET_DELETE_ORDER,
   GET_DELETE_PRODUCT_OF_ORDER,
@@ -21,6 +22,13 @@ export const addNewOrder = (order) => {
   return {
     type: ADD_NEW_ORDER,
     payload: order,
+  };
+};
+
+export const addDataShipOrder = (date) => {
+  return {
+    type: ADD_DATA_SHIP_ORDER,
+    payload: date,
   };
 };
 
