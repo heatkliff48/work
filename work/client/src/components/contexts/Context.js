@@ -299,6 +299,73 @@ const ProjectContextProvider = ({ children }) => {
     },
   ];
 
+  const users_info_table = [
+    {
+      Header: 'E-mail',
+      accessor: 'email',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Full Name',
+      accessor: 'fullName',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Group',
+      accessor: 'group',
+      Filter: DropdownFilter,
+    },
+  ];
+
+  const users_main_info_table = [
+    {
+      Header: 'Username',
+      accessor: 'u_username',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Email',
+      accessor: 'u_email',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Password',
+      accessor: 'password',
+    },
+    {
+      Header: 'Role',
+      accessor: 'role',
+    },
+  ];
+
+  const users_additional_info_table = [
+    {
+      Header: 'Full Name',
+      accessor: 'fullName',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Group',
+      accessor: 'group',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Shift',
+      accessor: 'shift',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Subdivision',
+      accessor: 'subdivision',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Phone',
+      accessor: 'phone',
+      Filter: TextSearchFilter,
+    },
+  ];
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -322,6 +389,8 @@ const ProjectContextProvider = ({ children }) => {
   const [currentClient, setCurrentClient] = useState({});
   const [currentDelivery, setCurrentDelivery] = useState();
   const [currentContact, setCurrentContact] = useState();
+  const [currentUsersInfo, setCurrentUsersInfo] = useState({});
+  const [usersInfoDataList, setUsersInfoDataList] = useState([]);
 
   const roleTable = [
     { id: 1, role_name: 'Production Manager' },
@@ -430,6 +499,13 @@ const ProjectContextProvider = ({ children }) => {
         setCurrentContact,
         clientsDataList,
         setClientsDataList,
+        users_info_table,
+        currentUsersInfo,
+        setCurrentUsersInfo,
+        usersInfoDataList,
+        setUsersInfoDataList,
+        users_main_info_table,
+        users_additional_info_table,
       }}
     >
       {children}

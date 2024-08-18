@@ -6,6 +6,8 @@ import rolesWatcher from './rolesSagas';
 import pagesWatcher from './pagesSagas';
 import ordersWatcher from './ordersSagas';
 import warehouseWatcher from './warehouseSagas';
+import usersInfoWatcher from './usersInfoSagas';
+
 export default function* rootSaga() {
   yield all([
     userWatcher(),
@@ -15,5 +17,6 @@ export default function* rootSaga() {
     pagesWatcher(),
     ordersWatcher(),
     warehouseWatcher(),
+    usersInfoWatcher(),
   ]);
 }

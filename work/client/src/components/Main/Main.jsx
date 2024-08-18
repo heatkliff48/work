@@ -20,6 +20,7 @@ function Main() {
       <button onClick={() => navigate('/orders')}>Orders</button>
       <button onClick={() => navigate('/clients')}>Clients</button>
       <button onClick={() => navigate('/warehouse')}>Warehouse</button>
+      <button onClick={() => navigate('/users_info')}>Users Info</button>
     </div>
   );
 }

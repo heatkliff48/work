@@ -13,6 +13,7 @@ import { pagesReducer } from './pagesReducer';
 import { ordersReducer } from './orderReducer';
 import { productsOfOrdersReducer } from './productsOfOrdersReducer';
 import { warehouseReducer } from './warehouseReducer';
+import { usersInfoReducer, usersMainInfoReducer } from './usersInfoReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -27,4 +28,6 @@ export const rootReducer = combineReducers({
   orders: ordersReducer,
   productsOfOrders: productsOfOrdersReducer,
   warehouse: warehouseReducer,
+  usersInfo: usersInfoReducer,
+  usersMainInfo: usersMainInfoReducer,
 });

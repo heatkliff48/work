@@ -11,6 +11,8 @@ const initState = {
   orders: [],
   productsOfOrders: [],
   warehouse: [],
+  usersInfo: [],
+  usersMainInfo: [],
 };
 
 export default initState;
