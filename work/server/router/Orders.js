@@ -5,6 +5,7 @@ const router = Router();
 
 router.get('/', OrdersController.getOrdersList);
 router.post('/add', OrdersController.addNewOrder);
+router.post('/date', OrdersController.addShippingDateOrder);
 router.post('/products', OrdersController.getProductsOfOrder);
 router.post('/delete', OrdersController.getDeleteOrder);
 router.post('/delete/product', OrdersController.getDeleteProductOfOrder);

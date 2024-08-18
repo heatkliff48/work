@@ -6,6 +6,7 @@ class OrdersRepository {
     const orders = await Orders.findAll();
     return orders;
   }
+
   static async addNewOrderData({ article, del_adr_id, contact_id, owner, status }) {
     const order = await Orders.create({
       article,
@@ -16,6 +17,17 @@ class OrdersRepository {
     });
 
     return order;
+  }
+
+  static async addShippingDateOrder({ order_id, shipping_date }) {
+    const order = await Orders.update(
+      {
+        shipping_date,
+      },
+      { where: { id: order_id } }
+    );
+
+    return;
   }
 
   static async getProductsOfOrder({ order_id }) {
@@ -52,7 +64,6 @@ class OrdersRepository {
   }
 
   static async getUpdateProductInfoOfOrder(productOfOrder) {
-    console.log('>>>>>>>>>>>>productOfOrder', productOfOrder);
     const {
       product_id,
       order_id,

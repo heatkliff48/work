@@ -63,6 +63,26 @@ class OrdersService {
     };
   }
 
+  static async addShippingDateOrder({ id, username, email, fingerprint, date }) {
+    await OrdersRepository.addShippingDateOrder(date);
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
   static async getProductsOfOrder({ id, username, email, fingerprint, order_id }) {
     const product_list = await OrdersRepository.getProductsOfOrder({
       order_id,

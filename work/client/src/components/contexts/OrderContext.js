@@ -144,6 +144,7 @@ const OrderContextProvider = ({ children }) => {
         owner: client,
         deliveryAddress,
         contactInfo,
+        shipping_date: order?.shipping_date,
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));

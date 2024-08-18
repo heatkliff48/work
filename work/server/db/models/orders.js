@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       del_adr_id: DataTypes.INTEGER,
       contact_id: DataTypes.INTEGER,
       status: DataTypes.STRING,
+      shipping_date: DataTypes.STRING,
     },
     {
       sequelize,
