@@ -5,8 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
 import './styles.css';
 
-// import ClientsAddress from '../ClientsAddress/ClientsAddress';
-// import ShowClientsEditModal from './ClientsInfoEditModal';
+import ShowPasswordChangeModal from './userPasswordChangeModal';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -55,7 +54,7 @@ function UsersInfoFullModal({ show, onHide }) {
                   className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
                   for="inline-full-client"
                 >
-                  {currentUsersInfo?.fullName}
+                  {currentUsersInfo?.fullName}'s user card
                 </h3>
                 <p>Username:{currentUsersInfo?.username}</p>
                 <p>Email:{currentUsersInfo?.email}</p>
@@ -70,12 +69,12 @@ function UsersInfoFullModal({ show, onHide }) {
           </form>
 
           <Row>
-            {/* <Col xs={12} md={8}>
-              <ClientsAddress />
+            <Col xs={12} md={8}>
+              {/* <ClientsAddress /> */}
             </Col>
             <Col xs={6} md={4}>
-              <ShowClientsEditModal />
-            </Col> */}
+              <ShowPasswordChangeModal />
+            </Col>
           </Row>
         </Container>
       </Modal.Body>

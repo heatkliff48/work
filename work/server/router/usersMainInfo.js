@@ -4,6 +4,7 @@ const TokenService = require('../services/Token.js');
 const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
+const bcrypt = require('bcryptjs');
 
 usersMainInfoRouter.get('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
@@ -44,10 +45,12 @@ usersMainInfoRouter.post('/', async (req, res) => {
   try {
     const { u_username, u_email, password, role } = req.body.usersMainInfo;
 
+    const hashedPassword = bcrypt.hashSync(password, 8);
+
     const usersMainInfo = await Users.create({
       username: u_username,
       email: u_email,
-      password,
+      password: hashedPassword,
       role,
     });
 
@@ -79,16 +82,15 @@ usersMainInfoRouter.post('/update/:u_id', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
   const { id, username, email } = req.user;
 
-  const { u_id, u_username, u_email, password, role } = req.body.usersMainInfo;
+  const { u_id, password } = req.body.usersMainInfo;
+
+  const hashedPassword = bcrypt.hashSync(password, 8);
 
   try {
     //const {c_id} = req.params;
     const usersMainInfo = await Users.update(
       {
-        username: u_username,
-        email: u_email,
-        password,
-        role,
+        password: hashedPassword,
       },
       {
         where: {

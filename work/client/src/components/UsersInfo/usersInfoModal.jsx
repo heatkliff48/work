@@ -28,6 +28,29 @@ function UsersInfoModal(props) {
     { value: 'peplex', label: 'Peplex' },
   ];
 
+  const roleOptions = [
+    { value: 1, label: 'Production Manager' },
+    { value: 2, label: 'Head of Sales Department' },
+    { value: 3, label: 'System administrator' },
+    { value: 4, label: 'Chief technologist' },
+    { value: 5, label: 'Mill operators' },
+    { value: 6, label: 'Casting operators' },
+    { value: 7, label: 'Cutting operators' },
+    { value: 8, label: 'Green array operators' },
+    { value: 9, label: 'Autoclave operators' },
+    { value: 10, label: 'White array operators' },
+    { value: 11, label: 'Packaging operators' },
+    { value: 12, label: 'Quality manager' },
+    { value: 13, label: 'Production director' },
+    { value: 14, label: 'Mechanical-electrical technicians' },
+    { value: 15, label: 'Forklift drivers' },
+    { value: 16, label: 'Sales department director' },
+    { value: 17, label: 'Sales department manager' },
+    { value: 18, label: 'Warehouse department director' },
+    { value: 19, label: 'Warehouse department manager' },
+    { value: 20, label: 'Accountant' },
+  ];
+
   const dispatch = useDispatch();
 
   const handleUsersInfoInputChange = useCallback((e) => {
@@ -45,13 +68,28 @@ function UsersInfoModal(props) {
     setUsersInfoInput((prev) => ({ ...prev, phone: phone_number }));
   }, []);
 
-  const handleSelectChange = (selectedOption, key) => {
+  const handleSelectGroupChange = (selectedOption, key) => {
     // setValue(selectedOption.value);
     setUsersInfoInput((prev) => ({ ...prev, [key]: selectedOption.value }));
   };
 
-  const getSelectedOption = (accessor) => {
+  const handleSelectRoleChange = (selectedOption, key) => {
+    // setValue(selectedOption.value);
+    setUsersMainInfoInput((prev) => ({ ...prev, [key]: selectedOption.value }));
+  };
+
+  const getSelectedGroupOption = (accessor) => {
     const options = groupOptions;
+    if (!options) return null;
+    const groupOption = options.find(
+      (option) => option.value === usersInfoInput?.[accessor]
+    );
+    // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
+    return groupOption || options[0];
+  };
+
+  const getSelectedRoleOption = (accessor) => {
+    const options = roleOptions;
     if (!options) return null;
     const groupOption = options.find(
       (option) => option.value === usersInfoInput?.[accessor]
@@ -62,6 +100,7 @@ function UsersInfoModal(props) {
 
   useEffect(() => {
     setUsersInfoInput((prev) => ({ ...prev, group: groupOptions[0].value }));
+    setUsersMainInfoInput((prev) => ({ ...prev, role: roleOptions[0].value }));
   }, [props.show]);
 
   const onSubmitForm = async (e) => {
@@ -109,14 +148,33 @@ function UsersInfoModal(props) {
                       </label>
                     </div>
                     <div className="md:w-2/3">
-                      <input
-                        className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                        id={el.accessor}
-                        name={el.accessor}
-                        type="text"
-                        value={usersMainInfoInput[el.accessor] || ''}
-                        onChange={(e) => handleUsersMainInfoInputChange(e)}
-                      />
+                      {el.accessor === 'password' ? (
+                        <input
+                          className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                          id={el.accessor}
+                          name={el.accessor}
+                          type="password"
+                          value={usersMainInfoInput[el.accessor] || ''}
+                          onChange={(e) => handleUsersMainInfoInputChange(e)}
+                        />
+                      ) : el.accessor === 'role' ? (
+                        <Select
+                          defaultValue={getSelectedRoleOption(el.accessor)}
+                          onChange={(v) => {
+                            handleSelectRoleChange(v, el.accessor);
+                          }}
+                          options={groupOptions}
+                        />
+                      ) : (
+                        <input
+                          className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                          id={el.accessor}
+                          name={el.accessor}
+                          type="text"
+                          value={usersMainInfoInput[el.accessor] || ''}
+                          onChange={(e) => handleUsersMainInfoInputChange(e)}
+                        />
+                      )}
                     </div>
                   </div>
                 </Col>
@@ -143,9 +201,9 @@ function UsersInfoModal(props) {
                     />
                   ) : el.accessor === 'group' ? (
                     <Select
-                      defaultValue={getSelectedOption(el.accessor)}
+                      defaultValue={getSelectedGroupOption(el.accessor)}
                       onChange={(v) => {
-                        handleSelectChange(v, el.accessor);
+                        handleSelectGroupChange(v, el.accessor);
                       }}
                       options={groupOptions}
                     />
