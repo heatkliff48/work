@@ -366,6 +366,23 @@ const ProjectContextProvider = ({ children }) => {
     },
   ];
 
+  const production_batch_log = [
+    {
+      Header: 'Article of product',
+      accessor: 'products_article',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Article of an order',
+      accessor: 'orders_article',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Production date',
+      accessor: 'production_date',
+    },
+  ];
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -391,6 +408,7 @@ const ProjectContextProvider = ({ children }) => {
   const [currentContact, setCurrentContact] = useState();
   const [currentUsersInfo, setCurrentUsersInfo] = useState({});
   const [usersInfoDataList, setUsersInfoDataList] = useState([]);
+  const [productionBatchLogData, setProductionBatchLogData] = useState([]);
 
   const roleTable = [
     { id: 1, role_name: 'Production Manager' },
@@ -506,6 +524,9 @@ const ProjectContextProvider = ({ children }) => {
         setUsersInfoDataList,
         users_main_info_table,
         users_additional_info_table,
+        production_batch_log,
+        productionBatchLogData,
+        setProductionBatchLogData,
       }}
     >
       {children}

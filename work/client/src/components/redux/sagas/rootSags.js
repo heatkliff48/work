@@ -7,6 +7,7 @@ import pagesWatcher from './pagesSagas';
 import ordersWatcher from './ordersSagas';
 import warehouseWatcher from './warehouseSagas';
 import usersInfoWatcher from './usersInfoSagas';
+import productionBatchLogWatcher from './productionBatchLogSagas';
 
 export default function* rootSaga() {
   yield all([
@@ -18,5 +19,6 @@ export default function* rootSaga() {
     ordersWatcher(),
     warehouseWatcher(),
     usersInfoWatcher(),
+    productionBatchLogWatcher(),
   ]);
 }

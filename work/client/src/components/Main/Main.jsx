@@ -21,6 +21,9 @@ function Main() {
       <button onClick={() => navigate('/clients')}>Clients</button>
       <button onClick={() => navigate('/warehouse')}>Warehouse</button>
       <button onClick={() => navigate('/users_info')}>Users Info</button>
+      <button onClick={() => navigate('/production_batch_log')}>
+        Production Batch Log
+      </button>
     </div>
   );
 }

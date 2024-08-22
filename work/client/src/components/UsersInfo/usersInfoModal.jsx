@@ -224,7 +224,9 @@ function UsersInfoModal(props) {
         </Container>
       </Modal.Body>
       <Modal.Footer>
-        <button form="addClientModel">Add Client</button>
+        <Button form="addClientModel" type="submit">
+          Add Client
+        </Button>
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>

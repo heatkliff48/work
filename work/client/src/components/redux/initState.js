@@ -13,6 +13,7 @@ const initState = {
   warehouse: [],
   usersInfo: [],
   usersMainInfo: [],
+  productionBatchLog: [],
 };
 
 export default initState;
