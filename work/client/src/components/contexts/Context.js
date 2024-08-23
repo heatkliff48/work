@@ -311,8 +311,8 @@ const ProjectContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Group',
-      accessor: 'group',
+      Header: 'Role',
+      accessor: 'role',
       Filter: DropdownFilter,
     },
   ];
@@ -342,11 +342,6 @@ const ProjectContextProvider = ({ children }) => {
     {
       Header: 'Full Name',
       accessor: 'fullName',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Group',
-      accessor: 'group',
       Filter: TextSearchFilter,
     },
     {

@@ -7,34 +7,31 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       fullName: {
-        type: Sequelize.STRING
-      },
-      group: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       shift: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       subdivision: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       phone: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('UsersInfos');
-  }
+  },
 };

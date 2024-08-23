@@ -58,9 +58,7 @@ function UsersInfoFullModal({ show, onHide }) {
                 </h3>
                 <p>Username:{currentUsersInfo?.username}</p>
                 <p>Email:{currentUsersInfo?.email}</p>
-                <p>Password:{currentUsersInfo?.password}</p>
                 <p>Role:{currentUsersInfo?.role}</p>
-                <p>Group:{currentUsersInfo?.group}</p>
                 <p>Shift:{currentUsersInfo?.shift}</p>
                 <p>Subdivision:{currentUsersInfo?.subdivision}</p>
                 <p>Work phone:{currentUsersInfo?.phone}</p>
@@ -69,9 +67,7 @@ function UsersInfoFullModal({ show, onHide }) {
           </form>
 
           <Row>
-            <Col xs={12} md={8}>
-              {/* <ClientsAddress /> */}
-            </Col>
+            <Col xs={12} md={8}></Col>
             <Col xs={6} md={4}>
               <ShowPasswordChangeModal />
             </Col>

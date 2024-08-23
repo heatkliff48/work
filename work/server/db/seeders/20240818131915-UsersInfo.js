@@ -7,9 +7,8 @@ module.exports = {
       'UsersInfos',
       [
         {
-          fullName: 'John Doe',
-          group: 'Admin',
-          shift: 'Early',
+          fullName: 'Admin',
+          shift: 'None',
           subdivision: 'Subdivision',
           phone: '123321',
           createdAt: new Date(),

@@ -1,12 +1,8 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useState } from 'react';
-import { PhoneInput } from 'react-international-phone';
+import React, { useState } from 'react';
 import 'react-international-phone/style.css';
-import Select from 'react-select';
 import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import { useDispatch } from 'react-redux';
 import { updateUsersMainInfo } from '#components/redux/actions/usersInfoAction';
 import './styles.css';
@@ -21,13 +17,6 @@ function PasswordChangeModal(props) {
   const [valid, setValid] = useState(isValid(usersInfoInput?.zip_code));
   const [passwordInput, setPasswordInput] = useState('');
 
-  const handleUsersMainInfoInputChange = useCallback((e) => {
-    setPasswordInput((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  }, []);
-
   const dispatch = useDispatch();
 
   const onSubmitForm = async (e) => {
@@ -41,7 +30,6 @@ function PasswordChangeModal(props) {
     };
     console.log('curr user info', usersMainInfo);
     dispatch(updateUsersMainInfo({ usersMainInfo }));
-    // setModalShow(false);
     props.onHide();
     setUsersMainInfoInput(currentUsersInfo);
   };

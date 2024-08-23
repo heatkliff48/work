@@ -14,25 +14,6 @@ function ProductionBatchLog() {
 
   useEffect(() => {
     if (productionBatchLog) {
-      // !!!!!!!!!!!!!!!!!!!!!!!!!
-      // const newArray = productionBatchLog.map((logs) => {
-      //   const { id, article, status, shipping_date } = order;
-      //   const client = clients.find((client) => client.id === order.owner);
-      //   const deliveryAddress = deliveryAddresses.find(
-      //     (address) =>
-      //       address.id === order.del_adr_id && address.client_id === order.owner
-      //   );
-
-      //   return {
-      //     id,
-      //     article,
-      //     status,
-      //     owner: client ? client.c_name : '',
-      //     del_adr_id: deliveryAddress ? deliveryAddress.street : '',
-      //     shipping_date,
-      //   };
-      // });
-
       setProductionBatchLogData(productionBatchLog);
     }
   }, [productionBatchLog]);

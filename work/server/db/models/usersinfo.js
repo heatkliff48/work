@@ -17,9 +17,6 @@ module.exports = (sequelize, DataTypes) => {
       fullName: {
         type: DataTypes.STRING,
       },
-      group: {
-        type: DataTypes.STRING,
-      },
       shift: {
         type: DataTypes.STRING,
       },

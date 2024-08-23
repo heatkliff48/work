@@ -20,12 +20,12 @@ function UsersInfoModal(props) {
   const [usersInfoInput, setUsersInfoInput] = useState({});
   const [usersMainInfoInput, setUsersMainInfoInput] = useState({});
   const regexp = new RegExp(`^[0-9]*$`);
-  const isValid = (value) => value !== '' && value !== '-';
-  const [valid, setValid] = useState(isValid(usersInfoInput?.zip_code));
 
-  const groupOptions = [
-    { value: 'memblex', label: 'Memblex' },
-    { value: 'peplex', label: 'Peplex' },
+  const shiftOptions = [
+    { value: 'None', label: 'None' },
+    { value: 'A', label: 'A' },
+    { value: 'A', label: 'B' },
+    { value: 'C', label: 'C' },
   ];
 
   const roleOptions = [
@@ -68,18 +68,16 @@ function UsersInfoModal(props) {
     setUsersInfoInput((prev) => ({ ...prev, phone: phone_number }));
   }, []);
 
-  const handleSelectGroupChange = (selectedOption, key) => {
-    // setValue(selectedOption.value);
+  const handleSelectShiftChange = (selectedOption, key) => {
     setUsersInfoInput((prev) => ({ ...prev, [key]: selectedOption.value }));
   };
 
   const handleSelectRoleChange = (selectedOption, key) => {
-    // setValue(selectedOption.value);
     setUsersMainInfoInput((prev) => ({ ...prev, [key]: selectedOption.value }));
   };
 
-  const getSelectedGroupOption = (accessor) => {
-    const options = groupOptions;
+  const getSelectedShiftOption = (accessor) => {
+    const options = shiftOptions;
     if (!options) return null;
     const groupOption = options.find(
       (option) => option.value === usersInfoInput?.[accessor]
@@ -99,7 +97,7 @@ function UsersInfoModal(props) {
   };
 
   useEffect(() => {
-    setUsersInfoInput((prev) => ({ ...prev, group: groupOptions[0].value }));
+    setUsersInfoInput((prev) => ({ ...prev, shift: shiftOptions[0].value }));
     setUsersMainInfoInput((prev) => ({ ...prev, role: roleOptions[0].value }));
   }, [props.show]);
 
@@ -163,7 +161,7 @@ function UsersInfoModal(props) {
                           onChange={(v) => {
                             handleSelectRoleChange(v, el.accessor);
                           }}
-                          options={groupOptions}
+                          options={roleOptions}
                         />
                       ) : (
                         <input
@@ -199,13 +197,13 @@ function UsersInfoModal(props) {
                       value={usersInfoInput[el.accessor] || ''}
                       onChange={(phone) => handleUsersPhoneInput(phone)}
                     />
-                  ) : el.accessor === 'group' ? (
+                  ) : el.accessor === 'shift' ? (
                     <Select
-                      defaultValue={getSelectedGroupOption(el.accessor)}
+                      defaultValue={getSelectedShiftOption(el.accessor)}
                       onChange={(v) => {
-                        handleSelectGroupChange(v, el.accessor);
+                        handleSelectShiftChange(v, el.accessor);
                       }}
-                      options={groupOptions}
+                      options={shiftOptions}
                     />
                   ) : (
                     <input
