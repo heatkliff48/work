@@ -16,6 +16,8 @@ import OrdersTable from '#components/Orders/OrdersTable.jsx';
 import MainContextProvider from '#components/contexts/MainContex.js';
 import OrderCart from '#components/Orders/OrderCart.jsx';
 import Warehouse from '#components/Warehouse/Warehouse.jsx';
+import UsersInfo from '#components/UsersInfo/usersInfo.jsx';
+import ProductionBatchLog from '#components/ProductionBatchLog/ProductionBatchLog.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -66,6 +68,8 @@ function App() {
           <Route path="/orders" element={<OrdersTable />} />
           <Route path="/order_card" element={<OrderCart />} />
           <Route path="/warehouse" element={<Warehouse />} />
+          <Route path="/users_info" element={<UsersInfo />} />
+          <Route path="/production_batch_log" element={<ProductionBatchLog />} />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>

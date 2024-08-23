@@ -11,6 +11,9 @@ const initState = {
   orders: [],
   productsOfOrders: [],
   warehouse: [],
+  usersInfo: [],
+  usersMainInfo: [],
+  productionBatchLog: [],
 };
 
 export default initState;

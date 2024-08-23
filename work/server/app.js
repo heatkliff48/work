@@ -14,6 +14,9 @@ const clientsAddress = require('./router/clientsAddress');
 const deliveryAddress = require('./router/deliveryAddress');
 const clientsContactInfo = require('./router/clientsContactInfo');
 const WarehouseRootRouter = require('./router/Warehouse.js');
+const usersInfoRouter = require('./router/usersInfo.js');
+const usersMainInfoRouter = require('./router/usersMainInfo.js');
+const productionBatchLogRouter = require('./router/productionBatchLog.js');
 
 const PORT = 3001;
 
@@ -44,6 +47,9 @@ app.use('/clientsAddress', TokenService.checkAccess, clientsAddress);
 app.use('/deliveryAddress', TokenService.checkAccess, deliveryAddress);
 app.use('/clientsContactInfo', TokenService.checkAccess, clientsContactInfo);
 app.use('/warehouse', TokenService.checkAccess, WarehouseRootRouter);
+app.use('/usersInfo', TokenService.checkAccess, usersInfoRouter);
+app.use('/usersMainInfo', TokenService.checkAccess, usersMainInfoRouter);
+app.use('/productionBatchLog', TokenService.checkAccess, productionBatchLogRouter);
 
 const start = async () => {
   try {
