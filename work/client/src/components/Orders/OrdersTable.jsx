@@ -22,42 +22,29 @@ function OrdersTable() {
     ordersDataList,
     setOrdersDataList,
   } = useOrderContext();
-  const { setCurrentClient } = useProjectContext();
+
+  const { setCurrentClient, roles, checkUserAccess, userAccess, setUserAccess } =
+    useProjectContext();
+
   const orders = useSelector((state) => state.orders);
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
 
   const dispatch = useDispatch();
 
-  // const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user);
   const navigate = useNavigate();
 
-  // const handleRowClick = (row) => {
-  //   if (userAccess.canRead) {
-  //     setProductCardData(row.original);
-  //     setModalProductCard(!modalProductCard);
-  //   }
-  // };
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Orders');
+      setUserAccess(access);
 
-  // useEffect(() => {
-  //   if (userAccess.canRead) {
-  //   }
-  // }, [userAccess.canRead]);
-
-  // useEffect(() => {
-  //   if (user && roles.length > 0) {
-  //     const access = checkUserAccess(user, roles, 'Products');
-  //     setUserAccess(access);
-
-  //     if (!access.canRead) {
-  //       navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
-  //     }
-  //   }
-  // }, [user, roles]);
-
-  // if (!userAccess.canRead) {
-  //   return <div>У вас нет прав для просмотра этой страницы.</div>;
-  // }
+      if (!access.canRead) {
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+      }
+    }
+  }, [user, roles]);
 
   useEffect(() => {
     if (orders && clients && deliveryAddresses) {
@@ -105,7 +92,7 @@ function OrdersTable() {
       <Table
         COLUMN_DATA={COLUMNS_ORDERS}
         dataOfTable={ordersDataList}
-        // userAccess={userAccess}
+        userAccess={userAccess}
         onClickButton={() => {
           setClientModalOrder(!clientModalOrder);
         }}

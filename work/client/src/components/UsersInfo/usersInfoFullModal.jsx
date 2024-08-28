@@ -13,7 +13,16 @@ import { useSelector } from 'react-redux';
 function UsersInfoFullModal({ show, onHide }) {
   const usersInfo = useSelector((state) => state.usersInfo);
   const usersMainInfo = useSelector((state) => state.usersMainInfo);
-  const { currentUsersInfo, setCurrentUsersInfo } = useProjectContext();
+  const {
+    currentUsersInfo,
+    setCurrentUsersInfo,
+    roles,
+    checkUserAccess,
+    userAccess,
+    setUserAccess,
+  } = useProjectContext();
+
+  const user = useSelector((state) => state.user);
 
   const combine = (a, b, prop) =>
     Object.values(
@@ -32,6 +41,13 @@ function UsersInfoFullModal({ show, onHide }) {
     const user = combined.filter((el) => el.id === currentUsersInfo.id)[0];
     setCurrentUsersInfo(user);
   }, [usersMainInfo, usersInfo]);
+
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Clients');
+      setUserAccess(access);
+    }
+  }, [user, roles]);
 
   return (
     <Modal
@@ -69,7 +85,7 @@ function UsersInfoFullModal({ show, onHide }) {
           <Row>
             <Col xs={12} md={8}></Col>
             <Col xs={6} md={4}>
-              <ShowPasswordChangeModal />
+              {userAccess.canWrite && <ShowPasswordChangeModal />}
             </Col>
           </Row>
         </Container>

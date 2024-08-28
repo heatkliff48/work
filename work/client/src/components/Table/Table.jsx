@@ -7,7 +7,7 @@ import { matchSorter } from 'match-sorter';
 function Table({
   COLUMN_DATA = [],
   dataOfTable = [],
-  // userAccess,
+  userAccess = { canRead: true, canWrite: false },
   onClickButton,
   buttonText = '',
   tableName = 'Table',
@@ -143,9 +143,9 @@ function Table({
             })}
           </tbody>
         </table>
-        {/* {userAccess.canWrite && ( */}
-        {!haveButton && <button onClick={onClickButton}>{buttonText}</button>}
-        {/* )} */}
+        {userAccess.canWrite && !haveButton && (
+          <button onClick={onClickButton}>{buttonText}</button>
+        )}
       </div>
     </>
   );

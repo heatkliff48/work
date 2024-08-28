@@ -35,7 +35,8 @@ const OrderCart = React.memo(() => {
     setProductInfoModalOrder,
   } = useOrderContext();
   const { displayNames } = useProjectContext();
-  const { latestProducts } = useProjectContext();
+  const { latestProducts, roles, checkUserAccess, userAccess, setUserAccess } =
+    useProjectContext();
 
   const productListOrder = useSelector((state) => state.productsOfOrders);
 
@@ -49,8 +50,13 @@ const OrderCart = React.memo(() => {
     vat_result: 0,
   });
 
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [orderStatusAccess, setOrderStatusAccess] = useState({
+    canRead: true,
+    canWrite: false,
+  });
 
   const filterKeys = useMemo(
     () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
@@ -210,6 +216,20 @@ const OrderCart = React.memo(() => {
   //   };
   // }, [orderCartData, updatedProductListOrder, displayNames, filterKeys]);
 
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Orders');
+      setUserAccess(access);
+
+      const statusAccess = checkUserAccess(user, roles, 'Orders_status');
+      setOrderStatusAccess(statusAccess);
+
+      if (!access.canRead) {
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+      }
+    }
+  }, [user, roles]);
+
   return (
     <>
       {productInfoModalOrder && (
@@ -238,21 +258,23 @@ const OrderCart = React.memo(() => {
               <h4>Contact Person</h4>
               {filterAndMapData(orderCartData?.contactInfo, filterKeys)}
             </div>
-            <ShowOrderContactEditModal />
+            {userAccess.canWrite && <ShowOrderContactEditModal />}
           </div>
-          <Button
-            onClick={() => {
-              dispatch(deleteOrder(orderCartData?.id));
-              navigate('/orders');
-            }}
-          >
-            Delete Order
-          </Button>
+          {userAccess.canWrite && (
+            <Button
+              onClick={() => {
+                dispatch(deleteOrder(orderCartData?.id));
+                navigate('/orders');
+              }}
+            >
+              Delete Order
+            </Button>
+          )}
         </div>
         <div className="delivery-address">
           <h4>Delivery Address</h4>
           {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
-          <ShowOrderDeliveryEditModal />
+          {userAccess.canWrite && <ShowOrderDeliveryEditModal />}
         </div>
         <table className="product-table">
           <thead>
@@ -278,20 +300,22 @@ const OrderCart = React.memo(() => {
                 </td>
               </tr>
             ))}
-            <Button
-              onClick={() => {
-                setNewOrder((prev) => ({
-                  ...prev,
-                  article: orderCartData.article,
-                  owner: orderCartData.owner.id,
-                  status: orderCartData.status,
-                  del_adr_id: orderCartData.deliveryAddress.id,
-                }));
-                setProductModalOrder(!productModalOrder);
-              }}
-            >
-              Add product
-            </Button>
+            {userAccess.canWrite && (
+              <Button
+                onClick={() => {
+                  setNewOrder((prev) => ({
+                    ...prev,
+                    article: orderCartData.article,
+                    owner: orderCartData.owner.id,
+                    status: orderCartData.status,
+                    del_adr_id: orderCartData.deliveryAddress.id,
+                  }));
+                  setProductModalOrder(!productModalOrder);
+                }}
+              >
+                Add product
+              </Button>
+            )}
           </tbody>
         </table>
         <div className="footer_data">
@@ -337,41 +361,44 @@ const OrderCart = React.memo(() => {
               )}
             </div>
           </div>
-          <div className="status-table">
-            {status_list.map((item) => (
-              <div key={item.accessor} className="status-row">
-                <div className="header">{item.Header}</div>
-                <input
-                  type="checkbox"
-                  checked={item.accessor === orderCartData?.status}
-                  onChange={() => {
-                    const order_id = orderCartData?.id;
-                    if (
-                      item.accessor !== status_list[0].accessor &&
-                      !selectedShippingDate
-                    ) {
-                      alert('Пожалуйста, выберите дату отправки');
-                      return;
-                    }
-                    if (item.accessor === status_list[1].accessor) {
+          {orderStatusAccess.canRead && (
+            <div className="status-table">
+              {status_list.map((item) => (
+                <div key={item.accessor} className="status-row">
+                  <div className="header">{item.Header}</div>
+                  <input
+                    type="checkbox"
+                    disabled={!orderStatusAccess.canWrite}
+                    checked={item.accessor === orderCartData?.status}
+                    onChange={() => {
+                      const order_id = orderCartData?.id;
+                      if (
+                        item.accessor !== status_list[0].accessor &&
+                        !selectedShippingDate
+                      ) {
+                        alert('Пожалуйста, выберите дату отправки');
+                        return;
+                      }
+                      if (item.accessor === status_list[1].accessor) {
+                        dispatch(
+                          addDataShipOrder({
+                            order_id,
+                            shipping_date: formatDataValue,
+                          })
+                        );
+                      }
                       dispatch(
-                        addDataShipOrder({
+                        updateOrderStatus({
                           order_id,
-                          shipping_date: formatDataValue,
+                          status: item.accessor,
                         })
                       );
-                    }
-                    dispatch(
-                      updateOrderStatus({
-                        order_id,
-                        status: item.accessor,
-                      })
-                    );
-                  }}
-                />
-              </div>
-            ))}
-          </div>
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>

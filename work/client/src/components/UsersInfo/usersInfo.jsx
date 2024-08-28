@@ -18,8 +18,13 @@ const UsersInfo = () => {
     users_info_table,
     usersInfoDataList,
     setUsersInfoDataList,
+    roles,
+    checkUserAccess,
+    userAccess,
+    setUserAccess,
   } = useProjectContext();
 
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const usersInfo = useSelector((state) => state.usersInfo);
   const usersMainInfo = useSelector((state) => state.usersMainInfo);
@@ -49,13 +54,21 @@ const UsersInfo = () => {
     setUsersInfoDataList(combined);
   }, [usersInfo, usersMainInfo]);
 
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Users_info');
+      setUserAccess(access);
+    }
+  }, [user, roles]);
+
   return (
     <Fragment>
       {' '}
-      <ShowUsersInfoModal />
+      {userAccess.canWrite && <ShowUsersInfoModal />}
       <Table
         COLUMN_DATA={users_info_table}
         dataOfTable={usersInfoDataList}
+        userAccess={userAccess}
         tableName={'Users'}
         handleRowClick={(row) => {
           clientHandler(row.original.id);

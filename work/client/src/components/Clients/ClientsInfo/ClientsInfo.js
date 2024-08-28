@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState, createContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import MydModalWithGrid from './ClientFullModal.js';
 import ShowClientsModal from './ClientsInfoModal.js';
 import { getAllClients } from '#components/redux/actions/clientAction';
@@ -20,32 +21,31 @@ const ClientsInfo = () => {
     clients_info_table,
     clientsDataList,
     setClientsDataList,
+    roles,
+    checkUserAccess,
+    userAccess,
+    setUserAccess,
   } = useProjectContext();
 
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const clients = useSelector((state) => state.clients);
 
   const [searchFilter, setSearchFilter] = useState('');
-  const [listOfClientsFiltered, setListOfClientsFiltered] = useState(clients);
 
   useEffect(() => {
-    dispatch(getAllClients());
-    dispatch(getAllDeliveryAddresses());
-    dispatch(getAllContactInfo());
-  }, []);
+    if (userAccess.canRead) {
+      dispatch(getAllClients());
+      dispatch(getAllDeliveryAddresses());
+      dispatch(getAllContactInfo());
+    }
+  }, [userAccess.canRead]);
 
   const clientHandler = (id) => {
     const client = clients.find((el) => el.id === id);
     setCurrentClient(client);
     setModalShow(true);
-  };
-
-  const filterListOfClientsHandler = (e) => {
-    setSearchFilter(e.target.value);
-    let filtered = clients.filter((el) =>
-      el.c_name?.toLowerCase().includes(e.target.value.toLowerCase())
-    );
-    setListOfClientsFiltered(filtered);
   };
 
   useEffect(() => {
@@ -55,66 +55,31 @@ const ClientsInfo = () => {
     setClientsDataList(filtered);
   }, [clients]);
 
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Clients');
+      setUserAccess(access);
+
+      if (!access.canRead) {
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+      }
+    }
+  }, [user, roles]);
+
   return (
     <Fragment>
       {' '}
-      {/* <ClientContext.Provider value={[currentClient, setCurrentClient]}> */}
-      <ShowClientsModal />
+      {userAccess.canWrite && <ShowClientsModal />}
       <Table
         COLUMN_DATA={clients_info_table}
         dataOfTable={clientsDataList}
-        // userAccess={userAccess}
-        // onClickButton={() => {
-        //   setClientModalOrder(!clientModalOrder);
-        // }}
-        // buttonText={'Add new order'}
         tableName={'Clients'}
+        userAccess={userAccess}
         handleRowClick={(row) => {
           clientHandler(row.original.id);
         }}
       />
-      {/* <div>
-        <h4>Search clients</h4>
-        <input
-          value={searchFilter}
-          onChange={(e) => {
-            filterListOfClientsHandler(e);
-          }}
-        />
-      </div>
-      <table
-        className="table mt-5 table-bordered text-center table-striped table-hover"
-        align="left"
-      >
-        <thead>
-          <tr>
-            <th>id</th>
-            <th>c_name</th>
-            <th>tin</th>
-            <th>category</th>
-          </tr>
-        </thead>
-        <tbody>
-          {listOfClientsFiltered?.map((entrie) => {
-            if (!entrie) return;
-            return (
-              <tr
-                key={entrie.id}
-                onClick={(e) => {
-                  clientHandler(entrie.id);
-                }}
-              >
-                <td>{entrie?.id}</td>
-                <td>{entrie?.c_name}</td>
-                <td>{entrie?.tin}</td>
-                <td>{entrie?.category}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table> */}
       <MydModalWithGrid show={modalShow} onHide={() => setModalShow(false)} />
-      {/* </ClientContext.Provider> */}
     </Fragment>
   );
 };

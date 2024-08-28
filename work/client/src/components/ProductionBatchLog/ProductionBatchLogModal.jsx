@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Container from 'react-bootstrap/Container';
@@ -7,17 +7,25 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 import Table from '#components/Table/Table.jsx';
 import { addNewProductionBatchLog } from '#components/redux/actions/productionBatchLogAction.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 // import { registerLocale, setDefaultLocale } from 'react-datepicker';
 // import { es } from 'date-fns/locale/es';
 // registerLocale('es', es);
 
 function AddProductToProductionBatchLogModal(props) {
-  const { COLUMNS, latestProducts } = useProjectContext();
+  const {
+    COLUMNS,
+    latestProducts,
+    roles,
+    checkUserAccess,
+    userAccess,
+    setUserAccess,
+  } = useProjectContext();
 
   const [selectedProduct, setSelectedProduct] = useState({});
   const [startDate, setStartDate] = useState(new Date());
 
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handlerAddProductToBatchLog = (row) => {
@@ -44,6 +52,13 @@ function AddProductToProductionBatchLogModal(props) {
     props.onHide();
     setSelectedProduct({});
   };
+
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Production_batch_log');
+      setUserAccess(access);
+    }
+  }, [user, roles]);
 
   return (
     <Modal
@@ -77,6 +92,7 @@ function AddProductToProductionBatchLogModal(props) {
             <Table
               COLUMN_DATA={COLUMNS}
               dataOfTable={latestProducts}
+              userAccess={userAccess}
               tableName={'Production Batch Logs'}
               handleRowClick={(row) => {
                 handlerAddProductToBatchLog(row);
