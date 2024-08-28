@@ -75,6 +75,7 @@ class WarehouseService {
     fingerprint,
     upd_rem_srock,
   }) {
+
     await WarehouseRepository.updateRemainingStock(upd_rem_srock);
     const payload = { id, username, email };
 
@@ -101,7 +102,9 @@ class WarehouseService {
     fingerprint,
     reserved_product,
   }) {
-    await WarehouseRepository.addNewReservedProducts(reserved_product);
+    const new_reserved_product = await WarehouseRepository.addNewReservedProducts(
+      reserved_product
+    );
     const payload = { id, username, email };
 
     const accessToken = await TokenService.generateAccessToken(payload);
@@ -114,6 +117,7 @@ class WarehouseService {
     });
 
     return {
+      new_reserved_product,
       accessToken,
       refreshToken,
       accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,

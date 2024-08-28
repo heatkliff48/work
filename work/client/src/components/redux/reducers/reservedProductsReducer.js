@@ -12,7 +12,7 @@ export const reservedProductsReducer = (reservedProducts = [], action) => {
     }
 
     case NEW_RESERVED_PRODUCT: {
-      return [...reservedProducts, payload];
+      return payload;
     }
 
     case DELETE_PRODUCT_FROM_RESERVED_LIST: {
