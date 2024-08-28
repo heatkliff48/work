@@ -29,7 +29,11 @@ class WarehouseRepository {
 
   static async addNewReservedProducts(reserved_product) {
     await ReservedProducts.create(reserved_product);
-    return;
+    const new_reserved_product = await ReservedProducts.findAll({
+      attributes: ['id', 'warehouse_id', 'orders_products_id', 'quantity'],
+    });
+
+    return new_reserved_product;
   }
 
   static async deleteReservedProducts({ id }) {
