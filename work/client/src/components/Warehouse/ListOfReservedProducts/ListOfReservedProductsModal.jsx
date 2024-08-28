@@ -63,10 +63,6 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
       (el) => el?.warehouse_id == curr_warehouse.id
     );
 
-    console.log('curr_warehouse', curr_warehouse);
-    console.log('list_of_reserved_products', list_of_reserved_products);
-    console.log('curr_res_prod_list', curr_res_prod_list);
-
     setCurrentListOfResProd(curr_res_prod_list);
   }, [list_of_reserved_products]);
 
