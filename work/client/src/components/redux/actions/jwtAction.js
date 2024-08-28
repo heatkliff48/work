@@ -9,6 +9,11 @@ const url = axios.create({
 
 export const refreshToken = (expiration) => async (dispatch, getState) => {
   const timeoutTrigger = expiration - 10000;
+
+  if (refreshTimeoutId) {
+    clearTimeout(refreshTimeoutId);
+  }
+
   refreshTimeoutId = setTimeout(() => {
     url
       .post('/auth/refresh')

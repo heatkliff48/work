@@ -16,6 +16,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     list_of_orders,
     newOrder,
     selectedProduct,
+    productTable
   } = useOrderContext();
   const { COLUMNS, latestProducts } = useProjectContext();
 

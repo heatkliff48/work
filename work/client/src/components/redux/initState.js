@@ -15,6 +15,7 @@ const initState = {
   usersMainInfo: [],
   productionBatchLog: [],
   reservedProducts: [],
+  ListOfOrderedProduction: [],
 };
 
 export default initState;

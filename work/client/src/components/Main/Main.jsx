@@ -24,6 +24,9 @@ function Main() {
       <button onClick={() => navigate('/production_batch_log')}>
         Production Batch Log
       </button>
+      <button onClick={() => navigate('/list_of_ordered_production')}>
+        List of ordered production
+      </button>
     </div>
   );
 }

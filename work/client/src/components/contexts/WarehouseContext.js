@@ -28,6 +28,13 @@ const WarehouseContextProvider = ({ children }) => {
     },
   ];
 
+  const COLUMNS_LIST_OF_ORDERED_PRODUCTION = [
+    { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
+    { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
+    { Header: 'Quantity', accessor: 'quantity', sortType: 'number' },
+    { Header: 'Date of shipping', accessor: 'shipping_date', sortType: 'string' },
+  ];
+
   const dispatch = useDispatch();
 
   const [warehouseModal, setWarehouseModal] = useState(false);
@@ -36,6 +43,9 @@ const WarehouseContextProvider = ({ children }) => {
   const [warehouseInfoCurIdModal, setWarehouseInfoCurIdModal] = useState(null);
   const warehouse_data = useSelector((state) => state.warehouse);
   const list_of_reserved_products = useSelector((state) => state.reservedProducts);
+  const list_of_ordered_production = useSelector(
+    (state) => state.ListOfOrderedProduction
+  );
   const [filteredProducts, setFilteredProducts] = useState();
 
   useEffect(() => {
@@ -46,8 +56,10 @@ const WarehouseContextProvider = ({ children }) => {
     <WarehouseContext.Provider
       value={{
         COLUMNS_WAREHOUSE,
+        COLUMNS_LIST_OF_ORDERED_PRODUCTION,
         warehouse_data,
         list_of_reserved_products,
+        list_of_ordered_production,
         warehouseModal,
         setWarehouseModal,
         reserveProductModal,

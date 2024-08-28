@@ -1,6 +1,4 @@
-import {
-  getOrders,
-} from '#components/redux/actions/ordersAction.js';
+import { getOrders } from '#components/redux/actions/ordersAction.js';
 import {
   createContext,
   useCallback,
@@ -151,6 +149,7 @@ const OrderContextProvider = ({ children }) => {
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
+      console.log('currentOrder', currentOrder);
       setOrderCartData(currentOrder);
     },
     [list_of_orders, clients, deliveryAddresses]
