@@ -28,8 +28,8 @@ class WarehouseRepository {
   }
 
   static async addNewReservedProducts(reserved_product) {
-    const new_reserved_product = await ReservedProducts.create(reserved_product);
-    return new_reserved_product;
+    await ReservedProducts.create(reserved_product);
+    return;
   }
 
   static async deleteReservedProducts({ id }) {

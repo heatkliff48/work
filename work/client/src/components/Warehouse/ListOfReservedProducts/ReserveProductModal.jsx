@@ -34,6 +34,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
     );
   };
 
+
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
       <ModalHeader toggle={toggle}>Choose product</ModalHeader>
@@ -51,6 +52,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
                 key={item.order_id}
                 onClick={() => {
                   addReservedProductHandler(item);
+                  toggle();
                 }}
               >
                 <td>{item.order_article}</td>

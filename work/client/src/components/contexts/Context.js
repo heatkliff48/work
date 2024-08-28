@@ -19,6 +19,7 @@ import {
   getAllWarehouse,
   getListOfReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
+import { getProductsOfOrders } from '#components/redux/actions/ordersAction.js';
 
 const ProjectContext = createContext();
 
@@ -477,6 +478,7 @@ const ProjectContextProvider = ({ children }) => {
     dispatch(getAllRoles());
     dispatch(getAllProducts());
     dispatch(getAllWarehouse());
+    dispatch(getProductsOfOrders());
     dispatch(getListOfReservedProducts());
   }, [user, modalRoleCard]);
 

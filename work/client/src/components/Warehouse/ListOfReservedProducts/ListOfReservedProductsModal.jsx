@@ -5,7 +5,10 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import ReservedProductModal from './ReserveProductModal';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { deleteReservedProducts } from '#components/redux/actions/warehouseAction.js';
+import {
+  deleteReservedProducts,
+  updateRemainingStock,
+} from '#components/redux/actions/warehouseAction.js';
 
 const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -42,19 +45,26 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
     );
 
     const order = list_of_orders.find((el) => el.id === orderProductMark?.order_id);
+
     return order?.article;
   };
 
-  const deleteHandler = (id) => {
-    dispatch(deleteReservedProducts(id));
+  const deleteHandler = (el) => {
+    const { id, remaining_stock } = curr_warehouse;
+
+    const new_remaining_stock = remaining_stock + el.quantity;
+
+    dispatch(deleteReservedProducts(el.id));
+    dispatch(updateRemainingStock({ warehouse_id: id, new_remaining_stock }));
   };
 
   useEffect(() => {
     const curr_res_prod_list = list_of_reserved_products.filter(
-      (el) => el.warehouse_id == curr_warehouse.id
+      (el) => el?.warehouse_id == curr_warehouse.id
     );
+
     setCurrentListOfResProd(curr_res_prod_list);
-  }, []);
+  }, [list_of_reserved_products]);
 
   useEffect(() => {
     const wh = getWarehouse();
@@ -70,6 +80,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
         quantity_real: product.quantity_real,
       };
     });
+
     setFilteredProducts(result);
   }, [productsOfOrders]);
 
@@ -126,7 +137,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
                       <Button
                         color="danger"
                         onClick={() => {
-                          deleteHandler(el.id);
+                          deleteHandler(el);
                         }}
                       >
                         Удалить
