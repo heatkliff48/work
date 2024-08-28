@@ -1,33 +1,15 @@
-import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import {
   addNewReservedProducts,
   updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Modal, ModalHeader, ModalBody, Table } from 'reactstrap';
 
 const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
+  const { filteredProducts } = useWarehouseContext();
   const dispatch = useDispatch();
-
-  const { list_of_orders, productsOfOrders } = useOrderContext();
-
-  const filteredProducts = useMemo(() => {
-    const filteredProductsOfOrders = productsOfOrders.filter(
-      (item) => item.product_id === warehouse.product_id
-    );
-
-    const result = filteredProductsOfOrders.map((product) => {
-      const order = list_of_orders.find((order) => order.id === product.order_id);
-      return {
-        productsOfOrders_id: product.id,
-        order_article: order ? order.article : '',
-        quantity_real: product.quantity_real,
-      };
-    });
-
-    return result;
-  }, [productsOfOrders]);
 
   const addReservedProductHandler = (res_prod) => {
     const { quantity_real, productsOfOrders_id } = res_prod;
@@ -64,7 +46,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.map((item) => (
+            {filteredProducts?.map((item) => (
               <tr
                 key={item.order_id}
                 onClick={() => {

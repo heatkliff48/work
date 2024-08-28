@@ -40,7 +40,8 @@ function Warehouse() {
         buttonText={'Add new product on warehouse'}
         tableName={'Warehouse'}
         handleRowClick={(row) => {
-          setWarehouseInfoCurIdModal(row.original.id)
+          console.log('warehouseInfoModal', warehouseInfoModal);
+          setWarehouseInfoCurIdModal(row.original.id);
           setWarehouseInfoModal(!warehouseInfoModal);
         }}
       />

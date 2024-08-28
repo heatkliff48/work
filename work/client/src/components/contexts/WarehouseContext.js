@@ -36,6 +36,7 @@ const WarehouseContextProvider = ({ children }) => {
   const [warehouseInfoCurIdModal, setWarehouseInfoCurIdModal] = useState(null);
   const warehouse_data = useSelector((state) => state.warehouse);
   const list_of_reserved_products = useSelector((state) => state.reservedProducts);
+  const [filteredProducts, setFilteredProducts] = useState();
 
   useEffect(() => {
     dispatch(getProductsOfOrders());
@@ -55,6 +56,8 @@ const WarehouseContextProvider = ({ children }) => {
         setWarehouseInfoModal,
         warehouseInfoCurIdModal,
         setWarehouseInfoCurIdModal,
+        filteredProducts,
+        setFilteredProducts,
       }}
     >
       {children}
