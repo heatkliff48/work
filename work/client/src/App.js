@@ -1,10 +1,6 @@
 import './App.css';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { SnackbarProvider } from 'notistack';
-import { useEffect } from 'react';
-import { setToken } from './components/redux/actions/jwtAction';
-import axios from 'axios';
 import LoginForm from './components/LoginForm/LoginForm';
 import Main from './components/Main/Main';
 import NavBar from './components/NavBar/NavBar';
@@ -20,38 +16,6 @@ import UsersInfo from '#components/UsersInfo/usersInfo.jsx';
 import ProductionBatchLog from '#components/ProductionBatchLog/ProductionBatchLog.jsx';
 
 function App() {
-  const dispatch = useDispatch();
-  const url = axios.create({
-    baseURL: process.env.REACT_APP_URL,
-    withCredentials: true,
-  });
-
-  // // Проверяем статус сервера
-  // const checkServerStatus = () => {
-  //   url
-  //     .get('/checkServerStatus')
-  //     .then((response) => {
-  //       console.log('response');
-  //       if (!response.ok) {
-  //         window.location.replace('/sign-in');
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error checking server status:', error);
-  //     });
-  // };
-
-  // setInterval(checkServerStatus, 5000);
-
-  useEffect(() => {
-    url
-      .post('/auth/refresh')
-      .then((res) => {
-        const { accessToken, accessTokenExpiration } = res.data;
-        dispatch(setToken(accessToken, accessTokenExpiration));
-      })
-      .catch(() => {});
-  }, [url]);
 
   return (
     <MainContextProvider>

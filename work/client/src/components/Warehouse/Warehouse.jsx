@@ -1,15 +1,17 @@
-import { useDispatch, useSelector } from 'react-redux';
 import Table from '../Table/Table';
-import { useEffect, useState } from 'react';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import WarehouseAddModal from './WarehouseAddModal';
+import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
 
 function Warehouse() {
   const {
     COLUMNS_WAREHOUSE,
     setWarehouseModal,
     warehouseModal,
-    warehouse_data
+    warehouse_data,
+    warehouseInfoModal,
+    setWarehouseInfoModal,
+    setWarehouseInfoCurIdModal,
   } = useWarehouseContext();
 
   return (
@@ -22,6 +24,12 @@ function Warehouse() {
           warehouse_data={warehouse_data}
         />
       )}
+      {warehouseInfoModal && (
+        <ListOfReservedProductsModal
+          isOpen={warehouseInfoModal}
+          toggle={() => setWarehouseInfoModal(!warehouseInfoModal)}
+        />
+      )}
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE}
         dataOfTable={warehouse_data}
@@ -32,7 +40,8 @@ function Warehouse() {
         buttonText={'Add new product on warehouse'}
         tableName={'Warehouse'}
         handleRowClick={(row) => {
-          // dispatch(getProductsOfOrders(row.original.id));
+          setWarehouseInfoCurIdModal(row.original.id)
+          setWarehouseInfoModal(!warehouseInfoModal);
         }}
       />
     </>

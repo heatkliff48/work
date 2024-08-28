@@ -1,4 +1,7 @@
-import { getOrders } from '#components/redux/actions/ordersAction.js';
+import {
+  getOrders,
+  getProductsOfOrders,
+} from '#components/redux/actions/ordersAction.js';
 import {
   createContext,
   useCallback,
@@ -116,12 +119,14 @@ const OrderContextProvider = ({ children }) => {
   const [isOrderReady, setIsOrderReady] = useState(false);
 
   const list_of_orders = useSelector((state) => state.orders);
+  const productsOfOrders = useSelector((state) => state.productsOfOrders);
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
   const contactInfos = useSelector((state) => state.contactInfo);
 
   useEffect(() => {
     dispatch(getOrders());
+    dispatch(getProductsOfOrders());
   }, [dispatch, isOrderReady]);
 
   const getCurrentOrderInfoHandler = useCallback(
@@ -167,6 +172,7 @@ const OrderContextProvider = ({ children }) => {
         newOrder,
         setNewOrder,
         list_of_orders,
+        productsOfOrders,
         status_list,
         productOfOrder,
         setProductOfOrder,

@@ -7,7 +7,7 @@ import { useCallback, useEffect } from 'react';
 
 import {
   getOrders,
-  getProductsOfOrders,
+  getCurrentProductsOfOrders,
 } from '#components/redux/actions/ordersAction.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 
@@ -113,7 +113,7 @@ function OrdersTable() {
         tableName={'Orders'}
         handleRowClick={(row) => {
           getCurrentOrderInfoHandler(row.original);
-          dispatch(getProductsOfOrders(row.original.id));
+          dispatch(getCurrentProductsOfOrders(row.original.id));
           navigate('/order_card');
         }}
       />

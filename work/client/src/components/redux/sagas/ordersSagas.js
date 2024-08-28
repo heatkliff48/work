@@ -9,11 +9,11 @@ import {
   GET_DELETE_ORDER,
   GET_DELETE_PRODUCT_OF_ORDER,
   GET_ORDERS_LIST,
-  GET_PRODUCTS_OF_ORDER,
+  GET_CURRENT_PRODUCTS_OF_ORDER,
   GET_UPDATE_PRODUCTS_OF_ORDER,
   NEW_ORDER,
   ORDERS_LIST,
-  PRODUCTS_OF_ORDER,
+  CURRENT_PRODUCTS_OF_ORDER,
   UPDATE_PRODUCTS_OF_ORDER,
   UPDATE_CONTACT_OF_ORDER,
   NEW_CONTACT_OF_ORDER,
@@ -25,6 +25,8 @@ import {
   UPDATE_PRODUCT_INFO_OF_ORDER,
   DATA_SHIP_ORDER,
   ADD_DATA_SHIP_ORDER,
+  PRODUCTS_OF_ORDER,
+  GET_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
 let accessTokenFront;
@@ -74,9 +76,18 @@ const addDataShipOrder = (date) => {
     .catch(showErrorMessage);
 };
 
-const getProductsOfOrder = (order_id) => {
+const getProductsOfOrder = () => {
   return url
-    .post('/orders/products', { order_id })
+    .get('/orders/products', {})
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getCurrentProductsOfOrder = (order_id) => {
+  return url
+    .post('/orders/current/products', { order_id })
     .then((res) => {
       return res.data;
     })
@@ -205,8 +216,7 @@ function* getProductsOfOrderWatcher(action) {
     accessTokenFront = yield select((state) => state.jwt);
 
     const { product_list, accessToken, accessTokenExpiration } = yield call(
-      getProductsOfOrder,
-      action.payload
+      getProductsOfOrder
     );
 
     window.localStorage.setItem('jwt', accessToken);
@@ -216,6 +226,25 @@ function* getProductsOfOrderWatcher(action) {
   } catch (err) {
     console.error(err);
     yield put({ type: PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
+function* getCurrentProductsOfOrderWatcher(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+
+    const { product_list, accessToken, accessTokenExpiration } = yield call(
+      getCurrentProductsOfOrder,
+      action.payload
+    );
+
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: CURRENT_PRODUCTS_OF_ORDER, payload: product_list });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: CURRENT_PRODUCTS_OF_ORDER, payload: [] });
   }
 }
 
@@ -364,6 +393,7 @@ function* ordersWatcher() {
   yield takeLatest(GET_ORDERS_LIST, getOrdersListWatcher);
   yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
   yield takeLatest(ADD_DATA_SHIP_ORDER, addDataShipOrderWatcher);
+  yield takeLatest(GET_CURRENT_PRODUCTS_OF_ORDER, getCurrentProductsOfOrderWatcher);
   yield takeLatest(GET_PRODUCTS_OF_ORDER, getProductsOfOrderWatcher);
   yield takeLatest(GET_UPDATE_PRODUCTS_OF_ORDER, getUpdateProductsOfOrderWatcher);
   yield takeLatest(

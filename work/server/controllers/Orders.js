@@ -74,11 +74,33 @@ class OrdersController {
   static async getProductsOfOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;
-    const { order_id } = req.body;
 
     try {
       const { accessToken, refreshToken, accessTokenExpiration, product_list } =
         await OrdersService.getProductsOfOrder({
+          id,
+          username,
+          email,
+          fingerprint,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ product_list, accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getCurrentProductsOfOrder(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    const { order_id } = req.body;
+
+    try {
+      const { accessToken, refreshToken, accessTokenExpiration, product_list } =
+        await OrdersService.getCurrentProductsOfOrder({
           order_id,
           id,
           username,

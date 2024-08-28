@@ -158,7 +158,8 @@ const OrderCart = React.memo(() => {
       }));
     } else {
       const vat_euro = (vatValue.vat_procent * final_price_product) / 100;
-      const vat_result = (final_price_product + vat_euro).toFixed(2);
+
+      const vat_result = final_price_product + vat_euro;
       setVatValue((prev) => ({
         ...prev,
         vat_result,
@@ -267,7 +268,8 @@ const OrderCart = React.memo(() => {
                 >
                   {filterAndMapData(product, filterKeys)}
                   <Button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       dispatch(getDeleteProductOfOrder(product?.id));
                     }}
                   >
@@ -323,7 +325,8 @@ const OrderCart = React.memo(() => {
             <div className="shippind_date">
               {haveShipDate ? (
                 <p>
-                  Дата отправки: {haveShipDate} ({handleDayBeforShipping()} дней до отправки)
+                  Дата отправки: {haveShipDate} ({handleDayBeforShipping()} дней до
+                  отправки)
                 </p>
               ) : (
                 <DatePicker
