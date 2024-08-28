@@ -3,14 +3,18 @@ import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
 import {
+  ADD_NEW_ORDERED_PRODUCTION,
   ADD_NEW_RESERVED_PRODUCT,
   ADD_NEW_WAREHOUSE,
   ALL_WAREHOUSE,
+  LIST_OF_ORDERED_PRODUCTION,
   DELETE_PRODUCT_FROM_RESERVED_LIST,
   GET_ALL_WAREHOUSE,
+  GET_LIST_OF_ORDERED_PRODUCTION,
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST,
   GET_LIST_OF_RESERVED_PRODUCTS,
   LIST_OF_RESERVED_PRODUCTS,
+  NEW_ORDERED_PRODUCTION,
   NEW_RESERVED_PRODUCT,
   NEW_WAREHOUSE,
   REMAINING_STOCK,
@@ -86,6 +90,24 @@ const addNewReservedProduct = (reserved_product) => {
 const deleteReservedProduct = (id) => {
   return url
     .post('/warehouse/reserved/product/delete', { id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getListOfOrderedProduction = () => {
+  return url
+    .get('/warehouse/ordered_production')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewListOfOrderedProduction = (ordered_production) => {
+  return url
+    .post('/warehouse/ordered_production/add', ordered_production)
     .then((res) => {
       return res.data;
     })
@@ -202,6 +224,39 @@ function* deleteReservedProductWatcher(action) {
   }
 }
 
+function* getListOfOrderedProductionWatcher() {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+
+    const { orderedProduction, accessToken, accessTokenExpiration } = yield call(
+      getListOfOrderedProduction
+    );
+
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put(setToken({ accessToken, accessTokenExpiration }));
+    yield put({ type: LIST_OF_ORDERED_PRODUCTION, payload: orderedProduction });
+  } catch (err) {
+    yield put({ type: LIST_OF_ORDERED_PRODUCTION, payload: [] });
+  }
+}
+
+function* addNewListOfOrderedProductionWatcher(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+
+    const { new_ordered_production, accessToken, accessTokenExpiration } =
+      yield call(addNewListOfOrderedProduction, action.payload);
+
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: NEW_ORDERED_PRODUCTION, payload: new_ordered_production });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: NEW_ORDERED_PRODUCTION, payload: [] });
+  }
+}
+
 function* warehouseWatcher() {
   yield takeLatest(GET_ALL_WAREHOUSE, getAllWarehouseWatcher);
   yield takeLatest(GET_LIST_OF_RESERVED_PRODUCTS, getListOfReservedProductsWatcher);
@@ -212,6 +267,11 @@ function* warehouseWatcher() {
     GET_DELETE_PRODUCT_FROM_RESERVED_LIST,
     deleteReservedProductWatcher
   );
+  yield takeLatest(
+    GET_LIST_OF_ORDERED_PRODUCTION,
+    getListOfOrderedProductionWatcher
+  );
+  yield takeLatest(ADD_NEW_ORDERED_PRODUCTION, addNewListOfOrderedProductionWatcher);
 }
 
 export default warehouseWatcher;

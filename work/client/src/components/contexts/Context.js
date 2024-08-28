@@ -17,6 +17,7 @@ import {
 import { getAllProducts } from '#components/redux/actions/productsAction.js';
 import {
   getAllWarehouse,
+  getListOfOrderedProduction,
   getListOfReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
 import { getProductsOfOrders } from '#components/redux/actions/ordersAction.js';
@@ -113,14 +114,14 @@ const ProjectContextProvider = ({ children }) => {
     {
       Header: 'Place of production',
       accessor: 'placeOfProduction',
-      defaultValue: 'Spain',
+      defaultValue: '0',
       Filter: DropdownFilter,
       sortType: 'string',
     },
     {
       Header: 'Type of packaging',
       accessor: 'typeOfPackaging',
-      defaultValue: 'Reusable',
+      defaultValue: '0',
       Filter: DropdownFilter,
       sortType: 'string',
     },
@@ -407,6 +408,7 @@ const ProjectContextProvider = ({ children }) => {
   const [currentContact, setCurrentContact] = useState();
   const [currentUsersInfo, setCurrentUsersInfo] = useState({});
   const [usersInfoDataList, setUsersInfoDataList] = useState([]);
+  const [latestProducts, setLatestProducts] = useState([]);
   const [productionBatchLogData, setProductionBatchLogData] = useState([]);
 
   const roleTable = [
@@ -432,8 +434,26 @@ const ProjectContextProvider = ({ children }) => {
     { id: 20, label: 'Accountant' },
   ];
 
-  const latestProducts = useMemo(() => {
-    const newProducts = products?.reduce((acc, product) => {
+  // const latestProducts = useMemo(() => {
+  //   const newProducts = products?.reduce((acc, product) => {
+  //     const { article, version } = product;
+  //     const existingProduct = acc.find((p) => p.article === article);
+  //     if (!existingProduct) {
+  //       acc.push(product);
+  //     } else if (version > existingProduct.version) {
+  //       acc = acc.map((p) => (p.article === article ? product : p));
+  //     }
+
+  //     return acc;
+  //   }, []);
+
+  //   return newProducts;
+  // }, [products]);
+
+  // latestProducts?.sort((a, b) => a.id - b.id);
+
+  useEffect(() => {
+    const newProductList = products?.reduce((acc, product) => {
       const { article, version } = product;
       const existingProduct = acc.find((p) => p.article === article);
       if (!existingProduct) {
@@ -445,10 +465,25 @@ const ProjectContextProvider = ({ children }) => {
       return acc;
     }, []);
 
-    return newProducts;
-  }, [products]);
+    newProductList?.sort((a, b) => a.id - b.id);
 
-  latestProducts?.sort((a, b) => a.id - b.id);
+    const newlatestProducts = newProductList.map((prod) => {
+      const newPlaceOfProduction = selectOptions.placeOfProduction.find(
+        (opt) => opt.value == prod.placeOfProduction
+      );
+      const newTypeOfPackaging = selectOptions.typeOfPackaging.find(
+        (opt) => opt.value == prod.typeOfPackaging
+      );
+
+      return {
+        ...prod,
+        placeOfProduction: newPlaceOfProduction?.label,
+        typeOfPackaging: newTypeOfPackaging?.label,
+      };
+    });
+
+    setLatestProducts(newlatestProducts);
+  }, [products]);
 
   const checkUserAccess = (user, roles, pageName) => {
     if (user.role === 3) return { canRead: true, canWrite: true };
@@ -480,6 +515,7 @@ const ProjectContextProvider = ({ children }) => {
     dispatch(getAllWarehouse());
     dispatch(getProductsOfOrders());
     dispatch(getListOfReservedProducts());
+    dispatch(getListOfOrderedProduction());
   }, [user, modalRoleCard]);
 
   useEffect(() => {
@@ -487,7 +523,6 @@ const ProjectContextProvider = ({ children }) => {
     // dispatch(checkUser());
 
     if (isCheckedAuth && !user) {
-      console.log('MAIN APP', user);
       navigate('/sign-in');
     }
   }, []);

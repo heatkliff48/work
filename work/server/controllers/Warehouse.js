@@ -19,6 +19,27 @@ class WarehouseController {
     }
   }
 
+  static async getListOfOrderedProduction(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    try {
+      const { orderedProduction, accessToken, refreshToken, accessTokenExpiration } =
+        await WarehouseService.getListOfOrderedProduction({
+          id,
+          username,
+          email,
+          fingerprint,
+        });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ orderedProduction, accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async getListOfReservedProducts(req, res) {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;
@@ -63,6 +84,34 @@ class WarehouseController {
         .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
         .status(200)
         .json({ new_warehouse, accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async addNewListOfOrderedProduction(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    const orderedProduction = req.body;
+    console.log('>>>>>>>>>>>>>>>.req.body', req.body);
+    try {
+      const {
+        accessToken,
+        refreshToken,
+        accessTokenExpiration,
+        new_ordered_production,
+      } = await WarehouseService.addNewListOfOrderedProduction({
+        id,
+        username,
+        email,
+        fingerprint,
+        orderedProduction,
+      });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ new_ordered_production, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

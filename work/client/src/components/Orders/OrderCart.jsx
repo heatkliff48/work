@@ -7,12 +7,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import {
   addDataShipOrder,
   deleteOrder,
   getDeleteProductOfOrder,
   updateOrderStatus,
 } from '#components/redux/actions/ordersAction.js';
+import { addNewListOfOrderedProduction } from '#components/redux/actions/warehouseAction.js';
 import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
 import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
 import AddProductOrderModal from './modal/AddProductOrderModal.jsx';
@@ -34,15 +36,14 @@ const OrderCart = React.memo(() => {
     productInfoModalOrder,
     setProductInfoModalOrder,
   } = useOrderContext();
-  const { displayNames } = useProjectContext();
-  const { latestProducts } = useProjectContext();
+
+  const { latestProducts, displayNames } = useProjectContext();
+  const { list_of_reserved_products } = useWarehouseContext();
 
   const productListOrder = useSelector((state) => state.productsOfOrders);
 
   const [dataValue, setDataValue] = useState(new Date());
   const [formatDataValue, setFormatDataValue] = useState(null);
-  const [daysUntilShipping, setDaysUntilShipping] = useState(null);
-  const [selectedShippingDate, setSelectedShippingDate] = useState(null);
   const [vatValue, setVatValue] = useState({
     vat_procent: 21,
     vat_euro: 0,
@@ -92,7 +93,6 @@ const OrderCart = React.memo(() => {
         day: '2-digit',
       });
       setFormatDataValue(formattedDate);
-      setSelectedShippingDate(date);
     },
     [dataValue]
   );
@@ -147,6 +147,62 @@ const OrderCart = React.memo(() => {
     setProductInfoModalOrder(!productInfoModalOrder);
   };
 
+  const statusChangeHandler = (status) => {
+    const order_id = orderCartData?.id;
+    const hasShippingDate = orderCartData?.shipping_date ?? formatDataValue;
+
+    if (status.accessor !== status_list[0].accessor && !hasShippingDate) {
+      alert('Пожалуйста, выберите дату отправки');
+      return;
+    } else if (status.accessor === status_list[1].accessor) {
+      dispatch(
+        addDataShipOrder({
+          order_id,
+          shipping_date: formatDataValue,
+        })
+      );
+    }
+
+    updatedProductListOrder.map((product) => {
+      const loc = latestProducts.find((el) => {
+        return el.id == product.product_id;
+      })?.placeOfProduction;
+
+      const haveProductReserve = list_of_reserved_products.find(
+        (el) => el.orders_products_id == product.id
+      );
+
+      if (
+        status.accessor === status_list[2].accessor &&
+        loc === 'Spain' &&
+        !haveProductReserve
+      ) {
+        dispatch(
+          addNewListOfOrderedProduction({
+            product_article: product?.product_article,
+            order_article: orderCartData?.article,
+            quantity: product?.quantity_real,
+            shipping_date: orderCartData?.shipping_date,
+          })
+        );
+      }
+    });
+
+    dispatch(
+      updateOrderStatus({
+        order_id,
+        status: status.accessor,
+      })
+    );
+  };
+
+  const deleteHandler = (product) => {
+    const res_prod = list_of_reserved_products.find((el) => el.id === product.id);
+
+    if (res_prod) alert('Этот продукт зарервировван на складе');
+    dispatch(getDeleteProductOfOrder(product?.id));
+  };
+
   useEffect(() => {
     const final_price_product =
       updatedProductListOrder.reduce((acc, el) => acc + el?.final_price, 0) || 0;
@@ -177,6 +233,13 @@ const OrderCart = React.memo(() => {
 
     if (storedData) {
       setOrderCartData(storedData);
+    }
+
+    if (!storedData?.shipping_date && updatedOrderCartData?.shipping_date) {
+      setOrderCartData((prev) => ({
+        ...prev,
+        shipping_date: updatedOrderCartData.shipping_date,
+      }));
     }
 
     if (updatedOrderCartData && updatedOrderCartData !== orderCartData) {
@@ -270,7 +333,7 @@ const OrderCart = React.memo(() => {
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
-                      dispatch(getDeleteProductOfOrder(product?.id));
+                      deleteHandler(product);
                     }}
                   >
                     Delete
@@ -322,7 +385,7 @@ const OrderCart = React.memo(() => {
                 <p>{vatValue.vat_result}</p>
               </div>
             </div>
-            <div className="shippind_date">
+            <div className="shipping_date">
               {haveShipDate ? (
                 <p>
                   Дата отправки: {haveShipDate} ({handleDayBeforShipping()} дней до
@@ -345,28 +408,7 @@ const OrderCart = React.memo(() => {
                   type="checkbox"
                   checked={item.accessor === orderCartData?.status}
                   onChange={() => {
-                    const order_id = orderCartData?.id;
-                    if (
-                      item.accessor !== status_list[0].accessor &&
-                      !selectedShippingDate
-                    ) {
-                      alert('Пожалуйста, выберите дату отправки');
-                      return;
-                    }
-                    if (item.accessor === status_list[1].accessor) {
-                      dispatch(
-                        addDataShipOrder({
-                          order_id,
-                          shipping_date: formatDataValue,
-                        })
-                      );
-                    }
-                    dispatch(
-                      updateOrderStatus({
-                        order_id,
-                        status: item.accessor,
-                      })
-                    );
+                    statusChangeHandler(item);
                   }}
                 />
               </div>

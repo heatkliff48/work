@@ -14,9 +14,9 @@ import OrderCart from '#components/Orders/OrderCart.jsx';
 import Warehouse from '#components/Warehouse/Warehouse.jsx';
 import UsersInfo from '#components/UsersInfo/usersInfo.jsx';
 import ProductionBatchLog from '#components/ProductionBatchLog/ProductionBatchLog.jsx';
+import ListOfOrderedProduction from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProduction.jsx';
 
 function App() {
-
   return (
     <MainContextProvider>
       <div className="wrapper">
@@ -34,6 +34,10 @@ function App() {
           <Route path="/warehouse" element={<Warehouse />} />
           <Route path="/users_info" element={<UsersInfo />} />
           <Route path="/production_batch_log" element={<ProductionBatchLog />} />
+          <Route
+            path="/list_of_ordered_production"
+            element={<ListOfOrderedProduction />}
+          />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>

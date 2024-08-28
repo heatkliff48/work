@@ -1,9 +1,26 @@
-const { Warehouses, ReservedProducts } = require('../db/models');
+const {
+  Warehouses,
+  ReservedProducts,
+  ListOfOrderedProductions,
+} = require('../db/models');
 
 class WarehouseRepository {
   static async getAllWarehouse() {
     const warehouse = await Warehouses.findAll();
     return warehouse ?? [];
+  }
+
+  static async getListOfOrderedProduction() {
+    const orderedProduction = await ListOfOrderedProductions.findAll({
+      attributes: [
+        'id',
+        'product_article',
+        'order_article',
+        'quantity',
+        'shipping_date',
+      ],
+    });
+    return orderedProduction ?? [];
   }
 
   static async getListOfReservedProducts() {
@@ -16,6 +33,21 @@ class WarehouseRepository {
   static async addNewWarehouse(warehouse) {
     const new_warehouse = await Warehouses.create(warehouse);
     return new_warehouse;
+  }
+
+  static async addNewListOfOrderedProduction(ordered_production) {
+    await ListOfOrderedProductions.create(ordered_production);
+
+    const new_ordered_production = await ListOfOrderedProductions.findAll({
+      attributes: [
+        'id',
+        'product_article',
+        'order_article',
+        'quantity',
+        'shipping_date',
+      ],
+    });
+    return new_ordered_production;
   }
 
   static async updateRemainingStock(upd_rem_srock) {

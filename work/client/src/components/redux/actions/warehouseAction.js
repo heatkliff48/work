@@ -5,6 +5,8 @@ import {
   GET_ALL_WAREHOUSE,
   GET_LIST_OF_RESERVED_PRODUCTS,
   UPDATE_REMAINING_STOCK,
+  GET_LIST_OF_ORDERED_PRODUCTION,
+  ADD_NEW_ORDERED_PRODUCTION,
 } from '../types/warehouseTypes';
 
 export const getAllWarehouse = () => {
@@ -44,5 +46,18 @@ export const deleteReservedProducts = (id) => {
   return {
     type: GET_DELETE_PRODUCT_FROM_RESERVED_LIST,
     payload: id,
+  };
+};
+
+export const getListOfOrderedProduction = () => {
+  return {
+    type: GET_LIST_OF_ORDERED_PRODUCTION,
+  };
+};
+
+export const addNewListOfOrderedProduction = (ordered_production) => {
+  return {
+    type: ADD_NEW_ORDERED_PRODUCTION,
+    payload: ordered_production,
   };
 };

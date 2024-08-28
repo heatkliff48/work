@@ -25,6 +25,27 @@ class WarehouseService {
     };
   }
 
+  static async getListOfOrderedProduction({ id, username, email, fingerprint }) {
+    const orderedProduction = await WarehouseRepository.getListOfOrderedProduction();
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      orderedProduction,
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
   static async getListOfReservedProducts({ id, username, email, fingerprint }) {
     const listOfReservedProducts =
       await WarehouseRepository.getListOfReservedProducts();
@@ -68,6 +89,34 @@ class WarehouseService {
     };
   }
 
+  static async addNewListOfOrderedProduction({
+    id,
+    username,
+    email,
+    fingerprint,
+    orderedProduction,
+  }) {
+    const new_ordered_production =
+      await WarehouseRepository.addNewListOfOrderedProduction(orderedProduction);
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      new_ordered_production,
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
   static async updateRemainingStock({
     id,
     username,
@@ -75,7 +124,6 @@ class WarehouseService {
     fingerprint,
     upd_rem_srock,
   }) {
-
     await WarehouseRepository.updateRemainingStock(upd_rem_srock);
     const payload = { id, username, email };
 
