@@ -15,6 +15,7 @@ import { productsOfOrdersReducer } from './productsOfOrdersReducer';
 import { warehouseReducer } from './warehouseReducer';
 import { usersInfoReducer, usersMainInfoReducer } from './usersInfoReducer';
 import { productionBatchLogReducer } from './productionBatchLogReducer';
+import { reservedProductsReducer } from './reservedProductsReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -32,4 +33,5 @@ export const rootReducer = combineReducers({
   usersInfo: usersInfoReducer,
   usersMainInfo: usersMainInfoReducer,
   productionBatchLog: productionBatchLogReducer,
+  reservedProducts: reservedProductsReducer,
 });

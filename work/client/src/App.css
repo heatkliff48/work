@@ -399,3 +399,35 @@ label {
 input[type='checkbox'] {
   margin-left: auto;
 }
+
+.warehouseModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.warehouseInfo {
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-info {
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.reserve-button {
+  margin-bottom: 10px;
+}

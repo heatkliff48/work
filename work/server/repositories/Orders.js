@@ -30,8 +30,38 @@ class OrdersRepository {
     return;
   }
 
-  static async getProductsOfOrder({ order_id }) {
-    const product_list = await OrdersProducts.findAll({ where: { order_id } });
+  static async getProductsOfOrder() {
+    const product_list = await OrdersProducts.findAll({
+      attributes: [
+        'id',
+        'order_id',
+        'product_id',
+        'quantity_m2',
+        'quantity_palet',
+        'quantity_real',
+        'price_m2',
+        'discount',
+        'final_price',
+      ],
+    });
+    return product_list;
+  }
+
+  static async getCurrentProductsOfOrder({ order_id }) {
+    const product_list = await OrdersProducts.findAll({
+      where: { order_id },
+      attributes: [
+        'id',
+        'order_id',
+        'product_id',
+        'quantity_m2',
+        'quantity_palet',
+        'quantity_real',
+        'price_m2',
+        'discount',
+        'final_price',
+      ],
+    });
 
     return product_list;
   }

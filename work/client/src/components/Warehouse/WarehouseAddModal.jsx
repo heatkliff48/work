@@ -49,7 +49,7 @@ const WarehouseAddModal = React.memo(
         setWarehouseData((prev) => ({
           ...prev,
           product_article: product.article,
-          warehouse_article,
+          article: warehouse_article,
         }));
       },
       [latestProducts]
@@ -99,11 +99,7 @@ const WarehouseAddModal = React.memo(
             {haveProduct ? (
               <>
                 {COLUMNS_WAREHOUSE.map((el) => {
-                  if (el.accessor === 'article') return null;
-                  if (
-                    el.accessor === 'warehouse_article' ||
-                    el.accessor === 'product_article'
-                  )
+                  if (el.accessor === 'article' || el.accessor === 'product_article')
                     return (
                       <>
                         <ModalBody>{el.Header}:</ModalBody>

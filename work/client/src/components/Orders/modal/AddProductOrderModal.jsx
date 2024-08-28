@@ -72,9 +72,9 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
     setProductOfOrder((prev) => ({
       ...prev,
-      price_m2: result,
+      price_m2: result.toFixed(2),
     }));
-    return result;
+    return result.toFixed(2);
   }, [selectedProduct?.price, selectedProduct?.m2, selectedProduct?.m3]);
 
   const final_price_value = useMemo(() => {
@@ -83,9 +83,9 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
     setProductOfOrder((prev) => ({
       ...prev,
-      final_price: result,
+      final_price: result.toFixed(2),
     }));
-    return result;
+    return result.toFixed(2);
   }, [price_m2_value, quantity_real_value, productOfOrder?.discount]);
 
   const addProductOrder = async () => {
@@ -99,14 +99,28 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
         })
       );
       setProductOfOrder({});
+      setSelectedProduct({});
     }
     toggle();
   };
 
   return (
     <div>
-      <Modal isOpen={isOpen} toggle={toggle}>
-        <ModalHeader toggle={toggle}>
+      <Modal
+        isOpen={isOpen}
+        toggle={() => {
+          toggle();
+          setProductOfOrder({});
+          setSelectedProduct({});
+        }}
+      >
+        <ModalHeader
+          toggle={() => {
+            toggle();
+            setProductOfOrder({});
+            setSelectedProduct({});
+          }}
+        >
           {haveProduct ? (
             <p>Fill in the remaining parameters</p>
           ) : (

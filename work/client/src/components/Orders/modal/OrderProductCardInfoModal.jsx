@@ -11,6 +11,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     productOfOrder,
     setProductOfOrder,
     selectedProduct,
+    setSelectedProduct,
   } = useOrderContext();
 
   const dispatch = useDispatch();
@@ -68,7 +69,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   const addProductOrder = async () => {
     dispatch(getUpdateProductInfoOfOrders(productOfOrder));
     setProductOfOrder({});
-
+    setSelectedProduct({});
     toggle();
   };
 
@@ -76,8 +77,21 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   return (
     <div>
-      <Modal isOpen={isOpen} toggle={toggle}>
-        <ModalHeader toggle={toggle}>
+      <Modal
+        isOpen={isOpen}
+        toggle={() => {
+          toggle();
+          setProductOfOrder({});
+          setSelectedProduct({});
+        }}
+      >
+        <ModalHeader
+          toggle={() => {
+            toggle();
+            setProductOfOrder({});
+            setSelectedProduct({});
+          }}
+        >
           <p>Fill in the remaining parameters</p>
         </ModalHeader>
         <ModalBody>

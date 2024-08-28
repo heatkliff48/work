@@ -22,7 +22,6 @@ class TokenService {
     const authHeader = req.headers?.authorization;
     const token = authHeader?.split(' ')?.[1];
 
-    console.log('>>>>>>.URL.<<<<<<<<', req.url);
     console.log('>>>>>>.CHECK.<<<<<<<<', token);
     // Массив путей, которые не требуют токена
     const noTokenPaths = ['/sign-up', '/sign-in', '/logout', '/refresh'];

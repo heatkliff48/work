@@ -15,7 +15,10 @@ import {
   NumberRangeColumnFilter,
 } from '#components/Table/filters.js';
 import { getAllProducts } from '#components/redux/actions/productsAction.js';
-import { getAllWarehouse } from '#components/redux/actions/warehouseAction.js';
+import {
+  getAllWarehouse,
+  getListOfReservedProducts,
+} from '#components/redux/actions/warehouseAction.js';
 
 const ProjectContext = createContext();
 
@@ -406,8 +409,26 @@ const ProjectContextProvider = ({ children }) => {
   const [productionBatchLogData, setProductionBatchLogData] = useState([]);
 
   const roleTable = [
-    { id: 1, role_name: 'Production Manager' },
-    { id: 2, role_name: 'Head of Sales Department' },
+    { id: 1, label: 'Production Manager' },
+    { id: 2, label: 'Head of Sales Department' },
+    { id: 3, label: 'System administrator' },
+    { id: 4, label: 'Chief technologist' },
+    { id: 5, label: 'Mill operators' },
+    { id: 6, label: 'Casting operators' },
+    { id: 7, label: 'Cutting operators' },
+    { id: 8, label: 'Green array operators' },
+    { id: 9, label: 'Autoclave operators' },
+    { id: 10, label: 'White array operators' },
+    { id: 11, label: 'Packaging operators' },
+    { id: 12, label: 'Quality manager' },
+    { id: 13, label: 'Production director' },
+    { id: 14, label: 'Mechanical-electrical technicians' },
+    { id: 15, label: 'Forklift drivers' },
+    { id: 16, label: 'Sales department director' },
+    { id: 17, label: 'Sales department manager' },
+    { id: 18, label: 'Warehouse department director' },
+    { id: 19, label: 'Warehouse department manager' },
+    { id: 20, label: 'Accountant' },
   ];
 
   const latestProducts = useMemo(() => {
@@ -456,6 +477,7 @@ const ProjectContextProvider = ({ children }) => {
     dispatch(getAllRoles());
     dispatch(getAllProducts());
     dispatch(getAllWarehouse());
+    dispatch(getListOfReservedProducts());
   }, [user, modalRoleCard]);
 
   useEffect(() => {

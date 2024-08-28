@@ -83,8 +83,35 @@ class OrdersService {
     };
   }
 
-  static async getProductsOfOrder({ id, username, email, fingerprint, order_id }) {
-    const product_list = await OrdersRepository.getProductsOfOrder({
+  static async getProductsOfOrder({ id, username, email, fingerprint }) {
+    const product_list = await OrdersRepository.getProductsOfOrder();
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      product_list,
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
+  static async getCurrentProductsOfOrder({
+    id,
+    username,
+    email,
+    fingerprint,
+    order_id,
+  }) {
+    const product_list = await OrdersRepository.getCurrentProductsOfOrder({
       order_id,
     });
     const payload = { id, username, email };

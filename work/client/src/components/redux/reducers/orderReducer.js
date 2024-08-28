@@ -20,7 +20,6 @@ export const ordersReducer = (orders = [], action) => {
     }
 
     case DATA_SHIP_ORDER: {
-      console.log('DATA_SHIP_ORDER', payload);
       const { order_id, shipping_date } = payload;
       const result = orders.map((order) => {
         if (order.id === order_id) {

@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
-import { Button } from 'reactstrap';
 import { GlobalFilterInput } from './GlobalFilterInput';
 import { matchSorter } from 'match-sorter';
 
@@ -80,7 +79,7 @@ function Table({
 
   return (
     <>
-      <h1>Table Of {tableName}</h1>
+      <h1>{tableName}</h1>
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}
         <GlobalFilterInput

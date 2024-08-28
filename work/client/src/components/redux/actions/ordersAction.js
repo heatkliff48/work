@@ -4,12 +4,13 @@ import {
   GET_DELETE_ORDER,
   GET_DELETE_PRODUCT_OF_ORDER,
   GET_ORDERS_LIST,
-  GET_PRODUCTS_OF_ORDER,
+  GET_CURRENT_PRODUCTS_OF_ORDER,
   GET_UPDATE_PRODUCT_INFO_OF_ORDER,
   GET_UPDATE_PRODUCTS_OF_ORDER,
   UPDATE_CONTACT_OF_ORDER,
   UPDATE_DELIVERY_OF_ORDER,
   UPDATE_STATUS_OF_ORDER,
+  GET_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -32,9 +33,15 @@ export const addDataShipOrder = (date) => {
   };
 };
 
-export const getProductsOfOrders = (order_id) => {
+export const getProductsOfOrders = () => {
   return {
     type: GET_PRODUCTS_OF_ORDER,
+  };
+};
+
+export const getCurrentProductsOfOrders = (order_id) => {
+  return {
+    type: GET_CURRENT_PRODUCTS_OF_ORDER,
     payload: order_id,
   };
 };

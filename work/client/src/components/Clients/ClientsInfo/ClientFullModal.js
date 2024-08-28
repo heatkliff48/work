@@ -21,13 +21,11 @@ function MydModalWithGrid({ show, onHide }) {
   const { currentClient, setCurrentClient } = useProjectContext();
 
   useEffect(() => {
-    if (Object.keys(currentClient).length === 0){
+    if (Object.keys(currentClient)?.length === 0){
       return
     }
-    const client = clients.filter((el) => el.id === currentClient.id)[0];
+    const client = clients.filter((el) => el.id === currentClient?.id)[0];
     setCurrentClient(client);
-
-    
   }, [clients]);
 
   return (
