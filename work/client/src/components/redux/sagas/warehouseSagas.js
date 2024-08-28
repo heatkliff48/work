@@ -164,16 +164,17 @@ function* updRemainingStockWatcher(action) {
 
 function* addNewReservedProductWatcher(action) {
   try {
+    const { payload } = action;
     accessTokenFront = yield select((state) => state.jwt);
 
-    const { reserved_product, accessToken, accessTokenExpiration } = yield call(
+    const { accessToken, accessTokenExpiration } = yield call(
       addNewReservedProduct,
-      action.payload
+      payload
     );
 
     window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: NEW_RESERVED_PRODUCT, payload: reserved_product });
+    yield put({ type: NEW_RESERVED_PRODUCT, payload });
     yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_RESERVED_PRODUCT, payload: [] });

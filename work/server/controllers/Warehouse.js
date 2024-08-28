@@ -98,23 +98,19 @@ class WarehouseController {
     const reserved_product = req.body;
 
     try {
-      const {
-        accessToken,
-        refreshToken,
-        accessTokenExpiration,
-        new_reserved_product,
-      } = await WarehouseService.addNewReservedProducts({
-        id,
-        username,
-        email,
-        fingerprint,
-        reserved_product,
-      });
+      const { accessToken, refreshToken, accessTokenExpiration } =
+        await WarehouseService.addNewReservedProducts({
+          id,
+          username,
+          email,
+          fingerprint,
+          reserved_product,
+        });
 
       return res
         .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
         .status(200)
-        .json({ new_reserved_product, accessToken, accessTokenExpiration });
+        .json({ accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

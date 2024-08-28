@@ -1,6 +1,5 @@
 import {
   getOrders,
-  getProductsOfOrders,
 } from '#components/redux/actions/ordersAction.js';
 import {
   createContext,
@@ -126,7 +125,6 @@ const OrderContextProvider = ({ children }) => {
 
   useEffect(() => {
     dispatch(getOrders());
-    dispatch(getProductsOfOrders());
   }, [dispatch, isOrderReady]);
 
   const getCurrentOrderInfoHandler = useCallback(
