@@ -34,7 +34,6 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
     );
   };
 
-  console.log('filteredProducts', filteredProducts);
 
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
