@@ -5,6 +5,7 @@ import { useCallback, useEffect } from 'react';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { getAllProductionBatchLogs } from '#components/redux/actions/productionBatchLogAction.js';
 import AddProductToProductionBatchLogModal from './ProductionBatchLogModal.jsx';
+import ShowAddListOfOrderedModal from './GetFromOrdersModal.jsx';
 
 function ProductionBatchLog() {
   const {
@@ -48,6 +49,7 @@ function ProductionBatchLog() {
   return (
     <>
       {userAccess.canWrite && <AddProductToProductionBatchLogModal />}
+      {userAccess.canWrite && <ShowAddListOfOrderedModal />}
       <Table
         COLUMN_DATA={production_batch_log}
         dataOfTable={productionBatchLogData}

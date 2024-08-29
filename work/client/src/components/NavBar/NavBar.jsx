@@ -48,16 +48,18 @@ function NavBar() {
             </div>
           </div>
         )}
-        <div className="nav_link_wrapper">
-          <div
-            className="nav_link"
-            onClick={() => 
-              {navigate('/clients');}
-            }
-          >
-            <p className="p_nav">Контакты</p>
+        {user && (
+          <div className="nav_link_wrapper">
+            <div
+              className="nav_link"
+              onClick={() => {
+                navigate('/clients');
+              }}
+            >
+              <p className="p_nav">Контакты</p>
+            </div>
           </div>
-        </div>
+        )}
         {user && (
           <div className="nav_link_wrapper">
             <div

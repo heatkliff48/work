@@ -486,8 +486,8 @@ const ProjectContextProvider = ({ children }) => {
   }, [products]);
 
   const checkUserAccess = (user, roles, pageName) => {
-    if (user.role === 3) return { canRead: true, canWrite: true };
-    const userRole = roles.find((role) => role.id === user.role);
+    if (user?.role === 3) return { canRead: true, canWrite: true };
+    const userRole = roles.find((role) => role.id === user?.role);
 
     if (!userRole || !userRole.isActive) {
       return { canRead: false, canWrite: false };
