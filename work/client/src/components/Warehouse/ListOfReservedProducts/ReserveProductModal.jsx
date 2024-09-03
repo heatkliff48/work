@@ -34,7 +34,6 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
     );
   };
 
-
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
       <ModalHeader toggle={toggle}>Choose product</ModalHeader>

@@ -11,7 +11,6 @@ export const productionBatchLogReducer = (productionBatchLog = [], action) => {
       return payload;
     }
     case NEW_PRODUCTION_BATCH_LOG: {
-      console.log('productionBatchLog', productionBatchLog);
       return [...productionBatchLog, payload];
     }
     case UPDATE_PRODUCTION_BATCH_LOG: {

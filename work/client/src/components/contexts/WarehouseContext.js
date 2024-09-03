@@ -29,10 +29,36 @@ const WarehouseContextProvider = ({ children }) => {
   ];
 
   const COLUMNS_LIST_OF_ORDERED_PRODUCTION = [
+    { Header: 'Date of shipping', accessor: 'shipping_date', sortType: 'string' },
     { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
     { Header: 'Quantity', accessor: 'quantity', sortType: 'number' },
+  ];
+  const COLUMNS_LIST_OF_ORDERED_PRODUCTION_OEM = [
     { Header: 'Date of shipping', accessor: 'shipping_date', sortType: 'string' },
+    { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
+    { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
+    { Header: 'Quantity', accessor: 'quantity', sortType: 'number' },
+    { Header: 'Status', accessor: 'status', sortType: 'string' },
+  ];
+
+  const ordered_production_oem_status = [
+    {
+      Header: 'Not startered',
+      accessor: 'not_start',
+    },
+    {
+      Header: 'Ordered',
+      accessor: 'ordered',
+    },
+    {
+      Header: 'Shipped',
+      accessor: 'shipped',
+    },
+    {
+      Header: 'Done',
+      accessor: 'done',
+    },
   ];
 
   const dispatch = useDispatch();
@@ -44,7 +70,10 @@ const WarehouseContextProvider = ({ children }) => {
   const warehouse_data = useSelector((state) => state.warehouse);
   const list_of_reserved_products = useSelector((state) => state.reservedProducts);
   const list_of_ordered_production = useSelector(
-    (state) => state.ListOfOrderedProduction
+    (state) => state.listOfOrderedProduction
+  );
+  const list_of_ordered_production_oem = useSelector(
+    (state) => state.listOfOrderedProductionOEM
   );
   const [filteredProducts, setFilteredProducts] = useState();
 
@@ -57,9 +86,12 @@ const WarehouseContextProvider = ({ children }) => {
       value={{
         COLUMNS_WAREHOUSE,
         COLUMNS_LIST_OF_ORDERED_PRODUCTION,
+        COLUMNS_LIST_OF_ORDERED_PRODUCTION_OEM,
         warehouse_data,
         list_of_reserved_products,
         list_of_ordered_production,
+        list_of_ordered_production_oem,
+        ordered_production_oem_status,
         warehouseModal,
         setWarehouseModal,
         reserveProductModal,

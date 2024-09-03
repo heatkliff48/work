@@ -19,6 +19,10 @@ import {
   NEW_WAREHOUSE,
   REMAINING_STOCK,
   UPDATE_REMAINING_STOCK,
+  LIST_OF_ORDERED_PRODUCTION_OEM,
+  NEW_ORDERED_PRODUCTION_OEM,
+  GET_LIST_OF_ORDERED_PRODUCTION_OEM,
+  ADD_NEW_ORDERED_PRODUCTION_OEM,
 } from '../types/warehouseTypes';
 
 let accessTokenFront;
@@ -108,6 +112,24 @@ const getListOfOrderedProduction = () => {
 const addNewListOfOrderedProduction = (ordered_production) => {
   return url
     .post('/warehouse/ordered_production/add', ordered_production)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getListOfOrderedProductionOEM = () => {
+  return url
+    .get('/warehouse/ordered_production_oem')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewListOfOrderedProductionOEM = (ordered_production_oem) => {
+  return url
+    .post('/warehouse/ordered_production_oem/add', ordered_production_oem)
     .then((res) => {
       return res.data;
     })
@@ -257,6 +279,45 @@ function* addNewListOfOrderedProductionWatcher(action) {
   }
 }
 
+function* getListOfOrderedProductionOEMWatcher() {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+
+    const { orderedProductionOEM, accessToken, accessTokenExpiration } = yield call(
+      getListOfOrderedProductionOEM
+    );
+
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put(setToken({ accessToken, accessTokenExpiration }));
+    yield put({
+      type: LIST_OF_ORDERED_PRODUCTION_OEM,
+      payload: orderedProductionOEM,
+    });
+  } catch (err) {
+    yield put({ type: LIST_OF_ORDERED_PRODUCTION_OEM, payload: [] });
+  }
+}
+
+function* addNewListOfOrderedProductionOEMWatcher(action) {
+  try {
+    accessTokenFront = yield select((state) => state.jwt);
+
+    const { new_ordered_production_OEM, accessToken, accessTokenExpiration } =
+      yield call(addNewListOfOrderedProductionOEM, action.payload);
+
+    window.localStorage.setItem('jwt', accessToken);
+
+    yield put({
+      type: NEW_ORDERED_PRODUCTION_OEM,
+      payload: new_ordered_production_OEM,
+    });
+    yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: NEW_ORDERED_PRODUCTION_OEM, payload: [] });
+  }
+}
+
 function* warehouseWatcher() {
   yield takeLatest(GET_ALL_WAREHOUSE, getAllWarehouseWatcher);
   yield takeLatest(GET_LIST_OF_RESERVED_PRODUCTS, getListOfReservedProductsWatcher);
@@ -272,6 +333,14 @@ function* warehouseWatcher() {
     getListOfOrderedProductionWatcher
   );
   yield takeLatest(ADD_NEW_ORDERED_PRODUCTION, addNewListOfOrderedProductionWatcher);
+  yield takeLatest(
+    GET_LIST_OF_ORDERED_PRODUCTION_OEM,
+    getListOfOrderedProductionOEMWatcher
+  );
+  yield takeLatest(
+    ADD_NEW_ORDERED_PRODUCTION_OEM,
+    addNewListOfOrderedProductionOEMWatcher
+  );
 }
 
 export default warehouseWatcher;

@@ -14,7 +14,10 @@ import {
   getDeleteProductOfOrder,
   updateOrderStatus,
 } from '#components/redux/actions/ordersAction.js';
-import { addNewListOfOrderedProduction } from '#components/redux/actions/warehouseAction.js';
+import {
+  addNewListOfOrderedProduction,
+  addNewListOfOrderedProductionOEM,
+} from '#components/redux/actions/warehouseAction.js';
 import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
 import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
 import AddProductOrderModal from './modal/AddProductOrderModal.jsx';
@@ -38,7 +41,8 @@ const OrderCart = React.memo(() => {
   } = useOrderContext();
 
   const { latestProducts, displayNames } = useProjectContext();
-  const { list_of_reserved_products } = useWarehouseContext();
+  const { list_of_reserved_products, ordered_production_oem_status } =
+    useWarehouseContext();
 
   const productListOrder = useSelector((state) => state.productsOfOrders);
 
@@ -179,10 +183,23 @@ const OrderCart = React.memo(() => {
       ) {
         dispatch(
           addNewListOfOrderedProduction({
+            shipping_date: orderCartData?.shipping_date,
             product_article: product?.product_article,
             order_article: orderCartData?.article,
             quantity: product?.quantity_real,
+          })
+        );
+      } else if (
+        status.accessor === status_list[2].accessor &&
+        !haveProductReserve
+      ) {
+        dispatch(
+          addNewListOfOrderedProductionOEM({
             shipping_date: orderCartData?.shipping_date,
+            product_article: product?.product_article,
+            order_article: orderCartData?.article,
+            quantity: product?.quantity_real,
+            status: ordered_production_oem_status[0].accessor,
           })
         );
       }

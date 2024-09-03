@@ -40,6 +40,31 @@ class WarehouseController {
     }
   }
 
+  static async getListOfReservedProductsOEM(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    try {
+      const {
+        orderedProductionOEM,
+        accessToken,
+        refreshToken,
+        accessTokenExpiration,
+      } = await WarehouseService.getListOfReservedProductsOEM({
+        id,
+        username,
+        email,
+        fingerprint,
+      });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ orderedProductionOEM, accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async getListOfReservedProducts(req, res) {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;
@@ -93,7 +118,7 @@ class WarehouseController {
     const fingerprint = req.fingerprint.hash;
     const { id, username, email } = req.user;
     const orderedProduction = req.body;
-    console.log('>>>>>>>>>>>>>>>.req.body', req.body);
+
     try {
       const {
         accessToken,
@@ -112,6 +137,34 @@ class WarehouseController {
         .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
         .status(200)
         .json({ new_ordered_production, accessToken, accessTokenExpiration });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async addNewListOfOrderedProductionOEM(req, res) {
+    const fingerprint = req.fingerprint.hash;
+    const { id, username, email } = req.user;
+    const orderedProductionOEM = req.body;
+
+    try {
+      const {
+        accessToken,
+        refreshToken,
+        accessTokenExpiration,
+        new_ordered_production_OEM,
+      } = await WarehouseService.addNewListOfOrderedProductionOEM({
+        id,
+        username,
+        email,
+        fingerprint,
+        orderedProductionOEM,
+      });
+
+      return res
+        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({ new_ordered_production_OEM, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

@@ -28,7 +28,6 @@ function PasswordChangeModal(props) {
       u_id,
       password: passwordInput,
     };
-    console.log('curr user info', usersMainInfo);
     dispatch(updateUsersMainInfo({ usersMainInfo }));
     props.onHide();
     setUsersMainInfoInput(currentUsersInfo);
