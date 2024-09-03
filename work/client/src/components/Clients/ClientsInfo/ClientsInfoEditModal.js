@@ -183,7 +183,6 @@ function ClientsEditModal(props) {
                       onChange={(v) => {
                         handleSelectChange(v);
                         // setCategory(v.value)
-                        // console.log('category inside select onChange', category)
                       }}
                       options={categoryOptions}
                     />

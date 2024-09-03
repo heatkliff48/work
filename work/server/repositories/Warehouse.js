@@ -2,6 +2,7 @@ const {
   Warehouses,
   ReservedProducts,
   ListOfOrderedProductions,
+  ListOfOrderedProductionOEMs,
 } = require('../db/models');
 
 class WarehouseRepository {
@@ -14,13 +15,28 @@ class WarehouseRepository {
     const orderedProduction = await ListOfOrderedProductions.findAll({
       attributes: [
         'id',
+        'shipping_date',
         'product_article',
         'order_article',
         'quantity',
-        'shipping_date',
       ],
     });
     return orderedProduction ?? [];
+  }
+
+  static async getListOfReservedProductsOEM() {
+    const orderedProductionOEM = await ListOfOrderedProductionOEMs.findAll({
+      attributes: [
+        'id',
+        'shipping_date',
+        'product_article',
+        'order_article',
+        'quantity',
+        'status',
+      ],
+      order: [['shipping_date', 'ASC']],
+    });
+    return orderedProductionOEM ?? [];
   }
 
   static async getListOfReservedProducts() {
@@ -46,8 +62,27 @@ class WarehouseRepository {
         'quantity',
         'shipping_date',
       ],
+      order: [['shipping_date', 'ASC']],
     });
     return new_ordered_production;
+  }
+
+  static async addNewListOfOrderedProductionOEM(ordered_production_oem) {
+
+    await ListOfOrderedProductionOEMs.create(ordered_production_oem);
+
+    const new_ordered_production_oem = await ListOfOrderedProductionOEMs.findAll({
+      attributes: [
+        'id',
+        'shipping_date',
+        'product_article',
+        'order_article',
+        'quantity',
+        'status',
+      ],
+      order: [['shipping_date', 'ASC']],
+    });
+    return new_ordered_production_oem;
   }
 
   static async updateRemainingStock(upd_rem_srock) {

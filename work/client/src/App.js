@@ -15,6 +15,7 @@ import Warehouse from '#components/Warehouse/Warehouse.jsx';
 import UsersInfo from '#components/UsersInfo/usersInfo.jsx';
 import ProductionBatchLog from '#components/ProductionBatchLog/ProductionBatchLog.jsx';
 import ListOfOrderedProduction from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProduction.jsx';
+import ListOfOrderedProductionOEM from '#components/Warehouse/ListOfOrderedProductionOEM/ListOfOrderedProductionOEM.jsx';
 
 function App() {
   return (
@@ -37,6 +38,10 @@ function App() {
           <Route
             path="/list_of_ordered_production"
             element={<ListOfOrderedProduction />}
+          />
+          <Route
+            path="/list_of_ordered_production_oem"
+            element={<ListOfOrderedProductionOEM />}
           />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />

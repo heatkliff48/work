@@ -25,8 +25,6 @@ function AddProductToProductionBatchLogModal(props) {
     const product = latestProducts.find((el) => el.id === row.original.id);
 
     setSelectedProduct((prev) => ({ ...prev, article_product: product?.article }));
-    console.log('product', product);
-    console.log('selectedProduct', selectedProduct);
   };
 
   const onSubmitForm = async (e) => {

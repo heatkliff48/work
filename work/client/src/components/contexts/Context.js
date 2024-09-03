@@ -18,6 +18,7 @@ import { getAllProducts } from '#components/redux/actions/productsAction.js';
 import {
   getAllWarehouse,
   getListOfOrderedProduction,
+  getListOfOrderedProductionOEM,
   getListOfReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
 import { getProductsOfOrders } from '#components/redux/actions/ordersAction.js';
@@ -516,6 +517,7 @@ const ProjectContextProvider = ({ children }) => {
     dispatch(getProductsOfOrders());
     dispatch(getListOfReservedProducts());
     dispatch(getListOfOrderedProduction());
+    dispatch(getListOfOrderedProductionOEM());
   }, [user, modalRoleCard]);
 
   useEffect(() => {
