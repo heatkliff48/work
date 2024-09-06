@@ -16,6 +16,7 @@ import UsersInfo from '#components/UsersInfo/usersInfo.jsx';
 import ProductionBatchLog from '#components/ProductionBatchLog/ProductionBatchLog.jsx';
 import ListOfOrderedProduction from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProduction.jsx';
 import ListOfOrderedProductionOEM from '#components/Warehouse/ListOfOrderedProductionOEM/ListOfOrderedProductionOEM.jsx';
+import ProductionBatchDesigner from '#components/ProductionBatchDesigner/ProductionBatchDesigner.jsx';
 
 function App() {
   return (
@@ -34,7 +35,11 @@ function App() {
           <Route path="/order_card" element={<OrderCart />} />
           <Route path="/warehouse" element={<Warehouse />} />
           <Route path="/users_info" element={<UsersInfo />} />
-          <Route path="/production_batch_log" element={<ProductionBatchLog />} />
+          <Route
+            path="/production_batch_designer"
+            element={<ProductionBatchDesigner />}
+          />
+          {/* <Route path="/production_batch_log" element={<ProductionBatchLog />} /> */}
           <Route
             path="/list_of_ordered_production"
             element={<ListOfOrderedProduction />}
