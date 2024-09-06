@@ -5,6 +5,7 @@ import Container from 'react-bootstrap/Container';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import Table from '#components/Table/Table.jsx';
 import { addNewProductionBatchLog } from '#components/redux/actions/productionBatchLogAction.js';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,15 +13,11 @@ import { useDispatch, useSelector } from 'react-redux';
 // import { es } from 'date-fns/locale/es';
 // registerLocale('es', es);
 
-function AddProductToProductionBatchLogModal(props) {
-  const {
-    COLUMNS,
-    latestProducts,
-    roles,
-    checkUserAccess,
-    userAccess,
-    setUserAccess,
-  } = useProjectContext();
+function AddListOfOrderedModal(props) {
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useProjectContext();
+
+  const { COLUMNS_LIST_OF_ORDERED_PRODUCTION, list_of_ordered_production } =
+    useWarehouseContext();
 
   const [selectedProduct, setSelectedProduct] = useState({});
   const [startDate, setStartDate] = useState(new Date());
@@ -29,10 +26,13 @@ function AddProductToProductionBatchLogModal(props) {
   const dispatch = useDispatch();
 
   const handlerAddProductToBatchLog = (row) => {
-    // const product = latestProducts.filter((el) => el.id === row.original.id);
-    const product = latestProducts.find((el) => el.id === row.original.id);
+    const product = list_of_ordered_production.find(
+      (el) => el.id === row.original.id
+    );
 
-    setSelectedProduct((prev) => ({ ...prev, article_product: product?.article }));
+    setSelectedProduct(product);
+
+    console.log('selectedProduct', selectedProduct);
   };
 
   const onSubmitForm = async (e) => {
@@ -41,8 +41,8 @@ function AddProductToProductionBatchLogModal(props) {
     dispatch(
       addNewProductionBatchLog({
         productionBatchLog: {
-          products_article: selectedProduct.article_product,
-          orders_article: 0,
+          products_article: selectedProduct.product_article,
+          orders_article: selectedProduct.order_article,
           production_date: new Date(startDate),
         },
       })
@@ -86,12 +86,12 @@ function AddProductToProductionBatchLogModal(props) {
                 dateFormat="dd/MM/yyyy"
               />
             </p>
-            <p>Selected product: {selectedProduct.article_product}</p>
+            <p>Selected product: {selectedProduct.product_article}</p>
             <Table
-              COLUMN_DATA={COLUMNS}
-              dataOfTable={latestProducts}
+              COLUMN_DATA={COLUMNS_LIST_OF_ORDERED_PRODUCTION}
+              dataOfTable={list_of_ordered_production}
               userAccess={userAccess}
-              tableName={'Production Batch Logs'}
+              tableName={'List of ordered production'}
               handleRowClick={(row) => {
                 handlerAddProductToBatchLog(row);
               }}
@@ -109,7 +109,7 @@ function AddProductToProductionBatchLogModal(props) {
   );
 }
 
-function ShowAddProductToProductionBatchLogModal() {
+function ShowAddListOfOrderedModal() {
   const [modalShow, setModalShow] = React.useState(false);
 
   return (
@@ -120,15 +120,12 @@ function ShowAddProductToProductionBatchLogModal() {
           setModalShow(true);
         }}
       >
-        Add Product
+        Add from list_of_ordered_production
       </Button>
 
-      <AddProductToProductionBatchLogModal
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-      />
+      <AddListOfOrderedModal show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );
 }
 
-export default ShowAddProductToProductionBatchLogModal;
+export default ShowAddListOfOrderedModal;

@@ -40,7 +40,14 @@ const OrderCart = React.memo(() => {
     setProductInfoModalOrder,
   } = useOrderContext();
 
-  const { latestProducts, displayNames } = useProjectContext();
+  const {
+    latestProducts,
+    displayNames,
+    roles,
+    checkUserAccess,
+    userAccess,
+    setUserAccess,
+  } = useProjectContext();
   const { list_of_reserved_products, ordered_production_oem_status } =
     useWarehouseContext();
 
@@ -54,8 +61,13 @@ const OrderCart = React.memo(() => {
     vat_result: 0,
   });
 
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [orderStatusAccess, setOrderStatusAccess] = useState({
+    canRead: true,
+    canWrite: false,
+  });
 
   const filterKeys = useMemo(
     () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
@@ -290,6 +302,20 @@ const OrderCart = React.memo(() => {
   //   };
   // }, [orderCartData, updatedProductListOrder, displayNames, filterKeys]);
 
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Orders');
+      setUserAccess(access);
+
+      const statusAccess = checkUserAccess(user, roles, 'Orders_status');
+      setOrderStatusAccess(statusAccess);
+
+      if (!access.canRead) {
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+      }
+    }
+  }, [user, roles]);
+
   return (
     <>
       {productInfoModalOrder && (
@@ -318,21 +344,23 @@ const OrderCart = React.memo(() => {
               <h4>Contact Person</h4>
               {filterAndMapData(orderCartData?.contactInfo, filterKeys)}
             </div>
-            <ShowOrderContactEditModal />
+            {userAccess.canWrite && <ShowOrderContactEditModal />}
           </div>
-          <Button
-            onClick={() => {
-              dispatch(deleteOrder(orderCartData?.id));
-              navigate('/orders');
-            }}
-          >
-            Delete Order
-          </Button>
+          {userAccess.canWrite && (
+            <Button
+              onClick={() => {
+                dispatch(deleteOrder(orderCartData?.id));
+                navigate('/orders');
+              }}
+            >
+              Delete Order
+            </Button>
+          )}
         </div>
         <div className="delivery-address">
           <h4>Delivery Address</h4>
           {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
-          <ShowOrderDeliveryEditModal />
+          {userAccess.canWrite && <ShowOrderDeliveryEditModal />}
         </div>
         <table className="product-table">
           <thead>
@@ -358,20 +386,22 @@ const OrderCart = React.memo(() => {
                 </td>
               </tr>
             ))}
-            <Button
-              onClick={() => {
-                setNewOrder((prev) => ({
-                  ...prev,
-                  article: orderCartData.article,
-                  owner: orderCartData.owner.id,
-                  status: orderCartData.status,
-                  del_adr_id: orderCartData.deliveryAddress.id,
-                }));
-                setProductModalOrder(!productModalOrder);
-              }}
-            >
-              Add product
-            </Button>
+            {userAccess.canWrite && (
+              <Button
+                onClick={() => {
+                  setNewOrder((prev) => ({
+                    ...prev,
+                    article: orderCartData.article,
+                    owner: orderCartData.owner.id,
+                    status: orderCartData.status,
+                    del_adr_id: orderCartData.deliveryAddress.id,
+                  }));
+                  setProductModalOrder(!productModalOrder);
+                }}
+              >
+                Add product
+              </Button>
+            )}
           </tbody>
         </table>
         <div className="footer_data">

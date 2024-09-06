@@ -1,7 +1,10 @@
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import Table from '../Table/Table';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import WarehouseAddModal from './WarehouseAddModal';
 import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
+import { useProjectContext } from '#components/contexts/Context.js';
 
 function Warehouse() {
   const {
@@ -13,6 +16,16 @@ function Warehouse() {
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
   } = useWarehouseContext();
+
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useProjectContext();
+  const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Warehouse');
+      setUserAccess(access);
+    }
+  }, [user, roles]);
 
   return (
     <>
@@ -33,7 +46,7 @@ function Warehouse() {
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE}
         dataOfTable={warehouse_data}
-        // userAccess={userAccess}
+        userAccess={userAccess}
         onClickButton={() => {
           setWarehouseModal(!warehouseModal);
         }}
