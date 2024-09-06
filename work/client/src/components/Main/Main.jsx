@@ -42,6 +42,9 @@ function Main() {
       <button onClick={() => navigate('/list_of_ordered_production')}>
         List of ordered production
       </button>
+      <button onClick={() => navigate('/list_of_ordered_production_oem')}>
+        List of ordered production OEM
+      </button>
     </div>
   );
 }

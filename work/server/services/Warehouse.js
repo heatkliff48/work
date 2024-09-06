@@ -46,6 +46,28 @@ class WarehouseService {
     };
   }
 
+  static async getListOfReservedProductsOEM({ id, username, email, fingerprint }) {
+    const orderedProductionOEM =
+      await WarehouseRepository.getListOfReservedProductsOEM();
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      orderedProductionOEM,
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
   static async getListOfReservedProducts({ id, username, email, fingerprint }) {
     const listOfReservedProducts =
       await WarehouseRepository.getListOfReservedProducts();
@@ -111,6 +133,36 @@ class WarehouseService {
 
     return {
       new_ordered_production,
+      accessToken,
+      refreshToken,
+      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    };
+  }
+
+  static async addNewListOfOrderedProductionOEM({
+    id,
+    username,
+    email,
+    fingerprint,
+    orderedProductionOEM,
+  }) {
+    const new_ordered_production_OEM =
+      await WarehouseRepository.addNewListOfOrderedProductionOEM(
+        orderedProductionOEM
+      );
+    const payload = { id, username, email };
+
+    const accessToken = await TokenService.generateAccessToken(payload);
+    const refreshToken = await TokenService.generateRefreshToken(payload);
+
+    await RefreshSessionsRepository.createRefreshSession({
+      user_id: id,
+      refresh_token: refreshToken,
+      finger_print: fingerprint,
+    });
+
+    return {
+      new_ordered_production_OEM,
       accessToken,
       refreshToken,
       accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,

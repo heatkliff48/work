@@ -16,7 +16,8 @@ import { warehouseReducer } from './warehouseReducer';
 import { usersInfoReducer, usersMainInfoReducer } from './usersInfoReducer';
 import { productionBatchLogReducer } from './productionBatchLogReducer';
 import { reservedProductsReducer } from './reservedProductsReducer';
-import { ListOfOrderedProductionReducer } from './ListOfOrderedProductionReducer';
+import { listOfOrderedProductionReducer } from './listOfOrderedProductionReducer';
+import { listOfOrderedProductionOEMReducer } from './listOfOrderedProductionOEMReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -35,5 +36,6 @@ export const rootReducer = combineReducers({
   usersMainInfo: usersMainInfoReducer,
   productionBatchLog: productionBatchLogReducer,
   reservedProducts: reservedProductsReducer,
-  ListOfOrderedProduction: ListOfOrderedProductionReducer,
+  listOfOrderedProduction: listOfOrderedProductionReducer,
+  listOfOrderedProductionOEM: listOfOrderedProductionOEMReducer,
 });
