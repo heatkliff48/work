@@ -1,14 +1,13 @@
 const usersMainInfoRouter = require('express').Router();
 const { Users } = require('../db/models/index.js');
 const TokenService = require('../services/Token.js');
-const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
 const bcrypt = require('bcryptjs');
 
 usersMainInfoRouter.get('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   try {
     const allUsersMainInfo = await Users.findAll({
@@ -16,23 +15,19 @@ usersMainInfoRouter.get('/', async (req, res) => {
     });
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({
-        allUsersMainInfo,
-        accessToken,
-        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-      });
+    return res.status(200).json({ allUsersMainInfo });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   allUsersMainInfo,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // });
   } catch (err) {
     console.error(err.message);
   }
@@ -40,7 +35,7 @@ usersMainInfoRouter.get('/', async (req, res) => {
 
 usersMainInfoRouter.post('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   try {
     const { u_username, u_email, password, role } = req.body.usersMainInfo;
@@ -54,24 +49,18 @@ usersMainInfoRouter.post('/', async (req, res) => {
       role,
     });
 
-    const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
-
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({
-        usersMainInfo,
-        accessToken,
-        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-      });
+    return res.status(200).json({ usersMainInfo });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   usersMainInfo,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // });
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -80,14 +69,12 @@ usersMainInfoRouter.post('/', async (req, res) => {
 
 usersMainInfoRouter.post('/update/:u_id', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
-
+  const { id, username, email } = req.session.user;
   const { u_id, password } = req.body.usersMainInfo;
 
   const hashedPassword = bcrypt.hashSync(password, 8);
 
   try {
-    //const {c_id} = req.params;
     const usersMainInfo = await Users.update(
       {
         password: hashedPassword,
@@ -102,23 +89,19 @@ usersMainInfoRouter.post('/update/:u_id', async (req, res) => {
     );
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({
-        usersMainInfo,
-        accessToken,
-        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-      });
+    return res.status(200).json({ usersMainInfo });
+    // .cookie('freshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   usersMainInfo,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // });
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);

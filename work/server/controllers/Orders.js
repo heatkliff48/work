@@ -5,15 +5,14 @@ const OrdersService = require('../services/Orders.js');
 class OrdersController {
   static async getOrdersList(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     try {
       const { accessToken, refreshToken, accessTokenExpiration, orders } =
         await OrdersService.getOrdersList({ id, username, email, fingerprint });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ orders, accessToken, accessTokenExpiration });
+      return res.status(200).json({ orders });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ orders, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -21,7 +20,7 @@ class OrdersController {
 
   static async addNewOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const { article, del_adr_id, contact_id, owner, status } = req.body.order;
 
     try {
@@ -38,10 +37,9 @@ class OrdersController {
           status,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ newOrder, accessToken, accessTokenExpiration });
+      return res.status(200).json({ newOrder });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ newOrder, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -49,7 +47,7 @@ class OrdersController {
 
   static async addShippingDateOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const date = req.body;
 
     try {
@@ -62,10 +60,9 @@ class OrdersController {
           date,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.status(200);
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ accessToken, accessTokenExpiration })
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -73,7 +70,7 @@ class OrdersController {
 
   static async getProductsOfOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
 
     try {
       const { accessToken, refreshToken, accessTokenExpiration, product_list } =
@@ -84,10 +81,9 @@ class OrdersController {
           fingerprint,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ product_list, accessToken, accessTokenExpiration });
+      return res.status(200).json({ product_list });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ product_list, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -95,7 +91,7 @@ class OrdersController {
 
   static async getCurrentProductsOfOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const { order_id } = req.body;
 
     try {
@@ -108,10 +104,9 @@ class OrdersController {
           fingerprint,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ product_list, accessToken, accessTokenExpiration });
+      return res.status(200).json({ product_list });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ product_list, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -119,7 +114,7 @@ class OrdersController {
 
   static async getUpdateProductsOfOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const { newProductsOfOrder } = req.body;
 
     try {
@@ -132,10 +127,9 @@ class OrdersController {
           fingerprint,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.status(200);
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ accessToken, accessTokenExpiration })
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -143,7 +137,7 @@ class OrdersController {
 
   static async getUpdateProductInfoOfOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const productOfOrder = req.body;
 
     try {
@@ -156,10 +150,9 @@ class OrdersController {
           fingerprint,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.status(200);
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ accessToken, accessTokenExpiration })
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -167,7 +160,7 @@ class OrdersController {
 
   static async getUpdateContactInfoOfOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const { contact_id, order_id } = req.body;
 
     try {
@@ -181,10 +174,9 @@ class OrdersController {
           fingerprint,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.status(200);
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ accessToken, accessTokenExpiration })
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -192,7 +184,7 @@ class OrdersController {
 
   static async getUpdateDeliveryAddressOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const { address_id, order_id } = req.body;
 
     try {
@@ -206,10 +198,9 @@ class OrdersController {
           fingerprint,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.status(200);
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ accessToken, accessTokenExpiration })
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -217,7 +208,7 @@ class OrdersController {
 
   static async getUpdateStatusOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const { status, order_id } = req.body;
 
     try {
@@ -231,10 +222,9 @@ class OrdersController {
           fingerprint,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.status(200);
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ accessToken, accessTokenExpiration })
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -242,7 +232,7 @@ class OrdersController {
 
   static async getDeleteProductOfOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const { product_id } = req.body;
 
     try {
@@ -255,10 +245,9 @@ class OrdersController {
           fingerprint,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.status(200);
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ accessToken, accessTokenExpiration })
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -266,7 +255,7 @@ class OrdersController {
 
   static async getDeleteOrder(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const { order_id } = req.body;
 
     try {
@@ -279,10 +268,9 @@ class OrdersController {
           fingerprint,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.status(200);
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ accessToken, accessTokenExpiration })
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

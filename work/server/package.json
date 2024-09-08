@@ -15,19 +15,20 @@
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "connect-redis": "^6.0.0",
+    "connect-session-sequelize": "^7.1.7",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.1.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-fingerprint": "^1.2.2",
-    "express-session": "^1.17.2",
+    "express-session": "^1.18.0",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.7.1",
+    "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
     "redis": "^3.1.2",
     "sequelize": "^6.37.3",
-    "yup": "^1.4.0"
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "morgan": "^1.10.0",

@@ -513,16 +513,15 @@ const ProjectContextProvider = ({ children }) => {
     if (!user) return;
     dispatch(getAllRoles());
     dispatch(getAllProducts());
-    dispatch(getAllWarehouse());
-    dispatch(getProductsOfOrders());
-    dispatch(getListOfReservedProducts());
-    dispatch(getListOfOrderedProduction());
-    dispatch(getListOfOrderedProductionOEM());
+    // dispatch(getAllWarehouse());
+    // dispatch(getProductsOfOrders());
+    // dispatch(getListOfReservedProducts());
+    // dispatch(getListOfOrderedProduction());
+    // dispatch(getListOfOrderedProductionOEM());
   }, [user, modalRoleCard]);
 
   useEffect(() => {
     //сделать диспатч чек юзер на нахождение юзера в бд
-    // dispatch(checkUser());
 
     if (isCheckedAuth && !user) {
       navigate('/sign-in');

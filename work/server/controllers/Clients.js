@@ -10,10 +10,9 @@ class ClientsController {
       const { accessToken, refreshToken, accessTokenExpiration, clients } =
         await ClientsService.getAllClients({ id, username, email, fingerprint });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ clients, accessToken, accessTokenExpiration });
+      return res.status(200).json({ clients });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ clients, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -33,10 +32,9 @@ class ClientsController {
           fingerprint,
           client,
         });
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ client, accessToken, accessTokenExpiration });
+      return res.status(200).json({ client });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ client, accessToken, accessTokenExpiration })
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

@@ -14,10 +14,16 @@ class AuthController {
           fingerprint: fingerprint.hash,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ user, accessToken, accessTokenExpiration });
+      req.session.user = {
+        id: user.id,
+        name: user.username,
+        email: user.email,
+        role: user.role,
+      };
+
+      return res.status(200).json({ user });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ user, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -35,65 +41,31 @@ class AuthController {
           role,
           fingerprint: fingerprint.hash,
         });
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ user, accessToken, accessTokenExpiration });
-    } catch (err) {
-      return ErrorUtils.catchError(res, err);
-    }
-  }
 
-  static async checkUser(req, res) {
-    const { username, email, role } = req.user;
-    const { fingerprint } = req;
-    try {
-      const { accessToken, refreshToken, accessTokenExpiration } =
-        await AuthService.checkUser({
-          username,
-          email,
-          role,
-          fingerprint: fingerprint.hash,
-        });
+      req.session.user = {
+        id: user.id,
+        name: user.username,
+        email: user.email,
+        role: user.role,
+      };
 
-      const user = req.user ?? {};
-
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ user, accessToken, accessTokenExpiration });
+      return res.status(200).json({ user });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ user, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
   }
 
   static async logOut(req, res) {
-    const { fingerprint } = req;
-    const refreshToken = req.cookies.refreshToken;
+    // const refreshToken = req.cookies.refreshToken;
     try {
-      await AuthService.logOut(refreshToken);
+      // await AuthService.logOut(refreshToken);
+      req.session.destroy();
+      res.clearCookie('sesid');
 
-      return res.clearCookie('refreshToken').sendStatus(200);
-    } catch (err) {
-      return ErrorUtils.catchError(res, err);
-    }
-  }
-
-  static async refresh(req, res) {
-    const { fingerprint } = req;
-    const currentRefreshToken = req.cookies.refreshToken;
-
-    try {
-      const { accessToken, refreshToken, accessTokenExpiration } =
-        await AuthService.refresh({
-          currentRefreshToken,
-          fingerprint,
-        });
-
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.sendStatus(200);
+      // .clearCookie('refreshToken')
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

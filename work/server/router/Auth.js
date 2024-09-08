@@ -1,13 +1,10 @@
 const { Router } = require('express');
 const AuthController = require('../controllers/Auth.js');
-const { AuthValidator } = require('../validators/Auth.js');
 
 const router = Router();
 
-router.post('/sign-in', AuthValidator.signIn, AuthController.signIn);
-router.post('/sign-up', AuthValidator.signUp, AuthController.signUp);
-router.post('/check/user', AuthController.checkUser);
-router.post('/logout', AuthValidator.logOut, AuthController.logOut);
-router.post('/refresh', AuthValidator.refresh, AuthController.refresh);
+router.post('/sign-in', AuthController.signIn);
+router.post('/sign-up', AuthController.signUp);
+router.post('/logout', AuthController.logOut);
 
 module.exports = router;

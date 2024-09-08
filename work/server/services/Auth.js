@@ -1,6 +1,5 @@
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const TokenService = require('./Token.js');
 const {
   NotFound,
@@ -8,7 +7,6 @@ const {
   Conflict,
   Unauthorized,
 } = require('../utils/Errors.js');
-const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
 const UserRepository = require('../repositories/User.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 
@@ -28,14 +26,12 @@ class AuthService {
       email: userData.email,
       role: userData.role,
     };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: userData.id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
+
     return {
       user: userData,
       accessToken,
@@ -61,14 +57,11 @@ class AuthService {
 
     const payload = { id: user.id, username, email, role };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: user.id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
     return {
       user,
       accessToken,
@@ -77,55 +70,10 @@ class AuthService {
     };
   }
 
-  static async checkUser({ username, email, fingerprint, role }) {
-    const payload = { id: user.id, username, email, role };
-
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: user.id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
-  }
-
-  static async logOut(refreshToken) {
-    await RefreshSessionsRepository.deleteRefreshSession(refreshToken);
-  }
-
-  static async refresh({ currentRefreshToken, fingerprint }) {
-    if (!currentRefreshToken) {
-      throw new Unauthorized();
-    }
-
-    const userData = await TokenService.verifyRefreshToken(currentRefreshToken);
-
-    const refreshSession = await RefreshSessionsRepository.getRefreshSession(
-      currentRefreshToken
-    );
-
-    if (!userData || !refreshSession) throw new Unauthorized();
-
-    if (refreshSession.finger_print !== fingerprint.hash) throw new Forbidden();
-
-    await RefreshSessionsRepository.deleteRefreshSession(currentRefreshToken);
-
-    const user = await UserRepository.getUserData(userData.email);
-    const accessToken = await TokenService.generateAccessToken({ ...user });
-    const refreshToken = await TokenService.generateRefreshToken({ ...user });
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+  static async logOut() {
+    // static async logOut(refreshToken) {
+    // await RefreshSessionsRepository.deleteRefreshSession(refreshToken);
+    
   }
 }
 

@@ -29,25 +29,25 @@ import {
   GET_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
-let accessTokenFront;
+// let accessTokenFront;
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
 });
 
-url.interceptors.request.use(
-  async (config) => {
-    if (accessTokenFront) {
-      config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.log('Interceptor: Request error', error);
-    return Promise.reject(error);
-  }
-);
+// url.interceptors.request.use(
+//   async (config) => {
+//     if (accessTokenFront) {
+//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     console.log('Interceptor: Request error', error);
+//     return Promise.reject(error);
+//   }
+// );
 
 const getAllOrders = () => {
   return url
@@ -159,13 +159,14 @@ const updateStatusOfOrder = (orderStatus) => {
 
 function* getOrdersListWatcher() {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
-    const { orders, accessToken, accessTokenExpiration } = yield call(getAllOrders);
+    // accessTokenFront = yield select((state) => state.jwt);
+    // const { orders, accessToken, accessTokenExpiration } = yield call(getAllOrders);
+    const { orders } = yield call(getAllOrders);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ORDERS_LIST, payload: orders });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error('Error:', err);
     yield put({ type: ORDERS_LIST, payload: [] });
@@ -174,17 +175,15 @@ function* getOrdersListWatcher() {
 
 function* addNewOrderWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
 
-    const { newOrder, accessToken, accessTokenExpiration } = yield call(
-      addNewOrder,
-      action.payload
-    );
+    // const { newOrder, accessToken, accessTokenExpiration } = yield call(
+    const { newOrder } = yield call(addNewOrder, action.payload);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_ORDER, payload: newOrder });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);
     yield put({ type: NEW_ORDER, payload: [] });
@@ -193,18 +192,16 @@ function* addNewOrderWatcher(action) {
 
 function* addDataShipOrderWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
 
-    const { accessToken, accessTokenExpiration } = yield call(
-      addDataShipOrder,
-      payload
-    );
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(addDataShipOrder, payload);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: DATA_SHIP_ORDER, payload });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);
     yield put({ type: DATA_SHIP_ORDER, payload: [] });
@@ -213,16 +210,15 @@ function* addDataShipOrderWatcher(action) {
 
 function* getProductsOfOrderWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
 
-    const { product_list, accessToken, accessTokenExpiration } = yield call(
-      getProductsOfOrder
-    );
+    // const { product_list, accessToken, accessTokenExpiration } = yield call(
+    const { product_list } = yield call(getProductsOfOrder);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: PRODUCTS_OF_ORDER, payload: product_list });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);
     yield put({ type: PRODUCTS_OF_ORDER, payload: [] });
@@ -231,17 +227,15 @@ function* getProductsOfOrderWatcher(action) {
 
 function* getCurrentProductsOfOrderWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
 
-    const { product_list, accessToken, accessTokenExpiration } = yield call(
-      getCurrentProductsOfOrder,
-      action.payload
-    );
+    // const { product_list, accessToken, accessTokenExpiration } = yield call(
+    const { product_list } = yield call(getCurrentProductsOfOrder, action.payload);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: CURRENT_PRODUCTS_OF_ORDER, payload: product_list });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);
     yield put({ type: CURRENT_PRODUCTS_OF_ORDER, payload: [] });
@@ -250,21 +244,19 @@ function* getCurrentProductsOfOrderWatcher(action) {
 
 function* getUpdateProductInfoOfOrderWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
 
-    const { accessToken, accessTokenExpiration } = yield call(
-      getUpdateProductInfoOfOrder,
-      payload
-    );
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(getUpdateProductInfoOfOrder, payload);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({
       type: UPDATE_PRODUCT_INFO_OF_ORDER,
       payload: payload,
     });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);
     yield put({ type: UPDATE_PRODUCT_INFO_OF_ORDER, payload: [] });
@@ -273,21 +265,19 @@ function* getUpdateProductInfoOfOrderWatcher(action) {
 
 function* getUpdateProductsOfOrderWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
 
-    const { accessToken, accessTokenExpiration } = yield call(
-      getUpdateProductsOfOrder,
-      payload
-    );
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(getUpdateProductsOfOrder, payload);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({
       type: UPDATE_PRODUCTS_OF_ORDER,
       payload: payload.newProductsOfOrder,
     });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);
     yield put({ type: UPDATE_PRODUCTS_OF_ORDER, payload: [] });
@@ -296,18 +286,16 @@ function* getUpdateProductsOfOrderWatcher(action) {
 
 function* getDeleteProductOfOrderWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
 
-    const { accessToken, accessTokenExpiration } = yield call(
-      getDeleteProductOfOrder,
-      payload
-    );
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(getDeleteProductOfOrder, payload);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: DELETE_PRODUCT_OF_ORDER, payload });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);
     yield put({ type: DELETE_PRODUCT_OF_ORDER, payload: [] });
@@ -316,19 +304,17 @@ function* getDeleteProductOfOrderWatcher(action) {
 
 function* getDeleteOrderWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
 
     const { payload } = action;
 
-    const { accessToken, accessTokenExpiration } = yield call(
-      getDeleteOrder,
-      payload
-    );
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(getDeleteOrder, payload);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: DELETE_ORDER, payload });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);
     yield put({ type: DELETE_ORDER, payload: [] });
@@ -337,17 +323,15 @@ function* getDeleteOrderWatcher(action) {
 
 function* updateContactOfOrderWorker(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
 
-    const { accessToken, accessTokenExpiration } = yield call(
-      updateContactOfOrder,
-      payload
-    );
-    window.localStorage.setItem('jwt', accessToken);
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(updateContactOfOrder, payload);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_CONTACT_OF_ORDER, payload });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_CONTACT_OF_ORDER, payload: [] });
   }
@@ -355,17 +339,15 @@ function* updateContactOfOrderWorker(action) {
 
 function* updateDeliveryOfOrderWorker(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
 
-    const { accessToken, accessTokenExpiration } = yield call(
-      updateDeliveryOfOrder,
-      payload
-    );
-    window.localStorage.setItem('jwt', accessToken);
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(updateDeliveryOfOrder, payload);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_DELIVERY_OF_ORDER, payload });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_DELIVERY_OF_ORDER, payload: [] });
   }
@@ -373,17 +355,15 @@ function* updateDeliveryOfOrderWorker(action) {
 
 function* updateStatusOfOrderWorker(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
 
-    const { accessToken, accessTokenExpiration } = yield call(
-      updateStatusOfOrder,
-      payload
-    );
-    window.localStorage.setItem('jwt', accessToken);
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(updateStatusOfOrder, payload);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: STATUS_OF_ORDER, payload });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: STATUS_OF_ORDER, payload: [] });
   }

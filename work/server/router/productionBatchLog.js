@@ -7,7 +7,7 @@ const { COOKIE_SETTINGS } = require('../constants.js');
 
 productionBatchLogRouter.get('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   try {
     const productionBatchLog = await ProductionBatchLog.findAll({
@@ -15,23 +15,19 @@ productionBatchLogRouter.get('/', async (req, res) => {
     });
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({
-        productionBatchLog,
-        accessToken,
-        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-      });
+    return res.status(200).json({ productionBatchLog });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   productionBatchLog,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // });
   } catch (err) {
     console.error(err.message);
   }
@@ -39,7 +35,7 @@ productionBatchLogRouter.get('/', async (req, res) => {
 
 productionBatchLogRouter.post('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   const { products_article, orders_article, production_date } =
     req.body.productionBatchLog;
@@ -52,23 +48,19 @@ productionBatchLogRouter.post('/', async (req, res) => {
     });
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({
-        productionBatchLog,
-        accessToken,
-        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-      });
+    return res.status(200).json({ productionBatchLog });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   productionBatchLog,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // });
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -77,13 +69,12 @@ productionBatchLogRouter.post('/', async (req, res) => {
 
 productionBatchLogRouter.post('/update/:l_id', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   const { l_id, products_article, orders_article, production_date } =
     req.body.productionBatchLog;
 
   try {
-    //const {c_id} = req.params;
     const productionBatchLog = await ProductionBatchLog.update(
       {
         products_article,
@@ -100,23 +91,19 @@ productionBatchLogRouter.post('/update/:l_id', async (req, res) => {
     );
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({
-        productionBatchLog,
-        accessToken,
-        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-      });
+    return res.status(200).json({ productionBatchLog });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   productionBatchLog,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // });
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);

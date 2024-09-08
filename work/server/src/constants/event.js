@@ -1,0 +1,5 @@
+const ADD_NEW_PRODUCT_SOCKET = 'ADD_NEW_PRODUCT_SOCKET';
+
+module.exports = {
+  ADD_NEW_PRODUCT_SOCKET,
+};
