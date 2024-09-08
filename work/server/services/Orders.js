@@ -1,6 +1,4 @@
-// const jwt = require('jsonwebtoken');
 const TokenService = require('./Token.js');
-const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const OrdersRepository = require('../repositories/Orders.js');
 
@@ -9,14 +7,10 @@ class OrdersService {
     const orders = await OrdersRepository.getOrdersListData();
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       orders,
@@ -46,14 +40,10 @@ class OrdersService {
     });
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       newOrder,
@@ -67,14 +57,10 @@ class OrdersService {
     await OrdersRepository.addShippingDateOrder(date);
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       accessToken,
@@ -87,14 +73,10 @@ class OrdersService {
     const product_list = await OrdersRepository.getProductsOfOrder();
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       product_list,
@@ -116,14 +98,10 @@ class OrdersService {
     });
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       product_list,
@@ -143,14 +121,10 @@ class OrdersService {
     await OrdersRepository.getUpdateProductsOfOrder(newProductsOfOrder);
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       accessToken,
@@ -169,14 +143,10 @@ class OrdersService {
     await OrdersRepository.getUpdateProductInfoOfOrder(productOfOrder);
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       accessToken,
@@ -197,14 +167,10 @@ class OrdersService {
 
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       accessToken,
@@ -225,14 +191,10 @@ class OrdersService {
 
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       accessToken,
@@ -253,14 +215,10 @@ class OrdersService {
 
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       accessToken,
@@ -281,14 +239,10 @@ class OrdersService {
     });
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       accessToken,
@@ -303,14 +257,10 @@ class OrdersService {
     });
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       accessToken,

@@ -122,7 +122,7 @@ const OrderContextProvider = ({ children }) => {
   const contactInfos = useSelector((state) => state.contactInfo);
 
   useEffect(() => {
-    dispatch(getOrders());
+    // dispatch(getOrders());
   }, [dispatch, isOrderReady]);
 
   const getCurrentOrderInfoHandler = useCallback(

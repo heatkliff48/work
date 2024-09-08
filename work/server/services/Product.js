@@ -1,6 +1,4 @@
-// const jwt = require('jsonwebtoken');
 const TokenService = require('./Token.js');
-const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const ProductsRepository = require('../repositories/Products.js');
 
@@ -9,14 +7,10 @@ class ProductService {
     const products = await ProductsRepository.getAllProductsData();
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       products,
@@ -30,14 +24,10 @@ class ProductService {
     const products = await ProductsRepository.addNewProductData(product);
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       products,
@@ -51,14 +41,10 @@ class ProductService {
     const products = await ProductsRepository.updateProductData(product);
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       products,
@@ -67,7 +53,6 @@ class ProductService {
       accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
     };
   }
-
 }
 
 module.exports = ProductService;

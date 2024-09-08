@@ -1,3 +1,4 @@
+import { ADD_NEW_PRODUCT_SOCKET } from '../types/constants/socket';
 import { ALL_PRODUCTS, NEW_PRODUCT, UPDATE_PRODUCT } from '../types/productsTypes';
 
 export const productsReducer = (products = [], action) => {
@@ -25,7 +26,8 @@ export const productsReducer = (products = [], action) => {
       // return updateProducts;
       return [...products, payload];
     }
-    case NEW_PRODUCT: {
+    case ADD_NEW_PRODUCT_SOCKET: {
+      console.log('ADD_NEW_PRODUCT_SOCKET payload', payload);
       return [...products, payload];
     }
     default:

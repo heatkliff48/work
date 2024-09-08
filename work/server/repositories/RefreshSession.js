@@ -1,6 +1,4 @@
-const { where } = require('sequelize');
 const { Refresh_session } = require('../db/models');
-const { JsonWebTokenError } = require('jsonwebtoken');
 
 class RefreshSessionRepository {
   static async getRefreshSession(refreshToken) {

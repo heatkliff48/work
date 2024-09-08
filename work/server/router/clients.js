@@ -1,13 +1,12 @@
 const clientsRouter = require('express').Router();
 const { Clients } = require('../db/models');
 const TokenService = require('../services/Token.js');
-const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
 
 clientsRouter.get('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   try {
     const allClients = await Clients.findAll({
@@ -15,23 +14,19 @@ clientsRouter.get('/', async (req, res) => {
     });
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({
-        allClients,
-        accessToken,
-        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-      });
+    return res.status(200).json({ allClients });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   allClients,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // });
   } catch (err) {
     console.error(err.message);
   }
@@ -39,7 +34,7 @@ clientsRouter.get('/', async (req, res) => {
 
 clientsRouter.post('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
   const { c_name, tin, category } = req.body.client;
 
   try {
@@ -50,19 +45,19 @@ clientsRouter.post('/', async (req, res) => {
     });
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({ client, accessToken, accessTokenExpiration: ACCESS_TOKEN_EXPIRATION });
+    return res.status(200).json({ client });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   client,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // })
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -71,7 +66,7 @@ clientsRouter.post('/', async (req, res) => {
 
 clientsRouter.get('/:id', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   try {
     const lastID = await Clients.findOne({
@@ -80,19 +75,19 @@ clientsRouter.get('/:id', async (req, res) => {
     });
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({ lastID, accessToken, accessTokenExpiration: ACCESS_TOKEN_EXPIRATION });
+    return res.status(200).json({ lastID });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   lastID,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // })
 
     // res.json(lastID);
   } catch (err) {
@@ -102,7 +97,7 @@ clientsRouter.get('/:id', async (req, res) => {
 
 clientsRouter.post('/update/:c_id', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   const { c_id, c_name, tin, category } = req.body.client;
 
@@ -124,19 +119,22 @@ clientsRouter.post('/update/:c_id', async (req, res) => {
     );
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({ client, accessToken, accessTokenExpiration: ACCESS_TOKEN_EXPIRATION });
+    return (
+      res
+        // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+        .status(200)
+        .json({
+          client,
+          accessToken,
+          accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+        })
+    );
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);

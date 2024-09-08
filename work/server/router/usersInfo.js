@@ -7,7 +7,7 @@ const { COOKIE_SETTINGS } = require('../constants.js');
 
 usersInfoRouter.get('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   try {
     const allUsersInfo = await UsersInfo.findAll({
@@ -15,23 +15,19 @@ usersInfoRouter.get('/', async (req, res) => {
     });
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({
-        allUsersInfo,
-        accessToken,
-        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-      });
+    return res.status(200).json({ allUsersInfo });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   allUsersInfo,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // });
   } catch (err) {
     console.error(err.message);
   }
@@ -39,7 +35,7 @@ usersInfoRouter.get('/', async (req, res) => {
 
 usersInfoRouter.post('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   try {
     const { fullName, group, shift, subdivision, phone } = req.body.usersInfo;
@@ -53,23 +49,19 @@ usersInfoRouter.post('/', async (req, res) => {
     });
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({
-        usersInfo,
-        accessToken,
-        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-      });
+    return res.status(200).json({ usersInfo });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   usersInfo,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // });
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -78,7 +70,7 @@ usersInfoRouter.post('/', async (req, res) => {
 
 usersInfoRouter.post('/update/:u_id', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.user;
+  const { id, username, email } = req.session.user;
 
   const { u_id, fullName, group, shift, subdivision, phone } = req.body.usersInfo;
 
@@ -102,23 +94,19 @@ usersInfoRouter.post('/update/:u_id', async (req, res) => {
     );
 
     const payload = { id, username, email };
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
 
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
-    return res
-      .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      .status(200)
-      .json({
-        usersInfo,
-        accessToken,
-        accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-      });
+    return res.status(200).json({ usersInfo });
+    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    // .json({
+    //   usersInfo,
+    //   accessToken,
+    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    // });
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);

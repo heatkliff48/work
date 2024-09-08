@@ -1,6 +1,4 @@
-// const jwt = require('jsonwebtoken');
 const TokenService = require('./Token.js');
-const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const ClientsRepository = require('../repositories/Clients.js');
 
@@ -9,14 +7,10 @@ class ClientsService {
     const clients = await ClientsRepository.getAllClientsData();
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       clients,
@@ -30,14 +24,10 @@ class ClientsService {
     const clients = await ClientsRepository.addNewClientData(client);
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       clients,
@@ -46,7 +36,6 @@ class ClientsService {
       accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
     };
   }
-
 }
 
 module.exports = ClientsService;

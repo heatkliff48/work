@@ -5,15 +5,14 @@ const WarehouseService = require('../services/Warehouse.js');
 class WarehouseController {
   static async getAllWarehouse(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     try {
       const { warehouse, accessToken, refreshToken, accessTokenExpiration } =
         await WarehouseService.getAllWarehouse({ id, username, email, fingerprint });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ warehouse, accessToken, accessTokenExpiration });
+      return res.status(200).json({ warehouse });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ warehouse, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -21,7 +20,7 @@ class WarehouseController {
 
   static async getListOfOrderedProduction(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     try {
       const { orderedProduction, accessToken, refreshToken, accessTokenExpiration } =
         await WarehouseService.getListOfOrderedProduction({
@@ -31,10 +30,9 @@ class WarehouseController {
           fingerprint,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ orderedProduction, accessToken, accessTokenExpiration });
+      return res.status(200).json({ orderedProduction });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ orderedProduction, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -42,7 +40,7 @@ class WarehouseController {
 
   static async getListOfReservedProductsOEM(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     try {
       const {
         orderedProductionOEM,
@@ -56,10 +54,9 @@ class WarehouseController {
         fingerprint,
       });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ orderedProductionOEM, accessToken, accessTokenExpiration });
+      return res.status(200).json({ orderedProductionOEM });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ orderedProductionOEM, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -67,7 +64,7 @@ class WarehouseController {
 
   static async getListOfReservedProducts(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     try {
       const {
         listOfReservedProducts,
@@ -81,10 +78,9 @@ class WarehouseController {
         fingerprint,
       });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ listOfReservedProducts, accessToken, accessTokenExpiration });
+      return res.status(200).json({ listOfReservedProducts });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ listOfReservedProducts, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -92,7 +88,7 @@ class WarehouseController {
 
   static async addNewWarehouse(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const warehouse = req.body;
 
     try {
@@ -105,10 +101,9 @@ class WarehouseController {
           warehouse,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ new_warehouse, accessToken, accessTokenExpiration });
+      return res.status(200).json({ new_warehouse });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ new_warehouse, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -116,7 +111,7 @@ class WarehouseController {
 
   static async addNewListOfOrderedProduction(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const orderedProduction = req.body;
 
     try {
@@ -133,10 +128,9 @@ class WarehouseController {
         orderedProduction,
       });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ new_ordered_production, accessToken, accessTokenExpiration });
+      return res.status(200).json({ new_ordered_production });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ new_ordered_production, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -144,7 +138,7 @@ class WarehouseController {
 
   static async addNewListOfOrderedProductionOEM(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const orderedProductionOEM = req.body;
 
     try {
@@ -161,10 +155,9 @@ class WarehouseController {
         orderedProductionOEM,
       });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ new_ordered_production_OEM, accessToken, accessTokenExpiration });
+      return res.status(200).json({ new_ordered_production_OEM });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ new_ordered_production_OEM, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -172,7 +165,7 @@ class WarehouseController {
 
   static async updateRemainingStock(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const upd_rem_srock = req.body;
 
     try {
@@ -185,10 +178,9 @@ class WarehouseController {
           upd_rem_srock,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.status(200);
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ accessToken, accessTokenExpiration })
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -196,7 +188,7 @@ class WarehouseController {
 
   static async addNewReservedProducts(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const reserved_product = req.body;
 
     try {
@@ -213,10 +205,9 @@ class WarehouseController {
         reserved_product,
       });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ new_reserved_product, accessToken, accessTokenExpiration });
+      return res.status(200).json({ new_reserved_product });
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ new_reserved_product, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -224,7 +215,7 @@ class WarehouseController {
 
   static async deleteReservedProducts(req, res) {
     const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.user;
+    const { id, username, email } = req.session.user;
     const reserved_products_id = req.body;
 
     try {
@@ -237,10 +228,9 @@ class WarehouseController {
           reserved_products_id,
         });
 
-      return res
-        .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({ accessToken, accessTokenExpiration });
+      return res.status(200);
+      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+      // .json({ accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

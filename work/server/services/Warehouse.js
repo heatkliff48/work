@@ -1,5 +1,4 @@
 const TokenService = require('./Token.js');
-const RefreshSessionsRepository = require('../repositories/RefreshSession.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const WarehouseRepository = require('../repositories/Warehouse.js');
 
@@ -8,14 +7,10 @@ class WarehouseService {
     const warehouse = await WarehouseRepository.getAllWarehouse();
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       warehouse,
@@ -29,14 +24,10 @@ class WarehouseService {
     const orderedProduction = await WarehouseRepository.getListOfOrderedProduction();
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       orderedProduction,
@@ -51,14 +42,10 @@ class WarehouseService {
       await WarehouseRepository.getListOfReservedProductsOEM();
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       orderedProductionOEM,
@@ -73,14 +60,10 @@ class WarehouseService {
       await WarehouseRepository.getListOfReservedProducts();
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       listOfReservedProducts,
@@ -94,14 +77,10 @@ class WarehouseService {
     const new_warehouse = await WarehouseRepository.addNewWarehouse(warehouse);
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       new_warehouse,
@@ -122,14 +101,10 @@ class WarehouseService {
       await WarehouseRepository.addNewListOfOrderedProduction(orderedProduction);
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       new_ordered_production,
@@ -152,14 +127,10 @@ class WarehouseService {
       );
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       new_ordered_production_OEM,
@@ -179,14 +150,10 @@ class WarehouseService {
     await WarehouseRepository.updateRemainingStock(upd_rem_srock);
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       accessToken,
@@ -207,14 +174,10 @@ class WarehouseService {
     );
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       new_reserved_product,
@@ -235,14 +198,10 @@ class WarehouseService {
 
     const payload = { id, username, email };
 
-    const accessToken = await TokenService.generateAccessToken(payload);
-    const refreshToken = await TokenService.generateRefreshToken(payload);
-
-    await RefreshSessionsRepository.createRefreshSession({
-      user_id: id,
-      refresh_token: refreshToken,
-      finger_print: fingerprint,
-    });
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
 
     return {
       accessToken,

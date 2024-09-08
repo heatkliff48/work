@@ -9,27 +9,27 @@ import {
   NEW_PRODUCT,
   UPDATE_PRODUCT,
 } from '../types/productsTypes';
-import { setToken } from '../actions/jwtAction';
+// import { setToken } from '../actions/jwtAction';
 
-let accessTokenFront;
+// let accessTokenFront;
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
 });
 
-url.interceptors.request.use(
-  async (config) => {
-    if (accessTokenFront) {
-      config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.log('Interceptor: Request error', error);
-    return Promise.reject(error);
-  }
-);
+// url.interceptors.request.use(
+//   async (config) => {
+//     if (accessTokenFront) {
+//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     console.log('Interceptor: Request error', error);
+//     return Promise.reject(error);
+//   }
+// );
 
 const getAllProducts = () => {
   return url
@@ -60,15 +60,14 @@ const addNewProduct = ({ product }) => {
 
 function* getAllProductsWatcher() {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
-    const { products, accessToken, accessTokenExpiration } = yield call(
-      getAllProducts
-    );
+    // accessTokenFront = yield select((state) => state.jwt);
+    // const { products, accessToken, accessTokenExpiration } = yield call(
+    const { products } = yield call(getAllProducts);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ALL_PRODUCTS, payload: products });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error('Error in getAllProductsWatcher:', err);
     yield put({ type: ALL_PRODUCTS, payload: [] });
@@ -77,15 +76,13 @@ function* getAllProductsWatcher() {
 
 function* updateProductWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
-    const { products, accessToken, accessTokenExpiration } = yield call(
-      updateProducts,
-      action.payload
-    );
-    window.localStorage.setItem('jwt', accessToken);
+    // accessTokenFront = yield select((state) => state.jwt);
+    // const { products, accessToken, accessTokenExpiration } = yield call(
+    const { products } = yield call(updateProducts, action.payload);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: UPDATE_PRODUCT, payload: products });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: UPDATE_PRODUCT, payload: [] });
   }
@@ -93,15 +90,13 @@ function* updateProductWatcher(action) {
 
 function* addNewProductWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
-    const { products, accessToken, accessTokenExpiration } = yield call(
-      addNewProduct,
-      action.payload
-    );
-    window.localStorage.setItem('jwt', accessToken);
+    // accessTokenFront = yield select((state) => state.jwt);
+    // const { products, accessToken, accessTokenExpiration } = yield call(
+    const { products } = yield call(addNewProduct, action.payload);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_PRODUCT, payload: products });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_PRODUCT, payload: [] });
   }

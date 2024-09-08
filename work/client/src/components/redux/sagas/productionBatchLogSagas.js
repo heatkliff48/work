@@ -1,7 +1,7 @@
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
-import { setToken } from '../actions/jwtAction';
+// import { setToken } from '../actions/jwtAction';
 import {
   ALL_PRODUCTION_BATCH_LOGS,
   NEW_PRODUCTION_BATCH_LOG,
@@ -11,25 +11,25 @@ import {
   NEED_UPDATE_PRODUCTION_BATCH_LOG,
 } from '../types/productionBatchLogTypes';
 
-let accessTokenFront;
+// let accessTokenFront;
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
 });
 
-url.interceptors.request.use(
-  async (config) => {
-    if (accessTokenFront) {
-      config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.log('Interceptor: Request error', error);
-    return Promise.reject(error);
-  }
-);
+// url.interceptors.request.use(
+//   async (config) => {
+//     if (accessTokenFront) {
+//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     console.log('Interceptor: Request error', error);
+//     return Promise.reject(error);
+//   }
+// );
 
 const getAllProductionBatchLogs = () => {
   return url
@@ -64,15 +64,14 @@ const updateProductionBatchLog = ({ productionBatchLog }) => {
 
 function* getAllProductionBatchLogsWorker(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
-    const { productionBatchLog, accessToken, accessTokenExpiration } = yield call(
-      getAllProductionBatchLogs
-    );
+    // accessTokenFront = yield select((state) => state.jwt);
+    // const { productionBatchLog, accessToken, accessTokenExpiration } = yield call(
+    const { productionBatchLog } = yield call(getAllProductionBatchLogs);
 
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ALL_PRODUCTION_BATCH_LOGS, payload: productionBatchLog });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: ALL_PRODUCTION_BATCH_LOGS, payload: [] });
   }
@@ -80,16 +79,17 @@ function* getAllProductionBatchLogsWorker(action) {
 
 function* addNewProductionBatchLogWorker(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
 
-    const { productionBatchLog, accessToken, accessTokenExpiration } = yield call(
+    // const { productionBatchLog, accessToken, accessTokenExpiration } = yield call(
+    const { productionBatchLog } = yield call(
       addNewProductionBatchLog,
       action.payload
     );
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_PRODUCTION_BATCH_LOG, payload: productionBatchLog });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_PRODUCTION_BATCH_LOG, payload: [] });
   }
@@ -97,16 +97,17 @@ function* addNewProductionBatchLogWorker(action) {
 
 function* updateProductionBatchLogWorker(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
 
-    const { productionBatchLog, accessToken, accessTokenExpiration } = yield call(
+    // const { productionBatchLog, accessToken, accessTokenExpiration } = yield call(
+    const { productionBatchLog } = yield call(
       updateProductionBatchLog,
       action.payload
     );
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: UPDATE_PRODUCTION_BATCH_LOG, payload: productionBatchLog });
-    yield put(setToken(accessToken, accessTokenExpiration));
+    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: UPDATE_PRODUCTION_BATCH_LOG, payload: [] });
   }

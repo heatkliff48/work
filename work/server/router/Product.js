@@ -1,6 +1,5 @@
 const { Router } = require('express');
 const ProductController = require('../controllers/Product.js');
-// const { ProductValidator } = require('../validators/Product.js');
 
 const router = Router();
 

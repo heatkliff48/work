@@ -14,6 +14,7 @@ class UserRepository {
 
   static async getUserData(email) {
     const currentUser = await Users.findOne({ where: { email } });
+
     return currentUser ?? null;
   }
 }

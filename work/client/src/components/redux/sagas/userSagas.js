@@ -10,31 +10,31 @@ import {
 } from '../types/userTypes';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
-import { deleteToken, setToken } from '../actions/jwtAction';
+// import { deleteToken, setToken } from '../actions/jwtAction';
 
-let accessTokenFront;
+// let accessTokenFront;
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
 });
 
-url.interceptors.request.use(
-  async (config) => {
-    // Проверяем, является ли текущий запрос запросом checkUser
-    const isCheckUserRequest =
-      config.url === '/auth/check/user' && config.method === 'post';
+// url.interceptors.request.use(
+//   async (config) => {
+//     // Проверяем, является ли текущий запрос запросом checkUser
+//     const isCheckUserRequest =
+//       config.url === '/auth/check/user' && config.method === 'post';
 
-    if (isCheckUserRequest && accessTokenFront) {
-      config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.log('Interceptor: Request error', error);
-    return Promise.reject(error);
-  }
-);
+//     if (isCheckUserRequest && accessTokenFront) {
+//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     console.log('Interceptor: Request error', error);
+//     return Promise.reject(error);
+//   }
+// );
 
 const addUser = (user) => {
   return url
@@ -68,17 +68,18 @@ const delUser = () => {
 };
 
 function* addUserWatcher(action) {
-  accessTokenFront = yield select((state) => state.jwt);
+  // accessTokenFront = yield select((state) => state.jwt);
 
   try {
-    const { user, accessToken, accessTokenExpiration } = yield call(
+    // const { user, accessToken, accessTokenExpiration } = yield call(
+    const { user } = yield call(
       addUser,
       action.payload
     );
 
     window.localStorage.setItem('user', JSON.stringify(user));
-    window.localStorage.setItem('jwt', accessToken);
-    yield put(setToken({ accessToken, accessTokenExpiration }));
+    // window.localStorage.setItem('jwt', accessToken);
+    // yield put(setToken({ accessToken, accessTokenExpiration }));
     yield put({ type: ADD_USER, payload: user });
   } catch (err) {
     yield put({ type: ADD_USER, payload: null });
@@ -87,18 +88,19 @@ function* addUserWatcher(action) {
 
 function* loginUserWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
 
-    const { user, accessToken, accessTokenExpiration } = yield call(
+    // const { user, accessToken, accessTokenExpiration } = yield call(
+    const { user } = yield call(
       loginUser,
       action.payload
     );
 
     window.localStorage.setItem('user', JSON.stringify(user));
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ADD_USER, payload: user });
-    yield put(setToken({ accessToken, accessTokenExpiration }));
+    // yield put(setToken({ accessToken, accessTokenExpiration }));
   } catch (err) {
     yield put({ type: ADD_USER, payload: null });
   }
@@ -106,15 +108,16 @@ function* loginUserWatcher(action) {
 
 function* checkUserWatcher(action) {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
 
-    const { user, accessToken, accessTokenExpiration } = yield call(checkUser);
+    // const { user, accessToken, accessTokenExpiration } = yield call(checkUser);
+    const { user } = yield call(checkUser);
 
     window.localStorage.setItem('user', JSON.stringify(user));
-    window.localStorage.setItem('jwt', accessToken);
+    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: CHECK_USER, payload: user });
-    yield put(setToken({ accessToken, accessTokenExpiration }));
+    // yield put(setToken({ accessToken, accessTokenExpiration }));
   } catch (err) {
     yield put({ type: CHECK_USER, payload: null });
   }
@@ -122,11 +125,11 @@ function* checkUserWatcher(action) {
 
 function* delUserWatcher() {
   try {
-    accessTokenFront = yield select((state) => state.jwt);
+    // accessTokenFront = yield select((state) => state.jwt);
 
     yield call(delUser);
     yield put({ type: DEL_USER, payload: null });
-    yield put(deleteToken());
+    // yield put(deleteToken());
   } catch (err) {
     yield put({ type: DEL_USER, payload: null });
   }

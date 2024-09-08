@@ -4,25 +4,25 @@ import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
 import { ALL_PAGES, GET_ALL_PAGES } from '../types/rolesTypes';
 
-let accessTokenFront
+// let accessTokenFront;
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
 });
 
-url.interceptors.request.use(
-  async (config) => {
-    if (accessTokenFront) {
-      config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.log('Interceptor: Request error', error);
-    return Promise.reject(error);
-  }
-);
+// url.interceptors.request.use(
+//   async (config) => {
+//     if (accessTokenFront) {
+//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     console.log('Interceptor: Request error', error);
+//     return Promise.reject(error);
+//   }
+// );
 
 const getPagesList = () => {
   return url
@@ -35,13 +35,12 @@ const getPagesList = () => {
 
 function* getAllPagesWatcher() {
   try {
-    accessTokenFront = yield select(state => state.jwt);
-    const { pages, accessToken, accessTokenExpiration } = yield call(
-      getPagesList,
-    );
+    // accessTokenFront = yield select(state => state.jwt);
+    // const { pages, accessToken, accessTokenExpiration } = yield call(
+    const { pages } = yield call(getPagesList);
 
-    window.localStorage.setItem('jwt', accessToken);
-    yield put(setToken({ accessToken, accessTokenExpiration }));
+    // window.localStorage.setItem('jwt', accessToken);
+    // yield put(setToken({ accessToken, accessTokenExpiration }));
     yield put({ type: ALL_PAGES, payload: pages });
   } catch (err) {
     yield put({ type: ALL_PAGES, payload: [] });
