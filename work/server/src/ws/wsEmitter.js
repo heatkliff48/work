@@ -1,4 +1,9 @@
-const { ADD_NEW_PRODUCT_SOCKET } = require('../constants/event');
+const {
+  ADD_NEW_PRODUCT_SOCKET,
+  UPDATE_PRODUCT_SOCKET,
+  UPDATE_ROLE_SOCKET,
+  UPDATE_ROLE_ACTIVE_SOCKET,
+} = require('../constants/event');
 const myEmitter = require('../ee');
 
 function registerWsEmitter(map) {
@@ -8,6 +13,39 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_PRODUCT_SOCKET,
           payload: products,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_PRODUCT_SOCKET, (products) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_PRODUCT_SOCKET,
+          payload: products,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_ROLE_SOCKET, (updRoleData) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_ROLE_SOCKET,
+          payload: updRoleData,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_ROLE_ACTIVE_SOCKET, (updActiveRoleData) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_ROLE_ACTIVE_SOCKET,
+          payload: updActiveRoleData,
         })
       );
     }

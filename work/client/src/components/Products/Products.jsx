@@ -24,7 +24,6 @@ function Products() {
     checkUserAccess,
     userAccess,
     setUserAccess,
-    selectOptions,
   } = useProjectContext();
 
   const columns = useMemo(() => COLUMNS, []);

@@ -77,17 +77,11 @@ function* getAllRolesWatcher() {
 
 function* updateRolesWatcher(action) {
   try {
+    yield call(updateRole, action.payload);
+    
     // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { updRoleData, accessToken, accessTokenExpiration } = yield call(
-    const { updRoleData } = yield call(
-      updateRole,
-      action.payload
-    );
-
+    // const { updRoleData, accessToken, accessTokenExpiration } = yield call(updateRole, action.payload)
     // window.localStorage.setItem('jwt', accessToken);
-
-    yield put({ type: UPDATE_ROLE, payload: updRoleData });
     // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: UPDATE_ROLE, payload: [] });
@@ -96,17 +90,14 @@ function* updateRolesWatcher(action) {
 
 function* updateRolesActiveWatcher(action) {
   try {
+    yield call(updateRoleActive, action.payload);
+
     // accessTokenFront = yield select((state) => state.jwt);
-
     // const { updActiveRoleData, accessToken, accessTokenExpiration } = yield call(
-    const { updActiveRoleData } = yield call(
-      updateRoleActive,
-      action.payload
-    );
-
+    //   updateRoleActive,
+    //   action.payload
+    // );
     // window.localStorage.setItem('jwt', accessToken);
-
-    yield put({ type: UPDATE_ROLE_ACTIVE, payload: updActiveRoleData });
     // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: UPDATE_ROLE_ACTIVE, payload: [] });

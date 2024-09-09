@@ -1,6 +1,11 @@
 const { ErrorUtils } = require('../utils/Errors.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
 const RolesService = require('../services/Roles.js');
+const myEmitter = require('../src/ee.js');
+const {
+  UPDATE_ROLE_SOCKET,
+  UPDATE_ROLE_ACTIVE_SOCKET,
+} = require('../src/constants/event.js');
 
 class RolesController {
   static async getAllRoles(req, res) {
@@ -34,7 +39,9 @@ class RolesController {
           updRole,
         });
 
-      return res.status(200).json({ updRoleData });
+      myEmitter.emit(UPDATE_ROLE_SOCKET, updRoleData);
+
+      return res.status(200);
       // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
       // .json({ updRoleData, accessToken, accessTokenExpiration });
     } catch (err) {
@@ -57,7 +64,9 @@ class RolesController {
           updActiveRole,
         });
 
-      return res.status(200).json({ updActiveRoleData });
+      myEmitter.emit(UPDATE_ROLE_ACTIVE_SOCKET, updActiveRoleData);
+
+      return res.status(200);
       // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
       // .json({ updActiveRoleData, accessToken, accessTokenExpiration });
     } catch (err) {

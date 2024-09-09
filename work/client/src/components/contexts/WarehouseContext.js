@@ -78,7 +78,7 @@ const WarehouseContextProvider = ({ children }) => {
   const [filteredProducts, setFilteredProducts] = useState();
 
   useEffect(() => {
-    // dispatch(getProductsOfOrders());
+    dispatch(getProductsOfOrders());
   }, [dispatch]);
 
   return (
