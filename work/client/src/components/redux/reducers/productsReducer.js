@@ -1,4 +1,4 @@
-import { ADD_NEW_PRODUCT_SOCKET } from '../types/constants/socket';
+import { NEW_PRODUCT_SOCKET, UPD_PRODUCT_SOCKET } from '../types/socketTypes/socket';
 import { ALL_PRODUCTS, NEW_PRODUCT, UPDATE_PRODUCT } from '../types/productsTypes';
 
 export const productsReducer = (products = [], action) => {
@@ -17,7 +17,7 @@ export const productsReducer = (products = [], action) => {
       }
       return productsArr;
     }
-    case UPDATE_PRODUCT: {
+    case UPD_PRODUCT_SOCKET: {
       // const updateProducts = products.map((el) => {
       //   if (el.id === payload.id) return payload;
       //   return el;
@@ -26,8 +26,7 @@ export const productsReducer = (products = [], action) => {
       // return updateProducts;
       return [...products, payload];
     }
-    case ADD_NEW_PRODUCT_SOCKET: {
-      console.log('ADD_NEW_PRODUCT_SOCKET payload', payload);
+    case NEW_PRODUCT_SOCKET: {
       return [...products, payload];
     }
     default:

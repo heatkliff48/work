@@ -513,11 +513,11 @@ const ProjectContextProvider = ({ children }) => {
     if (!user) return;
     dispatch(getAllRoles());
     dispatch(getAllProducts());
-    // dispatch(getAllWarehouse());
-    // dispatch(getProductsOfOrders());
-    // dispatch(getListOfReservedProducts());
-    // dispatch(getListOfOrderedProduction());
-    // dispatch(getListOfOrderedProductionOEM());
+    dispatch(getAllWarehouse());
+    dispatch(getProductsOfOrders());
+    dispatch(getListOfReservedProducts());
+    dispatch(getListOfOrderedProduction());
+    dispatch(getListOfOrderedProductionOEM());
   }, [user, modalRoleCard]);
 
   useEffect(() => {

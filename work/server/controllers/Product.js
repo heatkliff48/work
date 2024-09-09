@@ -2,7 +2,10 @@ const ProductService = require('../services/Product.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
 const myEmitter = require('../src/ee.js');
-const { ADD_NEW_PRODUCT_SOCKET } = require('../src/constants/event.js');
+const {
+  ADD_NEW_PRODUCT_SOCKET,
+  UPDATE_PRODUCT_SOCKET,
+} = require('../src/constants/event.js');
 
 class ProductController {
   static async getAllProduct(req, res) {
@@ -59,7 +62,9 @@ class ProductController {
           product,
         });
 
-      return res.status(200).json({ products });
+      myEmitter.emit(UPDATE_PRODUCT_SOCKET, products);
+
+      return res.status(200);
       // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
       // .json({ products, accessToken, accessTokenExpiration })
     } catch (err) {
