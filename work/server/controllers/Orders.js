@@ -1,6 +1,8 @@
 const { ErrorUtils } = require('../utils/Errors.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
 const OrdersService = require('../services/Orders.js');
+const myEmitter = require('../src/ee.js');
+const { ADD_NEW_ORDER_SOCKET, ADD_DATASHIP_ORDER_SOCKET } = require('../src/constants/event.js');
 
 class OrdersController {
   static async getOrdersList(req, res) {
@@ -37,7 +39,9 @@ class OrdersController {
           status,
         });
 
-      return res.status(200).json({ newOrder });
+      myEmitter.emit(ADD_NEW_ORDER_SOCKET, newOrder);
+
+      return res.status(200);
       // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
       // .json({ newOrder, accessToken, accessTokenExpiration });
     } catch (err) {
@@ -60,6 +64,7 @@ class OrdersController {
           date,
         });
 
+        myEmitter.emit(ADD_DATASHIP_ORDER_SOCKET, date)
       return res.status(200);
       // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
       // .json({ accessToken, accessTokenExpiration })

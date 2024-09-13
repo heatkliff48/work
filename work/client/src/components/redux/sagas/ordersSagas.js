@@ -159,13 +159,12 @@ const updateStatusOfOrder = (orderStatus) => {
 
 function* getOrdersListWatcher() {
   try {
+    const { orders } = yield call(getAllOrders);
+    yield put({ type: ORDERS_LIST, payload: orders });
+
     // accessTokenFront = yield select((state) => state.jwt);
     // const { orders, accessToken, accessTokenExpiration } = yield call(getAllOrders);
-    const { orders } = yield call(getAllOrders);
-
     // window.localStorage.setItem('jwt', accessToken);
-
-    yield put({ type: ORDERS_LIST, payload: orders });
     // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error('Error:', err);
@@ -175,14 +174,11 @@ function* getOrdersListWatcher() {
 
 function* addNewOrderWatcher(action) {
   try {
+    yield call(addNewOrder, action.payload);
+
     // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { newOrder, accessToken, accessTokenExpiration } = yield call(
-    const { newOrder } = yield call(addNewOrder, action.payload);
-
+    // const { newOrder, accessToken, accessTokenExpiration } = yield call(addNewOrder, action.payload);
     // window.localStorage.setItem('jwt', accessToken);
-
-    yield put({ type: NEW_ORDER, payload: newOrder });
     // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);
@@ -192,15 +188,12 @@ function* addNewOrderWatcher(action) {
 
 function* addDataShipOrderWatcher(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
-
-    // const { accessToken, accessTokenExpiration } = yield call(
     yield call(addDataShipOrder, payload);
 
+    // accessTokenFront = yield select((state) => state.jwt);
+    // const { accessToken, accessTokenExpiration } = yield call(
     // window.localStorage.setItem('jwt', accessToken);
-
-    yield put({ type: DATA_SHIP_ORDER, payload });
     // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);
