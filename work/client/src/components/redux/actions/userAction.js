@@ -18,11 +18,13 @@ export const loginUser = (user) => {
     payload: user,
   };
 };
+
 export const checkUser = () => {
   return {
     type: GET_CHECK_USER,
   };
 };
+
 export const delUser = () => {
   return {
     type: GET_DEL_USER,
