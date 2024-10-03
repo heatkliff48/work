@@ -4,20 +4,22 @@ import Table from '../Table/Table';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import WarehouseAddModal from './WarehouseAddModal';
 import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
-import { useProjectContext } from '#components/contexts/Context.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 function Warehouse() {
+  const { COLUMNS_WAREHOUSE } = useWarehouseContext();
+
   const {
-    COLUMNS_WAREHOUSE,
     setWarehouseModal,
     warehouseModal,
     warehouse_data,
     warehouseInfoModal,
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
-  } = useWarehouseContext();
+  } = useModalContext();
 
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const user = useSelector((state) => state.user);
 
   useEffect(() => {

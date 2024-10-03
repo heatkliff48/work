@@ -15,20 +15,15 @@ import { useProjectContext } from '#components/contexts/Context.js';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 function MydModalWithGrid({ show, onHide }) {
   const clients = useSelector((state) => state.clients);
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
 
-  const {
-    currentClient,
-    setCurrentClient,
-    roles,
-    checkUserAccess,
-    userAccess,
-    setUserAccess,
-  } = useProjectContext();
+  const { currentClient, setCurrentClient } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   useEffect(() => {
     if (Object.keys(currentClient)?.length === 0) {
@@ -43,7 +38,7 @@ function MydModalWithGrid({ show, onHide }) {
       const access = checkUserAccess(user, roles, 'Clients');
       setUserAccess(access);
 
-      if (!access.canRead) {
+      if (!access?.canRead) {
         navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }
@@ -81,15 +76,15 @@ function MydModalWithGrid({ show, onHide }) {
               <ClientsAddress />
             </Col>
             <Col xs={6} md={4}>
-              {userAccess.canWrite && <ShowClientsEditModal />}
+              {userAccess?.canWrite && <ShowClientsEditModal />}
             </Col>
           </Row>
 
           <Row>
-            {userAccess.canWrite && <ShowDeliveryAddressModal />}
+            {userAccess?.canWrite && <ShowDeliveryAddressModal />}
             <DeliveryAddress />
           </Row>
-          {userAccess.canWrite && <ShowClientsContactInfoModal />}
+          {userAccess?.canWrite && <ShowClientsContactInfoModal />}
           <ClientsContactInfo />
         </Container>
       </Modal.Body>

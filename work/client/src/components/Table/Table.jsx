@@ -143,7 +143,7 @@ function Table({
             })}
           </tbody>
         </table>
-        {userAccess.canWrite && !haveButton && (
+        {userAccess?.canWrite && !haveButton && (
           <button onClick={onClickButton}>{buttonText}</button>
         )}
       </div>

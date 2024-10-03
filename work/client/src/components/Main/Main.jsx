@@ -1,20 +1,42 @@
 // import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { useProjectContext } from '#components/contexts/Context.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllRoles } from '#components/redux/actions/rolesAction.js';
+import { getAllProducts } from '#components/redux/actions/productsAction.js';
+import {
+  getAllWarehouse,
+  getListOfOrderedProduction,
+  getListOfOrderedProductionOEM,
+  getListOfReservedProducts,
+} from '#components/redux/actions/warehouseAction.js';
+import {
+  getOrders,
+  getProductsOfOrders,
+} from '#components/redux/actions/ordersAction.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 function Main() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
-  const { roles, checkUserAccess } = useProjectContext();
-
+  const { roles, checkUserAccess } = useUsersContext();
+  const { modalRoleCard } = useModalContext();
   useEffect(() => {
     if (!user) {
       navigate('/sign-in');
     }
-  }, [navigate, user]);
+    dispatch(getAllRoles());
+    dispatch(getAllProducts());
+    dispatch(getAllWarehouse());
+    dispatch(getProductsOfOrders());
+    dispatch(getListOfReservedProducts());
+    dispatch(getListOfOrderedProduction());
+    dispatch(getListOfOrderedProductionOEM());
+    dispatch(getOrders());
+  }, [navigate, user, modalRoleCard]);
 
   return (
     <div>
@@ -34,11 +56,14 @@ function Main() {
       {checkUserAccess(user, roles, 'Users_info')?.canRead && (
         <button onClick={() => navigate('/users_info')}>Users Info</button>
       )}
-      {checkUserAccess(user, roles, 'Production_batch_log')?.canRead && (
+      {/* {checkUserAccess(user, roles, 'Production_batch_log')?.canRead && (
         <button onClick={() => navigate('/production_batch_log')}>
-          Production Batch Log
+          Production Batch Log 
         </button>
-      )}
+      )} */}
+      <button onClick={() => navigate('/production_batch_designer')}>
+        Production Batch Designer
+      </button>
       <button onClick={() => navigate('/list_of_ordered_production')}>
         List of ordered production
       </button>

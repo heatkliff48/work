@@ -4,7 +4,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -105,9 +104,6 @@ const OrderContextProvider = ({ children }) => {
 
   const dispatch = useDispatch();
   const [currentOrder, setCurrentOrder] = useState();
-  const [clientModalOrder, setClientModalOrder] = useState(false);
-  const [productModalOrder, setProductModalOrder] = useState(false);
-  const [productInfoModalOrder, setProductInfoModalOrder] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productOfOrder, setProductOfOrder] = useState({});
   const [newOrder, setNewOrder] = useState();
@@ -162,10 +158,6 @@ const OrderContextProvider = ({ children }) => {
         COLUMNS_ORDER_PRODUCT,
         currentOrder,
         setCurrentOrder,
-        clientModalOrder,
-        setClientModalOrder,
-        productModalOrder,
-        setProductModalOrder,
         newOrder,
         setNewOrder,
         list_of_orders,
@@ -182,8 +174,6 @@ const OrderContextProvider = ({ children }) => {
         setIsOrderReady,
         selectedProduct,
         setSelectedProduct,
-        productInfoModalOrder,
-        setProductInfoModalOrder,
       }}
     >
       {children}

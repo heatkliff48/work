@@ -4,17 +4,17 @@ import Modal from 'react-bootstrap/Modal';
 import Container from 'react-bootstrap/Container';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useProjectContext } from '#components/contexts/Context.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import Table from '#components/Table/Table.jsx';
 import { addNewProductionBatchLog } from '#components/redux/actions/productionBatchLogAction.js';
 import { useDispatch, useSelector } from 'react-redux';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 // import { registerLocale, setDefaultLocale } from 'react-datepicker';
 // import { es } from 'date-fns/locale/es';
 // registerLocale('es', es);
 
 function AddListOfOrderedModal(props) {
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const { COLUMNS_LIST_OF_ORDERED_PRODUCTION, list_of_ordered_production } =
     useWarehouseContext();

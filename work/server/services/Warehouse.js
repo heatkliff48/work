@@ -1,213 +1,72 @@
-const TokenService = require('./Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const WarehouseRepository = require('../repositories/Warehouse.js');
 
 class WarehouseService {
-  static async getAllWarehouse({ id, username, email, fingerprint }) {
+  static async getAllWarehouse() {
     const warehouse = await WarehouseRepository.getAllWarehouse();
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      warehouse,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return warehouse;
   }
 
-  static async getListOfOrderedProduction({ id, username, email, fingerprint }) {
+  static async getListOfOrderedProduction() {
     const orderedProduction = await WarehouseRepository.getListOfOrderedProduction();
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      orderedProduction,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return orderedProduction;
   }
 
-  static async getListOfReservedProductsOEM({ id, username, email, fingerprint }) {
+  static async getListOfReservedProductsOEM() {
     const orderedProductionOEM =
       await WarehouseRepository.getListOfReservedProductsOEM();
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      orderedProductionOEM,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return orderedProductionOEM;
   }
 
-  static async getListOfReservedProducts({ id, username, email, fingerprint }) {
+  static async getListOfReservedProducts() {
     const listOfReservedProducts =
       await WarehouseRepository.getListOfReservedProducts();
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      listOfReservedProducts,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return listOfReservedProducts;
   }
 
-  static async addNewWarehouse({ id, username, email, fingerprint, warehouse }) {
+  static async addNewWarehouse({ warehouse }) {
     const new_warehouse = await WarehouseRepository.addNewWarehouse(warehouse);
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      new_warehouse,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return new_warehouse;
   }
 
-  static async addNewListOfOrderedProduction({
-    id,
-    username,
-    email,
-    fingerprint,
-    orderedProduction,
-  }) {
+  static async addNewListOfOrderedProduction({ orderedProduction }) {
     const new_ordered_production =
       await WarehouseRepository.addNewListOfOrderedProduction(orderedProduction);
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      new_ordered_production,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return new_ordered_production;
   }
 
-  static async addNewListOfOrderedProductionOEM({
-    id,
-    username,
-    email,
-    fingerprint,
-    orderedProductionOEM,
-  }) {
+  static async addNewListOfOrderedProductionOEM({ orderedProductionOEM }) {
     const new_ordered_production_OEM =
       await WarehouseRepository.addNewListOfOrderedProductionOEM(
         orderedProductionOEM
       );
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      new_ordered_production_OEM,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return new_ordered_production_OEM;
   }
 
-  static async updateRemainingStock({
-    id,
-    username,
-    email,
-    fingerprint,
-    upd_rem_srock,
-  }) {
+  static async updateRemainingStock({ upd_rem_srock }) {
     await WarehouseRepository.updateRemainingStock(upd_rem_srock);
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return;
   }
 
-  static async addNewReservedProducts({
-    id,
-    username,
-    email,
-    fingerprint,
-    reserved_product,
-  }) {
+  static async addNewReservedProducts({ reserved_product }) {
     const new_reserved_product = await WarehouseRepository.addNewReservedProducts(
       reserved_product
     );
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      new_reserved_product,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return new_reserved_product;
   }
 
-  static async deleteReservedProducts({
-    id,
-    username,
-    email,
-    fingerprint,
-    reserved_products_id,
-  }) {
+  static async deleteReservedProducts({ reserved_products_id }) {
     await WarehouseRepository.deleteReservedProducts(reserved_products_id);
 
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return;
   }
 }
 

@@ -69,7 +69,6 @@ function App() {
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>
-        <SnackbarProvider />
       </div>
     </MainContextProvider>
   );

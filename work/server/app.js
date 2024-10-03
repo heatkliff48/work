@@ -12,7 +12,6 @@ redisClient.on('error', (err) => {
 });
 const RedisStore = require('connect-redis')(session);
 const Fingerprint = require('express-fingerprint');
-const TokenService = require('./services/Token.js');
 const cookieParser = require('cookie-parser');
 const registerWsEmitter = require('./src/ws/wsEmitter');
 

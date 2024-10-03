@@ -6,7 +6,6 @@ module.exports = {
       'Products',
       [
         {
-          id: 1,
           article: 'T.NORMAL110C300252560',
           version: 1,
           density: 300,
@@ -38,7 +37,6 @@ module.exports = {
         },
 
         {
-          id: 2,
           article: 'T.NORMAL110C300302560',
           version: 1,
           density: 300,
@@ -70,7 +68,6 @@ module.exports = {
         },
 
         {
-          id: 3,
           article: 'T.NORMAL110C350252560',
           version: 1,
           density: 350,
@@ -102,7 +99,6 @@ module.exports = {
         },
 
         {
-          id: 4,
           article: 'T.NORMAL110C350302560',
           version: 1,
           density: 350,
@@ -134,7 +130,6 @@ module.exports = {
         },
 
         {
-          id: 5,
           article: 'T.NORMAL110C350362560',
           version: 1,
           density: 350,
@@ -166,7 +161,6 @@ module.exports = {
         },
 
         {
-          id: 6,
           article: 'T.NORMAL110C400202560',
           version: 1,
           density: 400,
@@ -198,7 +192,6 @@ module.exports = {
         },
 
         {
-          id: 7,
           article: 'T.NORMAL110C400252560',
           version: 1,
           density: 400,
@@ -230,7 +223,6 @@ module.exports = {
         },
 
         {
-          id: 8,
           article: 'T.NORMAL110C50072560',
           version: 1,
           density: 500,
@@ -262,7 +254,6 @@ module.exports = {
         },
 
         {
-          id: 9,
           article: 'T.NORMAL110C50082560',
           version: 1,
           density: 500,
@@ -294,7 +285,6 @@ module.exports = {
         },
 
         {
-          id: 10,
           article: 'T.NORMAL110C500102560',
           version: 1,
           density: 500,
@@ -326,7 +316,6 @@ module.exports = {
         },
 
         {
-          id: 11,
           article: 'T.NORMAL110C500152560',
           version: 1,
           density: 500,
@@ -358,7 +347,6 @@ module.exports = {
         },
 
         {
-          id: 12,
           article: 'T.NORMAL110C60072560',
           version: 1,
           density: 600,
@@ -390,7 +378,6 @@ module.exports = {
         },
 
         {
-          id: 13,
           article: 'T.NORMAL110C60082560',
           version: 1,
           density: 600,
@@ -422,7 +409,6 @@ module.exports = {
         },
 
         {
-          id: 14,
           article: 'T.NORMAL110C600102560',
           version: 1,
           density: 600,
@@ -454,7 +440,6 @@ module.exports = {
         },
 
         {
-          id: 15,
           article: 'T.NORMAL110C600152560',
           version: 1,
           density: 600,
@@ -486,7 +471,6 @@ module.exports = {
         },
 
         {
-          id: 16,
           article: 'T.U-BLOC110C350202560',
           version: 1,
           density: 350,
@@ -518,7 +502,6 @@ module.exports = {
         },
 
         {
-          id: 17,
           article: 'T.U-BLOC110C350252560',
           version: 1,
           density: 350,
@@ -550,7 +533,6 @@ module.exports = {
         },
 
         {
-          id: 18,
           article: 'T.U-BLOC110C350302560',
           version: 1,
           density: 350,
@@ -582,7 +564,6 @@ module.exports = {
         },
 
         {
-          id: 19,
           article: 'T.U-BLOC110C400202560',
           version: 1,
           density: 400,
@@ -614,7 +595,6 @@ module.exports = {
         },
 
         {
-          id: 20,
           article: 'T.U-BLOC110C400252560',
           version: 1,
           density: 400,
@@ -646,7 +626,6 @@ module.exports = {
         },
 
         {
-          id: 21,
           article: 'T.O-BLOC110C350202560',
           version: 1,
           density: 350,
@@ -678,7 +657,6 @@ module.exports = {
         },
 
         {
-          id: 22,
           article: 'T.O-BLOC110C350252560',
           version: 1,
           density: 350,
@@ -710,7 +688,6 @@ module.exports = {
         },
 
         {
-          id: 23,
           article: 'T.O-BLOC110C350302560',
           version: 1,
           density: 350,
@@ -742,7 +719,6 @@ module.exports = {
         },
 
         {
-          id: 24,
           article: 'T.O-BLOC110C350362560',
           version: 1,
           density: 350,
@@ -774,7 +750,6 @@ module.exports = {
         },
 
         {
-          id: 25,
           article: 'T.O-BLOC110C400202560',
           version: 1,
           density: 400,
@@ -806,7 +781,6 @@ module.exports = {
         },
 
         {
-          id: 26,
           article: 'T.O-BLOC110C400252560',
           version: 1,
           density: 400,
@@ -838,7 +812,6 @@ module.exports = {
         },
 
         {
-          id: 27,
           article: 'T.NORMAL110C10072560',
           version: 1,
           density: 100,
@@ -870,7 +843,6 @@ module.exports = {
         },
 
         {
-          id: 28,
           article: 'T.NORMAL110C100102560',
           version: 1,
           density: 100,
@@ -902,7 +874,6 @@ module.exports = {
         },
 
         {
-          id: 29,
           article: 'T.NORMAL110C100152560',
           version: 1,
           density: 100,
@@ -934,7 +905,6 @@ module.exports = {
         },
 
         {
-          id: 30,
           article: 'T.FORJAD110C2002010060',
           version: 1,
           density: 200,
@@ -966,7 +936,6 @@ module.exports = {
         },
 
         {
-          id: 31,
           article: 'T.FORJAD110C2002210060',
           version: 1,
           density: 200,
@@ -998,7 +967,6 @@ module.exports = {
         },
 
         {
-          id: 32,
           article: 'T.FORJAD110C2002510060',
           version: 1,
           density: 200,
@@ -1030,7 +998,6 @@ module.exports = {
         },
 
         {
-          id: 33,
           article: 'T.FORJAD110C2003010060',
           version: 1,
           density: 200,

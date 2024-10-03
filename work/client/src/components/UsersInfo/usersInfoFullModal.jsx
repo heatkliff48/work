@@ -9,19 +9,13 @@ import ShowPasswordChangeModal from './userPasswordChangeModal';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 function UsersInfoFullModal({ show, onHide }) {
   const usersInfo = useSelector((state) => state.usersInfo);
   const usersMainInfo = useSelector((state) => state.usersMainInfo);
-  const {
-    currentUsersInfo,
-    setCurrentUsersInfo,
-    roles,
-    checkUserAccess,
-    userAccess,
-    setUserAccess,
-  } = useProjectContext();
-
+  const { currentUsersInfo, setCurrentUsersInfo } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const user = useSelector((state) => state.user);
 
   const combine = (a, b, prop) =>
@@ -85,7 +79,7 @@ function UsersInfoFullModal({ show, onHide }) {
           <Row>
             <Col xs={12} md={8}></Col>
             <Col xs={6} md={4}>
-              {userAccess.canWrite && <ShowPasswordChangeModal />}
+              {userAccess?.canWrite && <ShowPasswordChangeModal />}
             </Col>
           </Row>
         </Container>

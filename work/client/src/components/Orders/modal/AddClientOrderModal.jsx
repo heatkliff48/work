@@ -10,11 +10,10 @@ import { addNewOrder } from '#components/redux/actions/ordersAction.js';
 import ShowClientsModal from '#components/Clients/ClientsInfo/ClientsInfoModal.js';
 import ShowDeliveryAddressModal from '#components/Clients/DeliveryAddress/DeliveryAddressModal';
 import ShowClientsContactInfoModal from '#components/Clients/ClientsContactInfo/ClientsContactInfoModal';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 
 const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
-    clientModalOrder,
-    setClientModalOrder,
     newOrder,
     setNewOrder,
     status_list,
@@ -23,6 +22,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     isOrderReady,
     setIsOrderReady,
   } = useOrderContext();
+  const { clientModalOrder, setClientModalOrder } = useModalContext();
   const { setCurrentClient } = useProjectContext();
 
   const dispatch = useDispatch();

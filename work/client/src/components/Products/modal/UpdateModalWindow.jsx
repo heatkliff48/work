@@ -2,11 +2,11 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { updateProduct } from '#components/redux/actions/productsAction.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 
 function UpdateModalWindow() {
+  const { promProduct, setPromProduct } = useProjectContext();
   const {
-    promProduct,
-    setPromProduct,
     modalUpdate,
     setModalUpdate,
     modal,
@@ -14,9 +14,9 @@ function UpdateModalWindow() {
     setStayDefault,
     setModalProductCard,
     modalProductCard,
-  } = useProjectContext();
-  const dispatch = useDispatch();
+  } = useModalContext();
 
+  const dispatch = useDispatch();
   const productData = useSelector((state) => state.products).findLast(
     (el) => el.article === promProduct.article
   );

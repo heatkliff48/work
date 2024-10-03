@@ -8,6 +8,7 @@ import {
 } from '#components/redux/actions/usersInfoAction';
 import { useProjectContext } from '#components/contexts/Context.js';
 import Table from '#components/Table/Table';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 export const ClientContext = createContext();
 
@@ -18,11 +19,8 @@ const UsersInfo = () => {
     users_info_table,
     usersInfoDataList,
     setUsersInfoDataList,
-    roles,
-    checkUserAccess,
-    userAccess,
-    setUserAccess,
   } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -64,7 +62,7 @@ const UsersInfo = () => {
   return (
     <Fragment>
       {' '}
-      {userAccess.canWrite && <ShowUsersInfoModal />}
+      {userAccess?.canWrite && <ShowUsersInfoModal />}
       <Table
         COLUMN_DATA={users_info_table}
         dataOfTable={usersInfoDataList}

@@ -1,6 +1,5 @@
-import { getProductsOfOrders } from '#components/redux/actions/ordersAction.js';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { createContext, useContext, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const WarehouseContext = createContext();
 
@@ -61,12 +60,6 @@ const WarehouseContextProvider = ({ children }) => {
     },
   ];
 
-  const dispatch = useDispatch();
-
-  const [warehouseModal, setWarehouseModal] = useState(false);
-  const [reserveProductModal, setReserveProductModal] = useState(false);
-  const [warehouseInfoModal, setWarehouseInfoModal] = useState(false);
-  const [warehouseInfoCurIdModal, setWarehouseInfoCurIdModal] = useState(null);
   const warehouse_data = useSelector((state) => state.warehouse);
   const list_of_reserved_products = useSelector((state) => state.reservedProducts);
   const list_of_ordered_production = useSelector(
@@ -76,10 +69,6 @@ const WarehouseContextProvider = ({ children }) => {
     (state) => state.listOfOrderedProductionOEM
   );
   const [filteredProducts, setFilteredProducts] = useState();
-
-  useEffect(() => {
-    dispatch(getProductsOfOrders());
-  }, [dispatch]);
 
   return (
     <WarehouseContext.Provider
@@ -92,14 +81,6 @@ const WarehouseContextProvider = ({ children }) => {
         list_of_ordered_production,
         list_of_ordered_production_oem,
         ordered_production_oem_status,
-        warehouseModal,
-        setWarehouseModal,
-        reserveProductModal,
-        setReserveProductModal,
-        warehouseInfoModal,
-        setWarehouseInfoModal,
-        warehouseInfoCurIdModal,
-        setWarehouseInfoCurIdModal,
         filteredProducts,
         setFilteredProducts,
       }}

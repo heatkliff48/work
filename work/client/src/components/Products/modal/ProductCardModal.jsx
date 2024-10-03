@@ -15,15 +15,14 @@ import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 import ModalWindow from './ModalWindow';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 
 const ProductCardModal = React.memo(() => {
-  const {
-    modalProductCard,
-    setModalProductCard,
-    COLUMNS,
-    productCardData,
-    setProductCardData,
-  } = useProjectContext();
+  const { productCardData, setProductCardData } = useProjectContext();
+  const { modalProductCard, setModalProductCard } = useModalContext();
+  const { COLUMNS } = useProductsContext();
+
   const [lastVersion, setLastVersion] = useState(1);
   const [isModalWindowOpen, setIsModalWindowOpen] = useState(false);
   const [productByVersion, setProductByVersion] = useState();

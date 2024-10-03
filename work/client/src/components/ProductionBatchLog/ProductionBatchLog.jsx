@@ -6,17 +6,12 @@ import { useProjectContext } from '#components/contexts/Context.js';
 import { getAllProductionBatchLogs } from '#components/redux/actions/productionBatchLogAction.js';
 import AddProductToProductionBatchLogModal from './ProductionBatchLogModal.jsx';
 import ShowAddListOfOrderedModal from './GetFromOrdersModal.jsx';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 function ProductionBatchLog() {
-  const {
-    production_batch_log,
-    productionBatchLogData,
-    setProductionBatchLogData,
-    roles,
-    checkUserAccess,
-    userAccess,
-    setUserAccess,
-  } = useProjectContext();
+  const { production_batch_log, productionBatchLogData, setProductionBatchLogData } =
+    useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const productionBatchLog = useSelector((state) => state.productionBatchLog);
 
   const user = useSelector((state) => state.user);
@@ -40,7 +35,7 @@ function ProductionBatchLog() {
 
       console.log('userAccess', userAccess);
 
-      if (!access.canRead) {
+      if (!access?.canRead) {
         navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }
@@ -48,8 +43,8 @@ function ProductionBatchLog() {
 
   return (
     <>
-      {userAccess.canWrite && <AddProductToProductionBatchLogModal />}
-      {userAccess.canWrite && <ShowAddListOfOrderedModal />}
+      {userAccess?.canWrite && <AddProductToProductionBatchLogModal />}
+      {userAccess?.canWrite && <ShowAddListOfOrderedModal />}
       <Table
         COLUMN_DATA={production_batch_log}
         dataOfTable={productionBatchLogData}

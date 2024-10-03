@@ -1,15 +1,15 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { useProjectContext } from '#components/contexts/Context.js';
 import { useDispatch } from 'react-redux';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
 import Select from 'react-select';
 import { addNewWarehouse } from '#components/redux/actions/warehouseAction.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 
 const WarehouseAddModal = React.memo(
   ({ isOpen, toggle, COLUMNS_WAREHOUSE, warehouse_data }) => {
-    const { COLUMNS, latestProducts } = useProjectContext();
+    const { COLUMNS, latestProducts } = useProductsContext();
     const dispatch = useDispatch();
 
     const [warehouseData, setWarehouseData] = useState([]);

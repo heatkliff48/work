@@ -1,36 +1,13 @@
-const TokenService = require('./Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const OrdersRepository = require('../repositories/Orders.js');
 
 class OrdersService {
-  static async getOrdersList({ id, username, email, fingerprint }) {
+  static async getOrdersList() {
     const orders = await OrdersRepository.getOrdersListData();
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      orders,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return orders;
   }
 
-  static async addNewOrder({
-    id,
-    username,
-    email,
-    fingerprint,
-    article,
-    del_adr_id,
-    contact_id,
-    owner,
-    status,
-  }) {
+  static async addNewOrder({ article, del_adr_id, contact_id, owner, status }) {
     const newOrder = await OrdersRepository.addNewOrderData({
       article,
       del_adr_id,
@@ -38,235 +15,74 @@ class OrdersService {
       owner,
       status,
     });
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      newOrder,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return newOrder;
   }
 
-  static async addShippingDateOrder({ id, username, email, fingerprint, date }) {
+  static async addShippingDateOrder({ date }) {
     await OrdersRepository.addShippingDateOrder(date);
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return;
   }
 
-  static async getProductsOfOrder({ id, username, email, fingerprint }) {
+  static async getProductsOfOrder() {
     const product_list = await OrdersRepository.getProductsOfOrder();
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      product_list,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return product_list;
   }
 
-  static async getCurrentProductsOfOrder({
-    id,
-    username,
-    email,
-    fingerprint,
-    order_id,
-  }) {
+  static async getCurrentProductsOfOrder({ order_id }) {
     const product_list = await OrdersRepository.getCurrentProductsOfOrder({
       order_id,
     });
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      product_list,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return product_list;
   }
 
-  static async getUpdateProductsOfOrder({
-    id,
-    username,
-    email,
-    fingerprint,
-    newProductsOfOrder,
-  }) {
+  static async getUpdateProductsOfOrder({ newProductsOfOrder }) {
     await OrdersRepository.getUpdateProductsOfOrder(newProductsOfOrder);
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return;
   }
 
-  static async getUpdateProductInfoOfOrder({
-    id,
-    username,
-    email,
-    fingerprint,
-    productOfOrder,
-  }) {
+  static async getUpdateProductInfoOfOrder({ productOfOrder }) {
     await OrdersRepository.getUpdateProductInfoOfOrder(productOfOrder);
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return;
   }
 
-  static async getUpdateContactInfoOfOrder({
-    id,
-    username,
-    email,
-    fingerprint,
-    contact_id,
-    order_id,
-  }) {
+  static async getUpdateContactInfoOfOrder({ contact_id, order_id }) {
     await OrdersRepository.getUpdateContactInfoOrder({ contact_id, order_id });
 
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return;
   }
 
-  static async getUpdateDeliveryAddressOrder({
-    id,
-    username,
-    email,
-    fingerprint,
-    address_id,
-    order_id,
-  }) {
+  static async getUpdateDeliveryAddressOrder({ address_id, order_id }) {
     await OrdersRepository.getUpdateDeliveryAddressOrder({ address_id, order_id });
 
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return;
   }
 
-  static async getUpdateStatusOrder({
-    id,
-    username,
-    email,
-    fingerprint,
-    status,
-    order_id,
-  }) {
+  static async getUpdateStatusOrder({ status, order_id }) {
     await OrdersRepository.getUpdateStatusOrder({ status, order_id });
 
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return;
   }
 
-  static async getDeleteProductOfOrder({
-    id,
-    username,
-    email,
-    fingerprint,
-    product_id,
-  }) {
+  static async getDeleteProductOfOrder({ product_id }) {
     await OrdersRepository.getDeleteProductOfOrder({
       product_id,
     });
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return;
   }
 
-  static async getDeleteOrder({ id, username, email, fingerprint, order_id }) {
+  static async getDeleteOrder({ order_id }) {
     await OrdersRepository.getDeleteOrder({
       order_id,
     });
-    const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return;
   }
 }
 

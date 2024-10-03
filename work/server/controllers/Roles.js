@@ -1,5 +1,4 @@
 const { ErrorUtils } = require('../utils/Errors.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
 const RolesService = require('../services/Roles.js');
 const myEmitter = require('../src/ee.js');
 const {
@@ -9,81 +8,47 @@ const {
 
 class RolesController {
   static async getAllRoles(req, res) {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.session.user;
-
     try {
-      const { accessToken, refreshToken, accessTokenExpiration, roles } =
-        await RolesService.getAllRoles({ id, username, email, fingerprint });
+      const roles = await RolesService.getAllRoles();
 
       return res.status(200).json({ roles });
-      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      // .json({ roles, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
   }
 
   static async updateRoles(req, res) {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.session.user;
     const { updRole } = req.body;
 
     try {
-      const { accessToken, refreshToken, accessTokenExpiration, updRoleData } =
-        await RolesService.updateRoles({
-          id,
-          username,
-          email,
-          fingerprint,
-          updRole,
-        });
+      const updRoleData = await RolesService.updateRoles({updRole});
 
       myEmitter.emit(UPDATE_ROLE_SOCKET, updRoleData);
 
       return res.status(200);
-      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      // .json({ updRoleData, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
   }
 
   static async updateActiveRoles(req, res) {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.session.user;
     const { updActiveRole } = req.body;
 
     try {
-      const { accessToken, refreshToken, accessTokenExpiration, updActiveRoleData } =
-        await RolesService.updateActiveRoles({
-          id,
-          username,
-          email,
-          fingerprint,
-          updActiveRole,
-        });
+      const updActiveRoleData = await RolesService.updateActiveRoles({updActiveRole});
 
       myEmitter.emit(UPDATE_ROLE_ACTIVE_SOCKET, updActiveRoleData);
-
       return res.status(200);
-      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      // .json({ updActiveRoleData, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
   }
 
   static async getPagesList(req, res) {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.session.user;
     try {
-      const { accessToken, refreshToken, accessTokenExpiration, pages } =
-        await RolesService.getPagesList({ id, username, email, fingerprint });
+      const pages = await RolesService.getPagesList();
 
       return res.status(200).json({ pages });
-      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      // .json({ pages, accessToken, accessTokenExpiration });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

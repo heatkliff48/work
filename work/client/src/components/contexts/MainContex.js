@@ -1,18 +1,27 @@
+import { ProductsContextProvider } from './ProductContext';
+import { ModalContextProvider } from './ModalContext';
+import { UsersContextProvider } from './UserContext';
+// import { ClientsContextProvider } from './ClientsContext';
 import WarehouseContextProvider from './WarehouseContext';
-import ProjectContextProvider from './Context';
 import OrderContextProvider from './OrderContext';
-// const { default: ProjectContextProvider } = require('./Context');
-// const { default: OrderContextProvider } = require('./OrderContext');
+import ProjectContextProvider from './Context';
 
 const MainContextProvider = ({ children }) => {
   return (
     <ProjectContextProvider>
-      {' '}
-      <OrderContextProvider>
-        {' '}
-        <WarehouseContextProvider>{children}</WarehouseContextProvider>{' '}
-      </OrderContextProvider>{' '}
+      <ProductsContextProvider>
+        <ModalContextProvider>
+          <UsersContextProvider>
+            {/* <ClientsContextProvider> */}
+            <OrderContextProvider>
+              <WarehouseContextProvider>{children}</WarehouseContextProvider>
+            </OrderContextProvider>
+            {/* </ClientsContextProvider>*/}
+          </UsersContextProvider>
+        </ModalContextProvider>
+      </ProductsContextProvider>
     </ProjectContextProvider>
   );
 };
+
 export default MainContextProvider;

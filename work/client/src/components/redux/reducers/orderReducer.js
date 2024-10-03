@@ -1,12 +1,14 @@
 import {
   DELETE_ORDER,
-  NEW_ORDER,
   ORDERS_LIST,
   NEW_CONTACT_OF_ORDER,
   NEW_DELIVERY_OF_ORDER,
   STATUS_OF_ORDER,
-  DATA_SHIP_ORDER,
 } from '../types/ordersTypes';
+import {
+  DATASHIP_ORDER_SOCKET,
+  NEW_ORDER_SOCKET,
+} from '../types/socketTypes/socket';
 
 export const ordersReducer = (orders = [], action) => {
   const { type, payload } = action;
@@ -15,11 +17,11 @@ export const ordersReducer = (orders = [], action) => {
       return payload;
     }
 
-    case NEW_ORDER: {
+    case NEW_ORDER_SOCKET: {
       return [...orders, payload];
     }
 
-    case DATA_SHIP_ORDER: {
+    case DATASHIP_ORDER_SOCKET: {
       const { order_id, shipping_date } = payload;
       const result = orders.map((order) => {
         if (order.id === order_id) {

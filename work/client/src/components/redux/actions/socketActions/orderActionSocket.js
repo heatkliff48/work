@@ -1,5 +1,4 @@
 import {
-  ADD_DATASHIP_ORDER_SOCKET,
   DATASHIP_ORDER_SOCKET,
   NEW_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
