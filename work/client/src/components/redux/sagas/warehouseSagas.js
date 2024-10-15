@@ -187,15 +187,8 @@ function* addNewWarehouseWatcher(action) {
 function* updRemainingStockWatcher(action) {
   try {
     const { payload } = action;
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { accessToken, accessTokenExpiration } = yield call(
     yield call(updateRemStock, payload);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
-    yield put({ type: REMAINING_STOCK, payload });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: REMAINING_STOCK, payload: [] });
   }
@@ -223,18 +216,8 @@ function* addNewReservedProductWatcher(action) {
 function* deleteReservedProductWatcher(action) {
   try {
     const { payload } = action;
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { accessToken, accessTokenExpiration } = yield call(
     yield call(deleteReservedProduct, payload);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
-    yield put({
-      type: DELETE_PRODUCT_FROM_RESERVED_LIST,
-      payload,
-    });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: DELETE_PRODUCT_FROM_RESERVED_LIST, payload: [] });
   }

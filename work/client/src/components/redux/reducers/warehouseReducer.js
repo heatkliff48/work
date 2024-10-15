@@ -1,7 +1,7 @@
+import { REMAINING_STOCK_SOCKET } from '../types/socketTypes/socket';
 import {
   ALL_WAREHOUSE,
   NEW_WAREHOUSE,
-  REMAINING_STOCK,
 } from '../types/warehouseTypes';
 
 export const warehouseReducer = (warehouse = [], action) => {
@@ -15,7 +15,7 @@ export const warehouseReducer = (warehouse = [], action) => {
       return [...warehouse, payload];
     }
 
-    case REMAINING_STOCK: {
+    case REMAINING_STOCK_SOCKET: {
       const { warehouse_id, new_remaining_stock } = payload;
       const result = warehouse.map((el) => {
         if (el.id === warehouse_id) {

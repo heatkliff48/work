@@ -1,5 +1,5 @@
+import { DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET } from '../types/socketTypes/socket';
 import {
-  DELETE_PRODUCT_FROM_RESERVED_LIST,
   LIST_OF_RESERVED_PRODUCTS,
   NEW_RESERVED_PRODUCT,
 } from '../types/warehouseTypes';
@@ -15,8 +15,10 @@ export const reservedProductsReducer = (reservedProducts = [], action) => {
       return payload;
     }
 
-    case DELETE_PRODUCT_FROM_RESERVED_LIST: {
-      const newReservedProducts = reservedProducts.filter((el) => el.id !== payload);
+    case DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
+      const newReservedProducts = reservedProducts.filter(
+        (el) => el.id !== payload.id
+      );
 
       return newReservedProducts;
     }

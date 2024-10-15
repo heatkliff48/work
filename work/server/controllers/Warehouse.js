@@ -1,6 +1,12 @@
 const { ErrorUtils } = require('../utils/Errors.js');
 const WarehouseService = require('../services/Warehouse.js');
 
+const {
+  GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_REMAINING_STOCK_SOCKET,
+} = require('../src/constants/event.js');
+const myEmitter = require('../src/ee.js');
+
 class WarehouseController {
   static async getAllWarehouse(req, res) {
     try {
@@ -90,6 +96,8 @@ class WarehouseController {
     try {
       await WarehouseService.updateRemainingStock({ upd_rem_srock });
 
+      myEmitter.emit(UPDATE_REMAINING_STOCK_SOCKET, upd_rem_srock)
+
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -116,6 +124,10 @@ class WarehouseController {
     try {
       await WarehouseService.deleteReservedProducts({ reserved_products_id });
 
+      myEmitter.emit(
+        GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+        reserved_products_id
+      );
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);

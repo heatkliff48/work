@@ -130,6 +130,7 @@ function ProductionBatchDesigner() {
   }, [productionBatchDesigner, headers]);
 
   useEffect(() => {
+    console.log('list_of_ordered_production', list_of_ordered_production);
     if (!latestProducts || !list_of_ordered_production) return;
 
     const prodBatch = [];

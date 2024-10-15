@@ -7,6 +7,8 @@ const {
   ADD_DATASHIP_ORDER_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_REMAINING_STOCK_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -94,6 +96,31 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
           payload: product_id,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(
+    GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (reserved_products_id) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: reserved_products_id,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(UPDATE_REMAINING_STOCK_SOCKET, (upd_rem_srock) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_REMAINING_STOCK_SOCKET,
+          payload: upd_rem_srock,
         })
       );
     }
