@@ -4,6 +4,8 @@ const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_ORDER_SOCKET,
   ADD_DATASHIP_ORDER_SOCKET,
+  UPDATE_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -64,7 +66,6 @@ class OrdersController {
 
   static async getCurrentProductsOfOrder(req, res) {
     const { order_id } = req.body;
-
     try {
       const product_list = await OrdersService.getCurrentProductsOfOrder({
         order_id,
@@ -80,9 +81,11 @@ class OrdersController {
     const { newProductsOfOrder } = req.body;
 
     try {
-      await OrdersService.getUpdateProductsOfOrder({
+      const product_of_order = await OrdersService.getUpdateProductsOfOrder({
         newProductsOfOrder,
       });
+
+      myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
 
       return res.status(200);
     } catch (err) {
@@ -157,6 +160,7 @@ class OrdersController {
         product_id,
       });
 
+      myEmitter.emit(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, product_id)
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);

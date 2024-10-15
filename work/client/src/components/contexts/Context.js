@@ -169,6 +169,7 @@ const ProjectContextProvider = ({ children }) => {
   ];
 
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
 
   const [promProduct, setPromProduct] = useState(null);
   const [productCardData, setProductCardData] = useState({});
@@ -176,7 +177,6 @@ const ProjectContextProvider = ({ children }) => {
   const [roleId, setRoleId] = useState(0);
   const [currentClientID, setClientID] = useState(1);
   const [stayDefault, setStayDefault] = useState(true);
-  const user = useSelector((state) => state.user);
   const isCheckedAuth = useRef(false);
   const [clientsDataList, setClientsDataList] = useState([]);
   const [currentClient, setCurrentClient] = useState({});

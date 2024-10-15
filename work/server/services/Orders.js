@@ -40,9 +40,11 @@ class OrdersService {
   }
 
   static async getUpdateProductsOfOrder({ newProductsOfOrder }) {
-    await OrdersRepository.getUpdateProductsOfOrder(newProductsOfOrder);
+    const product_of_order = await OrdersRepository.getUpdateProductsOfOrder(
+      newProductsOfOrder
+    );
 
-    return;
+    return product_of_order;
   }
 
   static async getUpdateProductInfoOfOrder({ productOfOrder }) {

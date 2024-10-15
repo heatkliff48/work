@@ -79,7 +79,7 @@ class OrdersRepository {
       final_price,
     } = productOfOrder;
 
-    await OrdersProducts.create({
+    const product_of_order = await OrdersProducts.create({
       order_id,
       product_id,
       quantity_m2,
@@ -90,7 +90,7 @@ class OrdersRepository {
       final_price,
     });
 
-    return;
+    return product_of_order;
   }
 
   static async getUpdateProductInfoOfOrder(productOfOrder) {

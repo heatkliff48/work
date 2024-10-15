@@ -265,11 +265,6 @@ function* getUpdateProductsOfOrderWatcher(action) {
     yield call(getUpdateProductsOfOrder, payload);
 
     // window.localStorage.setItem('jwt', accessToken);
-
-    yield put({
-      type: UPDATE_PRODUCTS_OF_ORDER,
-      payload: payload.newProductsOfOrder,
-    });
     // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     console.error(err);

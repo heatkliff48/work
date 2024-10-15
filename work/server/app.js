@@ -15,6 +15,7 @@ const Fingerprint = require('express-fingerprint');
 const cookieParser = require('cookie-parser');
 const registerWsEmitter = require('./src/ws/wsEmitter');
 
+const AutoclaveRootRouter = require('./router/Autoclave.js');
 const AuthRootRouter = require('./router/Auth.js');
 const ProductRootRouter = require('./router/Product.js');
 const OrdersRootRouter = require('./router/Orders.js');
@@ -82,6 +83,7 @@ app.use('/warehouse', WarehouseRootRouter);
 app.use('/usersInfo', usersInfoRouter);
 app.use('/usersMainInfo', usersMainInfoRouter);
 app.use('/productionBatchLog', productionBatchLogRouter);
+app.use('/autoclave', AutoclaveRootRouter);
 
 // Обработка WebSocket соединений
 server.on('upgrade', function (req, socket, head) {

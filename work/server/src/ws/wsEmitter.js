@@ -5,6 +5,8 @@ const {
   UPDATE_ROLE_ACTIVE_SOCKET,
   ADD_NEW_ORDER_SOCKET,
   ADD_DATASHIP_ORDER_SOCKET,
+  UPDATE_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -70,6 +72,28 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_DATASHIP_ORDER_SOCKET,
           payload: date,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_PRODUCT_OF_ORDER_SOCKET, (product_of_order) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_PRODUCT_OF_ORDER_SOCKET,
+          payload: product_of_order,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, (product_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
+          payload: product_id,
         })
       );
     }

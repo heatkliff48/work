@@ -1,11 +1,5 @@
 import { getOrders } from '#components/redux/actions/ordersAction.js';
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { useNavigate } from 'react-router-dom';
 import { DropdownFilter } from '#components/Table/filters';
@@ -116,7 +110,7 @@ const OrderContextProvider = ({ children }) => {
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
   const contactInfos = useSelector((state) => state.contactInfo);
-
+  const autoclaveData = useSelector((state) => state.autoclave);
   useEffect(() => {
     dispatch(getOrders());
   }, [dispatch, isOrderReady]);
@@ -174,6 +168,7 @@ const OrderContextProvider = ({ children }) => {
         setIsOrderReady,
         selectedProduct,
         setSelectedProduct,
+        autoclaveData,
       }}
     >
       {children}
