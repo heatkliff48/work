@@ -25,6 +25,7 @@ import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
+import { BiCycling } from 'react-icons/bi';
 // import { BiCycling } from 'react-icons/bi';
 // import PrintContent from './PrintContent.jsx'; // Импортируем созданный компонент
 
@@ -455,7 +456,7 @@ const OrderCart = React.memo(() => {
                 <input
                   type="checkbox"
                   checked={item.accessor === orderCartData?.status}
-                  onChange={() => {
+                  onClick={() => {
                     statusChangeHandler(item);
                   }}
                 />

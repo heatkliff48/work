@@ -1,8 +1,10 @@
 import {
   DATASHIP_ORDER_SOCKET,
+  DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_PRODUCT_OF_ORDER_SOCKET,
   NEW_ORDER_SOCKET,
   NEW_PRODUCT_SOCKET,
+  REMAINING_STOCK_SOCKET,
   UPD_PRODUCT_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_ROLE_ACTIVE_SOCKET,
@@ -62,5 +64,19 @@ export const addDatashipOrderSocket = (date) => {
   return {
     type: DATASHIP_ORDER_SOCKET,
     payload: date,
+  };
+};
+
+export const deleteReservedProductSocket = (reserved_products_id) => {
+  return {
+    type: DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: reserved_products_id,
+  };
+};
+
+export const updateRemainingStockSocket = (upd_rem_srock) => {
+  return {
+    type: REMAINING_STOCK_SOCKET,
+    payload: upd_rem_srock,
   };
 };

@@ -1,14 +1,12 @@
-import { useOrderContext } from '#components/contexts/OrderContext.js';
 import {
   getAutoclave,
   saveAutoclave,
 } from '#components/redux/actions/autoclaveAction.js';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 function Autoclave({ autoclave }) {
   const dispatch = useDispatch();
-  // const autoclave = useSelector((state) => state.autoclave); // Получаем данные autoclave из Redux
 
   const getClassForAutoclave = (num) => {
     switch (num) {
@@ -37,25 +35,12 @@ function Autoclave({ autoclave }) {
     }
   };
 
-  // Разбиваем autoclave на подмассивы по 21 объекту
-  // const filledAutoclave = useMemo(() => {
-  //   console.log('filledAutoclave autoclave', autoclave);
-  //   if (!Array.isArray(autoclave)) return [];
-  //   const chunks = [];
-  //   for (let i = 0; i < autoclave.length; i += 21) {
-  //     chunks.push(autoclave.slice(i, i + 21));
-  //   }
-  //   return chunks;
-  // }, [autoclave]);
-
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
   };
 
   useEffect(() => {
     dispatch(getAutoclave());
-
-    console.log('AUTOCLAVE', autoclave);
   }, [dispatch]);
 
   return (
