@@ -1,12 +1,5 @@
 import { getOrders } from '#components/redux/actions/ordersAction.js';
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { useNavigate } from 'react-router-dom';
 import { DropdownFilter } from '#components/Table/filters';
@@ -105,9 +98,6 @@ const OrderContextProvider = ({ children }) => {
 
   const dispatch = useDispatch();
   const [currentOrder, setCurrentOrder] = useState();
-  const [clientModalOrder, setClientModalOrder] = useState(false);
-  const [productModalOrder, setProductModalOrder] = useState(false);
-  const [productInfoModalOrder, setProductInfoModalOrder] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productOfOrder, setProductOfOrder] = useState({});
   const [newOrder, setNewOrder] = useState();
@@ -120,7 +110,7 @@ const OrderContextProvider = ({ children }) => {
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
   const contactInfos = useSelector((state) => state.contactInfo);
-
+  const autoclaveData = useSelector((state) => state.autoclave);
   useEffect(() => {
     dispatch(getOrders());
   }, [dispatch, isOrderReady]);
@@ -162,10 +152,6 @@ const OrderContextProvider = ({ children }) => {
         COLUMNS_ORDER_PRODUCT,
         currentOrder,
         setCurrentOrder,
-        clientModalOrder,
-        setClientModalOrder,
-        productModalOrder,
-        setProductModalOrder,
         newOrder,
         setNewOrder,
         list_of_orders,
@@ -182,8 +168,7 @@ const OrderContextProvider = ({ children }) => {
         setIsOrderReady,
         selectedProduct,
         setSelectedProduct,
-        productInfoModalOrder,
-        setProductInfoModalOrder,
+        autoclaveData,
       }}
     >
       {children}

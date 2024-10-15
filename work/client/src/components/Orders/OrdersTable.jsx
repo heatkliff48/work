@@ -3,44 +3,44 @@ import { useNavigate } from 'react-router-dom';
 import Table from '../Table/Table';
 import AddClientOrderModal from './modal/AddClientOrderModal';
 import { useOrderContext } from '../contexts/OrderContext';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import {
   getOrders,
   getCurrentProductsOfOrders,
 } from '#components/redux/actions/ordersAction.js';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 function OrdersTable() {
   const {
     COLUMNS_ORDERS,
     getCurrentOrderInfoHandler,
-    clientModalOrder,
-    setClientModalOrder,
     setProductOfOrder,
     setNewOrder,
     ordersDataList,
     setOrdersDataList,
   } = useOrderContext();
-
-  const { setCurrentClient, roles, checkUserAccess, userAccess, setUserAccess } =
-    useProjectContext();
+  const { clientModalOrder, setClientModalOrder } = useModalContext();
+  const { setCurrentClient } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const orders = useSelector((state) => state.orders);
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const user = useSelector((state) => state.user);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (user && roles.length > 0) {
       const access = checkUserAccess(user, roles, 'Orders');
       setUserAccess(access);
 
-      if (!access.canRead) {
+      if (!access?.canRead) {
         navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }

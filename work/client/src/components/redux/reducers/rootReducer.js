@@ -18,6 +18,7 @@ import { productionBatchLogReducer } from './productionBatchLogReducer';
 import { reservedProductsReducer } from './reservedProductsReducer';
 import { listOfOrderedProductionReducer } from './listOfOrderedProductionReducer';
 import { listOfOrderedProductionOEMReducer } from './listOfOrderedProductionOEMReducer';
+import { autoclaveReducer } from './autoclaveReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -38,4 +39,5 @@ export const rootReducer = combineReducers({
   reservedProducts: reservedProductsReducer,
   listOfOrderedProduction: listOfOrderedProductionReducer,
   listOfOrderedProductionOEM: listOfOrderedProductionOEMReducer,
+  autoclave: autoclaveReducer,
 });

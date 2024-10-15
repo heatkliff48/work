@@ -4,27 +4,22 @@ import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
 import './products.css';
 import { getAllProducts } from '../redux/actions/productsAction';
 import ModalWindow from './modal/ModalWindow';
-import { useProjectContext } from '../contexts/Context';
 import ProductCardModal from './modal/ProductCardModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { GlobalFilterInput } from '#components/Table/GlobalFilterInput';
 import { matchSorter } from 'match-sorter';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { useProjectContext } from '#components/contexts/Context.js';
 
 function Products() {
-  const {
-    modal,
-    setModal,
-    COLUMNS,
-    latestProducts,
-    modalProductCard,
-    setModalProductCard,
-    setProductCardData,
-    roles,
-    checkUserAccess,
-    userAccess,
-    setUserAccess,
-  } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { modal, setModal, modalProductCard, setModalProductCard } =
+    useModalContext();
+  const { COLUMNS, latestProducts } = useProductsContext();
+  const { setProductCardData } = useProjectContext();
 
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => latestProducts ?? [], [latestProducts]);
@@ -93,17 +88,17 @@ function Products() {
   } = tableInstance;
 
   const handleRowClick = (row) => {
-    if (userAccess.canRead) {
+    if (userAccess?.canRead) {
       setProductCardData(row.original);
       setModalProductCard(!modalProductCard);
     }
   };
 
   useEffect(() => {
-    if (userAccess.canRead) {
+    if (userAccess?.canRead) {
       dispatch(getAllProducts());
     }
-  }, [userAccess.canRead]);
+  }, [userAccess?.canRead]);
 
   useEffect(() => {
     if (user && roles.length > 0) {
@@ -112,13 +107,13 @@ function Products() {
 
       console.log('access', access);
 
-      if (!access.canRead) {
+      if (!access?.canRead) {
         navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }
   }, [user, roles]);
 
-  if (!userAccess.canRead) {
+  if (!userAccess?.canRead) {
     return <div>У вас нет прав для просмотра этой страницы.</div>;
   }
 
@@ -197,7 +192,7 @@ function Products() {
             })}
           </tbody>
         </table>
-        {userAccess.canWrite && (
+        {userAccess?.canWrite && (
           <button onClick={() => setModal(!modal)}>Add product new</button>
         )}
       </div>

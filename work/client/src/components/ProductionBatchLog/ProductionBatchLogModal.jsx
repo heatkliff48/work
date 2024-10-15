@@ -4,23 +4,19 @@ import Modal from 'react-bootstrap/Modal';
 import Container from 'react-bootstrap/Container';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useProjectContext } from '#components/contexts/Context.js';
 import Table from '#components/Table/Table.jsx';
 import { addNewProductionBatchLog } from '#components/redux/actions/productionBatchLogAction.js';
 import { useDispatch, useSelector } from 'react-redux';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 // import { registerLocale, setDefaultLocale } from 'react-datepicker';
 // import { es } from 'date-fns/locale/es';
 // registerLocale('es', es);
 
 function AddProductToProductionBatchLogModal(props) {
-  const {
-    COLUMNS,
-    latestProducts,
-    roles,
-    checkUserAccess,
-    userAccess,
-    setUserAccess,
-  } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+
+  const { COLUMNS, latestProducts } = useProductsContext();
 
   const [selectedProduct, setSelectedProduct] = useState({});
   const [startDate, setStartDate] = useState(new Date());

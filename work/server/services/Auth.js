@@ -8,10 +8,10 @@ const {
   Unauthorized,
 } = require('../utils/Errors.js');
 const UserRepository = require('../repositories/User.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
+
 
 class AuthService {
-  static async signIn({ email, password, fingerprint }) {
+  static async signIn({ email, password }) {
     const userData = await UserRepository.getUserData(email);
 
     if (!userData) throw new NotFound('Пользователь не найден');
@@ -20,27 +20,10 @@ class AuthService {
 
     if (!isPasswordValid) throw new Unauthorized('Неверный логин или пароль');
 
-    const payload = {
-      id: userData.id,
-      username: userData.username,
-      email: userData.email,
-      role: userData.role,
-    };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      user: userData,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
+    return userData
   }
 
-  static async signUp({ username, email, password, fingerprint, role }) {
+  static async signUp({ username, email, password, role }) {
     const userData = await UserRepository.getUserData(email);
     if (userData) {
       throw new Conflict('Пользователь с такой почтой уже существует.');
@@ -55,25 +38,8 @@ class AuthService {
       role,
     });
 
-    const payload = { id: user.id, username, email, role };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
-    return {
-      user,
-      accessToken,
-      refreshToken,
-      accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    };
-  }
-
-  static async logOut() {
-    // static async logOut(refreshToken) {
-    // await RefreshSessionsRepository.deleteRefreshSession(refreshToken);
-    
+    return user
   }
 }
 

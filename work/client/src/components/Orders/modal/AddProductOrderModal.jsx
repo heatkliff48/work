@@ -1,11 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useOrderContext } from '../../contexts/OrderContext';
-import { useProjectContext } from '#components/contexts/Context.js';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
 import { getUpdateProductOfOrders } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 
 const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -16,9 +16,8 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     list_of_orders,
     newOrder,
     selectedProduct,
-    productTable
   } = useOrderContext();
-  const { COLUMNS, latestProducts } = useProjectContext();
+  const { COLUMNS, latestProducts } = useProductsContext();
 
   // const [selectedProduct, setSelectedProduct] = useState(null);
   const dispatch = useDispatch();

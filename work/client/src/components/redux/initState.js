@@ -17,6 +17,7 @@ const initState = {
   reservedProducts: [],
   listOfOrderedProduction: [],
   listOfOrderedProductionOEM: [],
+  autoclave: [],
 };
 
 export default initState;

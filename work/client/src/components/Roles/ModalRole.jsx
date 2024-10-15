@@ -4,9 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useProjectContext } from '../contexts/Context';
 import { updateRoles } from '../redux/actions/rolesAction';
 import { getPagesList } from '../redux/actions/pagesAction';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 
 function ModalRole() {
-  const { roleId, setRoleId, modalRoleCard, setModalRoleCard } = useProjectContext();
+  const { roleId, setRoleId } = useProjectContext();
+  const { modalRoleCard, setModalRoleCard } = useModalContext();
   const pages = useSelector((state) => state.pages);
   const role = useSelector((state) => state.roles.find((el) => el.id === roleId));
   const [permissions, setPermissions] = useState([]);

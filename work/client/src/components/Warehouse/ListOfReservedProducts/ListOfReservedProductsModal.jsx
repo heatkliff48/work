@@ -3,26 +3,27 @@ import { Modal, ModalHeader, ModalBody, Button, Table } from 'reactstrap';
 import { useDispatch } from 'react-redux';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import ReservedProductModal from './ReserveProductModal';
-import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import {
   deleteReservedProducts,
   updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 
 const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
   const {
     warehouse_data,
     list_of_reserved_products,
-    warehouseInfoCurIdModal,
-    reserveProductModal,
-    setReserveProductModal,
     filteredProducts,
     setFilteredProducts,
   } = useWarehouseContext();
 
+  const { warehouseInfoCurIdModal, reserveProductModal, setReserveProductModal } =
+    useModalContext();
+
   const { productsOfOrders, list_of_orders } = useOrderContext();
-  const { latestProducts } = useProjectContext();
+  const { latestProducts } = useProductsContext();
 
   const [currentListOfResProd, setCurrentListOfResProd] = useState();
   const dispatch = useDispatch();

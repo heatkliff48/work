@@ -3,11 +3,16 @@ import { useDispatch } from 'react-redux';
 import { useProjectContext } from '../contexts/Context';
 import ModalRole from './ModalRole';
 import { getAllRoles, updateRoleActive } from '../redux/actions/rolesAction';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 function Roles() {
-  const { modalRoleCard, setModalRoleCard, setRoleId, roles } = useProjectContext();
-  const dispatch = useDispatch();
+  const { setRoleId } = useProjectContext();
+  const { roles } = useUsersContext();
+  const { modalRoleCard, setModalRoleCard } = useModalContext();
+
   const [updatedRoles, setUpdatedRoles] = useState(roles);
+  const dispatch = useDispatch();
 
   const handleRowClick = (id) => {
     setRoleId(id);

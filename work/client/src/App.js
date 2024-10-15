@@ -33,7 +33,7 @@ function App() {
   useEffect(() => {
     if (user) {
       const socketOnMessageFunc = createSocketOnMessage(dispatch);
-      const webSocketClient = new WebSocketClient({ url, socketOnMessageFunc }); // Создайте экземпляр WebSocketClien
+      const webSocketClient = new WebSocketClient({ url, socketOnMessageFunc });
     }
 
     // if (isCheckedAuth && !user) navigate('/sign-in');
@@ -69,7 +69,6 @@ function App() {
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>
-        <SnackbarProvider />
       </div>
     </MainContextProvider>
   );

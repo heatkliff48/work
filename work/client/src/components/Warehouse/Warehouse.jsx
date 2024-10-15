@@ -1,31 +1,43 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Table from '../Table/Table';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import WarehouseAddModal from './WarehouseAddModal';
 import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
-import { useProjectContext } from '#components/contexts/Context.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import ErrorBoundary from './ErrorBiundary';
 
 function Warehouse() {
+  const { COLUMNS_WAREHOUSE } = useWarehouseContext();
+
   const {
-    COLUMNS_WAREHOUSE,
     setWarehouseModal,
     warehouseModal,
-    warehouse_data,
     warehouseInfoModal,
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
-  } = useWarehouseContext();
+  } = useModalContext();
 
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useProjectContext();
+  const { warehouse_data } = useWarehouseContext();
+
+  const handleRowClick = useCallback((row) => {
+    setWarehouseInfoCurIdModal(row.original.id);
+    setWarehouseInfoModal(!warehouseInfoModal);
+  }, []);
+
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
     if (user && roles.length > 0) {
       const access = checkUserAccess(user, roles, 'Warehouse');
-      setUserAccess(access);
+
+      if (JSON.stringify(access) !== JSON.stringify(userAccess)) {
+        setUserAccess(access);
+      }
     }
-  }, [user, roles]);
+  }, [user, roles, checkUserAccess, userAccess, setUserAccess]);
 
   return (
     <>
@@ -43,6 +55,7 @@ function Warehouse() {
           toggle={() => setWarehouseInfoModal(!warehouseInfoModal)}
         />
       )}
+
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE}
         dataOfTable={warehouse_data}
@@ -52,10 +65,7 @@ function Warehouse() {
         }}
         buttonText={'Add new product on warehouse'}
         tableName={'Warehouse'}
-        handleRowClick={(row) => {
-          setWarehouseInfoCurIdModal(row.original.id);
-          setWarehouseInfoModal(!warehouseInfoModal);
-        }}
+        handleRowClick={handleRowClick}
       />
     </>
   );

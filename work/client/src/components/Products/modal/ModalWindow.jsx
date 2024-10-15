@@ -6,6 +6,8 @@ import InputField from '../../InputField/InputField';
 import UpdateModalWindow from './UpdateModalWindow';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { addNewProduct } from '#components/redux/actions/productsAction.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 
 const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   const {
@@ -13,15 +15,13 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
     setVersion,
     promProduct,
     setPromProduct,
-    modal,
-    setModal,
-    modalUpdate,
-    setModalUpdate,
     stayDefault,
     setStayDefault,
-    setModalProductCard,
-    selectOptions,
   } = useProjectContext();
+  const { modal, setModal, modalUpdate, setModalUpdate, setModalProductCard } =
+    useModalContext();
+  const { selectOptions } = useProductsContext();
+
   const [formInput, setFormInput] = useState({});
   const [haveMath, setHaveMath] = useState({});
   const [trMark, setTrMark] = useState('');

@@ -22,6 +22,9 @@ import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
 import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
 import AddProductOrderModal from './modal/AddProductOrderModal.jsx';
 import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 // import { BiCycling } from 'react-icons/bi';
 // import PrintContent from './PrintContent.jsx'; // Импортируем созданный компонент
 
@@ -32,22 +35,20 @@ const OrderCart = React.memo(() => {
     setNewOrder,
     status_list,
     list_of_orders,
+    setSelectedProduct,
+    setProductOfOrder,
+  } = useOrderContext();
+  const {
     productModalOrder,
     setProductModalOrder,
-    setProductOfOrder,
-    setSelectedProduct,
     productInfoModalOrder,
     setProductInfoModalOrder,
-  } = useOrderContext();
+  } = useModalContext();
+  const { displayNames } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
-  const {
-    latestProducts,
-    displayNames,
-    roles,
-    checkUserAccess,
-    userAccess,
-    setUserAccess,
-  } = useProjectContext();
+  const { latestProducts } = useProductsContext();
+
   const { list_of_reserved_products, ordered_production_oem_status } =
     useWarehouseContext();
 
@@ -310,7 +311,7 @@ const OrderCart = React.memo(() => {
       const statusAccess = checkUserAccess(user, roles, 'Orders_status');
       setOrderStatusAccess(statusAccess);
 
-      if (!access.canRead) {
+      if (!access?.canRead) {
         navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }
@@ -344,9 +345,9 @@ const OrderCart = React.memo(() => {
               <h4>Contact Person</h4>
               {filterAndMapData(orderCartData?.contactInfo, filterKeys)}
             </div>
-            {userAccess.canWrite && <ShowOrderContactEditModal />}
+            {userAccess?.canWrite && <ShowOrderContactEditModal />}
           </div>
-          {userAccess.canWrite && (
+          {userAccess?.canWrite && (
             <Button
               onClick={() => {
                 dispatch(deleteOrder(orderCartData?.id));
@@ -360,7 +361,7 @@ const OrderCart = React.memo(() => {
         <div className="delivery-address">
           <h4>Delivery Address</h4>
           {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
-          {userAccess.canWrite && <ShowOrderDeliveryEditModal />}
+          {userAccess?.canWrite && <ShowOrderDeliveryEditModal />}
         </div>
         <table className="product-table">
           <thead>
@@ -386,7 +387,7 @@ const OrderCart = React.memo(() => {
                 </td>
               </tr>
             ))}
-            {userAccess.canWrite && (
+            {userAccess?.canWrite && (
               <Button
                 onClick={() => {
                   setNewOrder((prev) => ({

@@ -10,22 +10,19 @@ import {
   getAllContactInfo,
 } from '#components/redux/actions/clientAction';
 import Table from '#components/Table/Table';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 export const ClientContext = createContext();
 
 const ClientsInfo = () => {
   const [modalShow, setModalShow] = useState(false);
   const {
-    currentClient,
     setCurrentClient,
     clients_info_table,
     clientsDataList,
     setClientsDataList,
-    roles,
-    checkUserAccess,
-    userAccess,
-    setUserAccess,
   } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -35,12 +32,12 @@ const ClientsInfo = () => {
   const [searchFilter, setSearchFilter] = useState('');
 
   useEffect(() => {
-    if (userAccess.canRead) {
+    if (userAccess?.canRead) {
       dispatch(getAllClients());
       dispatch(getAllDeliveryAddresses());
       dispatch(getAllContactInfo());
     }
-  }, [userAccess.canRead]);
+  }, [userAccess?.canRead]);
 
   const clientHandler = (id) => {
     const client = clients.find((el) => el.id === id);
@@ -60,7 +57,7 @@ const ClientsInfo = () => {
       const access = checkUserAccess(user, roles, 'Clients');
       setUserAccess(access);
 
-      if (!access.canRead) {
+      if (!access?.canRead) {
         navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }
@@ -69,7 +66,7 @@ const ClientsInfo = () => {
   return (
     <Fragment>
       {' '}
-      {userAccess.canWrite && <ShowClientsModal />}
+      {userAccess?.canWrite && <ShowClientsModal />}
       <Table
         COLUMN_DATA={clients_info_table}
         dataOfTable={clientsDataList}
