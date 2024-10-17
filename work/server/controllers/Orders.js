@@ -6,6 +6,7 @@ const {
   ADD_DATASHIP_ORDER_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
+  UPDATE_STATUS_OF_ORDER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -146,6 +147,8 @@ class OrdersController {
         order_id,
       });
 
+      myEmitter.emit(UPDATE_STATUS_OF_ORDER_SOCKET, { status, order_id });
+
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -160,7 +163,7 @@ class OrdersController {
         product_id,
       });
 
-      myEmitter.emit(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, product_id)
+      myEmitter.emit(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, product_id);
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);

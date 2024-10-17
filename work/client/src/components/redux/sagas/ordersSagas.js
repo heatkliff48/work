@@ -343,15 +343,9 @@ function* updateDeliveryOfOrderWorker(action) {
 
 function* updateStatusOfOrderWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
-
-    // const { accessToken, accessTokenExpiration } = yield call(
     yield call(updateStatusOfOrder, payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: STATUS_OF_ORDER, payload });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: STATUS_OF_ORDER, payload: [] });
   }

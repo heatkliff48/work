@@ -2,11 +2,14 @@ import {
   getAutoclave,
   saveAutoclave,
 } from '#components/redux/actions/autoclaveAction.js';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 function Autoclave({ autoclave }) {
   const dispatch = useDispatch();
+
+  // Объект для отслеживания идентификаторов и присвоенных цветов
+  const [idColorMap, setIdColorMap] = useState({});
 
   const getClassForAutoclave = (num) => {
     switch (num) {
@@ -35,6 +38,22 @@ function Autoclave({ autoclave }) {
     }
   };
 
+  const assignColorToId = (id) => {
+    // Если ID уже присутствует в idColorMap, возвращаем его цвет
+    if (idColorMap[id] !== undefined) {
+      return idColorMap[id];
+    }
+
+    // Иначе присваиваем новый цвет
+    const nextColor = Object.keys(idColorMap).length % 10; // Ограничиваем количество цветов до 10
+    setIdColorMap((prevMap) => ({
+      ...prevMap,
+      [id]: nextColor,
+    }));
+
+    return nextColor;
+  };
+
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
   };
@@ -52,7 +71,7 @@ function Autoclave({ autoclave }) {
             <div
               key={cellIndex}
               className={`autoclave-cell ${getClassForAutoclave(
-                el.id !== null ? el.status_batch : 0
+                el.id !== null ? assignColorToId(el.id) : 0
               )}`}
             >
               {el.id !== null ? `${el.density}x${el.width}` : ''}

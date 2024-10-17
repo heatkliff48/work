@@ -9,7 +9,6 @@ function ProductionBatchDesigner() {
   const { list_of_ordered_production } = useWarehouseContext();
   const { autoclaveData } = useOrderContext();
 
-  const [totalCakes, setTotalCakes] = useState(0);
   const [autoclave, setAutoclave] = useState([]);
   const [productionBatchDesigner, setProdBatchDesigner] = useState([]);
   const [totalQuantity, setTotalQuantity] = useState(0);
@@ -34,55 +33,66 @@ function ProductionBatchDesigner() {
     []
   );
 
-  // const cakes_in_batch = useMemo(() => {
-  //   let result = 0;
-  //   for (let i = 0; i < autoclaveData.length; i++) {
-  //     if (!autoclaveData[i].id) return result;
-  //     result++;
-  //   }
-  //   return result;
-  // }, [autoclaveData]);
-
-  // const cakes_residue = useMemo(() => {}, []);
-
   const addOnAutoclave = (row) => {
-    const { id, density, width, total_cakes } = row;
+    let count = 0;
+    setAutoclave((prevAutoclave) => {
+      const newAutoclaveState = prevAutoclave.map((autoclaveRow) =>
+        autoclaveRow.map((cell) => ({ ...cell }))
+      );
 
-    // console.log('addOnAutoclave', autoclave);
+      const { id, density, width, total_cakes } = row;
+      let cakesPlaced = 0;
 
-    const newAutoclaveState = autoclave.map((autoclave) => [...autoclave]);
-
-    let cakesPlaced = 0;
-    for (let i = 0; i < newAutoclaveState.length; i++) {
-      for (let j = 0; j < newAutoclaveState[i].length; j++) {
-        if (newAutoclaveState[i][j].id === null && cakesPlaced < total_cakes) {
-          newAutoclaveState[i][j] = { id, density, width };
-          cakesPlaced++;
+      for (let i = 0; i < newAutoclaveState.length; i++) {
+        for (let j = 0; j < newAutoclaveState[i].length; j++) {
+          if (!newAutoclaveState[i][j].id && cakesPlaced < total_cakes) {
+            newAutoclaveState[i][j] = { id, density, width };
+            cakesPlaced++;
+            count++;
+          }
         }
+        if (cakesPlaced >= total_cakes) break;
       }
-      if (cakesPlaced >= total_cakes) break;
-    }
 
-    setAutoclave(newAutoclaveState);
+      return newAutoclaveState;
+    });
+
+    setProdBatchDesigner((prevBatch) => {
+      return prevBatch.map((batchItem) => {
+        const { cakes_in_batch, total_cakes } = batchItem;
+        if (batchItem.id === row.id) {
+          return {
+            ...batchItem,
+            cakes_in_batch: cakes_in_batch + count / 2,
+            cakes_residue: total_cakes - (cakes_in_batch + count / 2),
+          };
+        }
+        return batchItem;
+      });
+    });
   };
 
   const addCakesData = useCallback((prodBatch) => {
-    const cakes_const = (prodBatch.product_with_brack * prodBatch.quantity) / 3;
-    const quantity_cakes = cakes_const.toFixed(2);
+    const quantity_cakes = (prodBatch.product_with_brack / 3).toFixed(2);
     const free_product_cakes = (Math.ceil(quantity_cakes) - quantity_cakes).toFixed(
       2
     );
     const free_product_package = Math.ceil(free_product_cakes * 3);
-    setTotalCakes(Math.ceil(quantity_cakes));
+
+    const total_cakes = Math.ceil(quantity_cakes);
+
+    const cakesPlacedInAutoclave = autoclaveData.filter(
+      (unit) => unit.id_list_of_ordered_product === prodBatch.id
+    ).length;
 
     const updatedProdBatch = {
       ...prodBatch,
       cakes_quantity: quantity_cakes,
       free_product_cakes,
       free_product_package,
-      total_cakes: totalCakes,
-      cakes_in_batch: 0,
-      cakes_residue: 0, //total_cakes - cakes_in_batch
+      total_cakes,
+      cakes_in_batch: cakesPlacedInAutoclave,
+      cakes_residue: total_cakes - cakesPlacedInAutoclave,
     };
 
     return updatedProdBatch;
@@ -109,7 +119,12 @@ function ProductionBatchDesigner() {
             return <td key={accessor}>{row[accessor]}</td>;
           })}
           <td>
-            <button onClick={() => addOnAutoclave(row)}>Разместить</button>
+            <button
+              onClick={() => addOnAutoclave(row)}
+              disabled={row.cakes_residue === 0}
+            >
+              Разместить
+            </button>
           </td>
         </tr>
       );
@@ -127,37 +142,48 @@ function ProductionBatchDesigner() {
 
       return rows;
     });
-  }, [productionBatchDesigner, headers]);
+  }, [productionBatchDesigner]);
 
   useEffect(() => {
-    console.log('list_of_ordered_production', list_of_ordered_production);
     if (!latestProducts || !list_of_ordered_production) return;
+
+    const groupedByDensity = list_of_ordered_production.reduce((acc, curr) => {
+      const product = latestProducts.find((p) => p.article === curr.product_article);
+      if (!product) return acc;
+      const { density } = product;
+
+      if (!acc[density]) {
+        acc[density] = [];
+      }
+
+      acc[density].push({ ...curr, product });
+
+      return acc;
+    }, {});
 
     const prodBatch = [];
     let updatedTotalQuantity = totalQuantity;
 
-    latestProducts.sort((a, b) => a.density - b.density);
+    Object.keys(groupedByDensity).forEach((densityKey) => {
+      const group = groupedByDensity[densityKey];
+      group.forEach(({ id, quantity, product }) => {
+        const { m3, normOfBrack, width, density } = product;
 
-    for (let i = 0; i < list_of_ordered_production.length; i++) {
-      const { product_article, id, quantity } = list_of_ordered_production[i];
-      const product = latestProducts.find((p) => p.article === product_article);
-      if (!product) continue;
+        if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
+          const batch = addCakesData({
+            id,
+            density,
+            width,
+            quantity,
+            product_with_brack: quantity * (1 + normOfBrack / 100),
+            quantity_m3: (normOfBrack * m3).toFixed(2),
+          });
+          prodBatch.push(batch);
+          updatedTotalQuantity += quantity;
+        }
+      });
+    });
 
-      const { m3, normOfBrack, width, density } = product;
-
-      if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
-        const batch = addCakesData({
-          id,
-          density,
-          width,
-          quantity,
-          product_with_brack: 1 + normOfBrack / 100,
-          quantity_m3: (normOfBrack * m3).toFixed(2),
-        });
-        prodBatch.push(batch);
-        updatedTotalQuantity += quantity;
-      }
-    }
     setProdBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
 
@@ -168,7 +194,7 @@ function ProductionBatchDesigner() {
       filledAutoclave.push(updatedAutoclaveData.slice(i, i + 21));
     }
     setAutoclave(filledAutoclave);
-  }, [latestProducts, list_of_ordered_production, addCakesData]);
+  }, [latestProducts, list_of_ordered_production, autoclaveData]);
 
   const transformAutoclaveData = (autoclave, prodBatchDesigner) => {
     if (!autoclave || !prodBatchDesigner) return [];

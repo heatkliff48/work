@@ -5,6 +5,7 @@ import {
   NEW_ORDER_SOCKET,
   NEW_PRODUCT_SOCKET,
   REMAINING_STOCK_SOCKET,
+  STATUS_OF_ORDER_SOCKET,
   UPD_PRODUCT_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_ROLE_ACTIVE_SOCKET,
@@ -64,6 +65,13 @@ export const addDatashipOrderSocket = (date) => {
   return {
     type: DATASHIP_ORDER_SOCKET,
     payload: date,
+  };
+};
+
+export const updStatusOfOrderSocket = (order) => {
+  return {
+    type: STATUS_OF_ORDER_SOCKET,
+    payload: order,
   };
 };
 

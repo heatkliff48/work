@@ -8,6 +8,7 @@ import {
 import {
   DATASHIP_ORDER_SOCKET,
   NEW_ORDER_SOCKET,
+  STATUS_OF_ORDER_SOCKET,
 } from '../types/socketTypes/socket';
 
 export const ordersReducer = (orders = [], action) => {
@@ -53,7 +54,7 @@ export const ordersReducer = (orders = [], action) => {
       });
     }
 
-    case STATUS_OF_ORDER: {
+    case STATUS_OF_ORDER_SOCKET: {
       const { status, order_id } = payload;
       return orders.map((order) => {
         if (order.id === order_id) return { ...order, status };
