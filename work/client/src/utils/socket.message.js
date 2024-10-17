@@ -9,6 +9,7 @@ import {
   updateRolesActiveSocket,
   updateRolesSocket,
   updProductOfOrderSocket,
+  updStatusOfOrderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -22,6 +23,7 @@ import {
   UPDATE_REMAINING_STOCK_SOCKET,
   UPDATE_ROLE_ACTIVE_SOCKET,
   UPDATE_ROLE_SOCKET,
+  UPDATE_STATUS_OF_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -61,11 +63,15 @@ export const createSocketOnMessage = (dispatch) => (event) => {
       dispatch(addDatashipOrderSocket(payload));
       break;
 
-    case GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET :
+    case UPDATE_STATUS_OF_ORDER_SOCKET:
+      dispatch(updStatusOfOrderSocket(payload));
+      break;
+
+    case GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET:
       dispatch(deleteReservedProductSocket(payload));
       break;
 
-    case UPDATE_REMAINING_STOCK_SOCKET :
+    case UPDATE_REMAINING_STOCK_SOCKET:
       dispatch(updateRemainingStockSocket(payload));
       break;
 

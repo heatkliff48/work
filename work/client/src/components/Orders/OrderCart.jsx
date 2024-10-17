@@ -25,7 +25,7 @@ import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { BiCycling } from 'react-icons/bi';
+import { BiCloudLightRain, BiCycling } from 'react-icons/bi';
 // import { BiCycling } from 'react-icons/bi';
 // import PrintContent from './PrintContent.jsx'; // Импортируем созданный компонент
 
@@ -129,6 +129,7 @@ const OrderCart = React.memo(() => {
 
   const addProductArticleToOrderList = useCallback(
     (productListOrder, latestProducts) => {
+      console.log('addProductArticleToOrderList');
       return productListOrder?.map((orderProduct) => {
         const product = latestProducts?.find(
           (p) => p.id === orderProduct?.product_id
@@ -146,6 +147,7 @@ const OrderCart = React.memo(() => {
   );
 
   const updatedProductListOrder = useMemo(() => {
+    console.log('updatedProductListOrder');
     return addProductArticleToOrderList(productListOrder, latestProducts);
   }, [productListOrder]);
 
@@ -195,6 +197,7 @@ const OrderCart = React.memo(() => {
         loc === 'Spain' &&
         !haveProductReserve
       ) {
+        console.log('addNewListOfOrderedProduction', product);
         dispatch(
           addNewListOfOrderedProduction({
             shipping_date: orderCartData?.shipping_date,
@@ -217,6 +220,7 @@ const OrderCart = React.memo(() => {
           })
         );
       }
+      return;
     });
 
     dispatch(
@@ -313,10 +317,14 @@ const OrderCart = React.memo(() => {
       setOrderStatusAccess(statusAccess);
 
       if (!access?.canRead) {
-        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+        navigate('/'); 
       }
     }
   }, [user, roles]);
+
+  useEffect(() => {
+    console.log('orderCartData', orderCartData.status);
+  }, [orderCartData]);
 
   return (
     <>

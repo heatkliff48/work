@@ -9,6 +9,7 @@ const {
   GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   UPDATE_REMAINING_STOCK_SOCKET,
+  UPDATE_STATUS_OF_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -74,6 +75,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_DATASHIP_ORDER_SOCKET,
           payload: date,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_STATUS_OF_ORDER_SOCKET, (order) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_STATUS_OF_ORDER_SOCKET,
+          payload: order,
         })
       );
     }
