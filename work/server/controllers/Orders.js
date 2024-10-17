@@ -49,7 +49,6 @@ class OrdersController {
       });
 
       myEmitter.emit(ADD_DATASHIP_ORDER_SOCKET, date);
-      myEmitter.emit(ADD_DATASHIP_ORDER_SOCKET, date);
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);

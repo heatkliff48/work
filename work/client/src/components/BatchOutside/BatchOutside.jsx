@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
-import { useProjectContext } from '#components/contexts/Context.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 import BatchOutsideModal from './BatchOutsideModal';
 
 const BatchOutside = () => {
   const [modalShow, setModalShow] = useState(false);
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useProjectContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
