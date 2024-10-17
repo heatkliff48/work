@@ -3,6 +3,11 @@ const { Clients } = require('../db/models');
 const TokenService = require('../services/Token.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
+const myEmitter = require('../src/ee.js');
+const {
+  ADD_NEW_CLIENT_SOCKET,
+  UPDATE_CLIENT_SOCKET,
+} = require('../src/constants/event.js');
 
 clientsRouter.get('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
@@ -51,7 +56,8 @@ clientsRouter.post('/', async (req, res) => {
       fingerprint
     );
 
-    return res.status(200).json({ client });
+    myEmitter.emit(ADD_NEW_CLIENT_SOCKET, client);
+    return res.status(200); //.json({ client });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({
     //   client,
@@ -125,16 +131,19 @@ clientsRouter.post('/update/:c_id', async (req, res) => {
       fingerprint
     );
 
-    return (
-      res
-        // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-        .status(200)
-        .json({
-          client,
-          accessToken,
-          accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-        })
-    );
+    myEmitter.emit(UPDATE_CLIENT_SOCKET, client);
+    return res.status(200); //.json({ client });
+
+    // return (
+    //   res
+    //     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
+    //     .status(200)
+    //     .json({
+    //       client,
+    //       accessToken,
+    //       accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
+    //     })
+    // );
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);

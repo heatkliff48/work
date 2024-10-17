@@ -70,6 +70,7 @@ function Main() {
       <button onClick={() => navigate('/list_of_ordered_production_oem')}>
         List of ordered production OEM
       </button>
+      <button onClick={() => navigate('/batch_outside')}>Batch Outside</button>
     </div>
   );
 }

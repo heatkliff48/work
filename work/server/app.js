@@ -28,6 +28,7 @@ const WarehouseRootRouter = require('./router/Warehouse.js');
 const usersInfoRouter = require('./router/usersInfo.js');
 const usersMainInfoRouter = require('./router/usersMainInfo.js');
 const productionBatchLogRouter = require('./router/productionBatchLog.js');
+const batchOutsideRouter = require('./router/batchoutside.js');
 
 const app = express();
 const map = new Map();
@@ -83,6 +84,7 @@ app.use('/warehouse', WarehouseRootRouter);
 app.use('/usersInfo', usersInfoRouter);
 app.use('/usersMainInfo', usersMainInfoRouter);
 app.use('/productionBatchLog', productionBatchLogRouter);
+app.use('/batchOutside', batchOutsideRouter);
 app.use('/autoclave', AutoclaveRootRouter);
 
 // Обработка WebSocket соединений
