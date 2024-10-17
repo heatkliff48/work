@@ -5,6 +5,14 @@ const {
   UPDATE_ROLE_ACTIVE_SOCKET,
   ADD_NEW_ORDER_SOCKET,
   ADD_DATASHIP_ORDER_SOCKET,
+  ADD_NEW_CLIENT_SOCKET,
+  UPDATE_CLIENT_SOCKET,
+  ADD_NEW_BATCH_OUTSIDE_SOCKET,
+  UPDATE_BATCH_OUTSIDE_SOCKET,
+  ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
+  UPDATE_LEGAL_ADDRESS_SOCKET,
+  ADD_DELIVERY_ADDRESSES_SOCKET,
+  ADD_CONTACT_INFO_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
@@ -75,6 +83,94 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_DATASHIP_ORDER_SOCKET,
           payload: date,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_CLIENT_SOCKET, (client) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_CLIENT_SOCKET,
+          payload: client,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_CLIENT_SOCKET, (client) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_CLIENT_SOCKET,
+          payload: client,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_CLIENTS_LEGAL_ADDRESS_SOCKET, (legalAddress) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
+          payload: legalAddress,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_LEGAL_ADDRESS_SOCKET, (legalAddress) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_LEGAL_ADDRESS_SOCKET,
+          payload: legalAddress,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_CONTACT_INFO_SOCKET, (contactInfo) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_CONTACT_INFO_SOCKET,
+          payload: contactInfo,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_DELIVERY_ADDRESSES_SOCKET, (deliveryAddress) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_DELIVERY_ADDRESSES_SOCKET,
+          payload: deliveryAddress,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_BATCH_OUTSIDE_SOCKET, (batchOutside) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_BATCH_OUTSIDE_SOCKET,
+          payload: batchOutside,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_BATCH_OUTSIDE_SOCKET, (batchOutside) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_BATCH_OUTSIDE_SOCKET,
+          payload: batchOutside,
         })
       );
     }

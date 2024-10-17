@@ -1,6 +1,8 @@
 const ClientsService = require('../services/Clients.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
+const myEmitter = require('../src/ee.js');
+const { ADD_NEW_CLIENT_SOCKET } = require('../src/constants/event.js');
 
 class ClientsController {
   static async getAllClients(req, res) {
@@ -32,7 +34,8 @@ class ClientsController {
           fingerprint,
           client,
         });
-      return res.status(200).json({ client });
+      myEmitter.emit(ADD_NEW_CLIENT_SOCKET, client);
+      return res.status(200); //.json({ client });
       // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
       // .json({ client, accessToken, accessTokenExpiration })
     } catch (err) {

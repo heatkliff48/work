@@ -3,6 +3,11 @@ const { ClientLegalAddresses } = require('../db/models');
 const TokenService = require('../services/Token.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
+const myEmitter = require('../src/ee.js');
+const {
+  ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
+  UPDATE_LEGAL_ADDRESS_SOCKET,
+} = require('../src/constants/event.js');
 
 clientsAddress.post('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
@@ -38,6 +43,7 @@ clientsAddress.post('/', async (req, res) => {
       fingerprint
     );
 
+    myEmitter.emit(ADD_CLIENTS_LEGAL_ADDRESS_SOCKET, legalAddress);
     return res.status(200).json({ legalAddress });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({
@@ -151,6 +157,7 @@ clientsAddress.post('/update/:c_id', async (req, res) => {
       fingerprint
     );
 
+    myEmitter.emit(UPDATE_LEGAL_ADDRESS_SOCKET, legalAddress);
     return res.status(200).json({ legalAddress });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({

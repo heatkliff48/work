@@ -3,6 +3,8 @@ const { DeliveryAddresses } = require('../db/models');
 const TokenService = require('../services/Token.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
+const myEmitter = require('../src/ee.js');
+const { ADD_DELIVERY_ADDRESSES_SOCKET } = require('../src/constants/event.js');
 
 deliveryAddress.post('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
@@ -40,6 +42,7 @@ deliveryAddress.post('/', async (req, res) => {
       fingerprint
     );
 
+    myEmitter.emit(ADD_DELIVERY_ADDRESSES_SOCKET, deliveryAddress);
     return res.status(200).json({ deliveryAddress });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({

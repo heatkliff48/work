@@ -13,9 +13,29 @@ import {
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
+  addNewClientSocket,
+  updateClientSocket,
+  addNewLegalAddressSocket,
+  updateLegalAddressSocket,
+  addNewDeliveryAddressSocket,
+  addNewContactInfoSocket,
+} from '#components/redux/actions/socketActions/clientsActionSocket.js';
+import {
+  addNewBatchOutsideSocket,
+  updateBatchOutsideSocket,
+} from '#components/redux/actions/socketActions/batchOutsideActionSocket.js';
+import {
+  ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
+  ADD_CONTACT_INFO_SOCKET,
   ADD_DATASHIP_ORDER_SOCKET,
+  ADD_DELIVERY_ADDRESSES_SOCKET,
+  ADD_NEW_BATCH_OUTSIDE_SOCKET,
+  ADD_NEW_CLIENT_SOCKET,
   ADD_NEW_ORDER_SOCKET,
   ADD_NEW_PRODUCT_SOCKET,
+  UPDATE_BATCH_OUTSIDE_SOCKET,
+  UPDATE_CLIENT_SOCKET,
+  UPDATE_LEGAL_ADDRESS_SOCKET,
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_SOCKET,
@@ -61,6 +81,38 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_DATASHIP_ORDER_SOCKET:
       dispatch(addDatashipOrderSocket(payload));
+      break;
+
+    case ADD_NEW_CLIENT_SOCKET:
+      dispatch(addNewClientSocket(payload));
+      break;
+
+    case UPDATE_CLIENT_SOCKET:
+      dispatch(updateClientSocket(payload));
+      break;
+
+    case ADD_CLIENTS_LEGAL_ADDRESS_SOCKET:
+      dispatch(addNewLegalAddressSocket(payload));
+      break;
+
+    case UPDATE_LEGAL_ADDRESS_SOCKET:
+      dispatch(updateLegalAddressSocket(payload));
+      break;
+
+    case ADD_CONTACT_INFO_SOCKET:
+      dispatch(addNewContactInfoSocket(payload));
+      break;
+
+    case ADD_DELIVERY_ADDRESSES_SOCKET:
+      dispatch(addNewDeliveryAddressSocket(payload));
+      break;
+
+    case ADD_NEW_BATCH_OUTSIDE_SOCKET:
+      dispatch(addNewBatchOutsideSocket(payload));
+      break;
+
+    case UPDATE_BATCH_OUTSIDE_SOCKET:
+      dispatch(updateBatchOutsideSocket(payload));
       break;
 
     case UPDATE_STATUS_OF_ORDER_SOCKET:

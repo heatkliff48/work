@@ -3,6 +3,8 @@ const { ContactInfos } = require('../db/models');
 const TokenService = require('../services/Token.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
+const myEmitter = require('../src/ee.js');
+const { ADD_CONTACT_INFO_SOCKET } = require('../src/constants/event.js');
 
 clientsContactInfo.post('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
@@ -46,6 +48,7 @@ clientsContactInfo.post('/', async (req, res) => {
       fingerprint
     );
 
+    myEmitter.emit(ADD_CONTACT_INFO_SOCKET, contactInfo);
     return res.status(200).json({ contactInfo });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({

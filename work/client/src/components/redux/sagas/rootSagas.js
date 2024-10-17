@@ -8,6 +8,7 @@ import ordersWatcher from './ordersSagas';
 import warehouseWatcher from './warehouseSagas';
 import usersInfoWatcher from './usersInfoSagas';
 import productionBatchLogWatcher from './productionBatchLogSagas';
+import batchOutsideWatcher from './batchOutsideSagas';
 import autoclaveWatcher from './autoclaveSagas';
 
 export default function* rootSaga() {
@@ -21,6 +22,7 @@ export default function* rootSaga() {
     warehouseWatcher(),
     usersInfoWatcher(),
     productionBatchLogWatcher(),
+    batchOutsideWatcher(),
     autoclaveWatcher(),
   ]);
 }

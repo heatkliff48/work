@@ -16,6 +16,7 @@ import UsersInfo from '#components/UsersInfo/usersInfo.jsx';
 import ListOfOrderedProduction from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProduction.jsx';
 import ListOfOrderedProductionOEM from '#components/Warehouse/ListOfOrderedProductionOEM/ListOfOrderedProductionOEM.jsx';
 import ProductionBatchDesigner from '#components/ProductionBatchDesigner/ProductionBatchDesigner.jsx';
+import BatchOutside from '#components/BatchOutside/BatchOutside.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -66,6 +67,7 @@ function App() {
             path="/list_of_ordered_production_oem"
             element={<ListOfOrderedProductionOEM />}
           />
+          <Route path="/batch_outside" element={<BatchOutside />} />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>
