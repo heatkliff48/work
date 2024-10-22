@@ -4,6 +4,7 @@ const WarehouseService = require('../services/Warehouse.js');
 const {
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   UPDATE_REMAINING_STOCK_SOCKET,
+  ADD_NEW_WAREHOUSE_SOCKET,
 } = require('../src/constants/event.js');
 const myEmitter = require('../src/ee.js');
 
@@ -56,7 +57,8 @@ class WarehouseController {
     try {
       const new_warehouse = await WarehouseService.addNewWarehouse({ warehouse });
 
-      return res.status(200).json({ new_warehouse });
+      myEmitter.emit(ADD_NEW_WAREHOUSE_SOCKET, new_warehouse);
+      return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -96,7 +98,7 @@ class WarehouseController {
     try {
       await WarehouseService.updateRemainingStock({ upd_rem_srock });
 
-      myEmitter.emit(UPDATE_REMAINING_STOCK_SOCKET, upd_rem_srock)
+      myEmitter.emit(UPDATE_REMAINING_STOCK_SOCKET, upd_rem_srock);
 
       return res.status(200);
     } catch (err) {

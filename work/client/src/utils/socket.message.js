@@ -2,6 +2,7 @@ import {
   addDatashipOrderSocket,
   addNewOrderSocket,
   addNewProductSocket,
+  addNewWarehouseSocket,
   deeleteProductOfOrderSocket,
   deleteReservedProductSocket,
   updateProductSocket,
@@ -44,6 +45,7 @@ import {
   UPDATE_ROLE_ACTIVE_SOCKET,
   UPDATE_ROLE_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
+  ADD_NEW_WAREHOUSE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -83,6 +85,14 @@ export const createSocketOnMessage = (dispatch) => (event) => {
       dispatch(addDatashipOrderSocket(payload));
       break;
 
+    case UPDATE_STATUS_OF_ORDER_SOCKET:
+      dispatch(updStatusOfOrderSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_SOCKET:
+      dispatch(addNewWarehouseSocket(payload));
+      break;
+
     case ADD_NEW_CLIENT_SOCKET:
       dispatch(addNewClientSocket(payload));
       break;
@@ -113,10 +123,6 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_BATCH_OUTSIDE_SOCKET:
       dispatch(updateBatchOutsideSocket(payload));
-      break;
-
-    case UPDATE_STATUS_OF_ORDER_SOCKET:
-      dispatch(updStatusOfOrderSocket(payload));
       break;
 
     case GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET:

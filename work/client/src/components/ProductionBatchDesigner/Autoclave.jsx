@@ -39,13 +39,11 @@ function Autoclave({ autoclave }) {
   };
 
   const assignColorToId = (id) => {
-    // Если ID уже присутствует в idColorMap, возвращаем его цвет
     if (idColorMap[id] !== undefined) {
       return idColorMap[id];
     }
 
-    // Иначе присваиваем новый цвет
-    const nextColor = Object.keys(idColorMap).length % 10; // Ограничиваем количество цветов до 10
+    const nextColor = Object.keys(idColorMap).length % 10;
     setIdColorMap((prevMap) => ({
       ...prevMap,
       [id]: nextColor,
