@@ -101,6 +101,7 @@ const OrderContextProvider = ({ children }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productOfOrder, setProductOfOrder] = useState({});
   const [newOrder, setNewOrder] = useState();
+  const [autoclave, setAutoclave] = useState([]);
   const [ordersDataList, setOrdersDataList] = useState([]);
   const [orderCartData, setOrderCartData] = useState({});
   const [isOrderReady, setIsOrderReady] = useState(false);
@@ -139,7 +140,6 @@ const OrderContextProvider = ({ children }) => {
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
-      console.log('currentOrder', currentOrder);
       setOrderCartData(currentOrder);
     },
     [list_of_orders, clients, deliveryAddresses]
@@ -169,6 +169,7 @@ const OrderContextProvider = ({ children }) => {
         selectedProduct,
         setSelectedProduct,
         autoclaveData,
+        autoclave, setAutoclave
       }}
     >
       {children}

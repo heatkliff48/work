@@ -31,8 +31,6 @@ function AddListOfOrderedModal(props) {
     );
 
     setSelectedProduct(product);
-
-    console.log('selectedProduct', selectedProduct);
   };
 
   const onSubmitForm = async (e) => {

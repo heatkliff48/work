@@ -129,7 +129,6 @@ const OrderCart = React.memo(() => {
 
   const addProductArticleToOrderList = useCallback(
     (productListOrder, latestProducts) => {
-      console.log('addProductArticleToOrderList');
       return productListOrder?.map((orderProduct) => {
         const product = latestProducts?.find(
           (p) => p.id === orderProduct?.product_id
@@ -147,7 +146,6 @@ const OrderCart = React.memo(() => {
   );
 
   const updatedProductListOrder = useMemo(() => {
-    console.log('updatedProductListOrder');
     return addProductArticleToOrderList(productListOrder, latestProducts);
   }, [productListOrder]);
 
@@ -197,7 +195,6 @@ const OrderCart = React.memo(() => {
         loc === 'Spain' &&
         !haveProductReserve
       ) {
-        console.log('addNewListOfOrderedProduction', product);
         dispatch(
           addNewListOfOrderedProduction({
             shipping_date: orderCartData?.shipping_date,
