@@ -7,9 +7,8 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 function ProductionBatchDesigner() {
   const { latestProducts } = useProductsContext();
   const { list_of_ordered_production } = useWarehouseContext();
-  const { autoclaveData } = useOrderContext();
+  const { autoclaveData, autoclave, setAutoclave } = useOrderContext();
 
-  const [autoclave, setAutoclave] = useState([]);
   const [productionBatchDesigner, setProdBatchDesigner] = useState([]);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const MAX_QUANTITY = 1405;

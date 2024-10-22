@@ -450,9 +450,29 @@ input[type='checkbox'] {
   padding: 10px;
   margin: 2px;
   text-align: center;
-  width: 120px;  
-  height: 40px; 
+  width: 120px;
+  height: 40px;
   border: 1px solid gray; /* Рамка для ячейки */
+}
+
+.autoclave-buttons-container {
+  margin-top: 20px; /* Отступ сверху */
+  text-align: center; /* Центрирование кнопок */
+}
+
+.autoclave-buttons-container button {
+  padding: 10px 20px;
+  margin: 5px;
+  background-color: #4caf50; /* Зеленый фон */
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px; /* Закругление углов */
+  font-size: 16px;
+}
+
+.autoclave-buttons-container button:hover {
+  background-color: #45a049; /* Изменение цвета при наведении */
 }
 
 .cell-white {
