@@ -52,20 +52,12 @@ const BatchOutside = () => {
   ];
 
   useEffect(() => {
-    if (userAccess.canRead) {
-      dispatch(getBatchOutside());
-    }
-  }, [userAccess.canRead]);
-
-  useEffect(() => {
     if (batchOutside) {
       setBatchOutsideDataList(batchOutside);
     }
   }, [batchOutside]);
 
   const batchOutsideHandler = (id) => {
-    // const batch = batchOutside.find((el) => el.id === id);
-    // setCurrentBatch(batch);
     setModalShow(true);
   };
 
@@ -75,19 +67,24 @@ const BatchOutside = () => {
       setUserAccess(access);
 
       if (!access.canRead) {
-        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+        navigate('/');
       }
     }
   }, [user, roles]);
 
+  useEffect(() => {
+    if (userAccess.canRead) {
+      dispatch(getBatchOutside());
+    }
+  }, []);
+
   return (
     <Fragment>
       {' '}
-      {/* {userAccess.canWrite && <ShowClientsModal />} */}
       <Table
         COLUMN_DATA={batch_outside_table}
         dataOfTable={batchOutsideDataList}
-        tableName={'Табличка :)'}
+        tableName={'Таблица'}
         userAccess={userAccess}
         handleRowClick={(row) => {
           batchOutsideHandler(row.original.id);

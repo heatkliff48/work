@@ -36,13 +36,7 @@ function BatchOutsideModal(props) {
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
-
-    // dispatch(addNewClient({ client: clientInput }));
-    // dispatch(addNewLegalAddress({ legalAddress: clientLegalAddressInput }));
-    // setModalShow(false);
     props.onHide();
-    // setClientInput({});
-    // setClientLegalAddressInput({});
   };
 
   return (

@@ -21,6 +21,7 @@ function ModalRole() {
   useEffect(() => {
     if (role && pages) {
       const rolePermissions = role.PageAndRolesArray || [];
+      console.log('role', role);
       setPermissions(
         pages.map((page) => {
           const pageInfo = rolePermissions.find((p) => p.id === page.id);
@@ -85,6 +86,7 @@ function ModalRole() {
           </div>
           {permissions.map((perm) => (
             <div key={perm.page_id} className="table-row">
+              {/* {console.log('permissions', perm)} */}
               <div>{pages.find((page) => page.id === perm.page_id)?.page_name}</div>
               <div>
                 <input

@@ -173,12 +173,7 @@ function* addNewWarehouseWatcher(action) {
     // accessTokenFront = yield select((state) => state.jwt);
 
     // const { new_warehouse, accessToken, accessTokenExpiration } = yield call(
-    const { new_warehouse } = yield call(addNewWarehouse, action.payload);
-
-    // window.localStorage.setItem('jwt', accessToken);
-
-    yield put({ type: NEW_WAREHOUSE, payload: new_warehouse });
-    // yield put(setToken(accessToken, accessTokenExpiration));
+    yield call(addNewWarehouse, action.payload);
   } catch (err) {
     yield put({ type: NEW_WAREHOUSE, payload: [] });
   }
@@ -188,7 +183,6 @@ function* updRemainingStockWatcher(action) {
   try {
     const { payload } = action;
     yield call(updateRemStock, payload);
-
   } catch (err) {
     yield put({ type: REMAINING_STOCK, payload: [] });
   }
@@ -217,7 +211,6 @@ function* deleteReservedProductWatcher(action) {
   try {
     const { payload } = action;
     yield call(deleteReservedProduct, payload);
-
   } catch (err) {
     yield put({ type: DELETE_PRODUCT_FROM_RESERVED_LIST, payload: [] });
   }
@@ -228,9 +221,7 @@ function* getListOfOrderedProductionWatcher() {
     // accessTokenFront = yield select((state) => state.jwt);
 
     // const { orderedProduction, accessToken, accessTokenExpiration } = yield call(
-    const { orderedProduction} = yield call(
-      getListOfOrderedProduction
-    );
+    const { orderedProduction } = yield call(getListOfOrderedProduction);
 
     // window.localStorage.setItem('jwt', accessToken);
 
@@ -246,8 +237,10 @@ function* addNewListOfOrderedProductionWatcher(action) {
     // accessTokenFront = yield select((state) => state.jwt);
 
     // const { new_ordered_production, accessToken, accessTokenExpiration } =
-    const { new_ordered_production } =
-      yield call(addNewListOfOrderedProduction, action.payload);
+    const { new_ordered_production } = yield call(
+      addNewListOfOrderedProduction,
+      action.payload
+    );
 
     // window.localStorage.setItem('jwt', accessToken);
 
@@ -263,9 +256,7 @@ function* getListOfOrderedProductionOEMWatcher() {
     // accessTokenFront = yield select((state) => state.jwt);
 
     // const { orderedProductionOEM, accessToken, accessTokenExpiration } = yield call(
-    const { orderedProductionOEM } = yield call(
-      getListOfOrderedProductionOEM
-    );
+    const { orderedProductionOEM } = yield call(getListOfOrderedProductionOEM);
 
     // window.localStorage.setItem('jwt', accessToken);
 
@@ -284,8 +275,10 @@ function* addNewListOfOrderedProductionOEMWatcher(action) {
     // accessTokenFront = yield select((state) => state.jwt);
 
     // const { new_ordered_production_OEM, accessToken, accessTokenExpiration } =
-    const { new_ordered_production_OEM } =
-      yield call(addNewListOfOrderedProductionOEM, action.payload);
+    const { new_ordered_production_OEM } = yield call(
+      addNewListOfOrderedProductionOEM,
+      action.payload
+    );
 
     // window.localStorage.setItem('jwt', accessToken);
 

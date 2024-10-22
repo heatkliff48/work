@@ -104,7 +104,7 @@ module.exports = {
           density: 350,
           form: 'Normal',
           certificate: 'CE',
-          placeOfProduction: 1,
+          placeOfProduction: 0,
           typeOfPackaging: 1,
           width: 300,
           lengths: 600,

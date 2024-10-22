@@ -4,6 +4,7 @@ import {
   DELETE_PRODUCT_OF_ORDER_SOCKET,
   NEW_ORDER_SOCKET,
   NEW_PRODUCT_SOCKET,
+  NEW_WAREHOUSE_SOCKET,
   REMAINING_STOCK_SOCKET,
   STATUS_OF_ORDER_SOCKET,
   UPD_PRODUCT_SOCKET,
@@ -86,5 +87,12 @@ export const updateRemainingStockSocket = (upd_rem_srock) => {
   return {
     type: REMAINING_STOCK_SOCKET,
     payload: upd_rem_srock,
+  };
+};
+
+export const addNewWarehouseSocket = (new_warehouse) => {
+  return {
+    type: NEW_WAREHOUSE_SOCKET,
+    payload: new_warehouse,
   };
 };

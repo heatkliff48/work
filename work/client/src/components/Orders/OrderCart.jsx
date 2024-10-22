@@ -203,7 +203,7 @@ const OrderCart = React.memo(() => {
             shipping_date: orderCartData?.shipping_date,
             product_article: product?.product_article,
             order_article: orderCartData?.article,
-            quantity: product?.quantity_real,
+            quantity: product?.quantity_palet,
           })
         );
       } else if (
@@ -215,7 +215,7 @@ const OrderCart = React.memo(() => {
             shipping_date: orderCartData?.shipping_date,
             product_article: product?.product_article,
             order_article: orderCartData?.article,
-            quantity: product?.quantity_real,
+            quantity: product?.quantity_palet,
             status: ordered_production_oem_status[0].accessor,
           })
         );

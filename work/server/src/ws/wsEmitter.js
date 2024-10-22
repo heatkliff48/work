@@ -18,6 +18,7 @@ const {
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   UPDATE_REMAINING_STOCK_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
+  ADD_NEW_WAREHOUSE_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -83,6 +84,50 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_DATASHIP_ORDER_SOCKET,
           payload: date,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_STATUS_OF_ORDER_SOCKET, (order) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_STATUS_OF_ORDER_SOCKET,
+          payload: order,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_PRODUCT_OF_ORDER_SOCKET, (product_of_order) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_PRODUCT_OF_ORDER_SOCKET,
+          payload: product_of_order,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, (product_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
+          payload: product_id,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_WAREHOUSE_SOCKET, (new_warehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_SOCKET,
+          payload: new_warehouse,
         })
       );
     }
@@ -171,39 +216,6 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_BATCH_OUTSIDE_SOCKET,
           payload: batchOutside,
-        })
-      );
-    }
-  });
-
-  myEmitter.on(UPDATE_STATUS_OF_ORDER_SOCKET, (order) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: UPDATE_STATUS_OF_ORDER_SOCKET,
-          payload: order,
-        })
-      );
-    }
-  });
-
-  myEmitter.on(UPDATE_PRODUCT_OF_ORDER_SOCKET, (product_of_order) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: UPDATE_PRODUCT_OF_ORDER_SOCKET,
-          payload: product_of_order,
-        })
-      );
-    }
-  });
-
-  myEmitter.on(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, (product_id) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
-          payload: product_id,
         })
       );
     }
