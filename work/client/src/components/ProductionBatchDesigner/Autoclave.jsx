@@ -122,24 +122,32 @@ function Autoclave({ autoclave }) {
   const moveBatchLater = () => {
     if (!selectedId) return;
 
-    // setAutoclave((prevAutoclave) => {
-    //   let flatAutoclave = prevAutoclave.flat();
-    //   const batchToMove = flatAutoclave.filter((el) => el.id === selectedId);
+    setAutoclave((prevAutoclave) => {
+      // Преобразуем двухмерный массив в одномерный
+      let flatAutoclave = prevAutoclave.flat();
 
-    //   flatAutoclave = flatAutoclave.filter((el) => el.id !== selectedId);
+      // Находим все элементы с выбранным id
+      const batchToMove = flatAutoclave.filter((el) => el.id === selectedId);
 
-    //   const lastIndexOfOtherId = flatAutoclave
-    //     .map((el) => el.id)
-    //     .lastIndexOf((id) => id !== selectedId);
+      // Оставляем в массиве только элементы с другим id
+      flatAutoclave = flatAutoclave.filter((el) => el.id !== selectedId);
 
-    //   flatAutoclave.splice(lastIndexOfOtherId + 1, 0, ...batchToMove);
-    //   const newAutoclave = [];
-    //   while (flatAutoclave.length) {
-    //     newAutoclave.push(flatAutoclave.splice(0, 21));
-    //   }
+      // Находим индекс последнего элемента с другим id
+      const lastIndexOfOtherId = flatAutoclave
+        .map((el) => el.id)
+        .lastIndexOf(flatAutoclave.find((el) => el.id !== selectedId)?.id);
 
-    //   return newAutoclave;
-    // });
+      // Вставляем партию после последнего элемента с другим id
+      flatAutoclave.splice(lastIndexOfOtherId + 1, 0, ...batchToMove);
+
+      // Преобразуем одномерный массив обратно в двухмерный
+      const newAutoclave = [];
+      while (flatAutoclave.length) {
+        newAutoclave.push(flatAutoclave.splice(0, 21)); // 21 — количество элементов в каждой строке
+      }
+
+      return newAutoclave;
+    });
   };
 
   const onSaveHandler = () => {
@@ -172,6 +180,7 @@ function Autoclave({ autoclave }) {
       </div>
 
       <div className="autoclave-buttons-container">
+        {selectedId && <div>Выбран массив с id: {selectedId}</div>}
         <button onClick={deleteBatchById}>Удалить партию</button>
         <button onClick={deleteArrayById}>Удалить Массив</button>
         <button onClick={addArrayAfterId}>Добавить массив</button>
