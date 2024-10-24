@@ -89,9 +89,7 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
   const deleteArrayById = () => {
     if (!selectedId) return;
-    const { id, cakes_in_batch, cakes_residue } = batchDesigner.find(
-      (el) => el.id === selectedId
-    );
+    const { id, cakes_in_batch } = batchDesigner.find((el) => el.id === selectedId);
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
@@ -109,13 +107,18 @@ function Autoclave({ autoclave, quantity_pallets }) {
       while (flatAutoclave.length) {
         newAutoclave.push(flatAutoclave.splice(0, 21));
       }
-
       if (cakes_in_batch <= count) {
         dispatch(
           updateBatchState({
             id,
             cakes_in_batch: count,
             cakes_residue: 0,
+          })
+        );
+        dispatch(
+          unlockButton({
+            id,
+            isButtonLocked: true,
           })
         );
       } else {
@@ -126,7 +129,6 @@ function Autoclave({ autoclave, quantity_pallets }) {
             cakes_residue: cakes_in_batch - count,
           })
         );
-
         dispatch(
           unlockButton({
             id,
@@ -141,20 +143,22 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
   const deleteBatchById = () => {
     if (!selectedId) return;
+    const { id, cakes_in_batch } = batchDesigner.find((el) => el.id === selectedId);
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
       flatAutoclave = flatAutoclave.filter((el) => el.id !== selectedId);
+      // const count = flatAutoclave.filter((el) => el.id === id).length;
 
       const newAutoclave = [];
       while (flatAutoclave.length) {
         newAutoclave.push(flatAutoclave.splice(0, 21));
       }
+      // if()
 
       return newAutoclave;
     });
 
-    const { id, cakes_in_batch } = batchDesigner.find((el) => el.id === selectedId);
     dispatch(
       updateBatchState({
         id,
