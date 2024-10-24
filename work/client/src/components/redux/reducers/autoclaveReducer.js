@@ -8,8 +8,7 @@ export const autoclaveReducer = (autoclave = [], action) => {
     }
 
     case NEW_SAVE_AUTOCLAVE: {
-      console.log('REDUCER AUTOCLAVE', payload);
-      return payload?.sort((a, b) => a - b);
+      return payload;
     }
 
     default:
