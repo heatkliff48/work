@@ -23,6 +23,7 @@ import {
 } from '#components/redux/actions/socketActions/clientsActionSocket.js';
 import {
   addNewBatchOutsideSocket,
+  deleteBatchOutsideSocket,
   updateBatchOutsideSocket,
 } from '#components/redux/actions/socketActions/batchOutsideActionSocket.js';
 import {
@@ -46,6 +47,7 @@ import {
   UPDATE_ROLE_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
   ADD_NEW_WAREHOUSE_SOCKET,
+  DELETE_BATCH_OUTSIDE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -123,6 +125,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_BATCH_OUTSIDE_SOCKET:
       dispatch(updateBatchOutsideSocket(payload));
+      break;
+
+    case DELETE_BATCH_OUTSIDE_SOCKET:
+      dispatch(deleteBatchOutsideSocket(payload));
       break;
 
     case GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET:

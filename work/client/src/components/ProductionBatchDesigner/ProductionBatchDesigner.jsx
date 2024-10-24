@@ -20,6 +20,7 @@ function ProductionBatchDesigner() {
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const [productionBatchDesigner, setProdBatchDesigner] = useState([]);
   const [totalQuantity, setTotalQuantity] = useState(0);
+  const [quantityPallets, setQuantityPallets] = useState(0);
   const MAX_QUANTITY = 1405;
 
   // Мемоизация заголовков таблицы
@@ -84,6 +85,7 @@ function ProductionBatchDesigner() {
             })
           );
 
+          setQuantityPallets((cakes_in_batch + count / 2) * 3);
           return {
             ...batchItem,
             cakes_in_batch: cakes_in_batch + count / 2,
@@ -151,6 +153,7 @@ function ProductionBatchDesigner() {
         cakes_residue,
       })
     );
+    setQuantityPallets(cakesPlacedInAutoclave * 3);
 
     return updatedProdBatch;
   }, []);
@@ -296,7 +299,7 @@ function ProductionBatchDesigner() {
 
       {/* Компонент Autoclave */}
       <div style={{ marginLeft: '20px' }}>
-        <Autoclave autoclave={autoclave} />
+        <Autoclave autoclave={autoclave} quantity_pallets={quantityPallets} />
       </div>
     </div>
   );

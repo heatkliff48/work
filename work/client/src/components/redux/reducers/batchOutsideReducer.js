@@ -1,5 +1,8 @@
 import { FULL_BATCH_OUTSIDE } from '../types/batchOutsideTypes';
-import { NEW_BATCH_OUTSIDE_SOCKET } from '../types/socketTypes/socket';
+import {
+  NEED_DELETE_BATCH_OUTSIDE_SOCKET,
+  NEW_BATCH_OUTSIDE_SOCKET,
+} from '../types/socketTypes/socket';
 
 export const batchOutsideReducer = (batchOutside = [], action) => {
   const { type, payload } = action;
@@ -8,7 +11,12 @@ export const batchOutsideReducer = (batchOutside = [], action) => {
       return payload;
     }
     case NEW_BATCH_OUTSIDE_SOCKET: {
+      console.log('reducer', action);
       return [...batchOutside, payload];
+    }
+    case NEED_DELETE_BATCH_OUTSIDE_SOCKET: {
+      const result = batchOutside.filter((el) => el.id !== payload);
+      return result;
     }
     default:
       return batchOutside;
