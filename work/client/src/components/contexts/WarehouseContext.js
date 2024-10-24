@@ -69,6 +69,8 @@ const WarehouseContextProvider = ({ children }) => {
     (state) => state.listOfOrderedProductionOEM
   );
   const [filteredProducts, setFilteredProducts] = useState();
+  const [currentOrderedProducts, setCurrentOrderedProducts] = useState({});
+  const [currentBatchId, setCurrentBatchId] = useState(0);
 
   return (
     <WarehouseContext.Provider
@@ -83,6 +85,10 @@ const WarehouseContextProvider = ({ children }) => {
         ordered_production_oem_status,
         filteredProducts,
         setFilteredProducts,
+        currentOrderedProducts,
+        setCurrentOrderedProducts,
+        currentBatchId,
+        setCurrentBatchId,
       }}
     >
       {children}

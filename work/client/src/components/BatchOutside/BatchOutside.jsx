@@ -5,11 +5,18 @@ import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import BatchOutsideModal from './BatchOutsideModal';
 
 const BatchOutside = () => {
   const [modalShow, setModalShow] = useState(false);
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const {
+    currentOrderedProducts,
+    setCurrentOrderedProducts,
+    currentBatchId,
+    setCurrentBatchId,
+  } = useWarehouseContext();
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -17,6 +24,10 @@ const BatchOutside = () => {
   const batchOutside = useSelector((state) => state.batchOutside);
 
   const [batchOutsideDataList, setBatchOutsideDataList] = useState([]);
+
+  const list_of_ordered_production = useSelector(
+    (state) => state.listOfOrderedProduction
+  );
 
   const batch_outside_table = [
     {
@@ -58,6 +69,19 @@ const BatchOutside = () => {
   }, [batchOutside]);
 
   const batchOutsideHandler = (id) => {
+    const currBatch = batchOutside.find((el) => el.id === id);
+    setCurrentBatchId(currBatch.id);
+    console.log(
+      'id_list_of_ordered_production',
+      currBatch.id_list_of_ordered_production
+    );
+    const currOrderedProduction = list_of_ordered_production.find(
+      (el) => el.id === currBatch.id_list_of_ordered_production
+    );
+    setCurrentOrderedProducts(currOrderedProduction);
+    console.log('list_of_ordered_production', currOrderedProduction);
+    console.log('currentOrderedProducts', currentOrderedProducts);
+    console.log('prod_article', currentOrderedProducts.product_article);
     setModalShow(true);
   };
 
@@ -73,7 +97,7 @@ const BatchOutside = () => {
   }, [user, roles]);
 
   useEffect(() => {
-    if (userAccess.canRead) {
+    if (userAccess?.canRead) {
       dispatch(getBatchOutside());
     }
   }, []);

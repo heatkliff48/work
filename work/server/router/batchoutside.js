@@ -7,7 +7,9 @@ const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_BATCH_OUTSIDE_SOCKET,
   UPDATE_BATCH_OUTSIDE_SOCKET,
+  DELETE_BATCH_OUTSIDE_SOCKET,
 } = require('../src/constants/event.js');
+const { ErrorUtils } = require('../utils/Errors.js');
 
 batchOutsideRouter.get('/', async (req, res) => {
   const fingerprint = req.fingerprint.hash;
@@ -47,7 +49,7 @@ batchOutsideRouter.post('/', async (req, res) => {
     quantity_ordered,
     quantity_free,
     on_check,
-  } = req.body.batchOutside;
+  } = req.body;
 
   try {
     const batchOutside = await BatchOutside.create({
@@ -169,6 +171,19 @@ batchOutsideRouter.post('/update/:c_id', async (req, res) => {
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
+  }
+});
+
+batchOutsideRouter.post('/delete', async (req, res) => {
+  const { batch_id } = req.body;
+
+  try {
+    await BatchOutside.destroy({ where: { id: batch_id } });
+
+    myEmitter.emit(DELETE_BATCH_OUTSIDE_SOCKET, batch_id);
+    return res.status(200);
+  } catch (err) {
+    return ErrorUtils.catchError(res, err);
   }
 });
 

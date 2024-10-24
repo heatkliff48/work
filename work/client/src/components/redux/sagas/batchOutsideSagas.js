@@ -4,8 +4,10 @@ import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
 import {
   ADD_NEW_BATCH_OUTSIDE,
+  DELETE_BATCH_OUTSIDE,
   FULL_BATCH_OUTSIDE,
   GET_FULL_BATCH_OUTSIDE,
+  NEED_DELETE_BATCH_OUTSIDE,
   NEW_BATCH_OUTSIDE,
 } from '../types/batchOutsideTypes';
 
@@ -38,9 +40,19 @@ const getBatchOutside = () => {
     .catch(showErrorMessage);
 };
 
-const addNewBatchOutside = ({ batchOutside }) => {
+const addNewBatchOutside = (batchOutside) => {
   return url
-    .post('/batchOutside', { batchOutside })
+    .post('/batchOutside', batchOutside)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const deleteBatchOutside = (batch_id) => {
+  console.log('SAGA DELETE ID', batch_id);
+  return url
+    .post('/batchOutside/delete', { batch_id })
     .then((res) => {
       return res.data;
     })
@@ -86,6 +98,22 @@ function* addNewBatchOutsideWorker(action) {
   }
 }
 
+function* deleteBatchOutsideWorker(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    // const { client, accessToken, accessTokenExpiration } = yield call(
+    yield call(deleteBatchOutside, payload);
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: NEED_DELETE_BATCH_OUTSIDE, payload });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: NEED_DELETE_BATCH_OUTSIDE, payload: [] });
+  }
+}
+
 // function* updateClientWorker(action) {
 //   try {
 //     // accessTokenFront = yield select((state) => state.jwt);
@@ -106,6 +134,7 @@ function* addNewBatchOutsideWorker(action) {
 function* batchOutsideWatcher() {
   yield takeLatest(GET_FULL_BATCH_OUTSIDE, getBatchOutsideWorker);
   yield takeLatest(ADD_NEW_BATCH_OUTSIDE, addNewBatchOutsideWorker);
+  yield takeLatest(DELETE_BATCH_OUTSIDE, deleteBatchOutsideWorker);
 }
 
 export default batchOutsideWatcher;
