@@ -89,7 +89,7 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
   const deleteArrayById = () => {
     if (!selectedId) return;
-    const { id, cakes_in_batch } = batchDesigner.find((el) => el.id === selectedId);
+    const { id, cakes_in_batch } = batchDesigner?.find((el) => el.id === selectedId);
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
@@ -143,18 +143,18 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
   const deleteBatchById = () => {
     if (!selectedId) return;
-    const { id, cakes_in_batch } = batchDesigner.find((el) => el.id === selectedId);
+    const { id, cakes_in_batch, cakes_residue } = batchDesigner?.find(
+      (el) => el.id === selectedId
+    );
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
       flatAutoclave = flatAutoclave.filter((el) => el.id !== selectedId);
-      // const count = flatAutoclave.filter((el) => el.id === id).length;
 
       const newAutoclave = [];
       while (flatAutoclave.length) {
         newAutoclave.push(flatAutoclave.splice(0, 21));
       }
-      // if()
 
       return newAutoclave;
     });
@@ -163,7 +163,7 @@ function Autoclave({ autoclave, quantity_pallets }) {
       updateBatchState({
         id,
         cakes_in_batch: 0,
-        cakes_residue: cakes_in_batch,
+        cakes_residue: cakes_in_batch + cakes_residue,
       })
     );
 
@@ -179,27 +179,19 @@ function Autoclave({ autoclave, quantity_pallets }) {
     if (!selectedId) return;
 
     setAutoclave((prevAutoclave) => {
-      // Преобразуем двухмерный массив в одномерный
       let flatAutoclave = prevAutoclave.flat();
-
-      // Находим все элементы с выбранным id
       const batchToMove = flatAutoclave.filter((el) => el.id === selectedId);
-
-      // Оставляем в массиве только элементы с другим id
       flatAutoclave = flatAutoclave.filter((el) => el.id !== selectedId);
 
-      // Находим индекс последнего элемента с другим id
       const lastIndexOfOtherId = flatAutoclave
         .map((el) => el.id)
         .lastIndexOf(flatAutoclave.find((el) => el.id !== selectedId)?.id);
 
-      // Вставляем партию после последнего элемента с другим id
       flatAutoclave.splice(lastIndexOfOtherId + 1, 0, ...batchToMove);
 
-      // Преобразуем одномерный массив обратно в двухмерный
       const newAutoclave = [];
       while (flatAutoclave.length) {
-        newAutoclave.push(flatAutoclave.splice(0, 21)); // 21 — количество элементов в каждой строке
+        newAutoclave.push(flatAutoclave.splice(0, 21));
       }
 
       return newAutoclave;
@@ -208,20 +200,20 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
-    // const last_entry =
-    //   list_of_ordered_production[list_of_ordered_production.length - 1];
-    // const buff = last_entry?.quantity;
-    // const quantity_ordered = buff;
-    // const quantity_free = quantity_pallets - buff;
-    // const batchOutside = {
-    //   id_warehouse_batch: 'w',
-    //   id_list_of_ordered_production: last_entry?.id,
-    //   quantity_pallets,
-    //   quantity_ordered,
-    //   quantity_free,
-    //   on_check: 0,
-    // };
-    // dispatch(addNewBatchOutside(batchOutside));
+    const last_entry =
+      list_of_ordered_production[list_of_ordered_production.length - 1];
+    const buff = last_entry?.quantity;
+    const quantity_ordered = buff;
+    const quantity_free = quantity_pallets - buff;
+    const batchOutside = {
+      id_warehouse_batch: 'w',
+      id_list_of_ordered_production: last_entry?.id,
+      quantity_pallets,
+      quantity_ordered,
+      quantity_free,
+      on_check: 0,
+    };
+    dispatch(addNewBatchOutside(batchOutside));
   };
 
   useEffect(() => {

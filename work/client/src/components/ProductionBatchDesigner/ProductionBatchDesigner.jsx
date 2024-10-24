@@ -130,7 +130,7 @@ function ProductionBatchDesigner() {
 
     const total_cakes = Math.ceil(quantity_cakes);
 
-    const cakes_in_batch = autoclaveData.filter(
+    const cakes_in_batch = autoclaveData?.filter(
       (unit) => unit.id_list_of_ordered_product === prodBatch.id
     ).length;
 
@@ -153,7 +153,7 @@ function ProductionBatchDesigner() {
         cakes_residue,
       })
     );
-    // setQuantityPallets(cakesPlacedInAutoclave * 3);
+    setQuantityPallets(cakes_in_batch * 3);
 
     return updatedProdBatch;
   }, []);
