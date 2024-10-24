@@ -3,17 +3,20 @@ import {
   getAutoclave,
   saveAutoclave,
 } from '#components/redux/actions/autoclaveAction.js';
+import {
+  unlockButton,
+  updateBatchState,
+} from '#components/redux/actions/batchDesignerAction.js';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 function Autoclave({ autoclave }) {
-  const [selectedId, setSelectedId] = useState(null);
   const { setAutoclave } = useOrderContext();
-
   const dispatch = useDispatch();
 
-  // Объект для отслеживания идентификаторов и присвоенных цветов
+  const [selectedId, setSelectedId] = useState(null);
   const [idColorMap, setIdColorMap] = useState({});
+  const batchDesigner = useSelector((state) => state.batchDesigner);
 
   const getClassForAutoclave = (num) => {
     switch (num) {
@@ -82,6 +85,9 @@ function Autoclave({ autoclave }) {
 
   const deleteArrayById = () => {
     if (!selectedId) return;
+    const { id, cakes_in_batch, cakes_residue } = batchDesigner.find(
+      (el) => el.id === selectedId
+    );
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
@@ -93,10 +99,36 @@ function Autoclave({ autoclave }) {
         return prevAutoclave;
       }
       flatAutoclave.splice(firstIndex, 1);
+      const count = flatAutoclave.filter((el) => el.id === id).length;
 
       const newAutoclave = [];
       while (flatAutoclave.length) {
         newAutoclave.push(flatAutoclave.splice(0, 21));
+      }
+
+      if (cakes_in_batch <= count) {
+        dispatch(
+          updateBatchState({
+            id,
+            cakes_in_batch: count,
+            cakes_residue: 0,
+          })
+        );
+      } else {
+        dispatch(
+          updateBatchState({
+            id,
+            cakes_in_batch: count,
+            cakes_residue: cakes_in_batch - count,
+          })
+        );
+
+        dispatch(
+          unlockButton({
+            id,
+            isButtonLocked: false,
+          })
+        );
       }
 
       return newAutoclave;
@@ -117,6 +149,22 @@ function Autoclave({ autoclave }) {
 
       return newAutoclave;
     });
+
+    const { id, cakes_in_batch } = batchDesigner.find((el) => el.id === selectedId);
+    dispatch(
+      updateBatchState({
+        id,
+        cakes_in_batch: 0,
+        cakes_residue: cakes_in_batch,
+      })
+    );
+
+    dispatch(
+      unlockButton({
+        id: selectedId,
+        isButtonLocked: false,
+      })
+    );
   };
 
   const moveBatchLater = () => {

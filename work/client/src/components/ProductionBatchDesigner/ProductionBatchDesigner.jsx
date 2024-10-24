@@ -3,12 +3,21 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import Autoclave from './Autoclave';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  addBatchState,
+  unlockButton,
+  updateBatchState,
+} from '#components/redux/actions/batchDesignerAction.js';
 
 function ProductionBatchDesigner() {
+  const dispatch = useDispatch();
+
   const { latestProducts } = useProductsContext();
   const { list_of_ordered_production } = useWarehouseContext();
   const { autoclaveData, autoclave, setAutoclave } = useOrderContext();
 
+  const batchDesigner = useSelector((state) => state.batchDesigner);
   const [productionBatchDesigner, setProdBatchDesigner] = useState([]);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const MAX_QUANTITY = 1405;
@@ -60,16 +69,55 @@ function ProductionBatchDesigner() {
       return prevBatch.map((batchItem) => {
         const { cakes_in_batch, total_cakes } = batchItem;
         if (batchItem.id === row.id) {
+          dispatch(
+            updateBatchState({
+              id: row.id,
+              cakes_in_batch: count,
+              cakes_residue: total_cakes - count,
+            })
+          );
+
+          dispatch(
+            unlockButton({
+              id: row.id,
+              isButtonLocked: true,
+            })
+          );
+
           return {
             ...batchItem,
             cakes_in_batch: cakes_in_batch + count / 2,
             cakes_residue: total_cakes - (cakes_in_batch + count / 2),
           };
         }
+
         return batchItem;
       });
     });
   };
+
+  useEffect(() => {
+    setProdBatchDesigner((prev) => {
+      return prev.map((prodBatch) => {
+        const matchingBatch = batchDesigner.find(
+          (batch) => batch.id === prodBatch.id
+        );
+        if (
+          matchingBatch &&
+          (matchingBatch.cakes_in_batch !== prodBatch.cakes_in_batch ||
+            matchingBatch.cakes_residue !== prodBatch.cakes_residue)
+        ) {
+          return {
+            ...prodBatch,
+            cakes_in_batch: matchingBatch.cakes_in_batch,
+            cakes_residue: matchingBatch.cakes_residue,
+          };
+        }
+
+        return prodBatch;
+      });
+    });
+  }, [batchDesigner]);
 
   const addCakesData = useCallback((prodBatch) => {
     const quantity_cakes = (prodBatch.product_with_brack / 3).toFixed(2);
@@ -80,9 +128,11 @@ function ProductionBatchDesigner() {
 
     const total_cakes = Math.ceil(quantity_cakes);
 
-    const cakesPlacedInAutoclave = autoclaveData.filter(
+    const cakes_in_batch = autoclaveData.filter(
       (unit) => unit.id_list_of_ordered_product === prodBatch.id
     ).length;
+
+    const cakes_residue = total_cakes - cakes_in_batch;
 
     const updatedProdBatch = {
       ...prodBatch,
@@ -90,9 +140,17 @@ function ProductionBatchDesigner() {
       free_product_cakes,
       free_product_package,
       total_cakes,
-      cakes_in_batch: cakesPlacedInAutoclave,
-      cakes_residue: total_cakes - cakesPlacedInAutoclave,
+      cakes_in_batch,
+      cakes_residue,
     };
+
+    dispatch(
+      addBatchState({
+        id: prodBatch.id,
+        cakes_in_batch,
+        cakes_residue,
+      })
+    );
 
     return updatedProdBatch;
   }, []);
@@ -120,7 +178,7 @@ function ProductionBatchDesigner() {
           <td>
             <button
               onClick={() => addOnAutoclave(row)}
-              disabled={row.cakes_residue === 0}
+              disabled={batchDesigner.find((el) => el.id === row.id)?.isButtonLocked}
             >
               Разместить
             </button>
