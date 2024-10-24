@@ -12,16 +12,16 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
   const dispatch = useDispatch();
 
   const addReservedProductHandler = (res_prod) => {
-    const { quantity_real, productsOfOrders_id } = res_prod;
+    const { quantity_palet, productsOfOrders_id } = res_prod;
     const { id, remaining_stock } = warehouse;
 
-    if (quantity_real > remaining_stock) {
+    if (quantity_palet > remaining_stock) {
       alert(
         'Колличество заказной продукции превышает коллиичество продукции на складе!'
       );
       return;
     }
-    const new_remaining_stock = remaining_stock - quantity_real;
+    const new_remaining_stock = remaining_stock - quantity_palet;
 
     dispatch(updateRemainingStock({ warehouse_id: id, new_remaining_stock }));
 
@@ -29,7 +29,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
       addNewReservedProducts({
         warehouse_id: id,
         orders_products_id: productsOfOrders_id,
-        quantity: quantity_real,
+        quantity: quantity_palet,
       })
     );
   };
@@ -55,7 +55,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
                 }}
               >
                 <td>{item.order_article}</td>
-                <td>{item.quantity_real}</td>
+                <td>{item.quantity_palet}</td>
               </tr>
             ))}
           </tbody>

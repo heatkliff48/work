@@ -111,9 +111,9 @@ function BatchOutsideModal(props) {
       );
       ok = true;
     }
-    // if (ok) {
-    //   dispatch(deleteBatchOutside(currentBatchId));
-    // }
+    if (ok) {
+      dispatch(deleteBatchOutside(currentBatchId));
+    }
   };
 
   const onSubmitForm = async (e) => {
