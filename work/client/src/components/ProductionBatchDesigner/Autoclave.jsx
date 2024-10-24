@@ -12,19 +12,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addNewBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 
 function Autoclave({ autoclave, quantity_pallets }) {
+  const dispatch = useDispatch();
+  const { setAutoclave } = useOrderContext();
+  const [selectedId, setSelectedId] = useState(null);
+  const [idColorMap, setIdColorMap] = useState({});
+
+  const batchDesigner = useSelector((state) => state.batchDesigner);
   const list_of_ordered_production = useSelector(
     (state) => state.listOfOrderedProduction
   );
-  const [selectedId, setSelectedId] = useState(null);
-  const { setAutoclave } = useOrderContext();
-  const dispatch = useDispatch();
-
-  const [selectedId, setSelectedId] = useState(null);
-  const [idColorMap, setIdColorMap] = useState({});
-  const batchDesigner = useSelector((state) => state.batchDesigner);
-
-  const [prodType, setProdType] = useState('');
-
 
   const getClassForAutoclave = (num) => {
     switch (num) {
@@ -208,21 +204,20 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
-    const last_entry =
-      list_of_ordered_production[list_of_ordered_production.length - 1];
-    // const id_list_of_ordered_production = last_entry?.id;
-    const buff = last_entry?.quantity;
-    const quantity_ordered = buff;
-    const quantity_free = quantity_pallets - buff;
-    const batchOutside = {
-      id_warehouse_batch: 'w',
-      id_list_of_ordered_production: last_entry?.id,
-      quantity_pallets,
-      quantity_ordered,
-      quantity_free,
-      on_check: 0,
-    };
-    dispatch(addNewBatchOutside(batchOutside));
+    // const last_entry =
+    //   list_of_ordered_production[list_of_ordered_production.length - 1];
+    // const buff = last_entry?.quantity;
+    // const quantity_ordered = buff;
+    // const quantity_free = quantity_pallets - buff;
+    // const batchOutside = {
+    //   id_warehouse_batch: 'w',
+    //   id_list_of_ordered_production: last_entry?.id,
+    //   quantity_pallets,
+    //   quantity_ordered,
+    //   quantity_free,
+    //   on_check: 0,
+    // };
+    // dispatch(addNewBatchOutside(batchOutside));
   };
 
   useEffect(() => {

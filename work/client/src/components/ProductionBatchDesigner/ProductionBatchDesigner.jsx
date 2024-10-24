@@ -153,7 +153,7 @@ function ProductionBatchDesigner() {
         cakes_residue,
       })
     );
-    setQuantityPallets(cakesPlacedInAutoclave * 3);
+    // setQuantityPallets(cakesPlacedInAutoclave * 3);
 
     return updatedProdBatch;
   }, []);
