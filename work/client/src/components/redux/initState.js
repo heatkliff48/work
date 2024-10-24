@@ -18,6 +18,7 @@ const initState = {
   listOfOrderedProduction: [],
   listOfOrderedProductionOEM: [],
   autoclave: [],
+  batchDesigner: [],
 };
 
 export default initState;

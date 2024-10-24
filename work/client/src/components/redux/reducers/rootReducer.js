@@ -20,6 +20,7 @@ import { listOfOrderedProductionReducer } from './listOfOrderedProductionReducer
 import { listOfOrderedProductionOEMReducer } from './listOfOrderedProductionOEMReducer';
 import { batchOutsideReducer } from './batchOutsideReducer';
 import { autoclaveReducer } from './autoclaveReducer';
+import batchDesignerReducer from './batchDesignerReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -42,4 +43,5 @@ export const rootReducer = combineReducers({
   listOfOrderedProductionOEM: listOfOrderedProductionOEMReducer,
   batchOutside: batchOutsideReducer,
   autoclave: autoclaveReducer,
+  batchDesigner: batchDesignerReducer,
 });

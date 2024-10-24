@@ -169,7 +169,8 @@ const OrderContextProvider = ({ children }) => {
         selectedProduct,
         setSelectedProduct,
         autoclaveData,
-        autoclave, setAutoclave
+        autoclave,
+        setAutoclave,
       }}
     >
       {children}
