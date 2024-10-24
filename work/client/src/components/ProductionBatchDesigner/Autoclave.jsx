@@ -3,10 +3,14 @@ import {
   getAutoclave,
   saveAutoclave,
 } from '#components/redux/actions/autoclaveAction.js';
+import { addNewBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-function Autoclave({ autoclave }) {
+function Autoclave({ autoclave, quantity_pallets }) {
+  const list_of_ordered_production = useSelector(
+    (state) => state.listOfOrderedProduction
+  );
   const [selectedId, setSelectedId] = useState(null);
   const { setAutoclave } = useOrderContext();
 
@@ -14,6 +18,7 @@ function Autoclave({ autoclave }) {
 
   // Объект для отслеживания идентификаторов и присвоенных цветов
   const [idColorMap, setIdColorMap] = useState({});
+  const [prodType, setProdType] = useState('');
 
   const getClassForAutoclave = (num) => {
     switch (num) {
@@ -152,6 +157,21 @@ function Autoclave({ autoclave }) {
 
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
+    const last_entry =
+      list_of_ordered_production[list_of_ordered_production.length - 1];
+    // const id_list_of_ordered_production = last_entry?.id;
+    const buff = last_entry?.quantity;
+    const quantity_ordered = buff;
+    const quantity_free = quantity_pallets - buff;
+    const batchOutside = {
+      id_warehouse_batch: 'w',
+      id_list_of_ordered_production: last_entry?.id,
+      quantity_pallets,
+      quantity_ordered,
+      quantity_free,
+      on_check: 0,
+    };
+    dispatch(addNewBatchOutside(batchOutside));
   };
 
   useEffect(() => {

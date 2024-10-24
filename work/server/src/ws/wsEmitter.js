@@ -9,6 +9,7 @@ const {
   UPDATE_CLIENT_SOCKET,
   ADD_NEW_BATCH_OUTSIDE_SOCKET,
   UPDATE_BATCH_OUTSIDE_SOCKET,
+  DELETE_BATCH_OUTSIDE_SOCKET,
   ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
   UPDATE_LEGAL_ADDRESS_SOCKET,
   ADD_DELIVERY_ADDRESSES_SOCKET,
@@ -216,6 +217,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_BATCH_OUTSIDE_SOCKET,
           payload: batchOutside,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_BATCH_OUTSIDE_SOCKET, (batch_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_BATCH_OUTSIDE_SOCKET,
+          payload: batch_id,
         })
       );
     }

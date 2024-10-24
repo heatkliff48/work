@@ -53,6 +53,7 @@ const getAllClients = () => {
 };
 
 const addNewClient = ({ client }) => {
+  console.log('saga 1 client', client);
   return url
     .post('/clients', { client })
     .then((res) => {

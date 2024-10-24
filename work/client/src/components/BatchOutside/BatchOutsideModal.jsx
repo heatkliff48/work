@@ -4,9 +4,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { addNewWarehouse } from '#components/redux/actions/warehouseAction.js';
+import { useDispatch } from 'react-redux';
+import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 
 function BatchOutsideModal(props) {
   const [batchOutsideInput, setBatchOutsideInput] = useState({});
+  const dispatch = useDispatch();
   const batch_outside_info_table = [
     {
       Header: 'качественная продукция',
@@ -14,7 +20,7 @@ function BatchOutsideModal(props) {
     },
     {
       Header: 'хвосты',
-      accessor: 'leftovers',
+      accessor: 'remnants',
     },
     {
       Header: 'некондиция',
@@ -30,13 +36,92 @@ function BatchOutsideModal(props) {
     },
   ];
 
+  const { COLUMNS, latestProducts } = useProductsContext();
+  const {
+    warehouse_data,
+    filteredProducts,
+    currentOrderedProducts,
+    setCurrentOrderedProducts,
+    currentBatchId,
+  } = useWarehouseContext();
+  const [warehouseData, setWarehouseData] = useState({});
+
+  const getWarehouseArticle = (product, type, versionNumber) => {
+    // let versionNumber = '0001';
+    const year = new Date().getFullYear().toString().slice(-2);
+    const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
+    const day = new Date().getDate();
+
+    const certificate = product.certificate.slice(0, 1);
+    const density = product.density.toString().slice(0, 1);
+
+    // const articleId = warehouse_data.length === 0 ? 1 : warehouse_data.length + 1;
+    // versionNumber = `0000000${articleId}`.slice(-6);
+
+    const warehouseArticle = `S${type}0${certificate}${density}${year}${month}${day}${versionNumber}`;
+
+    return warehouseArticle;
+  };
+
   const handleBatchOutsideInfoInputChange = useCallback((e) => {
     setBatchOutsideInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }, []);
 
+  const checkInput = async () => {
+    const product = latestProducts.find((el) => el.id === currentOrderedProducts.id);
+
+    let versionNumber = '0001';
+    let incVersion = 1;
+    let ok = false;
+    if (batchOutsideInput.quality_product) {
+      const type = 0;
+      const articleId =
+        warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
+      versionNumber = `0000000${articleId}`.slice(-6);
+      const warehouse_article = getWarehouseArticle(product, type, versionNumber);
+      await dispatch(
+        addNewWarehouse({
+          ...warehouseData,
+          product_article: currentOrderedProducts.product_article,
+          article: warehouse_article,
+          warehouse_loc: 'local',
+          remaining_stock: batchOutsideInput.quality_product,
+        })
+      );
+      ok = true;
+      const warehouse_data_last_id =
+        warehouse_data[warehouse_data.length - 1].id + 1;
+      // console.log('warehouse_data_last_id', warehouse_data_last_id);
+      // console.log('FILTERED FOR RESERVE', filteredProducts[warehouse_data_last_id]);
+    }
+    if (batchOutsideInput.remnants) {
+      const type = 1;
+      const articleId =
+        warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
+      versionNumber = `0000000${articleId}`.slice(-6);
+      const warehouse_article = getWarehouseArticle(product, type, versionNumber);
+      dispatch(
+        addNewWarehouse({
+          ...warehouseData,
+          product_article: currentOrderedProducts.product_article,
+          article: warehouse_article,
+          warehouse_loc: 'local',
+          remaining_stock: batchOutsideInput.remnants,
+        })
+      );
+      ok = true;
+    }
+    // if (ok) {
+    //   dispatch(deleteBatchOutside(currentBatchId));
+    // }
+  };
+
   const onSubmitForm = async (e) => {
     e.preventDefault();
+    checkInput();
+
     props.onHide();
+    setBatchOutsideInput({});
   };
 
   return (
@@ -48,9 +133,7 @@ function BatchOutsideModal(props) {
       dialogClassName="modal-auto-size"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Модалочка для инпутиков
-        </Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">Batch Modal</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Container>
@@ -61,7 +144,7 @@ function BatchOutsideModal(props) {
               onSubmitForm(e);
             }}
           >
-            <h3>Батч аутсайд нихуя себе</h3>
+            <h3></h3>
             <Row>
               {batch_outside_info_table.map((el) => (
                 <Col key={el.id}>
