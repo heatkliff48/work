@@ -85,10 +85,10 @@ function ProductionBatchDesigner() {
             })
           );
 
-          setQuantityPallets((cakes_in_batch + count / 2) * 3);
+          setQuantityPallets((count / 2) * 3);
           return {
             ...batchItem,
-            cakes_in_batch: cakes_in_batch + count / 2,
+            cakes_in_batch: count / 2,
             cakes_residue: total_cakes - (cakes_in_batch + count / 2),
           };
         }
