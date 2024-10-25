@@ -20,7 +20,7 @@ function ProductionBatchDesigner() {
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const [productionBatchDesigner, setProdBatchDesigner] = useState([]);
   const [totalQuantity, setTotalQuantity] = useState(0);
-  const [quantityPallets, setQuantityPallets] = useState(0);
+  const [quantityPallets, setQuantityPallets] = useState({});
   const MAX_QUANTITY = 1405;
 
   // Мемоизация заголовков таблицы
@@ -85,11 +85,17 @@ function ProductionBatchDesigner() {
             })
           );
 
-          setQuantityPallets((count / 2) * 3);
+          // setQuantityPallets(count * 3); // {row.id: count*3}
+          setQuantityPallets((prev) => {
+            return {
+              ...prev,
+              [row.id]: count * 3,
+            };
+          });
           return {
             ...batchItem,
-            cakes_in_batch: count / 2,
-            cakes_residue: total_cakes - (cakes_in_batch + count / 2),
+            cakes_in_batch: count,
+            cakes_residue: total_cakes - (cakes_in_batch + count),
           };
         }
 
@@ -153,7 +159,7 @@ function ProductionBatchDesigner() {
         cakes_residue,
       })
     );
-    setQuantityPallets(cakes_in_batch * 3);
+    // setQuantityPallets(cakes_in_batch * 3);
 
     return updatedProdBatch;
   }, []);

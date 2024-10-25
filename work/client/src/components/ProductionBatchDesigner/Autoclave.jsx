@@ -77,6 +77,7 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
       const newElement = { ...flatAutoclave[lastIndex] };
       flatAutoclave.splice(lastIndex + 1, 0, newElement);
+      const count = flatAutoclave.filter((el) => el.id === selectedId).length;
 
       const newAutoclave = [];
       while (flatAutoclave.length) {
@@ -200,20 +201,27 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
-    const last_entry =
-      list_of_ordered_production[list_of_ordered_production.length - 1];
-    const buff = last_entry?.quantity;
-    const quantity_ordered = buff;
-    const quantity_free = quantity_pallets - buff;
-    const batchOutside = {
-      id_warehouse_batch: 'w',
-      id_list_of_ordered_production: last_entry?.id,
-      quantity_pallets,
-      quantity_ordered,
-      quantity_free,
-      on_check: 0,
-    };
-    dispatch(addNewBatchOutside(batchOutside));
+
+    // const last_entry =
+    //   list_of_ordered_production[list_of_ordered_production.length - 1];
+    // const buff = last_entry?.quantity;
+    // const quantity_ordered = buff;
+
+    for (const id in quantity_pallets) {
+      const { quantity } = list_of_ordered_production.find((el) => el.id == id);
+
+      const quantity_free = quantity_pallets[id] - quantity;
+
+      const batchOutside = {
+        id_warehouse_batch: 'w',
+        id_list_of_ordered_production: id,
+        quantity_pallets: quantity_pallets[id],
+        quantity_ordered: quantity,
+        quantity_free,
+        on_check: 0,
+      };
+      dispatch(addNewBatchOutside(batchOutside));
+    }
   };
 
   useEffect(() => {
