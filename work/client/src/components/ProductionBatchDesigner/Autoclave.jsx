@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 
-function Autoclave({ autoclave, quantity_pallets }) {
+function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
   const dispatch = useDispatch();
   const { setAutoclave } = useOrderContext();
   const [selectedId, setSelectedId] = useState(null);
@@ -65,6 +65,7 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
   const addArrayAfterId = () => {
     if (!selectedId) return;
+    const { id } = batchDesigner?.find((el) => el.id === selectedId);
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
@@ -77,7 +78,15 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
       const newElement = { ...flatAutoclave[lastIndex] };
       flatAutoclave.splice(lastIndex + 1, 0, newElement);
-      const count = flatAutoclave.filter((el) => el.id === selectedId).length;
+      const count = flatAutoclave.filter((el) => el.id === id).length;
+
+      dispatch(
+        updateBatchState({
+          id,
+          cakes_in_batch: count,
+          cakes_residue: 0,
+        })
+      );
 
       const newAutoclave = [];
       while (flatAutoclave.length) {
@@ -108,6 +117,8 @@ function Autoclave({ autoclave, quantity_pallets }) {
       while (flatAutoclave.length) {
         newAutoclave.push(flatAutoclave.splice(0, 21));
       }
+      const batchBD = batchFromBD.find((el) => el.id === selectedId);
+
       if (cakes_in_batch <= count) {
         dispatch(
           updateBatchState({
@@ -127,9 +138,10 @@ function Autoclave({ autoclave, quantity_pallets }) {
           updateBatchState({
             id,
             cakes_in_batch: count,
-            cakes_residue: cakes_in_batch - count,
+            cakes_residue: batchBD.cakes_in_batch - count,
           })
         );
+
         dispatch(
           unlockButton({
             id,
@@ -144,9 +156,7 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
   const deleteBatchById = () => {
     if (!selectedId) return;
-    const { id, cakes_in_batch, cakes_residue } = batchDesigner?.find(
-      (el) => el.id === selectedId
-    );
+    const { id } = batchDesigner?.find((el) => el.id === selectedId);
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
@@ -160,17 +170,18 @@ function Autoclave({ autoclave, quantity_pallets }) {
       return newAutoclave;
     });
 
+    const { cakes_residue } = batchFromBD.find((el) => el.id === selectedId);
     dispatch(
       updateBatchState({
         id,
         cakes_in_batch: 0,
-        cakes_residue: cakes_in_batch + cakes_residue,
+        cakes_residue: cakes_residue,
       })
     );
 
     dispatch(
       unlockButton({
-        id: selectedId,
+        id,
         isButtonLocked: false,
       })
     );
@@ -201,12 +212,6 @@ function Autoclave({ autoclave, quantity_pallets }) {
 
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
-
-    // const last_entry =
-    //   list_of_ordered_production[list_of_ordered_production.length - 1];
-    // const buff = last_entry?.quantity;
-    // const quantity_ordered = buff;
-
     for (const id in quantity_pallets) {
       const { quantity } = list_of_ordered_production.find((el) => el.id == id);
 

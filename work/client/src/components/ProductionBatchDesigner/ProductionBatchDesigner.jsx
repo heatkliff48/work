@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import Autoclave from './Autoclave';
@@ -6,6 +6,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addBatchState,
+  clearBatchState,
   unlockButton,
   updateBatchState,
 } from '#components/redux/actions/batchDesignerAction.js';
@@ -18,12 +19,15 @@ function ProductionBatchDesigner() {
   const { autoclaveData, autoclave, setAutoclave } = useOrderContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
+  const [batchFromBD, setBatchFromBD] = useState([]);
   const [productionBatchDesigner, setProdBatchDesigner] = useState([]);
+  const [currId, setCurrId] = useState(null);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [quantityPallets, setQuantityPallets] = useState({});
+  
   const MAX_QUANTITY = 1405;
+  let countRef = useRef(0);
 
-  // Мемоизация заголовков таблицы
   const headers = useMemo(
     () => [
       { Header: 'ID', accessor: 'id' },
@@ -44,6 +48,8 @@ function ProductionBatchDesigner() {
 
   const addOnAutoclave = (row) => {
     let count = 0;
+    setCurrId(row.id);
+
     setAutoclave((prevAutoclave) => {
       const newAutoclaveState = prevAutoclave.map((autoclaveRow) =>
         autoclaveRow.map((cell) => ({ ...cell }))
@@ -63,69 +69,10 @@ function ProductionBatchDesigner() {
         if (cakesPlaced >= total_cakes) break;
       }
 
+      countRef.current = count;
       return newAutoclaveState;
     });
-
-    setProdBatchDesigner((prevBatch) => {
-      return prevBatch.map((batchItem) => {
-        const { cakes_in_batch, total_cakes } = batchItem;
-        if (batchItem.id === row.id) {
-          dispatch(
-            updateBatchState({
-              id: row.id,
-              cakes_in_batch: count,
-              cakes_residue: total_cakes - count,
-            })
-          );
-
-          dispatch(
-            unlockButton({
-              id: row.id,
-              isButtonLocked: true,
-            })
-          );
-
-          // setQuantityPallets(count * 3); // {row.id: count*3}
-          setQuantityPallets((prev) => {
-            return {
-              ...prev,
-              [row.id]: count * 3,
-            };
-          });
-          return {
-            ...batchItem,
-            cakes_in_batch: count,
-            cakes_residue: total_cakes - (cakes_in_batch + count),
-          };
-        }
-
-        return batchItem;
-      });
-    });
   };
-
-  useEffect(() => {
-    setProdBatchDesigner((prev) => {
-      return prev.map((prodBatch) => {
-        const matchingBatch = batchDesigner.find(
-          (batch) => batch.id === prodBatch.id
-        );
-        if (
-          matchingBatch &&
-          (matchingBatch.cakes_in_batch !== prodBatch.cakes_in_batch ||
-            matchingBatch.cakes_residue !== prodBatch.cakes_residue)
-        ) {
-          return {
-            ...prodBatch,
-            cakes_in_batch: matchingBatch.cakes_in_batch,
-            cakes_residue: matchingBatch.cakes_residue,
-          };
-        }
-
-        return prodBatch;
-      });
-    });
-  }, [batchDesigner]);
 
   const addCakesData = useCallback((prodBatch) => {
     const quantity_cakes = (prodBatch.product_with_brack / 3).toFixed(2);
@@ -140,7 +87,7 @@ function ProductionBatchDesigner() {
       (unit) => unit.id_list_of_ordered_product === prodBatch.id
     ).length;
 
-    const cakes_residue = total_cakes - cakes_in_batch;
+    const cakes_residue = total_cakes - cakes_in_batch ?? 0;
 
     const updatedProdBatch = {
       ...prodBatch,
@@ -152,15 +99,24 @@ function ProductionBatchDesigner() {
       cakes_residue,
     };
 
-    dispatch(
-      addBatchState({
-        id: prodBatch.id,
-        cakes_in_batch,
-        cakes_residue,
-      })
-    );
-    // setQuantityPallets(cakes_in_batch * 3);
+    setBatchFromBD((prev) => [
+      ...prev,
+      { id: prodBatch.id, cakes_in_batch, cakes_residue },
+    ]);
 
+    const existingBatch = batchDesigner?.find((el) => el?.id === prodBatch.id);
+
+    if (!existingBatch) {
+      dispatch(
+        addBatchState({
+          id: prodBatch.id,
+          cakes_in_batch,
+          cakes_residue,
+        })
+      );
+    }
+
+    setQuantityPallets(cakes_in_batch * 3);
     return updatedProdBatch;
   }, []);
 
@@ -187,7 +143,9 @@ function ProductionBatchDesigner() {
           <td>
             <button
               onClick={() => addOnAutoclave(row)}
-              disabled={batchDesigner.find((el) => el.id === row.id)?.isButtonLocked}
+              disabled={
+                batchDesigner?.find((el) => el.id === row.id)?.isButtonLocked
+              }
             >
               Разместить
             </button>
@@ -211,7 +169,65 @@ function ProductionBatchDesigner() {
   }, [productionBatchDesigner]);
 
   useEffect(() => {
+    const currentCount = countRef.current;
+
+    setProdBatchDesigner((prevBatch) => {
+      return prevBatch.map((batchItem) => {
+        const { cakes_in_batch, total_cakes } = batchItem;
+        if (batchItem.id === currId) {
+          dispatch(
+            updateBatchState({
+              id: currId,
+              cakes_in_batch: currentCount,
+              cakes_residue: total_cakes - currentCount ?? 0,
+            })
+          );
+
+          dispatch(
+            unlockButton({
+              id: currId,
+              isButtonLocked: true,
+            })
+          );
+
+          setQuantityPallets((cakes_in_batch + currentCount) * 3);
+          return {
+            ...batchItem,
+            cakes_in_batch: cakes_in_batch + currentCount,
+            cakes_residue: total_cakes - (cakes_in_batch + currentCount) ?? 0,
+          };
+        }
+
+        return batchItem;
+      });
+    });
+  }, [autoclave, currId]);
+
+  useEffect(() => {
+    setProdBatchDesigner((prev) => {
+      return prev.map((batchItem) => {
+        for (let i = 0; i < batchDesigner.length; i++) {
+          if (batchDesigner[i].id === batchItem.id) {
+            return {
+              ...batchItem,
+              cakes_in_batch: batchDesigner[i].cakes_in_batch,
+              cakes_residue: batchDesigner[i].cakes_residue,
+            };
+          }
+        }
+        return batchItem;
+      });
+    });
+  }, [batchDesigner]);
+
+  useEffect(() => {
+    console.log('batchDesigner', batchDesigner);
+  }, [batchDesigner]);
+
+  useEffect(() => {
     if (!latestProducts || !list_of_ordered_production) return;
+
+    dispatch(clearBatchState());
 
     const groupedByDensity = list_of_ordered_production.reduce((acc, curr) => {
       const product = latestProducts.find((p) => p.article === curr.product_article);
@@ -305,7 +321,11 @@ function ProductionBatchDesigner() {
 
       {/* Компонент Autoclave */}
       <div style={{ marginLeft: '20px' }}>
-        <Autoclave autoclave={autoclave} quantity_pallets={quantityPallets} />
+        <Autoclave
+          autoclave={autoclave}
+          quantity_pallets={quantityPallets}
+          batchFromBD={batchFromBD}
+        />
       </div>
     </div>
   );
