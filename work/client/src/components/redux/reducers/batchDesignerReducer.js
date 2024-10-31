@@ -2,10 +2,10 @@ import {
   UPDATE_BATCH_BUTTON_STATUS,
   UPDATE_BATCH_STATE,
   ADD_BATCH_STATE,
+  CLEAR_BATCH_DESIGNER,
 } from '../types/productionBatchLogTypes';
 
 const batchDesignerReducer = (state = [], action) => {
-  //state = []
   const { type, payload } = action;
 
   switch (type) {
@@ -19,19 +19,26 @@ const batchDesignerReducer = (state = [], action) => {
       return newState;
     }
 
+    case CLEAR_BATCH_DESIGNER: {
+      return [];
+    }
+
     case ADD_BATCH_STATE: {
+      if (state?.find((el) => el.id === payload.id)) {
+        return state;
+      }
       return [...state, payload];
     }
 
     case UPDATE_BATCH_STATE: {
       const { id, cakes_in_batch, cakes_residue } = payload;
+      console.log('UPDATE_BATCH_STATE cakes_in_batch', cakes_in_batch);
       const newState = state?.map((el) => {
         if (el.id === id)
           return {
             ...el,
-            cakes_in_batch: cakes_in_batch,
-            cakes_residue: cakes_residue,
-            isButtonLocked: false,
+            cakes_in_batch,
+            cakes_residue,
           };
         return el;
       });
@@ -39,7 +46,7 @@ const batchDesignerReducer = (state = [], action) => {
       return newState;
     }
     default:
-      return [];
+      return state;
   }
 };
 
