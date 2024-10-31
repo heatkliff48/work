@@ -21,9 +21,10 @@ function ProductionBatchDesigner() {
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const [batchFromBD, setBatchFromBD] = useState([]);
   const [productionBatchDesigner, setProdBatchDesigner] = useState([]);
-  const [quantityPallets, setQuantityPallets] = useState(0);
-  const [totalQuantity, setTotalQuantity] = useState(0);
   const [currId, setCurrId] = useState(null);
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  const [quantityPallets, setQuantityPallets] = useState({});
+  
   const MAX_QUANTITY = 1405;
   let countRef = useRef(0);
 

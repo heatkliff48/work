@@ -78,7 +78,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
       return {
         productsOfOrders_id: product.id,
         order_article: order ? order.article : '',
-        quantity_real: product.quantity_real,
+        quantity_palet: product.quantity_palet,
       };
     });
 

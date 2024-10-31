@@ -90,8 +90,9 @@ function BatchOutsideModal(props) {
       );
       ok = true;
       const warehouse_data_last_id =
-        warehouse_data[warehouse_data.length - 1].id + 1;
-      // console.log('warehouse_data_last_id', warehouse_data_last_id);
+        warehouse_data.length === 0 ? 1 : warehouse_data.length;
+      // warehouse_data[warehouse_data.length - 1].id + 1;
+      console.log('warehouse_data_last_id', warehouse_data_last_id);
       // console.log('FILTERED FOR RESERVE', filteredProducts[warehouse_data_last_id]);
     }
     if (batchOutsideInput.remnants) {
@@ -100,7 +101,7 @@ function BatchOutsideModal(props) {
         warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
       versionNumber = `0000000${articleId}`.slice(-6);
       const warehouse_article = getWarehouseArticle(product, type, versionNumber);
-      dispatch(
+      await dispatch(
         addNewWarehouse({
           ...warehouseData,
           product_article: currentOrderedProducts.product_article,
@@ -111,9 +112,9 @@ function BatchOutsideModal(props) {
       );
       ok = true;
     }
-    // if (ok) {
-    //   dispatch(deleteBatchOutside(currentBatchId));
-    // }
+    if (ok) {
+      await dispatch(deleteBatchOutside(currentBatchId));
+    }
   };
 
   const onSubmitForm = async (e) => {
