@@ -184,16 +184,16 @@ function ProductionBatchDesigner() {
 
     setProdBatchDesigner((prevBatch) => {
       return prevBatch.map((batchItem) => {
-        const { cakes_in_batch, total_cakes } = batchItem;
-        const cakes_residue = total_cakes - currentCount ?? 0;
+        const { cakes_in_batch, total_cakes, cakes_residue } = batchItem;
 
-        
         if (batchItem?.id === currId) {
+          const new_cakes_residue =
+            cakes_residue - currentCount < 0 ? 0 : cakes_residue - currentCount;
           dispatch(
             updateBatchState({
               id: currId,
               cakes_in_batch: currentCount,
-              cakes_residue,
+              cakes_residue: new_cakes_residue,
             })
           );
 
@@ -238,6 +238,7 @@ function ProductionBatchDesigner() {
   useEffect(() => {
     if (!latestProducts || !list_of_ordered_production) return;
 
+    console.log();
     const groupedByDensity = list_of_ordered_production.reduce((acc, curr) => {
       const product = latestProducts.find((p) => p.article === curr.product_article);
       if (!product) return acc;

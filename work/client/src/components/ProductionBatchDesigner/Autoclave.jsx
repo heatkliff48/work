@@ -212,6 +212,25 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
     });
   };
 
+  const fillingAutoclave = () => {
+    if (!selectedId) return;
+
+    setAutoclave((prevAutoclave) => {
+      let flatAutoclave = prevAutoclave.flat();
+      const fillingElement = flatAutoclave.find((el) => el.id === selectedId);
+
+      return prevAutoclave.map((prevAutoclave) => {
+        const emptyIndex = prevAutoclave.findIndex((el) => !el.id);
+        if (emptyIndex >= 1) {
+          return prevAutoclave.map((el, i) =>
+            i >= emptyIndex ? fillingElement : el
+          );
+        }
+        return prevAutoclave;
+      });
+    });
+  };
+
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
     for (const id in quantity_pallets) {
@@ -245,9 +264,9 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
               <div
                 key={cellIndex}
                 className={`autoclave-cell ${getClassForAutoclave(
-                  el.id !== null ? assignColorToId(el.id) : 0
+                  el?.id !== null ? assignColorToId(el?.id) : 0
                 )}`}
-                onClick={() => setSelectedId(el.id)}
+                onClick={() => setSelectedId(el?.id)}
               >
                 {el.id !== null ? `${el.density}x${el.width}` : ''}
               </div>
@@ -262,6 +281,7 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
         <button onClick={deleteArrayById}>Удалить Массив</button>
         <button onClick={addArrayAfterId}>Добавить массив</button>
         <button onClick={moveBatchLater}>Поставить партию позже</button>
+        <button onClick={fillingAutoclave}>Заполнить Автоклав</button>
         <button onClick={onSaveHandler}>Save</button>
       </div>
     </div>
