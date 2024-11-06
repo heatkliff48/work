@@ -91,9 +91,6 @@ function BatchOutsideModal(props) {
       ok = true;
       const warehouse_data_last_id =
         warehouse_data.length === 0 ? 1 : warehouse_data.length;
-      // warehouse_data[warehouse_data.length - 1].id + 1;
-      console.log('warehouse_data_last_id', warehouse_data_last_id);
-      // console.log('FILTERED FOR RESERVE', filteredProducts[warehouse_data_last_id]);
     }
     if (batchOutsideInput.remnants) {
       const type = 1;

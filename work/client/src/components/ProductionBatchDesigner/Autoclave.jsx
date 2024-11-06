@@ -16,6 +16,7 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
   const { setAutoclave } = useOrderContext();
   const [selectedId, setSelectedId] = useState(null);
   const [idColorMap, setIdColorMap] = useState({});
+  const [quantityPallets, setQuantityPallets] = useState(quantity_pallets);
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const list_of_ordered_production = useSelector(
@@ -65,7 +66,7 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
 
   const addArrayAfterId = () => {
     if (!selectedId) return;
-    const { id } = batchDesigner?.find((el) => el.id === selectedId);
+    const { id } = batchDesigner?.find((el) => el?.id === selectedId);
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
@@ -87,6 +88,13 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
           cakes_residue: 0,
         })
       );
+
+      setQuantityPallets((prev) => {
+        return {
+          ...prev,
+          [id]: count * 3,
+        };
+      });
 
       const newAutoclave = [];
       while (flatAutoclave.length) {
@@ -135,6 +143,12 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
             isButtonLocked: true,
           })
         );
+        setQuantityPallets((prev) => {
+          return {
+            ...prev,
+            [id]: count,
+          };
+        });
       } else {
         dispatch(
           updateBatchState({
@@ -150,6 +164,13 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
             isButtonLocked: false,
           })
         );
+
+        setQuantityPallets((prev) => {
+          return {
+            ...prev,
+            [id]: count * 3,
+          };
+        });
       }
 
       return newAutoclave;
@@ -180,6 +201,13 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
         cakes_residue: cakes_residue,
       })
     );
+
+    setQuantityPallets((prev) => {
+      return {
+        ...prev,
+        [id]: 0,
+      };
+    });
 
     dispatch(
       unlockButton({
@@ -214,26 +242,55 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
 
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
-    for (const id in quantity_pallets) {
-      const { quantity } = list_of_ordered_production.find((el) => el.id == id);
+    Object.keys(quantityPallets).forEach((key) =>
+      quantityPallets[key] === undefined ? delete quantityPallets[key] : {}
+    ); // delete undefined from obj
+    console.log('quantityPallets----------', quantityPallets);
 
-      const quantity_free = quantity_pallets[id] - quantity;
+    // !!! add setQuantityPallets to other Autoclave add/delete actions/functions
 
-      const batchOutside = {
-        id_warehouse_batch: 'w',
-        id_list_of_ordered_production: id,
-        quantity_pallets: quantity_pallets[id],
-        quantity_ordered: quantity,
-        quantity_free,
-        on_check: 0,
-      };
-      dispatch(addNewBatchOutside(batchOutside));
+    for (const id in quantityPallets) {
+      if (id !== undefined) {
+        console.log('id----', id);
+        const { quantity } = list_of_ordered_production.find((el) => el.id == id);
+
+        const quantity_free = quantityPallets[id] - quantity;
+
+        const batchOutside = {
+          id_warehouse_batch: 'w',
+          id_list_of_ordered_production: id,
+          quantity_pallets: quantityPallets[id],
+          quantity_ordered: quantity,
+          quantity_free,
+          on_check: 0,
+        };
+        dispatch(addNewBatchOutside(batchOutside));
+      }
     }
   };
 
   useEffect(() => {
     dispatch(getAutoclave());
   }, [dispatch]);
+
+  useEffect(() => {
+    // const { id, value } = quantity_pallets;
+    // console.log('check id, value', id, value);
+    Object.keys(quantity_pallets).forEach((id) =>
+      setQuantityPallets((prev) => {
+        return {
+          ...prev,
+          [id]: quantity_pallets[id],
+        };
+      })
+    );
+
+    // console.log('quantity_pallets', quantity_pallets);
+  }, [quantity_pallets]);
+
+  useEffect(() => {
+    console.log('quantityPallets', quantityPallets);
+  }, [quantityPallets]);
 
   return (
     <div>

@@ -124,7 +124,6 @@ function ProductionBatchDesigner() {
       );
     }
 
-    setQuantityPallets(cakes_in_batch * 3);
     return updatedProdBatch;
   }, []);
 
@@ -187,7 +186,6 @@ function ProductionBatchDesigner() {
         const { cakes_in_batch, total_cakes } = batchItem;
         const cakes_residue = total_cakes - currentCount ?? 0;
 
-        
         if (batchItem?.id === currId) {
           dispatch(
             updateBatchState({
@@ -204,7 +202,12 @@ function ProductionBatchDesigner() {
             })
           );
 
-          setQuantityPallets((cakes_in_batch + currentCount) * 3);
+          setQuantityPallets((prev) => {
+            return {
+              ...prev,
+              [currId]: currentCount * 3,
+            };
+          });
           return {
             ...batchItem,
             cakes_in_batch: cakes_in_batch + currentCount,
