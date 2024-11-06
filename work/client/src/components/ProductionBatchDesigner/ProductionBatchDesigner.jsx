@@ -6,7 +6,6 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addBatchState,
-  clearBatchState,
   unlockButton,
   updateBatchState,
 } from '#components/redux/actions/batchDesignerAction.js';
@@ -24,7 +23,7 @@ function ProductionBatchDesigner() {
   const [currId, setCurrId] = useState(null);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [quantityPallets, setQuantityPallets] = useState({});
-  
+
   const MAX_QUANTITY = 1405;
   let countRef = useRef(0);
 
@@ -55,18 +54,18 @@ function ProductionBatchDesigner() {
         autoclaveRow.map((cell) => ({ ...cell }))
       );
 
-      const { id, density, width, total_cakes } = row;
+      const { id, density, width, cakes_residue } = row;
       let cakesPlaced = 0;
 
       for (let i = 0; i < newAutoclaveState.length; i++) {
         for (let j = 0; j < newAutoclaveState[i].length; j++) {
-          if (!newAutoclaveState[i][j].id && cakesPlaced < total_cakes) {
+          if (!newAutoclaveState[i][j].id && cakesPlaced < cakes_residue) {
             newAutoclaveState[i][j] = { id, density, width };
             cakesPlaced++;
             count++;
           }
         }
-        if (cakesPlaced >= total_cakes) break;
+        if (cakesPlaced >= cakes_residue) break;
       }
 
       countRef.current = count;
@@ -112,6 +111,15 @@ function ProductionBatchDesigner() {
           id: prodBatch.id,
           cakes_in_batch,
           cakes_residue,
+        })
+      );
+    }
+
+    if (cakes_in_batch > 0) {
+      dispatch(
+        unlockButton({
+          id: prodBatch.id,
+          isButtonLocked: true,
         })
       );
     }
@@ -169,24 +177,30 @@ function ProductionBatchDesigner() {
   }, [productionBatchDesigner]);
 
   useEffect(() => {
-    const currentCount = countRef.current;
+    const currentCount =
+      countRef.current === 0
+        ? batchDesigner.find((el) => el.id === currId)?.cakes_in_batch ?? 0
+        : countRef?.current;
 
     setProdBatchDesigner((prevBatch) => {
       return prevBatch.map((batchItem) => {
         const { cakes_in_batch, total_cakes } = batchItem;
-        if (batchItem.id === currId) {
+        const cakes_residue = total_cakes - currentCount ?? 0;
+
+        
+        if (batchItem?.id === currId) {
           dispatch(
             updateBatchState({
               id: currId,
               cakes_in_batch: currentCount,
-              cakes_residue: total_cakes - currentCount ?? 0,
+              cakes_residue,
             })
           );
 
           dispatch(
             unlockButton({
               id: currId,
-              isButtonLocked: true,
+              isButtonLocked: cakes_residue === 0,
             })
           );
 
@@ -201,6 +215,7 @@ function ProductionBatchDesigner() {
         return batchItem;
       });
     });
+    countRef.current = 0;
   }, [autoclave, currId]);
 
   useEffect(() => {
@@ -221,13 +236,7 @@ function ProductionBatchDesigner() {
   }, [batchDesigner]);
 
   useEffect(() => {
-    console.log('batchDesigner', batchDesigner);
-  }, [batchDesigner]);
-
-  useEffect(() => {
     if (!latestProducts || !list_of_ordered_production) return;
-
-    dispatch(clearBatchState());
 
     const groupedByDensity = list_of_ordered_production.reduce((acc, curr) => {
       const product = latestProducts.find((p) => p.article === curr.product_article);

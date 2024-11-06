@@ -16,6 +16,7 @@ import {
 } from '#components/redux/actions/ordersAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
+import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
 
 function Main() {
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ function Main() {
     dispatch(getListOfOrderedProduction());
     dispatch(getListOfOrderedProductionOEM());
     dispatch(getOrders());
+    dispatch(clearBatchState());
   }, [navigate, user, modalRoleCard]);
 
   return (

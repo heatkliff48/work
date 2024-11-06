@@ -99,7 +99,10 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
 
   const deleteArrayById = () => {
     if (!selectedId) return;
-    const { id, cakes_in_batch } = batchDesigner?.find((el) => el.id === selectedId);
+
+    const { id, cakes_in_batch } = batchDesigner?.find(
+      (el) => el?.id === selectedId
+    );
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
@@ -118,7 +121,6 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
         newAutoclave.push(flatAutoclave.splice(0, 21));
       }
       const batchBD = batchFromBD.find((el) => el.id === selectedId);
-
       if (cakes_in_batch <= count) {
         dispatch(
           updateBatchState({
