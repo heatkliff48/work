@@ -4,6 +4,7 @@ import {
   DELETE_PRODUCT_OF_ORDER_SOCKET,
   NEW_ORDER_SOCKET,
   NEW_PRODUCT_SOCKET,
+  NEW_RECIPE_SOCKET,
   NEW_WAREHOUSE_SOCKET,
   REMAINING_STOCK_SOCKET,
   STATUS_OF_ORDER_SOCKET,
@@ -94,5 +95,12 @@ export const addNewWarehouseSocket = (new_warehouse) => {
   return {
     type: NEW_WAREHOUSE_SOCKET,
     payload: new_warehouse,
+  };
+};
+
+export const addNewRecipeSocket = (recipe) => {
+  return {
+    type: NEW_RECIPE_SOCKET,
+    payload: recipe,
   };
 };

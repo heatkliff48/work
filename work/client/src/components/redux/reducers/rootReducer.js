@@ -21,6 +21,7 @@ import { listOfOrderedProductionOEMReducer } from './listOfOrderedProductionOEMR
 import { batchOutsideReducer } from './batchOutsideReducer';
 import { autoclaveReducer } from './autoclaveReducer';
 import batchDesignerReducer from './batchDesignerReducer';
+import { recipeReducer } from './recipeReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -44,4 +45,5 @@ export const rootReducer = combineReducers({
   batchOutside: batchOutsideReducer,
   autoclave: autoclaveReducer,
   batchDesigner: batchDesignerReducer,
+  recipe: recipeReducer,
 });

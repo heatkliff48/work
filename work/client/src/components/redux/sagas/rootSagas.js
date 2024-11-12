@@ -10,6 +10,7 @@ import usersInfoWatcher from './usersInfoSagas';
 import productionBatchLogWatcher from './productionBatchLogSagas';
 import batchOutsideWatcher from './batchOutsideSagas';
 import autoclaveWatcher from './autoclaveSagas';
+import recipeWatcher from './recipeSagas';
 
 export default function* rootSaga() {
   yield all([
@@ -24,5 +25,6 @@ export default function* rootSaga() {
     productionBatchLogWatcher(),
     batchOutsideWatcher(),
     autoclaveWatcher(),
+    recipeWatcher(),
   ]);
 }
