@@ -5,19 +5,22 @@ import { UsersContextProvider } from './UserContext';
 import WarehouseContextProvider from './WarehouseContext';
 import OrderContextProvider from './OrderContext';
 import ProjectContextProvider from './Context';
+import RecipeContextProvider from './RecipeContext';
 
 const MainContextProvider = ({ children }) => {
   return (
     <ProjectContextProvider>
       <ProductsContextProvider>
         <ModalContextProvider>
-          <UsersContextProvider>
-            {/* <ClientsContextProvider> */}
-            <OrderContextProvider>
-              <WarehouseContextProvider>{children}</WarehouseContextProvider>
-            </OrderContextProvider>
-            {/* </ClientsContextProvider>*/}
-          </UsersContextProvider>
+          <RecipeContextProvider>
+            <UsersContextProvider>
+              {/* <ClientsContextProvider> */}
+              <OrderContextProvider>
+                <WarehouseContextProvider>{children}</WarehouseContextProvider>
+              </OrderContextProvider>
+              {/* </ClientsContextProvider>*/}
+            </UsersContextProvider>
+          </RecipeContextProvider>
         </ModalContextProvider>
       </ProductsContextProvider>
     </ProjectContextProvider>

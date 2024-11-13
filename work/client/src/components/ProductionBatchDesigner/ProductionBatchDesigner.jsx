@@ -124,7 +124,6 @@ function ProductionBatchDesigner() {
       );
     }
 
-    setQuantityPallets(cakes_in_batch * 3);
     return updatedProdBatch;
   }, []);
 
@@ -204,7 +203,12 @@ function ProductionBatchDesigner() {
             })
           );
 
-          setQuantityPallets((cakes_in_batch + currentCount) * 3);
+          setQuantityPallets((prev) => {
+            return {
+              ...prev,
+              [currId]: currentCount * 3,
+            };
+          });
           return {
             ...batchItem,
             cakes_in_batch: cakes_in_batch + currentCount,

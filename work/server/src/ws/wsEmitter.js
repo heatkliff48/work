@@ -20,6 +20,7 @@ const {
   UPDATE_REMAINING_STOCK_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
   ADD_NEW_WAREHOUSE_SOCKET,
+  ADD_NEW_RECIPE_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -253,6 +254,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_REMAINING_STOCK_SOCKET,
           payload: upd_rem_srock,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_RECIPE_SOCKET, (recipe) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_RECIPE_SOCKET,
+          payload: recipe,
         })
       );
     }
