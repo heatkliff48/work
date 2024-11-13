@@ -12,6 +12,18 @@ module.exports = {
       article: {
         type: Sequelize.STRING,
       },
+      density: {
+        type: Sequelize.FLOAT,
+      },
+      certificate: {
+        type: Sequelize.STRING,
+      },
+      form_volume_m3: {
+        type: Sequelize.FLOAT,
+      },
+      dry_total: {
+        type: Sequelize.FLOAT,
+      },
       sand: {
         type: Sequelize.FLOAT,
       },

@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
   Recipe.init(
     {
       article: DataTypes.STRING,
+      density: DataTypes.FLOAT,
+      certificate: DataTypes.STRING,
+      form_volume_m3: DataTypes.FLOAT,
+      dry_total: DataTypes.FLOAT,
       sand: DataTypes.FLOAT,
       lime_lhoist: DataTypes.FLOAT,
       lime_barcelona: DataTypes.FLOAT,
