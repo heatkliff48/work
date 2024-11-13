@@ -86,18 +86,21 @@ function AddNewRecipeModal({ show, onHide }) {
     //     })
     //   );
     const article = recipeArticle();
-    setProductOfRecipe({});
-    setSelectedProduct({});
 
-    dispatch(
+    await dispatch(
       addNewRecipe({
         ...recipeInput,
         article,
+        density: selectedProduct?.density,
+        certificate: selectedProduct?.certificate,
+        form_volume_m3: formVolume,
+        dry_total: selectedProduct?.density * formVolume,
       })
     );
 
-    console.log(recipeInput);
-    console.log(article);
+    setProductOfRecipe({});
+    setSelectedProduct({});
+
     onHide();
     // }
   };

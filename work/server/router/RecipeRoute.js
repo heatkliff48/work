@@ -40,6 +40,10 @@ recipeRouter.post('/', async (req, res) => {
   const { id, username, email } = req.session.user;
   const {
     article,
+    density,
+    certificate,
+    form_volume_m3,
+    dry_total,
     sand,
     lime_lhoist,
     lime_barcelona,
@@ -58,6 +62,10 @@ recipeRouter.post('/', async (req, res) => {
   try {
     const recipe = await Recipe.create({
       article,
+      density,
+      certificate,
+      form_volume_m3,
+      dry_total,
       sand,
       lime_lhoist,
       lime_barcelona,
