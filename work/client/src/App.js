@@ -23,6 +23,7 @@ import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createSocketOnMessage } from '#utils/socket.message.js';
 import WebSocketClient from '#utils/WebSockeetClient.js';
+import RawMaterialsPlan from '#components/RawMaterialsPlan/RawMaterialsPlan.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -69,7 +70,10 @@ function App() {
             element={<ListOfOrderedProductionOEM />}
           />
           <Route path="/batch_outside" element={<BatchOutside />} />
+
           <Route path="/recipe_products" element={<ProductsListForRecipes />} />
+
+          <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>

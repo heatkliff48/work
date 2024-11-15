@@ -73,7 +73,12 @@ function Main() {
         List of ordered production OEM
       </button>
       <button onClick={() => navigate('/batch_outside')}>Batch Outside</button>
+
       <button onClick={() => navigate('/recipe_products')}>recipe_products</button>
+
+      <button onClick={() => navigate('/raw_materials_plan')}>
+        Raw Materials Plan
+      </button>
     </div>
   );
 }
