@@ -524,3 +524,38 @@ input[type='checkbox'] {
   background-color: pink;
   color: white;
 }
+
+.raw-materials-plan table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.raw-materials-plan th {
+  width: 20px; /* Фиксированная ширина для всех колонок */
+  padding: 4px;
+  border: 1px solid #ddd;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.raw-materials-plan td {
+  width: 20px;
+  padding: 4px;
+  border: 1px solid #ddd;
+  text-align: start;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.product-column {
+  background-color: #005fb1;
+  width: 60px;
+}
+
+.raw-materials-plan input[type='number'] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  text-align: center;
+}
