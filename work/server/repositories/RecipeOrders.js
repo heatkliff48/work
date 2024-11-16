@@ -8,8 +8,7 @@ class RecipeOrdersRepository {
         material_plan.id_batch != dbRecord.id_batch &&
         material_plan.id_recipe != dbRecord.id_recipe
     );
-
-    console.log('idsToReset', idsToReset);
+  
     if (idsToReset.length != 0) {
       await RecipeOrders.create(idsToReset);
     }
