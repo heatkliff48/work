@@ -1,4 +1,8 @@
-import { ADD_NEW_RECIPE, GET_FULL_RECIPE } from '../types/recipeTypes';
+import {
+  ADD_NEW_RECIPE,
+  GET_FULL_RECIPE,
+  SAVE_MATERIAL_PLAN,
+} from '../types/recipeTypes';
 
 export const getRecipe = () => {
   return {
@@ -10,5 +14,12 @@ export const addNewRecipe = (recipe) => {
   return {
     type: ADD_NEW_RECIPE,
     payload: recipe,
+  };
+};
+
+export const saveMaterialPlan = (mat_data) => {
+  return {
+    type: SAVE_MATERIAL_PLAN,
+    payload: mat_data,
   };
 };

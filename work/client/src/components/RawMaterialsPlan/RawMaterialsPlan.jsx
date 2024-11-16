@@ -1,7 +1,8 @@
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { saveMaterialPlan } from '#components/redux/actions/recipeAction.js';
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 
 function RawMaterialsPlan() {
@@ -15,6 +16,8 @@ function RawMaterialsPlan() {
   const [productsArray, setProductsArray] = useState([]);
   const [manualOrderShare, setManualOrderShare] = useState({});
   const [totals, setTotals] = useState({});
+
+  const dispatch = useDispatch();
 
   const rawMaterials = [
     { name: 'Sand', title: 'sand', remaining: 0 },
@@ -57,6 +60,20 @@ function RawMaterialsPlan() {
       product.current_recipe[mat_num] *
       product.quantity
     ).toFixed(2);
+  };
+
+  const handlerSave = () => {
+    productsArray.forEach((el) => {
+      const { current_recipe, id_batch, quantity } = el;
+      console.log();
+      const obj = {
+        id_recipe: current_recipe?.id,
+        id_batch,
+        production_volume: quantity,
+      };
+
+      dispatch(saveMaterialPlan(obj));
+    });
   };
 
   const handleRecipeChange = (index, selectedOption) => {
@@ -104,6 +121,7 @@ function RawMaterialsPlan() {
         }));
 
         return {
+          id_batch: batch.id,
           product_article: productArticle,
           quantity,
           recipeArray,
@@ -192,6 +210,7 @@ function RawMaterialsPlan() {
           ))}
         </tbody>
       </table>
+      <button onClick={handlerSave}>Save</button>
     </div>
   );
 }

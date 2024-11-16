@@ -7,7 +7,6 @@ export const getAutoclave = () => {
 };
 
 export const saveAutoclave = (autoclave) => {
-  console.log('ACTION AUTOCLAVE', autoclave);
   return {
     type: SAVE_AUTOCLAVE,
     payload: autoclave,
