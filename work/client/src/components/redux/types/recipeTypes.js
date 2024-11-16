@@ -3,3 +3,6 @@ export const FULL_RECIPE = 'FULL_RECIPE';
 
 export const ADD_NEW_RECIPE = 'ADD_NEW_RECIPE';
 export const NEW_RECIPE = 'NEW_RECIPE';
+
+export const SAVE_MATERIAL_PLAN = 'SAVE_MATERIAL_PLAN';
+

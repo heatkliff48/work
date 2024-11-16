@@ -7,6 +7,7 @@ import {
   FULL_RECIPE,
   GET_FULL_RECIPE,
   NEW_RECIPE,
+  SAVE_MATERIAL_PLAN,
 } from '../types/recipeTypes';
 
 const url = axios.create({
@@ -26,6 +27,15 @@ const getRecipe = () => {
 const addNewRecipe = (recipe) => {
   return url
     .post('/recipe', recipe)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const saveMaterialPlan = (material_plan) => {
+  return url
+    .post('/recipe_orders/', material_plan)
     .then((res) => {
       return res.data;
     })
@@ -62,11 +72,21 @@ function* addNewRecipeWorker(action) {
   }
 }
 
+function* saveMaterialPlanWatcher(action) {
+  try {
+    yield call(saveMaterialPlan, action.payload);
+
+  } catch (err) {
+    console.log('err recipe saga', err);
+  }
+}
+
 // watchers
 
 function* recipeWatcher() {
   yield takeLatest(GET_FULL_RECIPE, getRecipeWorker);
   yield takeLatest(ADD_NEW_RECIPE, addNewRecipeWorker);
+  yield takeLatest(SAVE_MATERIAL_PLAN, saveMaterialPlanWatcher);
 }
 
 export default recipeWatcher;
