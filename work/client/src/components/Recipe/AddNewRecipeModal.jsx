@@ -69,27 +69,38 @@ function AddNewRecipeModal({ show, onHide }) {
   const recipeArticle = () => {
     // M.+00+D+плотность(300)+скртификат(DE)+00000(i++)
     let versionNumber = '000001';
-    const articleId = list_of_recipes.length === 0 ? 1 : list_of_recipes.length + 1;
+    const articleId =
+      list_of_recipes.length === 0
+        ? 1
+        : parseInt(list_of_recipes[list_of_recipes.length - 1].article.slice(-6)) +
+          1;
     versionNumber = `0000000${articleId}`.slice(-6);
     const recipe_article = `M.00D${selectedProduct?.density}${selectedProduct?.certificate}${versionNumber}`; //
     return recipe_article;
   };
 
   const addRecipeHandler = async () => {
-    // if (haveOrderClient) {
-    //   dispatch(
-    //     getUpdateProductOfOrders({
-    //       newProductsOfOrder: {
-    //         order_id: haveOrderClient.id,
-    //         productOfOrder,
-    //       },
-    //     })
-    //   );
     const article = recipeArticle();
+
+    // Create a local copy of recipeInput and update it
+    const updatedRecipeInput = { ...recipeInput };
+
+    recipe_info.forEach(({ accessor }) => {
+      if (!(accessor in updatedRecipeInput)) {
+        updatedRecipeInput[accessor] = 0; // Add missing key with value 0
+      } else if (
+        updatedRecipeInput[accessor] === null ||
+        updatedRecipeInput[accessor] === ''
+      ) {
+        updatedRecipeInput[accessor] = 0;
+      }
+    });
+
+    setRecipeInput(updatedRecipeInput);
 
     await dispatch(
       addNewRecipe({
-        ...recipeInput,
+        ...updatedRecipeInput,
         article,
         density: selectedProduct?.density,
         certificate: selectedProduct?.certificate,
@@ -103,6 +114,13 @@ function AddNewRecipeModal({ show, onHide }) {
 
     onHide();
     // }
+  };
+
+  const closeHandler = () => {
+    setProductOfRecipe({});
+    setSelectedProduct({});
+
+    onHide();
   };
 
   return (
@@ -200,7 +218,7 @@ function AddNewRecipeModal({ show, onHide }) {
           <button form="addNewRecipeModal" onClick={addRecipeHandler}>
             Add new recipe
           </button>
-          <Button onClick={onHide}>Close</Button>
+          <Button onClick={closeHandler}>Close</Button>
         </Modal.Footer>
       </Modal>
     </div>
