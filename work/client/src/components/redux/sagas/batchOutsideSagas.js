@@ -9,6 +9,8 @@ import {
   GET_FULL_BATCH_OUTSIDE,
   NEED_DELETE_BATCH_OUTSIDE,
   NEW_BATCH_OUTSIDE,
+  UPDATE_BATCH_OUTSIDE,
+  UPDATE_NEW_BATCH_OUTSIDE,
 } from '../types/batchOutsideTypes';
 
 // let accessTokenFront;
@@ -58,14 +60,14 @@ const deleteBatchOutside = (batch_id) => {
     .catch(showErrorMessage);
 };
 
-// const updateBatchOutside = ({ batchOutside }) => {
-//   return url
-//     .post(`/batchOutside/update/${batchOutside.c_id}`, { batchOutside })
-//     .then((res) => {
-//       return res.data;
-//     })
-//     .catch(showErrorMessage);
-// };
+const updateBatchOutside = (batchOutside) => {
+  return url
+    .post(`/batchOutside/update/${batchOutside.id}`, batchOutside)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
 
 function* getBatchOutsideWorker(action) {
   try {
@@ -113,20 +115,15 @@ function* deleteBatchOutsideWorker(action) {
   }
 }
 
-// function* updateClientWorker(action) {
-//   try {
-//     // accessTokenFront = yield select((state) => state.jwt);
+function* updateClientWorker(action) {
+  try {
+    const { batchOutside } = yield call(updateBatchOutside, action.payload);
 
-//     // const { client, accessToken, accessTokenExpiration } = yield call(
-//     const { client } = yield call(updateClient, action.payload);
-//     // window.localStorage.setItem('jwt', accessToken);
-
-//     yield put({ type: UPDATE_CLIENT, payload: client });
-//     // yield put(setToken(accessToken, accessTokenExpiration));
-//   } catch (err) {
-//     yield put({ type: UPDATE_CLIENT, payload: [] });
-//   }
-// }
+    yield put({ type: UPDATE_BATCH_OUTSIDE, payload: batchOutside });
+  } catch (err) {
+    yield put({ type: UPDATE_BATCH_OUTSIDE, payload: [] });
+  }
+}
 
 // watchers
 
@@ -134,6 +131,7 @@ function* batchOutsideWatcher() {
   yield takeLatest(GET_FULL_BATCH_OUTSIDE, getBatchOutsideWorker);
   yield takeLatest(ADD_NEW_BATCH_OUTSIDE, addNewBatchOutsideWorker);
   yield takeLatest(DELETE_BATCH_OUTSIDE, deleteBatchOutsideWorker);
+  yield takeLatest(UPDATE_NEW_BATCH_OUTSIDE, updateClientWorker);
 }
 
 export default batchOutsideWatcher;

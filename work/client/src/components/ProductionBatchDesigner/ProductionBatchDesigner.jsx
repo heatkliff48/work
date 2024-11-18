@@ -227,6 +227,12 @@ function ProductionBatchDesigner() {
       return prev.map((batchItem) => {
         for (let i = 0; i < batchDesigner.length; i++) {
           if (batchDesigner[i].id === batchItem.id) {
+            setQuantityPallets((prev) => {
+              return {
+                ...prev,
+                [batchDesigner[i].id]: batchDesigner[i].cakes_in_batch * 3,
+              };
+            });
             return {
               ...batchItem,
               cakes_in_batch: batchDesigner[i].cakes_in_batch,
@@ -237,6 +243,7 @@ function ProductionBatchDesigner() {
         return batchItem;
       });
     });
+    console.log('batchDesigner', batchDesigner);
   }, [batchDesigner]);
 
   useEffect(() => {

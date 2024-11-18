@@ -9,7 +9,11 @@ import {
 } from '#components/redux/actions/batchDesignerAction.js';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addNewBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+import {
+  addNewBatchOutside,
+  deleteBatchOutside,
+  updateBatchOutside,
+} from '#components/redux/actions/batchOutsideAction.js';
 
 function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
   const dispatch = useDispatch();
@@ -22,6 +26,7 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
   const list_of_ordered_production = useSelector(
     (state) => state.listOfOrderedProduction
   );
+  const batchOutside = useSelector((state) => state.batchOutside);
 
   const getClassForAutoclave = (num) => {
     switch (num) {
@@ -246,14 +251,37 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
       const fillingElement = flatAutoclave.find((el) => el.id === selectedId);
+      let count = 0;
 
       return prevAutoclave.map((prevAutoclave) => {
         const emptyIndex = prevAutoclave.findIndex((el) => !el.id);
         if (emptyIndex >= 1) {
-          return prevAutoclave.map((el, i) =>
-            i >= emptyIndex ? fillingElement : el
-          );
+          return prevAutoclave.map((el, i) => {
+            if (i >= emptyIndex) {
+              count++;
+              return fillingElement;
+            } else {
+              return el;
+            }
+          });
         }
+
+        // ----------------------- TUT KAKAYA TO ZALUPA S CIFRAMI-----------------------
+
+        dispatch(
+          updateBatchState({
+            selectedId,
+            cakes_in_batch: quantityPallets[selectedId] / 3 + count,
+            // cakes_residue: 0,
+          })
+        );
+
+        setQuantityPallets((prev) => {
+          return {
+            ...prev,
+            [selectedId]: quantityPallets[selectedId] + count * 3,
+          };
+        });
         return prevAutoclave;
       });
     });
@@ -270,19 +298,59 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
 
     for (const id in quantityPallets) {
       if (id !== undefined) {
-        const { quantity } = list_of_ordered_production.find((el) => el.id === id);
+        console.log('id----', id);
+
+        const { quantity } = list_of_ordered_production.find(
+          (el) => el.id == Number(id)
+        );
 
         const quantity_free = quantityPallets[id] - quantity;
 
-        const batchOutside = {
-          id_warehouse_batch: 'w',
-          id_list_of_ordered_production: id,
-          quantity_pallets: quantityPallets[id],
-          quantity_ordered: quantity,
-          quantity_free,
-          on_check: 0,
-        };
-        dispatch(addNewBatchOutside(batchOutside));
+        console.log('quantityPallets[id]', quantityPallets[id]);
+        // console.log('batchOutside', batchOutside);
+        // console.log(typeof id);
+        // console.log(
+        //   'batchOutside.find((el) => el.id_list_of_ordered_production === id)',
+        //   batchOutside.find((el) => {
+        //     if (el.id_list_of_ordered_production == Number(id)) return el;
+        //   })
+        // );
+        if (quantityPallets[id] == 0) {
+          const currentBatch = batchOutside.find(
+            (el) => el.id_list_of_ordered_production == Number(id)
+          );
+          console.log('currentBatch', currentBatch.id);
+          dispatch(deleteBatchOutside(currentBatch.id));
+        } else if (
+          batchOutside.find(
+            (el) => el.id_list_of_ordered_production == Number(id)
+          ) !== undefined
+        ) {
+          console.log('UPDATE------------');
+          dispatch(
+            updateBatchOutside({
+              id: Number(id),
+              id_warehouse_batch: 'w',
+              id_list_of_ordered_production: id,
+              quantity_pallets: quantityPallets[id],
+              quantity_ordered: quantity,
+              quantity_free,
+              on_check: 0,
+            })
+          );
+        } else {
+          console.log('ADD------------');
+          dispatch(
+            addNewBatchOutside({
+              id_warehouse_batch: 'w',
+              id_list_of_ordered_production: id,
+              quantity_pallets: quantityPallets[id],
+              quantity_ordered: quantity,
+              quantity_free,
+              on_check: 0,
+            })
+          );
+        }
       }
     }
   };
