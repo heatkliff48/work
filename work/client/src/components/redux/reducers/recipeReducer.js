@@ -17,6 +17,7 @@ export const recipeReducer = (recipe = [], action) => {
       const result = recipe.filter((el) => el.id !== payload);
       return result;
     }
+
     default:
       return recipe;
   }

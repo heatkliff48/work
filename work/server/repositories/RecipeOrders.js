@@ -1,6 +1,12 @@
 const { RecipeOrders } = require('../db/models');
 
 class RecipeOrdersRepository {
+  static async getRecipeOrdersData() {
+    const allRecipeOrdersыInDB = await RecipeOrders.findAll();
+
+    return allRecipeOrdersыInDB;
+  }
+
   static async saveMaterialPlan(material_plan) {
     const allRecipeOrdersыInDB = await RecipeOrders.findAll();
     const idsToReset = allRecipeOrdersыInDB.filter(
@@ -8,7 +14,7 @@ class RecipeOrdersRepository {
         material_plan.id_batch != dbRecord.id_batch &&
         material_plan.id_recipe != dbRecord.id_recipe
     );
-  
+
     if (idsToReset.length != 0) {
       await RecipeOrders.create(idsToReset);
     }
