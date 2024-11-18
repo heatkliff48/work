@@ -46,11 +46,7 @@ function RecipeOrders() {
 
   useEffect(() => {
     const updatedData = recipeOrders.map((el) => {
-      console.log('el', el);
-      const batch = batchOutside.find((batch) => {
-        console.log('batch', batch);
-        return batch.id === el.id_batch;
-      });
+      const batch = batchOutside.find((batch) => batch.id === el.id_batch);
       const recipe = list_of_recipes.find((recipe) => recipe.id === el.id_recipe);
 
       return {

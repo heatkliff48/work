@@ -270,8 +270,7 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
 
     for (const id in quantityPallets) {
       if (id !== undefined) {
-        console.log('id----', id);
-        const { quantity } = list_of_ordered_production.find((el) => el.id == id);
+        const { quantity } = list_of_ordered_production.find((el) => el.id === id);
 
         const quantity_free = quantityPallets[id] - quantity;
 
