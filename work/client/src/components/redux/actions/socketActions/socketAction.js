@@ -2,6 +2,7 @@ import {
   DATASHIP_ORDER_SOCKET,
   DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_PRODUCT_OF_ORDER_SOCKET,
+  NEED_DELETE_RECIPE_SOCKET,
   NEW_ORDER_SOCKET,
   NEW_PRODUCT_SOCKET,
   NEW_RECIPE_SOCKET,
@@ -102,5 +103,12 @@ export const addNewRecipeSocket = (recipe) => {
   return {
     type: NEW_RECIPE_SOCKET,
     payload: recipe,
+  };
+};
+
+export const deleteRecipeSocket = (recipe_id) => {
+  return {
+    type: NEED_DELETE_RECIPE_SOCKET,
+    payload: recipe_id,
   };
 };

@@ -21,6 +21,7 @@ const {
   UPDATE_STATUS_OF_ORDER_SOCKET,
   ADD_NEW_WAREHOUSE_SOCKET,
   ADD_NEW_RECIPE_SOCKET,
+  DELETE_RECIPE_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -265,6 +266,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_RECIPE_SOCKET,
           payload: recipe,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_RECIPE_SOCKET, (recipe_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_RECIPE_SOCKET,
+          payload: recipe_id,
         })
       );
     }

@@ -6,3 +6,5 @@ export const NEW_RECIPE = 'NEW_RECIPE';
 
 export const SAVE_MATERIAL_PLAN = 'SAVE_MATERIAL_PLAN';
 
+export const DELETE_RECIPE = 'DELETE_RECIPE';
+export const NEED_DELETE_RECIPE = 'NEED_DELETE_RECIPE';

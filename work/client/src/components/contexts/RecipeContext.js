@@ -78,6 +78,7 @@ const RecipeContextProvider = ({ children }) => {
 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productOfRecipe, setProductOfRecipe] = useState({});
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   const list_of_recipes = useSelector((state) => state.recipe);
 
@@ -90,6 +91,8 @@ const RecipeContextProvider = ({ children }) => {
         productOfRecipe,
         setProductOfRecipe,
         list_of_recipes,
+        selectedRecipe,
+        setSelectedRecipe,
       }}
     >
       {children}

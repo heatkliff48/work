@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useNavigate } from 'react-router-dom';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import RecipeChoiceModal from './RecipeChoiceModal';
+import RecipeInfoModal from './RecipeInfoModal';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import AddNewRecipeModal from './AddNewRecipeModal';
 import { getRecipe } from '#components/redux/actions/recipeAction.js';
@@ -14,7 +14,7 @@ const ProductsListForRecipes = () => {
   const [modalShow, setModalShow] = useState(false);
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { COLUMNS, latestProducts } = useProductsContext();
-  const { recipe_info, list_of_recipes, selectedProduct, setSelectedProduct } =
+  const { recipe_info, list_of_recipes, selectedRecipe, setSelectedRecipe } =
     useRecipeContext();
 
   const user = useSelector((state) => state.user);
@@ -26,14 +26,14 @@ const ProductsListForRecipes = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // const handlerAddProductRecipe = useCallback((row) => {
-  //   const product = productsDataList.filter((el) => el.id === row.original.id)[0];
+  const handlerRecipeInfo = useCallback((row) => {
+    const recipe = list_of_recipes.filter((el) => el.id === row.original.id)[0];
 
-  //   setSelectedProduct(product);
-  //   // setProductOfOrder((prev) => ({ ...prev, product_id: product?.id }));
+    setSelectedRecipe(recipe);
+    // setProductOfOrder((prev) => ({ ...prev, product_id: product?.id }));
 
-  //   setModalShow(true);
-  // }, []);
+    setModalShow(true);
+  }, []);
 
   // useEffect(() => {
   //   let filtered = latestProducts.filter((el) =>
@@ -82,11 +82,11 @@ const ProductsListForRecipes = () => {
         onClickButton={() => {}}
         buttonText={''}
         tableName={'Table of recipes'}
-        // handleRowClick={(row) => {
-        //   handlerAddProductRecipe(row);
-        // }}
+        handleRowClick={(row) => {
+          handlerRecipeInfo(row);
+        }}
       />
-      <RecipeChoiceModal show={modalShow} onHide={() => setModalShow(false)} />
+      <RecipeInfoModal show={modalShow} onHide={() => setModalShow(false)} />
     </div>
   );
 };

@@ -50,7 +50,6 @@ const addNewBatchOutside = (batchOutside) => {
 };
 
 const deleteBatchOutside = (batch_id) => {
-  console.log('SAGA DELETE ID', batch_id);
   return url
     .post('/batchOutside/delete', { batch_id })
     .then((res) => {

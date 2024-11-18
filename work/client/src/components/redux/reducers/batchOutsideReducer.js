@@ -11,7 +11,6 @@ export const batchOutsideReducer = (batchOutside = [], action) => {
       return payload;
     }
     case NEW_BATCH_OUTSIDE_SOCKET: {
-      console.log('reducer', action);
       return [...batchOutside, payload];
     }
     case NEED_DELETE_BATCH_OUTSIDE_SOCKET: {

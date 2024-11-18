@@ -5,6 +5,7 @@ import {
   addNewRecipeSocket,
   addNewWarehouseSocket,
   deeleteProductOfOrderSocket,
+  deleteRecipeSocket,
   deleteReservedProductSocket,
   updateProductSocket,
   updateRemainingStockSocket,
@@ -50,6 +51,7 @@ import {
   ADD_NEW_WAREHOUSE_SOCKET,
   DELETE_BATCH_OUTSIDE_SOCKET,
   ADD_NEW_RECIPE_SOCKET,
+  DELETE_RECIPE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -143,6 +145,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_RECIPE_SOCKET:
       dispatch(addNewRecipeSocket(payload));
+
+    case DELETE_RECIPE_SOCKET:
+      dispatch(deleteRecipeSocket(payload));
+      break;
 
     default:
       break;
