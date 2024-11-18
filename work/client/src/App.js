@@ -24,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import { createSocketOnMessage } from '#utils/socket.message.js';
 import WebSocketClient from '#utils/WebSockeetClient.js';
 import RawMaterialsPlan from '#components/RawMaterialsPlan/RawMaterialsPlan.jsx';
+import RecipeOrders from '#components/RawMaterialsPlan/RecipeOrders.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -74,6 +75,7 @@ function App() {
           <Route path="/recipe_products" element={<ProductsListForRecipes />} />
 
           <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
+          <Route path="/recipe_orders" element={<RecipeOrders />} />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>

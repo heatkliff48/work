@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Table from '#components/Table/Table.jsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useNavigate } from 'react-router-dom';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import RecipeInfoModal from './RecipeInfoModal';
@@ -12,14 +11,10 @@ import { getRecipe } from '#components/redux/actions/recipeAction.js';
 
 const ProductsListForRecipes = () => {
   const [modalShow, setModalShow] = useState(false);
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-  const { COLUMNS, latestProducts } = useProductsContext();
-  const { recipe_info, list_of_recipes, selectedRecipe, setSelectedRecipe } =
-    useRecipeContext();
+  const { roles, checkUserAccess, setUserAccess } = useUsersContext();
+  const { recipe_info, list_of_recipes, setSelectedRecipe } = useRecipeContext();
 
   const user = useSelector((state) => state.user);
-
-  const [productsDataList, setCProductsDataList] = useState(latestProducts);
   const [newRecipeModalShow, setNewRecipeModalShow] = useState(false);
 
   // const dispatch = useDispatch(); // for recepie later
@@ -86,7 +81,11 @@ const ProductsListForRecipes = () => {
           handlerRecipeInfo(row);
         }}
       />
-      <RecipeInfoModal show={modalShow} onHide={() => setModalShow(false)} />
+      <RecipeInfoModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        needDeleteButton={true}
+      />
     </div>
   );
 };

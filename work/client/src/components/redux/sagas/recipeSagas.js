@@ -1,14 +1,15 @@
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
-import { setToken } from '../actions/jwtAction';
 import {
   ADD_NEW_RECIPE,
   DELETE_RECIPE,
   FULL_RECIPE,
   GET_FULL_RECIPE,
+  GET_RECIPE_ORDERS_DATA,
   NEED_DELETE_RECIPE,
   NEW_RECIPE,
+  RECIPE_ORDERS_DATA,
   SAVE_MATERIAL_PLAN,
 } from '../types/recipeTypes';
 
@@ -35,19 +36,27 @@ const addNewRecipe = (recipe) => {
     .catch(showErrorMessage);
 };
 
-const saveMaterialPlan = (material_plan) => {
+const deleteRecipe = (recipe_id) => {
   return url
-    .post('/recipe_orders/', material_plan)
+    .post('/recipe/delete', { recipe_id })
     .then((res) => {
       return res.data;
     })
     .catch(showErrorMessage);
 };
 
-const deleteRecipe = (recipe_id) => {
-  console.log('SAGA DELETE ID', recipe_id);
+const getRecipeOrdersData = () => {
   return url
-    .post('/recipe/delete', { recipe_id })
+    .get('/recipe_orders/')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const saveMaterialPlan = (material_plan) => {
+  return url
+    .post('/recipe_orders/', material_plan)
     .then((res) => {
       return res.data;
     })
@@ -84,14 +93,6 @@ function* addNewRecipeWorker(action) {
   }
 }
 
-function* saveMaterialPlanWatcher(action) {
-  try {
-    yield call(saveMaterialPlan, action.payload);
-  } catch (err) {
-    console.log('err recipe saga', err);
-  }
-}
-
 function* deleteRecipeWorker(action) {
   try {
     // accessTokenFront = yield select((state) => state.jwt);
@@ -108,13 +109,32 @@ function* deleteRecipeWorker(action) {
   }
 }
 
+function* getRecipeOrdersDataWatcher(action) {
+  try {
+    const data = yield call(getRecipeOrdersData);
+    yield put({ type: RECIPE_ORDERS_DATA, payload: data });
+  } catch (err) {
+    console.log('err recipe saga', err);
+  }
+}
+
+function* saveMaterialPlanWatcher(action) {
+  try {
+    yield call(saveMaterialPlan, action.payload);
+  } catch (err) {
+    console.log('err recipe saga', err);
+  }
+}
+
 // watchers
 
 function* recipeWatcher() {
   yield takeLatest(GET_FULL_RECIPE, getRecipeWorker);
   yield takeLatest(ADD_NEW_RECIPE, addNewRecipeWorker);
-  yield takeLatest(SAVE_MATERIAL_PLAN, saveMaterialPlanWatcher);
   yield takeLatest(DELETE_RECIPE, deleteRecipeWorker);
+
+  yield takeLatest(SAVE_MATERIAL_PLAN, saveMaterialPlanWatcher);
+  yield takeLatest(GET_RECIPE_ORDERS_DATA, getRecipeOrdersDataWatcher);
 }
 
 export default recipeWatcher;

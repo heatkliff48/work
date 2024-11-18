@@ -3,19 +3,12 @@ import Modal from 'react-bootstrap/Modal';
 import React, { useCallback, useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { useDispatch } from 'react-redux';
 import { deleteRecipe } from '#components/redux/actions/recipeAction.js';
 
 function RecipeInfoModal(props) {
-  const {
-    recipe_info,
-    list_of_recipes,
-    selectedProduct,
-    setSelectedProduct,
-    selectedRecipe,
-  } = useRecipeContext();
+  const { recipe_info, list_of_recipes, selectedRecipe } = useRecipeContext();
 
   const dispatch = useDispatch();
 
@@ -34,7 +27,8 @@ function RecipeInfoModal(props) {
   return (
     <>
       <Modal
-        {...props}
+        show={props.isOpen}
+        onHide={props.onHide}
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
@@ -52,7 +46,7 @@ function RecipeInfoModal(props) {
                 onSubmitForm(e);
               }}
             >
-              <h3>{selectedRecipe?.article}</h3>
+              <h3>{selectedRecipe?.article || 'No recipe selected'}</h3>
               {/* <h3>
                 {parseInt(
                   list_of_recipes[list_of_recipes.length - 1].article.slice(-6)
@@ -61,7 +55,6 @@ function RecipeInfoModal(props) {
               {selectedRecipe &&
                 recipe_info.map((el) => (
                   <Row>
-                    {/* <Col></Col> */}
                     <h3>
                       {el.Header}: {selectedRecipe[el.accessor] || 'Empty'}
                     </h3>
@@ -72,7 +65,9 @@ function RecipeInfoModal(props) {
         </Modal.Body>
         <Modal.Footer>
           {/* <button form="RecipeInfoModal">Сохранить</button> */}
-          <Button onClick={deleteRecipeHandler}>Delete Recipe</Button>
+          {props.needDeleteButton && (
+            <Button onClick={deleteRecipeHandler}>Delete Recipe</Button>
+          )}
           <Button onClick={props.onHide}>Close</Button>
         </Modal.Footer>
       </Modal>

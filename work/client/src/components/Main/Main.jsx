@@ -17,6 +17,7 @@ import {
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
+import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
 
 function Main() {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ function Main() {
     dispatch(getListOfOrderedProductionOEM());
     dispatch(getOrders());
     dispatch(clearBatchState());
+    dispatch(getRecipeOrdersData());
   }, [navigate, user, modalRoleCard]);
 
   return (
@@ -74,11 +76,12 @@ function Main() {
       </button>
       <button onClick={() => navigate('/batch_outside')}>Batch Outside</button>
 
-      <button onClick={() => navigate('/recipe_products')}>recipe_products</button>
+      <button onClick={() => navigate('/recipe_products')}>Recipe Products</button>
 
       <button onClick={() => navigate('/raw_materials_plan')}>
         Raw Materials Plan
       </button>
+      <button onClick={() => navigate('/recipe_orders')}>Recipe Orders</button>
     </div>
   );
 }
