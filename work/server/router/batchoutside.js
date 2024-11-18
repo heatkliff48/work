@@ -115,19 +115,17 @@ batchOutsideRouter.post('/', async (req, res) => {
 //   }
 // });
 
-batchOutsideRouter.post('/update/:c_id', async (req, res) => {
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
-
+batchOutsideRouter.post('/update/:id', async (req, res) => {
+  console.log('-------------------req.body.batchOutside', req.body);
   const {
-    c_id,
+    id,
     id_warehouse_batch,
     id_list_of_ordered_production,
     quantity_pallets,
     quantity_ordered,
     quantity_free,
     on_check,
-  } = req.body.batchOutside;
+  } = req.body;
 
   try {
     const batchOutside = await BatchOutside.update(
@@ -141,33 +139,15 @@ batchOutsideRouter.post('/update/:c_id', async (req, res) => {
       },
       {
         where: {
-          id: c_id,
+          id,
         },
         returning: true,
         plain: true,
       }
     );
 
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
     myEmitter.emit(UPDATE_BATCH_OUTSIDE_SOCKET, batchOutside);
-    return res.status(200); //.json({ client });
-
-    // return (
-    //   res
-    //     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-    //     .status(200)
-    //     .json({
-    //       client,
-    //       accessToken,
-    //       accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    //     })
-    // );
+    return res.status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
