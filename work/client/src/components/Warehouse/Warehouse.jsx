@@ -6,7 +6,6 @@ import WarehouseAddModal from './WarehouseAddModal';
 import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import ErrorBoundary from './ErrorBiundary';
 
 function Warehouse() {
   const { COLUMNS_WAREHOUSE } = useWarehouseContext();
