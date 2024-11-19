@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 const WarehouseContext = createContext();
@@ -75,6 +75,39 @@ const WarehouseContextProvider = ({ children }) => {
   const [filteredProducts, setFilteredProducts] = useState();
   const [currentOrderedProducts, setCurrentOrderedProducts] = useState({});
   const [currentBatchId, setCurrentBatchId] = useState(0);
+  const [listOfOrderedCakes, setListOfOrderedCakes] = useState([]);
+
+  const batchOutside = useSelector((state) => state.batchOutside);
+  const list_of_orders = useSelector((state) => state.orders);
+  const productsOfOrders = useSelector((state) => state.productsOfOrders);
+
+  useEffect(() => {
+    const data = list_of_ordered_production.map((el) => {
+      const quantity_cakes = (el.quantity / 3).toFixed(2);
+      const orderId = list_of_orders.find(
+        (order) => order.article === el.order_article
+      ).id;
+
+      const prodOrdId = productsOfOrders.filter((elem) => elem.order_id === orderId);
+
+      const quantity_in_warehouse = list_of_reserved_products.find((res_prod) =>
+        prodOrdId.find((prod) => res_prod.orders_products_id === prod.id)
+      )?.quantity;
+
+      const quantity_in_batch = (
+        batchOutside.find((batch) => batch.id_list_of_ordered_production === el.id)
+          ?.quantity_pallets / 3
+      ).toFixed(2);
+
+      return {
+        ...el,
+        quantity_cakes,
+        quantity_in_batch,
+        quantity_in_warehouse,
+      };
+    });
+    setListOfOrderedCakes(data);
+  }, [list_of_ordered_production]);
 
   return (
     <WarehouseContext.Provider
@@ -93,7 +126,7 @@ const WarehouseContextProvider = ({ children }) => {
         setCurrentOrderedProducts,
         currentBatchId,
         setCurrentBatchId,
-      }}
+        listOfOrderedCakes, setListOfOrderedCakes      }}
     >
       {children}
     </WarehouseContext.Provider>
