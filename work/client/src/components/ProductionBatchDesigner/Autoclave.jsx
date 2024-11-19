@@ -264,7 +264,6 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
     Object.keys(quantityPallets).forEach((key) =>
       quantityPallets[key] === undefined ? delete quantityPallets[key] : {}
     ); // delete undefined from obj
-    console.log('quantityPallets----------', quantityPallets);
 
     // !!! add setQuantityPallets to other Autoclave add/delete actions/functions
 

@@ -14,7 +14,7 @@ function ProductionBatchDesigner() {
   const dispatch = useDispatch();
 
   const { latestProducts } = useProductsContext();
-  const { list_of_ordered_production } = useWarehouseContext();
+  const { listOfOrderedCakes } = useWarehouseContext();
   const { autoclaveData, autoclave, setAutoclave } = useOrderContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
@@ -240,10 +240,12 @@ function ProductionBatchDesigner() {
   }, [batchDesigner]);
 
   useEffect(() => {
-    if (!latestProducts || !list_of_ordered_production) return;
+    if (!latestProducts || !listOfOrderedCakes) return;
 
-    console.log();
-    const groupedByDensity = list_of_ordered_production.reduce((acc, curr) => {
+    const rightListOfOrdered = listOfOrderedCakes.filter(
+      (el) => el.quantity !== el.quantity_in_warehouse
+    );
+    const groupedByDensity = rightListOfOrdered.reduce((acc, curr) => {
       const product = latestProducts.find((p) => p.article === curr.product_article);
       if (!product) return acc;
       const { density } = product;
@@ -290,7 +292,7 @@ function ProductionBatchDesigner() {
       filledAutoclave.push(updatedAutoclaveData.slice(i, i + 21));
     }
     setAutoclave(filledAutoclave);
-  }, [latestProducts, list_of_ordered_production, autoclaveData]);
+  }, [latestProducts, listOfOrderedCakes, autoclaveData]);
 
   const transformAutoclaveData = (autoclave, prodBatchDesigner) => {
     if (!autoclave || !prodBatchDesigner) return [];
