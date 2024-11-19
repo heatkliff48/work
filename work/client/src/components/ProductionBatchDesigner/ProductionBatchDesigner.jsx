@@ -243,7 +243,6 @@ function ProductionBatchDesigner() {
         return batchItem;
       });
     });
-    console.log('batchDesigner', batchDesigner);
   }, [batchDesigner]);
 
   useEffect(() => {

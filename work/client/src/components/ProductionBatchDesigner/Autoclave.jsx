@@ -297,7 +297,6 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
 
     for (const id in quantityPallets) {
       if (id !== undefined) {
-        console.log('id----', id);
 
         const { quantity } = list_of_ordered_production.find(
           (el) => el.id == Number(id)
@@ -305,27 +304,16 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
 
         const quantity_free = quantityPallets[id] - quantity;
 
-        console.log('quantityPallets[id]', quantityPallets[id]);
-        // console.log('batchOutside', batchOutside);
-        // console.log(typeof id);
-        // console.log(
-        //   'batchOutside.find((el) => el.id_list_of_ordered_production === id)',
-        //   batchOutside.find((el) => {
-        //     if (el.id_list_of_ordered_production == Number(id)) return el;
-        //   })
-        // );
-        if (quantityPallets[id] == 0) {
+        if (quantityPallets[id] === 0) {
           const currentBatch = batchOutside.find(
-            (el) => el.id_list_of_ordered_production == Number(id)
+            (el) => el.id_list_of_ordered_production === Number(id)
           );
-          console.log('currentBatch', currentBatch.id);
           dispatch(deleteBatchOutside(currentBatch.id));
         } else if (
           batchOutside.find(
-            (el) => el.id_list_of_ordered_production == Number(id)
+            (el) => el.id_list_of_ordered_production === Number(id)
           ) !== undefined
         ) {
-          console.log('UPDATE------------');
           dispatch(
             updateBatchOutside({
               id: Number(id),
@@ -338,7 +326,6 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
             })
           );
         } else {
-          console.log('ADD------------');
           dispatch(
             addNewBatchOutside({
               id_warehouse_batch: 'w',
@@ -359,8 +346,6 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
   }, [dispatch]);
 
   useEffect(() => {
-    // const { id, value } = quantity_pallets;
-    // console.log('check id, value', id, value);
     Object.keys(quantity_pallets).forEach((id) =>
       setQuantityPallets((prev) => {
         return {
@@ -370,12 +355,7 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
       })
     );
 
-    // console.log('quantity_pallets', quantity_pallets);
   }, [quantity_pallets]);
-
-  useEffect(() => {
-    console.log('quantityPallets', quantityPallets);
-  }, [quantityPallets]);
 
   return (
     <div>
