@@ -71,17 +71,10 @@ const BatchOutside = () => {
   const batchOutsideHandler = (id) => {
     const currBatch = batchOutside.find((el) => el.id === id);
     setCurrentBatchId(currBatch.id);
-    console.log(
-      'id_list_of_ordered_production',
-      currBatch.id_list_of_ordered_production
-    );
     const currOrderedProduction = list_of_ordered_production.find(
       (el) => el.id === currBatch.id_list_of_ordered_production
     );
     setCurrentOrderedProducts(currOrderedProduction);
-    console.log('list_of_ordered_production', currOrderedProduction);
-    console.log('currentOrderedProducts', currentOrderedProducts);
-    console.log('prod_article', currentOrderedProducts.product_article);
     setModalShow(true);
   };
 

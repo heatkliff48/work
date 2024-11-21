@@ -32,7 +32,6 @@ const batchDesignerReducer = (state = [], action) => {
 
     case UPDATE_BATCH_STATE: {
       const { id, cakes_in_batch, cakes_residue } = payload;
-      console.log('UPDATE_BATCH_STATE cakes_in_batch', cakes_in_batch);
       const newState = state?.map((el) => {
         if (el.id === id)
           return {
