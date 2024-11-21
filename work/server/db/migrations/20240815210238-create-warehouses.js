@@ -22,6 +22,9 @@ module.exports = {
       warehouse_loc: {
         type: Sequelize.STRING,
       },
+      type: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

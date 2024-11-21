@@ -25,6 +25,11 @@ const WarehouseContextProvider = ({ children }) => {
       accessor: 'warehouse_loc',
       sortType: 'string',
     },
+    {
+      Header: 'Type',
+      accessor: 'type',
+      sortType: 'string',
+    },
   ];
 
   const COLUMNS_LIST_OF_ORDERED_PRODUCTION = [
@@ -33,8 +38,16 @@ const WarehouseContextProvider = ({ children }) => {
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
     { Header: 'Quantity', accessor: 'quantity', sortType: 'number' },
     { Header: 'Quantity, cakes', accessor: 'quantity_cakes', sortType: 'number' },
-    { Header: 'Quantity in batch', accessor: 'quantity_in_batch', sortType: 'number' },
-    { Header: 'quantity in warehouse', accessor: 'quantity_in_warehouse', sortType: 'number' },
+    {
+      Header: 'Quantity in batch',
+      accessor: 'quantity_in_batch',
+      sortType: 'number',
+    },
+    {
+      Header: 'quantity in warehouse',
+      accessor: 'quantity_in_warehouse',
+      sortType: 'number',
+    },
   ];
 
   const COLUMNS_LIST_OF_ORDERED_PRODUCTION_OEM = [

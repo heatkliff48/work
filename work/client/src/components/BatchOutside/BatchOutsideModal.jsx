@@ -1,14 +1,20 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { addNewWarehouse } from '#components/redux/actions/warehouseAction.js';
+import {
+  addNewReservedProducts,
+  addNewWarehouse,
+  updateRemainingStock,
+} from '#components/redux/actions/warehouseAction.js';
 import { useDispatch } from 'react-redux';
 import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
 
 function BatchOutsideModal(props) {
   const [batchOutsideInput, setBatchOutsideInput] = useState({});
@@ -37,14 +43,19 @@ function BatchOutsideModal(props) {
   ];
 
   const { COLUMNS, latestProducts } = useProductsContext();
+  const { productsOfOrders, list_of_orders } = useOrderContext();
   const {
     warehouse_data,
     filteredProducts,
+    setFilteredProducts,
     currentOrderedProducts,
     setCurrentOrderedProducts,
     currentBatchId,
   } = useWarehouseContext();
+  const { warehouseInfoCurIdModal, setWarehouseInfoCurIdModal } = useModalContext();
   const [warehouseData, setWarehouseData] = useState({});
+
+  const [counter, setCounter] = useState(0);
 
   const getWarehouseArticle = (product, type, versionNumber) => {
     // let versionNumber = '0001';
@@ -86,11 +97,12 @@ function BatchOutsideModal(props) {
           article: warehouse_article,
           warehouse_loc: 'local',
           remaining_stock: batchOutsideInput.quality_product,
+          type: 'OK',
         })
       );
+      setCounter((prev) => prev + 1);
       ok = true;
-      const warehouse_data_last_id =
-        warehouse_data.length === 0 ? 1 : warehouse_data.length;
+      // console.log('warehouseInfoCurIdModal', warehouseInfoCurIdModal);
     }
     if (batchOutsideInput.remnants) {
       const type = 1;
@@ -105,14 +117,100 @@ function BatchOutsideModal(props) {
           article: warehouse_article,
           warehouse_loc: 'local',
           remaining_stock: batchOutsideInput.remnants,
+          type: 'Remnants',
         })
       );
+      setCounter((prev) => prev + 1);
       ok = true;
     }
     if (ok) {
+      // delete
       await dispatch(deleteBatchOutside(currentBatchId));
     }
   };
+
+  // ---------------------AUTO WAREHOUSE STOCK RESERVE-----------------
+
+  // useEffect(() => {
+  //   // setWarehouseInfoCurIdModal(warehouse_data[warehouse_data.length - 1].id);
+  //   // console.log('warehouse_data', warehouse_data);
+  //   // console.log('counter', counter);
+
+  //   // let j = 2;
+  //   // for (let i = 0; i < counter; i++) {
+  //   if (counter > 0) {
+  //     // console.log('wrehouse last id', warehouse_data[warehouse_data.length - j].id);
+  //     console.log('counter', counter);
+  //     const curr_warehouse = warehouse_data.find(
+  //       (wh) => wh.id === warehouse_data[warehouse_data.length - counter].id
+  //     );
+  //     const { id, remaining_stock } = curr_warehouse;
+  //     let remaining_stock_buff = remaining_stock;
+
+  //     console.log('curr_warehouse', curr_warehouse);
+
+  //     const product_id = latestProducts.find(
+  //       (el) => el.article === curr_warehouse.product_article
+  //     );
+  //     // console.log('product_id', product_id);
+
+  //     const filteredProductsOfOrders = productsOfOrders.filter(
+  //       (item) => item.product_id === product_id.id
+  //     );
+  //     // console.log('filteredProductsOfOrders', filteredProductsOfOrders);
+
+  //     const result = filteredProductsOfOrders.map((product) => {
+  //       const order = list_of_orders.find((order) => order.id === product.order_id);
+  //       return {
+  //         productsOfOrders_id: product.id,
+  //         order_article: order ? order.article : '',
+  //         quantity_palet: product.quantity_palet,
+  //       };
+  //     });
+  //     console.log('result', result);
+  //     setFilteredProducts(result);
+
+  //     result?.forEach((el) => {
+  //       const { quantity_palet, productsOfOrders_id } = el;
+
+  //       // console.log('el', el);
+  //       // console.log('id', id);
+  //       console.log('remaining_stock_buff', remaining_stock_buff);
+
+  //       if (quantity_palet > remaining_stock_buff) {
+  //         console.log(
+  //           'Колличество заказной продукции превышает коллиичество продукции на складе!'
+  //         );
+  //         // const new_quantity_palet = quantity_palet - remaining_stock;
+  //         // console.log('new_quantity_palet', new_quantity_palet);
+  //         return;
+  //       }
+  //       remaining_stock_buff = remaining_stock_buff - quantity_palet;
+
+  //       dispatch(
+  //         updateRemainingStock({
+  //           warehouse_id: id,
+  //           new_remaining_stock: remaining_stock_buff,
+  //         })
+  //       );
+
+  //       dispatch(
+  //         addNewReservedProducts({
+  //           warehouse_id: id,
+  //           orders_products_id: productsOfOrders_id,
+  //           quantity: quantity_palet,
+  //         })
+  //       );
+  //     });
+
+  //     // --j;
+  //     // if (j <= 0) {
+  //     //   j = 2;
+  //     setCounter(0);
+  //     //   }
+  //     // }
+  //   }
+  // }, [warehouse_data]);
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
