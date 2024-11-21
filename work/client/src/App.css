@@ -559,3 +559,21 @@ input[type='checkbox'] {
   padding: 0;
   text-align: center;
 }
+.page-container {
+  background: white;
+  padding: 20px;
+}
+
+.pdf_button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #007bff;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}

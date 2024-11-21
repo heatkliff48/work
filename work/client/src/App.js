@@ -12,7 +12,6 @@ import MainContextProvider from '#components/contexts/MainContex.js';
 import OrderCart from '#components/Orders/OrderCart.jsx';
 import Warehouse from '#components/Warehouse/Warehouse.jsx';
 import UsersInfo from '#components/UsersInfo/usersInfo.jsx';
-// import ProductionBatchLog from '#components/ProductionBatchLog/ProductionBatchLog.jsx';
 import ListOfOrderedProduction from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProduction.jsx';
 import ListOfOrderedProductionOEM from '#components/Warehouse/ListOfOrderedProductionOEM/ListOfOrderedProductionOEM.jsx';
 import ProductionBatchDesigner from '#components/ProductionBatchDesigner/ProductionBatchDesigner.jsx';
@@ -25,6 +24,7 @@ import { createSocketOnMessage } from '#utils/socket.message.js';
 import WebSocketClient from '#utils/WebSockeetClient.js';
 import RawMaterialsPlan from '#components/RawMaterialsPlan/RawMaterialsPlan.jsx';
 import RecipeOrders from '#components/RawMaterialsPlan/RecipeOrders.jsx';
+import PrintContent from '#components/Orders/PrintContent.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -76,6 +76,7 @@ function App() {
 
           <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
           <Route path="/recipe_orders" element={<RecipeOrders />} />
+          <Route path="/print-content" element={<PrintContent />} />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>
