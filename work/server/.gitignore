@@ -133,3 +133,6 @@ dist
 
 .dockerignore
 Dockerfile
+
+# Залупа загрузочная
+uploads

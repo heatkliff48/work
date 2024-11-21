@@ -29,6 +29,18 @@ function AddNewRecipeModal({ show, onHide }) {
   } = useRecipeContext();
 
   const [productsDataList, setCProductsDataList] = useState(latestProducts);
+  const [dryTotal, setDryTotal] = useState(0);
+  const dryTotalSumm = [
+    'article',
+    'sand',
+    'lime_lhoist',
+    'lime_barcelona',
+    'cement',
+    'gypsum',
+    'alu_1',
+    'alu_2',
+    'return_slurry_solids',
+  ];
 
   const formVolume = 6.78;
 
@@ -50,6 +62,9 @@ function AddNewRecipeModal({ show, onHide }) {
 
   const handleRecipeInfoInputChange = useCallback((e) => {
     setRecipeInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (dryTotalSumm.includes(e.target.name)) {
+      setDryTotal((prev) => prev + Number(e.target.value));
+    }
   }, []);
 
   useEffect(() => {
@@ -105,7 +120,7 @@ function AddNewRecipeModal({ show, onHide }) {
         density: selectedProduct?.density,
         certificate: selectedProduct?.certificate,
         form_volume_m3: formVolume,
-        dry_total: selectedProduct?.density * formVolume,
+        dry_total: dryTotal,
       })
     );
 
@@ -182,10 +197,10 @@ function AddNewRecipeModal({ show, onHide }) {
                               />
                             </div>
                             <div className="md:w-2/3">
-                              <h4>
+                              {/* <h4>
                                 {((selectedProduct?.density * formVolume) / 100) *
                                   recipeInput[el.accessor] || 0}
-                              </h4>
+                              </h4> */}
                             </div>
                           </div>
                         </Col>
@@ -195,7 +210,7 @@ function AddNewRecipeModal({ show, onHide }) {
                 </Row>
                 <h3>Density: {selectedProduct?.density}</h3>
                 <h3>Form volume, m3: {formVolume}</h3>
-                <h3>Dry total: {selectedProduct?.density * formVolume}</h3>
+                <h3>Dry total: {dryTotal}</h3>
               </form>
             </Container>
           ) : (
