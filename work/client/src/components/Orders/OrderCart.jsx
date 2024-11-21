@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useCallback, useState } from 'react';
+import React, { useEffect, useMemo, useCallback, useState, useRef } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
+import { useReactToPrint } from 'react-to-print';
 // import ReactDOM from 'react-dom';
 import { Button } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,9 +26,140 @@ import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { BiCloudLightRain, BiCycling } from 'react-icons/bi';
-// import { BiCycling } from 'react-icons/bi';
-// import PrintContent from './PrintContent.jsx'; // Импортируем созданный компонент
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  PDFViewer,
+  PDFDownloadLink,
+} from '@react-pdf/renderer';
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 30,
+    fontSize: 12,
+    fontFamily: 'Helvetica',
+  },
+  section: {
+    marginBottom: 15,
+    padding: 10,
+    border: '1 solid #ccc',
+  },
+  header: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  table: {
+    display: 'table',
+    width: 'auto',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
+  },
+  tableRow: {
+    flexDirection: 'row',
+  },
+  tableCell: {
+    flexGrow: 1,
+    padding: 5,
+    borderRight: '1 solid #ccc',
+    borderBottom: '1 solid #ccc',
+  },
+  tableHeader: {
+    backgroundColor: '#f5f5f5',
+    fontWeight: 'bold',
+  },
+  input: {
+    fontSize: 12,
+    padding: 5,
+    border: '1 solid #ccc',
+  },
+});
+
+const OrderPDF = ({ orderData, productList, vatValue }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      {/* Заголовок заказа */}
+      <View style={styles.section}>
+        <Text style={styles.header}>Order Card: {orderData?.article || 'N/A'}</Text>
+      </View>
+
+      {/* Клиентская информация */}
+      <View
+        style={[
+          styles.section,
+          { flexDirection: 'row', justifyContent: 'space-between' },
+        ]}
+      >
+        <View style={{ flex: 1 }}>
+          <Text style={styles.header}>Client Information</Text>
+          {Object.entries(orderData?.owner || {}).map(([key, value]) => {
+            if (key === 'id') return <></>;
+            return <Text key={key}>{`${key}: ${value}`}</Text>;
+          })}
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.header}>Contact Person</Text>
+          {Object.entries(orderData?.contactInfo || {}).map(([key, value]) => {
+            if (key === 'id') return <></>;
+            return <Text key={key}>{`${key}: ${value}`}</Text>;
+          })}
+        </View>
+      </View>
+
+      {/* Адрес доставки */}
+      <View style={styles.section}>
+        <Text style={styles.header}>Delivery Address</Text>
+        {Object.entries(orderData?.deliveryAddress || {}).map(([key, value]) => {
+          if (key === 'id') return <></>;
+          return <Text key={key}>{`${key}: ${value}`}</Text>;
+        })}
+      </View>
+
+      {/* Таблица продуктов */}
+      <View style={[styles.section, styles.table]}>
+        <View style={[styles.tableRow, styles.tableHeader]}>
+          <Text style={styles.tableCell}>Product</Text>
+          <Text style={styles.tableCell}>Quantity</Text>
+          <Text style={styles.tableCell}>Price</Text>
+        </View>
+        {productList.length > 0 ? (
+          productList.map((product, index) => (
+            <View style={styles.tableRow} key={index}>
+              <Text style={styles.tableCell}>{product?.product_article || 'N/A'}</Text>
+              <Text style={styles.tableCell}>
+                {product?.quantity_palet || 'N/A'}
+              </Text>
+              <Text style={styles.tableCell}>{product?.final_price || 'N/A'}</Text>
+            </View>
+          ))
+        ) : (
+          <Text>No products available</Text>
+        )}
+      </View>
+
+      {/* Данные VAT */}
+      <View style={styles.section}>
+        <Text style={styles.header}>VAT Information</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View>
+            <Text>VAT, %: {vatValue?.vat_procent || 'N/A'}</Text>
+          </View>
+          <View>
+            <Text>VAT, EURO: {vatValue?.vat_euro || 'N/A'}</Text>
+          </View>
+          <View>
+            <Text>Result: {vatValue?.vat_result || 'N/A'}</Text>
+          </View>
+        </View>
+      </View>
+    </Page>
+  </Document>
+);
 
 const OrderCart = React.memo(() => {
   const {
@@ -47,12 +179,14 @@ const OrderCart = React.memo(() => {
   } = useModalContext();
   const { displayNames } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-
   const { latestProducts } = useProductsContext();
-
   const { list_of_reserved_products, ordered_production_oem_status } =
     useWarehouseContext();
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const user = useSelector((state) => state.user);
   const productListOrder = useSelector((state) => state.productsOfOrders);
 
   const [dataValue, setDataValue] = useState(new Date());
@@ -62,10 +196,6 @@ const OrderCart = React.memo(() => {
     vat_euro: 0,
     vat_result: 0,
   });
-
-  const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [orderStatusAccess, setOrderStatusAccess] = useState({
     canRead: true,
     canWrite: false,
@@ -119,7 +249,6 @@ const OrderCart = React.memo(() => {
     const currentDate = new Date();
     const shippingDateString = orderCartData?.shipping_date;
 
-    // Преобразование строки в формате "23.08.2024" в объект Date
     const shippingDate = new Date(shippingDateString.split('.').reverse().join('-'));
 
     const timeDiff = shippingDate.getTime() - currentDate.getTime();
@@ -133,6 +262,7 @@ const OrderCart = React.memo(() => {
         const product = latestProducts?.find(
           (p) => p.id === orderProduct?.product_id
         );
+
         if (product) {
           return {
             product_article: product.article,
@@ -281,30 +411,6 @@ const OrderCart = React.memo(() => {
     localStorage.setItem('orderCartData', JSON.stringify(storedData));
   }, [list_of_orders]);
 
-  // const printOrder = useCallback(() => {
-  //   const printWindow = window.open('', '', 'width=800,height=600');
-  //   printWindow.document.write(
-  //     '<html><head><title>Print Order</title></head><body><div id="print-root"></div></body></html>'
-  //   );
-  //   printWindow.document.close();
-
-  //   printWindow.onload = () => {
-  //     console.log('onload');
-  //     const root = ReactDOM.createRoot(
-  //       printWindow.document.getElementById('print-root')
-  //     );
-  //     console.log('root', root);
-  //     root.render(
-  //       <PrintContent
-  //         orderCartData={orderCartData}
-  //         updatedProductListOrder={updatedProductListOrder}
-  //         displayNames={displayNames}
-  //         filterKeys={filterKeys}
-  //       />
-  //     );
-  //   };
-  // }, [orderCartData, updatedProductListOrder, displayNames, filterKeys]);
-
   useEffect(() => {
     if (user && roles.length > 0) {
       const access = checkUserAccess(user, roles, 'Orders');
@@ -314,14 +420,10 @@ const OrderCart = React.memo(() => {
       setOrderStatusAccess(statusAccess);
 
       if (!access?.canRead) {
-        navigate('/'); 
+        navigate('/');
       }
     }
   }, [user, roles]);
-
-  useEffect(() => {
-    console.log('orderCartData', orderCartData.status);
-  }, [orderCartData]);
 
   return (
     <>
@@ -337,8 +439,8 @@ const OrderCart = React.memo(() => {
           toggle={() => setProductModalOrder(!productModalOrder)}
         />
       )}
+
       <div className="page-container">
-        {/* <Button onClick={printOrder}>PDF</Button> */}
         <h4>Order Card: {orderCartData?.article}</h4>
 
         <div className="header-container">
@@ -371,7 +473,9 @@ const OrderCart = React.memo(() => {
         </div>
         <table className="product-table">
           <thead>
-            <tr>Products</tr>
+            <tr>
+              <td>Products</td>
+            </tr>
           </thead>
           <tbody>
             {updatedProductListOrder?.map((product) => (
@@ -394,20 +498,24 @@ const OrderCart = React.memo(() => {
               </tr>
             ))}
             {userAccess?.canWrite && (
-              <Button
-                onClick={() => {
-                  setNewOrder((prev) => ({
-                    ...prev,
-                    article: orderCartData.article,
-                    owner: orderCartData.owner.id,
-                    status: orderCartData.status,
-                    del_adr_id: orderCartData.deliveryAddress.id,
-                  }));
-                  setProductModalOrder(!productModalOrder);
-                }}
-              >
-                Add product
-              </Button>
+              <tr>
+                <td colSpan="100%">
+                  <Button
+                    onClick={() => {
+                      setNewOrder((prev) => ({
+                        ...prev,
+                        article: orderCartData.article,
+                        owner: orderCartData.owner.id,
+                        status: orderCartData.status,
+                        del_adr_id: orderCartData.deliveryAddress.id,
+                      }));
+                      setProductModalOrder(!productModalOrder);
+                    }}
+                  >
+                    Add product
+                  </Button>
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -447,6 +555,8 @@ const OrderCart = React.memo(() => {
                 </p>
               ) : (
                 <DatePicker
+                  id="data_pcker"
+                  type="text"
                   selected={dataValue}
                   onChange={(date) => handleDateChange(date)}
                   dateFormat="dd.MM.yyyy"
@@ -459,9 +569,10 @@ const OrderCart = React.memo(() => {
               <div key={item.accessor} className="status-row">
                 <div className="header">{item.Header}</div>
                 <input
+                  id={item.accessor}
                   type="checkbox"
                   checked={item.accessor === orderCartData?.status}
-                  onClick={() => {
+                  onChange={() => {
                     statusChangeHandler(item);
                   }}
                 />
@@ -470,6 +581,29 @@ const OrderCart = React.memo(() => {
           </div>
         </div>
       </div>
+      <PDFDownloadLink
+        document={
+          <OrderPDF
+            orderData={orderCartData}
+            productList={updatedProductListOrder}
+            vatValue={vatValue}
+          />
+        }
+        fileName={`order-${orderCartData?.article || 'N/A'}.pdf`}
+        className="pdf_button"
+      >
+        {({ blob, url, loading, error }) =>
+          loading ? 'Loading document...' : 'Download PDF'
+        }
+      </PDFDownloadLink>
+
+      <PDFViewer style={{ width: '100%', height: '500px' }}>
+        <OrderPDF
+          orderData={orderCartData}
+          productList={updatedProductListOrder || []}
+          vatValue={vatValue}
+        />
+      </PDFViewer>
     </>
   );
 });
