@@ -10,6 +10,7 @@ import {
 } from '#components/redux/actions/warehouseAction.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import FilesMain from '#components/FileUpload/FilesMain.jsx';
 
 const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -120,6 +121,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
           >
             Зарезервировать продукцию
           </Button>
+          <FilesMain />
           <Table>
             <thead>
               <tr>
