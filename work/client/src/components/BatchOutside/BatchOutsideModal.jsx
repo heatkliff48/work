@@ -102,7 +102,6 @@ function BatchOutsideModal(props) {
       );
       setCounter((prev) => prev + 1);
       ok = true;
-      // console.log('warehouseInfoCurIdModal', warehouseInfoCurIdModal);
     }
     if (batchOutsideInput.remnants) {
       const type = 1;
@@ -133,31 +132,24 @@ function BatchOutsideModal(props) {
 
   // useEffect(() => {
   //   // setWarehouseInfoCurIdModal(warehouse_data[warehouse_data.length - 1].id);
-  //   // console.log('warehouse_data', warehouse_data);
-  //   // console.log('counter', counter);
 
   //   // let j = 2;
   //   // for (let i = 0; i < counter; i++) {
   //   if (counter > 0) {
-  //     // console.log('wrehouse last id', warehouse_data[warehouse_data.length - j].id);
-  //     console.log('counter', counter);
   //     const curr_warehouse = warehouse_data.find(
   //       (wh) => wh.id === warehouse_data[warehouse_data.length - counter].id
   //     );
   //     const { id, remaining_stock } = curr_warehouse;
   //     let remaining_stock_buff = remaining_stock;
 
-  //     console.log('curr_warehouse', curr_warehouse);
-
   //     const product_id = latestProducts.find(
   //       (el) => el.article === curr_warehouse.product_article
   //     );
-  //     // console.log('product_id', product_id);
 
   //     const filteredProductsOfOrders = productsOfOrders.filter(
   //       (item) => item.product_id === product_id.id
   //     );
-  //     // console.log('filteredProductsOfOrders', filteredProductsOfOrders);
+//filteredProductsOfOrders);
 
   //     const result = filteredProductsOfOrders.map((product) => {
   //       const order = list_of_orders.find((order) => order.id === product.order_id);
@@ -167,22 +159,16 @@ function BatchOutsideModal(props) {
   //         quantity_palet: product.quantity_palet,
   //       };
   //     });
-  //     console.log('result', result);
   //     setFilteredProducts(result);
 
   //     result?.forEach((el) => {
   //       const { quantity_palet, productsOfOrders_id } = el;
-
-  //       // console.log('el', el);
-  //       // console.log('id', id);
-  //       console.log('remaining_stock_buff', remaining_stock_buff);
 
   //       if (quantity_palet > remaining_stock_buff) {
   //         console.log(
   //           'Колличество заказной продукции превышает коллиичество продукции на складе!'
   //         );
   //         // const new_quantity_palet = quantity_palet - remaining_stock;
-  //         // console.log('new_quantity_palet', new_quantity_palet);
   //         return;
   //       }
   //       remaining_stock_buff = remaining_stock_buff - quantity_palet;

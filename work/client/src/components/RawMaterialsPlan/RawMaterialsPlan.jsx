@@ -65,7 +65,6 @@ function RawMaterialsPlan() {
   const handlerSave = () => {
     productsArray.forEach((el) => {
       const { current_recipe, id_batch, quantity } = el;
-      console.log();
       const obj = {
         id_recipe: current_recipe?.id,
         id_batch,
