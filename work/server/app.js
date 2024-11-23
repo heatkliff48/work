@@ -32,6 +32,7 @@ const batchOutsideRouter = require('./router/batchoutside.js');
 const recipeRouter = require('./router/RecipeRoute.js');
 const recipeOrdersRouter = require('./router/RecipeOrders.js');
 const fileUpload = require('./router/fileUpload.js');
+const filesWarehouseRouter = require('./router/FilesWarehouse.js');
 
 const app = express();
 const map = new Map();
@@ -92,6 +93,7 @@ app.use('/autoclave', AutoclaveRootRouter);
 app.use('/recipe', recipeRouter);
 app.use('/recipe_orders', recipeOrdersRouter);
 app.use('/files', fileUpload);
+app.use('/filesWarehouse', filesWarehouseRouter);
 
 // Обработка WebSocket соединений
 server.on('upgrade', function (req, socket, head) {

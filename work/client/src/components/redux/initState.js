@@ -20,6 +20,7 @@ const initState = {
   autoclave: [],
   batchDesigner: [],
   recipeOrders: [],
+  filesWarehouse: [],
 };
 
 export default initState;
