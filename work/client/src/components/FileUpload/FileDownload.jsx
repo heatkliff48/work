@@ -1,10 +1,13 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { FileContext } from './FileContext';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 
 const FileDownload = () => {
-  const { files, message, setMessage } = useContext(FileContext);
+  const { files, message, setMessage, filesWarehouse } = useContext(FileContext);
   const [selectedFile, setSelectedFile] = useState('');
+  const [filteredFiles, setFilteredFiles] = useState(filesWarehouse);
+  const { warehouseInfoCurIdModal } = useModalContext();
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -26,6 +29,14 @@ const FileDownload = () => {
     }
   };
 
+  useEffect(() => {
+    const filteredFiles = filesWarehouse.filter(
+      (el) => el.warehouse_id === warehouseInfoCurIdModal
+    );
+    console.log('filteredFiles', filteredFiles);
+    setFilteredFiles(filteredFiles);
+  }, [filesWarehouse]);
+
   return (
     <div>
       <h1>File Download</h1>
@@ -35,9 +46,9 @@ const FileDownload = () => {
           onChange={(e) => setSelectedFile(e.target.value)}
         >
           <option value="">Select a file</option>
-          {files.map((file) => (
-            <option key={file} value={file}>
-              {file}
+          {filteredFiles.map((file) => (
+            <option key={file.file_name} value={file.file_name}>
+              {file.file_name}
             </option>
           ))}
         </select>

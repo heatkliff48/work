@@ -1,10 +1,16 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { FileContext } from './FileContext';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { addNewFilesWarehouse } from '#components/redux/actions/filesWarehouseAction.js';
+import { useDispatch } from 'react-redux';
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
   const { setMessage, refreshFiles } = useContext(FileContext);
+  const { warehouseInfoCurIdModal } = useModalContext();
+
+  const dispatch = useDispatch();
 
   const onChange = (e) => {
     setFile(e.target.files[0]);
@@ -12,23 +18,39 @@ const FileUpload = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('myFile', file);
+    if (file) {
+      console.log('File name:', file.name); // Log the file's name
+      const formData = new FormData();
+      formData.append('myFile', file);
 
-    try {
-      const res = await axios.post('http://localhost:3001/files/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setMessage(res.data);
-      refreshFiles(); // Refresh the file list after upload
-    } catch (err) {
-      if (err.response) {
-        setMessage(err.response.data);
-      } else {
-        setMessage('There was a problem with the server');
+      dispatch(
+        addNewFilesWarehouse({
+          warehouse_id: warehouseInfoCurIdModal,
+          file_name: file.name,
+        })
+      );
+
+      try {
+        const res = await axios.post(
+          'http://localhost:3001/files/upload',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        setMessage(res.data);
+        refreshFiles(); // Refresh the file list after upload
+      } catch (err) {
+        if (err.response) {
+          setMessage(err.response.data);
+        } else {
+          setMessage('There was a problem with the server');
+        }
       }
+    } else {
+      setMessage('No file selected!');
     }
   };
 

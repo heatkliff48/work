@@ -23,6 +23,7 @@ import { autoclaveReducer } from './autoclaveReducer';
 import batchDesignerReducer from './batchDesignerReducer';
 import { recipeReducer } from './recipeReducer';
 import { recipeOrdersReducer } from './RecipeOrdersReducer';
+import { filesWarehouseReducer } from './filesWarehouseReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -48,4 +49,5 @@ export const rootReducer = combineReducers({
   batchDesigner: batchDesignerReducer,
   recipe: recipeReducer,
   recipeOrders: recipeOrdersReducer,
+  filesWarehouse: filesWarehouseReducer,
 });
