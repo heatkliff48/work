@@ -2,8 +2,10 @@ import {
   DATASHIP_ORDER_SOCKET,
   DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_PRODUCT_OF_ORDER_SOCKET,
+  NEED_DELETE_FILES_ORDER_SOCKET,
   NEED_DELETE_FILES_WAREHOUSE_SOCKET,
   NEED_DELETE_RECIPE_SOCKET,
+  NEW_FILES_ORDER_SOCKET,
   NEW_FILES_WAREHOUSE_SOCKET,
   NEW_ORDER_SOCKET,
   NEW_PRODUCT_SOCKET,
@@ -126,5 +128,19 @@ export const deleteFilesWarehouseSocket = (warehouse_id) => {
   return {
     type: NEED_DELETE_FILES_WAREHOUSE_SOCKET,
     payload: warehouse_id,
+  };
+};
+
+export const addNewFilesOrderSocket = (filesOrder) => {
+  return {
+    type: NEW_FILES_ORDER_SOCKET,
+    payload: filesOrder,
+  };
+};
+
+export const deleteFilesOrderSocket = (order_id) => {
+  return {
+    type: NEED_DELETE_FILES_ORDER_SOCKET,
+    payload: order_id,
   };
 };

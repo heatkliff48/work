@@ -33,6 +33,7 @@ const recipeRouter = require('./router/RecipeRoute.js');
 const recipeOrdersRouter = require('./router/RecipeOrders.js');
 const fileUpload = require('./router/fileUpload.js');
 const filesWarehouseRouter = require('./router/FilesWarehouse.js');
+const filesOrderRouter = require('./router/FilesOrder.js');
 
 const app = express();
 const map = new Map();
@@ -94,6 +95,7 @@ app.use('/recipe', recipeRouter);
 app.use('/recipe_orders', recipeOrdersRouter);
 app.use('/files', fileUpload);
 app.use('/filesWarehouse', filesWarehouseRouter);
+app.use('/filesOrder', filesOrderRouter);
 
 // Обработка WebSocket соединений
 server.on('upgrade', function (req, socket, head) {

@@ -3,6 +3,7 @@ const {
   ReservedProducts,
   ListOfOrderedProductions,
   ListOfOrderedProductionOEMs,
+  OrdersProducts,
 } = require('../db/models');
 
 class WarehouseRepository {
@@ -68,7 +69,6 @@ class WarehouseRepository {
   }
 
   static async addNewListOfOrderedProductionOEM(ordered_production_oem) {
-
     await ListOfOrderedProductionOEMs.create(ordered_production_oem);
 
     const new_ordered_production_oem = await ListOfOrderedProductionOEMs.findAll({
@@ -99,6 +99,12 @@ class WarehouseRepository {
     const new_reserved_product = await ReservedProducts.findAll({
       attributes: ['id', 'warehouse_id', 'orders_products_id', 'quantity'],
     });
+    await OrdersProducts.update(
+      {
+        warehouse_id: reserved_product.warehouse_id,
+      },
+      { where: { id: reserved_product.orders_products_id } }
+    );
 
     return new_reserved_product;
   }

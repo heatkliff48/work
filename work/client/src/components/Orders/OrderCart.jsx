@@ -35,6 +35,8 @@ import {
   PDFViewer,
   PDFDownloadLink,
 } from '@react-pdf/renderer';
+import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
+import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
 
 const styles = StyleSheet.create({
   page: {
@@ -130,7 +132,9 @@ const OrderPDF = ({ orderData, productList, vatValue }) => (
         {productList.length > 0 ? (
           productList.map((product, index) => (
             <View style={styles.tableRow} key={index}>
-              <Text style={styles.tableCell}>{product?.product_article || 'N/A'}</Text>
+              <Text style={styles.tableCell}>
+                {product?.product_article || 'N/A'}
+              </Text>
               <Text style={styles.tableCell}>
                 {product?.quantity_palet || 'N/A'}
               </Text>
@@ -176,6 +180,9 @@ const OrderCart = React.memo(() => {
     setProductModalOrder,
     productInfoModalOrder,
     setProductInfoModalOrder,
+    warehouseInfoModal,
+    setWarehouseInfoModal,
+    setWarehouseInfoCurIdModal,
   } = useModalContext();
   const { displayNames } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
@@ -215,7 +222,7 @@ const OrderCart = React.memo(() => {
       Object.entries(data || {})
         .filter(([key]) => !filterKeys.includes(key))
         .map(([key, value]) => {
-          if (!key) return;
+          if (!key || key == 'warehouse_id') return;
           return (
             <div className="data-text" key={key}>
               <p>
@@ -439,6 +446,12 @@ const OrderCart = React.memo(() => {
           toggle={() => setProductModalOrder(!productModalOrder)}
         />
       )}
+      {warehouseInfoModal && (
+        <ListOfReservedProductsModal
+          isOpen={warehouseInfoModal}
+          toggle={() => setWarehouseInfoModal(!warehouseInfoModal)}
+        />
+      )}
 
       <div className="page-container">
         <h4>Order Card: {orderCartData?.article}</h4>
@@ -486,14 +499,26 @@ const OrderCart = React.memo(() => {
                   }}
                 >
                   {filterAndMapData(product, filterKeys)}
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteHandler(product);
-                    }}
-                  >
-                    Delete
-                  </Button>
+                  {product?.warehouse_id !== null ? (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setWarehouseInfoCurIdModal(product?.warehouse_id);
+                        setWarehouseInfoModal(!warehouseInfoModal);
+                      }}
+                    >
+                      Show batch
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteHandler(product);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -581,6 +606,7 @@ const OrderCart = React.memo(() => {
           </div>
         </div>
       </div>
+      <FilesMain />
       <PDFDownloadLink
         document={
           <OrderPDF
