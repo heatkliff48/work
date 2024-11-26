@@ -95,11 +95,12 @@ const WarehouseContextProvider = ({ children }) => {
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
 
   useEffect(() => {
+
     const data = list_of_ordered_production.map((el) => {
       const quantity_cakes = (el.quantity / 3).toFixed(2);
       const orderId = list_of_orders.find(
         (order) => order.article === el.order_article
-      ).id;
+      )?.id;
 
       const prodOrdId = productsOfOrders.filter((elem) => elem.order_id === orderId);
 
@@ -120,7 +121,36 @@ const WarehouseContextProvider = ({ children }) => {
       };
     });
     setListOfOrderedCakes(data);
-  }, [list_of_ordered_production]);
+
+    const groupedOrders = list_of_ordered_production.reduce((acc, item) => {
+      if (!acc[item.order_article]) {
+        acc[item.order_article] = [];
+      }
+      acc[item.order_article].push(item);
+      return acc;
+    }, {});
+
+    Object.entries(groupedOrders).forEach(([orderArticle, products]) => {
+      const allMatch = products.every((product) => {
+        const quantity_in_warehouse = list_of_reserved_products.find((res_prod) =>
+          productsOfOrders
+            .filter(
+              (prod) =>
+                prod.order_id ===
+                list_of_orders.find(
+                  (order) => order.article === product.order_article
+                )?.id
+            )
+            .some((prod) => res_prod.orders_products_id === prod.id)
+        )?.quantity;
+
+        return quantity_in_warehouse === product.quantity;
+      });
+
+      if (allMatch) {
+      }
+    });
+  }, [list_of_ordered_production, list_of_reserved_products, batchOutside]);
 
   return (
     <WarehouseContext.Provider
@@ -139,7 +169,9 @@ const WarehouseContextProvider = ({ children }) => {
         setCurrentOrderedProducts,
         currentBatchId,
         setCurrentBatchId,
-        listOfOrderedCakes, setListOfOrderedCakes      }}
+        listOfOrderedCakes,
+        setListOfOrderedCakes,
+      }}
     >
       {children}
     </WarehouseContext.Provider>

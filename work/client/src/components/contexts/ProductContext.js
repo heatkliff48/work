@@ -9,7 +9,6 @@ import {
 const ProductsContext = createContext();
 
 export const ProductsContextProvider = ({ children }) => {
-  const [latestProducts, setLatestProducts] = useState([]);
   const products = useSelector((state) => state.products);
   const dispatch = useDispatch();
 
@@ -210,7 +209,7 @@ export const ProductsContextProvider = ({ children }) => {
   );
 
   // Мемоизация списка продуктов
-  const memoizedProducts = useMemo(() => {
+  const latestProducts = useMemo(() => {
     const newProductList = products?.reduce((acc, product) => {
       const { article, version } = product;
       const existingProduct = acc.find((p) => p.article === article);
@@ -241,10 +240,6 @@ export const ProductsContextProvider = ({ children }) => {
 
     return newlatestProducts;
   }, [products]);
-
-  useEffect(() => {
-    setLatestProducts(memoizedProducts);
-  }, [dispatch, memoizedProducts]);
 
   return (
     <ProductsContext.Provider value={{ COLUMNS, latestProducts, selectOptions }}>
