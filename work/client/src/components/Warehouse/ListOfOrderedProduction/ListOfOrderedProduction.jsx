@@ -4,7 +4,6 @@ import Table from '#components/Table/Table.jsx';
 function ListOfOrderedProduction() {
   const { COLUMNS_LIST_OF_ORDERED_PRODUCTION, listOfOrderedCakes } =
     useWarehouseContext();
-
   return (
     <>
       <Table
