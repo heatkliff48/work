@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useCallback, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
-import { useReactToPrint } from 'react-to-print';
 // import ReactDOM from 'react-dom';
 import { Button } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,140 +25,7 @@ import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import {
-  Page,
-  Text,
-  View,
-  Document,
-  StyleSheet,
-  PDFViewer,
-  PDFDownloadLink,
-} from '@react-pdf/renderer';
-
-const styles = StyleSheet.create({
-  page: {
-    padding: 30,
-    fontSize: 12,
-    fontFamily: 'Helvetica',
-  },
-  section: {
-    marginBottom: 15,
-    padding: 10,
-    border: '1 solid #ccc',
-  },
-  header: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  table: {
-    display: 'table',
-    width: 'auto',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 10,
-  },
-  tableRow: {
-    flexDirection: 'row',
-  },
-  tableCell: {
-    flexGrow: 1,
-    padding: 5,
-    borderRight: '1 solid #ccc',
-    borderBottom: '1 solid #ccc',
-  },
-  tableHeader: {
-    backgroundColor: '#f5f5f5',
-    fontWeight: 'bold',
-  },
-  input: {
-    fontSize: 12,
-    padding: 5,
-    border: '1 solid #ccc',
-  },
-});
-
-const OrderPDF = ({ orderData, productList, vatValue }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      {/* Заголовок заказа */}
-      <View style={styles.section}>
-        <Text style={styles.header}>Order Card: {orderData?.article || 'N/A'}</Text>
-      </View>
-
-      {/* Клиентская информация */}
-      <View
-        style={[
-          styles.section,
-          { flexDirection: 'row', justifyContent: 'space-between' },
-        ]}
-      >
-        <View style={{ flex: 1 }}>
-          <Text style={styles.header}>Client Information</Text>
-          {Object.entries(orderData?.owner || {}).map(([key, value]) => {
-            if (key === 'id') return <></>;
-            return <Text key={key}>{`${key}: ${value}`}</Text>;
-          })}
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.header}>Contact Person</Text>
-          {Object.entries(orderData?.contactInfo || {}).map(([key, value]) => {
-            if (key === 'id') return <></>;
-            return <Text key={key}>{`${key}: ${value}`}</Text>;
-          })}
-        </View>
-      </View>
-
-      {/* Адрес доставки */}
-      <View style={styles.section}>
-        <Text style={styles.header}>Delivery Address</Text>
-        {Object.entries(orderData?.deliveryAddress || {}).map(([key, value]) => {
-          if (key === 'id') return <></>;
-          return <Text key={key}>{`${key}: ${value}`}</Text>;
-        })}
-      </View>
-
-      {/* Таблица продуктов */}
-      <View style={[styles.section, styles.table]}>
-        <View style={[styles.tableRow, styles.tableHeader]}>
-          <Text style={styles.tableCell}>Product</Text>
-          <Text style={styles.tableCell}>Quantity</Text>
-          <Text style={styles.tableCell}>Price</Text>
-        </View>
-        {productList.length > 0 ? (
-          productList.map((product, index) => (
-            <View style={styles.tableRow} key={index}>
-              <Text style={styles.tableCell}>{product?.product_article || 'N/A'}</Text>
-              <Text style={styles.tableCell}>
-                {product?.quantity_palet || 'N/A'}
-              </Text>
-              <Text style={styles.tableCell}>{product?.final_price || 'N/A'}</Text>
-            </View>
-          ))
-        ) : (
-          <Text>No products available</Text>
-        )}
-      </View>
-
-      {/* Данные VAT */}
-      <View style={styles.section}>
-        <Text style={styles.header}>VAT Information</Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View>
-            <Text>VAT, %: {vatValue?.vat_procent || 'N/A'}</Text>
-          </View>
-          <View>
-            <Text>VAT, EURO: {vatValue?.vat_euro || 'N/A'}</Text>
-          </View>
-          <View>
-            <Text>Result: {vatValue?.vat_result || 'N/A'}</Text>
-          </View>
-        </View>
-      </View>
-    </Page>
-  </Document>
-);
+import DownloadOrderPDF from './OrdersPDF.jsx';
 
 const OrderCart = React.memo(() => {
   const {
@@ -258,8 +124,10 @@ const OrderCart = React.memo(() => {
 
   const addProductArticleToOrderList = useCallback(
     (productListOrder, latestProducts) => {
-      return productListOrder?.map((orderProduct) => {
-        const product = latestProducts?.find(
+      if (!productListOrder || !latestProducts) return [];
+
+      return productListOrder.map((orderProduct) => {
+        const product = latestProducts.find(
           (p) => p.id === orderProduct?.product_id
         );
 
@@ -269,7 +137,7 @@ const OrderCart = React.memo(() => {
             ...orderProduct,
           };
         }
-        return orderProduct;
+        return { ...orderProduct, product_article: 'Unknown' };
       });
     },
     [productListOrder]
@@ -297,7 +165,10 @@ const OrderCart = React.memo(() => {
 
   const statusChangeHandler = (status) => {
     const order_id = orderCartData?.id;
-    const hasShippingDate = orderCartData?.shipping_date ?? formatDataValue;
+    const hasShippingDate =
+      orderCartData?.shipping_date.length > 0
+        ? orderCartData?.shipping_date
+        : formatDataValue;
 
     if (status.accessor !== status_list[0].accessor && !hasShippingDate) {
       alert('Пожалуйста, выберите дату отправки');
@@ -387,7 +258,9 @@ const OrderCart = React.memo(() => {
   }, [updatedProductListOrder, vatValue.vat_procent]);
 
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem('orderCartData'));
+    const storedData = localStorage.getItem('orderCartData')
+      ? JSON.parse(localStorage.getItem('orderCartData'))
+      : null;
 
     const updatedOrderCartData = list_of_orders.find(
       (order) => order.id === storedData.id
@@ -581,29 +454,13 @@ const OrderCart = React.memo(() => {
           </div>
         </div>
       </div>
-      <PDFDownloadLink
-        document={
-          <OrderPDF
-            orderData={orderCartData}
-            productList={updatedProductListOrder}
-            vatValue={vatValue}
-          />
-        }
-        fileName={`order-${orderCartData?.article || 'N/A'}.pdf`}
-        className="pdf_button"
-      >
-        {({ blob, url, loading, error }) =>
-          loading ? 'Loading document...' : 'Download PDF'
-        }
-      </PDFDownloadLink>
-
-      <PDFViewer style={{ width: '100%', height: '500px' }}>
-        <OrderPDF
-          orderData={orderCartData}
-          productList={updatedProductListOrder || []}
+      {orderCartData && updatedProductListOrder && vatValue && (
+        <DownloadOrderPDF
+          orderCartData={orderCartData}
+          updatedProductListOrder={updatedProductListOrder}
           vatValue={vatValue}
         />
-      </PDFViewer>
+      )}
     </>
   );
 });

@@ -7,14 +7,8 @@ class OrdersRepository {
     return orders;
   }
 
-  static async addNewOrderData({ article, del_adr_id, contact_id, owner, status }) {
-    const order = await Orders.create({
-      article,
-      owner,
-      del_adr_id,
-      contact_id,
-      status,
-    });
+  static async addNewOrderData(new_order) {
+    const order = await Orders.create(new_order);
 
     return order;
   }

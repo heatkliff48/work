@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useOrderContext } from '../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
@@ -103,6 +103,13 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }
     toggle();
   };
+  useEffect(() => {
+    const discount = productOfOrder?.discount ?? 0;
+    setProductOfOrder((prev) => ({
+      ...prev,
+      discount,
+    }));
+  }, []);
 
   return (
     <div>
