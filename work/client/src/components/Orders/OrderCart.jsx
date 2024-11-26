@@ -171,7 +171,7 @@ const OrderCart = React.memo(() => {
   const statusChangeHandler = (status) => {
     const order_id = orderCartData?.id;
     const hasShippingDate =
-      orderCartData?.shipping_date.length > 0
+      orderCartData?.shipping_date?.length > 0
         ? orderCartData?.shipping_date
         : formatDataValue;
 

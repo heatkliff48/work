@@ -1,9 +1,12 @@
+import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const WarehouseContext = createContext();
 
 const WarehouseContextProvider = ({ children }) => {
+  const dispatch = useDispatch();
+
   const COLUMNS_WAREHOUSE = [
     {
       Header: 'Article of warehouse',
@@ -95,7 +98,6 @@ const WarehouseContextProvider = ({ children }) => {
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
 
   useEffect(() => {
-
     const data = list_of_ordered_production.map((el) => {
       const quantity_cakes = (el.quantity / 3).toFixed(2);
       const orderId = list_of_orders.find(
@@ -120,37 +122,56 @@ const WarehouseContextProvider = ({ children }) => {
         quantity_in_warehouse,
       };
     });
+
     setListOfOrderedCakes(data);
 
     const groupedOrders = list_of_ordered_production.reduce((acc, item) => {
-      if (!acc[item.order_article]) {
-        acc[item.order_article] = [];
+      const orderId = list_of_orders.find(
+        (order) => order.article === item.order_article
+      )?.id;
+      const key = `${item.order_article}-${item.product_id}`;
+      if (!acc[key]) {
+        acc[key] = {
+          ...item,
+          orderId,
+          total_quantity: item.quantity,
+          total_quantity_in_warehouse: 0,
+        };
+      } else {
+        acc[key].total_quantity += item.quantity;
       }
-      acc[item.order_article].push(item);
-      return acc;
+
+      const prodOrdId = productsOfOrders.filter((elem) => elem.order_id === orderId);
+
+      const quantity_in_warehouse = list_of_reserved_products.find((res_prod) =>
+        prodOrdId.find((prod) => res_prod.orders_products_id === prod.id)
+      )?.quantity;
+
+      acc[key].total_quantity_in_warehouse += quantity_in_warehouse || 0;
+
+      return { ...acc, orderId };
     }, {});
 
-    Object.entries(groupedOrders).forEach(([orderArticle, products]) => {
-      const allMatch = products.every((product) => {
-        const quantity_in_warehouse = list_of_reserved_products.find((res_prod) =>
-          productsOfOrders
-            .filter(
-              (prod) =>
-                prod.order_id ===
-                list_of_orders.find(
-                  (order) => order.article === product.order_article
-                )?.id
-            )
-            .some((prod) => res_prod.orders_products_id === prod.id)
-        )?.quantity;
-
-        return quantity_in_warehouse === product.quantity;
-      });
+    // Проверка условий и запросы на сервер
+    Object.values(groupedOrders).forEach((group) => {
+      const allMatch = group.total_quantity === group.total_quantity_in_warehouse;
 
       if (allMatch) {
+        // dispatch(
+        //   updateOrderStatus({
+        //     order_id:orderId,
+        //     status: 'completed',
+        //   })
+        // );
       }
     });
-  }, [list_of_ordered_production, list_of_reserved_products, batchOutside]);
+  }, [
+    list_of_ordered_production,
+    list_of_reserved_products,
+    batchOutside,
+    list_of_orders,
+    productsOfOrders,
+  ]);
 
   return (
     <WarehouseContext.Provider
