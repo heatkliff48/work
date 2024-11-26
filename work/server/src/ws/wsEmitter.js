@@ -24,6 +24,8 @@ const {
   DELETE_RECIPE_SOCKET,
   ADD_NEW_FILES_WAREHOUSE_SOCKET,
   DELETE_FILES_WAREHOUSE_SOCKET,
+  ADD_NEW_FILES_ORDER_SOCKET,
+  DELETE_FILES_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -301,6 +303,28 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_FILES_WAREHOUSE_SOCKET,
           payload: warehouse_id,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_FILES_ORDER_SOCKET, (filesOrder) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_FILES_ORDER_SOCKET,
+          payload: filesOrder,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_FILES_ORDER_SOCKET, (order_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_FILES_ORDER_SOCKET,
+          payload: order_id,
         })
       );
     }

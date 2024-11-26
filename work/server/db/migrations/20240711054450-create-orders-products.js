@@ -41,6 +41,9 @@ module.exports = {
       final_price: {
         type: Sequelize.FLOAT,
       },
+      warehouse_id: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

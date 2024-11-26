@@ -38,8 +38,8 @@ const FileDownload = () => {
   }, [filesWarehouse]);
 
   return (
-    <div>
-      <h1>File Download</h1>
+    <div className="fileDownload">
+      <h5>File Download</h5>
       <form onSubmit={onSubmit}>
         <select
           value={selectedFile}

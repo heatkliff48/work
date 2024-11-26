@@ -1,11 +1,13 @@
 import {
   addDatashipOrderSocket,
+  addNewFilesOrderSocket,
   addNewFilesWarehouseSocket,
   addNewOrderSocket,
   addNewProductSocket,
   addNewRecipeSocket,
   addNewWarehouseSocket,
   deeleteProductOfOrderSocket,
+  deleteFilesOrderSocket,
   deleteFilesWarehouseSocket,
   deleteRecipeSocket,
   deleteReservedProductSocket,
@@ -56,6 +58,8 @@ import {
   DELETE_RECIPE_SOCKET,
   ADD_NEW_FILES_WAREHOUSE_SOCKET,
   DELETE_FILES_WAREHOUSE_SOCKET,
+  ADD_NEW_FILES_ORDER_SOCKET,
+  DELETE_FILES_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -159,6 +163,13 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case DELETE_FILES_WAREHOUSE_SOCKET:
       dispatch(deleteFilesWarehouseSocket(payload));
+      break;
+
+    case ADD_NEW_FILES_ORDER_SOCKET:
+      dispatch(addNewFilesOrderSocket(payload));
+
+    case DELETE_FILES_ORDER_SOCKET:
+      dispatch(deleteFilesOrderSocket(payload));
       break;
 
     default:

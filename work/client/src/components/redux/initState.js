@@ -21,6 +21,7 @@ const initState = {
   batchDesigner: [],
   recipeOrders: [],
   filesWarehouse: [],
+  filesOrder: [],
 };
 
 export default initState;

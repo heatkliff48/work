@@ -24,6 +24,7 @@ import batchDesignerReducer from './batchDesignerReducer';
 import { recipeReducer } from './recipeReducer';
 import { recipeOrdersReducer } from './RecipeOrdersReducer';
 import { filesWarehouseReducer } from './filesWarehouseReducer';
+import { filesOrderReducer } from './filesOrderReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -50,4 +51,5 @@ export const rootReducer = combineReducers({
   recipe: recipeReducer,
   recipeOrders: recipeOrdersReducer,
   filesWarehouse: filesWarehouseReducer,
+  filesOrder: filesOrderReducer,
 });

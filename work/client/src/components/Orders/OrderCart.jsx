@@ -27,6 +27,7 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import DownloadOrderPDF from './OrdersPDF.jsx';
 
+
 const OrderCart = React.memo(() => {
   const {
     orderCartData,
@@ -42,6 +43,9 @@ const OrderCart = React.memo(() => {
     setProductModalOrder,
     productInfoModalOrder,
     setProductInfoModalOrder,
+    warehouseInfoModal,
+    setWarehouseInfoModal,
+    setWarehouseInfoCurIdModal,
   } = useModalContext();
   const { displayNames } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
@@ -81,7 +85,7 @@ const OrderCart = React.memo(() => {
       Object.entries(data || {})
         .filter(([key]) => !filterKeys.includes(key))
         .map(([key, value]) => {
-          if (!key) return;
+          if (!key || key == 'warehouse_id') return;
           return (
             <div className="data-text" key={key}>
               <p>
@@ -312,6 +316,12 @@ const OrderCart = React.memo(() => {
           toggle={() => setProductModalOrder(!productModalOrder)}
         />
       )}
+      {warehouseInfoModal && (
+        <ListOfReservedProductsModal
+          isOpen={warehouseInfoModal}
+          toggle={() => setWarehouseInfoModal(!warehouseInfoModal)}
+        />
+      )}
 
       <div className="page-container">
         <h4>Order Card: {orderCartData?.article}</h4>
@@ -359,14 +369,26 @@ const OrderCart = React.memo(() => {
                   }}
                 >
                   {filterAndMapData(product, filterKeys)}
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteHandler(product);
-                    }}
-                  >
-                    Delete
-                  </Button>
+                  {product?.warehouse_id !== null ? (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setWarehouseInfoCurIdModal(product?.warehouse_id);
+                        setWarehouseInfoModal(!warehouseInfoModal);
+                      }}
+                    >
+                      Show batch
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteHandler(product);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -454,6 +476,7 @@ const OrderCart = React.memo(() => {
           </div>
         </div>
       </div>
+      <FilesMain />
       {orderCartData && updatedProductListOrder && vatValue && (
         <DownloadOrderPDF
           orderCartData={orderCartData}

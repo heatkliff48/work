@@ -12,6 +12,7 @@ import batchOutsideWatcher from './batchOutsideSagas';
 import autoclaveWatcher from './autoclaveSagas';
 import recipeWatcher from './recipeSagas';
 import filesWarehouseWatcher from './filesWarehouseSagas';
+import filesOrderWatcher from './filesOrderSagas';
 
 export default function* rootSaga() {
   yield all([
@@ -28,5 +29,6 @@ export default function* rootSaga() {
     autoclaveWatcher(),
     recipeWatcher(),
     filesWarehouseWatcher(),
+    filesOrderWatcher(),
   ]);
 }

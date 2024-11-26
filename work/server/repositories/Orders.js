@@ -36,6 +36,7 @@ class OrdersRepository {
         'price_m2',
         'discount',
         'final_price',
+        'warehouse_id',
       ],
     });
     return product_list;
@@ -54,6 +55,7 @@ class OrdersRepository {
         'price_m2',
         'discount',
         'final_price',
+        'warehouse_id',
       ],
     });
 
@@ -71,6 +73,7 @@ class OrdersRepository {
       price_m2,
       discount,
       final_price,
+      warehouse_id,
     } = productOfOrder;
 
     const product_of_order = await OrdersProducts.create({
@@ -82,6 +85,7 @@ class OrdersRepository {
       price_m2,
       discount,
       final_price,
+      warehouse_id,
     });
 
     return product_of_order;
@@ -97,6 +101,7 @@ class OrdersRepository {
       price_m2,
       discount,
       final_price,
+      warehouse_id,
     } = productOfOrder;
 
     await OrdersProducts.update(
@@ -109,6 +114,7 @@ class OrdersRepository {
         price_m2,
         discount,
         final_price,
+        warehouse_id,
       },
       { where: { id: productOfOrder.id } }
     );
