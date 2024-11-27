@@ -12,7 +12,8 @@ class RecipeOrdersRepository {
     const allRecipeOrdersInDB = await RecipeOrders.findAll();
 
     if (allRecipeOrdersInDB.length === 0) {
-      await RecipeOrders.create(material_plan);
+      const recipeOrders = await RecipeOrders.create(material_plan);
+      return recipeOrders;
     }
 
     const idsToReset = allRecipeOrdersInDB.find(
@@ -22,13 +23,16 @@ class RecipeOrdersRepository {
     );
 
     if (!idsToReset) {
-      await RecipeOrders.create(material_plan);
+      const recipeOrders = await RecipeOrders.create(material_plan);
+      return recipeOrders;
     }
+
     return;
   }
 
   static async deleteMaterialPlan(material_plan_id) {
     await RecipeOrders.destroy({ where: { id: material_plan_id } });
+
     return;
   }
 }

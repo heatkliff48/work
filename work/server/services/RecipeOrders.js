@@ -1,4 +1,4 @@
-const RecipeOrdersRepository = require("../repositories/RecipeOrders");
+const RecipeOrdersRepository = require('../repositories/RecipeOrders');
 
 class RecipeOrdersServices {
   static async getRecipeOrdersData() {
@@ -8,9 +8,11 @@ class RecipeOrdersServices {
   }
 
   static async saveMaterialPlan(material_plan) {
-    await RecipeOrdersRepository.saveMaterialPlan(material_plan);
+    const recipeOrders = await RecipeOrdersRepository.saveMaterialPlan(
+      material_plan
+    );
 
-    return;
+    return recipeOrders;
   }
 
   static async deleteMaterialPlan(material_plan_id) {

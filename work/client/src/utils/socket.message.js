@@ -9,8 +9,10 @@ import {
   deeleteProductOfOrderSocket,
   deleteFilesOrderSocket,
   deleteFilesWarehouseSocket,
+  deleteMaterialPlanSocket,
   deleteRecipeSocket,
   deleteReservedProductSocket,
+  saveMaterialPlanSocket,
   updateProductSocket,
   updateRemainingStockSocket,
   updateRolesActiveSocket,
@@ -60,6 +62,8 @@ import {
   DELETE_FILES_WAREHOUSE_SOCKET,
   ADD_NEW_FILES_ORDER_SOCKET,
   DELETE_FILES_ORDER_SOCKET,
+  SAVE_MATERIAL_PLAN_SOCKET,
+  DELETE_MATERIAL_PLAN_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -153,6 +157,7 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_RECIPE_SOCKET:
       dispatch(addNewRecipeSocket(payload));
+      break;
 
     case DELETE_RECIPE_SOCKET:
       dispatch(deleteRecipeSocket(payload));
@@ -160,6 +165,7 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_FILES_WAREHOUSE_SOCKET:
       dispatch(addNewFilesWarehouseSocket(payload));
+      break;
 
     case DELETE_FILES_WAREHOUSE_SOCKET:
       dispatch(deleteFilesWarehouseSocket(payload));
@@ -167,9 +173,18 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_FILES_ORDER_SOCKET:
       dispatch(addNewFilesOrderSocket(payload));
+      break;
 
     case DELETE_FILES_ORDER_SOCKET:
       dispatch(deleteFilesOrderSocket(payload));
+      break;
+
+    case SAVE_MATERIAL_PLAN_SOCKET:
+      dispatch(saveMaterialPlanSocket(payload));
+      break;
+
+    case DELETE_MATERIAL_PLAN_SOCKET:
+      dispatch(deleteMaterialPlanSocket(payload));
       break;
 
     default:
