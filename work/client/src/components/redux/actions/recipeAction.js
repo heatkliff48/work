@@ -4,6 +4,7 @@ import {
   SAVE_MATERIAL_PLAN,
   DELETE_RECIPE,
   GET_RECIPE_ORDERS_DATA,
+  DELETE_MATERIAL_PLAN,
 } from '../types/recipeTypes';
 
 export const getRecipe = () => {
@@ -37,5 +38,12 @@ export const saveMaterialPlan = (mat_data) => {
   return {
     type: SAVE_MATERIAL_PLAN,
     payload: mat_data,
+  };
+};
+
+export const deleteMaterialPlan = (mat_plan_id) => {
+  return {
+    type: DELETE_MATERIAL_PLAN,
+    payload: mat_plan_id,
   };
 };

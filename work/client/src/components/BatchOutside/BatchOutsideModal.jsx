@@ -15,6 +15,7 @@ import { useDispatch } from 'react-redux';
 import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { deleteMaterialPlan } from '#components/redux/actions/recipeAction.js';
 
 function BatchOutsideModal(props) {
   const [batchOutsideInput, setBatchOutsideInput] = useState({});
@@ -79,12 +80,13 @@ function BatchOutsideModal(props) {
   }, []);
 
   const checkInput = async () => {
-    const product = latestProducts.find((el) => el.id === currentOrderedProducts.id);
+    const product = latestProducts.find((el) => el.id === currentOrderedProducts?.id);
 
     let versionNumber = '0001';
     let incVersion = 1;
     let ok = false;
     if (batchOutsideInput.quality_product) {
+      dispatch(deleteMaterialPlan(currentBatchId))
       const type = 0;
       const articleId =
         warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
@@ -109,6 +111,7 @@ function BatchOutsideModal(props) {
         warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
       versionNumber = `0000000${articleId}`.slice(-6);
       const warehouse_article = getWarehouseArticle(product, type, versionNumber);
+
       await dispatch(
         addNewWarehouse({
           ...warehouseData,

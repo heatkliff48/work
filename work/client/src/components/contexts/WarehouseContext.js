@@ -122,14 +122,14 @@ const WarehouseContextProvider = ({ children }) => {
         quantity_in_warehouse,
       };
     });
-
+    console.log('data', data);
     setListOfOrderedCakes(data);
 
     const groupedOrders = list_of_ordered_production.reduce((acc, item) => {
       const orderId = list_of_orders.find(
         (order) => order.article === item.order_article
       )?.id;
-      const key = `${item.order_article}-${item.product_id}`;
+      const key = `${item.order_article}-${item.product_artcle}`;
       if (!acc[key]) {
         acc[key] = {
           ...item,
@@ -149,20 +149,19 @@ const WarehouseContextProvider = ({ children }) => {
 
       acc[key].total_quantity_in_warehouse += quantity_in_warehouse || 0;
 
-      return { ...acc, orderId };
+      return acc;
     }, {});
 
-    // Проверка условий и запросы на сервер
     Object.values(groupedOrders).forEach((group) => {
-      const allMatch = group.total_quantity === group.total_quantity_in_warehouse;
+      const allMatch = group?.total_quantity === group?.total_quantity_in_warehouse;
 
       if (allMatch) {
-        // dispatch(
-        //   updateOrderStatus({
-        //     order_id:orderId,
-        //     status: 'completed',
-        //   })
-        // );
+        dispatch(
+          updateOrderStatus({
+            order_id: group.orderId,
+            status: 'completed',
+          })
+        );
       }
     });
   }, [
