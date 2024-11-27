@@ -15,14 +15,14 @@ class RecipeOrdersRepository {
       await RecipeOrders.create(material_plan);
     }
 
-    const idsToReset = allRecipeOrdersInDB.filter(
+    const idsToReset = allRecipeOrdersInDB.find(
       (dbRecord) =>
-        material_plan.id_batch != dbRecord.id_batch &&
-        material_plan.id_recipe != dbRecord.id_recipe
+        material_plan.id_batch === dbRecord.id_batch &&
+        material_plan.id_recipe === dbRecord.id_recipe
     );
 
-    if (idsToReset.length != 0) {
-      await RecipeOrders.create(idsToReset);
+    if (!idsToReset) {
+      await RecipeOrders.create(material_plan);
     }
     return;
   }

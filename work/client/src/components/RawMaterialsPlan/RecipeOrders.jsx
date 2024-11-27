@@ -45,17 +45,21 @@ function RecipeOrders() {
   };
 
   useEffect(() => {
-    const updatedData = recipeOrders.map((el) => {
-      const batch = batchOutside.find((batch) => batch.id === el.id_batch);
-      const recipe = list_of_recipes.find((recipe) => recipe.id === el.id_recipe);
+    const updatedData = recipeOrders
+      .map((el) => {
+        const batch = batchOutside.find((batch) => batch.id === el.id_batch);
+        const recipe = list_of_recipes.find((recipe) => recipe.id === el.id_recipe);
 
-      return {
-        id: el.id,
-        recipe_article: recipe?.article || 'Unknown Recipe',
-        batch_article: batch?.id_warehouse_batch || 'Unknown Batch',
-        production_volume: el.production_volume || 0,
-      };
-    });
+        if (!batch || !recipe) return { id: null };
+
+        return {
+          id: el.id,
+          recipe_article: recipe?.article || 'Unknown Recipe',
+          batch_article: batch?.id_warehouse_batch || 'Unknown Batch',
+          production_volume: el.production_volume || 0,
+        };
+      })
+      .filter((el) => el.id);
 
     setRecipeDataList(updatedData);
   }, [recipeOrders, batchOutside, list_of_recipes]);

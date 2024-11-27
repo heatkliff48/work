@@ -39,11 +39,6 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   );
 
   const getOrderArticle = () => { // Переделать: каждая новая дата начинает id с 1, и сделать как в рецептах recipeArticle
-    // const articleId =
-    //   list_of_recipes.length === 0
-    //     ? 1
-    //     : parseInt(list_of_recipes[list_of_recipes.length - 1].article.slice(-6)) +
-    //       1;
     let versionNumber = '0001';
     const year = new Date().getFullYear().toString().slice(-2);
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
