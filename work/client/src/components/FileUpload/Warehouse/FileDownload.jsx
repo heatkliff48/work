@@ -33,7 +33,6 @@ const FileDownload = () => {
     const filteredFiles = filesWarehouse.filter(
       (el) => el.warehouse_id === warehouseInfoCurIdModal
     );
-    console.log('filteredFiles', filteredFiles);
     setFilteredFiles(filteredFiles);
   }, [filesWarehouse]);
 

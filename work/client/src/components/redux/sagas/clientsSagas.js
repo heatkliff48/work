@@ -30,19 +30,6 @@ const url = axios.create({
   withCredentials: true,
 });
 
-// url.interceptors.request.use(
-//   async (config) => {
-//     if (accessTokenFront) {
-//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     console.log('Interceptor: Request error', error);
-//     return Promise.reject(error);
-//   }
-// );
-
 const getAllClients = () => {
   return url
     .get('/clients')
@@ -53,7 +40,6 @@ const getAllClients = () => {
 };
 
 const addNewClient = ({ client }) => {
-  console.log('saga 1 client', client);
   return url
     .post('/clients', { client })
     .then((res) => {

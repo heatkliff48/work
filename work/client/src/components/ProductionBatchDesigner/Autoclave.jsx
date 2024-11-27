@@ -297,7 +297,6 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
 
     for (const id in quantityPallets) {
       if (id !== undefined) {
-
         const { quantity } = list_of_ordered_production.find(
           (el) => el.id == Number(id)
         );
@@ -308,7 +307,7 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
           const currentBatch = batchOutside.find(
             (el) => el.id_list_of_ordered_production === Number(id)
           );
-          dispatch(deleteBatchOutside(currentBatch.id));
+          dispatch(deleteBatchOutside(currentBatch?.id));
         } else if (
           batchOutside.find(
             (el) => el.id_list_of_ordered_production === Number(id)
@@ -354,7 +353,6 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
         };
       })
     );
-
   }, [quantity_pallets]);
 
   return (

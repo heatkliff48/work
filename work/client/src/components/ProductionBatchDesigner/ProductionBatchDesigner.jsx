@@ -203,12 +203,14 @@ function ProductionBatchDesigner() {
             })
           );
 
-          setQuantityPallets((prev) => {
-            return {
-              ...prev,
-              [currId]: currentCount * 3,
-            };
-          });
+          if (cakes_residue !== 0) {
+            setQuantityPallets((prev) => {
+              return {
+                ...prev,
+                [currId]: currentCount * 3,
+              };
+            });
+          }
           return {
             ...batchItem,
             cakes_in_batch: cakes_in_batch + currentCount,
@@ -227,12 +229,22 @@ function ProductionBatchDesigner() {
       return prev.map((batchItem) => {
         for (let i = 0; i < batchDesigner.length; i++) {
           if (batchDesigner[i].id === batchItem.id) {
-            setQuantityPallets((prev) => {
-              return {
-                ...prev,
-                [batchDesigner[i].id]: batchDesigner[i].cakes_in_batch * 3,
-              };
-            });
+            // ------------- возможно это понадобится
+
+            // if (
+            //   !batchDesigner?.find((el) => el.id === batchItem.id)?.isButtonLocked
+            // ) {
+            //   setQuantityPallets((prev) => {
+            //     return {
+            //       ...prev,
+            //       [batchDesigner[i].id]: batchDesigner[i].cakes_in_batch * 3,
+            //     };
+            //   });
+            // }
+            // console.log(
+            //   'batchDesigner[i].cakes_in_batch',
+            //   batchDesigner[i].cakes_in_batch
+            // );
             return {
               ...batchItem,
               cakes_in_batch: batchDesigner[i].cakes_in_batch,
