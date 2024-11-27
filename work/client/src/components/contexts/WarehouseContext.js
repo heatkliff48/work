@@ -122,7 +122,7 @@ const WarehouseContextProvider = ({ children }) => {
         quantity_in_warehouse,
       };
     });
-    console.log('data', data);
+
     setListOfOrderedCakes(data);
 
     const groupedOrders = list_of_ordered_production.reduce((acc, item) => {
