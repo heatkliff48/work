@@ -116,7 +116,6 @@ batchOutsideRouter.post('/', async (req, res) => {
 // });
 
 batchOutsideRouter.post('/update/:id', async (req, res) => {
-  console.log('-------------------req.body.batchOutside', req.body);
   const {
     id,
     id_warehouse_batch,

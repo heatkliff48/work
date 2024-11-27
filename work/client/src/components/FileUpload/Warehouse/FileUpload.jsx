@@ -19,7 +19,6 @@ const FileUpload = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (file) {
-      console.log('File name:', file.name); // Log the file's name
       const formData = new FormData();
       formData.append('myFile', file);
 

@@ -13,25 +13,10 @@ import {
   UPDATE_NEW_BATCH_OUTSIDE,
 } from '../types/batchOutsideTypes';
 
-// let accessTokenFront;
-
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
 });
-
-// url.interceptors.request.use(
-//   async (config) => {
-//     if (accessTokenFront) {
-//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     console.log('Interceptor: Request error', error);
-//     return Promise.reject(error);
-//   }
-// );
 
 const getBatchOutside = () => {
   return url

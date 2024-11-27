@@ -29,25 +29,10 @@ import {
   GET_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
-// let accessTokenFront;
-
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
 });
-
-// url.interceptors.request.use(
-//   async (config) => {
-//     if (accessTokenFront) {
-//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     console.log('Interceptor: Request error', error);
-//     return Promise.reject(error);
-//   }
-// );
 
 const getAllOrders = () => {
   return url
@@ -345,7 +330,6 @@ function* updateStatusOfOrderWorker(action) {
   try {
     const { payload } = action;
     yield call(updateStatusOfOrder, payload);
-
   } catch (err) {
     yield put({ type: STATUS_OF_ORDER, payload: [] });
   }

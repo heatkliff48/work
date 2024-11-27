@@ -276,11 +276,6 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
           })
         );
 
-        console.log(
-          'cakes in batch UPDATE BATCH STATE',
-          quantityPallets[selectedId] / 3 + count
-        );
-
         setQuantityPallets((prev) => {
           return {
             ...prev,
@@ -291,10 +286,6 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
       });
     });
   };
-
-  useEffect(() => {
-    console.log('quantityPallets', quantityPallets);
-  }, [quantityPallets]);
 
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
@@ -356,7 +347,6 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
   useEffect(() => {
     Object.keys(quantity_pallets).forEach((id) =>
       setQuantityPallets((prev) => {
-        console.log('PROVERKA NA PIDORA');
         return {
           ...prev,
           [id]: quantity_pallets[id],

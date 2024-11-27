@@ -203,12 +203,7 @@ function ProductionBatchDesigner() {
             })
           );
 
-          // console.log(batchDesigner?.find((el) => el.id === currId)?.isButtonLocked);
-          // console.log('batchDesigner', batchDesigner);
-          // console.log('currId', currId);
-
           if (cakes_residue !== 0) {
-            console.log(batchDesigner?.find((el) => el.id === currId));
             setQuantityPallets((prev) => {
               return {
                 ...prev,
@@ -216,8 +211,6 @@ function ProductionBatchDesigner() {
               };
             });
           }
-
-          // console.log('useEffect autoclave, currId', currentCount * 3);
           return {
             ...batchItem,
             cakes_in_batch: cakes_in_batch + currentCount,
@@ -236,6 +229,8 @@ function ProductionBatchDesigner() {
       return prev.map((batchItem) => {
         for (let i = 0; i < batchDesigner.length; i++) {
           if (batchDesigner[i].id === batchItem.id) {
+            // ------------- возможно это понадобится
+
             // if (
             //   !batchDesigner?.find((el) => el.id === batchItem.id)?.isButtonLocked
             // ) {
@@ -261,10 +256,6 @@ function ProductionBatchDesigner() {
       });
     });
   }, [batchDesigner]);
-
-  useEffect(() => {
-    console.log('ПРОВЕРКА НА ПИДОРСКИЙ quantityPallets', quantityPallets);
-  }, [quantityPallets]);
 
   useEffect(() => {
     if (!latestProducts || !listOfOrderedCakes) return;
