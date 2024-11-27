@@ -33,7 +33,7 @@ function RecipeOrders() {
   ];
 
   const handlerRecipeInfo = (row) => {
-    const recipe = list_of_recipes?.find((el) => el.id === row.original.id_recipe);
+    const recipe = list_of_recipes?.find((el) => el.id === row.original.id);
 
     if (!recipe) {
       console.error('Recipe not found');
@@ -64,7 +64,7 @@ function RecipeOrders() {
     <>
       {recipeModalShow && (
         <RecipeInfoModal
-          isOpen={recipeModalShow}
+          show={recipeModalShow}
           onHide={() => setRecipeModalShow((prev) => !prev)}
           needDeleteButton={false}
         />

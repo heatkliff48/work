@@ -203,12 +203,21 @@ function ProductionBatchDesigner() {
             })
           );
 
-          setQuantityPallets((prev) => {
-            return {
-              ...prev,
-              [currId]: currentCount * 3,
-            };
-          });
+          // console.log(batchDesigner?.find((el) => el.id === currId)?.isButtonLocked);
+          // console.log('batchDesigner', batchDesigner);
+          // console.log('currId', currId);
+
+          if (cakes_residue !== 0) {
+            console.log(batchDesigner?.find((el) => el.id === currId));
+            setQuantityPallets((prev) => {
+              return {
+                ...prev,
+                [currId]: currentCount * 3,
+              };
+            });
+          }
+
+          // console.log('useEffect autoclave, currId', currentCount * 3);
           return {
             ...batchItem,
             cakes_in_batch: cakes_in_batch + currentCount,
@@ -227,12 +236,20 @@ function ProductionBatchDesigner() {
       return prev.map((batchItem) => {
         for (let i = 0; i < batchDesigner.length; i++) {
           if (batchDesigner[i].id === batchItem.id) {
-            setQuantityPallets((prev) => {
-              return {
-                ...prev,
-                [batchDesigner[i].id]: batchDesigner[i].cakes_in_batch * 3,
-              };
-            });
+            // if (
+            //   !batchDesigner?.find((el) => el.id === batchItem.id)?.isButtonLocked
+            // ) {
+            //   setQuantityPallets((prev) => {
+            //     return {
+            //       ...prev,
+            //       [batchDesigner[i].id]: batchDesigner[i].cakes_in_batch * 3,
+            //     };
+            //   });
+            // }
+            // console.log(
+            //   'batchDesigner[i].cakes_in_batch',
+            //   batchDesigner[i].cakes_in_batch
+            // );
             return {
               ...batchItem,
               cakes_in_batch: batchDesigner[i].cakes_in_batch,
@@ -244,6 +261,10 @@ function ProductionBatchDesigner() {
       });
     });
   }, [batchDesigner]);
+
+  useEffect(() => {
+    console.log('ПРОВЕРКА НА ПИДОРСКИЙ quantityPallets', quantityPallets);
+  }, [quantityPallets]);
 
   useEffect(() => {
     if (!latestProducts || !listOfOrderedCakes) return;
