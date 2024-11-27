@@ -66,7 +66,7 @@ const saveMaterialPlan = (material_plan) => {
 
 const deleteMaterialPlan = (material_plan_id) => {
   return url
-    .post('/recipe_orders/delete', material_plan_id)
+    .post('/recipe_orders/delete', { material_plan_id })
     .then((res) => {
       return res.data;
     })

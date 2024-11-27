@@ -15,7 +15,7 @@ class RecipeOrdersController {
   }
 
   static async deleteMaterialPlan(req, res) {
-    const material_plan_id = req.body;
+    const { material_plan_id } = req.body;
     await RecipeOrdersServices.deleteMaterialPlan(material_plan_id);
 
     return res.status(200);
