@@ -5,5 +5,6 @@ const router = Router();
 
 router.get('/', AutoclaveController.getAutoclave);
 router.post('/save', AutoclaveController.saveAutoclave);
+router.post('/update', AutoclaveController.updateAutoclave);
 
 module.exports = router;

@@ -21,6 +21,16 @@ class AutoclaveController {
       return ErrorUtils.catchError(res, err);
     }
   }
+
+  static async updateAutoclave(req, res) {
+    try {
+      const newAutoclave = await AutoclaveService.updateAutoclave(req.body);
+
+      return res.json(newAutoclave).status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
 }
 
 module.exports = AutoclaveController;

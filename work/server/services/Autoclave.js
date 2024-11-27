@@ -14,6 +14,12 @@ class AutoclaveService {
 
     return;
   }
+
+  static async updateAutoclave(list_of_order_id) {
+    const newAutoclave = await AutoclavesRepository.updateAutoclave(list_of_order_id);
+
+    return newAutoclave;
+  }
 }
 
 module.exports = AutoclaveService;

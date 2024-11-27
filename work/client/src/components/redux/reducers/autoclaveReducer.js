@@ -1,4 +1,8 @@
-import { NEW_SAVE_AUTOCLAVE, SET_AUTOCLAVE } from '../types/autoclaveTypes';
+import {
+  NEW_AUTOCLAVE,
+  NEW_SAVE_AUTOCLAVE,
+  SET_AUTOCLAVE,
+} from '../types/autoclaveTypes';
 
 export const autoclaveReducer = (autoclave = [], action) => {
   const { type, payload } = action;
@@ -8,6 +12,10 @@ export const autoclaveReducer = (autoclave = [], action) => {
     }
 
     case NEW_SAVE_AUTOCLAVE: {
+      return payload;
+    }
+
+    case NEW_AUTOCLAVE: {
       return payload;
     }
 

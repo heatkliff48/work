@@ -3,9 +3,11 @@ import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import {
   GET_AUTOCLAVE,
+  NEW_AUTOCLAVE,
   NEW_SAVE_AUTOCLAVE,
   SAVE_AUTOCLAVE,
   SET_AUTOCLAVE,
+  UPDATE_AUTOCLAVE,
 } from '../types/autoclaveTypes';
 
 const url = axios.create({
@@ -25,6 +27,15 @@ const getAutoclave = () => {
 const saveAutoclave = (autoclave) => {
   return url
     .post('/autoclave/save', autoclave)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updateAutoclave = (list_of_order_id) => {
+  return url
+    .post('/autoclave/update', list_of_order_id)
     .then((res) => {
       return res.data;
     })
@@ -51,9 +62,20 @@ function* saveAutoclaveWatcher(action) {
   }
 }
 
+function* updateAutoclaveWatcher(action) {
+  try {
+    const new_data = yield call(updateAutoclave, action.payload);
+
+    yield put({ type: NEW_AUTOCLAVE, payload: new_data });
+  } catch (err) {
+    yield put({ type: NEW_AUTOCLAVE, payload: null });
+  }
+}
+
 function* autoclaveWatcher() {
   yield takeLatest(GET_AUTOCLAVE, getAutoclaveWatcher);
   yield takeLatest(SAVE_AUTOCLAVE, saveAutoclaveWatcher);
+  yield takeLatest(UPDATE_AUTOCLAVE, updateAutoclaveWatcher);
 }
 
 export default autoclaveWatcher;
