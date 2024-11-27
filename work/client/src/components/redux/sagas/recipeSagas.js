@@ -3,6 +3,7 @@ import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import {
   ADD_NEW_RECIPE,
+  DELETE_MATERIAL_PLAN,
   DELETE_RECIPE,
   FULL_RECIPE,
   GET_FULL_RECIPE,
@@ -57,6 +58,15 @@ const getRecipeOrdersData = () => {
 const saveMaterialPlan = (material_plan) => {
   return url
     .post('/recipe_orders/', material_plan)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const deleteMaterialPlan = (material_plan_id) => {
+  return url
+    .post('/recipe_orders/delete', material_plan_id)
     .then((res) => {
       return res.data;
     })
@@ -126,6 +136,14 @@ function* saveMaterialPlanWatcher(action) {
   }
 }
 
+function* deleteMaterialPlanWatcher(action) {
+  try {
+    yield call(deleteMaterialPlan, action.payload);
+  } catch (err) {
+    console.log('err recipe saga', err);
+  }
+}
+
 // watchers
 
 function* recipeWatcher() {
@@ -134,6 +152,7 @@ function* recipeWatcher() {
   yield takeLatest(DELETE_RECIPE, deleteRecipeWorker);
 
   yield takeLatest(SAVE_MATERIAL_PLAN, saveMaterialPlanWatcher);
+  yield takeLatest(DELETE_MATERIAL_PLAN, deleteMaterialPlanWatcher);
   yield takeLatest(GET_RECIPE_ORDERS_DATA, getRecipeOrdersDataWatcher);
 }
 

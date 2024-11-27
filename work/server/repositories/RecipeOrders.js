@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const { RecipeOrders } = require('../db/models');
 
 class RecipeOrdersRepository {
@@ -23,6 +24,11 @@ class RecipeOrdersRepository {
     if (idsToReset.length != 0) {
       await RecipeOrders.create(idsToReset);
     }
+    return;
+  }
+
+  static async deleteMaterialPlan(material_plan_id) {
+    await RecipeOrders.destroy({ where: { id: material_plan_id } });
     return;
   }
 }

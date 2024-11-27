@@ -33,7 +33,6 @@ const FileDownload = () => {
     const filteredFiles = filesOrder.filter(
       (el) => el.order_id === orderCartData?.id
     );
-    console.log('filteredFiles', filteredFiles);
     setFilteredFiles(filteredFiles);
   }, [filesOrder]);
 

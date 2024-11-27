@@ -12,6 +12,12 @@ class RecipeOrdersServices {
 
     return;
   }
+
+  static async deleteMaterialPlan(material_plan_id) {
+    await RecipeOrdersRepository.deleteMaterialPlan(material_plan_id);
+
+    return;
+  }
 }
 
 module.exports = RecipeOrdersServices;
