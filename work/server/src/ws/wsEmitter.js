@@ -26,6 +26,8 @@ const {
   DELETE_FILES_WAREHOUSE_SOCKET,
   ADD_NEW_FILES_ORDER_SOCKET,
   DELETE_FILES_ORDER_SOCKET,
+  SAVE_MATERIAL_PLAN_SOCKET,
+  DELETE_MATERIAL_PLAN_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -325,6 +327,28 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_FILES_ORDER_SOCKET,
           payload: order_id,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(SAVE_MATERIAL_PLAN_SOCKET, (recipeOrders) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: SAVE_MATERIAL_PLAN_SOCKET,
+          payload: recipeOrders,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_MATERIAL_PLAN_SOCKET, (material_plan_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_MATERIAL_PLAN_SOCKET,
+          payload: material_plan_id,
         })
       );
     }

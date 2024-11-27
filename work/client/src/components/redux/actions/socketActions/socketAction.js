@@ -12,11 +12,13 @@ import {
   NEW_RECIPE_SOCKET,
   NEW_WAREHOUSE_SOCKET,
   REMAINING_STOCK_SOCKET,
+  NEW_MATERIAL_PLAN_SOCKET,
   STATUS_OF_ORDER_SOCKET,
   UPD_PRODUCT_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_ROLE_ACTIVE_SOCKET,
   UPDATE_ROLE_SOCKET,
+  NEES_DELETE_MATERIAL_PLAN_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -142,5 +144,19 @@ export const deleteFilesOrderSocket = (order_id) => {
   return {
     type: NEED_DELETE_FILES_ORDER_SOCKET,
     payload: order_id,
+  };
+};
+
+export const saveMaterialPlanSocket = (recipeOrders) => {
+  return {
+    type: NEW_MATERIAL_PLAN_SOCKET,
+    payload: recipeOrders,
+  };
+};
+
+export const deleteMaterialPlanSocket = (material_plan_id) => {
+  return {
+    type: NEES_DELETE_MATERIAL_PLAN_SOCKET,
+    payload: material_plan_id,
   };
 };
