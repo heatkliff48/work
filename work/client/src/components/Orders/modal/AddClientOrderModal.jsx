@@ -38,18 +38,36 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     [newOrder?.del_adr_id]
   );
 
-  const getOrderArticle = () => { // Переделать: каждая новая дата начинает id с 1, и сделать как в рецептах recipeArticle
+  const getOrderArticle = () => {
     let versionNumber = '0001';
     const year = new Date().getFullYear().toString().slice(-2);
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
-    const day = new Date().getDate();
-
-    const articleId = list_of_orders.length === 0 ? 1 : list_of_orders.length + 1;
-    versionNumber = `0000000${articleId}`.slice(-8);
-
-    const orderArticle = `Z0000${day}${month}${year}${versionNumber}`;
+    const day = new Date().getDate().toString().padStart(2, '0');
+  
+    const currentDate = `${day}${month}${year}`;
+  
+    const ordersWithSameDate = list_of_orders.filter(order =>
+      order.article?.includes(currentDate)
+    );
+  
+    if (ordersWithSameDate.length > 0) {
+      const lastNumbers = ordersWithSameDate.map(order => {
+        const match = order.article.match(/(\d{8})$/);
+        return match ? parseInt(match[1], 10) : 0;
+      });
+  
+      const maxNumber = Math.max(...lastNumbers);
+  
+      versionNumber = `0000000${maxNumber + 1}`.slice(-8);
+    } else {
+      versionNumber = `00000001`;
+    }
+  
+    const orderArticle = `Z0000${currentDate}${versionNumber}`;
+  
     return orderArticle;
   };
+  
 
   const addClientOrderHendler = async (e, owner) => {
     e.preventDefault();

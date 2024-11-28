@@ -63,16 +63,7 @@ function RawMaterialsPlan() {
   };
 
   const handlerSave = () => {
-    productsArray.forEach((el) => {
-      const { current_recipe, id_batch, quantity } = el;
-      const obj = {
-        id_recipe: current_recipe?.id,
-        id_batch,
-        production_volume: quantity,
-      };
-
-      dispatch(saveMaterialPlan(obj));
-    });
+    dispatch(saveMaterialPlan(productsArray));
   };
 
   const handleRecipeChange = (index, selectedOption) => {
