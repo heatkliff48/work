@@ -17,11 +17,13 @@ import { useProjectContext } from '#components/contexts/Context.js';
 import ModalWindow from './ModalWindow';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 const ProductCardModal = React.memo(() => {
   const { productCardData, setProductCardData } = useProjectContext();
   const { modalProductCard, setModalProductCard } = useModalContext();
   const { COLUMNS } = useProductsContext();
+  const { userAccess } = useUsersContext();
 
   const [lastVersion, setLastVersion] = useState(1);
   const [isModalWindowOpen, setIsModalWindowOpen] = useState(false);
@@ -173,10 +175,11 @@ const ProductCardModal = React.memo(() => {
         </ModalBody>
         <ModalFooter>
           <div className="product_card">
-            <Button color="success" onClick={() => setIsModalWindowOpen(true)}>
-              Redactor
-            </Button>
-
+            {userAccess?.canWrite && (
+              <Button color="success" onClick={() => setIsModalWindowOpen(true)}>
+                Edit
+              </Button>
+            )}
             {isModalWindowOpen && (
               <ModalWindow
                 list={COLUMNS}
