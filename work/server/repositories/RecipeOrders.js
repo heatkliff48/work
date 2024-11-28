@@ -1,4 +1,3 @@
-const { where } = require('sequelize');
 const { RecipeOrders } = require('../db/models');
 
 class RecipeOrdersRepository {
@@ -47,7 +46,6 @@ class RecipeOrdersRepository {
       }
       return newRecipes;
     }
-
     return;
   }
 

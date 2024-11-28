@@ -109,28 +109,20 @@ class AutoclavesRepository {
   static async updateAutoclave(list_of_order_id) {
     const autoclave = await Autoclaves.findAll();
 
-    const updatedAutoclave = [];
-
-    autoclave.forEach((el) => {
-      if (el.id_list_of_ordered_product === list_of_order_id) {
-        updatedAutoclave.push({
-          id_list_of_ordered_product: null,
-          density: '',
-          width: '',
-        });
-      } else {
-        updatedAutoclave.push(el);
-      }
-    });
-
-    const nonNullItems = updatedAutoclave.filter(
-      (item) => item.id_list_of_ordered_product !== null
+    const nonNullItems = autoclave.filter(
+      (el) => el.id_list_of_ordered_product !== list_of_order_id
     );
-    const nullItems = updatedAutoclave.filter(
-      (item) => item.id_list_of_ordered_product === null
+    const targetItems = autoclave.filter(
+      (el) => el.id_list_of_ordered_product === list_of_order_id
     );
 
-    const finalAutoclaveArray = [...nonNullItems, ...nullItems];
+    const nullifiedItems = targetItems.map(() => ({
+      id_list_of_ordered_product: null,
+      density: '',
+      width: '',
+    }));
+
+    const finalAutoclaveArray = [...nonNullItems, ...nullifiedItems];
 
     for (let i = 0; i < finalAutoclaveArray.length; i++) {
       const currentElement = finalAutoclaveArray[i];
@@ -148,7 +140,10 @@ class AutoclavesRepository {
         }
       );
     }
-    const newAutoclave = await Autoclaves.findAll();
+
+    const newAutoclave = await Autoclaves.findAll({
+      order: [['id', 'ASC']],
+    });
     return newAutoclave;
   }
 }

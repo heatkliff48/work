@@ -33,7 +33,7 @@ function RecipeOrders() {
   ];
 
   const handlerRecipeInfo = (row) => {
-    const recipe = list_of_recipes?.find((el) => el.id === row.original.id);
+    const recipe = list_of_recipes?.find((el) => el.article === row.original.recipe_article);
 
     if (!recipe) {
       console.error('Recipe not found');

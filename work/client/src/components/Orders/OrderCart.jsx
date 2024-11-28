@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
-// import ReactDOM from 'react-dom';
 import { Button } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -330,10 +329,10 @@ const OrderCart = React.memo(() => {
           toggle={() => setWarehouseInfoModal(!warehouseInfoModal)}
         />
       )}
-
+  
       <div className="page-container">
         <h4>Order Card: {orderCartData?.article}</h4>
-
+  
         <div className="header-container">
           <div className="owner-info">
             <h4>Client Information</h4>
@@ -369,26 +368,26 @@ const OrderCart = React.memo(() => {
             </tr>
           </thead>
           <tbody>
-            {updatedProductListOrder?.map((product) => (
-              <tr key={product?.id} className="product-row">
-                <td
-                  onClick={() => {
-                    onProductClickHandler(product);
-                  }}
-                >
-                  {filterAndMapData(product, filterKeys)}
-                  {product?.warehouse_id !== null ? (
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setWarehouseInfoCurIdModal(product?.warehouse_id);
-                        setWarehouseInfoModal(!warehouseInfoModal);
-                      }}
-                    >
-                      Show batch
-                    </Button>
-                  ) : (
-                    deleteOrderAccess?.canWrite && (
+            {Array.isArray(updatedProductListOrder) &&
+              updatedProductListOrder?.map((product) => (
+                <tr key={product?.id || Math.random()} className="product-row">
+                  <td
+                    onClick={() => {
+                      onProductClickHandler(product);
+                    }}
+                  >
+                    {filterAndMapData(product, filterKeys)}
+                    {product?.warehouse_id !== null ? (
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setWarehouseInfoCurIdModal(product?.warehouse_id);
+                          setWarehouseInfoModal(!warehouseInfoModal);
+                        }}
+                      >
+                        Show batch
+                      </Button>
+                    ) : (
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -397,11 +396,10 @@ const OrderCart = React.memo(() => {
                       >
                         Delete
                       </Button>
-                    )
-                  )}
-                </td>
-              </tr>
-            ))}
+                    )}
+                  </td>
+                </tr>
+              ))}
             {userAccess?.canWrite && (
               <tr>
                 <td colSpan="100%">
@@ -490,15 +488,19 @@ const OrderCart = React.memo(() => {
           )}
         </div>
       </div>
-      <FilesMain userAccess={userAccess} />
-      {orderCartData && updatedProductListOrder && vatValue && (
-        <DownloadOrderPDF
-          orderCartData={orderCartData}
-          updatedProductListOrder={updatedProductListOrder}
-          vatValue={vatValue}
-        />
-      )}
+      <FilesMain />
+      {orderCartData &&
+        Array.isArray(updatedProductListOrder) &&
+        updatedProductListOrder.length > 0 &&
+        vatValue && (
+          <DownloadOrderPDF
+            orderCartData={orderCartData}
+            updatedProductListOrder={updatedProductListOrder}
+            vatValue={vatValue}
+          />
+        )}
     </>
   );
+  
 });
 export default OrderCart;

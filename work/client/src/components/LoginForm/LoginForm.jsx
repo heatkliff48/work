@@ -13,7 +13,7 @@ function LoginForm() {
     if (user) {
       navigate('/');
     }
-  }, [navigate, user]);
+  }, [user]);
 
   const inputChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));

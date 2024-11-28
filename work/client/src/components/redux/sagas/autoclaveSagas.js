@@ -58,7 +58,7 @@ function* saveAutoclaveWatcher(action) {
 
     yield put({ type: NEW_SAVE_AUTOCLAVE, payload: action.payload });
   } catch (err) {
-    yield put({ type: NEW_SAVE_AUTOCLAVE, payload: null });
+    console.log('saveAutoclaveWatcher', err);
   }
 }
 
@@ -68,7 +68,7 @@ function* updateAutoclaveWatcher(action) {
 
     yield put({ type: NEW_AUTOCLAVE, payload: new_data });
   } catch (err) {
-    yield put({ type: NEW_AUTOCLAVE, payload: null });
+    console.log('updateAutoclaveWatcher', err);
   }
 }
 

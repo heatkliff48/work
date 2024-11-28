@@ -303,6 +303,7 @@ function ProductionBatchDesigner() {
     setProdBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
 
+    //Неправильно сетиться автоклав если у нас нет какого-то батча
     const updatedAutoclaveData = transformAutoclaveData(autoclaveData, prodBatch);
 
     const filledAutoclave = [];
@@ -319,6 +320,7 @@ function ProductionBatchDesigner() {
       const batch = prodBatchDesigner.find(
         (prod) => prod.id === unit.id_list_of_ordered_product
       );
+//если нет batch то надо убрать эти объекты назад
 
       if (!batch)
         return {

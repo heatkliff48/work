@@ -1,6 +1,7 @@
 import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useProductsContext } from './ProductContext';
 
 const WarehouseContext = createContext();
 
@@ -96,18 +97,26 @@ const WarehouseContextProvider = ({ children }) => {
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_orders = useSelector((state) => state.orders);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
+  const { latestProducts } = useProductsContext();
 
   useEffect(() => {
     const data = list_of_ordered_production.map((el) => {
       const quantity_cakes = (el.quantity / 3).toFixed(2);
+
       const orderId = list_of_orders.find(
         (order) => order.article === el.order_article
       )?.id;
 
-      const prodOrdId = productsOfOrders.filter((elem) => elem.order_id === orderId);
+      const productId = latestProducts.find(
+        (product) => product.article === el.product_article
+      )?.id;
 
-      const quantity_in_warehouse = list_of_reserved_products.find((res_prod) =>
-        prodOrdId.find((prod) => res_prod.orders_products_id === prod.id)
+      const prodOrdId = productsOfOrders.find(
+        (elem) => elem.order_id === orderId && elem.product_id === productId
+      );
+
+      const quantity_in_warehouse = list_of_reserved_products.find(
+        (res_prod) => res_prod.orders_products_id === prodOrdId.id
       )?.quantity;
 
       const quantity_in_batch = (
@@ -129,31 +138,51 @@ const WarehouseContextProvider = ({ children }) => {
       const orderId = list_of_orders.find(
         (order) => order.article === item.order_article
       )?.id;
-      const key = `${item.order_article}-${item.product_artcle}`;
+
+      const productId = latestProducts.find(
+        (product) => product.article === item.product_article
+      )?.id;
+
+      const key = `${item.order_article}-${item.product_article}`;
+
       if (!acc[key]) {
         acc[key] = {
           ...item,
           orderId,
+          productId,
           total_quantity: item.quantity,
-          total_quantity_in_warehouse: 0,
+          quantities_in_warehouse: [],
         };
       } else {
         acc[key].total_quantity += item.quantity;
       }
 
-      const prodOrdId = productsOfOrders.filter((elem) => elem.order_id === orderId);
+      const prodOrdId = productsOfOrders.filter(
+        (elem) => elem.order_id === orderId && elem.product_id === productId
+      );
 
-      const quantity_in_warehouse = list_of_reserved_products.find((res_prod) =>
-        prodOrdId.find((prod) => res_prod.orders_products_id === prod.id)
-      )?.quantity;
+      const reservedQuantities = prodOrdId.map((prod) => {
+        const reserved = list_of_reserved_products.find(
+          (res_prod) => res_prod.orders_products_id === prod.id
+        );
+        return reserved ? reserved.quantity : 0;
+      });
 
-      acc[key].total_quantity_in_warehouse += quantity_in_warehouse || 0;
+      acc[key].quantities_in_warehouse.push(...reservedQuantities);
 
       return acc;
     }, {});
 
     Object.values(groupedOrders).forEach((group) => {
-      const allMatch = group?.total_quantity === group?.total_quantity_in_warehouse;
+      const order = list_of_orders.find((el) => el.id === group.orderId);
+      if (order?.status === 'completed') return;
+
+      const totalReserved = group.quantities_in_warehouse.reduce(
+        (sum, quantity) => sum + quantity,
+        0
+      );
+
+      const allMatch = group.total_quantity <= totalReserved;
 
       if (allMatch) {
         dispatch(
