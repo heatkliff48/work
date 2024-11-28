@@ -3,11 +3,11 @@ import FileUpload from './FileUpload';
 import FileDownload from './FileDownload';
 import { FileProvider } from './FileContext';
 
-const FilesMain = () => {
+const FilesMain = ({ userAccess }) => {
   return (
     <FileProvider>
       <div>
-        <FileUpload />
+        {userAccess?.canWrite && <FileUpload />}
         <FileDownload />
       </div>
     </FileProvider>

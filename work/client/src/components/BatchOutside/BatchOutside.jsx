@@ -36,7 +36,7 @@ const BatchOutside = () => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'id_list_of_ordered_production product',
+      Header: 'list_of_ordered_production product',
       accessor: 'product_article',
       Filter: TextSearchFilter,
     },
@@ -68,8 +68,8 @@ const BatchOutside = () => {
         const product_article_batch =
           list_of_ordered_production.find(
             (el) => el.id === batch.id_list_of_ordered_production
-          )?.product_artcle ?? '';
-        return { ...batch, product_artcle: product_article_batch };
+          )?.product_article ?? '';
+        return { ...batch, product_article: product_article_batch };
       });
       setBatchOutsideDataList(newData);
     }
@@ -87,7 +87,7 @@ const BatchOutside = () => {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Clients');
+      const access = checkUserAccess(user, roles, 'batch_outside');
       setUserAccess(access);
 
       if (!access.canRead) {
@@ -114,7 +114,9 @@ const BatchOutside = () => {
           batchOutsideHandler(row.original.id);
         }}
       />
-      <BatchOutsideModal show={modalShow} onHide={() => setModalShow(false)} />
+      {userAccess?.canWrite && (
+        <BatchOutsideModal show={modalShow} onHide={() => setModalShow(false)} />
+      )}
     </Fragment>
   );
 };

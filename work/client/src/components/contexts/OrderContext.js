@@ -83,8 +83,8 @@ const OrderContextProvider = ({ children }) => {
       accessor: 'transferred',
     },
     {
-      Header: 'The order has been completed',
-      accessor: 'completed',
+      Header: 'The order has been produced',
+      accessor: 'produced',
     },
     {
       Header: 'Shipment allowed',
@@ -93,6 +93,10 @@ const OrderContextProvider = ({ children }) => {
     {
       Header: 'Order shipped',
       accessor: 'shipped',
+    },
+    {
+      Header: 'The order is completed',
+      accessor: 'completed',
     },
   ];
 

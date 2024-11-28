@@ -80,13 +80,15 @@ function BatchOutsideModal(props) {
   }, []);
 
   const checkInput = async () => {
-    const product = latestProducts.find((el) => el.id === currentOrderedProducts?.id);
+    const product = latestProducts.find(
+      (el) => el.id === currentOrderedProducts?.id
+    );
 
     let versionNumber = '0001';
     let incVersion = 1;
     let ok = false;
     if (batchOutsideInput.quality_product) {
-      await dispatch(deleteMaterialPlan(currentBatchId))
+      await dispatch(deleteMaterialPlan(currentBatchId));
       const type = 0;
       const articleId =
         warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
@@ -152,7 +154,7 @@ function BatchOutsideModal(props) {
   //     const filteredProductsOfOrders = productsOfOrders.filter(
   //       (item) => item.product_id === product_id.id
   //     );
-//filteredProductsOfOrders);
+  //filteredProductsOfOrders);
 
   //     const result = filteredProductsOfOrders.map((product) => {
   //       const order = list_of_orders.find((order) => order.id === product.order_id);

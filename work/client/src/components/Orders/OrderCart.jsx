@@ -70,6 +70,10 @@ const OrderCart = React.memo(() => {
     canRead: true,
     canWrite: false,
   });
+  const [deleteOrderAccess, setDeleteOrderAccess] = useState({
+    canRead: true,
+    canWrite: false,
+  });
 
   const filterKeys = useMemo(
     () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
@@ -296,6 +300,9 @@ const OrderCart = React.memo(() => {
       const statusAccess = checkUserAccess(user, roles, 'Orders_status');
       setOrderStatusAccess(statusAccess);
 
+      const deleteAccess = checkUserAccess(user, roles, 'Del_orders');
+      setDeleteOrderAccess(deleteAccess);
+
       if (!access?.canRead) {
         navigate('/');
       }
@@ -338,7 +345,7 @@ const OrderCart = React.memo(() => {
             </div>
             {userAccess?.canWrite && <ShowOrderContactEditModal />}
           </div>
-          {userAccess?.canWrite && (
+          {deleteOrderAccess?.canWrite && (
             <Button
               onClick={() => {
                 dispatch(deleteOrder(orderCartData?.id));
@@ -460,21 +467,25 @@ const OrderCart = React.memo(() => {
               )}
             </div>
           </div>
-          <div className="status-table">
-            {status_list.map((item) => (
-              <div key={item.accessor} className="status-row">
-                <div className="header">{item.Header}</div>
-                <input
-                  id={item.accessor}
-                  type="checkbox"
-                  checked={item.accessor === orderCartData?.status}
-                  onChange={() => {
-                    statusChangeHandler(item);
-                  }}
-                />
-              </div>
-            ))}
-          </div>
+          {orderStatusAccess?.canRead && (
+            <div className="status-table">
+              {status_list.map((item) => (
+                <div key={item.accessor} className="status-row">
+                  <div className="header">{item.Header}</div>
+
+                  <input
+                    id={item.accessor}
+                    type="checkbox"
+                    checked={item.accessor === orderCartData?.status}
+                    onChange={() => {
+                      statusChangeHandler(item);
+                    }}
+                    disabled={!orderStatusAccess?.canWrite}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <FilesMain />
