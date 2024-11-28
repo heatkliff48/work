@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, Button, Table } from 'reactstrap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import ReservedProductModal from './ReserveProductModal';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
@@ -11,6 +12,7 @@ import {
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import FilesMain from '#components/FileUpload/Warehouse/FilesMain.jsx';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -22,11 +24,16 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
 
   const { warehouseInfoCurIdModal, reserveProductModal, setReserveProductModal } =
     useModalContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+
+  const user = useSelector((state) => state.user);
 
   const { productsOfOrders, list_of_orders } = useOrderContext();
   const { latestProducts } = useProductsContext();
 
   const [currentListOfResProd, setCurrentListOfResProd] = useState();
+
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const curr_warehouse = warehouse_data.find(
@@ -86,6 +93,19 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
     setFilteredProducts(result);
   }, [productsOfOrders]);
 
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Warehouse_reservation');
+      setUserAccess(access);
+
+      console.log('access', access);
+
+      if (!access?.canRead) {
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+      }
+    }
+  }, [user, roles]);
+
   return (
     <div>
       {reserveProductModal && (
@@ -109,18 +129,21 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
           <div className="warehouseInfo">
             <span>Местоположение: {curr_warehouse.warehouse_loc}</span>
           </div>
-          <Button
-            style={{ marginBottom: '10px' }}
-            color="primary"
-            disabled={
-              curr_warehouse?.remaining_stock === 0 || filteredProducts?.length === 0
-            }
-            onClick={() => {
-              setReserveProductModal(!reserveProductModal);
-            }}
-          >
-            Зарезервировать продукцию
-          </Button>
+          {userAccess?.canWrite && (
+            <Button
+              style={{ marginBottom: '10px' }}
+              color="primary"
+              disabled={
+                curr_warehouse?.remaining_stock === 0 ||
+                filteredProducts?.length === 0
+              }
+              onClick={() => {
+                setReserveProductModal(!reserveProductModal);
+              }}
+            >
+              Зарезервировать продукцию
+            </Button>
+          )}
           <FilesMain />
           <Table>
             <thead>

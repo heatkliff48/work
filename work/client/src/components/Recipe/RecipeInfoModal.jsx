@@ -4,13 +4,19 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { deleteRecipe } from '#components/redux/actions/recipeAction.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { useNavigate } from 'react-router-dom';
 
 function RecipeInfoModal(props) {
   const { recipe_info, list_of_recipes, selectedRecipe } = useRecipeContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+
+  const user = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
@@ -23,6 +29,19 @@ function RecipeInfoModal(props) {
 
     props.onHide();
   };
+
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'recipe_products');
+      setUserAccess(access);
+
+      console.log('access', access);
+
+      if (!access?.canRead) {
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+      }
+    }
+  }, [user, roles]);
 
   return (
     <>
@@ -65,7 +84,7 @@ function RecipeInfoModal(props) {
         </Modal.Body>
         <Modal.Footer>
           {/* <button form="RecipeInfoModal">Сохранить</button> */}
-          {props.needDeleteButton && (
+          {props.needDeleteButton && userAccess?.canWrite && (
             <Button onClick={deleteRecipeHandler}>Delete Recipe</Button>
           )}
           <Button onClick={props.onHide}>Close</Button>

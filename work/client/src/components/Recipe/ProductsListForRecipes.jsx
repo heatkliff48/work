@@ -11,7 +11,7 @@ import { getRecipe } from '#components/redux/actions/recipeAction.js';
 
 const ProductsListForRecipes = () => {
   const [modalShow, setModalShow] = useState(false);
-  const { roles, checkUserAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { recipe_info, list_of_recipes, setSelectedRecipe } = useRecipeContext();
 
   const user = useSelector((state) => state.user);
@@ -39,7 +39,7 @@ const ProductsListForRecipes = () => {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Products');
+      const access = checkUserAccess(user, roles, 'recipe_products');
       setUserAccess(access);
 
       console.log('access', access);
@@ -51,19 +51,23 @@ const ProductsListForRecipes = () => {
   }, [user, roles]);
 
   useEffect(() => {
-    dispatch(getRecipe());
+    if (userAccess?.canRead) {
+      dispatch(getRecipe());
+    }
   }, []);
 
   return (
     <div>
-      <Button
-        onClick={() => {
-          setNewRecipeModalShow(!newRecipeModalShow);
-        }}
-      >
-        Создать новый
-      </Button>
-      {newRecipeModalShow && (
+      {userAccess?.canWrite && (
+        <Button
+          onClick={() => {
+            setNewRecipeModalShow(!newRecipeModalShow);
+          }}
+        >
+          Создать новый
+        </Button>
+      )}
+      {newRecipeModalShow && userAccess?.canWrite && (
         <AddNewRecipeModal
           show={newRecipeModalShow}
           onHide={() => setNewRecipeModalShow(!newRecipeModalShow)}
@@ -73,7 +77,7 @@ const ProductsListForRecipes = () => {
       <Table
         COLUMN_DATA={recipe_info}
         dataOfTable={list_of_recipes}
-        // userAccess={userAccess}
+        userAccess={userAccess}
         onClickButton={() => {}}
         buttonText={''}
         tableName={'Table of recipes'}
@@ -84,7 +88,7 @@ const ProductsListForRecipes = () => {
       <RecipeInfoModal
         show={modalShow}
         onHide={() => setModalShow(false)}
-        needDeleteButton={true}
+        needDeleteButton={userAccess?.canWrite ?? false}
       />
     </div>
   );

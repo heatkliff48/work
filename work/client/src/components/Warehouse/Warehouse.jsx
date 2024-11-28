@@ -40,7 +40,7 @@ function Warehouse() {
 
   return (
     <>
-      {warehouseModal && (
+      {warehouseModal && userAccess?.canWrite && (
         <WarehouseAddModal
           isOpen={warehouseModal}
           toggle={() => setWarehouseModal(!warehouseModal)}

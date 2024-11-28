@@ -65,23 +65,35 @@ function Main() {
           Production Batch Log 
         </button>
       )} */}
-      <button onClick={() => navigate('/production_batch_designer')}>
-        Production Batch Designer
-      </button>
-      <button onClick={() => navigate('/list_of_ordered_production')}>
-        List of ordered production
-      </button>
-      <button onClick={() => navigate('/list_of_ordered_production_oem')}>
-        List of ordered production OEM
-      </button>
-      <button onClick={() => navigate('/batch_outside')}>Batch Outside</button>
-
-      <button onClick={() => navigate('/recipe_products')}>Recipe Products</button>
-
-      <button onClick={() => navigate('/raw_materials_plan')}>
-        Raw Materials Plan
-      </button>
-      <button onClick={() => navigate('/recipe_orders')}>Recipe Orders</button>
+      {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
+        <button onClick={() => navigate('/production_batch_designer')}>
+          Production Batch Designer
+        </button>
+      )}
+      {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
+        <button onClick={() => navigate('/list_of_ordered_production')}>
+          List of ordered production
+        </button>
+      )}
+      {checkUserAccess(user, roles, 'list_of_ordered_production_oem')?.canRead && (
+        <button onClick={() => navigate('/list_of_ordered_production_oem')}>
+          List of ordered production OEM
+        </button>
+      )}
+      {checkUserAccess(user, roles, 'batch_outside')?.canRead && (
+        <button onClick={() => navigate('/batch_outside')}>Batch Outside</button>
+      )}
+      {checkUserAccess(user, roles, 'recipe_products')?.canRead && (
+        <button onClick={() => navigate('/recipe_products')}>Recipe Products</button>
+      )}
+      {checkUserAccess(user, roles, 'raw_materials_plan')?.canRead && (
+        <button onClick={() => navigate('/raw_materials_plan')}>
+          Raw Materials Plan
+        </button>
+      )}
+      {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
+        <button onClick={() => navigate('/recipe_orders')}>Recipe Orders</button>
+      )}
     </div>
   );
 }
