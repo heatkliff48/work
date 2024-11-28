@@ -40,7 +40,7 @@ function Main() {
     dispatch(getOrders());
     dispatch(clearBatchState());
     dispatch(getRecipeOrdersData());
-  }, [navigate, user, modalRoleCard]);
+  }, [user, modalRoleCard]);
 
   return (
     <div>

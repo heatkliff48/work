@@ -86,7 +86,7 @@ function BatchOutsideModal(props) {
     let incVersion = 1;
     let ok = false;
     if (batchOutsideInput.quality_product) {
-      dispatch(deleteMaterialPlan(currentBatchId))
+      await dispatch(deleteMaterialPlan(currentBatchId))
       const type = 0;
       const articleId =
         warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;

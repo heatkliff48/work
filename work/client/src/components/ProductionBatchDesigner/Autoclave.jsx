@@ -342,7 +342,7 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
 
   useEffect(() => {
     dispatch(getAutoclave());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     Object.keys(quantity_pallets).forEach((id) =>

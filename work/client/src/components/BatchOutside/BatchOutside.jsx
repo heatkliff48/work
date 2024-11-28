@@ -36,8 +36,8 @@ const BatchOutside = () => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'id_list_of_ordered_production',
-      accessor: 'id_list_of_ordered_production',
+      Header: 'id_list_of_ordered_production product',
+      accessor: 'product_article',
       Filter: TextSearchFilter,
     },
     {
@@ -64,7 +64,14 @@ const BatchOutside = () => {
 
   useEffect(() => {
     if (batchOutside) {
-      setBatchOutsideDataList(batchOutside);
+      const newData = batchOutside.map((batch) => {
+        const product_article_batch =
+          list_of_ordered_production.find(
+            (el) => el.id === batch.id_list_of_ordered_production
+          )?.product_artcle ?? '';
+        return { ...batch, product_artcle: product_article_batch };
+      });
+      setBatchOutsideDataList(newData);
     }
   }, [batchOutside]);
 

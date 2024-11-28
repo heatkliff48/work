@@ -27,7 +27,7 @@ function RegForm() {
       navigate('/');
     }
     dispatch(getAllRoles());
-  }, [navigate, user]);
+  }, [user]);
 
   useEffect(() => {
     const selectedRole = roleTable.find((role) => role.id === formInput.role_id);

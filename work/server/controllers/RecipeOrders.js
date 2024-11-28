@@ -6,7 +6,7 @@ class RecipeOrdersController {
   static async getRecipeOrdersData(req, res) {
     const data = await RecipeOrdersServices.getRecipeOrdersData();
 
-    return res.status(200).json(data);
+    return res.json(data).status(200);
   }
 
   static async saveMaterialPlan(req, res) {

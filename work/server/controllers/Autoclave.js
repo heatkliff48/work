@@ -16,7 +16,7 @@ class AutoclaveController {
     try {
       await AutoclaveService.saveAutoclave(req.body);
 
-      return res.status(200);
+      return res.sendStatus(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

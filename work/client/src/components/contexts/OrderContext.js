@@ -114,7 +114,7 @@ const OrderContextProvider = ({ children }) => {
   const autoclaveData = useSelector((state) => state.autoclave);
   useEffect(() => {
     dispatch(getOrders());
-  }, [dispatch, isOrderReady]);
+  }, [ isOrderReady]);
 
   const getCurrentOrderInfoHandler = useCallback(
     (order_info) => {
