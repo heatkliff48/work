@@ -85,6 +85,12 @@ class WarehouseRepository {
     return new_ordered_production_oem;
   }
 
+  static async updateListOfOrderedProductionOEM(upd_ordered_production_oem) {
+    const { id, status } = upd_ordered_production_oem;
+    await ListOfOrderedProductionOEMs.update({ status }, { where: { id } });
+    return;
+  }
+
   static async updateRemainingStock(upd_rem_srock) {
     const { warehouse_id, new_remaining_stock } = upd_rem_srock;
     await Warehouses.update(

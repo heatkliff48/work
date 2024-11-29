@@ -49,6 +49,14 @@ class WarehouseService {
     return new_ordered_production_OEM;
   }
 
+  static async updateListOfOrderedProductionOEM({ upd_ordered_production_oem }) {
+    await WarehouseRepository.updateListOfOrderedProductionOEM(
+      upd_ordered_production_oem
+    );
+
+    return;
+  }
+
   static async updateRemainingStock({ upd_rem_srock }) {
     await WarehouseRepository.updateRemainingStock(upd_rem_srock);
 

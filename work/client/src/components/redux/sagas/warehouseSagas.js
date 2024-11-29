@@ -23,6 +23,7 @@ import {
   NEW_ORDERED_PRODUCTION_OEM,
   GET_LIST_OF_ORDERED_PRODUCTION_OEM,
   ADD_NEW_ORDERED_PRODUCTION_OEM,
+  UPDATE_ORDERED_PRODUCTION_OEM,
 } from '../types/warehouseTypes';
 
 // let accessTokenFront;
@@ -130,6 +131,15 @@ const getListOfOrderedProductionOEM = () => {
 const addNewListOfOrderedProductionOEM = (ordered_production_oem) => {
   return url
     .post('/warehouse/ordered_production_oem/add', ordered_production_oem)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updListOfOrderedProductionOEM = (ordered_production_oem) => {
+  return url
+    .post('/warehouse/ordered_production_oem/update', ordered_production_oem)
     .then((res) => {
       return res.data;
     })
@@ -292,6 +302,28 @@ function* addNewListOfOrderedProductionOEMWatcher(action) {
   }
 }
 
+function* updListOfOrderedProductionOEMWorker(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+
+    // const { new_ordered_production_OEM, accessToken, accessTokenExpiration } =
+    const { upd_ordered_production_oem } = yield call(
+      updListOfOrderedProductionOEM,
+      action.payload
+    );
+
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({
+      type: NEW_ORDERED_PRODUCTION_OEM,
+      payload: upd_ordered_production_oem,
+    });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: NEW_ORDERED_PRODUCTION_OEM, payload: [] });
+  }
+}
+
 function* warehouseWatcher() {
   yield takeLatest(GET_ALL_WAREHOUSE, getAllWarehouseWatcher);
   yield takeLatest(GET_LIST_OF_RESERVED_PRODUCTS, getListOfReservedProductsWatcher);
@@ -314,6 +346,10 @@ function* warehouseWatcher() {
   yield takeLatest(
     ADD_NEW_ORDERED_PRODUCTION_OEM,
     addNewListOfOrderedProductionOEMWatcher
+  );
+  yield takeLatest(
+    UPDATE_ORDERED_PRODUCTION_OEM,
+    updListOfOrderedProductionOEMWorker
   );
 }
 

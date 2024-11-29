@@ -92,6 +92,21 @@ class WarehouseController {
     }
   }
 
+  static async updateListOfOrderedProductionOEM(req, res) {
+    const upd_ordered_production_oem = req.body;
+
+    try {
+      const updOrderedProductionOEM =
+        await WarehouseService.updateListOfOrderedProductionOEM({
+          upd_ordered_production_oem,
+        });
+
+      return res.status(200).json(updOrderedProductionOEM);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async updateRemainingStock(req, res) {
     const upd_rem_srock = req.body;
 
