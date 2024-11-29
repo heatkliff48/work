@@ -43,31 +43,30 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     const year = new Date().getFullYear().toString().slice(-2);
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
     const day = new Date().getDate().toString().padStart(2, '0');
-  
+
     const currentDate = `${day}${month}${year}`;
-  
-    const ordersWithSameDate = list_of_orders.filter(order =>
+
+    const ordersWithSameDate = list_of_orders.filter((order) =>
       order.article?.includes(currentDate)
     );
-  
+
     if (ordersWithSameDate.length > 0) {
-      const lastNumbers = ordersWithSameDate.map(order => {
+      const lastNumbers = ordersWithSameDate.map((order) => {
         const match = order.article.match(/(\d{8})$/);
         return match ? parseInt(match[1], 10) : 0;
       });
-  
+
       const maxNumber = Math.max(...lastNumbers);
-  
+
       versionNumber = `0000000${maxNumber + 1}`.slice(-8);
     } else {
       versionNumber = `00000001`;
     }
-  
+
     const orderArticle = `Z0000${currentDate}${versionNumber}`;
-  
+
     return orderArticle;
   };
-  
 
   const addClientOrderHendler = async (e, owner) => {
     e.preventDefault();

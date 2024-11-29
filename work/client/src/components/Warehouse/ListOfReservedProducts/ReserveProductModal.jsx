@@ -1,16 +1,23 @@
 import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { updateAutoclave } from '#components/redux/actions/autoclaveAction.js';
 import {
   addNewReservedProducts,
   updateRemainingStock,
+  updListOfOrderedProductionOEM,
 } from '#components/redux/actions/warehouseAction.js';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Modal, ModalHeader, ModalBody, Table } from 'reactstrap';
 
 const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
-  const { filteredProducts, list_of_ordered_production } = useWarehouseContext();
+  const {
+    filteredProducts,
+    list_of_ordered_production,
+    list_of_ordered_production_oem,
+  } = useWarehouseContext();
+  const { latestProducts } = useProductsContext();
   const dispatch = useDispatch();
 
   const addReservedProductHandler = (res_prod) => {
@@ -42,6 +49,25 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
         quantity: quantity_palet,
       })
     );
+
+    if (
+      latestProducts.find((el) => el.id === warehouse.product_id)
+        ?.placeOfProduction !== 'Spain'
+    ) {
+      const list_of_order_oem_id = list_of_ordered_production_oem.find(
+        (el) =>
+          el.order_article === order_article &&
+          el.product_article === product_article
+      );
+      if (list_of_order_oem_id) {
+        dispatch(
+          updListOfOrderedProductionOEM({
+            id: list_of_order_oem_id.id,
+            status: 'Reserved',
+          })
+        );
+      }
+    }
   };
 
   return (
