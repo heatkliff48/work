@@ -81,6 +81,8 @@ const WarehouseContextProvider = ({ children }) => {
     },
   ];
 
+  const order_status = ['produced', 'shipment', 'shipped', 'completed'];
+
   const warehouse_data = useSelector((state) => state.warehouse);
   const list_of_reserved_products = useSelector((state) => state.reservedProducts);
   const list_of_ordered_production = useSelector(
@@ -100,37 +102,45 @@ const WarehouseContextProvider = ({ children }) => {
   const { latestProducts } = useProductsContext();
 
   useEffect(() => {
-    const data = list_of_ordered_production.map((el) => {
-      const quantity_cakes = (el.quantity / 3).toFixed(2);
+    const data = list_of_ordered_production
+      .filter((el) => {
+        const orderStatus = list_of_orders.find(
+          (order) => order.article === el.order_article
+        )?.status;
 
-      const orderId = list_of_orders.find(
-        (order) => order.article === el.order_article
-      )?.id;
+        return !['shipment', 'shipped', 'completed'].includes(orderStatus);
+      })
+      .map((el) => {
+        const quantity_cakes = (el.quantity / 3).toFixed(2);
 
-      const productId = latestProducts.find(
-        (product) => product.article === el.product_article
-      )?.id;
+        const orderId = list_of_orders.find(
+          (order) => order.article === el.order_article
+        )?.id;
 
-      const prodOrdId = productsOfOrders.find(
-        (elem) => elem.order_id === orderId && elem.product_id === productId
-      );
+        const productId = latestProducts.find(
+          (product) => product.article === el.product_article
+        )?.id;
 
-      const quantity_in_warehouse = list_of_reserved_products.find(
-        (res_prod) => res_prod.orders_products_id === prodOrdId.id
-      )?.quantity;
+        const prodOrdId = productsOfOrders.find(
+          (elem) => elem.order_id === orderId && elem.product_id === productId
+        )?.id;
 
-      const quantity_in_batch = (
-        batchOutside.find((batch) => batch.id_list_of_ordered_production === el.id)
-          ?.quantity_pallets / 3
-      ).toFixed(2);
+        const quantity_in_warehouse = list_of_reserved_products.find(
+          (res_prod) => res_prod.orders_products_id === prodOrdId
+        )?.quantity;
 
-      return {
-        ...el,
-        quantity_cakes,
-        quantity_in_batch,
-        quantity_in_warehouse,
-      };
-    });
+        const quantity_in_batch = (
+          batchOutside.find((batch) => batch.id_list_of_ordered_production === el.id)
+            ?.quantity_pallets / 3
+        ).toFixed(2);
+
+        return {
+          ...el,
+          quantity_cakes,
+          quantity_in_batch,
+          quantity_in_warehouse,
+        };
+      });
 
     setListOfOrderedCakes(data);
 
@@ -143,18 +153,13 @@ const WarehouseContextProvider = ({ children }) => {
         (product) => product.article === item.product_article
       )?.id;
 
-      const key = `${item.order_article}-${item.product_article}`;
+      const key = item.order_article;
 
       if (!acc[key]) {
         acc[key] = {
-          ...item,
           orderId,
-          productId,
-          total_quantity: item.quantity,
-          quantities_in_warehouse: [],
+          products: [],
         };
-      } else {
-        acc[key].total_quantity += item.quantity;
       }
 
       const prodOrdId = productsOfOrders.filter(
@@ -168,27 +173,31 @@ const WarehouseContextProvider = ({ children }) => {
         return reserved ? reserved.quantity : 0;
       });
 
-      acc[key].quantities_in_warehouse.push(...reservedQuantities);
+      acc[key].products.push({
+        product_article: item.product_article,
+        total_quantity: item.quantity,
+        total_quantity_in_warehouse: reservedQuantities.reduce(
+          (sum, qty) => sum + qty,
+          0
+        ),
+      });
 
       return acc;
     }, {});
 
     Object.values(groupedOrders).forEach((group) => {
       const order = list_of_orders.find((el) => el.id === group.orderId);
-      if (order?.status === 'completed') return;
+      if (order_status.includes(order?.status)) return;
 
-      const totalReserved = group.quantities_in_warehouse.reduce(
-        (sum, quantity) => sum + quantity,
-        0
+      const allMatch = group.products.every(
+        (product) => product.total_quantity <= product.total_quantity_in_warehouse
       );
-
-      const allMatch = group.total_quantity <= totalReserved;
 
       if (allMatch) {
         dispatch(
           updateOrderStatus({
             order_id: group.orderId,
-            status: 'completed',
+            status: 'produced',
           })
         );
       }
