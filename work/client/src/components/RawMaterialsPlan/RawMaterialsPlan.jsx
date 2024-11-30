@@ -55,6 +55,7 @@ function RawMaterialsPlan() {
   };
 
   const mathFunc = (mat_num, product) => {
+    if (!product.current_recipe) return 0;
     return (
       product.current_recipe?.dry_total *
       product.current_recipe[mat_num] *
@@ -153,16 +154,20 @@ function RawMaterialsPlan() {
                 <div>Продукт: {product.product_article}</div>
                 <div>
                   Рецепт:
-                  <Select
-                    onChange={(selectedOption) =>
-                      handleRecipeChange(index, selectedOption)
-                    }
-                    options={product.recipeOptions}
-                    value={{
-                      value: product.current_recipe?.id,
-                      label: product.current_recipe?.article,
-                    }}
-                  />
+                  {product?.current_recipe ? (
+                    <Select
+                      onChange={(selectedOption) =>
+                        handleRecipeChange(index, selectedOption)
+                      }
+                      options={product.recipeOptions}
+                      value={{
+                        value: product.current_recipe?.id,
+                        label: product.current_recipe?.article,
+                      }}
+                    />
+                  ) : (
+                    <> Рецепты отсутствуют</>
+                  )}
                 </div>
                 <div>Количество: {product.quantity}</div>
               </th>

@@ -25,9 +25,11 @@ import { recipeReducer } from './recipeReducer';
 import { recipeOrdersReducer } from './RecipeOrdersReducer';
 import { filesWarehouseReducer } from './filesWarehouseReducer';
 import { filesOrderReducer } from './filesOrderReducer';
+import { dataFetchedReducer } from './dataFetchedReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
+  dataFetched: dataFetchedReducer,
   products: productsReducer,
   jwt: jwtReducer,
   clients: clientsReducer,

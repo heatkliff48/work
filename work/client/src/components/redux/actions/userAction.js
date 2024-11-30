@@ -1,4 +1,5 @@
 import {
+  DATA_FETCHED,
   GET_ADD_USER,
   GET_CHECK_USER,
   GET_DEL_USER,
@@ -28,5 +29,12 @@ export const checkUser = () => {
 export const delUser = () => {
   return {
     type: GET_DEL_USER,
+  };
+};
+
+export const dataFetchedChange = (change) => {
+  return {
+    type: DATA_FETCHED,
+    payload: change,
   };
 };

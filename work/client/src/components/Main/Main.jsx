@@ -14,33 +14,43 @@ import {
   getOrders,
   getProductsOfOrders,
 } from '#components/redux/actions/ordersAction.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
 import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
+import { dataFetchedChange } from '#components/redux/actions/userAction.js';
 
 function Main() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const dataFetched = useSelector((state) => state.dataFetched);
 
   const { roles, checkUserAccess } = useUsersContext();
-  const { modalRoleCard } = useModalContext();
   useEffect(() => {
     if (!user) {
       navigate('/sign-in');
     }
-    dispatch(getAllRoles());
-    dispatch(getAllProducts());
-    dispatch(getAllWarehouse());
-    dispatch(getProductsOfOrders());
-    dispatch(getListOfReservedProducts());
-    dispatch(getListOfOrderedProduction());
-    dispatch(getListOfOrderedProductionOEM());
-    dispatch(getOrders());
+  }, [user]);
+
+  useEffect(() => {
+    if (!dataFetched) {
+      Promise.all([
+        dispatch(getAllRoles()),
+        dispatch(getAllProducts()),
+        dispatch(getAllWarehouse()),
+        dispatch(getProductsOfOrders()),
+        dispatch(getListOfReservedProducts()),
+        dispatch(getListOfOrderedProduction()),
+        dispatch(getListOfOrderedProductionOEM()),
+        dispatch(getOrders()),
+        dispatch(getRecipeOrdersData()),
+      ]).then(() => {
+        // Обновите флаг после завершения запросов
+        dispatch(dataFetchedChange(true));
+      });
+    }
     dispatch(clearBatchState());
-    dispatch(getRecipeOrdersData());
-  }, [user, modalRoleCard]);
+  }, []);
 
   return (
     <div>
