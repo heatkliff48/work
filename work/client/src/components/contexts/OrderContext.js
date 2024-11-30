@@ -109,6 +109,7 @@ const OrderContextProvider = ({ children }) => {
   const [ordersDataList, setOrdersDataList] = useState([]);
   const [orderCartData, setOrderCartData] = useState({});
   const [isOrderReady, setIsOrderReady] = useState(false);
+  const [quantityPallets, setQuantityPallets] = useState({});
 
   const list_of_orders = useSelector((state) => state.orders);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
@@ -118,7 +119,7 @@ const OrderContextProvider = ({ children }) => {
   const autoclaveData = useSelector((state) => state.autoclave);
   useEffect(() => {
     dispatch(getOrders());
-  }, [ isOrderReady]);
+  }, [isOrderReady]);
 
   const getCurrentOrderInfoHandler = useCallback(
     (order_info) => {
@@ -175,6 +176,8 @@ const OrderContextProvider = ({ children }) => {
         autoclaveData,
         autoclave,
         setAutoclave,
+        quantityPallets,
+        setQuantityPallets,
       }}
     >
       {children}

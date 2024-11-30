@@ -15,12 +15,12 @@ import {
   updateBatchOutside,
 } from '#components/redux/actions/batchOutsideAction.js';
 
-function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
+function Autoclave({ autoclave, batchFromBD }) {
   const dispatch = useDispatch();
-  const { setAutoclave } = useOrderContext();
+  const { setAutoclave, quantityPallets, setQuantityPallets } = useOrderContext();
   const [selectedId, setSelectedId] = useState(null);
   const [idColorMap, setIdColorMap] = useState({});
-  const [quantityPallets, setQuantityPallets] = useState(quantity_pallets);
+  // const [quantityPallets, setQuantityPallets] = useState(quantity_pallets);
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const list_of_ordered_production = useSelector(
@@ -287,6 +287,10 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
     });
   };
 
+  useEffect(() => {
+    console.log('quantityPallets', quantityPallets);
+  }, [quantityPallets]);
+
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
     Object.keys(quantityPallets).forEach((key) =>
@@ -345,15 +349,38 @@ function Autoclave({ autoclave, quantity_pallets, batchFromBD }) {
   }, []);
 
   useEffect(() => {
-    Object.keys(quantity_pallets).forEach((id) =>
-      setQuantityPallets((prev) => {
-        return {
-          ...prev,
-          [id]: quantity_pallets[id],
-        };
-      })
-    );
-  }, [quantity_pallets]);
+    // console.log('quantity_pallets', quantity_pallets);
+    console.log('batchOutside', batchOutside);
+    if (batchOutside) {
+      Object.keys(quantityPallets).forEach((id) => {
+        const batch = batchOutside.find(
+          (el) => el.id_list_of_ordered_production === Number(id)
+        );
+        if (batch) {
+          console.log('batch', batch);
+          setQuantityPallets((prev) => {
+            return {
+              ...prev,
+              [id]: batch.quantity_pallets,
+            };
+          });
+        }
+
+        //
+        // setQuantityPallets((prev) => {
+        //   console.log('id', id_list_of_ordered_production);
+        //   const id = id_list_of_ordered_production;
+        //   console.log(
+        //     'quantity_pallets',
+        //     batchOutside[id_list_of_ordered_production].quantity_pallets
+        //   );
+        //   return {
+        //     ...prev,
+        //     [id]: batchOutside[id_list_of_ordered_production].quantity_pallets,
+        //   };
+      });
+    }
+  }, [batchOutside]);
 
   return (
     <div>

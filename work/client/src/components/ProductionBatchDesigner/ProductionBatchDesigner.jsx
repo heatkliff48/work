@@ -15,14 +15,20 @@ function ProductionBatchDesigner() {
 
   const { latestProducts } = useProductsContext();
   const { listOfOrderedCakes } = useWarehouseContext();
-  const { autoclaveData, autoclave, setAutoclave } = useOrderContext();
+  const {
+    autoclaveData,
+    autoclave,
+    setAutoclave,
+    quantityPallets,
+    setQuantityPallets,
+  } = useOrderContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const [batchFromBD, setBatchFromBD] = useState([]);
   const [productionBatchDesigner, setProdBatchDesigner] = useState([]);
   const [currId, setCurrId] = useState(null);
   const [totalQuantity, setTotalQuantity] = useState(0);
-  const [quantityPallets, setQuantityPallets] = useState({});
+  // const [quantityPallets, setQuantityPallets] = useState({});
 
   const MAX_QUANTITY = 1405;
   let countRef = useRef(0);
@@ -204,6 +210,8 @@ function ProductionBatchDesigner() {
           );
 
           if (cakes_residue !== 0) {
+            // console.log('PBD currId', currId);
+            // console.log('PBD QuantityPallets', currentCount * 3);
             setQuantityPallets((prev) => {
               return {
                 ...prev,
@@ -320,7 +328,7 @@ function ProductionBatchDesigner() {
       const batch = prodBatchDesigner.find(
         (prod) => prod.id === unit.id_list_of_ordered_product
       );
-//если нет batch то надо убрать эти объекты назад
+      //если нет batch то надо убрать эти объекты назад
 
       if (!batch)
         return {
@@ -359,7 +367,7 @@ function ProductionBatchDesigner() {
       <div style={{ marginLeft: '20px' }}>
         <Autoclave
           autoclave={autoclave}
-          quantity_pallets={quantityPallets}
+          // quantity_pallets={quantityPallets}
           batchFromBD={batchFromBD}
         />
       </div>
