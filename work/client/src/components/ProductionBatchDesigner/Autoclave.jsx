@@ -20,7 +20,6 @@ function Autoclave({ autoclave, batchFromBD }) {
   const { setAutoclave, quantityPallets, setQuantityPallets } = useOrderContext();
   const [selectedId, setSelectedId] = useState(null);
   const [idColorMap, setIdColorMap] = useState({});
-  // const [quantityPallets, setQuantityPallets] = useState(quantity_pallets);
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const list_of_ordered_production = useSelector(
@@ -295,14 +294,14 @@ function Autoclave({ autoclave, batchFromBD }) {
     dispatch(saveAutoclave(autoclave));
     Object.keys(quantityPallets).forEach((key) =>
       quantityPallets[key] === undefined ? delete quantityPallets[key] : {}
-    ); // delete undefined from obj
+    );
 
     // !!! add setQuantityPallets to other Autoclave add/delete actions/functions
 
     for (const id in quantityPallets) {
       if (id !== undefined) {
         const { quantity } = list_of_ordered_production.find(
-          (el) => el.id == Number(id)
+          (el) => el.id === Number(id)
         );
 
         const quantity_free = quantityPallets[id] - quantity;
@@ -349,15 +348,12 @@ function Autoclave({ autoclave, batchFromBD }) {
   }, []);
 
   useEffect(() => {
-    // console.log('quantity_pallets', quantity_pallets);
-    console.log('batchOutside', batchOutside);
     if (batchOutside) {
       Object.keys(quantityPallets).forEach((id) => {
         const batch = batchOutside.find(
           (el) => el.id_list_of_ordered_production === Number(id)
         );
         if (batch) {
-          console.log('batch', batch);
           setQuantityPallets((prev) => {
             return {
               ...prev,
@@ -365,19 +361,6 @@ function Autoclave({ autoclave, batchFromBD }) {
             };
           });
         }
-
-        //
-        // setQuantityPallets((prev) => {
-        //   console.log('id', id_list_of_ordered_production);
-        //   const id = id_list_of_ordered_production;
-        //   console.log(
-        //     'quantity_pallets',
-        //     batchOutside[id_list_of_ordered_production].quantity_pallets
-        //   );
-        //   return {
-        //     ...prev,
-        //     [id]: batchOutside[id_list_of_ordered_production].quantity_pallets,
-        //   };
       });
     }
   }, [batchOutside]);

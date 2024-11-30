@@ -77,21 +77,26 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
 
   useEffect(() => {
     const wh = getWarehouse();
-    const filteredProductsOfOrders = productsOfOrders.filter(
-      (item) => item.product_id === wh.product_id
-    );
 
-    const result = filteredProductsOfOrders.map((product) => {
-      const order = list_of_orders.find((order) => order.id === product.order_id);
-      return {
-        productsOfOrders_id: product.id,
-        order_article: order ? order.article : '',
-        quantity_palet: product.quantity_palet,
-      };
-    });
+    const result = productsOfOrders
+      .filter((item) => {
+        const haveReserve = list_of_reserved_products.find(
+          (el) => el.orders_products_id === item.id
+        );
+        return !haveReserve && item.product_id === wh.product_id;
+      })
+      .map((product) => {
+        const order = list_of_orders.find((order) => order.id === product.order_id);
+
+        return {
+          productsOfOrders_id: product.id,
+          order_article: order ? order.article : '',
+          quantity_palet: product.quantity_palet,
+        };
+      });
 
     setFilteredProducts(result);
-  }, [productsOfOrders]);
+  }, [productsOfOrders, list_of_reserved_products]);
 
   useEffect(() => {
     if (user && roles.length > 0) {

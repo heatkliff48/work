@@ -208,7 +208,6 @@ export const ProductsContextProvider = ({ children }) => {
     []
   );
 
-  // Мемоизация списка продуктов
   const latestProducts = useMemo(() => {
     const newProductList = products?.reduce((acc, product) => {
       const { article, version } = product;

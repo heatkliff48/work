@@ -9,26 +9,21 @@ import {
   unlockButton,
   updateBatchState,
 } from '#components/redux/actions/batchDesignerAction.js';
+import { BiCycling } from 'react-icons/bi';
 
 function ProductionBatchDesigner() {
   const dispatch = useDispatch();
 
   const { latestProducts } = useProductsContext();
   const { listOfOrderedCakes } = useWarehouseContext();
-  const {
-    autoclaveData,
-    autoclave,
-    setAutoclave,
-    quantityPallets,
-    setQuantityPallets,
-  } = useOrderContext();
+  const { autoclaveData, autoclave, setAutoclave, setQuantityPallets } =
+    useOrderContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const [batchFromBD, setBatchFromBD] = useState([]);
   const [productionBatchDesigner, setProdBatchDesigner] = useState([]);
   const [currId, setCurrId] = useState(null);
   const [totalQuantity, setTotalQuantity] = useState(0);
-  // const [quantityPallets, setQuantityPallets] = useState({});
 
   const MAX_QUANTITY = 1405;
   let countRef = useRef(0);
@@ -210,8 +205,6 @@ function ProductionBatchDesigner() {
           );
 
           if (cakes_residue !== 0) {
-            // console.log('PBD currId', currId);
-            // console.log('PBD QuantityPallets', currentCount * 3);
             setQuantityPallets((prev) => {
               return {
                 ...prev,
@@ -311,7 +304,6 @@ function ProductionBatchDesigner() {
     setProdBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
 
-    //Неправильно сетиться автоклав если у нас нет какого-то батча
     const updatedAutoclaveData = transformAutoclaveData(autoclaveData, prodBatch);
 
     const filledAutoclave = [];
@@ -365,11 +357,7 @@ function ProductionBatchDesigner() {
 
       {/* Компонент Autoclave */}
       <div style={{ marginLeft: '20px' }}>
-        <Autoclave
-          autoclave={autoclave}
-          // quantity_pallets={quantityPallets}
-          batchFromBD={batchFromBD}
-        />
+        <Autoclave autoclave={autoclave} batchFromBD={batchFromBD} />
       </div>
     </div>
   );
