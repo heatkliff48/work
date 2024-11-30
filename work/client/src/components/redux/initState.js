@@ -1,5 +1,6 @@
 const initState = {
   user: {},
+  dataFetched:false,
   products: [],
   // jwt: null,
   clients: [],

@@ -9,3 +9,5 @@ export const LOGIN_USER = 'LOGIN_USER';
 
 export const GET_CHECK_USER = 'GET_CHECK_USER';
 export const CHECK_USER = 'CHECK_USER';
+
+export const DATA_FETCHED = 'DATA_FETCHED';

@@ -286,10 +286,6 @@ function Autoclave({ autoclave, batchFromBD }) {
     });
   };
 
-  useEffect(() => {
-    console.log('quantityPallets', quantityPallets);
-  }, [quantityPallets]);
-
   const onSaveHandler = () => {
     dispatch(saveAutoclave(autoclave));
     Object.keys(quantityPallets).forEach((key) =>
