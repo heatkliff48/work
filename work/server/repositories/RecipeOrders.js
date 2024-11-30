@@ -22,15 +22,16 @@ class RecipeOrdersRepository {
         await RecipeOrders.create(obj);
         recipeOrders.push(obj);
       }
+      const allRecipeOrders = await RecipeOrders.findAll();
 
-      return recipeOrders;
+      return allRecipeOrders;
     }
 
     const newRecipes = material_plan.filter((newRecipe) => {
       return !allRecipeOrdersInDB.some(
         (existingRecipe) =>
           existingRecipe.id_batch === newRecipe.id_batch &&
-          existingRecipe.id_recipe === newRecipe.id_recipe
+          existingRecipe.id_recipe === newRecipe.current_recipe.id
       );
     });
 
@@ -44,7 +45,9 @@ class RecipeOrdersRepository {
         };
         await RecipeOrders.create(obj);
       }
-      return newRecipes;
+      const allRecipeOrders = await RecipeOrders.findAll();
+
+      return allRecipeOrders;
     }
     return;
   }
