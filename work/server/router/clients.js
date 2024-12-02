@@ -10,20 +10,20 @@ const {
 } = require('../src/constants/event.js');
 
 clientsRouter.get('/', async (req, res) => {
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
+  // const fingerprint = req.fingerprint.hash;
+  // const { id, username, email } = req.session.user;
 
   try {
     const allClients = await Clients.findAll({
       order: [['id', 'ASC']],
     });
 
-    const payload = { id, username, email };
+    // const payload = { id, username, email };
 
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
+    // const { accessToken, refreshToken } = await TokenService.getTokens(
+    //   payload,
+    //   fingerprint
+    // );
 
     return res.status(200).json({ allClients });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
@@ -38,8 +38,6 @@ clientsRouter.get('/', async (req, res) => {
 });
 
 clientsRouter.post('/', async (req, res) => {
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
   const { c_name, tin, category } = req.body.client;
 
   try {
@@ -48,13 +46,6 @@ clientsRouter.post('/', async (req, res) => {
       tin,
       category,
     });
-
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
 
     myEmitter.emit(ADD_NEW_CLIENT_SOCKET, client);
     return res.status(200); //.json({ client });
@@ -71,21 +62,11 @@ clientsRouter.post('/', async (req, res) => {
 });
 
 clientsRouter.get('/:id', async (req, res) => {
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
-
   try {
     const lastID = await Clients.findOne({
       attributes: ['id'],
       order: [['id', 'DESC']],
     });
-
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
 
     return res.status(200).json({ lastID });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
@@ -102,9 +83,6 @@ clientsRouter.get('/:id', async (req, res) => {
 });
 
 clientsRouter.post('/update/:c_id', async (req, res) => {
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
-
   const { c_id, c_name, tin, category } = req.body.client;
 
   try {
@@ -122,13 +100,6 @@ clientsRouter.post('/update/:c_id', async (req, res) => {
         returning: true,
         plain: true,
       }
-    );
-
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
     );
 
     myEmitter.emit(UPDATE_CLIENT_SOCKET, client);
