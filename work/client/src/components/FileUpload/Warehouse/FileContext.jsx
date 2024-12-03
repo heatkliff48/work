@@ -13,7 +13,7 @@ export const FileProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // dispatch(getFilesWarehouse());
+    dispatch(getFilesWarehouse());
   }, []);
 
   const refreshFiles = async () => {
