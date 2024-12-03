@@ -137,7 +137,6 @@ function ProductionBatchDesigner() {
 
   const renderGroupedRows = useCallback(() => {
     let currentDensity = null;
-
     return productionBatchDesigner.flatMap((row, index) => {
       const rows = [];
 
