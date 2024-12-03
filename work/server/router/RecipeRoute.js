@@ -7,6 +7,8 @@ const {
 } = require('../src/constants/event.js');
 
 recipeRouter.get('/', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>recipeRouter get');
+
   try {
     const recipe = await Recipe.findAll({
       order: [['id', 'ASC']],
@@ -15,10 +17,13 @@ recipeRouter.get('/', async (req, res) => {
     return res.status(200).json({ recipe });
   } catch (err) {
     console.error(err.message);
+    return res.json({err})
   }
 });
 
 recipeRouter.post('/', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>recipeRouter post');
+
   const {
     article,
     density,
@@ -63,13 +68,16 @@ recipeRouter.post('/', async (req, res) => {
     });
 
     myEmitter.emit(ADD_NEW_RECIPE_SOCKET, recipe);
+    return res.status(200)
   } catch (err) {
-    console.error(err.message);
+    console.error('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',err.message);
     return res.status(500).json(err);
   }
 });
 
 recipeRouter.post('/delete', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>recipeRouter delete');
+
   const { recipe_id } = req.body;
 
   try {

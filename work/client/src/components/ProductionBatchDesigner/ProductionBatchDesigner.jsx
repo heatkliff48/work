@@ -58,7 +58,7 @@ function ProductionBatchDesigner() {
 
         let cakesPlaced = 0;
         let count = 0;
-        // Логика изменения состояния
+
         const row = productionBatchDesigner.find((r) => r.id === currId);
         if (row) {
           const { id, density, width, cakes_residue } = row;
@@ -137,7 +137,6 @@ function ProductionBatchDesigner() {
 
   const renderGroupedRows = useCallback(() => {
     let currentDensity = null;
-
     return productionBatchDesigner.flatMap((row, index) => {
       const rows = [];
 
@@ -184,18 +183,22 @@ function ProductionBatchDesigner() {
   }, [productionBatchDesigner]);
 
   useEffect(() => {
+    if (currId === null || autoclave.length === 0) return;
     const currentCount =
       countRef.current === 0
         ? batchDesigner.find((el) => el.id === currId)?.cakes_in_batch ?? 0
         : countRef?.current;
 
     setProdBatchDesigner((prevBatch) => {
-      return prevBatch.map((batchItem) => {
-        const { cakes_in_batch, total_cakes, cakes_residue } = batchItem;
+      let hasChanges = false;
+      const updatedBatch = prevBatch.map((batchItem) => {
+        if (batchItem.id === currId) {
+          const { cakes_residue, cakes_in_batch } = batchItem;
+          const new_cakes_residue = Math.max(cakes_residue - currentCount, 0);
+          if (cakes_residue !== new_cakes_residue) {
+            hasChanges = true;
+          }
 
-        if (batchItem?.id === currId) {
-          const new_cakes_residue =
-            cakes_residue - currentCount < 0 ? 0 : cakes_residue - currentCount;
           dispatch(
             updateBatchState({
               id: currId,
@@ -222,14 +225,13 @@ function ProductionBatchDesigner() {
           return {
             ...batchItem,
             cakes_in_batch: cakes_in_batch + currentCount,
-            cakes_residue: total_cakes - (cakes_in_batch + currentCount) ?? 0,
+            cakes_residue: new_cakes_residue,
           };
         }
-
         return batchItem;
       });
+      return hasChanges ? updatedBatch : prevBatch;
     });
-    countRef.current = 0;
   }, [autoclave, currId]);
 
   useEffect(() => {
@@ -237,22 +239,6 @@ function ProductionBatchDesigner() {
       return prev.map((batchItem) => {
         for (let i = 0; i < batchDesigner.length; i++) {
           if (batchDesigner[i].id === batchItem.id) {
-            // ------------- возможно это понадобится
-
-            // if (
-            //   !batchDesigner?.find((el) => el.id === batchItem.id)?.isButtonLocked
-            // ) {
-            //   setQuantityPallets((prev) => {
-            //     return {
-            //       ...prev,
-            //       [batchDesigner[i].id]: batchDesigner[i].cakes_in_batch * 3,
-            //     };
-            //   });
-            // }
-            // console.log(
-            //   'batchDesigner[i].cakes_in_batch',
-            //   batchDesigner[i].cakes_in_batch
-            // );
             return {
               ...batchItem,
               cakes_in_batch: batchDesigner[i].cakes_in_batch,

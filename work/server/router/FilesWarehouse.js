@@ -15,10 +15,13 @@ filesWarehouseRouter.get('/', async (req, res) => {
     return res.status(200).json({ filesWarehouse });
   } catch (err) {
     console.error(err.message);
+    return res.json({ error: 'Internal Server Error' }).status(500);
   }
 });
 
 filesWarehouseRouter.post('/', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>filesOrderRouter post');
+
   const { warehouse_id, file_name } = req.body;
 
   try {
@@ -28,22 +31,25 @@ filesWarehouseRouter.post('/', async (req, res) => {
     });
 
     myEmitter.emit(ADD_NEW_FILES_WAREHOUSE_SOCKET, filesWarehouse);
+    return res.status(200);
   } catch (err) {
     console.error(err.message);
-    return res.status(500).json(err);
+    return res.json({ error: 'Internal Server Error' }).status(500);
   }
 });
 
 filesWarehouseRouter.post('/delete', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>filesOrderRouter delete');
+
   const { warehouse_id } = req.body;
 
   try {
     await FilesWarehouse.destroy({ where: { id: warehouse_id } });
 
     myEmitter.emit(DELETE_FILES_WAREHOUSE_SOCKET, warehouse_id);
-    return res.status(200);
   } catch (err) {
-    return ErrorUtils.catchError(res, err);
+    console.error(err.message);
+    return res.json({ error: 'Internal Server Error' }).status(500);
   }
 });
 

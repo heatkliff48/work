@@ -12,6 +12,8 @@ const {
 const { ErrorUtils } = require('../utils/Errors.js');
 
 batchOutsideRouter.get('/', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter get');
+
   const fingerprint = req.fingerprint.hash;
   const { id, username, email } = req.session.user;
 
@@ -20,28 +22,18 @@ batchOutsideRouter.get('/', async (req, res) => {
       order: [['id', 'ASC']],
     });
 
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
     return res.status(200).json({ batchOutside });
-    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-    // .json({
-    //   fullBatchOutside,
-    //   accessToken,
-    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    // });
   } catch (err) {
     console.error(err.message);
   }
 });
 
 batchOutsideRouter.post('/', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter post');
+
   const fingerprint = req.fingerprint.hash;
   const { id, username, email } = req.session.user;
+
   const {
     id_warehouse_batch,
     id_list_of_ordered_production,
@@ -60,13 +52,6 @@ batchOutsideRouter.post('/', async (req, res) => {
       quantity_free,
       on_check,
     });
-
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
 
     myEmitter.emit(ADD_NEW_BATCH_OUTSIDE_SOCKET, batchOutside);
     return res.status(200); //.json({ client });
@@ -116,6 +101,8 @@ batchOutsideRouter.post('/', async (req, res) => {
 // });
 
 batchOutsideRouter.post('/update/:id', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter /update/:id');
+
   const {
     id,
     id_warehouse_batch,
@@ -154,6 +141,8 @@ batchOutsideRouter.post('/update/:id', async (req, res) => {
 });
 
 batchOutsideRouter.post('/delete', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter delete');
+
   const { batch_id } = req.body;
 
   try {

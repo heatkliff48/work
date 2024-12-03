@@ -12,6 +12,7 @@ import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import Table from '#components/Table/Table.jsx';
 import { addNewRecipe } from '#components/redux/actions/recipeAction.js';
+import '#components/Styles/modal.css';
 
 function AddNewRecipeModal({ show, onHide }) {
   const [recipeInput, setRecipeInput] = useState({});
@@ -144,9 +145,10 @@ function AddNewRecipeModal({ show, onHide }) {
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
-        dialogClassName="modal-auto-size"
+        dialogClassName="modal-dialog"
         show={show}
         onHide={onHide}
+        scrollable={true}
       >
         <Modal.Header closeButton>
           {haveProduct ? (
