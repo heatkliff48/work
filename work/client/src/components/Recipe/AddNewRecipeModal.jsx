@@ -169,6 +169,7 @@ function AddNewRecipeModal({ show, onHide }) {
                   onSubmitForm(e);
                 }}
               >
+                <h3></h3>
                 <Row>
                   {recipe_info.map((el) => {
                     if (el.accessor === 'id' || el.accessor === 'article')

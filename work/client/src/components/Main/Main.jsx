@@ -16,7 +16,7 @@ import {
 } from '#components/redux/actions/ordersAction.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
-import { getRecipe, getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
+import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
 import { dataFetchedChange } from '#components/redux/actions/userAction.js';
 
 function Main() {
@@ -66,7 +66,6 @@ function Main() {
     dispatch(getOrders());
     dispatch(getRecipeOrdersData());
     dispatch(clearBatchState());
-    dispatch(getRecipe());
     //dispatch(dataFetchedChange(true));
   }, [user]);
 

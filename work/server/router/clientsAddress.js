@@ -1,5 +1,8 @@
 const clientsAddress = require('express').Router();
 const { ClientLegalAddresses } = require('../db/models');
+const TokenService = require('../services/Token.js');
+const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
+const { COOKIE_SETTINGS } = require('../constants.js');
 const myEmitter = require('../src/ee.js');
 const {
   ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
@@ -7,6 +10,9 @@ const {
 } = require('../src/constants/event.js');
 
 clientsAddress.post('/', async (req, res) => {
+  const fingerprint = req.fingerprint.hash;
+  const { id, username, email } = req.session.user;
+
   try {
     const {
       street,
@@ -29,6 +35,14 @@ clientsAddress.post('/', async (req, res) => {
       phone_number,
       email,
     });
+
+    const payload = { id, username, email };
+
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
+
     myEmitter.emit(ADD_CLIENTS_LEGAL_ADDRESS_SOCKET, legalAddress);
     return res.status(200).json({ legalAddress });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
@@ -43,8 +57,19 @@ clientsAddress.post('/', async (req, res) => {
 });
 
 clientsAddress.get('/', async (req, res) => {
+  const fingerprint = req.fingerprint.hash;
+  const { id, username, email } = req.session.user;
+
   try {
     const legalAddress = await ClientLegalAddresses.findAll();
+
+    const payload = { id, username, email };
+
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
+
     return res.status(200).json({ legalAddress });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({
@@ -58,6 +83,9 @@ clientsAddress.get('/', async (req, res) => {
 });
 
 clientsAddress.get('/:c_id', async (req, res) => {
+  const fingerprint = req.fingerprint.hash;
+  const { id, username, email } = req.session.user;
+
   try {
     const { c_id } = req.params;
     const legalAddress = await ClientLegalAddresses.findOne({
@@ -65,6 +93,14 @@ clientsAddress.get('/:c_id', async (req, res) => {
         id: c_id,
       },
     });
+
+    const payload = { id, username, email };
+
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
+
     return res.status(200).json({ legalAddress });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({
@@ -78,6 +114,9 @@ clientsAddress.get('/:c_id', async (req, res) => {
 });
 
 clientsAddress.post('/update/:c_id', async (req, res) => {
+  const fingerprint = req.fingerprint.hash;
+  const { id, username, email } = req.session.user;
+
   try {
     const {
       c_id,
@@ -109,6 +148,13 @@ clientsAddress.post('/update/:c_id', async (req, res) => {
         returning: true,
         plain: true,
       }
+    );
+
+    const payload = { id, username, email };
+
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
     );
 
     myEmitter.emit(UPDATE_LEGAL_ADDRESS_SOCKET, legalAddress);

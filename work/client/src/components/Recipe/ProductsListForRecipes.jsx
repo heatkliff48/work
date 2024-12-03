@@ -53,7 +53,6 @@ const ProductsListForRecipes = () => {
   useEffect(() => {
     if (userAccess?.canRead) {
       dispatch(getRecipe());
-      console.log('list_of_recipes', list_of_recipes);
     }
   }, []);
 

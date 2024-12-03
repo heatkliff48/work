@@ -1,9 +1,15 @@
 const deliveryAddress = require('express').Router();
 const { DeliveryAddresses } = require('../db/models');
+const TokenService = require('../services/Token.js');
+const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
+const { COOKIE_SETTINGS } = require('../constants.js');
 const myEmitter = require('../src/ee.js');
 const { ADD_DELIVERY_ADDRESSES_SOCKET } = require('../src/constants/event.js');
 
 deliveryAddress.post('/', async (req, res) => {
+  const fingerprint = req.fingerprint.hash;
+  const { id, username, email } = req.session.user;
+
   try {
     const {
       currentClientID,
@@ -28,6 +34,14 @@ deliveryAddress.post('/', async (req, res) => {
       phone_number,
       email,
     });
+
+    const payload = { id, username, email };
+
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
+
     myEmitter.emit(ADD_DELIVERY_ADDRESSES_SOCKET, deliveryAddress);
     return res.status(200).json({ deliveryAddress });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
@@ -42,8 +56,18 @@ deliveryAddress.post('/', async (req, res) => {
 });
 
 deliveryAddress.get('/', async (req, res) => {
+  const fingerprint = req.fingerprint.hash;
+  const { id, username, email } = req.session.user;
+
   try {
     const deliveryAddresses = await DeliveryAddresses.findAll();
+    const payload = { id, username, email };
+
+    const { accessToken, refreshToken } = await TokenService.getTokens(
+      payload,
+      fingerprint
+    );
+
     return res.status(200).json({ deliveryAddresses });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({

@@ -150,11 +150,10 @@ class WarehouseRepository {
 
     try {
       const { warehouse_id, new_remaining_stock } = upd_rem_srock;
-      const upd = await Warehouses.update(
+      await Warehouses.update(
         { remaining_stock: new_remaining_stock },
         { where: { id: warehouse_id } }
       );
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd',upd);
       return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);

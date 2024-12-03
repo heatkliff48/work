@@ -34,37 +34,9 @@ const recipeOrdersRouter = require('./router/RecipeOrders.js');
 const fileUpload = require('./router/fileUpload.js');
 const filesWarehouseRouter = require('./router/FilesWarehouse.js');
 const filesOrderRouter = require('./router/FilesOrder.js');
-const winston = require('winston');
 
 const app = express();
 const map = new Map();
-
-
-const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    transports: [
-        new winston.transports.File({ filename: 'error.log', level: 'error' }),
-        new winston.transports.Console({ format: winston.format.simple() }),
-    ],
-});
-
-app.use((req, res, next) => {
-    logger.info(`Request: ${req.method} ${req.url}`);
-    next();
-});
-
-module.exports.logger = logger;
-
-// Memory Monitoring
-setInterval(() => {
-    const memoryUsage = process.memoryUsage();
-    console.log(`Memory usage: ${JSON.stringify(memoryUsage)}`);
-    if (memoryUsage.rss > 300 * 1024 * 1024) { // Limit set to 300 MB
-        console.error('Memory limit exceeded! Restarting server...');
-        process.exit(1); // Exit process to trigger pm2 restart
-    }
-}, 60000);
 
 const sessionParser = session({
   name: 'sesid',
