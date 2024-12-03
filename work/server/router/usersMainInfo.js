@@ -1,26 +1,11 @@
 const usersMainInfoRouter = require('express').Router();
-const { Users } = require('../db/models/index.js');
-const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
 const bcrypt = require('bcryptjs');
 
 usersMainInfoRouter.get('/', async (req, res) => {
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
-
   try {
     const allUsersMainInfo = await Users.findAll({
       order: [['id', 'ASC']],
     });
-
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
     return res.status(200).json({ allUsersMainInfo });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({
@@ -34,9 +19,6 @@ usersMainInfoRouter.get('/', async (req, res) => {
 });
 
 usersMainInfoRouter.post('/', async (req, res) => {
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
-
   try {
     const { u_username, u_email, password, role } = req.body.usersMainInfo;
 
@@ -48,11 +30,6 @@ usersMainInfoRouter.post('/', async (req, res) => {
       password: hashedPassword,
       role,
     });
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
 
     return res.status(200).json({ usersMainInfo });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
@@ -68,8 +45,6 @@ usersMainInfoRouter.post('/', async (req, res) => {
 });
 
 usersMainInfoRouter.post('/update/:u_id', async (req, res) => {
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
   const { u_id, password } = req.body.usersMainInfo;
 
   const hashedPassword = bcrypt.hashSync(password, 8);
@@ -86,13 +61,6 @@ usersMainInfoRouter.post('/update/:u_id', async (req, res) => {
         returning: true,
         plain: true,
       }
-    );
-
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
     );
 
     return res.status(200).json({ usersMainInfo });

@@ -1,8 +1,5 @@
 const batchOutsideRouter = require('express').Router();
 const { BatchOutside } = require('../db/models/index.js');
-const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
 const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_BATCH_OUTSIDE_SOCKET,
@@ -14,20 +11,10 @@ const { ErrorUtils } = require('../utils/Errors.js');
 batchOutsideRouter.get('/', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter get');
 
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
-
   try {
     const batchOutside = await BatchOutside.findAll({
       order: [['id', 'ASC']],
     });
-
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
 
     return res.status(200).json({ batchOutside });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
@@ -44,8 +31,6 @@ batchOutsideRouter.get('/', async (req, res) => {
 batchOutsideRouter.post('/', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter post');
 
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
   const {
     id_warehouse_batch,
     id_list_of_ordered_production,
@@ -65,13 +50,6 @@ batchOutsideRouter.post('/', async (req, res) => {
       on_check,
     });
 
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
     myEmitter.emit(ADD_NEW_BATCH_OUTSIDE_SOCKET, batchOutside);
     return res.status(200); //.json({ client });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
@@ -89,21 +67,11 @@ batchOutsideRouter.post('/', async (req, res) => {
 // get одной записи
 
 // batchOutsideRouter.get('/:id', async (req, res) => {
-//   const fingerprint = req.fingerprint.hash;
-//   const { id, username, email } = req.session.user;
-
 //   try {
 //     const lastID = await BatchOutside.findOne({
 //       attributes: ['id'],
 //       order: [['id', 'DESC']],
 //     });
-
-//     const payload = { id, username, email };
-
-//     const { accessToken, refreshToken } = await TokenService.getTokens(
-//       payload,
-//       fingerprint
-//     );
 
 //     return res.status(200).json({ lastID });
 //     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)

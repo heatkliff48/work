@@ -1,6 +1,5 @@
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
-const TokenService = require('./Token.js');
 const {
   NotFound,
   Forbidden,

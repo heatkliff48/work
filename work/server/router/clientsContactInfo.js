@@ -1,15 +1,9 @@
 const clientsContactInfo = require('express').Router();
 const { ContactInfos } = require('../db/models');
-const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
 const myEmitter = require('../src/ee.js');
 const { ADD_CONTACT_INFO_SOCKET } = require('../src/constants/event.js');
 
 clientsContactInfo.post('/', async (req, res) => {
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
-
   try {
     const {
       currentClientID,
@@ -41,13 +35,6 @@ clientsContactInfo.post('/', async (req, res) => {
       social,
     });
 
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
     myEmitter.emit(ADD_CONTACT_INFO_SOCKET, contactInfo);
     return res.status(200).json({ contactInfo });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
@@ -62,18 +49,8 @@ clientsContactInfo.post('/', async (req, res) => {
 });
 
 clientsContactInfo.get('/', async (req, res) => {
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
-
   try {
     const contactInfo = await ContactInfos.findAll();
-    const payload = { id, username, email };
-
-    const { accessToken, refreshToken } = await TokenService.getTokens(
-      payload,
-      fingerprint
-    );
-
     return res.status(200).json({ contactInfo });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({

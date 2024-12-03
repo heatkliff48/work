@@ -1,16 +1,12 @@
 const ClientsService = require('../services/Clients.js');
 const { ErrorUtils } = require('../utils/Errors.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
 const myEmitter = require('../src/ee.js');
 const { ADD_NEW_CLIENT_SOCKET } = require('../src/constants/event.js');
 
 class ClientsController {
   static async getAllClients(req, res) {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.body.user;
     try {
-      const { accessToken, refreshToken, accessTokenExpiration, clients } =
-        await ClientsService.getAllClients({ id, username, email, fingerprint });
+      const { clients } = await ClientsService.getAllClients({});
 
       return res.status(200).json({ clients });
       // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
@@ -21,19 +17,12 @@ class ClientsController {
   }
 
   static async addClient(req, res) {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.body.user;
-    const { client } = req.body;
+    const new_client = req.body.client;
 
     try {
-      const { accessToken, refreshToken, accessTokenExpiration, client } =
-        await ClientsService.addNewClient({
-          id,
-          username,
-          email,
-          fingerprint,
-          client,
-        });
+      const { client } = await ClientsService.addNewClient(
+        new_client,
+      );
       myEmitter.emit(ADD_NEW_CLIENT_SOCKET, client);
       return res.status(200); //.json({ client });
       // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)

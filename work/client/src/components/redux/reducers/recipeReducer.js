@@ -8,6 +8,7 @@ export const recipeReducer = (recipe = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case FULL_RECIPE: {
+      console.log('FULL_RECIPE', payload);
       return payload;
     }
     case NEW_RECIPE_SOCKET: {
