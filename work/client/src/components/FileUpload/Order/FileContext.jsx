@@ -13,7 +13,7 @@ export const FileProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // dispatch(getFilesOrder());
+    dispatch(getFilesOrder());
   }, []);
 
   const refreshFiles = async () => {
