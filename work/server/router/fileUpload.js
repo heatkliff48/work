@@ -7,14 +7,14 @@ const fs = require('fs');
 const storage = multer.diskStorage({
   destination: './uploads',
   filename: (req, file, cb) => {
-    cb(null, file.originalname); // Use the original filename
+    cb(null, file.originalname);
   },
 });
 
 // Init upload
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1000000 }, // 1MB
+  limits: { fileSize: 5000000 }, // 5MB
   fileFilter: (req, file, cb) => {
     checkFileType(file, cb);
   },
@@ -40,14 +40,21 @@ function checkFileType(file, cb) {
 
 // Upload endpoint
 fileUpload.post('/upload', (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>fileUpload upload');
+
+  if (!fs.existsSync('./uploads')) {
+    fs.mkdirSync('./uploads');
+  }
+  
   upload(req, res, (err) => {
     if (err) {
-      res.status(400).send(err);
+      console.error(err.message);
+      return res.status(500).json({ error: 'Internal Server Error' });
     } else {
       if (req.file == undefined) {
-        res.status(400).send('No file selected!');
+        return res.status(400).send('No file selected!');
       } else {
-        res.status(200).send(`File uploaded: ${req.file.filename}`);
+        return res.status(200).send(`File uploaded: ${req.file.filename}`);
       }
     }
   });
@@ -55,12 +62,14 @@ fileUpload.post('/upload', (req, res) => {
 
 // Download endpoint
 fileUpload.get('/download/:filename', (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>fileUpload download/:filename');
+
   const filePath = path.resolve(__dirname, '..', 'uploads', req.params.filename);
   console.log(`Attempting to download file: ${filePath}`);
   res.download(filePath, (err) => {
     if (err) {
       console.error(`Error downloading file: ${err}`);
-      res.status(500).send({
+      return res.status(500).send({
         message: 'Could not download the file. ' + err,
       });
     }
@@ -69,11 +78,13 @@ fileUpload.get('/download/:filename', (req, res) => {
 
 // Get list of files endpoint
 fileUpload.get('/files', (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>fileUpload files');
+
   fs.readdir('./uploads', (err, files) => {
     if (err) {
       return res.status(500).send('Unable to scan directory: ' + err);
     }
-    res.json(files);
+    return res.json(files);
   });
 });
 

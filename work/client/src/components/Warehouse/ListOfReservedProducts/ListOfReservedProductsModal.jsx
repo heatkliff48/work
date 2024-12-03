@@ -87,7 +87,6 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
       })
       .map((product) => {
         const order = list_of_orders.find((order) => order.id === product.order_id);
-
         return {
           productsOfOrders_id: product.id,
           order_article: order ? order.article : '',

@@ -26,31 +26,48 @@ function Main() {
   const dataFetched = useSelector((state) => state.dataFetched);
 
   const { roles, checkUserAccess } = useUsersContext();
+  // useEffect(() => {
+  //   if (!user) {
+  //     navigate('/sign-in');
+  //   }
+  // }, [user]);
+
+  // useEffect(() => {
+  //   if (!dataFetched) {
+  //     Promise.all([
+  //       dispatch(getAllRoles()),
+  //       dispatch(getAllProducts()),
+  //       dispatch(getAllWarehouse()),
+  //       dispatch(getProductsOfOrders()),
+  //       dispatch(getListOfReservedProducts()),
+  //       dispatch(getListOfOrderedProduction()),
+  //       dispatch(getListOfOrderedProductionOEM()),
+  //       dispatch(getOrders()),
+  //       dispatch(getRecipeOrdersData()),
+  //     ]).then(() => {
+  //       // Обновите флаг после завершения запросов
+  //       dispatch(dataFetchedChange(true));
+  //     });
+  //   }
+  //   dispatch(clearBatchState());
+  // }, []);
+
   useEffect(() => {
     if (!user) {
       navigate('/sign-in');
     }
-  }, [user]);
-
-  useEffect(() => {
-    if (!dataFetched) {
-      Promise.all([
-        dispatch(getAllRoles()),
-        dispatch(getAllProducts()),
-        dispatch(getAllWarehouse()),
-        dispatch(getProductsOfOrders()),
-        dispatch(getListOfReservedProducts()),
-        dispatch(getListOfOrderedProduction()),
-        dispatch(getListOfOrderedProductionOEM()),
-        dispatch(getOrders()),
-        dispatch(getRecipeOrdersData()),
-      ]).then(() => {
-        // Обновите флаг после завершения запросов
-        dispatch(dataFetchedChange(true));
-      });
-    }
+    dispatch(getAllRoles());
+    dispatch(getAllProducts());
+    dispatch(getAllWarehouse());
+    dispatch(getProductsOfOrders());
+    dispatch(getListOfReservedProducts());
+    dispatch(getListOfOrderedProduction());
+    dispatch(getListOfOrderedProductionOEM());
+    dispatch(getOrders());
+    dispatch(getRecipeOrdersData());
     dispatch(clearBatchState());
-  }, []);
+    //dispatch(dataFetchedChange(true));
+  }, [user]);
 
   return (
     <div>
