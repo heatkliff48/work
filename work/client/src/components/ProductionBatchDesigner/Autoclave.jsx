@@ -150,7 +150,7 @@ function Autoclave({ autoclave, batchFromBD }) {
         setQuantityPallets((prev) => {
           return {
             ...prev,
-            [id]: count,
+            [id]: count * 3,
           };
         });
       } else {
@@ -307,27 +307,42 @@ function Autoclave({ autoclave, batchFromBD }) {
             (el) => el.id_list_of_ordered_production === Number(id)
           );
           dispatch(deleteBatchOutside(currentBatch?.id));
+          setQuantityPallets((prev) => {
+            return {
+              ...prev,
+              [Number(id)]: 0,
+            };
+          });
         } else if (
           batchOutside.find(
             (el) => el.id_list_of_ordered_production === Number(id)
           ) !== undefined
         ) {
+          const currentBatchID = batchOutside.find(
+            (el) => el.id_list_of_ordered_production === Number(id)
+          ).id;
           dispatch(
             updateBatchOutside({
-              id: Number(id),
+              id: currentBatchID,
               id_warehouse_batch: 'w',
-              id_list_of_ordered_production: id,
+              id_list_of_ordered_production: Number(id),
               quantity_pallets: quantityPallets[id],
               quantity_ordered: quantity,
               quantity_free,
               on_check: 0,
             })
           );
+          setQuantityPallets((prev) => {
+            return {
+              ...prev,
+              [Number(id)]: quantityPallets[id],
+            };
+          });
         } else {
           dispatch(
             addNewBatchOutside({
               id_warehouse_batch: 'w',
-              id_list_of_ordered_production: id,
+              id_list_of_ordered_production: Number(id),
               quantity_pallets: quantityPallets[id],
               quantity_ordered: quantity,
               quantity_free,
@@ -343,23 +358,34 @@ function Autoclave({ autoclave, batchFromBD }) {
     dispatch(getAutoclave());
   }, []);
 
-  useEffect(() => {
-    if (batchOutside) {
-      Object.keys(quantityPallets).forEach((id) => {
-        const batch = batchOutside.find(
-          (el) => el.id_list_of_ordered_production === Number(id)
-        );
-        if (batch) {
-          setQuantityPallets((prev) => {
-            return {
-              ...prev,
-              [id]: batch.quantity_pallets,
-            };
-          });
-        }
-      });
-    }
-  }, [batchOutside]);
+  // ------------- ne udalay pls
+
+  // useEffect(() => {
+  //   // console.log('batchOutside', batchOutside);
+  //   // console.log('list_of_ordered_production', list_of_ordered_production);
+  //   if (batchOutside) {
+  //     list_of_ordered_production.forEach((ordered) => {
+  //       // console.log('id', ordered);
+  //       const batch = batchOutside.find(
+  //         (el) => el.id_list_of_ordered_production === Number(ordered.id)
+  //       );
+  //       if (batch) {
+  //         console.log('batch', batch);
+  //         console.log('ordered.id', ordered.id);
+  //         setQuantityPallets((prev) => {
+  //           return {
+  //             ...prev,
+  //             [ordered.id]: batch.quantity_pallets,
+  //           };
+  //         });
+  //       }
+  //     });
+  //   }
+  // }, [batchOutside]);
+
+  // useEffect(() => {
+  //   console.log('quantityPallets', quantityPallets);
+  // }, [quantityPallets]);
 
   return (
     <div>
