@@ -9,7 +9,6 @@ import {
   unlockButton,
   updateBatchState,
 } from '#components/redux/actions/batchDesignerAction.js';
-import { BiCycling } from 'react-icons/bi';
 
 function ProductionBatchDesigner() {
   const dispatch = useDispatch();
@@ -46,33 +45,41 @@ function ProductionBatchDesigner() {
     []
   );
 
-  const addOnAutoclave = (row) => {
-    let count = 0;
+  const handleAddOnAutoclave = (row) => {
     setCurrId(row.id);
+  };
 
-    setAutoclave((prevAutoclave) => {
-      const newAutoclaveState = prevAutoclave.map((autoclaveRow) =>
-        autoclaveRow.map((cell) => ({ ...cell }))
-      );
+  useEffect(() => {
+    if (currId !== null) {
+      setAutoclave((prevAutoclave) => {
+        const newAutoclaveState = prevAutoclave.map((autoclaveRow) =>
+          autoclaveRow.map((cell) => ({ ...cell }))
+        );
 
-      const { id, density, width, cakes_residue } = row;
-      let cakesPlaced = 0;
+        let cakesPlaced = 0;
+        let count = 0;
+        // Логика изменения состояния
+        const row = productionBatchDesigner.find((r) => r.id === currId);
+        if (row) {
+          const { id, density, width, cakes_residue } = row;
 
-      for (let i = 0; i < newAutoclaveState.length; i++) {
-        for (let j = 0; j < newAutoclaveState[i].length; j++) {
-          if (!newAutoclaveState[i][j].id && cakesPlaced < cakes_residue) {
-            newAutoclaveState[i][j] = { id, density, width };
-            cakesPlaced++;
-            count++;
+          for (let i = 0; i < newAutoclaveState.length; i++) {
+            for (let j = 0; j < newAutoclaveState[i].length; j++) {
+              if (!newAutoclaveState[i][j].id && cakesPlaced < cakes_residue) {
+                newAutoclaveState[i][j] = { id, density, width };
+                cakesPlaced++;
+                count++;
+              }
+            }
+            if (cakesPlaced >= cakes_residue) break;
           }
         }
-        if (cakesPlaced >= cakes_residue) break;
-      }
 
-      countRef.current = count;
-      return newAutoclaveState;
-    });
-  };
+        countRef.current = count;
+        return newAutoclaveState;
+      });
+    }
+  }, [currId]);
 
   const addCakesData = useCallback((prodBatch) => {
     const quantity_cakes = (prodBatch.product_with_brack / 3).toFixed(2);
@@ -150,7 +157,7 @@ function ProductionBatchDesigner() {
           })}
           <td>
             <button
-              onClick={() => addOnAutoclave(row)}
+              onClick={() => handleAddOnAutoclave(row)}
               disabled={
                 batchDesigner?.find((el) => el.id === row.id)?.isButtonLocked
               }
