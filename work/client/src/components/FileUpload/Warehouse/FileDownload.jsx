@@ -4,7 +4,7 @@ import { FileContext } from './FileContext';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 
 const FileDownload = () => {
-  const { files, message, setMessage, filesWarehouse } = useContext(FileContext);
+  const { message, setMessage, filesWarehouse } = useContext(FileContext);
   const [selectedFile, setSelectedFile] = useState('');
   const [filteredFiles, setFilteredFiles] = useState(filesWarehouse);
   const { warehouseInfoCurIdModal } = useModalContext();

@@ -4,7 +4,7 @@ import { FileContext } from './FileContext';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 
 const FileDownload = () => {
-  const { files, message, setMessage, filesOrder } = useContext(FileContext);
+  const {  message, setMessage, filesOrder } = useContext(FileContext);
   const [selectedFile, setSelectedFile] = useState('');
   const [filteredFiles, setFilteredFiles] = useState(filesOrder);
   const { orderCartData } = useOrderContext();
