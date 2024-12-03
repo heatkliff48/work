@@ -12,6 +12,8 @@ const {
 const { ErrorUtils } = require('../utils/Errors.js');
 
 batchOutsideRouter.get('/', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter get');
+
   const fingerprint = req.fingerprint.hash;
   const { id, username, email } = req.session.user;
 
@@ -40,6 +42,8 @@ batchOutsideRouter.get('/', async (req, res) => {
 });
 
 batchOutsideRouter.post('/', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter post');
+
   const fingerprint = req.fingerprint.hash;
   const { id, username, email } = req.session.user;
   const {
@@ -116,6 +120,8 @@ batchOutsideRouter.post('/', async (req, res) => {
 // });
 
 batchOutsideRouter.post('/update/:id', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter /update/:id');
+
   const {
     id,
     id_warehouse_batch,
@@ -154,6 +160,8 @@ batchOutsideRouter.post('/update/:id', async (req, res) => {
 });
 
 batchOutsideRouter.post('/delete', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter delete');
+
   const { batch_id } = req.body;
 
   try {

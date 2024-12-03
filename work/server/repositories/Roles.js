@@ -2,81 +2,101 @@ const { Roles, Pages, PageAndRoles } = require('../db/models');
 
 class RolesRepository {
   static async getAllRolesData() {
-    const roles = await Roles.findAll({
-      include: {
-        model: Pages,
-        as: 'PageAndRolesArray',
-      },
-    });
+    try {
+      const roles = await Roles.findAll({
+        include: {
+          model: Pages,
+          as: 'PageAndRolesArray',
+        },
+      });
 
-    return roles;
+      return roles;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
   }
 
   static async updateRolesData(updRole) {
-    const results = [];
-    const { id: role_id, PageAndRolesArray } = updRole;
+    try {
+      const results = [];
+      const { id: role_id, PageAndRolesArray } = updRole;
 
-    for (const pageData of PageAndRolesArray) {
-      const { id: page_id, PageAndRoles: pageAndRolesData } = pageData;
+      for (const pageData of PageAndRolesArray) {
+        const { id: page_id, PageAndRoles: pageAndRolesData } = pageData;
 
-      // Проверяем, существует ли pageAndRolesData и имеет ли он свойства write и read
-      const write =
-        pageAndRolesData && typeof pageAndRolesData.write === 'boolean'
-          ? pageAndRolesData.write
-          : false;
-      const read =
-        pageAndRolesData && typeof pageAndRolesData.read === 'boolean'
-          ? pageAndRolesData.read
-          : false;
+        // Проверяем, существует ли pageAndRolesData и имеет ли он свойства write и read
+        const write =
+          pageAndRolesData && typeof pageAndRolesData.write === 'boolean'
+            ? pageAndRolesData.write
+            : false;
+        const read =
+          pageAndRolesData && typeof pageAndRolesData.read === 'boolean'
+            ? pageAndRolesData.read
+            : false;
 
-      const existingPageAndRoles = await PageAndRoles.findOne({
-        where: { page_id, role_id },
-      });
-
-      let updRoleData;
-
-      if (!existingPageAndRoles) {
-        updRoleData = await PageAndRoles.create({
-          page_id,
-          role_id,
-          write,
-          read,
+        const existingPageAndRoles = await PageAndRoles.findOne({
+          where: { page_id, role_id },
         });
-      } else {
-        [, updRoleData] = await PageAndRoles.update(
-          { write, read },
-          {
-            where: { page_id, role_id },
-            returning: true,
-            plain: true,
-          }
-        );
-      }
 
-      results.push(updRoleData);
+        let updRoleData;
+
+        if (!existingPageAndRoles) {
+          updRoleData = await PageAndRoles.create({
+            page_id,
+            role_id,
+            write,
+            read,
+          });
+        } else {
+          [, updRoleData] = await PageAndRoles.update(
+            { write, read },
+            {
+              where: { page_id, role_id },
+              returning: true,
+              plain: true,
+            }
+          );
+        }
+
+        results.push(updRoleData);
+      }
+      return results;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
     }
-    return results;
   }
 
   static async updateActiveRolesData(updActiveRole) {
-    const updActiveRoleData = [];
+    try {
+      const updActiveRoleData = [];
 
-    for (const updRole of updActiveRole) {
-      const updatedRole = await Roles.update(updRole, {
-        where: { id: updRole.id },
-        returning: true,
-        plain: true,
-      });
+      for (const updRole of updActiveRole) {
+        const updatedRole = await Roles.update(updRole, {
+          where: { id: updRole.id },
+          returning: true,
+          plain: true,
+        });
 
-      updActiveRoleData.push(updatedRole[1]); // Добавляем обновленную роль в массив
+        updActiveRoleData.push(updatedRole[1]); // Добавляем обновленную роль в массив
+      }
+
+      return updActiveRoleData;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
     }
-
-    return updActiveRoleData;
   }
 
   static async getPagesListData() {
-    const pages = await Pages.findAll();
-    return pages;
+    try {
+      const pages = await Pages.findAll();
+      return pages;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
   }
 }
 

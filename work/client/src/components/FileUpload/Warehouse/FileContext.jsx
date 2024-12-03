@@ -13,17 +13,7 @@ export const FileProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getFilesWarehouse());
-    const fetchFiles = async () => {
-      try {
-        const res = await axios.get('http://localhost:3001/files/files');
-        setFiles(res.data);
-      } catch (err) {
-        setMessage('Error fetching files');
-      }
-    };
-
-    fetchFiles();
+    // dispatch(getFilesWarehouse());
   }, []);
 
   const refreshFiles = async () => {

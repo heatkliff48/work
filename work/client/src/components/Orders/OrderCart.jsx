@@ -408,9 +408,9 @@ const OrderCart = React.memo(() => {
                       setNewOrder((prev) => ({
                         ...prev,
                         article: orderCartData.article,
-                        owner: orderCartData.owner.id,
+                        owner: orderCartData.owner?.id,
                         status: orderCartData.status,
-                        del_adr_id: orderCartData.deliveryAddress.id,
+                        del_adr_id: orderCartData.deliveryAddress?.id,
                       }));
                       setProductModalOrder(!productModalOrder);
                     }}

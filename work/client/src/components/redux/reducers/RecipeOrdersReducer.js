@@ -13,8 +13,7 @@ export const recipeOrdersReducer = (recipeOrders = [], action) => {
     }
 
     case NEW_MATERIAL_PLAN_SOCKET: {
-      const new_recipe_orders = recipeOrders.concat(payload);
-      return new_recipe_orders;
+      return payload ?? recipeOrders;
     }
 
     case NEES_DELETE_MATERIAL_PLAN_SOCKET: {

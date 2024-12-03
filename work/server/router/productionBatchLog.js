@@ -2,6 +2,7 @@ const productionBatchLogRouter = require('express').Router();
 const { ProductionBatchLog } = require('../db/models');
 
 productionBatchLogRouter.get('/', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>productionBatchLogRouter get');
 
   try {
     const productionBatchLog = await ProductionBatchLog.findAll({
@@ -15,6 +16,7 @@ productionBatchLogRouter.get('/', async (req, res) => {
 });
 
 productionBatchLogRouter.post('/', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>productionBatchLogRouter post');
 
   const { products_article, orders_article, production_date } =
     req.body.productionBatchLog;
@@ -35,6 +37,7 @@ productionBatchLogRouter.post('/', async (req, res) => {
 });
 
 productionBatchLogRouter.post('/update/:l_id', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>productionBatchLogRouter update/:l_id');
 
   const { l_id, products_article, orders_article, production_date } =
     req.body.productionBatchLog;
