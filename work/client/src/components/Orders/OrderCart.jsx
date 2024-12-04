@@ -329,10 +329,10 @@ const OrderCart = React.memo(() => {
           toggle={() => setWarehouseInfoModal(!warehouseInfoModal)}
         />
       )}
-  
+
       <div className="page-container">
         <h4>Order Card: {orderCartData?.article}</h4>
-  
+
         <div className="header-container">
           <div className="owner-info">
             <h4>Client Information</h4>
@@ -488,7 +488,7 @@ const OrderCart = React.memo(() => {
           )}
         </div>
       </div>
-      <FilesMain />
+      <FilesMain userAccess={userAccess} />
       {orderCartData &&
         Array.isArray(updatedProductListOrder) &&
         updatedProductListOrder.length > 0 &&
@@ -501,6 +501,5 @@ const OrderCart = React.memo(() => {
         )}
     </>
   );
-  
 });
 export default OrderCart;
