@@ -57,7 +57,7 @@ function RawMaterialsPlan() {
   const mathFunc = (mat_num, product) => {
     if (!product.current_recipe) return 0;
     return (
-      product.current_recipe?.dry_total *
+      // product.current_recipe?.dry_total *
       product.current_recipe[mat_num] *
       product.quantity
     ).toFixed(2);
