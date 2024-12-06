@@ -6,7 +6,7 @@ import Table from '#components/Table/Table.jsx';
 import { getUpdateProductOfOrders } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
-import '#components/Styles/modal.css';
+import '#components/Styles/modals.css';
 
 const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -121,7 +121,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
           setProductOfOrder({});
           setSelectedProduct({});
         }}
-        className="modal-dialog"
+        className="modal-products-table"
         scrollable={true}
       >
         <ModalHeader

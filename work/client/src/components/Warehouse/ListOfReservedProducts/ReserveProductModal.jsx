@@ -2,13 +2,14 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { updateAutoclave } from '#components/redux/actions/autoclaveAction.js';
+import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import {
   addNewReservedProducts,
   updateRemainingStock,
   updListOfOrderedProductionOEM,
 } from '#components/redux/actions/warehouseAction.js';
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Modal, ModalHeader, ModalBody, Table } from 'reactstrap';
 
 const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
@@ -19,6 +20,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
   } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
   const dispatch = useDispatch();
+  const batchOutside = useSelector((state) => state.batchOutside);
 
   const addReservedProductHandler = (res_prod) => {
     const { quantity_palet, productsOfOrders_id, order_article } = res_prod;
@@ -38,8 +40,16 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
       (el) =>
         el.order_article === order_article && el.product_article === product_article
     );
+    console.log('list_of_order_id', list_of_order_id);
     if (list_of_order_id) {
       dispatch(updateAutoclave(list_of_order_id));
+      const currBatchID = batchOutside.find(
+        (el) => el.id_list_of_ordered_production === list_of_order_id.id
+      );
+      console.log('currBatchID', currBatchID.id);
+      if (currBatchID) {
+        dispatch(deleteBatchOutside(currBatchID.id));
+      }
     }
 
     dispatch(
