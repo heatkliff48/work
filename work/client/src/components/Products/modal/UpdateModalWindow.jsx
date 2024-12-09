@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { updateProduct } from '#components/redux/actions/productsAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 
 function UpdateModalWindow() {
   const { promProduct, setPromProduct } = useProjectContext();
@@ -15,6 +16,7 @@ function UpdateModalWindow() {
     setModalProductCard,
     modalProductCard,
   } = useModalContext();
+  const { selectOptions } = useProductsContext();
 
   const dispatch = useDispatch();
   const productData = useSelector((state) => state.products).findLast(
@@ -22,7 +24,22 @@ function UpdateModalWindow() {
   );
 
   const updateHadler = () => {
-    const updProduct = { ...promProduct, version: productData.version + 1 };
+    const { placeOfProduction, typeOfPackaging } = promProduct;
+    const updProduct = {
+      ...promProduct,
+      version: productData.version + 1,
+      placeOfProduction:
+        typeof placeOfProduction === 'number'
+          ? placeOfProduction
+          : selectOptions.placeOfProduction.find(
+              (el) => el.label === placeOfProduction
+            ).value,
+      typeOfPackaging:
+        typeof typeOfPackaging === 'number'
+          ? typeOfPackaging
+          : selectOptions.typeOfPackaging.find((el) => el.label === typeOfPackaging)
+              .value,
+    };
     setStayDefault(true);
     dispatch(updateProduct({ product: updProduct }));
     setPromProduct({});
