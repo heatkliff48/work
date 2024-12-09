@@ -55,31 +55,46 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
       typeOfPackaging,
     } = formInput;
 
-    const miniWidth = width?.toString().slice(0, 2);
-    const miniHeight = height?.toString().slice(0, 2);
-    const miniLengths = lengths?.toString().slice(0, 2);
-    const miniPlaceOfProduction = placeOfProduction?.toString().slice(0, 1);
-    const miniTypeOfPackaging = typeOfPackaging?.toString().slice(0, 1);
-
-    const prodArticle = `T.${form?.toUpperCase()}${miniPlaceOfProduction}${miniTypeOfPackaging}0${certificate?.substr(
+    const prodArticle = `T.${form?.toUpperCase()}${placeOfProduction}${typeOfPackaging}0${certificate?.substr(
       0,
       1
-    )}${density}${miniWidth}${miniHeight}${miniLengths}`;
+    )}${density}${width}${height}${lengths}`;
 
-    const isExistingProduct = products.some((product) => {
-      return product.article === prodArticle;
-    });
+    const updatedProduct = {
+      ...formInput,
+      placeOfProduction:
+        typeof placeOfProduction === 'number'
+          ? placeOfProduction
+          : selectOptions.placeOfProduction.find(
+              (el) => el.label === placeOfProduction
+            ).value,
+      typeOfPackaging:
+        typeof typeOfPackaging === 'number'
+          ? typeOfPackaging
+          : selectOptions.typeOfPackaging.find((el) => el.label === typeOfPackaging)
+              .value,
+      article: prodArticle,
+    };
+
+    console.log('updatedProduct', updatedProduct);
+
+    const isExistingProduct = products.some(
+      (product) => product.article === prodArticle
+    );
 
     if (isExistingProduct) {
       const existingProduct = products.find(
         (product) => product.article === prodArticle
       );
-      setPromProduct({ ...formInput, id: existingProduct.id, article: prodArticle });
+      setPromProduct({
+        ...updatedProduct,
+        id: existingProduct.id,
+      });
       setModalUpdate(!modalUpdate);
     } else {
       setModal(!modal);
       setModalProductCard(false);
-      dispatch(addNewProduct({ product: { ...formInput, article: prodArticle } }));
+      dispatch(addNewProduct({ product: updatedProduct }));
       clearData();
     }
   };
@@ -188,7 +203,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
       // Вычисление densityHuminityMax
       if (formInput?.humidity && values.densityDryMax) {
         values.densityHuminityMax = (
-          (1.05 + formInput?.humidity) *
+          (1.05 + formInput?.humidity * 0.01) *
           values.densityDryMax
         ).toFixed(2);
         updateFuncs.densityHuminityMax = (value) =>
@@ -201,7 +216,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
       // Вычисление densityHuminityDef
       if (formInput?.humidity && values.densityDryDef) {
         values.densityHuminityDef = (
-          (1 + formInput?.humidity) *
+          (1 + formInput?.humidity * 0.01) *
           values.densityDryDef
         ).toFixed(2);
         updateFuncs.densityHuminityDef = (value) =>
@@ -387,7 +402,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
                       if (articleId < 0) setArticleId(el.id);
                       setFormInput((prev) => ({
                         ...prev,
-                        [el.accessor]: option.value,
+                        [el.accessor]: option.value, // Используем value вместо label
                       }));
                     }}
                     options={selectOptions[el.accessor]}

@@ -117,11 +117,11 @@ export const ProductsContextProvider = ({ children }) => {
       accessor: 'm',
     },
     {
-      Header: 'Width in the array',
+      Header: 'Width in the cakes',
       accessor: 'widthInArray',
     },
     {
-      Header: 'M3 in the array',
+      Header: 'M3 in the cakes',
       accessor: 'm3InArray',
     },
     {
@@ -194,6 +194,7 @@ export const ProductsContextProvider = ({ children }) => {
       certificate: [
         { value: 'CE', label: 'CE' },
         { value: 'DAU', label: 'DAU' },
+        { value: 'DoP', label: 'DoP' },
       ],
       placeOfProduction: [
         { value: 0, label: 'Spain' },
@@ -222,6 +223,8 @@ export const ProductsContextProvider = ({ children }) => {
 
     newProductList?.sort((a, b) => a.id - b.id);
 
+
+    
     const newlatestProducts = newProductList.map((prod) => {
       const newPlaceOfProduction = selectOptions.placeOfProduction.find(
         (opt) => opt.value == prod.placeOfProduction
