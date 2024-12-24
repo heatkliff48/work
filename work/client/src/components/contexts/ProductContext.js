@@ -24,13 +24,12 @@ export const ProductsContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
       disableSortBy: true,
     },
-
-    {
-      Header: 'Version',
-      accessor: 'version',
-      defaultValue: 1,
-      sortType: 'number',
-    },
+    // {
+    //   Header: 'Version',
+    //   accessor: 'version',
+    //   defaultValue: 1,
+    //   sortType: 'number',
+    // },
     {
       Header: 'Density, kg/m³',
       accessor: 'density',
@@ -112,66 +111,66 @@ export const ProductsContextProvider = ({ children }) => {
       Header: 'M2 per pallet',
       accessor: 'm2',
     },
-    {
-      Header: 'Linear metre per pallet',
-      accessor: 'm',
-    },
-    {
-      Header: 'Width in the cakes',
-      accessor: 'widthInArray',
-    },
-    {
-      Header: 'M3 in the cakes',
-      accessor: 'm3InArray',
-    },
-    {
-      Header: 'Dry density max, kg/m³',
-      accessor: 'densityDryMax',
-    },
-    {
-      Header: 'Dry density default, kg/m³',
-      accessor: 'densityDryDef',
-    },
-    {
-      Header: 'Humidity, %',
-      accessor: 'humidity',
-      defaultValue: 30,
-      Filter: NumberRangeColumnFilter,
-      filter: 'between',
-      sortType: 'number',
-      min: 0,
-      max: 100,
-    },
-    {
-      Header: 'Density wet max, kg/m³',
-      accessor: 'densityHuminityMax',
-    },
-    {
-      Header: 'Density wet default, kg/m³',
-      accessor: 'densityHuminityDef',
-    },
-    {
-      Header: 'Product pallet weight max, kg',
-      accessor: 'weightMax',
-    },
-    {
-      Header: 'Product pallet weight default, kg',
-      accessor: 'weightDef',
-    },
-    {
-      Header: 'Norm of defect, %',
-      accessor: 'normOfBrack',
-      defaultValue: 2,
-      Filter: NumberRangeColumnFilter,
-      filter: 'between',
-      sortType: 'number',
-    },
-    {
-      Header: 'Priority for free products',
-      accessor: 'coefficientOfFree',
-      defaultValue: 0.5,
-      sortType: 'number',
-    },
+    // {
+    //   Header: 'Linear metre per pallet',
+    //   accessor: 'm',
+    // },
+    // {
+    //   Header: 'Width in the cakes',
+    //   accessor: 'widthInArray',
+    // },
+    // {
+    //   Header: 'M3 in the cakes',
+    //   accessor: 'm3InArray',
+    // },
+    // {
+    //   Header: 'Dry density max, kg/m³',
+    //   accessor: 'densityDryMax',
+    // },
+    // {
+    //   Header: 'Dry density default, kg/m³',
+    //   accessor: 'densityDryDef',
+    // },
+    // {
+    //   Header: 'Humidity, %',
+    //   accessor: 'humidity',
+    //   defaultValue: 30,
+    //   Filter: NumberRangeColumnFilter,
+    //   filter: 'between',
+    //   sortType: 'number',
+    //   min: 0,
+    //   max: 100,
+    // },
+    // {
+    //   Header: 'Density wet max, kg/m³',
+    //   accessor: 'densityHuminityMax',
+    // },
+    // {
+    //   Header: 'Density wet default, kg/m³',
+    //   accessor: 'densityHuminityDef',
+    // },
+    // {
+    //   Header: 'Product pallet weight max, kg',
+    //   accessor: 'weightMax',
+    // },
+    // {
+    //   Header: 'Product pallet weight default, kg',
+    //   accessor: 'weightDef',
+    // },
+    // {
+    //   Header: 'Norm of defect, %',
+    //   accessor: 'normOfBrack',
+    //   defaultValue: 2,
+    //   Filter: NumberRangeColumnFilter,
+    //   filter: 'between',
+    //   sortType: 'number',
+    // },
+    // {
+    //   Header: 'Priority for free products',
+    //   accessor: 'coefficientOfFree',
+    //   defaultValue: 0.5,
+    //   sortType: 'number',
+    // },
     {
       Header: 'Price per m³',
       accessor: 'price',
@@ -223,8 +222,6 @@ export const ProductsContextProvider = ({ children }) => {
 
     newProductList?.sort((a, b) => a.id - b.id);
 
-
-    
     const newlatestProducts = newProductList.map((prod) => {
       const newPlaceOfProduction = selectOptions.placeOfProduction.find(
         (opt) => opt.value == prod.placeOfProduction

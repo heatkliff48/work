@@ -19,6 +19,8 @@ import {
   UPDATE_ROLE_ACTIVE_SOCKET,
   UPDATE_ROLE_SOCKET,
   NEES_DELETE_MATERIAL_PLAN_SOCKET,
+  NEW_FILES_PRODUCT_SOCKET,
+  NEED_DELETE_FILES_PRODUCT_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -144,6 +146,20 @@ export const deleteFilesOrderSocket = (order_id) => {
   return {
     type: NEED_DELETE_FILES_ORDER_SOCKET,
     payload: order_id,
+  };
+};
+
+export const addNewFilesProductSocket = (filesProduct) => {
+  return {
+    type: NEW_FILES_PRODUCT_SOCKET,
+    payload: filesProduct,
+  };
+};
+
+export const deleteFilesProductSocket = (product_id) => {
+  return {
+    type: NEED_DELETE_FILES_PRODUCT_SOCKET,
+    payload: product_id,
   };
 };
 

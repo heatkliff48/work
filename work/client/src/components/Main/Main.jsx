@@ -72,6 +72,9 @@ function Main() {
   return (
     <div>
       <p>MAIN PAGE</p>
+      {checkUserAccess(user, roles, 'Roles')?.canRead && (
+        <button onClick={() => navigate('/roles')}>Roles</button>
+      )}
       {checkUserAccess(user, roles, 'Products')?.canRead && (
         <button onClick={() => navigate('/products')}>Products</button>
       )}

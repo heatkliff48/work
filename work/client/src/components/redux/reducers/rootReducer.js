@@ -26,6 +26,7 @@ import { recipeOrdersReducer } from './RecipeOrdersReducer';
 import { filesWarehouseReducer } from './filesWarehouseReducer';
 import { filesOrderReducer } from './filesOrderReducer';
 import { dataFetchedReducer } from './dataFetchedReducer';
+import { filesProductReducer } from './filesProductReducer';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -54,4 +55,5 @@ export const rootReducer = combineReducers({
   recipeOrders: recipeOrdersReducer,
   filesWarehouse: filesWarehouseReducer,
   filesOrder: filesOrderReducer,
+  filesProduct: filesProductReducer,
 });

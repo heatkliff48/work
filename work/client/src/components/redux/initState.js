@@ -1,6 +1,6 @@
 const initState = {
   user: {},
-  dataFetched:false,
+  dataFetched: false,
   products: [],
   // jwt: null,
   clients: [],
@@ -23,6 +23,7 @@ const initState = {
   recipeOrders: [],
   filesWarehouse: [],
   filesOrder: [],
+  filesProduct: [],
 };
 
 export default initState;

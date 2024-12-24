@@ -234,8 +234,8 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
       }
 
       // Вычисление weightDef
-      if (values.densityHuminityDef && values.m3) {
-        values.weightDef = (values.densityHuminityDef * values.m3 + 23).toFixed(2);
+      if (values.densityDryDef && values.m3) {
+        values.weightDef = (values.densityDryDef * values.m3 + 23).toFixed(2);
         updateFuncs.weightDef = (value) =>
           setFormInput((prev) => ({ ...prev, weightDef: value }));
       }
