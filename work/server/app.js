@@ -34,6 +34,7 @@ const recipeOrdersRouter = require('./router/RecipeOrders.js');
 const fileUpload = require('./router/fileUpload.js');
 const filesWarehouseRouter = require('./router/FilesWarehouse.js');
 const filesOrderRouter = require('./router/FilesOrder.js');
+const filesProductRouter = require('./router/FilesProduct.js');
 
 const app = express();
 const map = new Map();
@@ -79,7 +80,6 @@ app.use((err, req, res, next) => {
   res.status(500).send('Internal Server Error');
 });
 
-
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 
@@ -102,6 +102,7 @@ app.use('/recipe_orders', recipeOrdersRouter);
 app.use('/files', fileUpload);
 app.use('/filesWarehouse', filesWarehouseRouter);
 app.use('/filesOrder', filesOrderRouter);
+app.use('/filesProduct', filesProductRouter);
 
 // Обработка WebSocket соединений
 server.on('upgrade', function (req, socket, head) {
