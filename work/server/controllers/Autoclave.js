@@ -14,9 +14,9 @@ class AutoclaveController {
 
   static async saveAutoclave(req, res) {
     try {
-      await AutoclaveService.saveAutoclave(req.body);
+      const newAutoclave = await AutoclaveService.saveAutoclave(req.body);
 
-      return res.sendStatus(200);
+      return res.json(newAutoclave).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

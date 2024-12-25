@@ -54,9 +54,9 @@ function* getAutoclaveWatcher(action) {
 
 function* saveAutoclaveWatcher(action) {
   try {
-    yield call(saveAutoclave, action.payload);
+    const new_data = yield call(saveAutoclave, action.payload);
 
-    yield put({ type: NEW_SAVE_AUTOCLAVE, payload: action.payload });
+    yield put({ type: NEW_SAVE_AUTOCLAVE, payload: new_data });
   } catch (err) {
     console.log('saveAutoclaveWatcher', err);
   }

@@ -10,13 +10,15 @@ class AutoclaveService {
   }
 
   static async saveAutoclave(autoclave) {
-    await AutoclavesRepository.saveAutoclave(autoclave);
+    const newAutoclave = await AutoclavesRepository.saveAutoclave(autoclave);
 
-    return;
+    return newAutoclave;
   }
 
   static async updateAutoclave(list_of_order_id) {
-    const newAutoclave = await AutoclavesRepository.updateAutoclave(list_of_order_id);
+    const newAutoclave = await AutoclavesRepository.updateAutoclave(
+      list_of_order_id
+    );
 
     return newAutoclave;
   }

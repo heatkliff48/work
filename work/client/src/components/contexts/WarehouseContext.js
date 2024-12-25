@@ -103,8 +103,8 @@ const WarehouseContextProvider = ({ children }) => {
 
   useEffect(() => {
     const data = list_of_ordered_production
-      .filter((el) => {
-        const orderStatus = list_of_orders.find(
+      ?.filter((el) => {
+        const orderStatus = list_of_orders?.find(
           (order) => order.article === el.order_article
         )?.status;
 
