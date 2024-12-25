@@ -12,11 +12,15 @@ export const autoclaveReducer = (autoclave = [], action) => {
     }
 
     case NEW_SAVE_AUTOCLAVE: {
-      return payload;
+      console.log('NEW_SAVE_AUTOCLAVE', payload);
+
+      return payload ?? autoclave;
     }
 
     case NEW_AUTOCLAVE: {
-      return payload;
+      console.log('NEW_AUTOCLAVE', payload);
+
+      return payload ?? autoclave;
     }
 
     default:

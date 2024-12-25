@@ -89,7 +89,6 @@ function ProductionBatchDesigner() {
     const free_product_package = Math.ceil(free_product_cakes * 3);
 
     const total_cakes = Math.ceil(quantity_cakes);
-
     const cakes_in_batch = autoclaveData?.filter(
       (unit) => unit.id_list_of_ordered_product === prodBatch.id
     ).length;
@@ -285,7 +284,7 @@ function ProductionBatchDesigner() {
             density,
             width,
             quantity,
-            product_with_brack: quantity * (1 + normOfBrack / 100),
+            product_with_brack: (quantity * (1 + normOfBrack / 100)).toFixed(2),
             quantity_m3: (normOfBrack * m3).toFixed(2),
           });
           prodBatch.push(batch);
@@ -296,7 +295,6 @@ function ProductionBatchDesigner() {
 
     setProdBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
-
     const updatedAutoclaveData = transformAutoclaveData(autoclaveData, prodBatch);
 
     const filledAutoclave = [];
@@ -313,7 +311,6 @@ function ProductionBatchDesigner() {
       const batch = prodBatchDesigner.find(
         (prod) => prod.id === unit.id_list_of_ordered_product
       );
-      //если нет batch то надо убрать эти объекты назад
 
       if (!batch)
         return {

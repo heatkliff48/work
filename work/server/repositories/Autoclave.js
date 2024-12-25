@@ -111,8 +111,11 @@ class AutoclavesRepository {
         );
         count++;
       }
+      const newAutoclave = await Autoclaves.findAll({
+        order: [['id', 'ASC']],
+      });
 
-      return;
+      return newAutoclave;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
@@ -159,6 +162,7 @@ class AutoclavesRepository {
       const newAutoclave = await Autoclaves.findAll({
         order: [['id', 'ASC']],
       });
+
       return newAutoclave;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
