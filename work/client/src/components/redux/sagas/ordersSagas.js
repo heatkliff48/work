@@ -159,12 +159,13 @@ function* getOrdersListWatcher() {
 
 function* addNewOrderWatcher(action) {
   try {
-    yield call(addNewOrder, action.payload);
+    const newOrder = yield call(addNewOrder, action.payload);
 
     // accessTokenFront = yield select((state) => state.jwt);
     // const { newOrder, accessToken, accessTokenExpiration } = yield call(addNewOrder, action.payload);
     // window.localStorage.setItem('jwt', accessToken);
     // yield put(setToken(accessToken, accessTokenExpiration));
+    yield put({ type: NEW_ORDER, payload: newOrder });
   } catch (err) {
     console.error(err);
     yield put({ type: NEW_ORDER, payload: [] });
@@ -329,7 +330,9 @@ function* updateDeliveryOfOrderWorker(action) {
 function* updateStatusOfOrderWorker(action) {
   try {
     const { payload } = action;
-    yield call(updateStatusOfOrder, payload);
+    const status = yield call(updateStatusOfOrder, payload);
+    yield put({ type: STATUS_OF_ORDER, payload: status });
+
   } catch (err) {
     yield put({ type: STATUS_OF_ORDER, payload: [] });
   }

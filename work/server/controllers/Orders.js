@@ -34,7 +34,7 @@ class OrdersController {
 
       myEmitter.emit(ADD_NEW_ORDER_SOCKET, newOrder);
 
-      return res.status(200);
+      return res.status(200).json(newOrder);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -149,7 +149,7 @@ class OrdersController {
 
       myEmitter.emit(UPDATE_STATUS_OF_ORDER_SOCKET, { status, order_id });
 
-      return res.status(200);
+      return res.json({ status, order_id }).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

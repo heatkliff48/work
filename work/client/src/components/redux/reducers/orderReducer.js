@@ -4,6 +4,7 @@ import {
   NEW_CONTACT_OF_ORDER,
   NEW_DELIVERY_OF_ORDER,
   STATUS_OF_ORDER,
+  NEW_ORDER,
 } from '../types/ordersTypes';
 import {
   DATASHIP_ORDER_SOCKET,
@@ -19,6 +20,11 @@ export const ordersReducer = (orders = [], action) => {
     }
 
     case NEW_ORDER_SOCKET: {
+      return [...orders, payload];
+    }
+    case NEW_ORDER: {
+      if (orders.find((order) => order.id === payload.id)) return orders;
+
       return [...orders, payload];
     }
 
@@ -55,6 +61,13 @@ export const ordersReducer = (orders = [], action) => {
     }
 
     case STATUS_OF_ORDER_SOCKET: {
+      const { status, order_id } = payload;
+      return orders.map((order) => {
+        if (order.id === order_id) return { ...order, status };
+        return order;
+      });
+    }
+    case STATUS_OF_ORDER: {
       const { status, order_id } = payload;
       return orders.map((order) => {
         if (order.id === order_id) return { ...order, status };
