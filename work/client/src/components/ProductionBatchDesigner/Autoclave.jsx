@@ -288,8 +288,6 @@ function Autoclave({ autoclave, batchFromBD }) {
 
   const onSaveHandler = async () => {
     await dispatch(saveAutoclave(autoclave));
-    // };
-    // const updBatch = () => {
     Object.keys(quantityPallets).forEach((key) =>
       quantityPallets[key] === undefined ? delete quantityPallets[key] : {}
     );

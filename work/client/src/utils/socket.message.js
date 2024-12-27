@@ -73,6 +73,7 @@ import {
 export const createSocketOnMessage = (dispatch) => (event) => {
   const parsedData = JSON.parse(event.data);
   const { type, payload } = parsedData;
+  console.log('createSocketOnMessage, parsedData', parsedData);
 
   switch (type) {
     case ADD_NEW_PRODUCT_SOCKET:
