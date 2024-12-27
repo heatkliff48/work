@@ -18,10 +18,10 @@ function Products() {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { modal, setModal, modalProductCard, setModalProductCard } =
     useModalContext();
-  const { COLUMNS, latestProducts } = useProductsContext();
+  const { TABLE_COLUMNS, COLUMNS, latestProducts } = useProductsContext();
   const { setProductCardData } = useProjectContext();
 
-  const columns = useMemo(() => COLUMNS, []);
+  const columns = useMemo(() => TABLE_COLUMNS, []);
   const data = useMemo(() => latestProducts ?? [], [latestProducts]);
 
   const defaultColumn = useMemo(
