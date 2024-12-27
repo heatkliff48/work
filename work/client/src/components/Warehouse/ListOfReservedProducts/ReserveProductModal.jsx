@@ -46,7 +46,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
       const currBatchID = batchOutside.find(
         (el) => el.id_list_of_ordered_production === list_of_order_id.id
       );
-      console.log('currBatchID', currBatchID.id);
+      console.log('currBatchID', currBatchID?.id);
       if (currBatchID) {
         dispatch(deleteBatchOutside(currBatchID.id));
       }

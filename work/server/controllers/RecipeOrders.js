@@ -36,7 +36,7 @@ class RecipeOrdersController {
 
     myEmitter.emit(DELETE_MATERIAL_PLAN_SOCKET, material_plan_id);
 
-    return res.status(200);
+    return res.json(material_plan_id).status(200);
   }
 }
 

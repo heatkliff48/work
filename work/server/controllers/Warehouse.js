@@ -58,7 +58,7 @@ class WarehouseController {
       const new_warehouse = await WarehouseService.addNewWarehouse({ warehouse });
 
       myEmitter.emit(ADD_NEW_WAREHOUSE_SOCKET, new_warehouse);
-      return res.status(200);
+      return res.status(200).json({ new_warehouse });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
