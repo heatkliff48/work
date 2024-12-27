@@ -14,9 +14,6 @@ const { ErrorUtils } = require('../utils/Errors.js');
 batchOutsideRouter.get('/', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter get');
 
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
-
   try {
     const batchOutside = await BatchOutside.findAll({
       order: [['id', 'ASC']],
@@ -30,9 +27,6 @@ batchOutsideRouter.get('/', async (req, res) => {
 
 batchOutsideRouter.post('/', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter post');
-
-  const fingerprint = req.fingerprint.hash;
-  const { id, username, email } = req.session.user;
 
   const {
     id_warehouse_batch,

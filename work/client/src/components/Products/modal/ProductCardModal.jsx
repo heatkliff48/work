@@ -18,6 +18,7 @@ import ModalWindow from './ModalWindow';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
+import FilesMain from '#components/FileUpload/Product/FilesMain.jsx';
 
 const ProductCardModal = React.memo(() => {
   const { productCardData, setProductCardData } = useProjectContext();
@@ -172,6 +173,7 @@ const ProductCardModal = React.memo(() => {
               );
             })}
           </div>
+          <FilesMain userAccess={userAccess} />
         </ModalBody>
         <ModalFooter>
           <div className="product_card">

@@ -12,7 +12,7 @@ function NavBar() {
     <nav className="nav_wrapper">
       <div className="nav_left_wrapper"></div>
       <div className="nav_right_wrapper">
-        {user && (
+        {/* {user &&  (
           <div className="nav_link_wrapper">
             <div
               className="nav_link"
@@ -23,7 +23,7 @@ function NavBar() {
               <p className="p_nav">Roles</p>
             </div>
           </div>
-        )}
+        )} */}
         {user && (
           <div className="nav_link_wrapper">
             <div
@@ -48,7 +48,7 @@ function NavBar() {
             </div>
           </div>
         )}
-        {user && (
+        {/* {user && (
           <div className="nav_link_wrapper">
             <div
               className="nav_link"
@@ -59,7 +59,7 @@ function NavBar() {
               <p className="p_nav">Контакты</p>
             </div>
           </div>
-        )}
+        )} */}
         {user && (
           <div className="nav_link_wrapper">
             <div
