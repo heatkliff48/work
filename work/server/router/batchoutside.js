@@ -48,7 +48,7 @@ batchOutsideRouter.post('/', async (req, res) => {
     });
 
     myEmitter.emit(ADD_NEW_BATCH_OUTSIDE_SOCKET, batchOutside);
-    return res.status(200); //.json({ client });
+    return res.json(batchOutside).status(200); //.json({ client });
     // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
     // .json({
     //   client,
@@ -127,7 +127,7 @@ batchOutsideRouter.post('/update/:id', async (req, res) => {
     );
 
     myEmitter.emit(UPDATE_BATCH_OUTSIDE_SOCKET, batchOutside);
-    return res.status(200);
+    return res.json(batchOutside).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -143,7 +143,7 @@ batchOutsideRouter.post('/delete', async (req, res) => {
     await BatchOutside.destroy({ where: { id: batch_id } });
 
     myEmitter.emit(DELETE_BATCH_OUTSIDE_SOCKET, batch_id);
-    return res.status(200);
+    return res.json(batch_id).status(200);
   } catch (err) {
     return ErrorUtils.catchError(res, err);
   }
