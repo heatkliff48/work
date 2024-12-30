@@ -121,13 +121,19 @@ const WarehouseContextProvider = ({ children }) => {
           (product) => product.article === el.product_article
         )?.id;
 
-        const prodOrdId = productsOfOrders.find(
+        const arrOfOrderProduct = productsOfOrders.filter(
           (elem) => elem.order_id === orderId && elem.product_id === productId
-        )?.id;
+        );
+        // console.log('arrOfOrderProduct', arrOfOrderProduct);
 
-        const quantity_in_warehouse = list_of_reserved_products.find(
-          (res_prod) => res_prod.orders_products_id === prodOrdId
-        )?.quantity;
+        const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, el) => {
+          const reserved = list_of_reserved_products.find(
+            (res_prod) => res_prod.orders_products_id === el.id
+          );
+          return sum + (reserved ? reserved.quantity : 0);
+        }, 0);
+
+        // console.log('quantity_in_warehouse', quantity_in_warehouse);
 
         const quantity_in_batch = (
           batchOutside.find((batch) => batch.id_list_of_ordered_production === el.id)

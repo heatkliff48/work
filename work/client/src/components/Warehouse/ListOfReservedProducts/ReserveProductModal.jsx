@@ -3,6 +3,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { updateAutoclave } from '#components/redux/actions/autoclaveAction.js';
 import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 import {
   addNewReservedProducts,
   updateRemainingStock,
@@ -19,6 +20,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
     list_of_ordered_production_oem,
   } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
+  const { list_of_orders } = useOrderContext();
   const dispatch = useDispatch();
   const batchOutside = useSelector((state) => state.batchOutside);
 
@@ -74,6 +76,15 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
           updListOfOrderedProductionOEM({
             id: list_of_order_oem_id.id,
             status: 'Reserved',
+          })
+        );
+        const order_id = list_of_orders.find(
+          (el) => el.article === order_article
+        )?.id;
+        dispatch(
+          updateOrderStatus({
+            order_id,
+            status: 'produced',
           })
         );
       }
