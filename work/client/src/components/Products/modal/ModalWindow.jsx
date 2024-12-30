@@ -63,20 +63,18 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
     const updatedProduct = {
       ...formInput,
       placeOfProduction:
-        typeof placeOfProduction === 'number'
+        typeof placeOfProduction == 'number'
           ? placeOfProduction
           : selectOptions.placeOfProduction.find(
-              (el) => el.label === placeOfProduction
-            ).value,
+              (el) => el.label == placeOfProduction
+            )?.value,
       typeOfPackaging:
-        typeof typeOfPackaging === 'number'
+        typeof typeOfPackaging == 'number'
           ? typeOfPackaging
-          : selectOptions.typeOfPackaging.find((el) => el.label === typeOfPackaging)
-              .value,
+          : selectOptions.typeOfPackaging.find((el) => el.label == typeOfPackaging)
+              ?.value,
       article: prodArticle,
     };
-
-    console.log('updatedProduct', updatedProduct);
 
     const isExistingProduct = products.some(
       (product) => product.article === prodArticle
