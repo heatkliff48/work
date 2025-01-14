@@ -24,6 +24,17 @@ const WarehouseAddModal = React.memo(
       { value: 'remote', label: 'Remote' },
     ];
 
+    const type_select = [
+      {
+        value: 'OK',
+        label: 'OK',
+      },
+      {
+        value: 'Remnants',
+        label: 'Remnants',
+      },
+    ];
+
     const getWarehouseArticle = (product) => {
       let versionNumber = '0001';
       const year = new Date().getFullYear().toString().slice(-2);
@@ -79,6 +90,26 @@ const WarehouseAddModal = React.memo(
       return selectedOption || warehouseLocOpt[0];
     };
 
+    const handleSelectTypeChange = (selectedOption) => {
+      setWarehouseData((prev) => ({ ...prev, type: selectedOption.value }));
+
+      setWarehouseLoc(selectedOption.value);
+    };
+
+    const getSelectedTypeOption = (accessor) => {
+      if (!warehouseData?.type)
+        setWarehouseData((prev) => ({
+          ...prev,
+          type: type_select[0].value,
+        }));
+
+      const selectedOption = type_select.find(
+        (option) => option.value === warehouseData?.[accessor]
+      );
+
+      return selectedOption || type_select[0];
+    };
+
     const addProductOrder = async () => {
       dispatch(addNewWarehouse(warehouseData));
       setWarehouseData({});
@@ -115,14 +146,32 @@ const WarehouseAddModal = React.memo(
                     );
                   if (el.accessor === 'warehouse_loc')
                     return (
-                      <Select
-                        defaultValue={getSelectedOption(el.accessor)}
-                        onChange={(v) => {
-                          handleSelectChange(v);
-                        }}
-                        options={warehouseLocOpt}
-                        key={el.id}
-                      />
+                      <>
+                        <ModalBody>{el.Header}:</ModalBody>
+                        <Select
+                          defaultValue={getSelectedOption(el.accessor)}
+                          onChange={(v) => {
+                            handleSelectChange(v);
+                          }}
+                          options={warehouseLocOpt}
+                          key={el.id}
+                        />
+                      </>
+                    );
+
+                  if (el.accessor === 'type')
+                    return (
+                      <>
+                        <ModalBody>{el.Header}:</ModalBody>
+                        <Select
+                          defaultValue={getSelectedTypeOption(el.accessor)}
+                          onChange={(v) => {
+                            handleSelectTypeChange(v);
+                          }}
+                          options={type_select}
+                          key={el.id}
+                        />
+                      </>
                     );
                   return (
                     <InputField
