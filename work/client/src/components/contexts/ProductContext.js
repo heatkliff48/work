@@ -420,7 +420,7 @@ export const ProductsContextProvider = ({ children }) => {
       return Number(placeOfProduction);
     }
 
-    // Если это строка, попытаться найти в selectOptions.placeOfProduction
+    // Если это строка, попытаться найти в `selectOptions.placeOfProduction`
     const matchedOption = selectOptions.placeOfProduction.find(
       (el) => el.label === placeOfProduction || el.value === placeOfProduction
     );
@@ -440,7 +440,7 @@ export const ProductsContextProvider = ({ children }) => {
       return Number(typeOfPackaging);
     }
 
-    // Если это строка, попытаться найти в selectOptions.typeOfPackaging
+    // Если это строка, попытаться найти в `selectOptions.typeOfPackaging`
     const matchedOption = selectOptions.typeOfPackaging.find(
       (el) => el.label === typeOfPackaging || el.value === typeOfPackaging
     );

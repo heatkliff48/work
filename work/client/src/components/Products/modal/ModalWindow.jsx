@@ -46,6 +46,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
 
   const updateProductHandler = () => {
     const {
+      version,
       form,
       certificate,
       width,
