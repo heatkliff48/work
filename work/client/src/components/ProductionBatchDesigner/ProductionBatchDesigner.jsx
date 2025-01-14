@@ -20,6 +20,7 @@ function ProductionBatchDesigner() {
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const [batchFromBD, setBatchFromBD] = useState([]);
+  const [acData, setAcData] = useState([]);
   const [productionBatchDesigner, setProdBatchDesigner] = useState([]);
   const [currId, setCurrId] = useState(null);
   const [totalQuantity, setTotalQuantity] = useState(0);
@@ -48,6 +49,153 @@ function ProductionBatchDesigner() {
   const handleAddOnAutoclave = (row) => {
     setCurrId(row.id);
   };
+
+  const addCakesData = useCallback(
+    (prodBatch) => {
+      const quantity_cakes = (prodBatch.product_with_brack / 3).toFixed(2);
+      const free_product_cakes = (
+        Math.ceil(quantity_cakes) - quantity_cakes
+      ).toFixed(2);
+      const free_product_package = Math.ceil(free_product_cakes * 3);
+
+      const total_cakes = Math.ceil(quantity_cakes);
+      const cakes_in_batch = autoclaveData?.filter(
+        (unit) => unit.id_list_of_ordered_product === prodBatch.id
+      ).length;
+
+      const cakes_residue = total_cakes - cakes_in_batch ?? 0;
+
+      const updatedProdBatch = {
+        ...prodBatch,
+        cakes_quantity: quantity_cakes,
+        free_product_cakes,
+        free_product_package,
+        total_cakes,
+        cakes_in_batch,
+        cakes_residue,
+      };
+
+      setBatchFromBD((prev) => {
+        const existingIndex = prev.findIndex((item) => item.id === prodBatch.id);
+
+        if (existingIndex !== -1) {
+          const updated = [...prev];
+          updated[existingIndex] = {
+            id: prodBatch.id,
+            cakes_in_batch,
+            cakes_residue,
+          };
+          return updated;
+        }
+
+        return [...prev, { id: prodBatch.id, cakes_in_batch, cakes_residue }];
+      });
+
+      const existingBatch = batchDesigner?.find((el) => el?.id === prodBatch.id);
+
+      if (!existingBatch) {
+        dispatch(
+          addBatchState({
+            id: prodBatch.id,
+            cakes_in_batch,
+            cakes_residue,
+          })
+        );
+      }
+
+      if (cakes_in_batch > 0) {
+        dispatch(
+          unlockButton({
+            id: prodBatch.id,
+            isButtonLocked: true,
+          })
+        );
+      }
+
+      return updatedProdBatch;
+    },
+    [autoclaveData, batchDesigner, dispatch]
+  );
+
+  const transformAutoclaveData = (autoclave, prodBatchDesigner) => {
+    if (!autoclave || !prodBatchDesigner) return [];
+
+    const transformedAutoclave = autoclave.map((unit) => {
+      const batch = prodBatchDesigner.find(
+        (prod) => prod.id === unit.id_list_of_ordered_product
+      );
+
+      if (!batch)
+        return {
+          id: null,
+          density: '',
+          width: '',
+        };
+
+      return {
+        id: batch.id,
+        density: batch.density,
+        width: batch.width,
+      };
+    });
+
+    return transformedAutoclave.filter((item) => item !== null);
+  };
+
+  useEffect(() => {
+    if (!latestProducts || !listOfOrderedCakes) return;
+
+    const rightListOfOrdered = listOfOrderedCakes.filter(
+      (el) => el.quantity !== el.quantity_in_warehouse
+    );
+
+    const groupedByDensity = rightListOfOrdered.reduce((acc, curr) => {
+      const product = latestProducts.find((p) => p.article === curr.product_article);
+      if (!product) return acc;
+      const { density } = product;
+
+      if (!acc[density]) {
+        acc[density] = [];
+      }
+
+      acc[density].push({ ...curr, product });
+
+      return acc;
+    }, {});
+
+    const prodBatch = [];
+    let updatedTotalQuantity = totalQuantity;
+
+    Object.keys(groupedByDensity).forEach((densityKey) => {
+      const group = groupedByDensity[densityKey];
+      group.forEach(({ id, quantity, product }) => {
+        const { m3, normOfBrack, width, density } = product;
+
+        if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
+          const batch = addCakesData({
+            id,
+            density,
+            width,
+            quantity,
+            product_with_brack: (quantity * (1 + normOfBrack / 100)).toFixed(2),
+            quantity_m3: (normOfBrack * m3).toFixed(2),
+          });
+          prodBatch.push(batch);
+          updatedTotalQuantity += quantity;
+        }
+      });
+    });
+
+    setProdBatchDesigner(prodBatch);
+    setTotalQuantity(updatedTotalQuantity);
+    const updatedAutoclaveData = transformAutoclaveData(autoclaveData, prodBatch);
+
+    const filledAutoclave = [];
+    for (let i = 0; i < updatedAutoclaveData.length; i += 21) {
+      filledAutoclave.push(updatedAutoclaveData.slice(i, i + 21));
+    }
+    setAcData(filledAutoclave);
+  }, [latestProducts, listOfOrderedCakes, autoclaveData]);
 
   useEffect(() => {
     if (currId !== null) {
@@ -81,58 +229,75 @@ function ProductionBatchDesigner() {
     }
   }, [currId]);
 
-  const addCakesData = useCallback((prodBatch) => {
-    const quantity_cakes = (prodBatch.product_with_brack / 3).toFixed(2);
-    const free_product_cakes = (Math.ceil(quantity_cakes) - quantity_cakes).toFixed(
-      2
-    );
-    const free_product_package = Math.ceil(free_product_cakes * 3);
+  useEffect(() => {
+    if (currId === null || autoclave.length === 0) return;
 
-    const total_cakes = Math.ceil(quantity_cakes);
-    const cakes_in_batch = autoclaveData?.filter(
-      (unit) => unit.id_list_of_ordered_product === prodBatch.id
-    ).length;
+    const currentCount =
+      countRef.current === 0
+        ? batchDesigner.find((el) => el.id === currId)?.cakes_in_batch ?? 0
+        : countRef?.current;
 
-    const cakes_residue = total_cakes - cakes_in_batch ?? 0;
+    setProdBatchDesigner((prevBatch) => {
+      let hasChanges = false;
+      const updatedBatch = prevBatch.map((batchItem) => {
+        if (batchItem.id === currId) {
+          const { cakes_residue, cakes_in_batch } = batchItem;
+          const new_cakes_residue = Math.max(cakes_residue - currentCount, 0);
+          if (cakes_residue !== new_cakes_residue) {
+            hasChanges = true;
+          }
 
-    const updatedProdBatch = {
-      ...prodBatch,
-      cakes_quantity: quantity_cakes,
-      free_product_cakes,
-      free_product_package,
-      total_cakes,
-      cakes_in_batch,
-      cakes_residue,
-    };
+          dispatch(
+            updateBatchState({
+              id: currId,
+              cakes_in_batch: currentCount,
+              cakes_residue: new_cakes_residue,
+            })
+          );
 
-    setBatchFromBD((prev) => [
-      ...prev,
-      { id: prodBatch.id, cakes_in_batch, cakes_residue },
-    ]);
+          dispatch(
+            unlockButton({
+              id: currId,
+              isButtonLocked: new_cakes_residue === 0,
+            })
+          );
 
-    const existingBatch = batchDesigner?.find((el) => el?.id === prodBatch.id);
+          if (cakes_residue !== 0) {
+            setQuantityPallets((prev) => {
+              return {
+                ...prev,
+                [currId]: currentCount * 3,
+              };
+            });
+          }
+          return {
+            ...batchItem,
+            cakes_in_batch: cakes_in_batch + currentCount,
+            cakes_residue: new_cakes_residue,
+          };
+        }
+        return batchItem;
+      });
+      return hasChanges ? updatedBatch : prevBatch;
+    });
+  }, [autoclave]);
 
-    if (!existingBatch) {
-      dispatch(
-        addBatchState({
-          id: prodBatch.id,
-          cakes_in_batch,
-          cakes_residue,
-        })
-      );
-    }
-
-    if (cakes_in_batch > 0) {
-      dispatch(
-        unlockButton({
-          id: prodBatch.id,
-          isButtonLocked: true,
-        })
-      );
-    }
-
-    return updatedProdBatch;
-  }, []);
+  useEffect(() => {
+    setProdBatchDesigner((prev) => {
+      return prev.map((batchItem) => {
+        for (let i = 0; i < batchDesigner.length; i++) {
+          if (batchDesigner[i].id === batchItem.id) {
+            return {
+              ...batchItem,
+              cakes_in_batch: batchDesigner[i].cakes_in_batch,
+              cakes_residue: batchDesigner[i].cakes_residue,
+            };
+          }
+        }
+        return batchItem;
+      });
+    });
+  }, [batchDesigner]);
 
   const renderGroupedRows = useCallback(() => {
     let currentDensity = null;
@@ -181,154 +346,6 @@ function ProductionBatchDesigner() {
     });
   }, [productionBatchDesigner]);
 
-  useEffect(() => {
-    if (currId === null || autoclave.length === 0) return;
-    const currentCount =
-      countRef.current === 0
-        ? batchDesigner.find((el) => el.id === currId)?.cakes_in_batch ?? 0
-        : countRef?.current;
-
-    setProdBatchDesigner((prevBatch) => {
-      let hasChanges = false;
-      const updatedBatch = prevBatch.map((batchItem) => {
-        if (batchItem.id === currId) {
-          const { cakes_residue, cakes_in_batch } = batchItem;
-          const new_cakes_residue = Math.max(cakes_residue - currentCount, 0);
-          if (cakes_residue !== new_cakes_residue) {
-            hasChanges = true;
-          }
-
-          dispatch(
-            updateBatchState({
-              id: currId,
-              cakes_in_batch: currentCount,
-              cakes_residue: new_cakes_residue,
-            })
-          );
-
-          dispatch(
-            unlockButton({
-              id: currId,
-              isButtonLocked: cakes_residue === 0,
-            })
-          );
-
-          if (cakes_residue !== 0) {
-            setQuantityPallets((prev) => {
-              return {
-                ...prev,
-                [currId]: currentCount * 3,
-              };
-            });
-          }
-          return {
-            ...batchItem,
-            cakes_in_batch: cakes_in_batch + currentCount,
-            cakes_residue: new_cakes_residue,
-          };
-        }
-        return batchItem;
-      });
-      return hasChanges ? updatedBatch : prevBatch;
-    });
-  }, [autoclave, currId]);
-
-  useEffect(() => {
-    setProdBatchDesigner((prev) => {
-      return prev.map((batchItem) => {
-        for (let i = 0; i < batchDesigner.length; i++) {
-          if (batchDesigner[i].id === batchItem.id) {
-            return {
-              ...batchItem,
-              cakes_in_batch: batchDesigner[i].cakes_in_batch,
-              cakes_residue: batchDesigner[i].cakes_residue,
-            };
-          }
-        }
-        return batchItem;
-      });
-    });
-  }, [batchDesigner]);
-
-  useEffect(() => {
-    if (!latestProducts || !listOfOrderedCakes) return;
-
-    const rightListOfOrdered = listOfOrderedCakes.filter(
-      (el) => el.quantity !== el.quantity_in_warehouse
-    );
-    const groupedByDensity = rightListOfOrdered.reduce((acc, curr) => {
-      const product = latestProducts.find((p) => p.article === curr.product_article);
-      if (!product) return acc;
-      const { density } = product;
-
-      if (!acc[density]) {
-        acc[density] = [];
-      }
-
-      acc[density].push({ ...curr, product });
-
-      return acc;
-    }, {});
-
-    const prodBatch = [];
-    let updatedTotalQuantity = totalQuantity;
-
-    Object.keys(groupedByDensity).forEach((densityKey) => {
-      const group = groupedByDensity[densityKey];
-      group.forEach(({ id, quantity, product }) => {
-        const { m3, normOfBrack, width, density } = product;
-
-        if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
-          const batch = addCakesData({
-            id,
-            density,
-            width,
-            quantity,
-            product_with_brack: (quantity * (1 + normOfBrack / 100)).toFixed(2),
-            quantity_m3: (normOfBrack * m3).toFixed(2),
-          });
-          prodBatch.push(batch);
-          updatedTotalQuantity += quantity;
-        }
-      });
-    });
-
-    setProdBatchDesigner(prodBatch);
-    setTotalQuantity(updatedTotalQuantity);
-    const updatedAutoclaveData = transformAutoclaveData(autoclaveData, prodBatch);
-
-    const filledAutoclave = [];
-    for (let i = 0; i < updatedAutoclaveData.length; i += 21) {
-      filledAutoclave.push(updatedAutoclaveData.slice(i, i + 21));
-    }
-    setAutoclave(filledAutoclave);
-  }, [latestProducts, listOfOrderedCakes, autoclaveData]);
-
-  const transformAutoclaveData = (autoclave, prodBatchDesigner) => {
-    if (!autoclave || !prodBatchDesigner) return [];
-
-    const transformedAutoclave = autoclave.map((unit) => {
-      const batch = prodBatchDesigner.find(
-        (prod) => prod.id === unit.id_list_of_ordered_product
-      );
-
-      if (!batch)
-        return {
-          id: null,
-          density: '',
-          width: '',
-        };
-
-      return {
-        id: batch.id,
-        density: batch.density,
-        width: batch.width,
-      };
-    });
-
-    return transformedAutoclave.filter((item) => item !== null);
-  };
-
   return (
     <div style={{ display: 'flex' }}>
       {/* Таблица */}
@@ -347,7 +364,7 @@ function ProductionBatchDesigner() {
 
       {/* Компонент Autoclave */}
       <div style={{ marginLeft: '20px' }}>
-        <Autoclave autoclave={autoclave} batchFromBD={batchFromBD} />
+        <Autoclave acData={acData} batchFromBD={batchFromBD} />
       </div>
     </div>
   );

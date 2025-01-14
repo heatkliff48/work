@@ -15,7 +15,7 @@ function UpdateModalWindow() {
     setModalProductCard,
     modalProductCard,
   } = useModalContext();
-  const { selectOptions, rightPlaceOfProductionFunc, rightTypeOfPackagingFunc } =
+  const { rightPlaceOfProductionFunc, rightTypeOfPackagingFunc } =
     useProductsContext();
 
   const dispatch = useDispatch();

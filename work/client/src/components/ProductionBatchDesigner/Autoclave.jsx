@@ -15,9 +15,10 @@ import {
   updateBatchOutside,
 } from '#components/redux/actions/batchOutsideAction.js';
 
-function Autoclave({ autoclave, batchFromBD }) {
+function Autoclave({ acData, batchFromBD }) {
   const dispatch = useDispatch();
-  const { setAutoclave, quantityPallets, setQuantityPallets } = useOrderContext();
+  const { setAutoclave, quantityPallets, setQuantityPallets, autoclave } =
+    useOrderContext();
   const [selectedId, setSelectedId] = useState(null);
   const [idColorMap, setIdColorMap] = useState({});
 
@@ -196,13 +197,12 @@ function Autoclave({ autoclave, batchFromBD }) {
 
       return newAutoclave;
     });
-
-    const { cakes_residue } = batchFromBD.find((el) => el.id === selectedId);
+    const { cakes_in_batch } = batchFromBD.find((el) => el.id === selectedId);
     dispatch(
       updateBatchState({
         id,
         cakes_in_batch: 0,
-        cakes_residue: cakes_residue,
+        cakes_residue: cakes_in_batch,
       })
     );
 
@@ -357,6 +357,10 @@ function Autoclave({ autoclave, batchFromBD }) {
   useEffect(() => {
     dispatch(getAutoclave());
   }, []);
+
+  useEffect(() => {
+    setAutoclave(acData);
+  }, [acData]);
 
   // ------------- ne udalay pls
 
