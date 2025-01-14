@@ -35,6 +35,22 @@ function RawMaterialsPlan() {
     { name: 'Condensate', title: 'condensate', remaining: 0 },
   ];
 
+  const raw_materials_table = [
+    { Header: 'Sand', accessor: 'sand' },
+    { Header: 'Lime Lhoist', accessor: 'lime_lhoist' },
+    { Header: 'Lime Barcelona', accessor: 'lime_barcelona' },
+    { Header: 'Cement', accessor: 'cement' },
+    { Header: 'Gypsum', accessor: 'gypsum' },
+    { Header: 'Alu 1', accessor: 'alu_1' },
+    { Header: 'Alu 2', accessor: 'alu_2' },
+    { Header: 'Return slurry - solids', accessor: 'return_slurry_solids' },
+    { Header: 'Return slurry - water', accessor: 'return_slurry_water' },
+    { Header: 'Water', accessor: 'water' },
+    { Header: 'Water cold', accessor: 'water_cold' },
+    { Header: 'Water hot', accessor: 'water_hot' },
+    { Header: 'Condensate', accessor: 'condensate' },
+  ];
+
   const handleOrderShareChange = (name, value) => {
     setManualOrderShare((prev) => ({ ...prev, [name]: parseFloat(value) || 0 }));
   };
@@ -58,9 +74,8 @@ function RawMaterialsPlan() {
     if (!product.current_recipe) return 0;
     return (
       // product.current_recipe?.dry_total *
-      product.current_recipe[mat_num] *
-      product.quantity
-    ).toFixed(2);
+      (product.current_recipe[mat_num] * product.quantity).toFixed(2)
+    );
   };
 
   const handlerSave = () => {
@@ -140,12 +155,14 @@ function RawMaterialsPlan() {
       };
     });
     setTotals(updatedTotals);
+    console.log('rawMaterials', rawMaterials);
+    console.log('productsArray', productsArray);
   }, [manualOrderShare, productsArray]);
 
   return (
     <div className="raw-materials-plan">
       <table>
-        <thead>
+        {/* <thead>
           <tr>
             <th>Сырье</th>
             <th>Остатки сырья</th>
@@ -203,6 +220,94 @@ function RawMaterialsPlan() {
               <td>{totals[material.name]?.totalOrder || 0}</td>
             </tr>
           ))}
+        </tbody> */}
+        <thead>
+          <tr>
+            <th></th>
+            {rawMaterials.map((material, index) => (
+              <th key={index}>{material.name}</th>
+            ))}
+            {/* <th></th>
+            {raw_materials_table.map((el) => (
+              <th key={el.accessor}>{el.Header}</th>
+            ))} */}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Остатки сырья</th>
+            {rawMaterials.map((material, index) => (
+              <td key={index}>{material.remaining}</td>
+            ))}
+          </tr>
+
+          {productsArray?.map((product, index) => (
+            <tr>
+              <th key={index} className="product-column">
+                <div>Продукт: {product.product_article}</div>
+                <div>
+                  Рецепт:
+                  {product?.current_recipe ? (
+                    <Select
+                      onChange={(selectedOption) =>
+                        handleRecipeChange(index, selectedOption)
+                      }
+                      options={product.recipeOptions}
+                      value={{
+                        value: product.current_recipe?.id,
+                        label: product.current_recipe?.article,
+                      }}
+                    />
+                  ) : (
+                    <> Рецепты отсутствуют</>
+                  )}
+                </div>
+                <div>Количество: {product.quantity}</div>
+              </th>
+
+              {productsArray?.map((product, i) =>
+                rawMaterials.map((material, index) => (
+                  <td key={`${index}-${i}`} className="product-data">
+                    {mathFunc(material.title, product)}
+                  </td>
+                ))
+              )}
+            </tr>
+          ))}
+
+          <tr>
+            <th>Итого</th>
+            {rawMaterials.map((material, index) => (
+              <td>{totals[material.name]?.total || 0}</td>
+            ))}
+          </tr>
+          <tr>
+            <th>Потребность</th>
+            {rawMaterials.map((material, index) => (
+              <td>{totals[material.name]?.need || 0}</td>
+            ))}
+          </tr>
+          <tr>
+            <th>Доля заказа (ручной ввод)</th>
+            {rawMaterials.map((material, index) => (
+              <td>
+                <input
+                  type="number"
+                  value={manualOrderShare[material.name] || ''}
+                  onChange={(e) =>
+                    handleOrderShareChange(material.name, e.target.value)
+                  }
+                  placeholder="0"
+                />
+              </td>
+            ))}
+          </tr>
+          <tr>
+            <th>Итого заказа</th>
+            {rawMaterials.map((material, index) => (
+              <td>{totals[material.name]?.totalOrder || 0}</td>
+            ))}
+          </tr>
         </tbody>
       </table>
       <button onClick={handlerSave}>Save</button>
