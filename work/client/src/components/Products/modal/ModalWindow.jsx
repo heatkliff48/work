@@ -46,7 +46,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
 
   const updateProductHandler = () => {
     const {
-      version,
       form,
       certificate,
       width,
@@ -63,7 +62,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
     const prodArticle = `T.${form?.toUpperCase()}${rightPlaceOfProduction}${rightTypeOfPackaging}0${certificate?.substr(
       0,
       1
-    )}${density}${width}${height}${lengths}${Number(version) + 1}`;
+    )}${density}${width}${height}${lengths}`;
 
     const updatedProduct = {
       ...formInput,
