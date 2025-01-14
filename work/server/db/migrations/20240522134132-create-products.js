@@ -11,7 +11,6 @@ module.exports = {
       },
       article: {
         allowNull: false,
-        unique: true,
         type: Sequelize.STRING,
       },
       version: {
