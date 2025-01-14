@@ -184,7 +184,6 @@ function Autoclave({ acData, batchFromBD }) {
 
   const deleteBatchById = () => {
     if (!selectedId) return;
-    console.log('batchDesigner', batchDesigner);
     const { id } = batchDesigner?.find((el) => el.id === selectedId);
 
     setAutoclave((prevAutoclave) => {
@@ -198,7 +197,6 @@ function Autoclave({ acData, batchFromBD }) {
 
       return newAutoclave;
     });
-    console.log('batchFromBD', batchFromBD);
     const { cakes_in_batch } = batchFromBD.find((el) => el.id === selectedId);
     dispatch(
       updateBatchState({
