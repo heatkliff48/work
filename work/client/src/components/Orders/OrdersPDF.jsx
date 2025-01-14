@@ -139,13 +139,6 @@ const DownloadOrderPDF = ({ orderCartData, updatedProductListOrder, vatValue }) 
     >
       {({ loading }) => (loading ? 'Loading document...' : 'Download PDF')}
     </PDFDownloadLink>
-    <PDFViewer style={{ width: '100%', height: '500px' }}>
-      <OrderPDF
-        orderData={orderCartData || {}}
-        productList={updatedProductListOrder || []}
-        vatValue={vatValue || {}}
-      />
-    </PDFViewer>
   </div>
 );
 
