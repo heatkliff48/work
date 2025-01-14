@@ -108,7 +108,9 @@ const WarehouseContextProvider = ({ children }) => {
           (order) => order.article === el.order_article
         )?.status;
 
-        return !['shipment', 'shipped', 'completed'].includes(orderStatus);
+        return !['produced', 'shipment', 'shipped', 'completed'].includes(
+          orderStatus
+        );
       })
       .map((el) => {
         const quantity_cakes = (el.quantity / 3).toFixed(2);
