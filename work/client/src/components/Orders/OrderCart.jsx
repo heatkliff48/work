@@ -61,6 +61,7 @@ const OrderCart = React.memo(() => {
 
   const [dataValue, setDataValue] = useState(new Date());
   const [formatDataValue, setFormatDataValue] = useState(null);
+  const [ordersStatus, setOrdersStatus] = useState(0);
   const [vatValue, setVatValue] = useState({
     vat_procent: 21,
     vat_euro: 0,
@@ -172,6 +173,9 @@ const OrderCart = React.memo(() => {
   };
 
   const statusChangeHandler = (status) => {
+    const statusId = status_list.find((stat) => stat.accessor === status.accessor);
+    if (statusId < ordersStatus) return alert('This status cannot be set');
+
     const order_id = orderCartData?.id;
     const hasShippingDate =
       orderCartData?.shipping_date?.length > 0
@@ -228,6 +232,8 @@ const OrderCart = React.memo(() => {
       }
       return;
     });
+
+    setOrdersStatus(statusId);
 
     dispatch(
       updateOrderStatus({
@@ -288,6 +294,11 @@ const OrderCart = React.memo(() => {
     if (updatedOrderCartData && updatedOrderCartData !== orderCartData) {
       setOrderCartData((prev) => ({ ...prev, status: updatedOrderCartData.status }));
     }
+
+    const statusId = status_list.find(
+      (status) => status.accessor == updatedOrderCartData.status
+    );
+    setOrdersStatus(statusId);
 
     localStorage.setItem('orderCartData', JSON.stringify(storedData));
   }, [list_of_orders]);

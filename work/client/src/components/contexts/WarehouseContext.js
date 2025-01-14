@@ -124,7 +124,6 @@ const WarehouseContextProvider = ({ children }) => {
         const arrOfOrderProduct = productsOfOrders.filter(
           (elem) => elem.order_id === orderId && elem.product_id === productId
         );
-        // console.log('arrOfOrderProduct', arrOfOrderProduct);
 
         const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, el) => {
           const reserved = list_of_reserved_products.find(
@@ -132,8 +131,6 @@ const WarehouseContextProvider = ({ children }) => {
           );
           return sum + (reserved ? reserved.quantity : 0);
         }, 0);
-
-        // console.log('quantity_in_warehouse', quantity_in_warehouse);
 
         const quantity_in_batch = (
           batchOutside.find((batch) => batch.id_list_of_ordered_production === el.id)

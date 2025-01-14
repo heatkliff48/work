@@ -76,8 +76,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
       article: prodArticle,
     };
 
-    console.log('updatedProduct', updatedProduct);
-
     const isExistingProduct = products.some(
       (product) => product.article === prodArticle
     );
