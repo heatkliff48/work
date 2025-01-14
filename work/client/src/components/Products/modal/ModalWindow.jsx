@@ -9,7 +9,7 @@ import { addNewProduct } from '#components/redux/actions/productsAction.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 
-const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
+const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) => {
   const {
     version,
     setVersion,
@@ -20,7 +20,8 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
   } = useProjectContext();
   const { modal, setModal, modalUpdate, setModalUpdate, setModalProductCard } =
     useModalContext();
-  const { selectOptions } = useProductsContext();
+  const { selectOptions, rightPlaceOfProductionFunc, rightTypeOfPackagingFunc } =
+    useProductsContext();
 
   const [formInput, setFormInput] = useState({});
   const [haveMath, setHaveMath] = useState({});
@@ -55,24 +56,18 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle }) => {
       typeOfPackaging,
     } = formInput;
 
-    const prodArticle = `T.${form?.toUpperCase()}${placeOfProduction}${typeOfPackaging}0${certificate?.substr(
+    const rightPlaceOfProduction = rightPlaceOfProductionFunc(placeOfProduction);
+    const rightTypeOfPackaging = rightTypeOfPackagingFunc(typeOfPackaging);
+
+    const prodArticle = `T.${form?.toUpperCase()}${rightPlaceOfProduction}${rightTypeOfPackaging}0${certificate?.substr(
       0,
       1
-    )}${density}${width}${height}${lengths}`;
+    )}${density}${width}${height}${lengths}${Number(version) + 1}`;
 
     const updatedProduct = {
       ...formInput,
-      placeOfProduction:
-        typeof Number(placeOfProduction) === 'number'
-          ? placeOfProduction
-          : selectOptions.placeOfProduction.find(
-              (el) => el.label === placeOfProduction
-            )?.value,
-      typeOfPackaging:
-        typeof Number(typeOfPackaging) === 'number'
-          ? typeOfPackaging
-          : selectOptions.typeOfPackaging.find((el) => el.label === typeOfPackaging)
-              ?.value,
+      placeOfProduction: rightPlaceOfProduction,
+      typeOfPackaging: rightTypeOfPackaging,
       article: prodArticle,
     };
 

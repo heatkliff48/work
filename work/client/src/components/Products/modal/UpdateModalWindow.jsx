@@ -6,17 +6,17 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 
 function UpdateModalWindow() {
-  const { promProduct, setPromProduct } = useProjectContext();
+  const { promProduct, setPromProduct, setStayDefault } = useProjectContext();
   const {
     modalUpdate,
     setModalUpdate,
     modal,
     setModal,
-    setStayDefault,
     setModalProductCard,
     modalProductCard,
   } = useModalContext();
-  const { selectOptions } = useProductsContext();
+  const { selectOptions, rightPlaceOfProductionFunc, rightTypeOfPackagingFunc } =
+    useProductsContext();
 
   const dispatch = useDispatch();
   const productData = useSelector((state) => state.products).findLast(
@@ -28,18 +28,10 @@ function UpdateModalWindow() {
     const updProduct = {
       ...promProduct,
       version: productData.version + 1,
-      placeOfProduction:
-        typeof placeOfProduction === 'number'
-          ? placeOfProduction
-          : selectOptions.placeOfProduction.find(
-              (el) => el.label === placeOfProduction
-            ).value,
-      typeOfPackaging:
-        typeof typeOfPackaging === 'number'
-          ? typeOfPackaging
-          : selectOptions.typeOfPackaging.find((el) => el.label === typeOfPackaging)
-              .value,
+      placeOfProduction: rightPlaceOfProductionFunc(placeOfProduction),
+      typeOfPackaging: rightTypeOfPackagingFunc(typeOfPackaging),
     };
+
     setStayDefault(true);
     dispatch(updateProduct({ product: updProduct }));
     setPromProduct({});

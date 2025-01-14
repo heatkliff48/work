@@ -178,7 +178,12 @@ const ProductCardModal = React.memo(() => {
         <ModalFooter>
           <div className="product_card">
             {userAccess?.canWrite && (
-              <Button color="success" onClick={() => setIsModalWindowOpen(true)}>
+              <Button
+                color="success"
+                onClick={() => {
+                  setIsModalWindowOpen(true);
+                }}
+              >
                 Edit
               </Button>
             )}
