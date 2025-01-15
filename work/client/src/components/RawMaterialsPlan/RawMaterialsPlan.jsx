@@ -155,8 +155,6 @@ function RawMaterialsPlan() {
       };
     });
     setTotals(updatedTotals);
-    console.log('rawMaterials', rawMaterials);
-    console.log('productsArray', productsArray);
   }, [manualOrderShare, productsArray]);
 
   return (
@@ -265,13 +263,15 @@ function RawMaterialsPlan() {
                 <div>Количество: {product.quantity}</div>
               </th>
 
-              {productsArray?.map((product, i) =>
-                rawMaterials.map((material, index) => (
-                  <td key={`${index}-${i}`} className="product-data">
+              {
+                // productsArray?.map((product, i) =>
+                rawMaterials.map((material) => (
+                  <td className="product-data">
                     {mathFunc(material.title, product)}
                   </td>
                 ))
-              )}
+                // )
+              }
             </tr>
           ))}
 
