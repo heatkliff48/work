@@ -1,4 +1,3 @@
-
 # Manufacturing Execution System (MES)
 
 ## Overview
@@ -8,19 +7,23 @@ This MES application is designed to manage and monitor production processes in a
 ## Features
 
 1. **Batch Management**:
+
    - Track the status of production batches in real-time.
    - Allocate products to autoclaves based on density, quantity, and dimensions.
    - Handle product placement and movement dynamically.
 
 2. **Resource Tracking**:
+
    - Monitor product quantities (`cakes_in_batch`, `cakes_residue`) during placement in autoclaves.
    - Optimize resource usage based on configurable thresholds (e.g., `MAX_QUANTITY`).
 
 3. **Automated Calculations**:
+
    - Calculate product residues, quantities, and placement dynamically based on input data.
    - Real-time updates to production tables and autoclave states.
 
 4. **User Interface**:
+
    - Interactive table views for production batches.
    - Grouped rows and real-time updates for enhanced clarity.
    - Buttons for user actions, such as product placement and batch updates.
@@ -39,36 +42,41 @@ This MES application is designed to manage and monitor production processes in a
 ## Key Components
 
 ### 1. **ProductionBatchDesigner**
-   - Core component for managing and displaying production batches.
-   - Features:
-     - Dynamic calculation of product attributes (`cakes_in_batch`, `cakes_residue`).
-     - Real-time interaction with autoclave data.
-     - Grouped and detailed views of production batches.
+
+- Core component for managing and displaying production batches.
+- Features:
+  - Dynamic calculation of product attributes (`cakes_in_batch`, `cakes_residue`).
+  - Real-time interaction with autoclave data.
+  - Grouped and detailed views of production batches.
 
 ### 2. **Autoclave**
-   - Manages the state and visualization of autoclave resources.
-   - Features:
-     - Dynamic assignment of products to autoclaves.
-     - Tracking and visualization of autoclave utilization.
-     - Action buttons for adding, deleting, and moving batches.
+
+- Manages the state and visualization of autoclave resources.
+- Features:
+  - Dynamic assignment of products to autoclaves.
+  - Tracking and visualization of autoclave utilization.
+  - Action buttons for adding, deleting, and moving batches.
 
 ### 3. **Contexts and State Management**
-   - **WarehouseContext**: Handles inventory and product data.
-   - **OrderContext**: Manages order-specific workflows and autoclave state.
-   - **Redux Actions**:
-     - `addBatchState`: Add new batch data.
-     - `unlockButton`: Manage button states dynamically.
-     - `updateBatchState`: Update batch details.
+
+- **WarehouseContext**: Handles inventory and product data.
+- **OrderContext**: Manages order-specific workflows and autoclave state.
+- **Redux Actions**:
+  - `addBatchState`: Add new batch data.
+  - `unlockButton`: Manage button states dynamically.
+  - `updateBatchState`: Update batch details.
 
 ## Installation
 
 1. Clone the repository:
+
    ```bash
    git clone <repository-url>
    cd <project-directory>
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -81,10 +89,12 @@ This MES application is designed to manage and monitor production processes in a
 ## Usage
 
 1. **Production Management**:
+
    - Access the `ProductionBatchDesigner` table to view and manage production batches.
    - Use the "Разместить" button to allocate products to autoclaves.
 
 2. **Autoclave Operations**:
+
    - Navigate to the `Autoclave` section to view the placement of products.
    - Utilize action buttons for batch operations like deletion or movement.
 
@@ -94,9 +104,11 @@ This MES application is designed to manage and monitor production processes in a
 ## Troubleshooting
 
 ### Excessive Rerenders
-- Verify that state updates (`setProdBatchDesigner`, `setAutoclave`) are conditional and avoid unnecessary triggers.
+
+- Verify that state updates (`setProductonBatchDesigner`, `setAutoclave`) are conditional and avoid unnecessary triggers.
 
 ### Incorrect Calculations
+
 - Add debugging logs around critical calculations (`cakes_in_batch`, `cakes_residue`) to validate logic.
 
 ## Contribution
