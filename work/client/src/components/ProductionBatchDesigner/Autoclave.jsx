@@ -113,9 +113,7 @@ function Autoclave({ acData, batchFromBD }) {
   const deleteArrayById = () => {
     if (!selectedId) return;
 
-    const { id, cakes_in_batch } = batchDesigner?.find(
-      (el) => el?.id === selectedId
-    );
+    const { id } = batchDesigner?.find((el) => el?.id === selectedId);
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
@@ -126,15 +124,16 @@ function Autoclave({ acData, batchFromBD }) {
         alert('Не найдено элементов с таким id');
         return prevAutoclave;
       }
+
       flatAutoclave.splice(firstIndex, 1);
-      const count = flatAutoclave.filter((el) => el.id === id).length;
+      const count = flatAutoclave.filter((el) => el.id === selectedId).length;
 
       const newAutoclave = [];
       while (flatAutoclave.length) {
         newAutoclave.push(flatAutoclave.splice(0, 21));
       }
-      const batchBD = batchFromBD.find((el) => el.id === selectedId);
-      if (cakes_in_batch <= count) {
+      const { cakes_residue } = batchFromBD.find((el) => el.id === selectedId);
+      if (cakes_residue <= count) {
         dispatch(
           updateBatchState({
             id,
@@ -159,7 +158,7 @@ function Autoclave({ acData, batchFromBD }) {
           updateBatchState({
             id,
             cakes_in_batch: count,
-            cakes_residue: batchBD.cakes_in_batch - count,
+            cakes_residue: cakes_residue - count,
           })
         );
 
@@ -197,12 +196,14 @@ function Autoclave({ acData, batchFromBD }) {
 
       return newAutoclave;
     });
-    const { cakes_in_batch } = batchFromBD.find((el) => el.id === selectedId);
+    const { cakes_in_batch, cakes_residue } = batchFromBD.find(
+      (el) => el.id === selectedId
+    );
     dispatch(
       updateBatchState({
         id,
-        cakes_in_batch: 0,
-        cakes_residue: cakes_in_batch,
+        cakes_in_batch,
+        cakes_residue,
       })
     );
 
@@ -246,43 +247,46 @@ function Autoclave({ acData, batchFromBD }) {
 
   const fillingAutoclave = () => {
     if (!selectedId) return;
+    const { id } = batchDesigner?.find((el) => el?.id === selectedId);
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
-      const fillingElement = flatAutoclave.find((el) => el.id === selectedId);
-      let count = 0;
 
-      return prevAutoclave.map((prevAutoclave) => {
-        const emptyIndex = prevAutoclave.findIndex((el) => !el.id);
-        if (emptyIndex >= 1) {
-          return prevAutoclave.map((el, i) => {
-            if (i >= emptyIndex) {
-              count++;
-              return fillingElement;
-            } else {
-              return el;
-            }
-          });
-        }
+      const lastIndex = flatAutoclave.map((el) => el.id).lastIndexOf(selectedId);
 
-        // ----------------------- TUT KAKAYA TO ZALUPA S CIFRAMI-----------------------
-
-        dispatch(
-          updateBatchState({
-            selectedId,
-            cakes_in_batch: quantityPallets[selectedId] / 3 + count,
-            // cakes_residue: 0,
-          })
-        );
-
-        setQuantityPallets((prev) => {
-          return {
-            ...prev,
-            [selectedId]: quantityPallets[selectedId] + count * 3,
-          };
-        });
+      if (lastIndex === -1) {
+        alert('Не найдено элементов с таким id');
         return prevAutoclave;
+      }
+      const fillingElement = flatAutoclave.find((el) => el.id === selectedId);
+
+      for (let i = lastIndex % 21; i < 20; i++) {
+        flatAutoclave.splice(lastIndex + 1, 0, fillingElement);
+      }
+
+      const count = flatAutoclave.filter((el) => el.id === id).length;
+
+      dispatch(
+        updateBatchState({
+          id: selectedId,
+          cakes_in_batch: count,
+          cakes_residue: 0,
+        })
+      );
+
+      setQuantityPallets((prev) => {
+        return {
+          ...prev,
+          [id]: count * 3,
+        };
       });
+
+      const newAutoclave = [];
+      while (flatAutoclave.length) {
+        newAutoclave.push(flatAutoclave.splice(0, 21));
+      }
+
+      return newAutoclave;
     });
   };
 

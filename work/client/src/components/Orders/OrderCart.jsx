@@ -173,15 +173,24 @@ const OrderCart = React.memo(() => {
   };
 
   const statusChangeHandler = (status) => {
-    if (ordersStatus.includes(status.accessor))
+    const currentStatus = ordersStatus[ordersStatus.length - 1];
+    const currentIndex = status_list.findIndex((s) => s.accessor === currentStatus);
+    const newIndex = status_list.findIndex((s) => s.accessor === status.accessor);
+  
+    if (newIndex > currentIndex + 1) {
       return alert('This status cannot be set');
-
+    }
+  
+    if (ordersStatus.includes(status.accessor)) {
+      return alert('This status cannot be set');
+    }
+  
     const order_id = orderCartData?.id;
     const hasShippingDate =
       orderCartData?.shipping_date?.length > 0
         ? orderCartData?.shipping_date
         : formatDataValue;
-
+  
     if (status.accessor !== status_list[0].accessor && !hasShippingDate) {
       alert('Пожалуйста, выберите дату отправки');
       return;
@@ -193,16 +202,13 @@ const OrderCart = React.memo(() => {
         })
       );
     }
-
-    updatedProductListOrder.map((product) => {
-      const loc = latestProducts.find((el) => {
-        return el.id == product.product_id;
-      })?.placeOfProduction;
-
+  
+    updatedProductListOrder.forEach((product) => {
+      const loc = latestProducts.find((el) => el.id == product.product_id)?.placeOfProduction;
       const haveProductReserve = list_of_reserved_products.find(
         (el) => el.orders_products_id == product.id
       );
-
+  
       if (
         status.accessor === status_list[2].accessor &&
         loc === 'Spain' &&
@@ -230,11 +236,11 @@ const OrderCart = React.memo(() => {
           })
         );
       }
-      return;
     });
-
+  
+    // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
-
+  
     dispatch(
       updateOrderStatus({
         order_id,
@@ -498,7 +504,7 @@ const OrderCart = React.memo(() => {
         </div>
       </div>
       <FilesMain userAccess={userAccess} />
-      {orderCartData &&
+      {/* {orderCartData &&
         Array.isArray(updatedProductListOrder) &&
         updatedProductListOrder.length > 0 &&
         vatValue && (
@@ -507,7 +513,7 @@ const OrderCart = React.memo(() => {
             updatedProductListOrder={updatedProductListOrder}
             vatValue={vatValue}
           />
-        )}
+        )} */}
     </>
   );
 });
