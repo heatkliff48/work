@@ -177,7 +177,7 @@ const OrderCart = React.memo(() => {
     // const currentIndex = status_list.findIndex((s) => s.accessor === currentStatus);
     // const newIndex = status_list.findIndex((s) => s.accessor === status.accessor);
 
-    if (Number(status.accessor) < Number(orderCartData?.status)) {
+    if (status.accessor < orderCartData?.status) {
       return alert('This status cannot be set');
     }
 

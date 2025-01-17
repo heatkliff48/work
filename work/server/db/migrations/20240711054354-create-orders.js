@@ -34,7 +34,7 @@ module.exports = {
         // },
       },
       status: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       shipping_date: {
         type: Sequelize.STRING,
