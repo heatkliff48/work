@@ -198,9 +198,7 @@ function ProductionBatchDesigner() {
   }, [latestProducts, listOfOrderedCakes, autoclaveData]);
 
   useEffect(() => {
-    console.log('currId', currId);
     if (currId !== null) {
-      console.log('currId', currId);
       setAutoclave((prevAutoclave) => {
         const newAutoclaveState = prevAutoclave.map((autoclaveRow) =>
           autoclaveRow.map((cell) => ({ ...cell }))
