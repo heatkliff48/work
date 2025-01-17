@@ -21,6 +21,7 @@ function OrdersTable() {
     setNewOrder,
     ordersDataList,
     setOrdersDataList,
+    status_list,
   } = useOrderContext();
   const { clientModalOrder, setClientModalOrder } = useModalContext();
   const { setCurrentClient } = useProjectContext();
@@ -59,7 +60,8 @@ function OrdersTable() {
         return {
           id,
           article,
-          status,
+          status:
+            status_list?.find((stat) => stat.accessor == status).Header || status,
           owner: client ? client.c_name : '',
           del_adr_id: deliveryAddress ? deliveryAddress.street : '',
           shipping_date,
