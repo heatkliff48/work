@@ -25,7 +25,7 @@ function ProductionBatchDesigner() {
   const [currId, setCurrId] = useState(null);
   const [totalQuantity, setTotalQuantity] = useState(0);
 
-  const MAX_QUANTITY = 1405;
+  const MAX_QUANTITY = 10405;
   let countRef = useRef(0);
 
   const headers = useMemo(
@@ -51,22 +51,28 @@ function ProductionBatchDesigner() {
   };
 
   const addCakesData = useCallback(
-    (prodBatch) => {
-      const quantity_cakes = (prodBatch.product_with_brack / 3).toFixed(2);
+    (prodBatchData) => {
+      const quantity_cakes = (prodBatchData.product_with_brack / 3).toFixed(2);
       const free_product_cakes = (
         Math.ceil(quantity_cakes) - quantity_cakes
       ).toFixed(2);
       const free_product_package = Math.ceil(free_product_cakes * 3);
 
+      const haveBatch = batchDesigner.length > 0;
       const total_cakes = Math.ceil(quantity_cakes);
-      const cakes_in_batch = autoclaveData?.filter(
-        (unit) => unit.id_list_of_ordered_product === prodBatch.id
-      ).length;
 
-      const cakes_residue = total_cakes - cakes_in_batch ?? 0;
+      const cakes_in_batch = haveBatch
+        ? batchDesigner.find((el) => el.id === prodBatchData.id).cakes_in_batch
+        : autoclaveData?.filter(
+            (unit) => unit.id_list_of_ordered_product === prodBatchData.id
+          ).length;
+
+      const cakes_residue = haveBatch
+        ? batchDesigner.find((el) => el.id === prodBatchData.id).cakes_residue
+        : Math.max(total_cakes - cakes_in_batch, 0);
 
       const updatedProdBatch = {
-        ...prodBatch,
+        ...prodBatchData,
         cakes_quantity: quantity_cakes,
         free_product_cakes,
         free_product_package,
@@ -76,27 +82,30 @@ function ProductionBatchDesigner() {
       };
 
       setBatchFromBD((prev) => {
-        const existingIndex = prev.findIndex((item) => item.id === prodBatch.id);
+        const existingIndex = prev.findIndex((item) => item.id === prodBatchData.id);
 
         if (existingIndex !== -1) {
           const updated = [...prev];
           updated[existingIndex] = {
-            id: prodBatch.id,
-            cakes_in_batch,
-            cakes_residue,
+            id: prodBatchData.id,
+            cakes_in_batch: 0,
+            cakes_residue: total_cakes,
           };
           return updated;
         }
 
-        return [...prev, { id: prodBatch.id, cakes_in_batch, cakes_residue }];
+        return [
+          ...prev,
+          { id: prodBatchData.id, cakes_in_batch: 0, cakes_residue: total_cakes },
+        ];
       });
 
-      const existingBatch = batchDesigner?.find((el) => el?.id === prodBatch.id);
+      const existingBatch = batchDesigner?.find((el) => el?.id === prodBatchData.id);
 
       if (!existingBatch) {
         dispatch(
           addBatchState({
-            id: prodBatch.id,
+            id: prodBatchData.id,
             cakes_in_batch,
             cakes_residue,
           })
@@ -106,24 +115,24 @@ function ProductionBatchDesigner() {
       if (cakes_in_batch > 0) {
         dispatch(
           unlockButton({
-            id: prodBatch.id,
-            isButtonLocked: true,
+            id: prodBatchData.id,
+            isButtonLocked: cakes_residue === 0,
           })
         );
       }
 
       return updatedProdBatch;
     },
-    [autoclaveData, batchDesigner, dispatch]
+    [autoclaveData, batchDesigner]
   );
 
-  const transformAutoclaveData = (autoclave, prodBatchDesigner) => {
-    if (!autoclave || !prodBatchDesigner) return [];
+  const transformAutoclaveData = (tAutoclave, prodBatchDesigner) => {
+    if (!tAutoclave || !prodBatchDesigner) return [];
 
-    const transformedAutoclave = autoclave.map((unit) => {
-      const batch = prodBatchDesigner.find(
-        (prod) => prod.id === unit.id_list_of_ordered_product
-      );
+    const transformedAutoclave = tAutoclave.map((unit) => {
+      const batch = prodBatchDesigner.find((prod) => {
+        return prod.id === unit.id_list_of_ordered_product;
+      });
 
       if (!batch)
         return {
@@ -170,7 +179,6 @@ function ProductionBatchDesigner() {
       const group = groupedByDensity[densityKey];
       group.forEach(({ id, quantity, product }) => {
         const { m3, normOfBrack, width, density } = product;
-
         if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
           const batch = addCakesData({
             id,
@@ -189,7 +197,6 @@ function ProductionBatchDesigner() {
     setProductonBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
     const updatedAutoclaveData = transformAutoclaveData(autoclaveData, prodBatch);
-
     const filledAutoclave = [];
     for (let i = 0; i < updatedAutoclaveData.length; i += 21) {
       filledAutoclave.push(updatedAutoclaveData.slice(i, i + 21));
@@ -320,7 +327,7 @@ function ProductionBatchDesigner() {
     });
 
     countRef.current = 0;
-    setCurrId(null)
+    setCurrId(null);
   }, [currId]);
 
   const renderGroupedRows = useCallback(() => {

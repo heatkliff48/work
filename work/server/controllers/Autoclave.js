@@ -16,7 +16,7 @@ class AutoclaveController {
     try {
       const newAutoclave = await AutoclaveService.saveAutoclave(req.body);
 
-      return res.json(newAutoclave).status(200);
+      return res.status(200).json(newAutoclave);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -26,7 +26,7 @@ class AutoclaveController {
     try {
       const newAutoclave = await AutoclaveService.updateAutoclave(req.body);
 
-      return res.json(newAutoclave).status(200);
+      return res.status(200).json(newAutoclave);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
