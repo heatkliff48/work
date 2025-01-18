@@ -23,7 +23,7 @@ import FilesMain from '#components/FileUpload/Product/FilesMain.jsx';
 const ProductCardModal = React.memo(() => {
   const { productCardData, setProductCardData } = useProjectContext();
   const { modalProductCard, setModalProductCard } = useModalContext();
-  const { COLUMNS } = useProductsContext();
+  const { COLUMNS, selectOptions } = useProductsContext();
   const { userAccess } = useUsersContext();
 
   const [lastVersion, setLastVersion] = useState(1);
@@ -69,7 +69,7 @@ const ProductCardModal = React.memo(() => {
     // Найти продукт с выбранной версией
     const selectedProduct = products.find(
       (product) =>
-        product.article === productCardData.article.slice(0, -4) &&
+        product.article === productCardData.article && // .slice(0, -4)
         product.version === parseInt(selectedOption.value)
     );
 
@@ -77,7 +77,15 @@ const ProductCardModal = React.memo(() => {
       // Обновить productCardData с новой версией
       setProductCardData({
         ...selectedProduct,
-        article: memoizedArticle(selectedProduct),
+        placeOfProduction:
+          selectOptions.placeOfProduction?.find(
+            (place) => place.value == selectedProduct.placeOfProduction
+          )?.label || selectedProduct.placeOfProduction,
+        typeOfPackaging:
+          selectOptions.typeOfPackaging?.find(
+            (place) => place.value == selectedProduct.typeOfPackaging
+          )?.label || selectedProduct.typeOfPackaging,
+        // article: memoizedArticle(selectedProduct),
       });
     }
   };
@@ -95,13 +103,13 @@ const ProductCardModal = React.memo(() => {
   useEffect(() => {
     setProductCardData((prevProductCardData) => {
       const newArticle = memoizedArticle(prevProductCardData);
-      return { ...prevProductCardData, article: newArticle };
+      return { ...prevProductCardData }; // , article: newArticle
     });
   }, [modalProductCard]);
 
   useEffect(() => {
     const searchArticle = productCardData.article
-      ? productCardData.article.slice(0, productCardData.article.length - 4)
+      ? productCardData.article.slice(0, productCardData.article.length)
       : '';
 
     const prodArrVers = products?.reduce((acc, el) => {
@@ -129,7 +137,10 @@ const ProductCardModal = React.memo(() => {
           <div className="product_card_header">
             <div>
               <div>Article</div>
-              <div className="product_article">{productCardData.article}</div>
+              {/* productCardData.article */}
+              <div className="product_article">
+                {memoizedArticle(productCardData)}
+              </div>
             </div>
             <div>
               <div>Last version: {lastVersion}</div>
@@ -137,7 +148,7 @@ const ProductCardModal = React.memo(() => {
                 <Select
                   onChange={handleSelectChange}
                   options={productByVersion}
-                  value={getSelectedOption('version')}
+                  defaultValue={getSelectedOption('version')}
                 />
               </div>
             </div>
