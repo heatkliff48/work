@@ -115,7 +115,6 @@ class AutoclavesRepository {
         order: [['id', 'ASC']],
       });
 
-      console.log('>>>>>>>>>>>>>>>>>AUTOVLSVE', newAutoclave);
       return newAutoclave;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);

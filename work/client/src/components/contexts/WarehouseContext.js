@@ -127,16 +127,16 @@ const WarehouseContextProvider = ({ children }) => {
           (elem) => elem.order_id === orderId && elem.product_id === productId
         );
 
-        const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, el) => {
+        const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
           const reserved = list_of_reserved_products.find(
-            (res_prod) => res_prod.orders_products_id === el.id
+            (res_prod) => res_prod.orders_products_id === elem.id
           );
           return sum + (reserved ? reserved.quantity : 0);
         }, 0);
 
         const quantity_in_batch = (
           batchOutside.find((batch) => batch.id_list_of_ordered_production === el.id)
-            ?.quantity_pallets / 3
+            ?.quantity_pallets / 3 || 0
         ).toFixed(2);
 
         return {
@@ -145,7 +145,19 @@ const WarehouseContextProvider = ({ children }) => {
           quantity_in_batch,
           quantity_in_warehouse,
         };
-      });
+      })
+      .reduce((uniqueItems, item) => {
+        if (
+          !uniqueItems.some(
+            (el) =>
+              el.product_article === item.product_article &&
+              el.order_article === item.order_article
+          )
+        ) {
+          uniqueItems.push(item);
+        }
+        return uniqueItems;
+      }, []);
 
     setListOfOrderedCakes(data);
 
