@@ -96,6 +96,11 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          page_name: 'orders_change_person_in_charge',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );

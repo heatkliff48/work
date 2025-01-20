@@ -516,16 +516,19 @@ const OrderCart = React.memo(() => {
                 />
               )}
             </div>
-            <div className="person_in_charge">
-              <p>Person in charge</p>
-              <Select
-                defaultValue={getSelectedOption(orderCartData.person_in_charge)}
-                onChange={(v) => {
-                  handleSelectChange(v);
-                }}
-                options={personsInChargeList}
-              />
-            </div>
+            {checkUserAccess(user, roles, 'orders_change_person_in_charge')
+              ?.canWrite && (
+              <div className="person_in_charge">
+                <p>Person in charge</p>
+                <Select
+                  defaultValue={getSelectedOption(orderCartData.person_in_charge)}
+                  onChange={(v) => {
+                    handleSelectChange(v);
+                  }}
+                  options={personsInChargeList}
+                />
+              </div>
+            )}
           </div>
           {orderStatusAccess?.canRead && (
             <div className="status-table">
