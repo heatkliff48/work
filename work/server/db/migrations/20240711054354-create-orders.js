@@ -39,6 +39,9 @@ module.exports = {
       shipping_date: {
         type: Sequelize.STRING,
       },
+      person_in_charge: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

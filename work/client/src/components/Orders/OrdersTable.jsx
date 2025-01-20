@@ -22,6 +22,7 @@ function OrdersTable() {
     ordersDataList,
     setOrdersDataList,
     status_list,
+    usersInfo,
   } = useOrderContext();
   const { clientModalOrder, setClientModalOrder } = useModalContext();
   const { setCurrentClient } = useProjectContext();
@@ -50,7 +51,7 @@ function OrdersTable() {
   useEffect(() => {
     if (orders && clients && deliveryAddresses) {
       const newArray = orders.map((order) => {
-        const { id, article, status, shipping_date } = order;
+        const { id, article, status, shipping_date, person_in_charge } = order;
         const client = clients.find((client) => client.id === order.owner);
         const deliveryAddress = deliveryAddresses.find(
           (address) =>
@@ -65,6 +66,10 @@ function OrdersTable() {
           owner: client ? client.c_name : '',
           del_adr_id: deliveryAddress ? deliveryAddress.street : '',
           shipping_date,
+          person_in_charge:
+            person_in_charge != 0
+              ? usersInfo.find((user) => user.id === person_in_charge)?.fullName
+              : 'None',
         };
       });
 

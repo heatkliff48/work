@@ -19,6 +19,7 @@ import {
   updateRemainingStockSocket,
   updateRolesActiveSocket,
   updateRolesSocket,
+  updInChargeOrderSocket,
   updProductOfOrderSocket,
   updStatusOfOrderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
@@ -68,6 +69,7 @@ import {
   DELETE_MATERIAL_PLAN_SOCKET,
   ADD_NEW_FILES_PRODUCT_SOCKET,
   DELETE_FILES_PRODUCT_SOCKET,
+  UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -110,6 +112,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_STATUS_OF_ORDER_SOCKET:
       dispatch(updStatusOfOrderSocket(payload));
+      break;
+
+    case UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET:
+      dispatch(updInChargeOrderSocket(payload));
       break;
 
     case ADD_NEW_WAREHOUSE_SOCKET:

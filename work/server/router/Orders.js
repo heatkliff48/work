@@ -18,5 +18,6 @@ router.post(
   OrdersController.getUpdateDeliveryAddressOrder
 );
 router.post('/update/status', OrdersController.getUpdateStatusOrder);
+router.post('/update/in_charge', OrdersController.getUpdateInChargeOrder);
 
 module.exports = router;

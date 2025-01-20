@@ -27,6 +27,8 @@ import {
   ADD_DATA_SHIP_ORDER,
   PRODUCTS_OF_ORDER,
   GET_PRODUCTS_OF_ORDER,
+  UPDATE_PERSON_IN_CHARGE_OF_ORDER,
+  PERSON_IN_CHARGE_OF_ORDER,
 } from '../types/ordersTypes';
 
 const url = axios.create({
@@ -136,6 +138,15 @@ const updateDeliveryOfOrder = (newDeliveryOfOrder) => {
 const updateStatusOfOrder = (orderStatus) => {
   return url
     .post('/orders/update/status', orderStatus)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updateInChargeOfOrder = (orderInCharge) => {
+  return url
+    .post('/orders/update/in_charge', orderInCharge)
     .then((res) => {
       return res.data;
     })
@@ -332,9 +343,18 @@ function* updateStatusOfOrderWorker(action) {
     const { payload } = action;
     const status = yield call(updateStatusOfOrder, payload);
     yield put({ type: STATUS_OF_ORDER, payload: status });
-
   } catch (err) {
     yield put({ type: STATUS_OF_ORDER, payload: [] });
+  }
+}
+
+function* updateInChargeOfOrderWorker(action) {
+  try {
+    const { payload } = action;
+    const status = yield call(updateInChargeOfOrder, payload);
+    yield put({ type: PERSON_IN_CHARGE_OF_ORDER, payload: status });
+  } catch (err) {
+    yield put({ type: PERSON_IN_CHARGE_OF_ORDER, payload: [] });
   }
 }
 
@@ -354,6 +374,7 @@ function* ordersWatcher() {
   yield takeLatest(UPDATE_CONTACT_OF_ORDER, updateContactOfOrderWorker);
   yield takeLatest(UPDATE_DELIVERY_OF_ORDER, updateDeliveryOfOrderWorker);
   yield takeLatest(UPDATE_STATUS_OF_ORDER, updateStatusOfOrderWorker);
+  yield takeLatest(UPDATE_PERSON_IN_CHARGE_OF_ORDER, updateInChargeOfOrderWorker);
 }
 
 export default ordersWatcher;
