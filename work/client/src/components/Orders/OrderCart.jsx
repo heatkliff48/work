@@ -506,7 +506,7 @@ const OrderCart = React.memo(() => {
         </div>
       </div>
       <FilesMain userAccess={userAccess} />
-      {/* {orderCartData &&
+      {orderCartData &&
         Array.isArray(updatedProductListOrder) &&
         updatedProductListOrder.length > 0 &&
         vatValue && (
@@ -515,7 +515,7 @@ const OrderCart = React.memo(() => {
             updatedProductListOrder={updatedProductListOrder}
             vatValue={vatValue}
           />
-        )} */}
+        )}
     </>
   );
 });
