@@ -251,7 +251,7 @@ function ProductionBatchDesigner() {
   }, [currId]);
 
   useEffect(() => {
-    if (currId !== null || autoclave.length !== 0) {
+    if (autoclave.length !== 0) {
       setProductonBatchDesigner((prev) => {
         return prev.map((batchItem) => {
           for (let i = 0; i < batchDesigner.length; i++) {

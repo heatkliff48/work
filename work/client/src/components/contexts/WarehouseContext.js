@@ -104,25 +104,31 @@ const WarehouseContextProvider = ({ children }) => {
   useEffect(() => {
     const data = list_of_ordered_production
       ?.filter((el) => {
+        // Определение статуса заказа
         const orderStatus = list_of_orders?.find(
           (order) => order.article === el.order_article
         )?.status;
 
+        // Исключение заказов с указанными статусами
         return !['produced', 'shipment', 'shipped', 'completed'].includes(
           orderStatus
         );
       })
       .map((el) => {
+        // Рассчитать количество тортов
         const quantity_cakes = (el.quantity / 3).toFixed(2);
 
+        // Найти ID заказа
         const orderId = list_of_orders.find(
           (order) => order.article === el.order_article
         )?.id;
 
+        // Найти ID продукта
         const productId = latestProducts.find(
           (product) => product.article === el.product_article
         )?.id;
 
+        // Фильтровать продукты заказа
         const arrOfOrderProduct = productsOfOrders.filter(
           (elem) => elem.order_id === orderId && elem.product_id === productId
         );
@@ -134,6 +140,7 @@ const WarehouseContextProvider = ({ children }) => {
           return sum + (reserved ? reserved.quantity : 0);
         }, 0);
 
+        // Рассчитать количество в партии
         const quantity_in_batch = (
           batchOutside.find((batch) => batch.id_list_of_ordered_production === el.id)
             ?.quantity_pallets / 3 || 0
