@@ -110,6 +110,7 @@ const OrderContextProvider = ({ children }) => {
   const [orderCartData, setOrderCartData] = useState({});
   const [isOrderReady, setIsOrderReady] = useState(false);
   const [quantityPallets, setQuantityPallets] = useState({});
+  const [personsInChargeList, setPersonsInChargeList] = useState([]);
 
   const list_of_orders = useSelector((state) => state.orders);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
@@ -117,9 +118,34 @@ const OrderContextProvider = ({ children }) => {
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
   const contactInfos = useSelector((state) => state.contactInfo);
   const autoclaveData = useSelector((state) => state.autoclave);
+  const usersInfo = useSelector((state) => state.usersInfo);
+  const usersMainInfo = useSelector((state) => state.usersMainInfo);
+
   useEffect(() => {
     dispatch(getOrders());
   }, [isOrderReady]);
+
+  useEffect(() => {
+    const filteredUsersList = usersMainInfo.filter(
+      (user) => user.role === 2 || user.role === 16 || user.role === 17
+    );
+
+    const tempPersonsInChargeList = [
+      {
+        value: 0,
+        label: 'None',
+      },
+    ];
+
+    filteredUsersList.forEach((element) => {
+      const label = usersInfo.find((user) => user.id === element.id)?.fullName;
+      const value = element.id;
+
+      tempPersonsInChargeList.push({ value, label });
+    });
+
+    setPersonsInChargeList(tempPersonsInChargeList);
+  }, [usersMainInfo]);
 
   const getCurrentOrderInfoHandler = useCallback(
     (order_info) => {
@@ -178,6 +204,8 @@ const OrderContextProvider = ({ children }) => {
         setAutoclave,
         quantityPallets,
         setQuantityPallets,
+        personsInChargeList,
+        setPersonsInChargeList,
       }}
     >
       {children}

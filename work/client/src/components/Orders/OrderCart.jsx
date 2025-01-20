@@ -27,6 +27,7 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import DownloadOrderPDF from './OrdersPDF.jsx';
 import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
 import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
+import Select from 'react-select';
 
 const OrderCart = React.memo(() => {
   const {
@@ -37,6 +38,7 @@ const OrderCart = React.memo(() => {
     list_of_orders,
     setSelectedProduct,
     setProductOfOrder,
+    personsInChargeList,
   } = useOrderContext();
   const {
     productModalOrder,
@@ -75,6 +77,7 @@ const OrderCart = React.memo(() => {
     canRead: true,
     canWrite: false,
   });
+  const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
 
   const filterKeys = useMemo(
     () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
@@ -178,6 +181,10 @@ const OrderCart = React.memo(() => {
     // const newIndex = status_list.findIndex((s) => s.accessor === status.accessor);
 
     if (status.accessor < orderCartData?.status) {
+      return alert('This status cannot be set');
+    }
+
+    if (status.accessor > orderCartData?.status + 1) {
       return alert('This status cannot be set');
     }
 
@@ -325,6 +332,20 @@ const OrderCart = React.memo(() => {
       }
     }
   }, [user, roles]);
+
+  const handleSelectChange = (selectedOption, key) => {
+    setSelectedPersonInCharge((prev) => ({ ...prev, [key]: selectedOption.value }));
+  };
+
+  const getSelectedOption = (accessor) => {
+    const options = personsInChargeList;
+    if (!options) return null;
+    const personInChargeOption = options.find(
+      (option) => option.value === selectedPersonInCharge?.[accessor]
+    );
+    // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
+    return personInChargeOption || options[0];
+  };
 
   return (
     <>
@@ -482,6 +503,16 @@ const OrderCart = React.memo(() => {
                   dateFormat="dd.MM.yyyy"
                 />
               )}
+            </div>
+            <div className="person_in_charge">
+              <p>Person in charge</p>
+              <Select
+                defaultValue={getSelectedOption(orderCartData.person_in_charge)}
+                onChange={(v) => {
+                  handleSelectChange(v, orderCartData.person_in_charge);
+                }}
+                options={personsInChargeList}
+              />
             </div>
           </div>
           {orderStatusAccess?.canRead && (
