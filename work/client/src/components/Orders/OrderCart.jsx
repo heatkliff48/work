@@ -11,6 +11,7 @@ import {
   addDataShipOrder,
   deleteOrder,
   getDeleteProductOfOrder,
+  updateOrderInCharge,
   updateOrderStatus,
 } from '#components/redux/actions/ordersAction.js';
 import {
@@ -333,15 +334,26 @@ const OrderCart = React.memo(() => {
     }
   }, [user, roles]);
 
-  const handleSelectChange = (selectedOption, key) => {
-    setSelectedPersonInCharge((prev) => ({ ...prev, [key]: selectedOption.value }));
+  const handleSelectChange = (selectedOption) => {
+    setSelectedPersonInCharge((prev) => ({
+      ...prev,
+      person_in_charge: selectedOption.value,
+    }));
+    const order_id = orderCartData?.id;
+    dispatch(
+      updateOrderInCharge({
+        order_id,
+        person_in_charge: selectedOption.value,
+      })
+    );
   };
 
   const getSelectedOption = (accessor) => {
     const options = personsInChargeList;
     if (!options) return null;
+    console.log('orderCartData', orderCartData);
     const personInChargeOption = options.find(
-      (option) => option.value === selectedPersonInCharge?.[accessor]
+      (option) => option.value === orderCartData?.person_in_charge
     );
     // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
     return personInChargeOption || options[0];
@@ -509,7 +521,7 @@ const OrderCart = React.memo(() => {
               <Select
                 defaultValue={getSelectedOption(orderCartData.person_in_charge)}
                 onChange={(v) => {
-                  handleSelectChange(v, orderCartData.person_in_charge);
+                  handleSelectChange(v);
                 }}
                 options={personsInChargeList}
               />

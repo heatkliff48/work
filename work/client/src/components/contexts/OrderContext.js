@@ -29,6 +29,12 @@ const OrderContextProvider = ({ children }) => {
       Filter: DropdownFilter,
       sortType: 'string',
     },
+    {
+      Header: 'Person in charge of the order',
+      accessor: 'person_in_charge',
+      Filter: DropdownFilter,
+      sortType: 'person_in_charge',
+    },
   ];
 
   const COLUMNS_ORDER_PRODUCT = [
@@ -168,6 +174,7 @@ const OrderContextProvider = ({ children }) => {
         deliveryAddress,
         contactInfo,
         shipping_date: order?.shipping_date,
+        person_in_charge: order?.person_in_charge,
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
@@ -206,6 +213,7 @@ const OrderContextProvider = ({ children }) => {
         setQuantityPallets,
         personsInChargeList,
         setPersonsInChargeList,
+        usersInfo,
       }}
     >
       {children}

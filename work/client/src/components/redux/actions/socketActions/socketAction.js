@@ -21,6 +21,7 @@ import {
   NEES_DELETE_MATERIAL_PLAN_SOCKET,
   NEW_FILES_PRODUCT_SOCKET,
   NEED_DELETE_FILES_PRODUCT_SOCKET,
+  PERSON_IN_CHARGE_OF_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -83,6 +84,13 @@ export const updStatusOfOrderSocket = (order) => {
   return {
     type: STATUS_OF_ORDER_SOCKET,
     payload: order,
+  };
+};
+
+export const updInChargeOrderSocket = (person_in_charge) => {
+  return {
+    type: PERSON_IN_CHARGE_OF_ORDER_SOCKET,
+    payload: person_in_charge,
   };
 };
 

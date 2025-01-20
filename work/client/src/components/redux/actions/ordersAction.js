@@ -11,6 +11,7 @@ import {
   UPDATE_DELIVERY_OF_ORDER,
   UPDATE_STATUS_OF_ORDER,
   GET_PRODUCTS_OF_ORDER,
+  UPDATE_PERSON_IN_CHARGE_OF_ORDER,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -92,5 +93,12 @@ export const updateOrderStatus = (orderStatus) => {
   return {
     type: UPDATE_STATUS_OF_ORDER,
     payload: orderStatus,
+  };
+};
+
+export const updateOrderInCharge = (orderInCharge) => {
+  return {
+    type: UPDATE_PERSON_IN_CHARGE_OF_ORDER,
+    payload: orderInCharge,
   };
 };

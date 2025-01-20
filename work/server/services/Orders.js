@@ -7,13 +7,21 @@ class OrdersService {
     return orders;
   }
 
-  static async addNewOrder({ article, del_adr_id, contact_id, owner, status }) {
+  static async addNewOrder({
+    article,
+    del_adr_id,
+    contact_id,
+    owner,
+    status,
+    person_in_charge,
+  }) {
     const newOrder = await OrdersRepository.addNewOrderData({
       article,
       del_adr_id,
       contact_id,
       owner,
       status,
+      person_in_charge,
     });
 
     return newOrder;
@@ -67,6 +75,12 @@ class OrdersService {
 
   static async getUpdateStatusOrder({ status, order_id }) {
     await OrdersRepository.getUpdateStatusOrder({ status, order_id });
+
+    return;
+  }
+
+  static async getUpdateInChargeOrder({ person_in_charge, order_id }) {
+    await OrdersRepository.getUpdateInChargeOrder({ person_in_charge, order_id });
 
     return;
   }

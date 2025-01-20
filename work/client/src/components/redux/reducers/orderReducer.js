@@ -9,6 +9,7 @@ import {
 import {
   DATASHIP_ORDER_SOCKET,
   NEW_ORDER_SOCKET,
+  PERSON_IN_CHARGE_OF_ORDER_SOCKET,
   STATUS_OF_ORDER_SOCKET,
 } from '../types/socketTypes/socket';
 
@@ -71,6 +72,14 @@ export const ordersReducer = (orders = [], action) => {
       const { status, order_id } = payload;
       return orders.map((order) => {
         if (order.id === order_id) return { ...order, status };
+        return order;
+      });
+    }
+
+    case PERSON_IN_CHARGE_OF_ORDER_SOCKET: {
+      const { person_in_charge, order_id } = payload;
+      return orders.map((order) => {
+        if (order.id === order_id) return { ...order, person_in_charge };
         return order;
       });
     }

@@ -7,6 +7,7 @@ const {
   UPDATE_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
+  UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -21,7 +22,8 @@ class OrdersController {
   }
 
   static async addNewOrder(req, res) {
-    const { article, del_adr_id, contact_id, owner, status } = req.body.order;
+    const { article, del_adr_id, contact_id, owner, status, person_in_charge } =
+      req.body.order;
 
     try {
       const newOrder = await OrdersService.addNewOrder({
@@ -30,6 +32,7 @@ class OrdersController {
         contact_id,
         owner,
         status,
+        person_in_charge,
       });
 
       myEmitter.emit(ADD_NEW_ORDER_SOCKET, newOrder);
@@ -150,6 +153,27 @@ class OrdersController {
       myEmitter.emit(UPDATE_STATUS_OF_ORDER_SOCKET, { status, order_id });
 
       return res.json({ status, order_id }).status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getUpdateInChargeOrder(req, res) {
+    console.log('-------------------------req.body', req.body);
+    const { person_in_charge, order_id } = req.body;
+
+    try {
+      await OrdersService.getUpdateInChargeOrder({
+        person_in_charge,
+        order_id,
+      });
+
+      myEmitter.emit(UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET, {
+        person_in_charge,
+        order_id,
+      });
+
+      return res.json({ person_in_charge, order_id }).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

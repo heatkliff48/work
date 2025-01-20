@@ -30,6 +30,7 @@ const {
   DELETE_MATERIAL_PLAN_SOCKET,
   ADD_NEW_FILES_PRODUCT_SOCKET,
   DELETE_FILES_PRODUCT_SOCKET,
+  UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -106,6 +107,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_STATUS_OF_ORDER_SOCKET,
           payload: order,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET, (person_in_charge) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
+          payload: person_in_charge,
         })
       );
     }

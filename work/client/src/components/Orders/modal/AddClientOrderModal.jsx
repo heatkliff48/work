@@ -76,10 +76,15 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
       article,
       owner: owner.id,
       status: status_list[0].accessor,
+      person_in_charge: 0,
     });
     setCurrentClient(owner);
     setSearchFilter('');
   };
+
+  useEffect(() => {
+    console.log('newOrder', newOrder);
+  }, [newOrder]);
 
   const backHanddler = () => {
     setNewOrder({});
