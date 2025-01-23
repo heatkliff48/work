@@ -77,32 +77,44 @@ const OrderContextProvider = ({ children }) => {
 
   const status_list = [
     {
-      Header: 'Order approved',
+      Header: 'Initial contact',
       accessor: 1,
     },
     {
-      Header: 'The order is accepted by the client',
+      Header: 'Inquiry in progress',
       accessor: 2,
     },
     {
-      Header: 'The order is allowed to be transferred to production',
+      Header: 'Proposal approved by us',
       accessor: 3,
     },
     {
-      Header: 'The order has been produced',
+      Header: 'Proposal accepted by client',
       accessor: 4,
     },
     {
-      Header: 'Shipment allowed',
+      Header: 'Contracted order', // date
       accessor: 5,
     },
     {
-      Header: 'Order shipped',
+      Header: 'Order allowed for production',
       accessor: 6,
     },
     {
-      Header: 'The order is completed',
+      Header: 'Order produced',
       accessor: 7,
+    },
+    {
+      Header: 'Shipping allowed',
+      accessor: 8,
+    },
+    {
+      Header: 'Order shipped',
+      accessor: 9,
+    },
+    {
+      Header: 'Order completed',
+      accessor: 10,
     },
   ];
 

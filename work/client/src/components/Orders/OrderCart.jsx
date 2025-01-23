@@ -199,10 +199,10 @@ const OrderCart = React.memo(() => {
         ? orderCartData?.shipping_date
         : formatDataValue;
 
-    if (status.accessor !== status_list[0].accessor && !hasShippingDate) {
+    if (status.accessor > status_list[3].accessor && !hasShippingDate) {
       alert('Пожалуйста, выберите дату отправки');
       return;
-    } else if (status.accessor === status_list[1].accessor) {
+    } else if (status.accessor === status_list[4].accessor) {
       dispatch(
         addDataShipOrder({
           order_id,
@@ -220,7 +220,7 @@ const OrderCart = React.memo(() => {
       );
 
       if (
-        status.accessor === status_list[2].accessor &&
+        status.accessor === status_list[5].accessor &&
         loc === 'Spain' &&
         !haveProductReserve
       ) {
@@ -233,7 +233,7 @@ const OrderCart = React.memo(() => {
           })
         );
       } else if (
-        status.accessor === status_list[2].accessor &&
+        status.accessor === status_list[5].accessor &&
         !haveProductReserve
       ) {
         dispatch(
@@ -351,7 +351,6 @@ const OrderCart = React.memo(() => {
   const getSelectedOption = (accessor) => {
     const options = personsInChargeList;
     if (!options) return null;
-    console.log('orderCartData', orderCartData);
     const personInChargeOption = options.find(
       (option) => option.value === orderCartData?.person_in_charge
     );
