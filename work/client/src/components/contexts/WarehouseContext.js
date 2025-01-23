@@ -110,9 +110,7 @@ const WarehouseContextProvider = ({ children }) => {
         )?.status;
 
         // Исключение заказов с указанными статусами
-        return !['produced', 'shipment', 'shipped', 'completed'].includes(
-          orderStatus
-        );
+        return ![7, 8, 9, 10].includes(orderStatus);
       })
       .map((el) => {
         // Рассчитать количество тортов
