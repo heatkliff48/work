@@ -24,12 +24,6 @@ export const ProductsContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
       disableSortBy: true,
     },
-    // {
-    //   Header: 'Version',
-    //   accessor: 'version',
-    //   defaultValue: 1,
-    //   sortType: 'number',
-    // },
     {
       Header: 'Density, kg/m³',
       accessor: 'density',
@@ -50,6 +44,27 @@ export const ProductsContextProvider = ({ children }) => {
     {
       Header: 'Type of packaging',
       accessor: 'typeOfPackaging',
+      defaultValue: '0',
+      Filter: DropdownFilter,
+      sortType: 'string',
+    },
+    {
+      Header: 'Pallet Type',
+      accessor: 'palletType',
+      defaultValue: '0',
+      Filter: DropdownFilter,
+      sortType: 'string',
+    },
+    {
+      Header: 'Pallet Size',
+      accessor: 'palletSize',
+      defaultValue: '0',
+      Filter: DropdownFilter,
+      sortType: 'text',
+    },
+    {
+      Header: 'Pallet Height',
+      accessor: 'palletHeight',
       defaultValue: '0',
       Filter: DropdownFilter,
       sortType: 'string',
@@ -111,66 +126,6 @@ export const ProductsContextProvider = ({ children }) => {
       Header: 'M2 per pallet',
       accessor: 'm2',
     },
-    // {
-    //   Header: 'Linear metre per pallet',
-    //   accessor: 'm',
-    // },
-    // {
-    //   Header: 'Width in the cakes',
-    //   accessor: 'widthInArray',
-    // },
-    // {
-    //   Header: 'M3 in the cakes',
-    //   accessor: 'm3InArray',
-    // },
-    // {
-    //   Header: 'Dry density max, kg/m³',
-    //   accessor: 'densityDryMax',
-    // },
-    // {
-    //   Header: 'Dry density default, kg/m³',
-    //   accessor: 'densityDryDef',
-    // },
-    // {
-    //   Header: 'Humidity, %',
-    //   accessor: 'humidity',
-    //   defaultValue: 30,
-    //   Filter: NumberRangeColumnFilter,
-    //   filter: 'between',
-    //   sortType: 'number',
-    //   min: 0,
-    //   max: 100,
-    // },
-    // {
-    //   Header: 'Density wet max, kg/m³',
-    //   accessor: 'densityHuminityMax',
-    // },
-    // {
-    //   Header: 'Density wet default, kg/m³',
-    //   accessor: 'densityHuminityDef',
-    // },
-    // {
-    //   Header: 'Product pallet weight max, kg',
-    //   accessor: 'weightMax',
-    // },
-    // {
-    //   Header: 'Product pallet weight default, kg',
-    //   accessor: 'weightDef',
-    // },
-    // {
-    //   Header: 'Norm of defect, %',
-    //   accessor: 'normOfBrack',
-    //   defaultValue: 2,
-    //   Filter: NumberRangeColumnFilter,
-    //   filter: 'between',
-    //   sortType: 'number',
-    // },
-    // {
-    //   Header: 'Priority for free products',
-    //   accessor: 'coefficientOfFree',
-    //   defaultValue: 0.5,
-    //   sortType: 'number',
-    // },
     {
       Header: 'Price per m³',
       accessor: 'price',
@@ -219,6 +174,27 @@ export const ProductsContextProvider = ({ children }) => {
     {
       Header: 'Type of packaging',
       accessor: 'typeOfPackaging',
+      defaultValue: '0',
+      Filter: DropdownFilter,
+      sortType: 'string',
+    },
+    {
+      Header: 'Pallet Type',
+      accessor: 'palletType',
+      defaultValue: '0',
+      Filter: DropdownFilter,
+      sortType: 'string',
+    },
+    {
+      Header: 'Pallet Size',
+      accessor: 'palletSize',
+      defaultValue: '0',
+      Filter: DropdownFilter,
+      sortType: 'text',
+    },
+    {
+      Header: 'Pallet Height',
+      accessor: 'palletHeight',
       defaultValue: '0',
       Filter: DropdownFilter,
       sortType: 'string',
@@ -373,6 +349,19 @@ export const ProductsContextProvider = ({ children }) => {
         { value: 1, label: 'Disposable' },
         { value: 2, label: 'Marine' },
       ],
+      palletType: [
+        { value: 0, label: 'Disposable' },
+        { value: 1, label: 'Reusable' },
+      ],
+      palletSize: [
+        { value: 0, label: '120x100' },
+        { value: 1, label: '120x80' },
+      ],
+      palletHeight: [
+        { value: 0, label: 'Std' },
+        { value: 1, label: 'Marine' },
+        { value: 2, label: 'High' },
+      ],
     }),
     []
   );
@@ -398,11 +387,23 @@ export const ProductsContextProvider = ({ children }) => {
       const newTypeOfPackaging = selectOptions.typeOfPackaging.find(
         (opt) => opt.value == prod.typeOfPackaging
       );
+      const newPalletType = selectOptions.palletType.find(
+        (opt) => opt.value == prod.palletType
+      );
+      const newPalletSize = selectOptions.palletSize.find(
+        (opt) => opt.value == prod.palletSize
+      );
+      const newPalletHeight = selectOptions.palletHeight.find(
+        (opt) => opt.value == prod.palletHeight
+      );
 
       return {
         ...prod,
         placeOfProduction: newPlaceOfProduction?.label,
         typeOfPackaging: newTypeOfPackaging?.label,
+        palletType: newPalletType?.label,
+        palletSize: newPalletSize?.label,
+        palletHeight: newPalletHeight?.label,
       };
     });
 

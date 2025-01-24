@@ -25,11 +25,20 @@ module.exports = {
       certificate: {
         type: Sequelize.STRING,
       },
-      /** new block */
       placeOfProduction: {
         type: Sequelize.STRING,
       },
       typeOfPackaging: {
+        type: Sequelize.STRING,
+      },
+      /** new block */
+      palletType: {
+        type: Sequelize.STRING,
+      },
+      palletSize: {
+        type: Sequelize.TEXT,
+      },
+      palletHeight: {
         type: Sequelize.STRING,
       },
       /** new block */
@@ -88,6 +97,15 @@ module.exports = {
         type: Sequelize.FLOAT,
       },
       price: {
+        type: Sequelize.FLOAT,
+      },
+      quantityBlockPallet: {
+        type: Sequelize.FLOAT,
+      },
+      volumeBlock: {
+        type: Sequelize.FLOAT,
+      },
+      volumeBlockOnPallet: {
         type: Sequelize.FLOAT,
       },
       createdAt: {

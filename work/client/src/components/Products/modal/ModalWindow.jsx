@@ -126,10 +126,39 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
     return newDefaultValues;
   }, [list]);
 
+  const calculatePalletDimensions = (palletSize, palletHeight) => {
+    // Определение ширины и длины паллета
+    const palletWidth = palletSize === 0 ? 1000 : 800;
+    const palletLength = 1200;
+
+    // Определение высоты паллета
+    let palletHeightValue;
+    switch (palletHeight) {
+      case 0:
+        palletHeightValue = 1200;
+        break;
+      case 1:
+        palletHeightValue = 1000;
+        break;
+      case 2:
+        palletHeightValue = 1500;
+        break;
+      default:
+        palletHeightValue = 1200; // Стандартное значение
+    }
+
+    return { palletWidth, palletLength, palletHeight: palletHeightValue };
+  };
+
   const memoizedCalculateValues = useCallback(
     (formInput) => {
       const values = {};
       const updateFuncs = {};
+
+      const { palletWidth, palletLength, palletHeight } = calculatePalletDimensions(
+        formInput?.palletSize,
+        formInput?.palletHeight
+      );
 
       // Вычисление m3
       if (formInput?.lengths && formInput?.height && formInput?.width) {
@@ -233,6 +262,42 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
           setFormInput((prev) => ({ ...prev, weightDef: value }));
       }
 
+      if (formInput?.lengths && formInput?.height && formInput?.width) {
+        values.volumeBlock = (
+          ((((formInput?.lengths / 1000) * formInput?.height) / 1000) *
+            formInput?.width) /
+          1000
+        ).toFixed(3);
+        updateFuncs.volumeBlock = (value) =>
+          setFormInput((prev) => ({ ...prev, volumeBlock: value }));
+      }
+
+      if (
+        formInput?.lengths &&
+        formInput?.height &&
+        formInput?.width &&
+        palletWidth &&
+        palletLength &&
+        palletHeight
+      ) {
+        values.quantityBlockPallet =
+          Math.floor(palletLength / formInput?.lengths) *
+          Math.floor(palletHeight / formInput?.height) *
+          Math.floor(palletWidth / formInput?.width);
+
+        updateFuncs.quantityBlockPallet = (value) =>
+          setFormInput((prev) => ({ ...prev, quantityBlockPallet: value }));
+      }
+
+      if (values.quantityBlockPallet && values.volumeBlock) {
+        values.volumeBlockOnPallet = values.quantityBlockPallet * values.volumeBlock;
+
+        updateFuncs.volumeBlockOnPallet = (value) =>
+          setFormInput((prev) => ({ ...prev, volumeBlockOnPallet: value }));
+      }
+
+      console.log('values', values);
+
       return { values, updateFuncs };
     },
     [
@@ -241,6 +306,8 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       formInput.width,
       formInput.density,
       formInput.humidity,
+      formInput.palletSize,
+      formInput.palletHeight,
     ]
   );
 
@@ -395,7 +462,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
                       if (articleId < 0) setArticleId(el.id);
                       setFormInput((prev) => ({
                         ...prev,
-                        [el.accessor]: option.value, // Используем value вместо label
+                        [el.accessor]: option.value,
                       }));
                     }}
                     options={selectOptions[el.accessor]}
