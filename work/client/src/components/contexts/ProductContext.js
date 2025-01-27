@@ -56,7 +56,7 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Pallet Size',
+      Header: 'Pallet Size, cm',
       accessor: 'palletSize',
       defaultValue: '0',
       Filter: DropdownFilter,
@@ -119,15 +119,15 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'M3 per pallet',
+      Header: 'Volume per pallet, m3',
       accessor: 'm3',
     },
     {
-      Header: 'M2 per pallet',
+      Header: 'Area on the pallet, m2',
       accessor: 'm2',
     },
     {
-      Header: 'Price per m³',
+      Header: 'Price per m³, EURO',
       accessor: 'price',
       defaultValue: 0,
       Filter: NumberRangeColumnFilter,
@@ -186,7 +186,7 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Pallet Size',
+      Header: 'Pallet Size, cm',
       accessor: 'palletSize',
       defaultValue: '0',
       Filter: DropdownFilter,
@@ -249,15 +249,15 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'M3 per pallet',
+      Header: 'Volume per pallet, m3',
       accessor: 'm3',
     },
     {
-      Header: 'M2 per pallet',
+      Header: 'Area on the pallet, m2',
       accessor: 'm2',
     },
     {
-      Header: 'Linear metre per pallet',
+      Header: 'Linear metre per pallet, m',
       accessor: 'm',
     },
     {
@@ -265,7 +265,7 @@ export const ProductsContextProvider = ({ children }) => {
       accessor: 'widthInArray',
     },
     {
-      Header: 'M3 in the cakes',
+      Header: 'Volume in the cakes, m3',
       accessor: 'm3InArray',
     },
     {
@@ -311,13 +311,13 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'number',
     },
     {
-      Header: 'Priority for free products',
+      Header: 'Priority for free products, 0-5',
       accessor: 'coefficientOfFree',
       defaultValue: 0.5,
       sortType: 'number',
     },
     {
-      Header: 'Price per m³',
+      Header: 'Price per m³, EURO',
       accessor: 'price',
       defaultValue: 0,
       Filter: NumberRangeColumnFilter,

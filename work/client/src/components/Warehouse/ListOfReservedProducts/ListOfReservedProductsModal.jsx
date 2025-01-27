@@ -127,7 +127,9 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
           <div className="warehouseInfo">
             <span>Тип продукта: {curr_warehouse.product_article}</span>
             <span>
-              Остаток свободной продукции: {curr_warehouse.remaining_stock}
+              Остаток свободной продукции,{' '}
+              {curr_warehouse?.type == 'OK' ? 'палет' : 'шт. блоков'}:{' '}
+              {curr_warehouse.remaining_stock}
             </span>
           </div>
           <div className="warehouseInfo">
