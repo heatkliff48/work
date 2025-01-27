@@ -39,7 +39,7 @@ const OrderContextProvider = ({ children }) => {
 
   const COLUMNS_ORDER_PRODUCT = [
     {
-      Header: 'Profuct id',
+      Header: 'Product id',
       accessor: 'product_id',
       disableSortBy: true,
     },
@@ -49,17 +49,17 @@ const OrderContextProvider = ({ children }) => {
       sortType: 'number',
     },
     {
-      Header: 'Quantity of palet',
+      Header: 'Quantity of pallets',
       accessor: 'quantity_palet',
       sortType: 'number',
     },
     {
-      Header: 'Real quantity',
+      Header: 'Real quantity, m2',
       accessor: 'quantity_real',
       sortType: 'number',
     },
     {
-      Header: 'Price, m2',
+      Header: 'Price, EURO per m2',
       accessor: 'price_m2',
       sortType: 'number',
     },
@@ -69,7 +69,7 @@ const OrderContextProvider = ({ children }) => {
       defaultValue: 0,
     },
     {
-      Header: 'Final price',
+      Header: 'Final price, EURO',
       accessor: 'final_price',
       sortType: 'number',
     },

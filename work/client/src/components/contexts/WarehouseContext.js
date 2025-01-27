@@ -40,15 +40,15 @@ const WarehouseContextProvider = ({ children }) => {
     { Header: 'Date of shipping', accessor: 'shipping_date', sortType: 'string' },
     { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
-    { Header: 'Quantity', accessor: 'quantity', sortType: 'number' },
-    { Header: 'Quantity, cakes', accessor: 'quantity_cakes', sortType: 'number' },
+    { Header: 'Quantity of pallets', accessor: 'quantity', sortType: 'number' },
+    { Header: 'Quantity of cakes', accessor: 'quantity_cakes', sortType: 'number' },
     {
-      Header: 'Quantity in batch',
+      Header: 'Quantity in batch, cakes',
       accessor: 'quantity_in_batch',
       sortType: 'number',
     },
     {
-      Header: 'quantity in warehouse',
+      Header: 'Quantity in warehouse, pallets',
       accessor: 'quantity_in_warehouse',
       sortType: 'number',
     },
@@ -58,7 +58,7 @@ const WarehouseContextProvider = ({ children }) => {
     { Header: 'Date of shipping', accessor: 'shipping_date', sortType: 'string' },
     { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
-    { Header: 'Quantity', accessor: 'quantity', sortType: 'number' },
+    { Header: 'Quantity of pallets', accessor: 'quantity', sortType: 'number' },
     { Header: 'Status', accessor: 'status', sortType: 'string' },
   ];
 
@@ -114,7 +114,7 @@ const WarehouseContextProvider = ({ children }) => {
       })
       .map((el) => {
         // Рассчитать количество тортов
-        const quantity_cakes = (el.quantity / 3).toFixed(2);
+        const quantity_cakes = Math.ceil(el.quantity / 3);
 
         // Найти ID заказа
         const orderId = list_of_orders.find(
@@ -139,10 +139,9 @@ const WarehouseContextProvider = ({ children }) => {
         }, 0);
 
         // Рассчитать количество в партии
-        const quantity_in_batch = (
+        const quantity_in_batch =
           batchOutside.find((batch) => batch.id_list_of_ordered_production === el.id)
-            ?.quantity_pallets / 3 || 0
-        ).toFixed(2);
+            ?.quantity_pallets / 3 || 0;
 
         return {
           ...el,
