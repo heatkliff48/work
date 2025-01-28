@@ -54,7 +54,7 @@ module.exports = {
       tradingMark: {
         type: Sequelize.STRING,
       },
-      m3: {
+      volumeBlockOnPallet: {
         type: Sequelize.FLOAT,
       },
       m2: {
@@ -99,13 +99,10 @@ module.exports = {
       price: {
         type: Sequelize.FLOAT,
       },
-      quantityBlockPallet: {
+      quantityBlockOnPallet: {
         type: Sequelize.FLOAT,
       },
       volumeBlock: {
-        type: Sequelize.FLOAT,
-      },
-      volumeBlockOnPallet: {
         type: Sequelize.FLOAT,
       },
       createdAt: {

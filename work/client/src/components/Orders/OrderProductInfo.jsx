@@ -45,14 +45,14 @@
 //     if (!selectedProduct) return 0;
 
 //     const result =
-//       (selectedProduct?.price * selectedProduct?.m3) / selectedProduct?.m2;
+//       (selectedProduct?.price * selectedProduct?.volumeBlockOnPallet) / selectedProduct?.m2;
 
 //     setProductOfOrder((prev) => ({
 //       ...prev,
 //       price_m2: result,
 //     }));
 //     return result;
-//   }, [selectedProduct?.price, selectedProduct?.m2, selectedProduct?.m3]);
+//   }, [selectedProduct?.price, selectedProduct?.m2, selectedProduct?.volumeBlockOnPallet]);
 
 //   const final_price_value = useMemo(() => {
 //     if (!selectedProduct) return 0;

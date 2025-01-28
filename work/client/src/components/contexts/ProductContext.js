@@ -120,7 +120,7 @@ export const ProductsContextProvider = ({ children }) => {
     },
     {
       Header: 'Volume per pallet, m3',
-      accessor: 'm3',
+      accessor: 'volumeBlockOnPallet',
     },
     {
       Header: 'Area on the pallet, m2',
@@ -250,7 +250,7 @@ export const ProductsContextProvider = ({ children }) => {
     },
     {
       Header: 'Volume per pallet, m3',
-      accessor: 'm3',
+      accessor: 'volumeBlockOnPallet',
     },
     {
       Header: 'Area on the pallet, m2',

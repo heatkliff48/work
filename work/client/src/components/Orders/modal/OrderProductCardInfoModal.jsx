@@ -46,14 +46,19 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const price_m2_value = useMemo(() => {
     const result =
-      (selectedProduct?.price * selectedProduct?.m3) / selectedProduct?.m2;
+      (selectedProduct?.price * selectedProduct?.volumeBlockOnPallet) /
+      selectedProduct?.m2;
 
     setProductOfOrder((prev) => ({
       ...prev,
       price_m2: result,
     }));
     return result;
-  }, [selectedProduct?.price, selectedProduct?.m2, selectedProduct?.m3]);
+  }, [
+    selectedProduct?.price,
+    selectedProduct?.m2,
+    selectedProduct?.volumeBlockOnPallet,
+  ]);
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
