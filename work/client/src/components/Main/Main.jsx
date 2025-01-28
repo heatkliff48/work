@@ -18,7 +18,6 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
 import { dataFetchedChange } from '#components/redux/actions/userAction.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
-import Gorilla from './Gorilla';
 
 function Main() {
   const navigate = useNavigate();
@@ -104,7 +103,6 @@ function Main() {
       {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
         <button onClick={() => navigate('/recipe_orders')}>Recipe Orders</button>
       )}
-      <Gorilla />
     </div>
   );
 }
