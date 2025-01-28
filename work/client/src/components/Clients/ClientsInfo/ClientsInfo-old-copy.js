@@ -70,7 +70,7 @@ const ClientsInfo = () => {
           <tr>
             <th>id</th>
             <th>c_name</th>
-            <th>tin</th>
+            <th>cif_vat</th>
             <th>category</th>
           </tr>
         </thead>
@@ -86,7 +86,7 @@ const ClientsInfo = () => {
               >
                 <td>{entrie?.id}</td>
                 <td>{entrie?.c_name}</td>
-                <td>{entrie?.tin}</td>
+                <td>{entrie?.cif_vat}</td>
                 <td>{entrie?.category}</td>
               </tr>
             );

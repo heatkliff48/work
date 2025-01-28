@@ -27,7 +27,7 @@ function ClientsEditModal(props) {
   const [clientInput, setClientInput] = useState(currentClient);
   const [clientLegalAddressInput, setClientLegalAddressInput] = useState({});
   const [c_name, setName] = useState(currentClient?.c_name);
-  const [tin, setTIN] = useState(currentClient?.tin);
+  const [cifvat, setCIFVAT] = useState(currentClient?.cif_vat);
   const [category, setCategory] = useState(currentClient?.category);
   const [street, setStreet] = useState(legalAddress?.street);
   const [additional_info, setAddInfo] = useState(legalAddress?.additional_info);
@@ -83,7 +83,7 @@ function ClientsEditModal(props) {
     const client = {
       c_id,
       c_name,
-      tin,
+      cifvat,
       category,
     };
 
@@ -153,16 +153,16 @@ function ClientsEditModal(props) {
                       className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
                       for="version"
                     >
-                      TIN
+                      CIF/VAT
                     </label>
                   </div>
                   <div className="md:w-2/3">
                     <input
                       className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                      id="tin"
+                      id="cif_vat"
                       type="text"
-                      value={tin}
-                      onChange={(e) => setTIN(e.target.value)}
+                      value={cifvat}
+                      onChange={(e) => setCIFVAT(e.target.value)}
                     />
                   </div>
                 </div>

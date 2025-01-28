@@ -15,7 +15,7 @@ const ProjectContextProvider = ({ children }) => {
     discount: 'Discount, %',
     final_price: 'Final price, EURO',
     c_name: 'Name of owner',
-    tin: 'TIN',
+    cif_vat: 'CIF/VAT',
     category: 'Category',
     street: 'Street',
     additional_info: 'Additional info',
@@ -44,8 +44,8 @@ const ProjectContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'TIN',
-      accessor: 'tin',
+      Header: 'CIF/VAT',
+      accessor: 'cif_vat',
     },
     {
       Header: 'Category',

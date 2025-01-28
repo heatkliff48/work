@@ -38,12 +38,12 @@ clientsRouter.get('/', async (req, res) => {
 });
 
 clientsRouter.post('/', async (req, res) => {
-  const { c_name, tin, category } = req.body.client;
+  const { c_name, cif_vat, category } = req.body.client;
 
   try {
     const client = await Clients.create({
       c_name,
-      tin,
+      cif_vat,
       category,
     });
 
@@ -83,14 +83,14 @@ clientsRouter.get('/:id', async (req, res) => {
 });
 
 clientsRouter.post('/update/:c_id', async (req, res) => {
-  const { c_id, c_name, tin, category } = req.body.client;
+  const { c_id, c_name, cif_vat, category } = req.body.client;
 
   try {
     //const {c_id} = req.params;
     const client = await Clients.update(
       {
         c_name,
-        tin,
+        cif_vat,
         category,
       },
       {
