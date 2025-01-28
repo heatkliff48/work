@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       c_name: {
         type: DataTypes.STRING,
       },
-      tin: {
+      cif_vat: {
         type: DataTypes.STRING,
       },
       category: {

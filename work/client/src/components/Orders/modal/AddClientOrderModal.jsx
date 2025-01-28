@@ -196,7 +196,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                 <thead>
                   <tr>
                     <th key={'c_name'}>c_name</th>
-                    <th key={'tin'}>tin</th>
+                    <th key={'cif_vat'}>cif_vat</th>
                     <th key={'category'}>category</th>
                   </tr>
                 </thead>
@@ -212,7 +212,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                         }}
                       >
                         <td>{entrie?.c_name}</td>
-                        <td>{entrie?.tin}</td>
+                        <td>{entrie?.cif_vat}</td>
                         <td>{entrie?.category}</td>
                       </tr>
                     );

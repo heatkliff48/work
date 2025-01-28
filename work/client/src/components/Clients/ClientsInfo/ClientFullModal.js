@@ -65,7 +65,7 @@ function MydModalWithGrid({ show, onHide }) {
                 >
                   {currentClient?.c_name}
                 </h3>
-                <p>TIN:{currentClient?.tin}</p>
+                <p>CIF/VAT:{currentClient?.cif_vat}</p>
                 <p>Category:{currentClient?.category}</p>
               </div>
             </div>

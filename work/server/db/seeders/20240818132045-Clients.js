@@ -8,7 +8,7 @@ module.exports = {
       [
         {
           c_name: 'Constructora Iberia',
-          tin: '12345678',
+          cif_vat: '12345678',
           category: 'developers',
           createdAt: new Date(),
           updatedAt: new Date(),

@@ -12,7 +12,7 @@ module.exports = {
       c_name: {
         type: Sequelize.TEXT
       },
-      tin: {
+      cif_vat: {
         type: Sequelize.TEXT
       },
       category: {
