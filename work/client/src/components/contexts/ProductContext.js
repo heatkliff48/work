@@ -56,7 +56,7 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Pallet Size, cm',
+      Header: 'Pallet Size, mm',
       accessor: 'palletSize',
       defaultValue: '0',
       Filter: DropdownFilter,
@@ -186,7 +186,7 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Pallet Size, cm',
+      Header: 'Pallet Size, mm',
       accessor: 'palletSize',
       defaultValue: '0',
       Filter: DropdownFilter,
@@ -354,8 +354,8 @@ export const ProductsContextProvider = ({ children }) => {
         { value: 1, label: 'Reusable' },
       ],
       palletSize: [
-        { value: 0, label: '120x100' },
-        { value: 1, label: '120x80' },
+        { value: 0, label: '1200x1000' },
+        { value: 1, label: '1200x800' },
       ],
       palletHeight: [
         { value: 0, label: 'Std' },
