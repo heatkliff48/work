@@ -6,8 +6,8 @@ import InputField from '../../InputField/InputField';
 import UpdateModalWindow from './UpdateModalWindow';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { addNewProduct } from '#components/redux/actions/productsAction.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useProductsContext } from '#components/contexts/productContext.js';
 
 const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) => {
   const {
@@ -131,10 +131,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
     const palletWidthValue = palletSize === 0 ? 1000 : 800;
     const palletLengthValue = 1200;
 
-    console.log('palletWidthValue', palletWidthValue);
-
-    console.log('palletHeight', palletHeight);
-
     // Определение высоты паллета
     let palletHeightValue;
     switch (palletHeight) {
@@ -150,7 +146,6 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       default:
         palletHeightValue = 1200; // Стандартное значение
     }
-    console.log('palletHeightValue', palletHeightValue);
 
     return {
       palletWidth: palletWidthValue,
@@ -200,7 +195,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       // Вычисление m3
       if (values.quantityBlockOnPallet && values.volumeBlock) {
         values.volumeBlockOnPallet =
-          values.quantityBlockOnPallet * values.volumeBlock;
+          (values.quantityBlockOnPallet * values.volumeBlock).toFixed(2);
 
         updateFuncs.volumeBlockOnPallet = (value) =>
           setFormInput((prev) => ({ ...prev, volumeBlockOnPallet: value }));
