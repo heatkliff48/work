@@ -42,13 +42,12 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
       (el) =>
         el.order_article === order_article && el.product_article === product_article
     );
-    console.log('list_of_order_id', list_of_order_id);
+
     if (list_of_order_id) {
       dispatch(updateAutoclave(list_of_order_id));
       const currBatchID = batchOutside.find(
         (el) => el.id_list_of_ordered_production === list_of_order_id.id
       );
-      console.log('currBatchID', currBatchID?.id);
       if (currBatchID) {
         dispatch(deleteBatchOutside(currBatchID.id));
       }
@@ -84,7 +83,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
         dispatch(
           updateOrderStatus({
             order_id,
-            status: 'produced',
+            status: 7,
           })
         );
       }
