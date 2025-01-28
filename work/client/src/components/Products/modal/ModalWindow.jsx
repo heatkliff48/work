@@ -7,7 +7,7 @@ import UpdateModalWindow from './UpdateModalWindow';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { addNewProduct } from '#components/redux/actions/productsAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useProductsContext } from '#components/contexts/productContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 
 const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) => {
   const {
@@ -46,7 +46,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
 
   const updateProductHandler = () => {
     const {
-      form,
+      tradingMark,
       certificate,
       width,
       height,
@@ -59,7 +59,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
     const rightPlaceOfProduction = rightPlaceOfProductionFunc(placeOfProduction);
     const rightTypeOfPackaging = rightTypeOfPackagingFunc(typeOfPackaging);
 
-    const prodArticle = `T.${form?.toUpperCase()}${rightPlaceOfProduction}${rightTypeOfPackaging}0${certificate?.substr(
+    const prodArticle = `T.${tradingMark?.toUpperCase()}${rightPlaceOfProduction}${rightTypeOfPackaging}0${certificate?.substr(
       0,
       1
     )}${density}${width}${height}${lengths}`;
@@ -162,7 +162,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       const { palletWidth, palletLength, palletHeight } = calculatePalletDimensions(
         formInput?.palletSize,
         formInput?.palletHeight
-      )
+      );
 
       if (
         formInput?.lengths &&
@@ -194,8 +194,9 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
 
       // Вычисление m3
       if (values.quantityBlockOnPallet && values.volumeBlock) {
-        values.volumeBlockOnPallet =
-          (values.quantityBlockOnPallet * values.volumeBlock).toFixed(2);
+        values.volumeBlockOnPallet = (
+          values.quantityBlockOnPallet * values.volumeBlock
+        ).toFixed(2);
 
         updateFuncs.volumeBlockOnPallet = (value) =>
           setFormInput((prev) => ({ ...prev, volumeBlockOnPallet: value }));
