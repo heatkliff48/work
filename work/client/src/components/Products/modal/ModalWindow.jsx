@@ -46,7 +46,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
 
   const updateProductHandler = () => {
     const {
-      form,
+      tradingMark,
       certificate,
       width,
       height,
@@ -59,7 +59,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
     const rightPlaceOfProduction = rightPlaceOfProductionFunc(placeOfProduction);
     const rightTypeOfPackaging = rightTypeOfPackagingFunc(typeOfPackaging);
 
-    const prodArticle = `T.${form?.toUpperCase()}${rightPlaceOfProduction}${rightTypeOfPackaging}0${certificate?.substr(
+    const prodArticle = `T.${tradingMark?.toUpperCase()}${rightPlaceOfProduction}${rightTypeOfPackaging}0${certificate?.substr(
       0,
       1
     )}${density}${width}${height}${lengths}`;
