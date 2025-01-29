@@ -21,13 +21,16 @@ function ClientsModal(props) {
   const [valid, setValid] = useState(isValid(clientLegalAddressInput.zip_code));
 
   const categoryOptions = [
-    { value: 'developers', label: 'Developers' },
-    { value: 'property_developers', label: 'Property Developers' },
-    { value: 'architects', label: 'Architects' },
-    { value: 'dealers', label: 'Dealers' },
-    { value: 'retail_chains', label: 'Retail Chains' },
-    { value: 'private_client', label: 'Private Client' },
-    { value: 'government_developer', label: 'Government Developer' },
+    { value: 'constructor_de_gobieno', label: 'Constructor de gobieno' },
+    { value: 'promotor', label: 'Promotor' },
+    { value: 'constructor', label: 'Constructor' },
+    { value: 'arquitecto', label: 'Arquitecto' },
+    { value: 'distributor_con_almacen', label: 'Distributor con almacen' },
+    { value: 'distributor_sin_almacen', label: 'Distributor sin almacen' },
+    { value: 'tienda_de_la_construccion', label: 'Tienda de la construccion' },
+    { value: 'equipos_de_construccion', label: 'Equipos de construccion' },
+    { value: 'agente', label: 'Agente' },
+    { value: 'cliente_privado', label: 'Cliente privado' },
   ];
 
   const dispatch = useDispatch();
@@ -37,7 +40,15 @@ function ClientsModal(props) {
   }, []);
 
   const handleClientPhoneInput = useCallback((phone) => {
-    setClientLegalAddressInput((prev) => ({ ...prev, phone_number: phone }));
+    setClientLegalAddressInput((prev) => ({ ...prev, phone_office: phone }));
+  }, []);
+
+  const handleClientFaxInput = useCallback((phone) => {
+    setClientLegalAddressInput((prev) => ({ ...prev, fax: phone }));
+  }, []);
+
+  const handleClientPhoneMobileInput = useCallback((phone) => {
+    setClientLegalAddressInput((prev) => ({ ...prev, phone_mobile: phone }));
   }, []);
 
   const handleSelectChange = (selectedOption, key) => {
@@ -147,11 +158,23 @@ function ClientsModal(props) {
                   </label>
                 </div>
                 <div className="md:w-2/3" key={el.id}>
-                  {el.accessor === 'phone_number' ? (
+                  {el.accessor === 'phone_office' ? (
                     <PhoneInput
                       defaultCountry="es"
                       value={clientInput[el.accessor] || ''}
                       onChange={(phone) => handleClientPhoneInput(phone)}
+                    />
+                  ) : el.accessor === 'fax' ? (
+                    <PhoneInput
+                      defaultCountry="es"
+                      value={clientInput[el.accessor] || ''}
+                      onChange={(phone) => handleClientFaxInput(phone)}
+                    />
+                  ) : el.accessor === 'phone_mobile' ? (
+                    <PhoneInput
+                      defaultCountry="es"
+                      value={clientInput[el.accessor] || ''}
+                      onChange={(phone) => handleClientPhoneMobileInput(phone)}
                     />
                   ) : el.accessor === 'zip_code' ? (
                     <input

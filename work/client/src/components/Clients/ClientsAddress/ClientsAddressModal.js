@@ -10,7 +10,10 @@ function ClientsAddressModal(props) {
   const [zip_code, setZIP] = useState('');
   const [province, setProvince] = useState('');
   const [country, setCountry] = useState('');
-  const [phone_number, setPhone] = useState('');
+  const [phone_office, setPhoneOffice] = useState('');
+  const [fax, setFax] = useState('');
+  const [phone_mobile, setPhoneMobile] = useState('');
+  const [web_link, setWebLink] = useState('');
   const [email, setEmail] = useState('');
 
   const onSubmitForm = async (e) => {
@@ -23,7 +26,10 @@ function ClientsAddressModal(props) {
         zip_code,
         province,
         country,
-        phone_number,
+        phone_office,
+        fax,
+        phone_mobile,
+        web_link,
         email,
       };
       const response = await fetch('http://localhost:5000/clientsAddress', {
@@ -175,16 +181,73 @@ function ClientsAddressModal(props) {
                 className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
                 for="discription"
               >
-                Phone number
+                Phone office
               </label>
             </div>
             <div className="md:w-2/3">
               <input
                 className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                id="phone_number"
+                id="phone_office"
                 type="text"
-                value={phone_number}
-                onChange={(e) => setPhone(e.target.value)}
+                value={phone_office}
+                onChange={(e) => setPhoneOffice(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="md:flex md:items-center mb-6">
+            <div className="md:w-1/3">
+              <label
+                className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                for="discription"
+              >
+                Fax
+              </label>
+            </div>
+            <div className="md:w-2/3">
+              <input
+                className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                id="fax"
+                type="text"
+                value={fax}
+                onChange={(e) => setFax(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="md:flex md:items-center mb-6">
+            <div className="md:w-1/3">
+              <label
+                className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                for="discription"
+              >
+                Mobile
+              </label>
+            </div>
+            <div className="md:w-2/3">
+              <input
+                className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                id="phone_mobile"
+                type="text"
+                value={phone_mobile}
+                onChange={(e) => setPhoneMobile(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="md:flex md:items-center mb-6">
+            <div className="md:w-1/3">
+              <label
+                className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                for="discription"
+              >
+                Web link
+              </label>
+            </div>
+            <div className="md:w-2/3">
+              <input
+                className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                id="web_link"
+                type="text"
+                value={web_link}
+                onChange={(e) => setWebLink(e.target.value)}
               />
             </div>
           </div>

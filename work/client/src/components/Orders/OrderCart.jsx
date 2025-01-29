@@ -358,6 +358,10 @@ const OrderCart = React.memo(() => {
     return personInChargeOption || options[0];
   };
 
+  useEffect(() => {
+    console.log('orderCartData', orderCartData);
+  }, []);
+
   return (
     <>
       {productInfoModalOrder && (

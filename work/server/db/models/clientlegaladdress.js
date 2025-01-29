@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class ClientLegalAddresses extends Model {
     /**
@@ -11,37 +9,49 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ Clients }) {
       // define association here
-      this.belongsTo(Clients, { foreignKey: 'id' })
+      this.belongsTo(Clients, { foreignKey: 'id' });
     }
   }
-  ClientLegalAddresses.init({
-    street: {
-      type: DataTypes.STRING,
+  ClientLegalAddresses.init(
+    {
+      street: {
+        type: DataTypes.STRING,
+      },
+      additional_info: {
+        type: DataTypes.STRING,
+      },
+      city: {
+        type: DataTypes.STRING,
+      },
+      zip_code: {
+        type: DataTypes.INTEGER,
+      },
+      province: {
+        type: DataTypes.STRING,
+      },
+      country: {
+        type: DataTypes.STRING,
+      },
+      phone_office: {
+        type: DataTypes.STRING,
+      },
+      fax: {
+        type: DataTypes.STRING,
+      },
+      phone_mobile: {
+        type: DataTypes.STRING,
+      },
+      web_link: {
+        type: DataTypes.STRING,
+      },
+      email: {
+        type: DataTypes.STRING,
+      },
     },
-    additional_info: {
-      type: DataTypes.STRING,
-    },
-    city: {
-      type: DataTypes.STRING,
-    },
-    zip_code: {
-      type: DataTypes.INTEGER,
-    },
-    province: {
-      type: DataTypes.STRING,
-    },
-    country: {
-      type: DataTypes.STRING,
-    },
-    phone_number: {
-      type: DataTypes.STRING,
-    },
-    email: {
-      type: DataTypes.STRING,
-    },
-  }, {
-    sequelize,
-    modelName: 'ClientLegalAddresses',
-  });
+    {
+      sequelize,
+      modelName: 'ClientLegalAddresses',
+    }
+  );
   return ClientLegalAddresses;
 };

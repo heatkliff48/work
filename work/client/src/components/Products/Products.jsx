@@ -129,6 +129,21 @@ function Products() {
       )}
       {modalProductCard && <ProductCardModal />}
       <h1>Sortable Table</h1>
+      {userAccess?.canWrite && (
+        <button
+          onClick={() => setModal(!modal)}
+          style={{
+            backgroundColor: 'blue',
+            color: 'white',
+            padding: '10px 20px',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+          }}
+        >
+          Add product new
+        </button>
+      )}
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}
         <GlobalFilterInput
@@ -192,21 +207,6 @@ function Products() {
             })}
           </tbody>
         </table>
-        {userAccess?.canWrite && (
-          <button
-            onClick={() => setModal(!modal)}
-            style={{
-              backgroundColor: 'blue',
-              color: 'white',
-              padding: '10px 20px',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}
-          >
-            Add product new
-          </button>
-        )}
       </div>
     </>
   );

@@ -47,8 +47,6 @@ const DeliveryAddress = ({ clickFunk = null, showSearch = false }) => {
       >
         <thead>
           <tr>
-            <th>id</th>
-            <th>client id</th>
             <th>street</th>
             <th>additional_info</th>
             <th>city</th>
@@ -70,8 +68,6 @@ const DeliveryAddress = ({ clickFunk = null, showSearch = false }) => {
                   clickFunk(entrie.id);
                 }}
               >
-                <td>{entrie?.id}</td>
-                <td>{entrie?.client_id}</td>
                 <td>{entrie?.street}</td>
                 <td>{entrie?.additional_info}</td>
                 <td>{entrie?.city}</td>

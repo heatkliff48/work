@@ -62,7 +62,7 @@ function OrdersTable() {
           id,
           article,
           status:
-            status_list?.find((stat) => stat.accessor == status).Header || status,
+            status_list?.find((stat) => stat.accessor == status)?.Header || status,
           owner: client ? client.c_name : '',
           del_adr_id: deliveryAddress ? deliveryAddress.street : '',
           shipping_date,

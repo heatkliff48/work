@@ -35,22 +35,36 @@ function ClientsEditModal(props) {
   const [zip_code, setZIP] = useState(legalAddress?.zip_code);
   const [province, setProvince] = useState(legalAddress?.province);
   const [country, setCountry] = useState(legalAddress?.country);
-  const [phone_number, setPhone] = useState(legalAddress?.phone_number);
+  const [phone_office, setPhoneOffice] = useState(legalAddress?.phone_office);
+  const [fax, setFax] = useState(legalAddress?.fax);
+  const [phone_mobile, setPhoneMobile] = useState(legalAddress?.phone_mobile);
+  const [web_link, setWebLink] = useState(legalAddress?.web_link);
   const [c_email, setEmail] = useState(legalAddress?.email);
 
   const categoryOptions = [
-    { value: 'developers', label: 'Developers' },
-    { value: 'property_developers', label: 'Property Developers' },
-    { value: 'architects', label: 'Architects' },
-    { value: 'dealers', label: 'Dealers' },
-    { value: 'retail_chains', label: 'Retail Chains' },
-    { value: 'private_client', label: 'Private Client' },
-    { value: 'government_developer', label: 'Government Developer' },
+    { value: 'constructor_de_gobieno', label: 'Constructor de gobieno' },
+    { value: 'promotor', label: 'Promotor' },
+    { value: 'constructor', label: 'Constructor' },
+    { value: 'arquitecto', label: 'Arquitecto' },
+    { value: 'distributor_con_almacen', label: 'Distributor con almacen' },
+    { value: 'distributor_sin_almacen', label: 'Distributor sin almacen' },
+    { value: 'tienda_de_la_construccion', label: 'Tienda de la construccion' },
+    { value: 'equipos_de_construccion', label: 'Equipos de construccion' },
+    { value: 'agente', label: 'Agente' },
+    { value: 'cliente_privado', label: 'Cliente privado' },
   ];
 
   const handleClientPhoneInput = useCallback((phone) => {
-    // setClientLegalAddressInput((prev) => ({ ...prev, phone_number: phone }));
-    setPhone(phone);
+    // setClientLegalAddressInput((prev) => ({ ...prev, phone_office: phone }));
+    setPhoneOffice(phone);
+  }, []);
+
+  const handleClientFaxInput = useCallback((number) => {
+    setFax(number);
+  }, []);
+
+  const handleClientPhoneMobileInput = useCallback((number) => {
+    setPhoneMobile(number);
   }, []);
 
   const handleSelectChange = (selectedOption) => {
@@ -72,7 +86,7 @@ function ClientsEditModal(props) {
       category: getSelectedOption(currentClient?.category).value,
     }));
     setCategory(clientInput.category);
-    setPhone(legalAddress?.phone_number || '');
+    setPhoneOffice(legalAddress?.phone_office || '');
   }, [props.show]);
 
   const dispatch = useDispatch();
@@ -96,7 +110,10 @@ function ClientsEditModal(props) {
       zip_code,
       province,
       country,
-      phone_number,
+      phone_office,
+      fax,
+      phone_mobile,
+      web_link,
       c_email,
     };
     dispatch(updateLegalAddress({ legalAddress }));
@@ -319,14 +336,67 @@ function ClientsEditModal(props) {
                   className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
                   for="discription"
                 >
-                  Phone number
+                  Phone office
                 </label>
               </div>
               <div className="md:w-2/3">
                 <PhoneInput
                   // defaultCountry="es"
-                  value={phone_number}
+                  value={phone_office}
                   onChange={(phone) => handleClientPhoneInput(phone)}
+                />
+              </div>
+            </div>
+            <div className="md:flex md:items-center mb-6">
+              <div className="md:w-1/3">
+                <label
+                  className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                  for="discription"
+                >
+                  Fax
+                </label>
+              </div>
+              <div className="md:w-2/3">
+                <PhoneInput
+                  // defaultCountry="es"
+                  value={fax}
+                  onChange={(number) => handleClientFaxInput(number)}
+                />
+              </div>
+            </div>
+            <div className="md:flex md:items-center mb-6">
+              <div className="md:w-1/3">
+                <label
+                  className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                  for="discription"
+                >
+                  Mobile
+                </label>
+              </div>
+              <div className="md:w-2/3">
+                <PhoneInput
+                  // defaultCountry="es"
+                  value={phone_mobile}
+                  onChange={(number) => handleClientPhoneMobileInput(number)}
+                />
+              </div>
+            </div>
+            <div className="md:flex md:items-center mb-6">
+              <div className="md:w-1/3">
+                <label
+                  className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                  for="discription"
+                >
+                  Web link
+                </label>
+              </div>
+              <div className="md:w-2/3">
+                <input
+                  className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                  id="email"
+                  type="text"
+                  value={web_link}
+                  onChange={(e) => setWebLink(e.target.value)}
                 />
               </div>
             </div>

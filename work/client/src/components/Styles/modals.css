@@ -5,3 +5,9 @@
   max-height: 100vh;
   height: 100vh;
 }
+
+.modal-clients-full-table {
+  margin: auto;
+  max-width: 100vw;
+  width: 100vw;
+}

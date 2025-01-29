@@ -23,7 +23,10 @@ const ProjectContextProvider = ({ children }) => {
     zip_code: 'Zip code',
     province: 'Province',
     country: 'Country',
-    phone_number: 'Phone number',
+    phone_office: 'Phone (office)',
+    fax: 'Fax',
+    phone_mobile: 'Phone Mobile',
+    web_link: 'Web link',
     email: 'E-mail',
     first_name: 'First name',
     last_name: 'Last name',
@@ -80,8 +83,20 @@ const ProjectContextProvider = ({ children }) => {
       accessor: 'country',
     },
     {
-      Header: 'Phone number',
-      accessor: 'phone_number',
+      Header: 'Phone (office)',
+      accessor: 'phone_office',
+    },
+    {
+      Header: 'Fax',
+      accessor: 'fax',
+    },
+    {
+      Header: 'Phone mobile',
+      accessor: 'phone_mobile',
+    },
+    {
+      Header: 'Web link',
+      accessor: 'web_link',
     },
     {
       Header: 'Email',
