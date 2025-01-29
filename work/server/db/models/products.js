@@ -27,7 +27,6 @@ module.exports = (sequelize, DataTypes) => {
       certificate: DataTypes.STRING,
       placeOfProduction: DataTypes.STRING,
       typeOfPackaging: DataTypes.STRING,
-      palletType: DataTypes.STRING,
       palletSize: DataTypes.TEXT,
       palletHeight: DataTypes.STRING,
       width: DataTypes.FLOAT,

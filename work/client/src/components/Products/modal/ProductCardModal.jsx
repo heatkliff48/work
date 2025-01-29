@@ -34,7 +34,7 @@ const ProductCardModal = React.memo(() => {
 
   const memoizedArticle = (prod) => {
     const {
-      tradingMark,
+      form,
       certificate,
       width,
       height,
@@ -55,7 +55,7 @@ const ProductCardModal = React.memo(() => {
     const miniPlaceOfProduction = placeOfProduction?.slice(0, 1);
     const miniTypeOfPackaging = typeOfPackaging?.slice(0, 1);
 
-    newArticle = `T.${tradingMark?.toUpperCase()}${certificate?.substr(
+    newArticle = `T.${form?.toUpperCase()}${certificate?.substr(
       0,
       1
     )}${miniPlaceOfProduction}${miniTypeOfPackaging}0${density}${miniWidth}${miniHeight}${miniLengths}${versionNumber}`;
