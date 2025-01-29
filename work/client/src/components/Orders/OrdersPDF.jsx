@@ -4,7 +4,6 @@ import {
   View,
   Document,
   StyleSheet,
-  PDFViewer,
   PDFDownloadLink,
 } from '@react-pdf/renderer';
 
@@ -50,96 +49,128 @@ const styles = StyleSheet.create({
   },
 });
 
-const OrderPDF = ({ orderData = {}, productList = [], vatValue = {} }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
-        <Text style={styles.header}>Order Card: {orderData?.article || 'N/A'}</Text>
-      </View>
-      <View
-        style={[
-          styles.section,
-          { flexDirection: 'row', justifyContent: 'space-between' },
-        ]}
-      >
-        <View style={{ flex: 1 }}>
-          <Text style={styles.header}>Client Information</Text>
-          {Object.entries(orderData?.owner || {})?.map(([key, value]) => (
-            <Text key={`owner-${key}`}>{`${key}: ${value}`}</Text>
+const OrderPDF = ({ orderData = {}, productList = [], vatValue = {} }) => {
+  if (
+    Object.keys(orderData).length === 0 ||
+    productList.length === 0 ||
+    Object.keys(vatValue).length === 0
+  ) {
+    return (
+      <Document>
+        <Page size="A4" style={styles.page}>
+          <Text>Ошибка: Нет данных для генерации PDF.</Text>
+        </Page>
+      </Document>
+    );
+  }
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <Text style={styles.header}>
+            Order Card: {orderData?.article || 'N/A'}
+          </Text>
+        </View>
+        <View
+          style={[
+            styles.section,
+            { flexDirection: 'row', justifyContent: 'space-between' },
+          ]}
+        >
+          <View style={{ flex: 1 }}>
+            <Text style={styles.header}>Client Information</Text>
+            {Object.entries(orderData?.owner || {})?.map(([key, value]) => (
+              <Text key={`owner-${key}`}>{`${key}: ${value}`}</Text>
+            ))}
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.header}>Contact Person</Text>
+            {Object.entries(orderData?.contactInfo || {})?.map(([key, value]) => (
+              <Text key={`contact-${key}`}>{`${key}: ${value}`}</Text>
+            ))}
+          </View>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.header}>Delivery Address</Text>
+          {Object.entries(orderData?.deliveryAddress || {})?.map(([key, value]) => (
+            <Text key={`delivery-${key}`}>{`${key}: ${value}`}</Text>
           ))}
         </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.header}>Contact Person</Text>
-          {Object.entries(orderData?.contactInfo || {})?.map(([key, value]) => (
-            <Text key={`contact-${key}`}>{`${key}: ${value}`}</Text>
-          ))}
+        <View style={[styles.section, styles.table]}>
+          <View style={[styles.tableRow, styles.tableHeader]}>
+            <Text style={styles.tableCell}>Product</Text>
+            <Text style={styles.tableCell}>Quantity</Text>
+            <Text style={styles.tableCell}>Price</Text>
+          </View>
+          {Array.isArray(productList) && productList.length > 0 ? (
+            productList.map((product, index) => (
+              <View
+                style={styles.tableRow}
+                key={product?.id || product?.product_article || index}
+              >
+                <Text style={styles.tableCell}>
+                  {product?.product_article || 'N/A'}
+                </Text>
+                <Text style={styles.tableCell}>
+                  {product?.quantity_palet || 'N/A'}
+                </Text>
+                <Text style={styles.tableCell}>{product?.final_price || 'N/A'}</Text>
+              </View>
+            ))
+          ) : (
+            <Text>No products available</Text>
+          )}
         </View>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.header}>Delivery Address</Text>
-        {Object.entries(orderData?.deliveryAddress || {})?.map(([key, value]) => (
-          <Text key={`delivery-${key}`}>{`${key}: ${value}`}</Text>
-        ))}
-      </View>
-      <View style={[styles.section, styles.table]}>
-        <View style={[styles.tableRow, styles.tableHeader]}>
-          <Text style={styles.tableCell}>Product</Text>
-          <Text style={styles.tableCell}>Quantity</Text>
-          <Text style={styles.tableCell}>Price</Text>
-        </View>
-        {Array.isArray(productList) && productList.length > 0 ? (
-          productList.map((product, index) => (
-            <View
-              style={styles.tableRow}
-              key={product?.id || product?.product_article || index}
-            >
-              <Text style={styles.tableCell}>
-                {product?.product_article || 'N/A'}
-              </Text>
-              <Text style={styles.tableCell}>
-                {product?.quantity_palet || 'N/A'}
-              </Text>
-              <Text style={styles.tableCell}>{product?.final_price || 'N/A'}</Text>
+        <View style={styles.section}>
+          <Text style={styles.header}>VAT Information</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View>
+              <Text>VAT, %: {vatValue?.vat_procent || 'N/A'}</Text>
             </View>
-          ))
-        ) : (
-          <Text>No products available</Text>
-        )}
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.header}>VAT Information</Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View>
-            <Text>VAT, %: {vatValue?.vat_procent || 'N/A'}</Text>
-          </View>
-          <View>
-            <Text>VAT, EURO: {vatValue?.vat_euro || 'N/A'}</Text>
-          </View>
-          <View>
-            <Text>Result: {vatValue?.vat_result || 'N/A'}</Text>
+            <View>
+              <Text>VAT, EURO: {vatValue?.vat_euro || 'N/A'}</Text>
+            </View>
+            <View>
+              <Text>Result: {vatValue?.vat_result || 'N/A'}</Text>
+            </View>
           </View>
         </View>
-      </View>
-    </Page>
-  </Document>
-);
+      </Page>
+    </Document>
+  );
+};
 
-const DownloadOrderPDF = ({ orderCartData, updatedProductListOrder, vatValue }) => (
-  <div>
-    <PDFDownloadLink
-      document={
-        <OrderPDF
-          orderData={orderCartData || {}}
-          productList={updatedProductListOrder || []}
-          vatValue={vatValue || {}}
-        />
-      }
-      fileName={`order-${orderCartData?.article || 'N/A'}.pdf`}
-      className="pdf_button"
-    >
-      {({ loading }) => (loading ? 'Loading document...' : 'Download PDF')}
-    </PDFDownloadLink>
-  </div>
-);
+const DownloadOrderPDF = ({ orderCartData, updatedProductListOrder, vatValue }) => {
+  if (
+    !orderCartData ||
+    typeof orderCartData !== 'object' ||
+    Object.keys(orderCartData).length === 0 ||
+    !Array.isArray(updatedProductListOrder) ||
+    updatedProductListOrder.length === 0 ||
+    !vatValue ||
+    typeof vatValue !== 'object' ||
+    Object.keys(vatValue).length === 0
+  ) {
+    return <div>Ошибка: Нет данных для генерации PDF.</div>;
+  }
+  
+  return (
+    <div>
+      <PDFDownloadLink
+        document={
+          <OrderPDF
+            orderData={orderCartData || {}}
+            productList={updatedProductListOrder || []}
+            vatValue={vatValue || {}}
+          />
+        }
+        fileName={`order-${orderCartData?.article || 'N/A'}.pdf`}
+        className="pdf_button"
+      >
+        {({ loading }) => (loading ? 'Loading document...' : 'Download PDF')}
+      </PDFDownloadLink>
+    </div>
+  );
+};
 
 export default DownloadOrderPDF;
