@@ -32,9 +32,6 @@ module.exports = {
         type: Sequelize.STRING,
       },
       /** new block */
-      palletType: {
-        type: Sequelize.STRING,
-      },
       palletSize: {
         type: Sequelize.TEXT,
       },

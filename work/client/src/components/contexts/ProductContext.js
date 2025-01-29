@@ -49,13 +49,6 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Pallet Type',
-      accessor: 'palletType',
-      defaultValue: '0',
-      Filter: DropdownFilter,
-      sortType: 'string',
-    },
-    {
       Header: 'Pallet Size, mm',
       accessor: 'palletSize',
       defaultValue: '0',
@@ -174,13 +167,6 @@ export const ProductsContextProvider = ({ children }) => {
     {
       Header: 'Type of packaging',
       accessor: 'typeOfPackaging',
-      defaultValue: '0',
-      Filter: DropdownFilter,
-      sortType: 'string',
-    },
-    {
-      Header: 'Pallet Type',
-      accessor: 'palletType',
       defaultValue: '0',
       Filter: DropdownFilter,
       sortType: 'string',
@@ -347,11 +333,6 @@ export const ProductsContextProvider = ({ children }) => {
       typeOfPackaging: [
         { value: 0, label: 'Reusable' },
         { value: 1, label: 'Disposable' },
-        { value: 2, label: 'Marine' },
-      ],
-      palletType: [
-        { value: 0, label: 'Disposable' },
-        { value: 1, label: 'Reusable' },
       ],
       palletSize: [
         { value: 0, label: '1200x1000' },
@@ -387,9 +368,6 @@ export const ProductsContextProvider = ({ children }) => {
       const newTypeOfPackaging = selectOptions.typeOfPackaging.find(
         (opt) => opt.value == prod.typeOfPackaging
       );
-      const newPalletType = selectOptions.palletType.find(
-        (opt) => opt.value == prod.palletType
-      );
       const newPalletSize = selectOptions.palletSize.find(
         (opt) => opt.value == prod.palletSize
       );
@@ -401,7 +379,6 @@ export const ProductsContextProvider = ({ children }) => {
         ...prod,
         placeOfProduction: newPlaceOfProduction?.label,
         typeOfPackaging: newTypeOfPackaging?.label,
-        palletType: newPalletType?.label,
         palletSize: newPalletSize?.label,
         palletHeight: newPalletHeight?.label,
       };
