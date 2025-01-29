@@ -233,7 +233,7 @@ function RawMaterialsPlan() {
         </thead>
         <tbody>
           <tr>
-            <th>Остатки сырья</th>
+            <th>Remaining raw materials</th>
             {rawMaterials.map((material, index) => (
               <td key={index}>{material.remaining}</td>
             ))}
@@ -242,9 +242,9 @@ function RawMaterialsPlan() {
           {productsArray?.map((product, index) => (
             <tr>
               <th key={index} className="product-column">
-                <div>Продукт: {product.product_article}</div>
+                <div>Product: {product.product_article}</div>
                 <div>
-                  Рецепт:
+                  Recipe:
                   {product?.current_recipe ? (
                     <Select
                       onChange={(selectedOption) =>
@@ -257,10 +257,10 @@ function RawMaterialsPlan() {
                       }}
                     />
                   ) : (
-                    <> Рецепты отсутствуют</>
+                    <> No recipes</>
                   )}
                 </div>
-                <div>Количество: {product.quantity}</div>
+                <div>Quantity: {product.quantity}</div>
               </th>
 
               {
@@ -276,19 +276,19 @@ function RawMaterialsPlan() {
           ))}
 
           <tr>
-            <th>Итого</th>
+            <th>Total</th>
             {rawMaterials.map((material, index) => (
               <td>{totals[material.name]?.total || 0}</td>
             ))}
           </tr>
           <tr>
-            <th>Потребность</th>
+            <th>Requirement</th>
             {rawMaterials.map((material, index) => (
               <td>{totals[material.name]?.need || 0}</td>
             ))}
           </tr>
           <tr>
-            <th>Доля заказа (ручной ввод)</th>
+            <th>Reorder share</th>
             {rawMaterials.map((material, index) => (
               <td>
                 <input
@@ -303,7 +303,7 @@ function RawMaterialsPlan() {
             ))}
           </tr>
           <tr>
-            <th>Итого заказа</th>
+            <th>Summary order</th>
             {rawMaterials.map((material, index) => (
               <td>{totals[material.name]?.totalOrder || 0}</td>
             ))}
