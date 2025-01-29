@@ -4,6 +4,7 @@ import Container from 'react-bootstrap/Container';
 import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
 import './styles.css';
+import '#components/Styles/modals.css';
 
 import ClientsAddress from '../ClientsAddress/ClientsAddress';
 import DeliveryAddress from '../DeliveryAddress/DeliveryAddress';
@@ -46,10 +47,12 @@ function MydModalWithGrid({ show, onHide }) {
 
   return (
     <Modal
+      size="lg"
       show={show}
       aria-labelledby="contained-modal-title-vcenter"
-      dialogClassName="modal-auto-size"
+      dialogClassName="modal-clients-full-table"
       onHide={onHide}
+      scrollable={true}
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">Client's card</Modal.Title>

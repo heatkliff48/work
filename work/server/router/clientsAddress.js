@@ -18,7 +18,10 @@ clientsAddress.post('/', async (req, res) => {
       zip_code,
       province,
       country,
-      phone_number,
+      phone_office,
+      fax,
+      phone_mobile,
+      web_link,
       email,
     } = req.body.legalAddress;
 
@@ -29,7 +32,10 @@ clientsAddress.post('/', async (req, res) => {
       zip_code,
       province,
       country,
-      phone_number,
+      phone_office,
+      fax,
+      phone_mobile,
+      web_link,
       email,
     });
 
@@ -93,7 +99,10 @@ clientsAddress.post('/update/:c_id', async (req, res) => {
       zip_code,
       province,
       country,
-      phone_number,
+      phone_office,
+      fax,
+      phone_mobile,
+      web_link,
       c_email,
     } = req.body.legalAddress;
 
@@ -105,7 +114,10 @@ clientsAddress.post('/update/:c_id', async (req, res) => {
         zip_code,
         province,
         country,
-        phone_number,
+        phone_office,
+        fax,
+        phone_mobile,
+        web_link,
         email: c_email,
       },
       {

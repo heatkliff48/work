@@ -19,14 +19,16 @@ const ClientsAddress = () => {
       <h3 className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
         Legal Address
       </h3>
-      <p>id:{legalAddress?.id}</p>
       <p>street: {legalAddress?.street}</p>
       <p>additional_info: {legalAddress?.additional_info}</p>
       <p>city: {legalAddress?.city}</p>
       <p>zip_code: {legalAddress?.zip_code}</p>
       <p>province: {legalAddress?.province}</p>
       <p>country: {legalAddress?.country}</p>
-      <p>phone_number: {legalAddress?.phone_number}</p>
+      <p>phone_office: {legalAddress?.phone_office}</p>
+      <p>fax: {legalAddress?.fax}</p>
+      <p>phone_mobile: {legalAddress?.phone_mobile}</p>
+      <p>web_link: {legalAddress?.web_link}</p>
       <p>email: {legalAddress?.email}</p>
     </Fragment>
   );

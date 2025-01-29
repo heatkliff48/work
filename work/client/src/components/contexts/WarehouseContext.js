@@ -81,7 +81,7 @@ const WarehouseContextProvider = ({ children }) => {
     },
   ];
 
-  const order_status = ['produced', 'shipment', 'shipped', 'completed'];
+  const order_status = [7, 8, 9, 10];
 
   const warehouse_data = useSelector((state) => state.warehouse);
   const list_of_reserved_products = useSelector((state) => state.reservedProducts);
@@ -218,7 +218,7 @@ const WarehouseContextProvider = ({ children }) => {
         dispatch(
           updateOrderStatus({
             order_id: group.orderId,
-            status: 'produced',
+            status: 7,
           })
         );
       }
