@@ -193,7 +193,19 @@ function Products() {
           </tbody>
         </table>
         {userAccess?.canWrite && (
-          <button onClick={() => setModal(!modal)}>Add product new</button>
+          <button
+            onClick={() => setModal(!modal)}
+            style={{
+              backgroundColor: 'blue',
+              color: 'white',
+              padding: '10px 20px',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            Add product new
+          </button>
         )}
       </div>
     </>
