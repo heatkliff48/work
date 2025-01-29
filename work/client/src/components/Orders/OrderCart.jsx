@@ -276,12 +276,15 @@ const OrderCart = React.memo(() => {
         vat_result: 0,
       }));
     } else {
-      const vat_euro = (vatValue.vat_procent * final_price_product) / 100;
+      const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
+        2
+      );
 
-      const vat_result = final_price_product + vat_euro;
+      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
+
       setVatValue((prev) => ({
         ...prev,
-        vat_result,
+        vat_result: vat_result,
         vat_euro,
       }));
     }
@@ -555,16 +558,17 @@ const OrderCart = React.memo(() => {
         </div>
       </div>
       <FilesMain userAccess={userAccess} />
-      {orderCartData &&
+      {/* {orderCartData &&
+        Object.keys(orderCartData)?.length !== 0 &&
         Array.isArray(updatedProductListOrder) &&
-        updatedProductListOrder.length > 0 &&
-        vatValue && (
+        updatedProductListOrder?.length > 0 &&
+        vatValue !== 0 && (
           <DownloadOrderPDF
             orderCartData={orderCartData}
             updatedProductListOrder={updatedProductListOrder}
             vatValue={vatValue}
           />
-        )}
+        )} */}
     </>
   );
 });
