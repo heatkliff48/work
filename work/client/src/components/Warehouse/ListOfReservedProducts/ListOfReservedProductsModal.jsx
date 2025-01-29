@@ -125,15 +125,14 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
         </ModalHeader>
         <ModalBody>
           <div className="warehouseInfo">
-            <span>Тип продукта: {curr_warehouse.product_article}</span>
+            <span>Product article: {curr_warehouse.product_article}</span>
             <span>
-              Остаток свободной продукции,{' '}
-              {curr_warehouse?.type == 'OK' ? 'палет' : 'шт. блоков'}:{' '}
+              Free products, {curr_warehouse?.type == 'OK' ? 'pallet' : 'blocks'}:{' '}
               {curr_warehouse.remaining_stock}
             </span>
           </div>
           <div className="warehouseInfo">
-            <span>Местоположение: {curr_warehouse.warehouse_loc}</span>
+            <span>Location: {curr_warehouse.warehouse_loc}</span>
           </div>
           {userAccess?.canWrite && (
             <Button
@@ -147,15 +146,15 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
                 setReserveProductModal(!reserveProductModal);
               }}
             >
-              Зарезервировать продукцию
+              Reserve product
             </Button>
           )}
           <FilesMain />
           <Table>
             <thead>
               <tr>
-                <th>UID заказа</th>
-                <th>Количество</th>
+                <th>UID of an order</th>
+                <th>Quantity</th>
                 <th></th>
               </tr>
             </thead>
@@ -172,7 +171,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
                           deleteHandler(el);
                         }}
                       >
-                        Удалить
+                        Delete
                       </Button>
                     </td>
                   </tr>

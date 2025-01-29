@@ -64,7 +64,7 @@ const ProductsListForRecipes = () => {
             setNewRecipeModalShow(!newRecipeModalShow);
           }}
         >
-          Создать новый
+          Create new recipe
         </Button>
       )}
       {newRecipeModalShow && userAccess?.canWrite && (
