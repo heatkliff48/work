@@ -18,7 +18,6 @@ const initState = {
   reservedProducts: [],
   listOfOrderedProduction: [],
   listOfOrderedProductionOEM: [],
-  autoclave: [],
   batchDesigner: [],
   recipeOrders: [],
   filesWarehouse: [],

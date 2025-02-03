@@ -1,7 +1,6 @@
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { updateAutoclave } from '#components/redux/actions/autoclaveAction.js';
 import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 import {
@@ -44,7 +43,6 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
     );
 
     if (list_of_order_id) {
-      dispatch(updateAutoclave(list_of_order_id));
       const currBatchID = batchOutside.find(
         (el) => el.id_list_of_ordered_production === list_of_order_id.id
       );
