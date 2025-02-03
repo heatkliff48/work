@@ -19,7 +19,6 @@ import { reservedProductsReducer } from './reservedProductsReducer';
 import { listOfOrderedProductionReducer } from './listOfOrderedProductionReducer';
 import { listOfOrderedProductionOEMReducer } from './listOfOrderedProductionOEMReducer';
 import { batchOutsideReducer } from './batchOutsideReducer';
-import { autoclaveReducer } from './autoclaveReducer';
 import batchDesignerReducer from './batchDesignerReducer';
 import { recipeReducer } from './recipeReducer';
 import { recipeOrdersReducer } from './RecipeOrdersReducer';
@@ -49,7 +48,6 @@ export const rootReducer = combineReducers({
   listOfOrderedProduction: listOfOrderedProductionReducer,
   listOfOrderedProductionOEM: listOfOrderedProductionOEMReducer,
   batchOutside: batchOutsideReducer,
-  autoclave: autoclaveReducer,
   batchDesigner: batchDesignerReducer,
   recipe: recipeReducer,
   recipeOrders: recipeOrdersReducer,

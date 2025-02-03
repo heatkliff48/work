@@ -135,7 +135,6 @@ const OrderContextProvider = ({ children }) => {
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
   const contactInfos = useSelector((state) => state.contactInfo);
-  const autoclaveData = useSelector((state) => state.autoclave);
   const usersInfo = useSelector((state) => state.usersInfo);
   const usersMainInfo = useSelector((state) => state.usersMainInfo);
 
@@ -218,7 +217,6 @@ const OrderContextProvider = ({ children }) => {
         setIsOrderReady,
         selectedProduct,
         setSelectedProduct,
-        autoclaveData,
         autoclave,
         setAutoclave,
         quantityPallets,

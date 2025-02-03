@@ -1,9 +1,5 @@
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import {
-  getAutoclave,
-  saveAutoclave,
-} from '#components/redux/actions/autoclaveAction.js';
-import {
   unlockButton,
   updateBatchState,
 } from '#components/redux/actions/batchDesignerAction.js';
@@ -291,8 +287,6 @@ function Autoclave({ acData, batchFromBD }) {
   };
 
   const onSaveHandler = async () => {
-    await dispatch(saveAutoclave(autoclave));
-
     Object.keys(quantityPallets).forEach((key) =>
       quantityPallets[key] === undefined ? delete quantityPallets[key] : {}
     );
@@ -360,10 +354,6 @@ function Autoclave({ acData, batchFromBD }) {
   };
 
   useEffect(() => {
-    dispatch(getAutoclave());
-  }, []);
-
-  useEffect(() => {
     setAutoclave(acData);
   }, [acData]);
 
@@ -406,7 +396,7 @@ function Autoclave({ acData, batchFromBD }) {
               <div
                 key={cellIndex}
                 className={`autoclave-cell ${getClassForAutoclave(
-                  el?.id !== null ? assignColorToId(el?.id) : 0
+                  assignColorToId(el?.id)
                 )}`}
                 onClick={() => setSelectedId(el?.id)}
               >

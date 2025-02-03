@@ -15,8 +15,7 @@ function ProductionBatchDesigner() {
 
   const { latestProducts } = useProductsContext();
   const { listOfOrderedCakes } = useWarehouseContext();
-  const { autoclaveData, autoclave, setAutoclave, setQuantityPallets } =
-    useOrderContext();
+  const { autoclave, setAutoclave, setQuantityPallets } = useOrderContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const [batchFromBD, setBatchFromBD] = useState([]);
@@ -25,8 +24,17 @@ function ProductionBatchDesigner() {
   const [currId, setCurrId] = useState(null);
   const [totalQuantity, setTotalQuantity] = useState(0);
 
-  const MAX_QUANTITY = 10405;
   let countRef = useRef(0);
+  const MAX_QUANTITY = 10405;
+  const emptyAutoclave = useMemo(
+    () =>
+      Array.from({ length: 210 }, () => ({
+        id_lst_of_ordered_production: null,
+        status: 0,
+        quallty_check: 0,
+      })),
+    []
+  );
 
   const headers = useMemo(
     () => [
@@ -63,7 +71,7 @@ function ProductionBatchDesigner() {
 
       const cakes_in_batch = haveBatch
         ? batchDesigner.find((el) => el.id === prodBatchData.id).cakes_in_batch
-        : autoclaveData?.filter(
+        : emptyAutoclave?.filter(
             (unit) => unit.id_list_of_ordered_product === prodBatchData.id
           ).length;
 
@@ -123,7 +131,7 @@ function ProductionBatchDesigner() {
 
       return updatedProdBatch;
     },
-    [autoclaveData, batchDesigner]
+    [emptyAutoclave, batchDesigner]
   );
 
   const transformAutoclaveData = (tAutoclave, prodBatchDesigner) => {
@@ -196,13 +204,13 @@ function ProductionBatchDesigner() {
 
     setProductonBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
-    const updatedAutoclaveData = transformAutoclaveData(autoclaveData, prodBatch);
+    const updatedAutoclaveData = transformAutoclaveData(emptyAutoclave, prodBatch);
     const filledAutoclave = [];
     for (let i = 0; i < updatedAutoclaveData.length; i += 21) {
       filledAutoclave.push(updatedAutoclaveData.slice(i, i + 21));
     }
     setAcData(filledAutoclave);
-  }, [latestProducts, listOfOrderedCakes, autoclaveData]);
+  }, [latestProducts, listOfOrderedCakes, emptyAutoclave]);
 
   useEffect(() => {
     if (currId !== null) {

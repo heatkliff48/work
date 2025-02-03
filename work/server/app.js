@@ -15,7 +15,6 @@ const Fingerprint = require('express-fingerprint');
 const cookieParser = require('cookie-parser');
 const registerWsEmitter = require('./src/ws/wsEmitter');
 
-const AutoclaveRootRouter = require('./router/Autoclave.js');
 const AuthRootRouter = require('./router/Auth.js');
 const ProductRootRouter = require('./router/Product.js');
 const OrdersRootRouter = require('./router/Orders.js');
@@ -96,7 +95,6 @@ app.use('/usersInfo', usersInfoRouter);
 app.use('/usersMainInfo', usersMainInfoRouter);
 app.use('/productionBatchLog', productionBatchLogRouter);
 app.use('/batchOutside', batchOutsideRouter);
-app.use('/autoclave', AutoclaveRootRouter);
 app.use('/recipe', recipeRouter);
 app.use('/recipe_orders', recipeOrdersRouter);
 app.use('/files', fileUpload);

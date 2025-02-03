@@ -16,14 +16,14 @@ import {
 } from '#components/redux/actions/ordersAction.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
-import { dataFetchedChange } from '#components/redux/actions/userAction.js';
+// import { dataFetchedChange } from '#components/redux/actions/userAction.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
 
 function Main() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  const dataFetched = useSelector((state) => state.dataFetched);
+  // const dataFetched = useSelector((state) => state.dataFetched);
 
   const { roles, checkUserAccess } = useUsersContext();
 
