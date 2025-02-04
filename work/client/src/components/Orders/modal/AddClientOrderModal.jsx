@@ -82,10 +82,6 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setSearchFilter('');
   };
 
-  useEffect(() => {
-    console.log('newOrder', newOrder);
-  }, [newOrder]);
-
   const backHanddler = () => {
     setNewOrder({});
     setCurrentClient({});

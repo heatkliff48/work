@@ -29,6 +29,7 @@ import DownloadOrderPDF from './OrdersPDF.jsx';
 import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
 import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
 import Select from 'react-select';
+import ListOfOrderedProductionReserveModal from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProductionReserveModal.jsx';
 
 const OrderCart = React.memo(() => {
   const {
@@ -53,8 +54,13 @@ const OrderCart = React.memo(() => {
   const { displayNames } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { latestProducts } = useProductsContext();
-  const { list_of_reserved_products, ordered_production_oem_status } =
-    useWarehouseContext();
+  const {
+    warehouse_data,
+    list_of_reserved_products,
+    ordered_production_oem_status,
+    filteredWarehouseByProduct,
+    setFilteredWarehouseByProduct,
+  } = useWarehouseContext();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -79,6 +85,8 @@ const OrderCart = React.memo(() => {
     canWrite: false,
   });
   const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
+  const [reserveModalShow, setReserveModalShow] = useState(false);
+  const [currentOrderedProduct, setCurrentOrderedProduct] = useState({});
 
   const filterKeys = useMemo(
     () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
@@ -361,9 +369,19 @@ const OrderCart = React.memo(() => {
     return personInChargeOption || options[0];
   };
 
-  useEffect(() => {
-    console.log('orderCartData', orderCartData);
-  }, []);
+  const productHandler = (product) => {
+    const filteredWarehouse = warehouse_data.filter(
+      (entry) => entry.product_article === product.product_article
+    );
+
+    const articles = {
+      product_article: product.product_article,
+      order_article: orderCartData.article,
+    };
+    setCurrentOrderedProduct(articles);
+    setFilteredWarehouseByProduct(filteredWarehouse);
+    setReserveModalShow(true);
+  };
 
   return (
     <>
@@ -383,6 +401,22 @@ const OrderCart = React.memo(() => {
         <ListOfReservedProductsModal
           isOpen={warehouseInfoModal}
           toggle={() => setWarehouseInfoModal(!warehouseInfoModal)}
+        />
+      )}
+      {reserveModalShow && (
+        <ListOfOrderedProductionReserveModal
+          show={reserveModalShow}
+          onHide={() => setReserveModalShow(false)}
+          listOfOrderedProductionReserveData={filteredWarehouseByProduct}
+          currentOrderedProduct={currentOrderedProduct}
+          handleRowClick={(row) => {
+            setWarehouseInfoCurIdModal(row.original.id);
+            setReserveModalShow(!reserveModalShow);
+            // без этого лочится скролл, я хз почему
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = '0px';
+            setWarehouseInfoModal(!warehouseInfoModal);
+          }}
         />
       )}
 
@@ -437,8 +471,9 @@ const OrderCart = React.memo(() => {
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setWarehouseInfoCurIdModal(product?.warehouse_id);
-                          setWarehouseInfoModal(!warehouseInfoModal);
+                          // setWarehouseInfoCurIdModal(product?.warehouse_id);
+                          // setWarehouseInfoModal(!warehouseInfoModal);
+                          productHandler(product);
                         }}
                       >
                         Show batch

@@ -95,6 +95,7 @@ const WarehouseContextProvider = ({ children }) => {
   const [currentOrderedProducts, setCurrentOrderedProducts] = useState({});
   const [currentBatchId, setCurrentBatchId] = useState(0);
   const [listOfOrderedCakes, setListOfOrderedCakes] = useState([]);
+  const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
 
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_orders = useSelector((state) => state.orders);
@@ -131,11 +132,26 @@ const WarehouseContextProvider = ({ children }) => {
           (elem) => elem.order_id === orderId && elem.product_id === productId
         );
 
+        // const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
+        //   const reserved = list_of_reserved_products.find(
+        //     (res_prod) => res_prod.orders_products_id === elem.id
+        //   );
+        //   return sum + (reserved ? reserved.quantity : 0);
+        // }, 0);
+
         const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
-          const reserved = list_of_reserved_products.find(
+          // Filter to get all matching reserved products
+          const reservedProducts = list_of_reserved_products.filter(
             (res_prod) => res_prod.orders_products_id === elem.id
           );
-          return sum + (reserved ? reserved.quantity : 0);
+
+          // Sum up the 'quantity' of all matching reserved products
+          const totalReservedQuantity = reservedProducts.reduce(
+            (resSum, res_prod) => resSum + res_prod.quantity,
+            0
+          );
+
+          return sum + totalReservedQuantity;
         }, 0);
 
         // Рассчитать количество в партии
@@ -250,6 +266,8 @@ const WarehouseContextProvider = ({ children }) => {
         setCurrentBatchId,
         listOfOrderedCakes,
         setListOfOrderedCakes,
+        filteredWarehouseByProduct,
+        setFilteredWarehouseByProduct,
       }}
     >
       {children}
