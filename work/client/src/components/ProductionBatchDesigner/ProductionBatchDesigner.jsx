@@ -1,14 +1,16 @@
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import Autoclave from './Autoclave';
+import ModalTable from '#components/Table/ModalTable.jsx';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { useDispatch, useSelector } from 'react-redux';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import {
   addBatchState,
   unlockButton,
   updateBatchState,
 } from '#components/redux/actions/batchDesignerAction.js';
+import Autoclave from './Autoclave';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 function ProductionBatchDesigner() {
   const dispatch = useDispatch();
@@ -16,13 +18,14 @@ function ProductionBatchDesigner() {
   const { latestProducts } = useProductsContext();
   const { listOfOrderedCakes } = useWarehouseContext();
   const { autoclave, setAutoclave, setQuantityPallets } = useOrderContext();
+  const { productBatchModal, setProductBatchModal } = useModalContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
-  const [batchFromBD, setBatchFromBD] = useState([]);
-  const [acData, setAcData] = useState([]);
-  const [productionBatchDesigner, setProductonBatchDesigner] = useState([]);
-  const [currId, setCurrId] = useState(null);
   const [totalQuantity, setTotalQuantity] = useState(0);
+  const [currId, setCurrId] = useState(null);
+  const [acData, setAcData] = useState([]);
+  const [batchFromBD, setBatchFromBD] = useState([]);
+  const [productionBatchDesigner, setProductonBatchDesigner] = useState([]);
 
   let countRef = useRef(0);
   const MAX_QUANTITY = 10405;
@@ -53,6 +56,49 @@ function ProductionBatchDesigner() {
     ],
     []
   );
+
+  const addProduckHandler = (prod_data) => {
+    const { density, width } = prod_data;
+    const curr_id = batchDesigner.length + 1;
+    setAutoclave((prevAutoclave) => {
+      let flatAutoclave = prevAutoclave.flat();
+      const lastIndex = flatAutoclave.filter((el) => el.id).length;
+
+      const newElement = { id: curr_id, density, width };
+      flatAutoclave.splice(lastIndex, 0, newElement);
+      const count = flatAutoclave.filter((el) => el.id === curr_id).length;
+
+      dispatch(
+        addBatchState({
+          id: curr_id,
+          cakes_in_batch: 1,
+          cakes_residue: 0,
+        })
+      );
+
+      setQuantityPallets((prev) => {
+        return {
+          ...prev,
+          [curr_id]: count * 3,
+        };
+      });
+
+      const newAutoclave = [];
+      while (flatAutoclave.length) {
+        newAutoclave.push(flatAutoclave.splice(0, 21));
+      }
+
+      return newAutoclave;
+    });
+    setBatchFromBD((prev) => [
+      ...prev,
+      {
+        id: curr_id,
+        cakes_in_batch: 1,
+        cakes_residue: 0,
+      },
+    ]);
+  };
 
   const handleAddOnAutoclave = (row) => {
     setCurrId(row.id);
@@ -186,7 +232,7 @@ function ProductionBatchDesigner() {
     Object.keys(groupedByDensity).forEach((densityKey) => {
       const group = groupedByDensity[densityKey];
       group.forEach(({ id, quantity, product }) => {
-        const { m3, normOfBrack, width, density } = product;
+        const { volumeBlockOnPallet, normOfBrack, width, density } = product;
         if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
           const batch = addCakesData({
             id,
@@ -194,7 +240,7 @@ function ProductionBatchDesigner() {
             width,
             quantity,
             product_with_brack: (quantity * (1 + normOfBrack / 100)).toFixed(2),
-            quantity_m3: (normOfBrack * m3).toFixed(2),
+            quantity_m3: (normOfBrack * volumeBlockOnPallet).toFixed(2),
           });
           prodBatch.push(batch);
           updatedTotalQuantity += quantity;
@@ -204,11 +250,14 @@ function ProductionBatchDesigner() {
 
     setProductonBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
+
     const updatedAutoclaveData = transformAutoclaveData(emptyAutoclave, prodBatch);
+
     const filledAutoclave = [];
     for (let i = 0; i < updatedAutoclaveData.length; i += 21) {
       filledAutoclave.push(updatedAutoclaveData.slice(i, i + 21));
     }
+
     setAcData(filledAutoclave);
   }, [latestProducts, listOfOrderedCakes, emptyAutoclave]);
 
@@ -388,7 +437,32 @@ function ProductionBatchDesigner() {
   return (
     <div style={{ display: 'flex' }}>
       {/* Таблица */}
+      {productBatchModal && (
+        <ModalTable
+          isOpen={productBatchModal}
+          toggle={() => setProductBatchModal(!productBatchModal)}
+          data={latestProducts}
+          onClickRow={addProduckHandler}
+        />
+      )}
       <div>
+        <button
+          onClick={() => {
+            setProductBatchModal(!productBatchModal);
+          }}
+          style={{
+            width: '150px',
+            height: '50px',
+            backgroundColor: 'blue',
+            color: 'white',
+            padding: '10px 20px',
+            margin: '5px',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          Add product
+        </button>
         <table>
           <thead>
             <tr>
