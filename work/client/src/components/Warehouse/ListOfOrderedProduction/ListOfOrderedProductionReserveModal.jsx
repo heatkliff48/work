@@ -109,12 +109,12 @@ function ListOfOrderedProductionReserveModal({
             (el) => el.article === order_article
           )?.id;
 
-          // dispatch(
-          //   updateOrderStatus({
-          //     order_id,
-          //     status: 7,
-          //   })
-          // );
+          dispatch(
+            updateOrderStatus({
+              order_id,
+              status: 7,
+            })
+          );
         }
       }
     }
