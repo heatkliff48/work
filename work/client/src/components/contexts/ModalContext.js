@@ -6,15 +6,16 @@ export const ModalContextProvider = ({ children }) => {
   const [modal, setModal] = useState(false);
   const [modalUpdate, setModalUpdate] = useState(false);
   const [modalRoleCard, setModalRoleCard] = useState(false);
+  const [warehouseModal, setWarehouseModal] = useState(false);
   const [modalAddClient, setModalAddClient] = useState(false);
   const [modalProductCard, setModalProductCard] = useState(false);
   const [clientModalOrder, setClientModalOrder] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
-  const [productInfoModalOrder, setProductInfoModalOrder] = useState(false);
-  const [warehouseModal, setWarehouseModal] = useState(false);
   const [reserveProductModal, setReserveProductModal] = useState(false);
   const [warehouseInfoModal, setWarehouseInfoModal] = useState(false);
   const [warehouseInfoCurIdModal, setWarehouseInfoCurIdModal] = useState(null);
+  const [productInfoModalOrder, setProductInfoModalOrder] = useState(false);
+  const [productBatchModal, setProductBatchModal] = useState(false);
 
   return (
     <ModalContext.Provider
@@ -43,6 +44,8 @@ export const ModalContextProvider = ({ children }) => {
         setWarehouseInfoModal,
         warehouseInfoCurIdModal,
         setWarehouseInfoCurIdModal,
+        productBatchModal,
+        setProductBatchModal,
       }}
     >
       {children}

@@ -3,13 +3,13 @@ import {
   unlockButton,
   updateBatchState,
 } from '#components/redux/actions/batchDesignerAction.js';
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   addNewBatchOutside,
   deleteBatchOutside,
   updateBatchOutside,
 } from '#components/redux/actions/batchOutsideAction.js';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 function Autoclave({ acData, batchFromBD }) {
   const dispatch = useDispatch();
@@ -67,6 +67,7 @@ function Autoclave({ acData, batchFromBD }) {
 
   const addArrayAfterId = () => {
     if (!selectedId) return;
+
     const { id } = batchDesigner?.find((el) => el?.id === selectedId);
 
     setAutoclave((prevAutoclave) => {
@@ -77,7 +78,7 @@ function Autoclave({ acData, batchFromBD }) {
         alert('Не найдено элементов с таким id');
         return prevAutoclave;
       }
-
+      console.log('flatAutoclave[lastIndex]', flatAutoclave[lastIndex]);
       const newElement = { ...flatAutoclave[lastIndex] };
       flatAutoclave.splice(lastIndex + 1, 0, newElement);
       const count = flatAutoclave.filter((el) => el.id === id).length;
@@ -398,7 +399,9 @@ function Autoclave({ acData, batchFromBD }) {
                 className={`autoclave-cell ${getClassForAutoclave(
                   assignColorToId(el?.id)
                 )}`}
-                onClick={() => setSelectedId(el?.id)}
+                onClick={() => {
+                  setSelectedId(el?.id);
+                }}
               >
                 {el.id !== null ? `${el.density}x${el.width}` : ''}
               </div>
