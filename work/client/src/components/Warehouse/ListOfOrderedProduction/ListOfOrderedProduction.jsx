@@ -3,14 +3,8 @@ import Table from '#components/Table/Table.jsx';
 import { useEffect, useState } from 'react';
 import ListOfOrderedProductionReserveModal from './ListOfOrderedProductionReserveModal';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  addNewReservedProducts,
-  updateRemainingStock,
-  updListOfOrderedProductionOEM,
-} from '#components/redux/actions/warehouseAction.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 
 function ListOfOrderedProduction() {
   const {
