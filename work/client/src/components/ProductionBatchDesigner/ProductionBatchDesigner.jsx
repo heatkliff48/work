@@ -59,18 +59,23 @@ function ProductionBatchDesigner() {
 
   const addProduckHandler = (prod_data) => {
     const { density, width } = prod_data;
-    const curr_id = batchDesigner.length + 1;
+
+    const maxId = batchDesigner.reduce(
+      (max, item) => (item.id > max ? item.id : max),
+      0
+    );
+
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
       const lastIndex = flatAutoclave.filter((el) => el.id).length;
 
-      const newElement = { id: curr_id, density, width };
+      const newElement = { id: maxId, density, width };
       flatAutoclave.splice(lastIndex, 0, newElement);
-      const count = flatAutoclave.filter((el) => el.id === curr_id).length;
+      const count = flatAutoclave.filter((el) => el.id === maxId).length;
 
       dispatch(
         addBatchState({
-          id: curr_id,
+          id: maxId,
           cakes_in_batch: 1,
           cakes_residue: 0,
         })
@@ -79,7 +84,7 @@ function ProductionBatchDesigner() {
       setQuantityPallets((prev) => {
         return {
           ...prev,
-          [curr_id]: count * 3,
+          [maxId]: count * 3,
         };
       });
 
@@ -93,7 +98,7 @@ function ProductionBatchDesigner() {
     setBatchFromBD((prev) => [
       ...prev,
       {
-        id: curr_id,
+        id: maxId,
         cakes_in_batch: 1,
         cakes_residue: 0,
       },
