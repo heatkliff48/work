@@ -124,7 +124,7 @@ const BatchOutside = () => {
       <Table
         COLUMN_DATA={batch_outside_table}
         dataOfTable={batchOutsideDataList}
-        tableName={'Таблица'}
+        tableName={'Production plan'}
         userAccess={userAccess}
         handleRowClick={(row) => {
           batchOutsideHandler(row.original.id);

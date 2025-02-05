@@ -90,7 +90,7 @@ function Main() {
         </button>
       )}
       {checkUserAccess(user, roles, 'batch_outside')?.canRead && (
-        <button onClick={() => navigate('/batch_outside')}>Batch Outside</button>
+        <button onClick={() => navigate('/batch_outside')}>Production Plan</button>
       )}
       {checkUserAccess(user, roles, 'recipe_products')?.canRead && (
         <button onClick={() => navigate('/recipe_products')}>Recipe Products</button>
