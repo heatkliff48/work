@@ -33,10 +33,6 @@ function ProductionBatchDesigner() {
   const [acData, setAcData] = useState([]);
   const [batchFromBD, setBatchFromBD] = useState([]);
 
-  useEffect(() => {
-    console.log('productionBatchDesigner', productionBatchDesigner); // cakes_in_batch -> quantity_pallets
-  }, [productionBatchDesigner]);
-
   let countRef = useRef(0);
   const MAX_QUANTITY = 10405;
   const emptyAutoclave = useMemo(

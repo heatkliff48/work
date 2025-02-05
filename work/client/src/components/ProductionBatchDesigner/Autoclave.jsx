@@ -85,8 +85,6 @@ function Autoclave({ acData, batchFromBD }) {
         alert('Не найдено элементов с таким id');
         return prevAutoclave;
       }
-      console.log('flatAutoclave[lastIndex]', flatAutoclave[lastIndex]);
-      console.log('lastIndex', lastIndex);
 
       const newElement = { ...flatAutoclave[lastIndex] };
       flatAutoclave.splice(lastIndex + 1, 0, newElement);
@@ -303,10 +301,6 @@ function Autoclave({ acData, batchFromBD }) {
       return newAutoclave;
     });
   };
-
-  // useEffect(() => {
-  //   console.log('batchDesigner', batchDesigner);
-  // }, [batchDesigner]);
 
   const onSaveHandler = async () => {
     let positionInBatch = 1;
