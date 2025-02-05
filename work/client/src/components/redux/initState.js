@@ -23,6 +23,7 @@ const initState = {
   filesWarehouse: [],
   filesOrder: [],
   filesProduct: [],
+  stockBalance: [],
 };
 
 export default initState;

@@ -1,31 +1,32 @@
-import { combineReducers } from 'redux';
-import { userReducer } from './userReducer';
-import { productsReducer } from './productsReducer';
-import { jwtReducer } from './jwtReducer';
+import { recipeOrdersReducer } from './RecipeOrdersReducer';
+import batchDesignerReducer from './batchDesignerReducer';
+import { batchOutsideReducer } from './batchOutsideReducer';
 import {
   clientsReducer,
   legalAddressReducer,
   deliveryAddressesReducer,
   contactInfoReducer,
 } from './clientsReducer';
-import { rolesReducer } from './rolesReducer';
-import { pagesReducer } from './pagesReducer';
-import { ordersReducer } from './orderReducer';
-import { productsOfOrdersReducer } from './productsOfOrdersReducer';
-import { warehouseReducer } from './warehouseReducer';
-import { usersInfoReducer, usersMainInfoReducer } from './usersInfoReducer';
-import { productionBatchLogReducer } from './productionBatchLogReducer';
-import { reservedProductsReducer } from './reservedProductsReducer';
-import { listOfOrderedProductionReducer } from './listOfOrderedProductionReducer';
-import { listOfOrderedProductionOEMReducer } from './listOfOrderedProductionOEMReducer';
-import { batchOutsideReducer } from './batchOutsideReducer';
-import batchDesignerReducer from './batchDesignerReducer';
-import { recipeReducer } from './recipeReducer';
-import { recipeOrdersReducer } from './RecipeOrdersReducer';
-import { filesWarehouseReducer } from './filesWarehouseReducer';
-import { filesOrderReducer } from './filesOrderReducer';
 import { dataFetchedReducer } from './dataFetchedReducer';
+import { filesOrderReducer } from './filesOrderReducer';
 import { filesProductReducer } from './filesProductReducer';
+import { filesWarehouseReducer } from './filesWarehouseReducer';
+import { jwtReducer } from './jwtReducer';
+import { listOfOrderedProductionOEMReducer } from './listOfOrderedProductionOEMReducer';
+import { listOfOrderedProductionReducer } from './listOfOrderedProductionReducer';
+import { ordersReducer } from './orderReducer';
+import { pagesReducer } from './pagesReducer';
+import { productionBatchLogReducer } from './productionBatchLogReducer';
+import { productsOfOrdersReducer } from './productsOfOrdersReducer';
+import { productsReducer } from './productsReducer';
+import { recipeReducer } from './recipeReducer';
+import { reservedProductsReducer } from './reservedProductsReducer';
+import { rolesReducer } from './rolesReducer';
+import { stockBalanceReducer } from './stockBalanceReducer';
+import { userReducer } from './userReducer';
+import { usersInfoReducer, usersMainInfoReducer } from './usersInfoReducer';
+import { warehouseReducer } from './warehouseReducer';
+import { combineReducers } from 'redux';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -54,4 +55,5 @@ export const rootReducer = combineReducers({
   filesWarehouse: filesWarehouseReducer,
   filesOrder: filesOrderReducer,
   filesProduct: filesProductReducer,
+  stockBalance: stockBalanceReducer,
 });

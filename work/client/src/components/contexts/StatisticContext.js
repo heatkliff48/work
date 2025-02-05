@@ -29,14 +29,15 @@ const StatisticContextProvider = ({ children }) => {
     },
   ];
 
-  const [stockBalance, setStockBalance] = useState([]);
+  const stock_balance = useSelector((state) => state.stockBalance).sort(
+    (a, b) => a.diff - b.diff
+  );
 
   return (
     <StatisticContext.Provider
       value={{
         COLUMNS_STOCK_BALANCE,
-        stockBalance,
-        setStockBalance,
+        stock_balance,
       }}
     >
       {children}
