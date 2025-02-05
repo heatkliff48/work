@@ -67,6 +67,7 @@ const OrderCart = React.memo(() => {
 
   const user = useSelector((state) => state.user);
   const productListOrder = useSelector((state) => state.productsOfOrders);
+  const reservedProducts = useSelector((state) => state.reservedProducts);
 
   const [dataValue, setDataValue] = useState(new Date());
   const [formatDataValue, setFormatDataValue] = useState(null);
@@ -370,18 +371,43 @@ const OrderCart = React.memo(() => {
   };
 
   const productHandler = (product) => {
-    const filteredWarehouse = warehouse_data.filter(
-      (entry) => entry.product_article === product.product_article
-    );
+    // console.log(product);
 
-    const articles = {
-      product_article: product.product_article,
-      order_article: orderCartData.article,
-    };
-    setCurrentOrderedProduct(articles);
-    setFilteredWarehouseByProduct(filteredWarehouse);
-    setReserveModalShow(true);
+    const reservedProduct = productListOrder.find(
+      (orderedProduct) =>
+        orderedProduct.order_id === product.order_id &&
+        orderedProduct.product_id === product.product_id
+    );
+    console.log('reservedProduct', reservedProduct);
+
+    if (reservedProduct) {
+      const filteredWarehouseID = reservedProducts.filter(
+        (entry) => entry.orders_products_id === reservedProduct.id
+      );
+      console.log('filteredWarehouseID', filteredWarehouseID);
+      console.log('warehouse_data', warehouse_data);
+      const filteredWarehouse = warehouse_data.filter((entry) =>
+        filteredWarehouseID.some(
+          (warehouseIDs) => warehouseIDs.warehouse_id === entry.id
+        )
+      );
+      console.log('filteredWarehouse', filteredWarehouse);
+      const articles = {
+        product_article: product.product_article,
+        order_article: orderCartData.article,
+      };
+      setCurrentOrderedProduct(articles);
+      setFilteredWarehouseByProduct(filteredWarehouse);
+      setReserveModalShow(true);
+    }
+
+    // const filteredWarehouse = warehouse_data.filter(
+    //   (entry) => entry.product_article === product.product_article
+    // );
   };
+  useEffect(() => {
+    console.log('filteredWarehouseByProduct', filteredWarehouseByProduct);
+  }, [filteredWarehouseByProduct]);
 
   return (
     <>

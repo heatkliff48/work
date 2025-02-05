@@ -13,8 +13,15 @@ import { useDispatch, useSelector } from 'react-redux';
 
 function Autoclave({ acData, batchFromBD }) {
   const dispatch = useDispatch();
-  const { setAutoclave, quantityPallets, setQuantityPallets, autoclave } =
-    useOrderContext();
+  const {
+    setAutoclave,
+    quantityPallets,
+    setQuantityPallets,
+    autoclave,
+    productionBatchDesigner,
+    batchOrderIDs,
+    setBatchOrderIDs,
+  } = useOrderContext();
   const [selectedId, setSelectedId] = useState(null);
   const [idColorMap, setIdColorMap] = useState({});
 
@@ -79,6 +86,8 @@ function Autoclave({ acData, batchFromBD }) {
         return prevAutoclave;
       }
       console.log('flatAutoclave[lastIndex]', flatAutoclave[lastIndex]);
+      console.log('lastIndex', lastIndex);
+
       const newElement = { ...flatAutoclave[lastIndex] };
       flatAutoclave.splice(lastIndex + 1, 0, newElement);
       const count = flatAutoclave.filter((el) => el.id === id).length;
@@ -97,6 +106,8 @@ function Autoclave({ acData, batchFromBD }) {
           [id]: count * 3,
         };
       });
+
+      setBatchOrderIDs((prev) => (prev.includes(id) ? prev : [...prev, id]));
 
       const newAutoclave = [];
       while (flatAutoclave.length) {
@@ -150,6 +161,7 @@ function Autoclave({ acData, batchFromBD }) {
             [id]: count * 3,
           };
         });
+        setBatchOrderIDs((prev) => (prev.includes(id) ? prev : [...prev, id]));
       } else {
         dispatch(
           updateBatchState({
@@ -172,6 +184,7 @@ function Autoclave({ acData, batchFromBD }) {
             [id]: count * 3,
           };
         });
+        setBatchOrderIDs((prev) => (prev.includes(id) ? prev : [...prev, id]));
       }
 
       return newAutoclave;
@@ -210,6 +223,8 @@ function Autoclave({ acData, batchFromBD }) {
         [id]: 0,
       };
     });
+
+    setBatchOrderIDs((prev) => prev.filter((item) => item !== id));
 
     dispatch(
       unlockButton({
@@ -278,6 +293,8 @@ function Autoclave({ acData, batchFromBD }) {
         };
       });
 
+      setBatchOrderIDs((prev) => (prev.includes(id) ? prev : [...prev, id]));
+
       const newAutoclave = [];
       while (flatAutoclave.length) {
         newAutoclave.push(flatAutoclave.splice(0, 21));
@@ -287,71 +304,96 @@ function Autoclave({ acData, batchFromBD }) {
     });
   };
 
+  // useEffect(() => {
+  //   console.log('batchDesigner', batchDesigner);
+  // }, [batchDesigner]);
+
   const onSaveHandler = async () => {
-    Object.keys(quantityPallets).forEach((key) =>
-      quantityPallets[key] === undefined ? delete quantityPallets[key] : {}
-    );
+    let positionInBatch = 1;
+
+    batchOrderIDs.forEach((id) => {
+      const product = productionBatchDesigner.find((p) => p.id === id);
+
+      dispatch(
+        addNewBatchOutside({
+          product_article: product.article,
+          quantity_pallets: product.cakes_in_batch * 3,
+          quantity_free: product.free_product_package,
+          position_in_autoclave: positionInBatch,
+        })
+      );
+      positionInBatch = positionInBatch + product.cakes_in_batch;
+    });
 
     // !!! add setQuantityPallets to other Autoclave add/delete actions/functions
 
-    for (const id in quantityPallets) {
-      if (id !== undefined) {
-        const { quantity } = list_of_ordered_production.find(
-          (el) => el.id === Number(id)
-        );
+    // for (const id in quantityPallets) {
+    //   if (id !== undefined) {
+    //     const { quantity } = list_of_ordered_production.find(
+    //       (el) => el.id === Number(id)
+    //     );
 
-        const quantity_free = quantityPallets[id] - quantity;
+    //     const quantity_free = quantityPallets[id] - quantity;
 
-        if (quantityPallets[id] === 0) {
-          const currentBatch = batchOutside.find(
-            (el) => el.id_list_of_ordered_production === Number(id)
-          );
-          dispatch(deleteBatchOutside(currentBatch?.id));
-          setQuantityPallets((prev) => {
-            return {
-              ...prev,
-              [Number(id)]: 0,
-            };
-          });
-        } else if (
-          batchOutside.find(
-            (el) => el.id_list_of_ordered_production === Number(id)
-          ) !== undefined
-        ) {
-          const currentBatchID = batchOutside.find(
-            (el) => el.id_list_of_ordered_production === Number(id)
-          ).id;
-          dispatch(
-            updateBatchOutside({
-              id: currentBatchID,
-              id_warehouse_batch: 'w',
-              id_list_of_ordered_production: Number(id),
-              quantity_pallets: quantityPallets[id],
-              quantity_ordered: quantity,
-              quantity_free,
-              on_check: 0,
-            })
-          );
-          setQuantityPallets((prev) => {
-            return {
-              ...prev,
-              [Number(id)]: quantityPallets[id],
-            };
-          });
-        } else {
-          dispatch(
-            addNewBatchOutside({
-              id_warehouse_batch: 'w',
-              id_list_of_ordered_production: Number(id),
-              quantity_pallets: quantityPallets[id],
-              quantity_ordered: quantity,
-              quantity_free,
-              on_check: 0,
-            })
-          );
-        }
-      }
-    }
+    //     console.log('quantityPallets', quantityPallets[id]);
+    //     console.log('quantity_free', quantity_free);
+
+    //     // dispatch(
+    //     //   addNewBatchOutside({
+    //     //     quantity_pallets: quantityPallets[id],
+    //     //     quantity_free,
+    //     //   })
+    //     // );
+
+    //     // if (quantityPallets[id] === 0) {
+    //     //   const currentBatch = batchOutside.find(
+    //     //     (el) => el.id_list_of_ordered_production === Number(id)
+    //     //   );
+    //     //   dispatch(deleteBatchOutside(currentBatch?.id));
+    //     //   setQuantityPallets((prev) => {
+    //     //     return {
+    //     //       ...prev,
+    //     //       [Number(id)]: 0,
+    //     //     };
+    //     //   });
+    //     // } else if (
+    //     //   batchOutside.find(
+    //     //     (el) => el.id_list_of_ordered_production === Number(id)
+    //     //   ) !== undefined
+    //     // ) {
+    //     //   const currentBatchID = batchOutside.find(
+    //     //     (el) => el.id_list_of_ordered_production === Number(id)
+    //     //   ).id;
+    //     //   dispatch(
+    //     //     updateBatchOutside({
+    //     //       id: currentBatchID,
+    //     //       id_warehouse_batch: 'w',
+    //     //       id_list_of_ordered_production: Number(id),
+    //     //       quantity_pallets: quantityPallets[id],
+    //     //       quantity_ordered: quantity,
+    //     //       quantity_free,
+    //     //       on_check: 0,
+    //     //     })
+    //     //   );
+    //     //   setQuantityPallets((prev) => {
+    //     //     return {
+    //     //       ...prev,
+    //     //       [Number(id)]: quantityPallets[id],
+    //     //     };
+    //     //   });
+    //     // } else {
+    //     //   dispatch(
+    //     //     addNewBatchOutside({
+    //     //       id_list_of_ordered_production: Number(id),
+    //     //       quantity_pallets: quantityPallets[id],
+    //     //       quantity_ordered: quantity,
+    //     //       quantity_free,
+    //     //       on_check: 0,
+    //     //     })
+    //     //   );
+    //     // }
+    //   }
+    // }
   };
 
   useEffect(() => {

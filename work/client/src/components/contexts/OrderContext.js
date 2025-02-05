@@ -129,6 +129,8 @@ const OrderContextProvider = ({ children }) => {
   const [isOrderReady, setIsOrderReady] = useState(false);
   const [quantityPallets, setQuantityPallets] = useState({});
   const [personsInChargeList, setPersonsInChargeList] = useState([]);
+  const [productionBatchDesigner, setProductonBatchDesigner] = useState([]);
+  const [batchOrderIDs, setBatchOrderIDs] = useState([]);
 
   const list_of_orders = useSelector((state) => state.orders);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
@@ -224,6 +226,10 @@ const OrderContextProvider = ({ children }) => {
         personsInChargeList,
         setPersonsInChargeList,
         usersInfo,
+        productionBatchDesigner,
+        setProductonBatchDesigner,
+        batchOrderIDs,
+        setBatchOrderIDs,
       }}
     >
       {children}

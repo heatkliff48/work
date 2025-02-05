@@ -7,37 +7,31 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
-      id_warehouse_batch: {
-        type: Sequelize.STRING
-      },
-      id_list_of_ordered_production: {
-        type: Sequelize.INTEGER
+      product_article: {
+        type: Sequelize.STRING,
       },
       quantity_pallets: {
-        type: Sequelize.INTEGER
-      },
-      quantity_ordered: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       quantity_free: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
-      on_check: {
-        type: Sequelize.INTEGER
+      position_in_autoclave: {
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('BatchOutsides');
-  }
+  },
 };

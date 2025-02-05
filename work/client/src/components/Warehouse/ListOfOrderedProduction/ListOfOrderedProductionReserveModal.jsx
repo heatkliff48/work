@@ -63,7 +63,7 @@ function ListOfOrderedProductionReserveModal({
     if (remainsToReserve == 0) {
       alert('Fully reserved!');
       return;
-    } else if (quantity > product.remaining_stock) {
+    } else if (remainsToReserve > product.remaining_stock) {
       dispatch(
         updateRemainingStock({ warehouse_id: warehouse.id, new_remaining_stock: 0 })
       );
@@ -76,7 +76,8 @@ function ListOfOrderedProductionReserveModal({
         })
       );
     } else {
-      const new_remaining_stock = product.remaining_stock - quantity;
+      // const new_remaining_stock = product.remaining_stock - quantity;
+      const new_remaining_stock = product.remaining_stock - remainsToReserve;
 
       dispatch(
         updateRemainingStock({ warehouse_id: warehouse.id, new_remaining_stock })
@@ -86,7 +87,16 @@ function ListOfOrderedProductionReserveModal({
         addNewReservedProducts({
           warehouse_id: warehouse.id,
           orders_products_id: result.productsOfOrders_id,
-          quantity: quantity,
+          quantity: remainsToReserve,
+        })
+      );
+
+      const order_id = list_of_orders.find((el) => el.article === order_article)?.id;
+      console.log('order_id', order_id);
+      dispatch(
+        updateOrderStatus({
+          order_id,
+          status: 7,
         })
       );
 
@@ -94,7 +104,7 @@ function ListOfOrderedProductionReserveModal({
         latestProducts.find((el) => el.id === warehouse.product_id)
           ?.placeOfProduction !== 'Spain'
       ) {
-        const list_of_order_oem_id = list_of_ordered_production_oem.find(
+        const list_of_order_oem_id = list_of_ordered_production_oem?.find(
           (el) =>
             el.order_article === order_article &&
             el.product_article === product_article
@@ -104,16 +114,6 @@ function ListOfOrderedProductionReserveModal({
             updListOfOrderedProductionOEM({
               id: list_of_order_oem_id.id,
               status: 'Reserved',
-            })
-          );
-          const order_id = list_of_orders.find(
-            (el) => el.article === order_article
-          )?.id;
-
-          dispatch(
-            updateOrderStatus({
-              order_id,
-              status: 7,
             })
           );
         }
@@ -147,11 +147,11 @@ function ListOfOrderedProductionReserveModal({
   const COLUMNS_FILTERED_WAREHOUSE = [
     { Header: 'Warehouse article', accessor: 'article', sortType: 'string' },
     { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
-    {
-      Header: 'Quantity in warehouse, pallets',
-      accessor: 'remaining_stock',
-      sortType: 'number',
-    },
+    // {
+    //   Header: 'Quantity in warehouse, pallets',
+    //   accessor: 'remaining_stock',
+    //   sortType: 'number',
+    // },
   ];
 
   useEffect(() => {
@@ -186,12 +186,14 @@ function ListOfOrderedProductionReserveModal({
   }, [list_of_reserved_products, show]);
 
   useEffect(() => {
-    const filteredWarehouse = warehouse_data.filter(
-      (entry) =>
-        entry.product_article === currentOrderedProduct.product_article &&
-        entry.remaining_stock != 0
-    );
-    setFilteredWarehouseByProduct(filteredWarehouse);
+    if (needToReserve) {
+      const filteredWarehouse = warehouse_data.filter(
+        (entry) =>
+          entry.product_article === currentOrderedProduct.product_article &&
+          entry.remaining_stock != 0
+      );
+      setFilteredWarehouseByProduct(filteredWarehouse);
+    }
   }, [warehouse_data]);
 
   return (

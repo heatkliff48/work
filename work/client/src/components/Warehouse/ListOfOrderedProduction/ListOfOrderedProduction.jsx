@@ -1,10 +1,7 @@
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import Table from '#components/Table/Table.jsx';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ListOfOrderedProductionReserveModal from './ListOfOrderedProductionReserveModal';
-import { useDispatch, useSelector } from 'react-redux';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
 
 function ListOfOrderedProduction() {
   const {
@@ -13,15 +10,10 @@ function ListOfOrderedProduction() {
     warehouse_data,
     filteredWarehouseByProduct,
     setFilteredWarehouseByProduct,
-    list_of_ordered_production_oem,
-    list_of_reserved_products,
   } = useWarehouseContext();
-  const { latestProducts } = useProductsContext();
-  const { productsOfOrders, list_of_orders } = useOrderContext();
 
   const [modalShow, setModalShow] = useState(false);
   const [currentOrderedProduct, setCurrentOrderedProduct] = useState({});
-  const dispatch = useDispatch();
 
   const productHandler = (product) => {
     const filteredWarehouse = warehouse_data.filter(
