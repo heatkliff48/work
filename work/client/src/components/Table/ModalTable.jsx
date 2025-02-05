@@ -1,7 +1,12 @@
 import React from 'react';
 import { Modal, ModalHeader, ModalBody } from 'reactstrap';
 
-const ModalTable = ({ isOpen, toggle, data = [], onClickRow = null }) => {
+const ModalTable = ({
+  isOpen,
+  toggle,
+  data = [],
+  onClickRow = null,
+}) => {
   const filteredData = data?.filter((item) => item?.article.startsWith('T'));
 
   const isProductData = filteredData.length > 0;

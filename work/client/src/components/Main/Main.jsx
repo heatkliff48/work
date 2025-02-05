@@ -1,23 +1,24 @@
 // import axios from 'axios';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllRoles } from '#components/redux/actions/rolesAction.js';
+
+import { useUsersContext } from '#components/contexts/UserContext.js';
+// import { dataFetchedChange } from '#components/redux/actions/userAction.js';
+import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
+import {
+  getOrders,
+  getProductsOfOrders,
+} from '#components/redux/actions/ordersAction.js';
 import { getAllProducts } from '#components/redux/actions/productsAction.js';
+import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
+import { getAllRoles } from '#components/redux/actions/rolesAction.js';
 import {
   getAllWarehouse,
   getListOfOrderedProduction,
   getListOfOrderedProductionOEM,
   getListOfReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
-import {
-  getOrders,
-  getProductsOfOrders,
-} from '#components/redux/actions/ordersAction.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
-// import { dataFetchedChange } from '#components/redux/actions/userAction.js';
-import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function Main() {
   const navigate = useNavigate();
@@ -57,6 +58,9 @@ function Main() {
       {checkUserAccess(user, roles, 'Products')?.canRead && (
         <button onClick={() => navigate('/products')}>Products</button>
       )}
+
+      <button onClick={() => navigate('/statistics')}>Statistics</button>
+
       {checkUserAccess(user, roles, 'Orders')?.canRead && (
         <button onClick={() => navigate('/orders')}>Orders</button>
       )}
