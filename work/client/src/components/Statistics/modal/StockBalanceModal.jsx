@@ -1,11 +1,14 @@
 import { useStatisticContext } from '#components/contexts/StatisticContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { addNewStockBalance } from '#components/redux/actions/stockBalanceAction.js';
 import { useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 
 const StockBalanceModal = ({ isOpen, toggle }) => {
   const { warehouse_data } = useWarehouseContext();
-  const { stockBalance, setStockBalance } = useStatisticContext();
+  const { stock_balance } = useStatisticContext();
+  const dispatch = useDispatch();
 
   const [filter_data, setFilterData] = useState([]);
   const [stock_requirements, setStockRequirements] = useState();
@@ -17,21 +20,18 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
 
   const onButtonClick = () => {
     const num_stock_requirements = Number(stock_requirements);
-    setStockBalance((prev) => [
+
+    setStock((prev) => ({
       ...prev,
-      {
-        ...stock,
-        stock_requirements: num_stock_requirements,
-        diff: num_stock_requirements - stock.in_stock,
-      },
-    ]);
-    toggle();
+      stock_requirements: num_stock_requirements,
+      diff: num_stock_requirements - stock.in_stock,
+    }));
   };
 
   let haveProduct = useMemo(() => stock?.product_article ?? false, [stock]);
 
   useEffect(() => {
-    if (!warehouse_data || warehouse_data.length === 0 || !stockBalance) return;
+    if (!warehouse_data || warehouse_data.length === 0 || !stock_balance) return;
 
     const aggregatedData = warehouse_data.reduce((acc, item) => {
       const { product_article, remaining_stock } = item;
@@ -48,15 +48,20 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
 
     resultArray = resultArray.filter(
       (item) =>
-        !stockBalance.some((stock) => stock.product_article === item.product_article)
+        !stock_balance.some(
+          (stock) => stock.product_article === item.product_article
+        )
     );
 
     setFilterData(resultArray);
   }, []);
 
   useEffect(() => {
-    console.log('stock', stock);
-  }, [stock]);
+    if (Object.keys(stock).length === 0) return;
+    dispatch(addNewStockBalance(stock));
+    toggle();
+    setStock({});
+  }, [stock.diff]);
 
   return (
     <Modal

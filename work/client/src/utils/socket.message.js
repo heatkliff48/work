@@ -6,6 +6,7 @@ import {
   addNewOrderSocket,
   addNewProductSocket,
   addNewRecipeSocket,
+  addNewStockBalanceSocket,
   addNewWarehouseSocket,
   deeleteProductOfOrderSocket,
   deleteFilesOrderSocket,
@@ -70,6 +71,7 @@ import {
   ADD_NEW_FILES_PRODUCT_SOCKET,
   DELETE_FILES_PRODUCT_SOCKET,
   UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
+  ADD_NEW_STOCK_BALANCE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -204,6 +206,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case DELETE_MATERIAL_PLAN_SOCKET:
       dispatch(deleteMaterialPlanSocket(payload));
+      break;
+
+    case ADD_NEW_STOCK_BALANCE_SOCKET:
+      dispatch(addNewStockBalanceSocket(payload));
       break;
 
     default:

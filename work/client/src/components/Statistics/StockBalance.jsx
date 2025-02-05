@@ -3,13 +3,13 @@ import { useStatisticContext } from '#components/contexts/StatisticContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import Table from '../Table/Table';
 import StockBalanceModal from './modal/StockBalanceModal';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 function StockBalance() {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { stockBalanceModal, setStockBalanceModal } = useModalContext();
-  const { COLUMNS_STOCK_BALANCE, stockBalance, setStockBalance } =
+  const { COLUMNS_STOCK_BALANCE, stock_balance } =
     useStatisticContext();
 
   const user = useSelector((state) => state.user);
@@ -41,7 +41,7 @@ function StockBalance() {
       )}
       <Table
         COLUMN_DATA={COLUMNS_STOCK_BALANCE}
-        dataOfTable={stockBalance}
+        dataOfTable={stock_balance}
         userAccess={userAccess}
         onClickButton={() => {
           setStockBalanceModal(!stockBalanceModal);

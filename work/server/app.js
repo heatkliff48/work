@@ -19,6 +19,7 @@ const AuthRootRouter = require('./router/Auth.js');
 const ProductRootRouter = require('./router/Product.js');
 const OrdersRootRouter = require('./router/Orders.js');
 const RolesRootRouter = require('./router/Roles.js');
+const StockBalanceRootRouter = require('./router/StockBalance.js');
 const clientsRouter = require('./router/clients.js');
 const clientsAddress = require('./router/clientsAddress');
 const deliveryAddress = require('./router/deliveryAddress');
@@ -101,6 +102,7 @@ app.use('/files', fileUpload);
 app.use('/filesWarehouse', filesWarehouseRouter);
 app.use('/filesOrder', filesOrderRouter);
 app.use('/filesProduct', filesProductRouter);
+app.use('/stockBalance', StockBalanceRootRouter);
 
 // Обработка WebSocket соединений
 server.on('upgrade', function (req, socket, head) {

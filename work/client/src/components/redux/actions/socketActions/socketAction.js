@@ -22,6 +22,7 @@ import {
   NEW_FILES_PRODUCT_SOCKET,
   NEED_DELETE_FILES_PRODUCT_SOCKET,
   PERSON_IN_CHARGE_OF_ORDER_SOCKET,
+  NEW_STOCK_BALANCE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -182,5 +183,12 @@ export const deleteMaterialPlanSocket = (material_plan_id) => {
   return {
     type: NEES_DELETE_MATERIAL_PLAN_SOCKET,
     payload: material_plan_id,
+  };
+};
+
+export const addNewStockBalanceSocket = (stock) => {
+  return {
+    type: NEW_STOCK_BALANCE_SOCKET,
+    payload: stock,
   };
 };

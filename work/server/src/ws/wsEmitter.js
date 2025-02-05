@@ -31,6 +31,7 @@ const {
   ADD_NEW_FILES_PRODUCT_SOCKET,
   DELETE_FILES_PRODUCT_SOCKET,
   UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
+  ADD_NEW_STOCK_BALANCE_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -385,6 +386,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_FILES_PRODUCT_SOCKET,
           payload: product_id,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_STOCK_BALANCE_SOCKET, (newStockBalance) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_STOCK_BALANCE_SOCKET,
+          payload: newStockBalance,
         })
       );
     }

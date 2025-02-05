@@ -10,6 +10,7 @@ import {
 import { getAllProducts } from '#components/redux/actions/productsAction.js';
 import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
 import { getAllRoles } from '#components/redux/actions/rolesAction.js';
+import { getAllStockBalance } from '#components/redux/actions/stockBalanceAction.js';
 import {
   getAllWarehouse,
   getListOfOrderedProduction,
@@ -45,6 +46,7 @@ function Main() {
     dispatch(getOrders());
     dispatch(getRecipeOrdersData());
     dispatch(clearBatchState());
+    dispatch(getAllStockBalance());
     //dispatch(dataFetchedChange(true));
   }, []);
 
