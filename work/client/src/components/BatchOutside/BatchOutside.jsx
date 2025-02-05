@@ -31,11 +31,6 @@ const BatchOutside = () => {
 
   const batch_outside_table = [
     {
-      Header: 'id_warehouse_batch',
-      accessor: 'id_warehouse_batch',
-      Filter: TextSearchFilter,
-    },
-    {
       Header: 'list_of_ordered_production product',
       accessor: 'product_article',
       Filter: TextSearchFilter,
@@ -46,32 +41,53 @@ const BatchOutside = () => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'quantity_ordered',
-      accessor: 'quantity_ordered',
-      Filter: TextSearchFilter,
-    },
-    {
       Header: 'quantity_free',
       accessor: 'quantity_free',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'on_check',
-      accessor: 'on_check',
+      Header: 'Position in autoclave',
+      accessor: 'position_in_autoclave',
       Filter: TextSearchFilter,
     },
   ];
 
+  // const batch_outside_table = [
+  //   {
+  //     Header: 'id_warehouse_batch',
+  //     accessor: 'id_warehouse_batch',
+  //     Filter: TextSearchFilter,
+  //   },
+  //   {
+  //     Header: 'list_of_ordered_production product',
+  //     accessor: 'product_article',
+  //     Filter: TextSearchFilter,
+  //   },
+  //   {
+  //     Header: 'quantity_pallets',
+  //     accessor: 'quantity_pallets',
+  //     Filter: TextSearchFilter,
+  //   },
+  //   {
+  //     Header: 'quantity_ordered',
+  //     accessor: 'quantity_ordered',
+  //     Filter: TextSearchFilter,
+  //   },
+  //   {
+  //     Header: 'quantity_free',
+  //     accessor: 'quantity_free',
+  //     Filter: TextSearchFilter,
+  //   },
+  //   {
+  //     Header: 'on_check',
+  //     accessor: 'on_check',
+  //     Filter: TextSearchFilter,
+  //   },
+  // ];
+
   useEffect(() => {
     if (batchOutside) {
-      const newData = batchOutside.map((batch) => {
-        const product_article_batch =
-          list_of_ordered_production.find(
-            (el) => el.id === batch.id_list_of_ordered_production
-          )?.product_article ?? '';
-        return { ...batch, product_article: product_article_batch };
-      });
-      setBatchOutsideDataList(newData);
+      setBatchOutsideDataList(batchOutside);
     }
   }, [batchOutside]);
 

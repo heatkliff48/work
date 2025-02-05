@@ -13,6 +13,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import FilesMain from '#components/FileUpload/Warehouse/FilesMain.jsx';
 import { useUsersContext } from '#components/contexts/UserContext.js';
+import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 
 const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -61,10 +62,20 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
   const deleteHandler = (el) => {
     const { id, remaining_stock } = curr_warehouse;
 
+    const reservedProduct = productsOfOrders.find(
+      (orderedProduct) => orderedProduct.id === el.orders_products_id
+    );
     const new_remaining_stock = remaining_stock + el.quantity;
 
     dispatch(deleteReservedProducts(el.id));
     dispatch(updateRemainingStock({ warehouse_id: id, new_remaining_stock }));
+
+    dispatch(
+      updateOrderStatus({
+        order_id: reservedProduct.order_id,
+        status: 6,
+      })
+    );
   };
 
   useEffect(() => {

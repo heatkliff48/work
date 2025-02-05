@@ -17,7 +17,14 @@ function ProductionBatchDesigner() {
 
   const { latestProducts } = useProductsContext();
   const { listOfOrderedCakes } = useWarehouseContext();
-  const { autoclave, setAutoclave, setQuantityPallets } = useOrderContext();
+  const {
+    autoclave,
+    setAutoclave,
+    setQuantityPallets,
+    productionBatchDesigner,
+    setProductonBatchDesigner,
+    setBatchOrderIDs,
+  } = useOrderContext();
   const { productBatchModal, setProductBatchModal } = useModalContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
@@ -25,7 +32,6 @@ function ProductionBatchDesigner() {
   const [currId, setCurrId] = useState(null);
   const [acData, setAcData] = useState([]);
   const [batchFromBD, setBatchFromBD] = useState([]);
-  const [productionBatchDesigner, setProductonBatchDesigner] = useState([]);
 
   let countRef = useRef(0);
   const MAX_QUANTITY = 10405;
@@ -85,6 +91,8 @@ function ProductionBatchDesigner() {
           [maxId]: count * 3,
         };
       });
+
+      setBatchOrderIDs((prev) => (prev.includes(maxId) ? prev : [...prev, maxId]));
 
       const newAutoclave = [];
       while (flatAutoclave.length) {
@@ -235,7 +243,9 @@ function ProductionBatchDesigner() {
     Object.keys(groupedByDensity).forEach((densityKey) => {
       const group = groupedByDensity[densityKey];
       group.forEach(({ id, quantity, product }) => {
-        const { volumeBlockOnPallet, normOfBrack, width, density } = product;
+        const { volumeBlockOnPallet, normOfBrack, width, density, article } =
+          product;
+
         if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
           const batch = addCakesData({
             id,
@@ -244,6 +254,7 @@ function ProductionBatchDesigner() {
             quantity,
             product_with_brack: (quantity * (1 + normOfBrack / 100)).toFixed(2),
             quantity_m3: (normOfBrack * volumeBlockOnPallet).toFixed(2),
+            article,
           });
           prodBatch.push(batch);
           updatedTotalQuantity += quantity;
@@ -373,6 +384,10 @@ function ProductionBatchDesigner() {
             ...prev,
             [currId]: new_cakes_in_batch * 3,
           }));
+
+          setBatchOrderIDs((prev) =>
+            prev.includes(currId) ? prev : [...prev, currId]
+          );
 
           return {
             ...batchItem,

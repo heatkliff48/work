@@ -28,23 +28,15 @@ batchOutsideRouter.get('/', async (req, res) => {
 batchOutsideRouter.post('/', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter post');
 
-  const {
-    id_warehouse_batch,
-    id_list_of_ordered_production,
-    quantity_pallets,
-    quantity_ordered,
-    quantity_free,
-    on_check,
-  } = req.body;
+  const { product_article, quantity_pallets, quantity_free, position_in_autoclave } =
+    req.body;
 
   try {
     const batchOutside = await BatchOutside.create({
-      id_warehouse_batch,
-      id_list_of_ordered_production,
+      product_article,
       quantity_pallets,
-      quantity_ordered,
       quantity_free,
-      on_check,
+      position_in_autoclave,
     });
 
     myEmitter.emit(ADD_NEW_BATCH_OUTSIDE_SOCKET, batchOutside);
@@ -99,23 +91,19 @@ batchOutsideRouter.post('/update/:id', async (req, res) => {
 
   const {
     id,
-    id_warehouse_batch,
-    id_list_of_ordered_production,
+    product_article,
     quantity_pallets,
-    quantity_ordered,
     quantity_free,
-    on_check,
+    position_in_autoclave,
   } = req.body;
 
   try {
     const batchOutside = await BatchOutside.update(
       {
-        id_warehouse_batch,
-        id_list_of_ordered_production,
+        product_article,
         quantity_pallets,
-        quantity_ordered,
         quantity_free,
-        on_check,
+        position_in_autoclave,
       },
       {
         where: {
