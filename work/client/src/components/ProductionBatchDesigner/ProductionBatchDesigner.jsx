@@ -453,16 +453,7 @@ function ProductionBatchDesigner() {
           onClick={() => {
             setProductBatchModal(!productBatchModal);
           }}
-          style={{
-            width: '150px',
-            height: '50px',
-            backgroundColor: 'blue',
-            color: 'white',
-            padding: '10px 20px',
-            margin: '5px',
-            border: 'none',
-            cursor: 'pointer',
-          }}
+          className="table_button"
         >
           Add product
         </button>
