@@ -60,10 +60,8 @@ function ProductionBatchDesigner() {
   const addProduckHandler = (prod_data) => {
     const { density, width } = prod_data;
 
-    const maxId = batchDesigner.reduce(
-      (max, item) => (item.id > max ? item.id : max),
-      0
-    );
+    const maxId =
+      batchDesigner.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
 
     setAutoclave((prevAutoclave) => {
       let flatAutoclave = prevAutoclave.flat();
