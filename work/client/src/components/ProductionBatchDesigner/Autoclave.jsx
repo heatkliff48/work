@@ -304,19 +304,48 @@ function Autoclave({ acData, batchFromBD }) {
 
   const onSaveHandler = async () => {
     let positionInBatch = 1;
+    let batchPositions = [];
 
     batchOrderIDs.forEach((id) => {
       const product = productionBatchDesigner.find((p) => p.id === id);
 
+      if (product) {
+        batchPositions.push({
+          product,
+          positionInBatch, // Store position before updating
+        });
+
+        positionInBatch += product.cakes_in_batch;
+      }
+    });
+
+    const mergedBatchPositions = batchPositions.reduce((acc, current) => {
+      const lastItem = acc[acc.length - 1];
+
+      // Check if the last product in the merged array is the same
+      if (lastItem && lastItem.product.article === current.product.article) {
+        // Keep the positionInBatch from the first entry
+        lastItem.product.cakes_in_batch += current.product.cakes_in_batch; // Sum cakes_in_batch
+      } else {
+        // Add a new entry
+        acc.push({
+          product: { ...current.product },
+          positionInBatch: current.positionInBatch, // Keep initial position
+        });
+      }
+
+      return acc;
+    }, []);
+
+    mergedBatchPositions.forEach((position) => {
       dispatch(
         addNewBatchOutside({
-          product_article: product.article,
-          quantity_pallets: product.cakes_in_batch * 3,
-          quantity_free: product.free_product_package,
-          position_in_autoclave: positionInBatch,
+          product_article: position.product.article,
+          quantity_pallets: position.product.cakes_in_batch * 3,
+          quantity_free: position.product.free_product_package,
+          position_in_autoclave: position.positionInBatch,
         })
       );
-      positionInBatch = positionInBatch + product.cakes_in_batch;
     });
 
     // !!! add setQuantityPallets to other Autoclave add/delete actions/functions
