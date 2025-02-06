@@ -5,16 +5,24 @@ export const stockBalanceReducer = (stockBalance = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case ALL_STOCK_BALANCE: {
+      payload.sort((a, b) => a.diff - b.diff);
       return payload;
     }
 
     case NEW_STOCK_BALANCE: {
-      if (stockBalance.find((order) => order.id === payload.id)) return stockBalance;
+      payload.sort((a, b) => a.diff - b.diff);
+
+      if (stockBalance?.find((stock) => stock.id === payload.id))
+        return stockBalance;
+
       return [...stockBalance, payload];
     }
 
     case NEW_STOCK_BALANCE_SOCKET: {
-      if (stockBalance.find((order) => order.id === payload.id)) return stockBalance;
+      payload.sort((a, b) => a.diff - b.diff);
+
+      if (stockBalance?.find((stock) => stock.id === payload.id))
+        return stockBalance;
 
       return [...stockBalance, payload];
     }
