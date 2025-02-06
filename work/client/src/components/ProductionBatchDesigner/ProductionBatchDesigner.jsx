@@ -63,8 +63,8 @@ function ProductionBatchDesigner() {
     []
   );
 
-  const addProduckHandler = (prod_data) => {
-    const { density, width } = prod_data;
+  const addProductHandler = (prod_data) => {
+    const { article, density, width } = prod_data;
 
     const maxId =
       batchDesigner.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
@@ -80,6 +80,8 @@ function ProductionBatchDesigner() {
       dispatch(
         addBatchState({
           id: maxId,
+          id_list_of_ordered_production: null,
+          product_article: article,
           cakes_in_batch: 1,
           cakes_residue: 0,
         })
@@ -105,6 +107,8 @@ function ProductionBatchDesigner() {
       ...prev,
       {
         id: maxId,
+        id_list_of_ordered_production: null,
+        product_article: article,
         cakes_in_batch: 1,
         cakes_residue: 0,
       },
@@ -117,7 +121,8 @@ function ProductionBatchDesigner() {
 
   const addCakesData = useCallback(
     (prodBatchData) => {
-      const quantity_cakes = (prodBatchData.product_with_brack / 3).toFixed(2);
+      const { id, product_with_brack, article } = prodBatchData;
+      const quantity_cakes = (product_with_brack / 3).toFixed(2);
       const free_product_cakes = (
         Math.ceil(quantity_cakes) - quantity_cakes
       ).toFixed(2);
@@ -127,13 +132,12 @@ function ProductionBatchDesigner() {
       const total_cakes = Math.ceil(quantity_cakes);
 
       const cakes_in_batch = haveBatch
-        ? batchDesigner.find((el) => el.id === prodBatchData.id).cakes_in_batch
-        : emptyAutoclave?.filter(
-            (unit) => unit.id_list_of_ordered_product === prodBatchData.id
-          ).length;
+        ? batchDesigner.find((el) => el.id === id).cakes_in_batch
+        : emptyAutoclave?.filter((unit) => unit.id_list_of_ordered_product === id)
+            .length;
 
       const cakes_residue = haveBatch
-        ? batchDesigner.find((el) => el.id === prodBatchData.id).cakes_residue
+        ? batchDesigner.find((el) => el.id === id).cakes_residue
         : Math.max(total_cakes - cakes_in_batch, 0);
 
       const updatedProdBatch = {
@@ -147,30 +151,28 @@ function ProductionBatchDesigner() {
       };
 
       setBatchFromBD((prev) => {
-        const existingIndex = prev.findIndex((item) => item.id === prodBatchData.id);
+        const existingIndex = prev.findIndex((item) => item.id === id);
 
         if (existingIndex !== -1) {
           const updated = [...prev];
           updated[existingIndex] = {
-            id: prodBatchData.id,
+            id,
             cakes_in_batch: 0,
             cakes_residue: total_cakes,
           };
           return updated;
         }
 
-        return [
-          ...prev,
-          { id: prodBatchData.id, cakes_in_batch: 0, cakes_residue: total_cakes },
-        ];
+        return [...prev, { id, cakes_in_batch: 0, cakes_residue: total_cakes }];
       });
 
-      const existingBatch = batchDesigner?.find((el) => el?.id === prodBatchData.id);
+      const existingBatch = batchDesigner?.find((el) => el?.id === id);
 
       if (!existingBatch) {
         dispatch(
           addBatchState({
             id: prodBatchData.id,
+            product_article: article,
             cakes_in_batch,
             cakes_residue,
           })
@@ -460,7 +462,7 @@ function ProductionBatchDesigner() {
           isOpen={productBatchModal}
           toggle={() => setProductBatchModal(!productBatchModal)}
           data={latestProducts}
-          onClickRow={addProduckHandler}
+          onClickRow={addProductHandler}
         />
       )}
       <div>

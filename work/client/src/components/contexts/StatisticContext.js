@@ -29,10 +29,7 @@ const StatisticContextProvider = ({ children }) => {
     },
   ];
 
-  const stock_balance = useSelector((state) => state.stockBalance).sort(
-    (a, b) => a.diff - b.diff
-  );
-
+  const stock_balance = useSelector((state) => state.stockBalance);
   return (
     <StatisticContext.Provider
       value={{
