@@ -16,6 +16,7 @@ export const ModalContextProvider = ({ children }) => {
   const [warehouseInfoCurIdModal, setWarehouseInfoCurIdModal] = useState(null);
   const [productInfoModalOrder, setProductInfoModalOrder] = useState(false);
   const [productBatchModal, setProductBatchModal] = useState(false);
+  const [stockBalanceModal, setStockBalanceModal] = useState(false);
 
   return (
     <ModalContext.Provider
@@ -46,6 +47,8 @@ export const ModalContextProvider = ({ children }) => {
         setWarehouseInfoCurIdModal,
         productBatchModal,
         setProductBatchModal,
+        stockBalanceModal,
+        setStockBalanceModal,
       }}
     >
       {children}

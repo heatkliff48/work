@@ -1,8 +1,8 @@
+import { GlobalFilterInput } from './GlobalFilterInput';
+import { matchSorter } from 'match-sorter';
 import { useMemo } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
-import { GlobalFilterInput } from './GlobalFilterInput';
-import { matchSorter } from 'match-sorter';
 
 function Table({
   COLUMN_DATA = [],
@@ -87,6 +87,13 @@ function Table({
           setGlobalFilter={setGlobalFilter}
           globalFilter={state.globalFilter}
         />
+        <div>
+          {userAccess?.canWrite && !haveButton && (
+            <button onClick={onClickButton} className="table_button">
+              {buttonText}
+            </button>
+          )}
+        </div>
         <table {...getTableProps()}>
           <thead>
             {headerGroups.map((hG) => {
@@ -143,9 +150,6 @@ function Table({
             })}
           </tbody>
         </table>
-        {userAccess?.canWrite && !haveButton && (
-          <button onClick={onClickButton}>{buttonText}</button>
-        )}
       </div>
     </>
   );
