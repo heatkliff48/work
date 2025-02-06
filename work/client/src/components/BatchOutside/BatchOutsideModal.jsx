@@ -1,24 +1,27 @@
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+import { deleteMaterialPlan } from '#components/redux/actions/recipeAction.js';
 import {
   addNewReservedProducts,
   addNewWarehouse,
   updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
+import React, { useCallback, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
+import Modal from 'react-bootstrap/Modal';
+import Row from 'react-bootstrap/Row';
 import { useDispatch } from 'react-redux';
-import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { deleteMaterialPlan } from '#components/redux/actions/recipeAction.js';
 
 function BatchOutsideModal(props) {
-  const [batchOutsideInput, setBatchOutsideInput] = useState({});
+  const { latestProducts } = useProductsContext();
+  const { list_of_orders } = useOrderContext();
+  const { warehouse_data, currentOrderedProducts, currentBatchId } =
+    useWarehouseContext();
+
   const dispatch = useDispatch();
   const batch_outside_info_table = [
     {
@@ -43,32 +46,15 @@ function BatchOutsideModal(props) {
     },
   ];
 
-  const { COLUMNS, latestProducts } = useProductsContext();
-  const { productsOfOrders, list_of_orders } = useOrderContext();
-  const {
-    warehouse_data,
-    filteredProducts,
-    setFilteredProducts,
-    currentOrderedProducts,
-    setCurrentOrderedProducts,
-    currentBatchId,
-  } = useWarehouseContext();
-  const { warehouseInfoCurIdModal, setWarehouseInfoCurIdModal } = useModalContext();
-  const [warehouseData, setWarehouseData] = useState({});
-
-  const [counter, setCounter] = useState(0);
+  const [batchOutsideInput, setBatchOutsideInput] = useState({});
 
   const getWarehouseArticle = (product, type, versionNumber) => {
-    // let versionNumber = '0001';
     const year = new Date().getFullYear().toString().slice(-2);
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
     const day = new Date().getDate();
 
     const certificate = product.certificate.slice(0, 1);
     const density = product.density.toString().slice(0, 1);
-
-    // const articleId = warehouse_data.length === 0 ? 1 : warehouse_data.length + 1;
-    // versionNumber = `0000000${articleId}`.slice(-6);
 
     const warehouseArticle = `S${type}0${certificate}${density}${year}${month}${day}${versionNumber}`;
 
@@ -96,7 +82,6 @@ function BatchOutsideModal(props) {
       const warehouse_article = getWarehouseArticle(product, type, versionNumber);
       await dispatch(
         addNewWarehouse({
-          ...warehouseData,
           product_article: currentOrderedProducts.product_article,
           article: warehouse_article,
           warehouse_loc: 'local',
@@ -104,7 +89,6 @@ function BatchOutsideModal(props) {
           type: 'OK',
         })
       );
-      setCounter((prev) => prev + 1);
       ok = true;
     }
     if (batchOutsideInput.remnants) {
@@ -116,7 +100,6 @@ function BatchOutsideModal(props) {
 
       await dispatch(
         addNewWarehouse({
-          ...warehouseData,
           product_article: currentOrderedProducts.product_article,
           article: warehouse_article,
           warehouse_loc: 'local',
@@ -124,91 +107,87 @@ function BatchOutsideModal(props) {
           type: 'Remnants',
         })
       );
-      setCounter((prev) => prev + 1);
       ok = true;
     }
     if (ok) {
-      // delete
       await dispatch(deleteBatchOutside(currentBatchId));
     }
   };
 
-  // ---------------------AUTO WAREHOUSE STOCK RESERVE-----------------
+  const addReservedProductHandler = () => {
+    console.log('currentOrderedProducts', currentOrderedProducts);
+    console.log('batchOutsideInput', batchOutsideInput);
+    // const { quantity_palet, productsOfOrders_id, order_article } = res_prod;
+    // const { id, remaining_stock, product_article } = warehouse;
 
-  // useEffect(() => {
-  //   // setWarehouseInfoCurIdModal(warehouse_data[warehouse_data.length - 1].id);
+    // if (quantity_palet > remaining_stock) {
+    //   alert(
+    //     'Колличество заказной продукции превышает коллиичество продукции на складе!'
+    //   );
+    //   return;
+    // }
+    // const new_remaining_stock = remaining_stock - quantity_palet;
 
-  //   // let j = 2;
-  //   // for (let i = 0; i < counter; i++) {
-  //   if (counter > 0) {
-  //     const curr_warehouse = warehouse_data.find(
-  //       (wh) => wh.id === warehouse_data[warehouse_data.length - counter].id
-  //     );
-  //     const { id, remaining_stock } = curr_warehouse;
-  //     let remaining_stock_buff = remaining_stock;
+    // dispatch(updateRemainingStock({ warehouse_id: id, new_remaining_stock }));
 
-  //     const product_id = latestProducts.find(
-  //       (el) => el.article === curr_warehouse.product_article
-  //     );
+    // const list_of_order_id = list_of_ordered_production.find(
+    //   (el) =>
+    //     el.order_article === order_article && el.product_article === product_article
+    // );
 
-  //     const filteredProductsOfOrders = productsOfOrders.filter(
-  //       (item) => item.product_id === product_id.id
-  //     );
-  //filteredProductsOfOrders);
+    // if (list_of_order_id) {
+    //   const currBatchID = batchOutside.find(
+    //     (el) => el.id_list_of_ordered_production === list_of_order_id.id
+    //   );
+    //   if (currBatchID) {
+    //     dispatch(deleteBatchOutside(currBatchID.id));
+    //   }
+    // }
 
-  //     const result = filteredProductsOfOrders.map((product) => {
-  //       const order = list_of_orders.find((order) => order.id === product.order_id);
-  //       return {
-  //         productsOfOrders_id: product.id,
-  //         order_article: order ? order.article : '',
-  //         quantity_palet: product.quantity_palet,
-  //       };
-  //     });
-  //     setFilteredProducts(result);
+    // dispatch(
+    //   addNewReservedProducts({
+    //     warehouse_id: id,
+    //     orders_products_id: productsOfOrders_id,
+    //     quantity: quantity_palet,
+    //   })
+    // );
 
-  //     result?.forEach((el) => {
-  //       const { quantity_palet, productsOfOrders_id } = el;
-
-  //       if (quantity_palet > remaining_stock_buff) {
-  //         console.log(
-  //           'Колличество заказной продукции превышает коллиичество продукции на складе!'
-  //         );
-  //         // const new_quantity_palet = quantity_palet - remaining_stock;
-  //         return;
-  //       }
-  //       remaining_stock_buff = remaining_stock_buff - quantity_palet;
-
-  //       dispatch(
-  //         updateRemainingStock({
-  //           warehouse_id: id,
-  //           new_remaining_stock: remaining_stock_buff,
-  //         })
-  //       );
-
-  //       dispatch(
-  //         addNewReservedProducts({
-  //           warehouse_id: id,
-  //           orders_products_id: productsOfOrders_id,
-  //           quantity: quantity_palet,
-  //         })
-  //       );
-  //     });
-
-  //     // --j;
-  //     // if (j <= 0) {
-  //     //   j = 2;
-  //     setCounter(0);
-  //     //   }
-  //     // }
-  //   }
-  // }, [warehouse_data]);
+    // if (
+    //   latestProducts.find((el) => el.id === warehouse.product_id)
+    //     ?.placeOfProduction !== 'Spain'
+    // ) {
+    //   const list_of_order_oem_id = list_of_ordered_production_oem.find(
+    //     (el) =>
+    //       el.order_article === order_article &&
+    //       el.product_article === product_article
+    //   );
+    //   if (list_of_order_oem_id) {
+    //     dispatch(
+    //       updListOfOrderedProductionOEM({
+    //         id: list_of_order_oem_id.id,
+    //         status: 'Reserved',
+    //       })
+    //     );
+    //     const order_id = list_of_orders.find(
+    //       (el) => el.article === order_article
+    //     )?.id;
+    //     dispatch(
+    //       updateOrderStatus({
+    //         order_id,
+    //         status: 7,
+    //       })
+    //     );
+    //   }
+    // }
+  };
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
-    checkInput();
+    // checkInput();
+    addReservedProductHandler();
 
-    props.onHide();
-    setBatchOutsideInput({});
+    // props.onHide();
+    // setBatchOutsideInput({});
   };
 
   return (
@@ -231,7 +210,6 @@ function BatchOutsideModal(props) {
               onSubmitForm(e);
             }}
           >
-            <h3></h3>
             <Row>
               {batch_outside_info_table.map((el) => (
                 <Col key={el.id}>

@@ -21,6 +21,9 @@ module.exports = {
       position_in_autoclave: {
         type: Sequelize.INTEGER,
       },
+      id_list_of_ordered_production: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

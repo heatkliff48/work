@@ -37,6 +37,7 @@ batchOutsideRouter.post('/', async (req, res) => {
       quantity_pallets,
       quantity_free,
       position_in_autoclave,
+      id_list_of_ordered_production,
     });
 
     myEmitter.emit(ADD_NEW_BATCH_OUTSIDE_SOCKET, batchOutside);
@@ -95,6 +96,7 @@ batchOutsideRouter.post('/update/:id', async (req, res) => {
     quantity_pallets,
     quantity_free,
     position_in_autoclave,
+    id_list_of_ordered_production,
   } = req.body;
 
   try {
@@ -104,6 +106,7 @@ batchOutsideRouter.post('/update/:id', async (req, res) => {
         quantity_pallets,
         quantity_free,
         position_in_autoclave,
+        id_list_of_ordered_production,
       },
       {
         where: {
