@@ -80,6 +80,8 @@ function ProductionBatchDesigner() {
       dispatch(
         addBatchState({
           id: maxId,
+          id_list_of_ordered_production: null,
+          product_article: prod_data.article,
           cakes_in_batch: 1,
           cakes_residue: 0,
         })
@@ -171,6 +173,7 @@ function ProductionBatchDesigner() {
         dispatch(
           addBatchState({
             id: prodBatchData.id,
+            product_article: prodBatchData.article,
             cakes_in_batch,
             cakes_residue,
           })
