@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       quantity_pallets: DataTypes.INTEGER,
       quantity_free: DataTypes.INTEGER,
       position_in_autoclave: DataTypes.INTEGER,
+      id_list_of_ordered_production: DataTypes.INTEGER,
     },
     {
       sequelize,

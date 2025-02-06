@@ -307,7 +307,8 @@ function Autoclave({ acData, batchFromBD }) {
     let batchPositions = [];
 
     batchOrderIDs.forEach((id) => {
-      const product = productionBatchDesigner.find((p) => p.id === id);
+      // const product = productionBatchDesigner.find((p) => p.id === id);
+      const product = batchDesigner.find((p) => p.id === id);
 
       if (product) {
         batchPositions.push({
@@ -323,7 +324,12 @@ function Autoclave({ acData, batchFromBD }) {
       const lastItem = acc[acc.length - 1];
 
       // Check if the last product in the merged array is the same
-      if (lastItem && lastItem.product.article === current.product.article) {
+      if (
+        lastItem &&
+        lastItem.product.product_article === current.product.product_article &&
+        lastItem.product.id_list_of_ordered_production !== null &&
+        current.product.id_list_of_ordered_production !== null
+      ) {
         // Keep the positionInBatch from the first entry
         lastItem.product.cakes_in_batch += current.product.cakes_in_batch; // Sum cakes_in_batch
       } else {
@@ -342,115 +348,20 @@ function Autoclave({ acData, batchFromBD }) {
         addNewBatchOutside({
           product_article: position.product.article,
           quantity_pallets: position.product.cakes_in_batch * 3,
-          quantity_free: position.product.free_product_package,
+          quantity_free: position.product.free_product_package ?? null,
           position_in_autoclave: position.positionInBatch,
+          id_list_of_ordered_production:
+            position.product.id_list_of_ordered_production !== null
+              ? position.product.id
+              : null,
         })
       );
     });
-
-    // !!! add setQuantityPallets to other Autoclave add/delete actions/functions
-
-    // for (const id in quantityPallets) {
-    //   if (id !== undefined) {
-    //     const { quantity } = list_of_ordered_production.find(
-    //       (el) => el.id === Number(id)
-    //     );
-
-    //     const quantity_free = quantityPallets[id] - quantity;
-
-    //     console.log('quantityPallets', quantityPallets[id]);
-    //     console.log('quantity_free', quantity_free);
-
-    //     // dispatch(
-    //     //   addNewBatchOutside({
-    //     //     quantity_pallets: quantityPallets[id],
-    //     //     quantity_free,
-    //     //   })
-    //     // );
-
-    //     // if (quantityPallets[id] === 0) {
-    //     //   const currentBatch = batchOutside.find(
-    //     //     (el) => el.id_list_of_ordered_production === Number(id)
-    //     //   );
-    //     //   dispatch(deleteBatchOutside(currentBatch?.id));
-    //     //   setQuantityPallets((prev) => {
-    //     //     return {
-    //     //       ...prev,
-    //     //       [Number(id)]: 0,
-    //     //     };
-    //     //   });
-    //     // } else if (
-    //     //   batchOutside.find(
-    //     //     (el) => el.id_list_of_ordered_production === Number(id)
-    //     //   ) !== undefined
-    //     // ) {
-    //     //   const currentBatchID = batchOutside.find(
-    //     //     (el) => el.id_list_of_ordered_production === Number(id)
-    //     //   ).id;
-    //     //   dispatch(
-    //     //     updateBatchOutside({
-    //     //       id: currentBatchID,
-    //     //       id_warehouse_batch: 'w',
-    //     //       id_list_of_ordered_production: Number(id),
-    //     //       quantity_pallets: quantityPallets[id],
-    //     //       quantity_ordered: quantity,
-    //     //       quantity_free,
-    //     //       on_check: 0,
-    //     //     })
-    //     //   );
-    //     //   setQuantityPallets((prev) => {
-    //     //     return {
-    //     //       ...prev,
-    //     //       [Number(id)]: quantityPallets[id],
-    //     //     };
-    //     //   });
-    //     // } else {
-    //     //   dispatch(
-    //     //     addNewBatchOutside({
-    //     //       id_list_of_ordered_production: Number(id),
-    //     //       quantity_pallets: quantityPallets[id],
-    //     //       quantity_ordered: quantity,
-    //     //       quantity_free,
-    //     //       on_check: 0,
-    //     //     })
-    //     //   );
-    //     // }
-    //   }
-    // }
   };
 
   useEffect(() => {
     setAutoclave(acData);
   }, [acData]);
-
-  // ------------- ne udalay pls
-
-  // useEffect(() => {
-  //   // console.log('batchOutside', batchOutside);
-  //   // console.log('list_of_ordered_production', list_of_ordered_production);
-  //   if (batchOutside) {
-  //     list_of_ordered_production.forEach((ordered) => {
-  //       // console.log('id', ordered);
-  //       const batch = batchOutside.find(
-  //         (el) => el.id_list_of_ordered_production === Number(ordered.id)
-  //       );
-  //       if (batch) {
-  //         console.log('batch', batch);
-  //         console.log('ordered.id', ordered.id);
-  //         setQuantityPallets((prev) => {
-  //           return {
-  //             ...prev,
-  //             [ordered.id]: batch.quantity_pallets,
-  //           };
-  //         });
-  //       }
-  //     });
-  //   }
-  // }, [batchOutside]);
-
-  // useEffect(() => {
-  //   console.log('quantityPallets', quantityPallets);
-  // }, [quantityPallets]);
 
   return (
     <div>
