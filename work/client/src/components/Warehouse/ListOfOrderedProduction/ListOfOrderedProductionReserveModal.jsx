@@ -67,7 +67,7 @@ function ListOfOrderedProductionReserveModal({
       dispatch(
         updateRemainingStock({ warehouse_id: warehouse.id, new_remaining_stock: 0 })
       );
-
+      setRemainsToReserve(remainsToReserve - product.remaining_stock);
       dispatch(
         addNewReservedProducts({
           warehouse_id: warehouse.id,
@@ -82,7 +82,7 @@ function ListOfOrderedProductionReserveModal({
       dispatch(
         updateRemainingStock({ warehouse_id: warehouse.id, new_remaining_stock })
       );
-
+      setRemainsToReserve(0);
       dispatch(
         addNewReservedProducts({
           warehouse_id: warehouse.id,
@@ -92,7 +92,7 @@ function ListOfOrderedProductionReserveModal({
       );
 
       const order_id = list_of_orders.find((el) => el.article === order_article)?.id;
-      console.log('order_id', order_id);
+
       dispatch(
         updateOrderStatus({
           order_id,
@@ -121,10 +121,6 @@ function ListOfOrderedProductionReserveModal({
     }
   };
 
-  useEffect(() => {
-    console.log('remainsToReserve', remainsToReserve);
-  }, [remainsToReserve]);
-
   const COLUMNS_FILTERED_WAREHOUSE_FOR_RESERVE = [
     { Header: 'Warehouse article', accessor: 'article', sortType: 'string' },
     { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
@@ -147,11 +143,6 @@ function ListOfOrderedProductionReserveModal({
   const COLUMNS_FILTERED_WAREHOUSE = [
     { Header: 'Warehouse article', accessor: 'article', sortType: 'string' },
     { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
-    // {
-    //   Header: 'Quantity in warehouse, pallets',
-    //   accessor: 'remaining_stock',
-    //   sortType: 'number',
-    // },
   ];
 
   useEffect(() => {
@@ -182,8 +173,12 @@ function ListOfOrderedProductionReserveModal({
       if (checkReserve?.quantity_palet - reserveSum > 0) {
         setRemainsToReserve(checkReserve.quantity_palet - reserveSum);
       } else setRemainsToReserve(0);
-    } else setRemainsToReserve(checkReserve.quantity_palet);
-  }, [list_of_reserved_products, show]);
+    } else {
+      if (remainsToReserve == 0) {
+        setRemainsToReserve(checkReserve.quantity_palet);
+      }
+    }
+  }, [list_of_reserved_products, show, warehouse_data, productsOfOrders]);
 
   useEffect(() => {
     if (needToReserve) {
