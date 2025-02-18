@@ -32,8 +32,6 @@ const OrderContextProvider = ({ children }) => {
     {
       Header: 'Person in charge of the order',
       accessor: 'person_in_charge',
-      Filter: DropdownFilter,
-      sortType: 'person_in_charge',
     },
   ];
 
