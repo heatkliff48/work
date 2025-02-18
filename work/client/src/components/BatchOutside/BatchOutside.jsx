@@ -4,19 +4,15 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import BatchOutsideModal from './BatchOutsideModal';
-import React, { Fragment, useEffect, useState, createContext } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const BatchOutside = () => {
   const [modalShow, setModalShow] = useState(false);
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-  const {
-    currentOrderedProducts,
-    setCurrentOrderedProducts,
-    currentBatchId,
-    setCurrentBatchId,
-  } = useWarehouseContext();
+  const { setCurrentOrderedProducts, setCurrentBatchId, setCurrentBatch } =
+    useWarehouseContext();
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -61,7 +57,7 @@ const BatchOutside = () => {
   const batchOutsideHandler = (id) => {
     const currBatch = batchOutside.find((el) => el.id === id);
     setCurrentBatchId(currBatch.id);
-
+    setCurrentBatch(currBatch);
     const currOrderedProduction = list_of_ordered_production.find(
       (el) => el.id === currBatch.id_list_of_ordered_production
     );

@@ -2,13 +2,16 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 import { deleteMaterialPlan } from '#components/redux/actions/recipeAction.js';
 import {
   addNewReservedProducts,
   addNewWarehouse,
   updateRemainingStock,
+  updListOfOrderedProductionOEM,
 } from '#components/redux/actions/warehouseAction.js';
 import React, { useCallback, useState } from 'react';
+import { useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
@@ -18,9 +21,15 @@ import { useDispatch } from 'react-redux';
 
 function BatchOutsideModal(props) {
   const { latestProducts } = useProductsContext();
-  const { list_of_orders } = useOrderContext();
-  const { warehouse_data, currentOrderedProducts, currentBatchId } =
-    useWarehouseContext();
+  const { list_of_orders, productsOfOrders } = useOrderContext();
+  const {
+    currentBatch,
+    currentBatchId,
+    warehouse_data,
+    listOfOrderedCakes,
+    currentOrderedProducts,
+    list_of_ordered_production_oem,
+  } = useWarehouseContext();
 
   const dispatch = useDispatch();
   const batch_outside_info_table = [
@@ -47,6 +56,7 @@ function BatchOutsideModal(props) {
   ];
 
   const [batchOutsideInput, setBatchOutsideInput] = useState({});
+  const [autoSave, setAutoSave] = useState(false);
 
   const getWarehouseArticle = (product, type, versionNumber) => {
     const year = new Date().getFullYear().toString().slice(-2);
@@ -66,6 +76,7 @@ function BatchOutsideModal(props) {
   }, []);
 
   const checkInput = async () => {
+    const { quality_product } = batchOutsideInput;
     const product = latestProducts.find(
       (el) => el.id === currentOrderedProducts?.id
     );
@@ -73,23 +84,25 @@ function BatchOutsideModal(props) {
     let versionNumber = '0001';
     let incVersion = 1;
     let ok = false;
-    if (batchOutsideInput.quality_product) {
-      await dispatch(deleteMaterialPlan(currentBatchId));
+    if (quality_product) {
+      if (quality_product >= currentBatch.quantity_pallets)
+        await dispatch(deleteMaterialPlan(currentBatchId));
       const type = 0;
       const articleId =
         warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
+
       versionNumber = `0000000${articleId}`.slice(-6);
       const warehouse_article = getWarehouseArticle(product, type, versionNumber);
+
       await dispatch(
         addNewWarehouse({
           product_article: currentOrderedProducts.product_article,
           article: warehouse_article,
           warehouse_loc: 'local',
-          remaining_stock: batchOutsideInput.quality_product,
+          remaining_stock: quality_product,
           type: 'OK',
         })
       );
-      ok = true;
     }
     if (batchOutsideInput.remnants) {
       const type = 1;
@@ -107,88 +120,92 @@ function BatchOutsideModal(props) {
           type: 'Remnants',
         })
       );
-      ok = true;
     }
+    setAutoSave(true);
+
     if (ok) {
       await dispatch(deleteBatchOutside(currentBatchId));
     }
   };
 
-  const addReservedProductHandler = () => {
-    console.log('currentOrderedProducts', currentOrderedProducts);
-    console.log('batchOutsideInput', batchOutsideInput);
-    // const { quantity_palet, productsOfOrders_id, order_article } = res_prod;
-    // const { id, remaining_stock, product_article } = warehouse;
-
-    // if (quantity_palet > remaining_stock) {
-    //   alert(
-    //     'Колличество заказной продукции превышает коллиичество продукции на складе!'
-    //   );
-    //   return;
-    // }
-    // const new_remaining_stock = remaining_stock - quantity_palet;
-
-    // dispatch(updateRemainingStock({ warehouse_id: id, new_remaining_stock }));
-
-    // const list_of_order_id = list_of_ordered_production.find(
-    //   (el) =>
-    //     el.order_article === order_article && el.product_article === product_article
-    // );
-
-    // if (list_of_order_id) {
-    //   const currBatchID = batchOutside.find(
-    //     (el) => el.id_list_of_ordered_production === list_of_order_id.id
-    //   );
-    //   if (currBatchID) {
-    //     dispatch(deleteBatchOutside(currBatchID.id));
-    //   }
-    // }
-
-    // dispatch(
-    //   addNewReservedProducts({
-    //     warehouse_id: id,
-    //     orders_products_id: productsOfOrders_id,
-    //     quantity: quantity_palet,
-    //   })
-    // );
-
-    // if (
-    //   latestProducts.find((el) => el.id === warehouse.product_id)
-    //     ?.placeOfProduction !== 'Spain'
-    // ) {
-    //   const list_of_order_oem_id = list_of_ordered_production_oem.find(
-    //     (el) =>
-    //       el.order_article === order_article &&
-    //       el.product_article === product_article
-    //   );
-    //   if (list_of_order_oem_id) {
-    //     dispatch(
-    //       updListOfOrderedProductionOEM({
-    //         id: list_of_order_oem_id.id,
-    //         status: 'Reserved',
-    //       })
-    //     );
-    //     const order_id = list_of_orders.find(
-    //       (el) => el.article === order_article
-    //     )?.id;
-    //     dispatch(
-    //       updateOrderStatus({
-    //         order_id,
-    //         status: 7,
-    //       })
-    //     );
-    //   }
-    // }
-  };
-
   const onSubmitForm = async (e) => {
     e.preventDefault();
-    // checkInput();
-    addReservedProductHandler();
+    checkInput();
 
-    // props.onHide();
-    // setBatchOutsideInput({});
+    props.onHide();
+    setBatchOutsideInput({});
   };
+
+  useEffect(() => {
+    if (!autoSave) return;
+
+    const { order_article, product_article, id } = currentOrderedProducts;
+    const { quality_product } = batchOutsideInput;
+
+    const warehouse = warehouse_data.find(
+      (el) => el.product_article === product_article
+    );
+
+    const order_id = list_of_orders.find(
+      (order) => order.article === order_article
+    )?.id;
+
+    const product_id = latestProducts.find(
+      (product) => product.article === product_article
+    )?.id;
+
+    const productsOfOrders_id = productsOfOrders.find(
+      (elem) => elem.order_id === order_id && elem.product_id === product_id
+    )?.id;
+
+    const { quantity, quantity_in_warehouse } = listOfOrderedCakes.find(
+      (el) => el.id == id
+    );
+
+    const needReserved = quantity - quantity_in_warehouse;
+    const result = quality_product <= needReserved ? quality_product : needReserved;
+
+    dispatch(
+      addNewReservedProducts({
+        warehouse_id: warehouse?.id,
+        orders_products_id: productsOfOrders_id,
+        quantity: result,
+      })
+    );
+
+    const stock = warehouse?.remaining_stock - result;
+    const new_remaining_stock = stock > 0 ? stock : 0;
+
+    dispatch(
+      updateRemainingStock({ warehouse_id: warehouse?.id, new_remaining_stock })
+    );
+
+    if (
+      latestProducts.find((el) => el.article === product_article)
+        ?.placeOfProduction !== 'Spain'
+    ) {
+      const list_of_order_oem_id = list_of_ordered_production_oem.find(
+        (el) =>
+          el.order_article === order_article &&
+          el.product_article === product_article
+      );
+      if (list_of_order_oem_id) {
+        dispatch(
+          updListOfOrderedProductionOEM({
+            id: list_of_order_oem_id.id,
+            status: 'Reserved',
+          })
+        );
+        dispatch(
+          updateOrderStatus({
+            order_id,
+            status: 7,
+          })
+        );
+      }
+    }
+    setAutoSave(false);
+  }, [warehouse_data]);
 
   return (
     <Modal

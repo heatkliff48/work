@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import DatePicker from 'react-datepicker';
-import { Button } from 'reactstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
+import ListOfOrderedProductionReserveModal from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProductionReserveModal.jsx';
+import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import {
   addDataShipOrder,
@@ -18,18 +20,16 @@ import {
   addNewListOfOrderedProduction,
   addNewListOfOrderedProductionOEM,
 } from '#components/redux/actions/warehouseAction.js';
-import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
-import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
-import AddProductOrderModal from './modal/AddProductOrderModal.jsx';
-import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
 import DownloadOrderPDF from './OrdersPDF.jsx';
-import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
-import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
+import AddProductOrderModal from './modal/AddProductOrderModal.jsx';
+import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
+import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
+import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
+import DatePicker from 'react-datepicker';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import ListOfOrderedProductionReserveModal from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProductionReserveModal.jsx';
+import { Button } from 'reactstrap';
 
 const OrderCart = React.memo(() => {
   const {
@@ -186,21 +186,12 @@ const OrderCart = React.memo(() => {
   };
 
   const statusChangeHandler = (status) => {
-    const currentStatus = ordersStatus[ordersStatus.length - 1];
-    // const currentIndex = status_list.findIndex((s) => s.accessor === currentStatus);
-    // const newIndex = status_list.findIndex((s) => s.accessor === status.accessor);
-
-    if (status.accessor < orderCartData?.status) {
+    if (
+      status.accessor < orderCartData?.status ||
+      status.accessor > orderCartData?.status + 1
+    ) {
       return alert('This status cannot be set');
     }
-
-    if (status.accessor > orderCartData?.status + 1) {
-      return alert('This status cannot be set');
-    }
-
-    // if (ordersStatus.includes(status.accessor)) {
-    //   return alert('This status cannot be set');
-    // }
 
     const order_id = orderCartData?.id;
     const hasShippingDate =
