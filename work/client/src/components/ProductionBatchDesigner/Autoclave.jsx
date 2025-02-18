@@ -346,14 +346,14 @@ function Autoclave({ acData, batchFromBD }) {
     mergedBatchPositions.forEach((position) => {
       dispatch(
         addNewBatchOutside({
-          product_article: position.product.article,
+          product_article: position.product.product_article,
           quantity_pallets: position.product.cakes_in_batch * 3,
           quantity_free: position.product.free_product_package ?? null,
           position_in_autoclave: position.positionInBatch,
-          id_list_of_ordered_production:
-            position.product.id_list_of_ordered_production !== null
-              ? position.product.id
-              : null,
+          id_list_of_ordered_production: position.product
+            ?.id_list_of_ordered_production
+            ? null
+            : position.product.id,
         })
       );
     });

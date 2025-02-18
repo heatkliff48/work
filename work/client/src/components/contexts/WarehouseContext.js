@@ -1,7 +1,7 @@
 import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
+import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useProductsContext } from './ProductContext';
 
 const WarehouseContext = createContext();
 
@@ -94,6 +94,7 @@ const WarehouseContextProvider = ({ children }) => {
   const [filteredProducts, setFilteredProducts] = useState();
   const [currentOrderedProducts, setCurrentOrderedProducts] = useState({});
   const [currentBatchId, setCurrentBatchId] = useState(0);
+  const [currentBatch, setCurrentBatch] = useState();
   const [listOfOrderedCakes, setListOfOrderedCakes] = useState([]);
   const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
 
@@ -141,8 +142,8 @@ const WarehouseContextProvider = ({ children }) => {
 
         const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
           // Filter to get all matching reserved products
-          const reservedProducts = list_of_reserved_products.filter(
-            (res_prod) => res_prod.orders_products_id === elem.id
+          const reservedProducts = list_of_reserved_products?.filter(
+            (res_prod) => res_prod?.orders_products_id === elem.id
           );
 
           // Sum up the 'quantity' of all matching reserved products
@@ -264,6 +265,8 @@ const WarehouseContextProvider = ({ children }) => {
         setCurrentOrderedProducts,
         currentBatchId,
         setCurrentBatchId,
+        currentBatch,
+        setCurrentBatch,
         listOfOrderedCakes,
         setListOfOrderedCakes,
         filteredWarehouseByProduct,
