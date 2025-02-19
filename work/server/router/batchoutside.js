@@ -28,8 +28,13 @@ batchOutsideRouter.get('/', async (req, res) => {
 batchOutsideRouter.post('/', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter post');
 
-  const { product_article, quantity_pallets, quantity_free, position_in_autoclave } =
-    req.body;
+  const {
+    product_article,
+    quantity_pallets,
+    quantity_free,
+    position_in_autoclave,
+    id_list_of_ordered_production,
+  } = req.body;
 
   try {
     const batchOutside = await BatchOutside.create({
