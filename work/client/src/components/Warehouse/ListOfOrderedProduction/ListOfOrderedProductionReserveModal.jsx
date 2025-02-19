@@ -31,7 +31,7 @@ function ListOfOrderedProductionReserveModal({
     useOrderContext();
   const { latestProducts } = useProductsContext();
   const dispatch = useDispatch();
-  const [remainsToReserve, setRemainsToReserve] = useState(0);
+  const [remainsToReserve, setRemainsToReserve] = useState(-1);
 
   const handleReserveOrderedProduct = (product) => {
     const { quantity, product_article, order_article } = currentOrderedProduct;
@@ -159,6 +159,8 @@ function ListOfOrderedProductionReserveModal({
       (prod) => prod.order_id === order_id && prod.product_id === product_id
     );
 
+    console.log('checkReserve', checkReserve);
+
     if (checkReserve?.warehouse_id !== null) {
       let reserveSum = 0;
       // const reserveQuantity = list_of_reserved_products?.find(
@@ -174,7 +176,8 @@ function ListOfOrderedProductionReserveModal({
         setRemainsToReserve(checkReserve.quantity_palet - reserveSum);
       } else setRemainsToReserve(0);
     } else {
-      if (remainsToReserve == 0) {
+      if (remainsToReserve < 0) {
+        console.log('-----------------');
         setRemainsToReserve(checkReserve.quantity_palet);
       }
     }
