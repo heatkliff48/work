@@ -175,6 +175,7 @@ function ProductionBatchDesigner() {
             product_article: article,
             cakes_in_batch,
             cakes_residue,
+            free_product_package,
           })
         );
       }

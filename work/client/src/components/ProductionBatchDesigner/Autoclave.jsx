@@ -332,6 +332,8 @@ function Autoclave({ acData, batchFromBD }) {
       ) {
         // Keep the positionInBatch from the first entry
         lastItem.product.cakes_in_batch += current.product.cakes_in_batch; // Sum cakes_in_batch
+        lastItem.product.free_product_package +=
+          current.product.free_product_package;
       } else {
         // Add a new entry
         acc.push({
@@ -350,18 +352,23 @@ function Autoclave({ acData, batchFromBD }) {
           quantity_pallets: position.product.cakes_in_batch * 3,
           quantity_free: position.product.free_product_package ?? null,
           position_in_autoclave: position.positionInBatch,
-          id_list_of_ordered_production: position.product
-            ?.id_list_of_ordered_production
-            ? null
-            : position.product.id,
+          id_list_of_ordered_production:
+            position.product.id_list_of_ordered_production !== null
+              ? position.product.id
+              : null,
         })
       );
     });
+    setBatchOrderIDs([]);
   };
 
   useEffect(() => {
     setAutoclave(acData);
   }, [acData]);
+
+  useEffect(() => {
+    setBatchOrderIDs([]);
+  }, []);
 
   return (
     <div>
