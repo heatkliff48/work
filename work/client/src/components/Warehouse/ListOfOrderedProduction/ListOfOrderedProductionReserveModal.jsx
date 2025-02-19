@@ -159,8 +159,6 @@ function ListOfOrderedProductionReserveModal({
       (prod) => prod.order_id === order_id && prod.product_id === product_id
     );
 
-    console.log('checkReserve', checkReserve);
-
     if (checkReserve?.warehouse_id !== null) {
       let reserveSum = 0;
       // const reserveQuantity = list_of_reserved_products?.find(
@@ -177,7 +175,6 @@ function ListOfOrderedProductionReserveModal({
       } else setRemainsToReserve(0);
     } else {
       if (remainsToReserve < 0) {
-        console.log('-----------------');
         setRemainsToReserve(checkReserve.quantity_palet);
       }
     }
