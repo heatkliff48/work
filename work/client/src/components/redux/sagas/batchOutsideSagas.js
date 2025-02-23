@@ -1,5 +1,3 @@
-import { put, call, takeLatest, select } from 'redux-saga/effects';
-import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import { setToken } from '../actions/jwtAction';
 import {
@@ -12,6 +10,8 @@ import {
   UPDATE_BATCH_OUTSIDE,
   UPDATE_NEW_BATCH_OUTSIDE,
 } from '../types/batchOutsideTypes';
+import axios from 'axios';
+import { put, call, takeLatest, select } from 'redux-saga/effects';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -47,7 +47,7 @@ const deleteBatchOutside = (batch_id) => {
 
 const updateBatchOutside = (batchOutside) => {
   return url
-    .post(`/batchOutside/update/${batchOutside.id}`, batchOutside)
+    .post('/batchOutside/update', batchOutside)
     .then((res) => {
       return res.data;
     })

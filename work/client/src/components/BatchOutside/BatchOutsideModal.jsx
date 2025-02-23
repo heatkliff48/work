@@ -1,7 +1,10 @@
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+import {
+  deleteBatchOutside,
+  updateBatchOutside,
+} from '#components/redux/actions/batchOutsideAction.js';
 import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 import { deleteMaterialPlan } from '#components/redux/actions/recipeAction.js';
 import {
@@ -163,12 +166,6 @@ function BatchOutsideModal(props) {
 
     const needReserved = quantity - quantity_in_warehouse;
     const result = quality_product <= needReserved ? quality_product : needReserved;
-    console.log('typeof quality_product', typeof quality_product);
-    console.log('typeof needReserved', typeof needReserved);
-    console.log('quantity', quantity);
-    console.log('quantity_in_warehouse', quantity_in_warehouse);
-    console.log('result', result);
-    console.log('quality_product <= needReserved', quality_product <= needReserved);
 
     dispatch(
       addNewReservedProducts({
@@ -209,6 +206,14 @@ function BatchOutsideModal(props) {
         );
       }
     }
+    const new_quantity_pallets = currentBatch.quantity_pallets - quality_product;
+
+    dispatch(
+      updateBatchOutside({
+        ...currentBatch,
+        quantity_pallets: new_quantity_pallets <= 0 ? 0 : new_quantity_pallets,
+      })
+    );
     setAutoSave(false);
     setBatchOutsideInput({});
   }, [warehouse_data]);

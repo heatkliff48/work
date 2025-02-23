@@ -92,7 +92,7 @@ batchOutsideRouter.post('/', async (req, res) => {
 //   }
 // });
 
-batchOutsideRouter.post('/update/:id', async (req, res) => {
+batchOutsideRouter.post('/update', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>batchOutsideRouter /update/:id');
 
   const {
