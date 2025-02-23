@@ -5,8 +5,6 @@ import {
 } from '#components/redux/actions/batchDesignerAction.js';
 import {
   addNewBatchOutside,
-  deleteBatchOutside,
-  updateBatchOutside,
 } from '#components/redux/actions/batchOutsideAction.js';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,10 +13,8 @@ function Autoclave({ acData, batchFromBD }) {
   const dispatch = useDispatch();
   const {
     setAutoclave,
-    quantityPallets,
     setQuantityPallets,
     autoclave,
-    productionBatchDesigner,
     batchOrderIDs,
     setBatchOrderIDs,
   } = useOrderContext();
@@ -26,11 +22,6 @@ function Autoclave({ acData, batchFromBD }) {
   const [idColorMap, setIdColorMap] = useState({});
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
-  const list_of_ordered_production = useSelector(
-    (state) => state.listOfOrderedProduction
-  );
-  const batchOutside = useSelector((state) => state.batchOutside);
-
   const getClassForAutoclave = (num) => {
     switch (num) {
       case 0:
