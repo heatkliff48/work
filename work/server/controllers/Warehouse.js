@@ -111,11 +111,11 @@ class WarehouseController {
     const upd_rem_srock = req.body;
 
     try {
-      await WarehouseService.updateRemainingStock({ upd_rem_srock });
+      const updWarehouse = await WarehouseService.updateRemainingStock({ upd_rem_srock });
 
-      myEmitter.emit(UPDATE_REMAINING_STOCK_SOCKET, upd_rem_srock);
+      myEmitter.emit(UPDATE_REMAINING_STOCK_SOCKET, updWarehouse);
 
-      return res.status(200);
+      return res.status(200).json(updWarehouse);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

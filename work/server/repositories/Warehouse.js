@@ -154,7 +154,8 @@ class WarehouseRepository {
         { remaining_stock: new_remaining_stock },
         { where: { id: warehouse_id } }
       );
-      return;
+      const updWarehouse = await Warehouses.findAll()
+      return updWarehouse;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;

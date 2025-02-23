@@ -192,7 +192,8 @@ function* addNewWarehouseWatcher(action) {
 function* updRemainingStockWatcher(action) {
   try {
     const { payload } = action;
-    yield call(updateRemStock, payload);
+    const updWarehouse = yield call(updateRemStock, payload);
+    yield put({ type: REMAINING_STOCK, payload: updWarehouse });
   } catch (err) {
     yield put({ type: REMAINING_STOCK, payload: [] });
   }

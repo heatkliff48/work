@@ -133,7 +133,6 @@ function BatchOutsideModal(props) {
     checkInput();
 
     props.onHide();
-    setBatchOutsideInput({});
   };
 
   useEffect(() => {
@@ -143,7 +142,7 @@ function BatchOutsideModal(props) {
     const { quality_product } = batchOutsideInput;
 
     const warehouse = warehouse_data.find(
-      (el) => el.product_article === product_article
+      (el) => el.product_article === product_article && el.remaining_stock !== 0
     );
 
     const order_id = list_of_orders.find(
@@ -164,6 +163,12 @@ function BatchOutsideModal(props) {
 
     const needReserved = quantity - quantity_in_warehouse;
     const result = quality_product <= needReserved ? quality_product : needReserved;
+    console.log('typeof quality_product', typeof quality_product);
+    console.log('typeof needReserved', typeof needReserved);
+    console.log('quantity', quantity);
+    console.log('quantity_in_warehouse', quantity_in_warehouse);
+    console.log('result', result);
+    console.log('quality_product <= needReserved', quality_product <= needReserved);
 
     dispatch(
       addNewReservedProducts({
@@ -205,6 +210,7 @@ function BatchOutsideModal(props) {
       }
     }
     setAutoSave(false);
+    setBatchOutsideInput({});
   }, [warehouse_data]);
 
   return (

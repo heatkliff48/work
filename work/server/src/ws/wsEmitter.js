@@ -270,12 +270,12 @@ function registerWsEmitter(map) {
     }
   );
 
-  myEmitter.on(UPDATE_REMAINING_STOCK_SOCKET, (upd_rem_srock) => {
+  myEmitter.on(UPDATE_REMAINING_STOCK_SOCKET, (updWarehouse) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
         JSON.stringify({
           type: UPDATE_REMAINING_STOCK_SOCKET,
-          payload: upd_rem_srock,
+          payload: updWarehouse,
         })
       );
     }
