@@ -109,6 +109,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }
     toggle();
   };
+  
   useEffect(() => {
     const discount = productOfOrder?.discount ?? 0;
     setProductOfOrder((prev) => ({

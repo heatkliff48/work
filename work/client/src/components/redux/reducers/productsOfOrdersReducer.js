@@ -22,12 +22,15 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
     }
 
     case UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
+      console.log('UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET', payload);
+
       return [...productsOfOrders, payload];
     }
 
     case UPDATE_PRODUCT_INFO_OF_ORDER: {
+      console.log('UPDATE_PRODUCT_INFO_OF_ORDER', payload);
       const result = productsOfOrders.map((el) => {
-        if (el.id === payload.id) {
+        if (el?.id === payload?.id) {
           return { ...payload };
         }
 

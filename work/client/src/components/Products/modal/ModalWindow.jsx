@@ -224,20 +224,14 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       }
 
       // Вычисление m3InArray
-      if (
-        formInput?.lengths &&
-        formInput?.height &&
-        formInput?.width &&
-        values.widthInArray
-      ) {
-        values.volumeBlockInArray = (
+      if (values.volumeBlock && values.widthInArray) {
+        values.m3InArray = (
           Math.floor(600 / formInput?.lengths) *
           Math.floor(6000 / formInput?.height) *
           values.widthInArray *
-          ((formInput?.lengths * formInput?.height * formInput?.width) /
-            Math.pow(10, 9))
+          (values.volumeBlock)
         ).toFixed(2);
-        updateFuncs.volumeBlockInArray = (value) =>
+        updateFuncs.m3InArray = (value) =>
           setFormInput((prev) => ({ ...prev, m3InArray: value }));
       }
 

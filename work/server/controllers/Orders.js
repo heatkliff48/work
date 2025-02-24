@@ -101,11 +101,11 @@ class OrdersController {
     const productOfOrder = req.body;
 
     try {
-      await OrdersService.getUpdateProductInfoOfOrder({
+      const upd_prod_info = await OrdersService.getUpdateProductInfoOfOrder({
         productOfOrder,
       });
 
-      return res.status(200);
+      return res.status(200).json(upd_prod_info);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

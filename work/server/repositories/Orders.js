@@ -102,19 +102,37 @@ class OrdersRepository {
         warehouse_id,
       } = productOfOrder;
 
-      const product_of_order = await OrdersProducts.create({
-        order_id,
-        product_id,
-        quantity_m2,
-        quantity_palet,
-        quantity_real,
-        price_m2,
-        discount,
-        final_price,
-        warehouse_id,
+      const product_of_order = await OrdersProducts.create(
+        {
+          order_id,
+          product_id,
+          quantity_m2,
+          quantity_palet,
+          quantity_real,
+          price_m2,
+          discount,
+          final_price,
+          warehouse_id,
+        }
+      );
+
+      const allOrdrProd = await OrdersProducts.findAll({
+        attributes: [
+          'id',
+          'order_id',
+          'product_id',
+          'quantity_m2',
+          'quantity_palet',
+          'quantity_real',
+          'price_m2',
+          'discount',
+          'final_price',
+          'warehouse_id',
+        ],
       });
 
-      return product_of_order;
+      const tid = allOrdrProd[allOrdrProd.length - 1].id;
+      return { id: tid, ...product_of_order.toJSON() };
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
@@ -133,6 +151,7 @@ class OrdersRepository {
         discount,
         final_price,
         warehouse_id,
+        id,
       } = productOfOrder;
 
       await OrdersProducts.update(
@@ -147,9 +166,26 @@ class OrdersRepository {
           final_price,
           warehouse_id,
         },
-        { where: { id: productOfOrder.id } }
+        { where: { id } }
       );
-      return;
+
+      const upd_prod_info = await OrdersProducts.findOne({
+        where: { id },
+        attributes: [
+          'id',
+          'order_id',
+          'product_id',
+          'quantity_m2',
+          'quantity_palet',
+          'quantity_real',
+          'price_m2',
+          'discount',
+          'final_price',
+          'warehouse_id',
+        ],
+      });
+
+      return upd_prod_info;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
