@@ -1,3 +1,4 @@
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useStatisticContext } from '#components/contexts/StatisticContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { addNewStockBalance } from '#components/redux/actions/stockBalanceAction.js';
@@ -8,6 +9,7 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 const StockBalanceModal = ({ isOpen, toggle }) => {
   const { warehouse_data } = useWarehouseContext();
   const { stock_balance } = useStatisticContext();
+  const { products } = useProductsContext();
   const dispatch = useDispatch();
 
   const [filter_data, setFilterData] = useState([]);
@@ -31,7 +33,13 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
   let haveProduct = useMemo(() => stock?.product_article ?? false, [stock]);
 
   useEffect(() => {
-    if (!warehouse_data || warehouse_data.length === 0 || !stock_balance) return;
+    if (
+      !warehouse_data ||
+      warehouse_data.length === 0 ||
+      !stock_balance ||
+      !products
+    )
+      return;
 
     const aggregatedData = warehouse_data.reduce((acc, item) => {
       const { product_article, remaining_stock } = item;
@@ -44,6 +52,12 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
       return acc;
     }, {});
 
+    products.forEach(({ product_article }) => {
+      if (!aggregatedData[product_article]) {
+        aggregatedData[product_article] = { product_article, in_stock: 0 };
+      }
+    });
+
     let resultArray = Object.values(aggregatedData);
 
     resultArray = resultArray.filter(
@@ -54,7 +68,7 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
     );
 
     setFilterData(resultArray);
-  }, []);
+  }, []); 
 
   useEffect(() => {
     if (Object.keys(stock).length === 0) return;
