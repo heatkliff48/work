@@ -9,7 +9,7 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 const StockBalanceModal = ({ isOpen, toggle }) => {
   const { warehouse_data } = useWarehouseContext();
   const { stock_balance } = useStatisticContext();
-  const { products } = useProductsContext();
+  const { latestProducts } = useProductsContext();
   const dispatch = useDispatch();
 
   const [filter_data, setFilterData] = useState([]);
@@ -37,7 +37,7 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
       !warehouse_data ||
       warehouse_data.length === 0 ||
       !stock_balance ||
-      !products
+      !latestProducts
     )
       return;
 
@@ -52,9 +52,9 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
       return acc;
     }, {});
 
-    products.forEach(({ product_article }) => {
-      if (!aggregatedData[product_article]) {
-        aggregatedData[product_article] = { product_article, in_stock: 0 };
+    latestProducts.forEach(({ article }) => {
+      if (!aggregatedData[article]) {
+        aggregatedData[article] = { product_article: article, in_stock: 0 };
       }
     });
 
@@ -68,10 +68,11 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
     );
 
     setFilterData(resultArray);
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (Object.keys(stock).length === 0) return;
+    console.log('stock', stock);
     dispatch(addNewStockBalance(stock));
     toggle();
     setStock({});
