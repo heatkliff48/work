@@ -10,21 +10,17 @@ export const stockBalanceReducer = (stockBalance = [], action) => {
     }
 
     case NEW_STOCK_BALANCE: {
-      payload.sort((a, b) => a.diff - b.diff);
-
       if (stockBalance?.find((stock) => stock.id === payload.id))
-        return stockBalance;
+        return stockBalance.sort((a, b) => a.diff - b.diff);
 
-      return [...stockBalance, payload];
+      return [...stockBalance, payload].sort((a, b) => a.diff - b.diff);
     }
 
     case NEW_STOCK_BALANCE_SOCKET: {
-      payload.sort((a, b) => a.diff - b.diff);
-
       if (stockBalance?.find((stock) => stock.id === payload.id))
-        return stockBalance;
+        return stockBalance.sort((a, b) => a.diff - b.diff);
 
-      return [...stockBalance, payload];
+      return [...stockBalance, payload].sort((a, b) => a.diff - b.diff);
     }
 
     default:
