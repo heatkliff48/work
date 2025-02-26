@@ -198,12 +198,6 @@ function BatchOutsideModal(props) {
             status: 'Reserved',
           })
         );
-        dispatch(
-          updateOrderStatus({
-            order_id,
-            status: 7,
-          })
-        );
       }
     }
     const new_quantity_pallets = currentBatch.quantity_pallets - quality_product;

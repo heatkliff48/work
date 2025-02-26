@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
-import InputField from '../../InputField/InputField';
-import UpdateModalWindow from './UpdateModalWindow';
 import { useProjectContext } from '#components/contexts/Context.js';
-import { addNewProduct } from '#components/redux/actions/productsAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { addNewProduct } from '#components/redux/actions/productsAction.js';
+import InputField from '../../InputField/InputField';
+import UpdateModalWindow from './UpdateModalWindow';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) => {
   const {
@@ -89,6 +89,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       setModalProductCard(false);
       dispatch(addNewProduct({ product: updatedProduct }));
       clearData();
+      setStayDefault(true);
     }
   };
 
@@ -454,16 +455,16 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
               );
             }
             if (selectOptions[el.accessor]) {
-              let selOpt = selectOptions[el.accessor][0];
               return (
                 <div className="item_select" key={el.id}>
                   <ModalBody>{el.Header}:</ModalBody>
                   <Select
-                    defaultValue={selOpt}
+                    value={
+                      selectOptions[el.accessor].find(
+                        (opt) => opt.value === formInput[el.accessor]
+                      ) || null
+                    }
                     onChange={(option) => {
-                      console.log('el.accessor', el.accessor);
-                      console.log('option.value', option.value);
-
                       if (articleId < 0) setArticleId(el.id);
                       setFormInput((prev) => ({
                         ...prev,
