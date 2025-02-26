@@ -223,7 +223,9 @@ function ProductionBatchDesigner() {
     if (!latestProducts || !listOfOrderedCakes) return;
 
     const rightListOfOrdered = listOfOrderedCakes.filter(
-      (el) => el.quantity !== el.quantity_in_warehouse
+      (el) =>
+        el.quantity !== el.quantity_in_warehouse &&
+        el.quantity_cakes > el.quantity_in_batch
     );
 
     const groupedByDensity = rightListOfOrdered.reduce((acc, curr) => {

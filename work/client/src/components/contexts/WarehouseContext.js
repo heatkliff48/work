@@ -237,6 +237,7 @@ const WarehouseContextProvider = ({ children }) => {
       const allMatch = group.products.every(
         (product) => product.total_quantity <= product.total_quantity_in_warehouse
       );
+      console.log('allMatch', allMatch);
 
       if (allMatch) {
         dispatch(

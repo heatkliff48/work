@@ -12,6 +12,7 @@ export const warehouseReducer = (warehouse = [], action) => {
     }
 
     case NEW_WAREHOUSE_SOCKET: {
+
       return [...warehouse, payload];
     }
 

@@ -238,13 +238,13 @@ function* getUpdateProductInfoOfOrderWatcher(action) {
     const { payload } = action;
 
     // const { accessToken, accessTokenExpiration } = yield call(
-    yield call(getUpdateProductInfoOfOrder, payload);
+   const upd_prod_info =  yield call(getUpdateProductInfoOfOrder, payload);
 
     // window.localStorage.setItem('jwt', accessToken);
 
     yield put({
       type: UPDATE_PRODUCT_INFO_OF_ORDER,
-      payload: payload,
+      payload: upd_prod_info,
     });
     // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {

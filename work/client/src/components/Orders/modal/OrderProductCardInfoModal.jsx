@@ -45,9 +45,10 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   }, [quantity_palet_value, selectedProduct?.m2]);
 
   const price_m2_value = useMemo(() => {
-    const result =
+    const result = (
       (selectedProduct?.price * selectedProduct?.volumeBlockOnPallet) /
-      selectedProduct?.m2;
+      selectedProduct?.m2
+    ).toFixed(2);
 
     setProductOfOrder((prev) => ({
       ...prev,

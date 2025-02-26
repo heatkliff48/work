@@ -56,9 +56,9 @@ class OrdersService {
   }
 
   static async getUpdateProductInfoOfOrder({ productOfOrder }) {
-    await OrdersRepository.getUpdateProductInfoOfOrder(productOfOrder);
+    const upd_prod_info = await OrdersRepository.getUpdateProductInfoOfOrder(productOfOrder);
 
-    return;
+    return upd_prod_info;
   }
 
   static async getUpdateContactInfoOfOrder({ contact_id, order_id }) {

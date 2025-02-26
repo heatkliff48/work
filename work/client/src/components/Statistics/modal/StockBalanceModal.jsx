@@ -33,13 +33,7 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
   let haveProduct = useMemo(() => stock?.product_article ?? false, [stock]);
 
   useEffect(() => {
-    if (
-      !warehouse_data ||
-      warehouse_data.length === 0 ||
-      !stock_balance ||
-      !latestProducts
-    )
-      return;
+    if (!warehouse_data || !stock_balance || !latestProducts) return;
 
     const aggregatedData = warehouse_data.reduce((acc, item) => {
       const { product_article, remaining_stock } = item;
@@ -57,7 +51,6 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
         aggregatedData[article] = { product_article: article, in_stock: 0 };
       }
     });
-
     let resultArray = Object.values(aggregatedData);
 
     resultArray = resultArray.filter(
@@ -72,7 +65,6 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
 
   useEffect(() => {
     if (Object.keys(stock).length === 0) return;
-    console.log('stock', stock);
     dispatch(addNewStockBalance(stock));
     toggle();
     setStock({});

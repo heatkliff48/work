@@ -32,7 +32,7 @@ function DeliveryAddressModal(props) {
         street,
         additional_info,
         city,
-        zip_code,
+        zip_code: zip_code.length > 0 ? zip_code : null,
         province,
         country,
         phone_number,
