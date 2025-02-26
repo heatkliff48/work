@@ -103,6 +103,50 @@ const WarehouseContextProvider = ({ children }) => {
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
   const { latestProducts } = useProductsContext();
 
+  const processOrders = (orderedProduction, groupedOrders) => {
+    return orderedProduction.reduce((acc, item) => {
+      const orderId = list_of_orders.find(
+        (order) => order.article === item.order_article
+      )?.id;
+
+      const productId = latestProducts.find(
+        (product) => product.article === item.product_article
+      )?.id;
+
+      const key = item.order_article;
+
+      if (!acc[key]) {
+        acc[key] = {
+          orderId,
+          products: [],
+        };
+      }
+
+      const prodOrdId = productsOfOrders.filter(
+        (elem) => elem.order_id === orderId && elem.product_id === productId
+      );
+
+      const reservedQuantities = prodOrdId.map((prod) => {
+        return list_of_reserved_products.reduce((sum, res_prod) => {
+          return res_prod.orders_products_id === prod.id
+            ? sum + res_prod.quantity
+            : sum;
+        }, 0);
+      });
+
+      acc[key].products.push({
+        product_article: item.product_article,
+        total_quantity: item.quantity,
+        total_quantity_in_warehouse: reservedQuantities.reduce(
+          (sum, qty) => sum + qty,
+          0
+        ),
+      });
+
+      return acc;
+    }, groupedOrders);
+  };
+
   useEffect(() => {
     const data = list_of_ordered_production
       ?.filter((el) => {
@@ -182,47 +226,9 @@ const WarehouseContextProvider = ({ children }) => {
 
     setListOfOrderedCakes(data);
 
-    const groupedOrders = list_of_ordered_production.reduce((acc, item) => {
-      const orderId = list_of_orders.find(
-        (order) => order.article === item.order_article
-      )?.id;
+    let groupedOrders = processOrders(list_of_ordered_production, {});
 
-      const productId = latestProducts.find(
-        (product) => product.article === item.product_article
-      )?.id;
-
-      const key = item.order_article;
-
-      if (!acc[key]) {
-        acc[key] = {
-          orderId,
-          products: [],
-        };
-      }
-
-      const prodOrdId = productsOfOrders.filter(
-        (elem) => elem.order_id === orderId && elem.product_id === productId
-      );
-
-      const reservedQuantities = prodOrdId.map((prod) => {
-        const totalReserved = list_of_reserved_products.reduce((sum, res_prod) => {
-          return res_prod.orders_products_id === prod.id ? sum + res_prod.quantity : sum;
-        }, 0);
-      
-        return totalReserved;
-      });
-
-      acc[key].products.push({
-        product_article: item.product_article,
-        total_quantity: item.quantity,
-        total_quantity_in_warehouse: reservedQuantities.reduce(
-          (sum, qty) => sum + qty,
-          0
-        ),
-      });
-
-      return acc;
-    }, {});
+    groupedOrders = processOrders(list_of_ordered_production_oem, groupedOrders);
 
     Object.values(groupedOrders).forEach((group) => {
       const order = list_of_orders.find((el) => el.id === group.orderId);
@@ -242,6 +248,65 @@ const WarehouseContextProvider = ({ children }) => {
         );
       }
     });
+
+    // const groupedOrders = list_of_ordered_production.reduce((acc, item) => {
+    //   const orderId = list_of_orders.find(
+    //     (order) => order.article === item.order_article
+    //   )?.id;
+
+    //   const productId = latestProducts.find(
+    //     (product) => product.article === item.product_article
+    //   )?.id;
+
+    //   const key = item.order_article;
+
+    //   if (!acc[key]) {
+    //     acc[key] = {
+    //       orderId,
+    //       products: [],
+    //     };
+    //   }
+
+    //   const prodOrdId = productsOfOrders.filter(
+    //     (elem) => elem.order_id === orderId && elem.product_id === productId
+    //   );
+
+    //   const reservedQuantities = prodOrdId.map((prod) => {
+    //     const reserved = list_of_reserved_products.find(
+    //       (res_prod) => res_prod.orders_products_id === prod.id
+    //     );
+    //     return reserved ? reserved.quantity : 0;
+    //   });
+
+    //   acc[key].products.push({
+    //     product_article: item.product_article,
+    //     total_quantity: item.quantity,
+    //     total_quantity_in_warehouse: reservedQuantities.reduce(
+    //       (sum, qty) => sum + qty,
+    //       0
+    //     ),
+    //   });
+
+    //   return acc;
+    // }, {});
+
+    // Object.values(groupedOrders).forEach((group) => {
+    //   const order = list_of_orders.find((el) => el.id === group.orderId);
+    //   if (order_status.includes(order?.status)) return;
+
+    //   const allMatch = group.products.every(
+    //     (product) => product.total_quantity <= product.total_quantity_in_warehouse
+    //   );
+
+    //   if (allMatch) {
+    //     dispatch(
+    //       updateOrderStatus({
+    //         order_id: group.orderId,
+    //         status: 7,
+    //       })
+    //     );
+    //   }
+    // });
   }, [
     list_of_ordered_production,
     list_of_reserved_products,

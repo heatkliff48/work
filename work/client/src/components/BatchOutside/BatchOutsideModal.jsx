@@ -185,7 +185,7 @@ function BatchOutsideModal(props) {
 
       const stock = warehouse?.remaining_stock - result;
       const new_remaining_stock = stock > 0 ? stock : 0;
-console.log('new_remaining_stock', new_remaining_stock);
+
       dispatch(
         updateRemainingStock({ warehouse_id: warehouse?.id, new_remaining_stock })
       );
