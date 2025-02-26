@@ -46,9 +46,14 @@ const ClientsInfo = () => {
   };
 
   useEffect(() => {
-    let filtered = clients.filter((el) =>
-      el.c_name?.toLowerCase().includes(searchFilter.toLowerCase())
-    );
+    let filtered = clients
+      .filter((el) => el.c_name?.toLowerCase().includes(searchFilter.toLowerCase()))
+      .map((el) => {
+        if (!el.zip_code) 
+          return { ...el, zip_code: null };
+        return el;
+      });
+
     setClientsDataList(filtered);
   }, [clients]);
 

@@ -66,8 +66,8 @@ function BatchOutsideModal(props) {
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
     const day = new Date().getDate();
 
-    const certificate = product.certificate.slice(0, 1);
-    const density = product.density.toString().slice(0, 1);
+    const certificate = product?.certificate.slice(0, 1);
+    const density = product?.density.toString().slice(0, 1);
 
     const warehouseArticle = `S${type}0${certificate}${density}${year}${month}${day}${versionNumber}`;
 
@@ -99,7 +99,7 @@ function BatchOutsideModal(props) {
 
       await dispatch(
         addNewWarehouse({
-          product_article: currentOrderedProducts.product_article,
+          product_article: product.article,
           article: warehouse_article,
           warehouse_loc: 'local',
           remaining_stock: quality_product,
@@ -116,7 +116,7 @@ function BatchOutsideModal(props) {
 
       await dispatch(
         addNewWarehouse({
-          product_article: currentOrderedProducts.product_article,
+          product_article: product.article,
           article: warehouse_article,
           warehouse_loc: 'local',
           remaining_stock: batchOutsideInput.remnants,
@@ -140,72 +140,76 @@ function BatchOutsideModal(props) {
 
   useEffect(() => {
     if (!autoSave) return;
-
-    const { order_article, product_article, id } = currentOrderedProducts;
     const { quality_product } = batchOutsideInput;
 
-    const warehouse = warehouse_data.find(
-      (el) => el.product_article === product_article && el.remaining_stock !== 0
-    );
+    if (currentBatch?.id_list_of_ordered_production) {
+      const { order_article, product_article, id } = currentOrderedProducts;
 
-    const order_id = list_of_orders.find(
-      (order) => order.article === order_article
-    )?.id;
-
-    const product_id = latestProducts.find(
-      (product) => product.article === product_article
-    )?.id;
-
-    const productsOfOrders_id = productsOfOrders.find(
-      (elem) => elem.order_id === order_id && elem.product_id === product_id
-    )?.id;
-
-    const { quantity, quantity_in_warehouse } = listOfOrderedCakes.find(
-      (el) => el.id == id
-    );
-
-    const needReserved = quantity - quantity_in_warehouse;
-    const result = quality_product <= needReserved ? quality_product : needReserved;
-
-    dispatch(
-      addNewReservedProducts({
-        warehouse_id: warehouse?.id,
-        orders_products_id: productsOfOrders_id,
-        quantity: result,
-      })
-    );
-
-    const stock = warehouse?.remaining_stock - result;
-    const new_remaining_stock = stock > 0 ? stock : 0;
-
-    dispatch(
-      updateRemainingStock({ warehouse_id: warehouse?.id, new_remaining_stock })
-    );
-
-    if (
-      latestProducts.find((el) => el.article === product_article)
-        ?.placeOfProduction !== 'Spain'
-    ) {
-      const list_of_order_oem_id = list_of_ordered_production_oem.find(
-        (el) =>
-          el.order_article === order_article &&
-          el.product_article === product_article
+      const warehouse = warehouse_data.find(
+        (el) => el.product_article === product_article && el.remaining_stock !== 0
       );
-      if (list_of_order_oem_id) {
-        dispatch(
-          updListOfOrderedProductionOEM({
-            id: list_of_order_oem_id.id,
-            status: 'Reserved',
-          })
+
+      const order_id = list_of_orders.find(
+        (order) => order.article === order_article
+      )?.id;
+
+      const product_id = latestProducts.find(
+        (product) => product.article === product_article
+      )?.id;
+
+      const productsOfOrders_id = productsOfOrders.find(
+        (elem) => elem.order_id === order_id && elem.product_id === product_id
+      )?.id;
+
+      const { quantity, quantity_in_warehouse } = listOfOrderedCakes?.find(
+        (el) => el.id == id
+      );
+
+      const needReserved = quantity - quantity_in_warehouse;
+      const result =
+        quality_product <= needReserved ? quality_product : needReserved;
+
+      console.log('quantity', quantity);
+      console.log('quantity', quantity);
+
+      console.log('needReserved', needReserved);
+      console.log('result', result);
+
+      dispatch(
+        addNewReservedProducts({
+          warehouse_id: warehouse?.id,
+          orders_products_id: productsOfOrders_id,
+          quantity: result,
+        })
+      );
+
+      const stock = warehouse?.remaining_stock - result;
+      const new_remaining_stock = stock > 0 ? stock : 0;
+console.log('new_remaining_stock', new_remaining_stock);
+      dispatch(
+        updateRemainingStock({ warehouse_id: warehouse?.id, new_remaining_stock })
+      );
+
+      if (
+        latestProducts.find((el) => el.article === product_article)
+          ?.placeOfProduction !== 'Spain'
+      ) {
+        const list_of_order_oem_id = list_of_ordered_production_oem.find(
+          (el) =>
+            el.order_article === order_article &&
+            el.product_article === product_article
         );
-        dispatch(
-          updateOrderStatus({
-            order_id,
-            status: 7,
-          })
-        );
+        if (list_of_order_oem_id) {
+          dispatch(
+            updListOfOrderedProductionOEM({
+              id: list_of_order_oem_id.id,
+              status: 'Reserved',
+            })
+          );
+        }
       }
     }
+
     const new_quantity_pallets = currentBatch.quantity_pallets - quality_product;
 
     dispatch(

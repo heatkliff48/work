@@ -87,6 +87,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
     } else {
       setModal(!modal);
       setModalProductCard(false);
+      setStayDefault(true);
       dispatch(addNewProduct({ product: updatedProduct }));
       clearData();
     }
@@ -174,8 +175,8 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       ) {
         values.quantityBlockOnPallet =
           Math.floor(palletLength / formInput?.lengths) *
-          Math.floor(palletHeight / formInput?.height) *
-          Math.floor(palletWidth / formInput?.width);
+          Math.floor(palletHeight / formInput?.width) *
+          Math.floor(palletWidth / formInput?.height);
 
         updateFuncs.quantityBlockOnPallet = (value) =>
           setFormInput((prev) => ({ ...prev, quantityBlockOnPallet: value }));
@@ -226,24 +227,24 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       // Вычисление m3InArray
       if (values.volumeBlock && values.widthInArray) {
         values.m3InArray = (
-          Math.floor(600 / formInput?.lengths) *
+          1 *
           Math.floor(6000 / formInput?.height) *
           values.widthInArray *
-          (values.volumeBlock)
+          values.volumeBlock
         ).toFixed(2);
         updateFuncs.m3InArray = (value) =>
           setFormInput((prev) => ({ ...prev, m3InArray: value }));
       }
 
       if (formInput?.density) {
-        values.densityDryMax = (formInput?.density * 1.25).toFixed(2);
+        values.densityDryMax = Number(formInput?.density) + 50;
         updateFuncs.densityDryMax = (value) =>
           setFormInput((prev) => ({ ...prev, densityDryMax: value }));
       }
 
       // Вычисление densityDryDef
       if (formInput?.density) {
-        values.densityDryDef = (formInput?.density * 1.05).toFixed(2);
+        values.densityDryDef = (formInput?.density * 1.02).toFixed(2);
         updateFuncs.densityDryDef = (value) =>
           setFormInput((prev) => ({ ...prev, densityDryDef: value }));
       }
@@ -405,6 +406,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
         isOpen={isOpen}
         toggle={() => {
           clearData();
+          setStayDefault(true)
           toggle();
         }}
       >

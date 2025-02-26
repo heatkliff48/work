@@ -1,5 +1,6 @@
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
@@ -13,6 +14,7 @@ const BatchOutside = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { setCurrentOrderedProducts, setCurrentBatchId, setCurrentBatch } =
     useWarehouseContext();
+  const { latestProducts } = useProductsContext();
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -58,9 +60,11 @@ const BatchOutside = () => {
     const currBatch = batchOutside.find((el) => el.id === id);
     setCurrentBatchId(currBatch.id);
     setCurrentBatch(currBatch);
-    const currOrderedProduction = list_of_ordered_production.find(
-      (el) => el.id === currBatch.id_list_of_ordered_production
-    );
+    const currOrderedProduction = currBatch?.id_list_of_ordered_production
+      ? list_of_ordered_production.find(
+          (el) => el.id === currBatch.id_list_of_ordered_production
+        )
+      : latestProducts.find((el) => el.article === currBatch.product_article);
 
     setCurrentOrderedProducts(currOrderedProduction);
     setModalShow(true);

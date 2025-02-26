@@ -205,10 +205,11 @@ const WarehouseContextProvider = ({ children }) => {
       );
 
       const reservedQuantities = prodOrdId.map((prod) => {
-        const reserved = list_of_reserved_products.find(
-          (res_prod) => res_prod.orders_products_id === prod.id
-        );
-        return reserved ? reserved.quantity : 0;
+        const totalReserved = list_of_reserved_products.reduce((sum, res_prod) => {
+          return res_prod.orders_products_id === prod.id ? sum + res_prod.quantity : sum;
+        }, 0);
+      
+        return totalReserved;
       });
 
       acc[key].products.push({
@@ -230,6 +231,7 @@ const WarehouseContextProvider = ({ children }) => {
       const allMatch = group.products.every(
         (product) => product.total_quantity <= product.total_quantity_in_warehouse
       );
+      console.log('allMatch', allMatch);
 
       if (allMatch) {
         dispatch(
