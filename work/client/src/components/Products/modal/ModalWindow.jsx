@@ -407,7 +407,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
         isOpen={isOpen}
         toggle={() => {
           clearData();
-          setStayDefault(true)
+          setStayDefault(true);
           toggle();
         }}
       >
@@ -457,7 +457,9 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
                   <Select
                     value={
                       selectOptions[el.accessor].find(
-                        (opt) => opt.value === formInput[el.accessor]
+                        (opt) =>
+                          opt.value == formInput[el.accessor] ||
+                          opt.label == formInput[el.accessor]
                       ) || null
                     }
                     onChange={(option) => {
