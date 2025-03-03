@@ -88,8 +88,9 @@ function BatchOutsideModal(props) {
     let incVersion = 1;
     let ok = false;
     if (quality_product) {
-      if (quality_product >= currentBatch.quantity_pallets)
-        await dispatch(deleteMaterialPlan(currentBatchId));
+      console.log('log', currentBatch.quantity_pallets - quality_product <= currentBatch.quantity_free);
+      if (currentBatch.quantity_pallets - quality_product <= currentBatch.quantity_free)
+        await dispatch(deleteBatchOutside(currentBatchId));
       const type = 0;
       const articleId =
         warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
@@ -149,6 +150,7 @@ function BatchOutsideModal(props) {
         (el) => el.product_article === product_article && el.remaining_stock !== 0
       );
 
+
       const order_id = list_of_orders.find(
         (order) => order.article === order_article
       )?.id;
@@ -161,19 +163,17 @@ function BatchOutsideModal(props) {
         (elem) => elem.order_id === order_id && elem.product_id === product_id
       )?.id;
 
-      const { quantity, quantity_in_warehouse } = listOfOrderedCakes?.find(
-        (el) => el.id == id
-      );
+      const order_not_reserved = listOfOrderedCakes?.find((el) => el.id == id);
+      let result;
 
-      const needReserved = quantity - quantity_in_warehouse;
-      const result =
-        quality_product <= needReserved ? quality_product : needReserved;
+      if (order_not_reserved) {
+        const { quantity, quantity_in_warehouse } = order_not_reserved;
 
-      console.log('quantity', quantity);
-      console.log('quantity', quantity);
-
-      console.log('needReserved', needReserved);
-      console.log('result', result);
+        const needReserved = quantity - quantity_in_warehouse;
+        result = quality_product <= needReserved ? quality_product : needReserved;
+      } else {
+        result = quality_product;
+      }
 
       dispatch(
         addNewReservedProducts({
@@ -183,12 +183,14 @@ function BatchOutsideModal(props) {
         })
       );
 
-      const stock = warehouse?.remaining_stock - result;
-      const new_remaining_stock = stock > 0 ? stock : 0;
+      if (order_not_reserved) {
+        const stock = warehouse?.remaining_stock - result;
+        const new_remaining_stock = stock > 0 ? stock : 0;
 
-      dispatch(
-        updateRemainingStock({ warehouse_id: warehouse?.id, new_remaining_stock })
-      );
+        dispatch(
+          updateRemainingStock({ warehouse_id: warehouse?.id, new_remaining_stock })
+        );
+      }
 
       if (
         latestProducts.find((el) => el.article === product_article)

@@ -119,7 +119,7 @@ const OrderCart = React.memo(() => {
     (date) => {
       const currentDate = new Date();
       if (date < currentDate) {
-        alert('Выбранная дата не может быть меньше текущей даты');
+        alert('The selected date cannot be before than the current date');
         return;
       }
       setDataValue(date);
@@ -554,8 +554,8 @@ const OrderCart = React.memo(() => {
             <div className="shipping_date">
               {haveShipDate ? (
                 <p>
-                  Дата отправки: {haveShipDate} ({handleDayBeforShipping()} дней до
-                  отправки)
+                  Shipping date: {haveShipDate} ({handleDayBeforShipping()} days
+                  before shipment)
                 </p>
               ) : (
                 <DatePicker
