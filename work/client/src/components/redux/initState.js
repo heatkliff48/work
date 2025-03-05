@@ -24,6 +24,8 @@ const initState = {
   filesOrder: [],
   filesProduct: [],
   stockBalance: [],
+  dryMixesJournal: [],
+  relatedMaterialsJournal: [],
 };
 
 export default initState;

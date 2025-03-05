@@ -23,6 +23,10 @@ import {
   NEED_DELETE_FILES_PRODUCT_SOCKET,
   PERSON_IN_CHARGE_OF_ORDER_SOCKET,
   NEW_STOCK_BALANCE_SOCKET,
+  NEW_DRY_MIXES_JOURNAL_SOCKET,
+  NEED_UPDATE_DRY_MIXES_JOURNAL_SOCKET,
+  NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
+  NEED_UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -190,5 +194,33 @@ export const addNewStockBalanceSocket = (stock) => {
   return {
     type: NEW_STOCK_BALANCE_SOCKET,
     payload: stock,
+  };
+};
+
+export const addNewDryMixesJournalSocket = (dryMixesJournal) => {
+  return {
+    type: NEW_DRY_MIXES_JOURNAL_SOCKET,
+    payload: dryMixesJournal,
+  };
+};
+
+export const updateDryMixesJournalSocket = (dryMixesJournal) => {
+  return {
+    type: NEED_UPDATE_DRY_MIXES_JOURNAL_SOCKET,
+    payload: dryMixesJournal,
+  };
+};
+
+export const addNewRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
+  return {
+    type: NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
+    payload: relatedMaterialsJournal,
+  };
+};
+
+export const updateRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
+  return {
+    type: NEED_UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
+    payload: relatedMaterialsJournal,
   };
 };

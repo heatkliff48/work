@@ -26,6 +26,9 @@ import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import ProductsTypeJournal from '#components/Products/ProductsTypeJournal.jsx';
+import DryMixesJournal from '#components/Products/DryMixesJournal.jsx';
+import RelatedMaterialsJournal from '#components/Products/RelatedMaterialsJournal.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -79,6 +82,12 @@ function App() {
           <Route path="/recipe_orders" element={<RecipeOrders />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/stock_balance" element={<StockBalance />} />
+          <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
+          <Route path="/dry_mixes_journal" element={<DryMixesJournal />} />
+          <Route
+            path="/related_materials_journal"
+            element={<RelatedMaterialsJournal />}
+          />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>

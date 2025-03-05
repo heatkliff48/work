@@ -32,6 +32,10 @@ const {
   DELETE_FILES_PRODUCT_SOCKET,
   UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
   ADD_NEW_STOCK_BALANCE_SOCKET,
+  ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
+  UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
+  ADD_NEW_DRY_MIXES_JOURNAL_SOCKET,
+  UPDATE_DRY_MIXES_JOURNAL_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -401,6 +405,56 @@ function registerWsEmitter(map) {
       );
     }
   });
+
+  myEmitter.on(ADD_NEW_DRY_MIXES_JOURNAL_SOCKET, (dryMixesJournal) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_DRY_MIXES_JOURNAL_SOCKET,
+          payload: dryMixesJournal,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_DRY_MIXES_JOURNAL_SOCKET, (dryMixesJournal) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_DRY_MIXES_JOURNAL_SOCKET,
+          payload: dryMixesJournal,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(
+    ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
+    (relatedMaterialsJournal) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
+            payload: relatedMaterialsJournal,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
+    (relatedMaterialsJournal) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
+            payload: relatedMaterialsJournal,
+          })
+        );
+      }
+    }
+  );
 
   // myEmitter.on(CHECK_CARD_SOCKET, (gameusers, street, dohod, isFree, money) => {
   //   for (let [id, userConnect] of map) {

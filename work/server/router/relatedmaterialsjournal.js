@@ -1,0 +1,90 @@
+const relatedMaterialsJournalRouter = require('express').Router();
+const { RelatedMaterialsJournal } = require('../db/models/index.js');
+const TokenService = require('../services/Token.js');
+const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
+const { COOKIE_SETTINGS } = require('../constants.js');
+const myEmitter = require('../src/ee.js');
+const {
+  ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
+  UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
+} = require('../src/constants/event.js');
+const { ErrorUtils } = require('../utils/Errors.js');
+
+relatedMaterialsJournalRouter.get('/', async (req, res) => {
+  try {
+    const relatedMaterialsJournal = await RelatedMaterialsJournal.findAll({
+      order: [['id', 'ASC']],
+    });
+
+    return res.status(200).json({ relatedMaterialsJournal });
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+relatedMaterialsJournalRouter.post('/', async (req, res) => {
+  const { product_name, units_per_pack, price_per_pack, type } = req.body;
+
+  try {
+    const relatedMaterialsJournal = await RelatedMaterialsJournal.create({
+      product_name,
+      units_per_pack,
+      price_per_pack,
+      type,
+    });
+
+    myEmitter.emit(
+      ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
+      relatedMaterialsJournal
+    );
+    return res.json(relatedMaterialsJournal).status(200);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+relatedMaterialsJournalRouter.post('/update', async (req, res) => {
+  const { id, product_name, units_per_pack, price_per_pack, type } = req.body;
+
+  try {
+    const relatedMaterialsJournal = await RelatedMaterialsJournal.update(
+      {
+        product_name,
+        units_per_pack,
+        price_per_pack,
+        type,
+      },
+      {
+        where: {
+          id,
+        },
+        returning: true,
+        plain: true,
+      }
+    );
+
+    myEmitter.emit(UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET, relatedMaterialsJournal);
+    return res.json(relatedMaterialsJournal).status(200);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+// delete
+
+// relatedMaterialsJournalRouter.post('/delete', async (req, res) => {
+//   const { batch_id } = req.body;
+
+//   try {
+//     await RelatedMaterialsJournal.destroy({ where: { id: batch_id } });
+
+//     myEmitter.emit(DELETE_BATCH_OUTSIDE_SOCKET, batch_id);
+//     return res.json(batch_id).status(200);
+//   } catch (err) {
+//     return ErrorUtils.catchError(res, err);
+//   }
+// });
+
+module.exports = relatedMaterialsJournalRouter;
