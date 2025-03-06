@@ -85,6 +85,8 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       });
       setModalUpdate(!modalUpdate);
     } else {
+      console.log('formInput', formInput);
+
       setModal(!modal);
       setModalProductCard(false);
       setStayDefault(true);
@@ -399,6 +401,9 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       setFormInput((prev) => ({ ...prev, version }));
     }
   }, [version]);
+  useEffect(() => {
+    console.log('formInput', formInput);
+  }, [formInput]);
 
   return (
     <div>
