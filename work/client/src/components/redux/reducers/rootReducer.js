@@ -1,4 +1,5 @@
 import { recipeOrdersReducer } from './RecipeOrdersReducer';
+import { accountingReducer } from './accoutingReducer';
 import batchDesignerReducer from './batchDesignerReducer';
 import { batchOutsideReducer } from './batchOutsideReducer';
 import {
@@ -56,4 +57,5 @@ export const rootReducer = combineReducers({
   filesOrder: filesOrderReducer,
   filesProduct: filesProductReducer,
   stockBalance: stockBalanceReducer,
+  accountingDataList: accountingReducer,
 });

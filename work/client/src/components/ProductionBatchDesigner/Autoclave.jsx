@@ -297,7 +297,7 @@ function Autoclave({ acData, batchFromBD }) {
     let positionInBatch = 1;
     let batchPositions = [];
 
-    batchOrderIDs.forEach((id) => {
+    batchOrderIDs?.forEach((id) => {
       // const product = productionBatchDesigner.find((p) => p.id === id);
       const product = batchDesigner.find((p) => p.id === id);
 

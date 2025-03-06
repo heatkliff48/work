@@ -12,6 +12,10 @@ import {
   UPDATE_STATUS_OF_ORDER,
   GET_PRODUCTS_OF_ORDER,
   UPDATE_PERSON_IN_CHARGE_OF_ORDER,
+  UPD_ACCOUTING_DATA_LIST,
+  ADD_ACCOUTING_DATA_LIST,
+  DELETE_ACCOUTING_DATA_LIST,
+  CLEAR_ACCOUTING_DATA_LIST,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -100,5 +104,32 @@ export const updateOrderInCharge = (orderInCharge) => {
   return {
     type: UPDATE_PERSON_IN_CHARGE_OF_ORDER,
     payload: orderInCharge,
+  };
+};
+
+export const clearAccountingDataList = () => {
+  return {
+    type: CLEAR_ACCOUTING_DATA_LIST,
+  };
+};
+
+export const addAccountingDataList = (accountingDataList) => {
+  return {
+    type: ADD_ACCOUTING_DATA_LIST,
+    payload: accountingDataList,
+  };
+};
+
+export const updAccountingDataList = (article) => {
+  return {
+    type: UPD_ACCOUTING_DATA_LIST,
+    payload: article,
+  };
+};
+
+export const deleteAccountingData = (article) => {
+  return {
+    type: DELETE_ACCOUTING_DATA_LIST,
+    payload: article,
   };
 };

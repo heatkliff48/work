@@ -1,10 +1,10 @@
 // import axios from 'axios';
 
-import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 // import { dataFetchedChange } from '#components/redux/actions/userAction.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
 import {
+  getAccountingDataList,
   getOrders,
   getProductsOfOrders,
 } from '#components/redux/actions/ordersAction.js';
@@ -26,7 +26,6 @@ function Main() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  const { setAccountingDataList } = useOrderContext();
   // const dataFetched = useSelector((state) => state.dataFetched);
 
   const { roles, checkUserAccess } = useUsersContext();
@@ -49,7 +48,6 @@ function Main() {
     dispatch(getRecipeOrdersData());
     dispatch(clearBatchState());
     dispatch(getAllStockBalance());
-    setAccountingDataList([]);
     //dispatch(dataFetchedChange(true));
   }, []);
 
