@@ -1,4 +1,5 @@
 import './App.css';
+import Accounting from '#components/Accounting/Accounting.jsx';
 import BatchOutside from '#components/BatchOutside/BatchOutside.jsx';
 import OrderCart from '#components/Orders/OrderCart.jsx';
 import OrdersTable from '#components/Orders/OrdersTable.jsx';
@@ -55,6 +56,7 @@ function App() {
           <Route path="/sign-in" element={<LoginForm />} />
           <Route path="/clients" element={<ClientsInfo />} />
           <Route path="/orders" element={<OrdersTable />} />
+          <Route path="/accounting" element={<Accounting />} />
           <Route path="/order_card" element={<OrderCart />} />
           <Route path="/warehouse" element={<Warehouse />} />
           <Route path="/users_info" element={<UsersInfo />} />

@@ -85,6 +85,8 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       });
       setModalUpdate(!modalUpdate);
     } else {
+      console.log('formInput', formInput);
+
       setModal(!modal);
       setModalProductCard(false);
       setStayDefault(true);
@@ -399,6 +401,9 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       setFormInput((prev) => ({ ...prev, version }));
     }
   }, [version]);
+  useEffect(() => {
+    console.log('formInput', formInput);
+  }, [formInput]);
 
   return (
     <div>
@@ -407,7 +412,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
         isOpen={isOpen}
         toggle={() => {
           clearData();
-          setStayDefault(true)
+          setStayDefault(true);
           toggle();
         }}
       >
@@ -457,7 +462,9 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
                   <Select
                     value={
                       selectOptions[el.accessor].find(
-                        (opt) => opt.value === formInput[el.accessor]
+                        (opt) =>
+                          opt.value == formInput[el.accessor] ||
+                          opt.label == formInput[el.accessor]
                       ) || null
                     }
                     onChange={(option) => {

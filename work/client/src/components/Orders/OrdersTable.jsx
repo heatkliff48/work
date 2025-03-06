@@ -1,17 +1,16 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import Table from '../Table/Table';
-import AddClientOrderModal from './modal/AddClientOrderModal';
-import { useOrderContext } from '../contexts/OrderContext';
-import { useEffect } from 'react';
-
+import { useProjectContext } from '#components/contexts/Context.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 import {
   getOrders,
   getCurrentProductsOfOrders,
 } from '#components/redux/actions/ordersAction.js';
-import { useProjectContext } from '#components/contexts/Context.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
+import Table from '../Table/Table';
+import { useOrderContext } from '../contexts/OrderContext';
+import AddClientOrderModal from './modal/AddClientOrderModal';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function OrdersTable() {
   const {

@@ -5,7 +5,6 @@ import {
   deleteBatchOutside,
   updateBatchOutside,
 } from '#components/redux/actions/batchOutsideAction.js';
-import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 import { deleteMaterialPlan } from '#components/redux/actions/recipeAction.js';
 import {
   addNewReservedProducts,
