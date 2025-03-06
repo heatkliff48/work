@@ -1,4 +1,12 @@
+import FilesMain from '#components/FileUpload/Product/FilesMain.jsx';
+import { useProjectContext } from '#components/contexts/Context.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import ModalWindow from './ModalWindow';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import Select from 'react-select';
 import {
   Button,
   Card,
@@ -10,15 +18,6 @@ import {
   ModalFooter,
   ModalHeader,
 } from 'reactstrap';
-import Select from 'react-select';
-
-import { useSelector } from 'react-redux';
-import { useProjectContext } from '#components/contexts/Context.js';
-import ModalWindow from './ModalWindow';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import FilesMain from '#components/FileUpload/Product/FilesMain.jsx';
 import BarcodeGenerator from './BarcodeGenerator';
 
 const ProductCardModal = React.memo(() => {
@@ -112,7 +111,6 @@ const ProductCardModal = React.memo(() => {
     const searchArticle = productCardData.article
       ? productCardData.article.slice(0, productCardData.article.length)
       : '';
-
     const prodArrVers = products?.reduce((acc, el) => {
       const { article, version } = el;
       if (article === searchArticle)

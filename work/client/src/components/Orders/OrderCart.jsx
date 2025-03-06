@@ -41,6 +41,7 @@ const OrderCart = React.memo(() => {
     setSelectedProduct,
     setProductOfOrder,
     personsInChargeList,
+    accountingDataList,
   } = useOrderContext();
   const {
     productModalOrder,
@@ -71,6 +72,7 @@ const OrderCart = React.memo(() => {
 
   const [dataValue, setDataValue] = useState(new Date());
   const [formatDataValue, setFormatDataValue] = useState(null);
+  const [aproveAccounting, setAproveAccounting] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState([]);
   const [vatValue, setVatValue] = useState({
     vat_procent: 21,
@@ -191,6 +193,10 @@ const OrderCart = React.memo(() => {
       status.accessor > orderCartData?.status + 1
     ) {
       return alert('This status cannot be set');
+    }
+
+    if (aproveAccounting) {
+      return alert("Please await accounting's verification");
     }
 
     const order_id = orderCartData?.id;
@@ -393,6 +399,14 @@ const OrderCart = React.memo(() => {
     // );
   };
 
+  useEffect(() => {
+    if (
+      accountingDataList.some((el) => el.orders_article == orderCartData?.article)
+    ) {
+      setAproveAccounting(true);
+    }
+  }, [accountingDataList]);
+
   return (
     <>
       {productInfoModalOrder && (
@@ -438,12 +452,19 @@ const OrderCart = React.memo(() => {
             <h4>Client Information</h4>
             {filterAndMapData(orderCartData?.owner, filterKeys)}
           </div>
+
           <div className="contact-info">
             <div className="contact-text">
               <h4>Contact Person</h4>
               {filterAndMapData(orderCartData?.contactInfo, filterKeys)}
             </div>
             {userAccess?.canWrite && <ShowOrderContactEditModal />}
+          </div>
+
+          <div className="delivery-address">
+            <h4>Delivery Address</h4>
+            {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
+            {userAccess?.canWrite && <ShowOrderDeliveryEditModal />}
           </div>
           {deleteOrderAccess?.canWrite && (
             <Button
@@ -455,11 +476,6 @@ const OrderCart = React.memo(() => {
               Delete Order
             </Button>
           )}
-        </div>
-        <div className="delivery-address">
-          <h4>Delivery Address</h4>
-          {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
-          {userAccess?.canWrite && <ShowOrderDeliveryEditModal />}
         </div>
         <table className="product-table">
           <thead>
@@ -583,6 +599,11 @@ const OrderCart = React.memo(() => {
           </div>
           {orderStatusAccess?.canRead && (
             <div className="status-table">
+              {aproveAccounting && (
+                <div className="status-row" style={{ backgroundColor: 'yellow' }}>
+                  Awaiting accounting approval
+                </div>
+              )}
               {status_list.map((item) => (
                 <div key={item.accessor} className="status-row">
                   <div className="header">{item.Header}</div>

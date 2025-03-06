@@ -1,8 +1,8 @@
+// import { useNavigate } from 'react-router-dom';
+import { DropdownFilter } from '#components/Table/filters';
 import { getOrders } from '#components/redux/actions/ordersAction.js';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { useNavigate } from 'react-router-dom';
-import { DropdownFilter } from '#components/Table/filters';
 
 const OrderContext = createContext();
 
@@ -32,6 +32,19 @@ const OrderContextProvider = ({ children }) => {
     {
       Header: 'Person in charge of the order',
       accessor: 'person_in_charge',
+    },
+  ];
+
+  const COLUMNS_ACCOUNTING = [
+    {
+      Header: 'Article of order',
+      accessor: 'orders_article',
+      disableSortBy: true,
+    },
+    {
+      Header: 'Status of order',
+      accessor: 'orders_status',
+      disableSortBy: true,
     },
   ];
 
@@ -117,18 +130,20 @@ const OrderContextProvider = ({ children }) => {
   ];
 
   const dispatch = useDispatch();
-  const [currentOrder, setCurrentOrder] = useState();
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [productOfOrder, setProductOfOrder] = useState({});
   const [newOrder, setNewOrder] = useState();
-  const [autoclave, setAutoclave] = useState([]);
-  const [ordersDataList, setOrdersDataList] = useState([]);
-  const [orderCartData, setOrderCartData] = useState({});
+  const [currentOrder, setCurrentOrder] = useState();
   const [isOrderReady, setIsOrderReady] = useState(false);
+  const [storedData, setStoredData] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [orderCartData, setOrderCartData] = useState({});
+  const [productOfOrder, setProductOfOrder] = useState({});
   const [quantityPallets, setQuantityPallets] = useState({});
+  const [autoclave, setAutoclave] = useState([]);
+  const [batchOrderIDs, setBatchOrderIDs] = useState([]);
+  const [ordersDataList, setOrdersDataList] = useState([]);
+  const [accountingDataList, setAccountingDataList] = useState([]);
   const [personsInChargeList, setPersonsInChargeList] = useState([]);
   const [productionBatchDesigner, setProductonBatchDesigner] = useState([]);
-  const [batchOrderIDs, setBatchOrderIDs] = useState([]);
 
   const list_of_orders = useSelector((state) => state.orders);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
@@ -137,6 +152,36 @@ const OrderContextProvider = ({ children }) => {
   const contactInfos = useSelector((state) => state.contactInfo);
   const usersInfo = useSelector((state) => state.usersInfo);
   const usersMainInfo = useSelector((state) => state.usersMainInfo);
+
+  const accountingAccessStatusList = [5, 7, 9];
+  const accountingStatusList = [
+    {
+      Header: 'Allowed for production by accounting',
+      accessor: 1,
+    },
+    {
+      Header: 'Allowed to shipping by accounting',
+      accessor: 2,
+    },
+    {
+      Header: 'Allowed to close by accounting',
+      accessor: 3,
+    },
+  ];
+
+  const getAccountingStatus = (status) => {
+    switch (status) {
+      case 5:
+        return 0;
+      case 7:
+        return 1;
+      case 9:
+        return 2;
+
+      default:
+        break;
+    }
+  };
 
   useEffect(() => {
     dispatch(getOrders());
@@ -194,10 +239,30 @@ const OrderContextProvider = ({ children }) => {
     [list_of_orders, clients, deliveryAddresses]
   );
 
+  useEffect(() => {
+    if (list_of_orders.length === 0) return;
+    list_of_orders.forEach((order) => {
+      if (
+        accountingAccessStatusList.find((el) => el == order.status) &&
+        !accountingDataList.some((el) => el.orders_article == order.article)
+      ) {
+        const orders_status = getAccountingStatus(order.status);
+        setAccountingDataList((prev) => [
+          ...prev,
+          {
+            orders_article: order.article,
+            orders_status,
+          },
+        ]);
+      }
+    });
+  }, [list_of_orders]);
+
   return (
     <OrderContext.Provider
       value={{
         COLUMNS_ORDERS,
+        COLUMNS_ACCOUNTING,
         COLUMNS_ORDER_PRODUCT,
         currentOrder,
         setCurrentOrder,
@@ -228,6 +293,11 @@ const OrderContextProvider = ({ children }) => {
         setProductonBatchDesigner,
         batchOrderIDs,
         setBatchOrderIDs,
+        accountingDataList,
+        setAccountingDataList,
+        accountingStatusList,
+        storedData,
+        setStoredData,
       }}
     >
       {children}
