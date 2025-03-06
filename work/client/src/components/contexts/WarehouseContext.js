@@ -177,13 +177,6 @@ const WarehouseContextProvider = ({ children }) => {
           (elem) => elem.order_id === orderId && elem.product_id === productId
         );
 
-        // const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
-        //   const reserved = list_of_reserved_products.find(
-        //     (res_prod) => res_prod.orders_products_id === elem.id
-        //   );
-        //   return sum + (reserved ? reserved.quantity : 0);
-        // }, 0);
-
         const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
           // Filter to get all matching reserved products
           const reservedProducts = list_of_reserved_products?.filter(
@@ -230,7 +223,7 @@ const WarehouseContextProvider = ({ children }) => {
 
     groupedOrders = processOrders(list_of_ordered_production_oem, groupedOrders);
 
-    Object.values(groupedOrders).forEach((group) => {
+    Object.values(groupedOrders)?.forEach((group) => {
       const order = list_of_orders.find((el) => el.id === group.orderId);
       if (order_status.includes(order?.status)) return;
 

@@ -3,21 +3,23 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useSelector } from 'react-redux';
+import { updAccountingDataList } from '#components/redux/actions/ordersAction.js';
+import { useDispatch, useSelector } from 'react-redux';
 
 const AccountngOrderCard = React.memo(() => {
   const {
     storedData,
     setStoredData,
     orderCartData,
-    setOrderCartData,
-    accountingStatusList,
     list_of_orders,
-    setAccountingDataList,
+    setOrderCartData,
+    getAccountingStatus,
+    accountingStatusList,
   } = useOrderContext();
   const { displayNames } = useProjectContext();
   const { latestProducts } = useProductsContext();
   const productListOrder = useSelector((state) => state.productsOfOrders);
+  const dispatch = useDispatch();
 
   const [vatValue, setVatValue] = useState({
     vat_procent: 21,
@@ -68,27 +70,16 @@ const AccountngOrderCard = React.memo(() => {
     [productListOrder]
   );
 
-  const getAccountingStatus = (orders_status) => {
-    switch (orders_status) {
-      case 5:
-        return 1;
-      case 7:
-        return 2;
-      case 9:
-        return 3;
-
-      default:
-        break;
-    }
-  };
-
   const updatedProductListOrder = useMemo(() => {
     return addProductArticleToOrderList(productListOrder, latestProducts);
   }, [productListOrder]);
 
   const statusChangeHandler = () => {
-    setAccountingDataList((prev) =>
-      prev.filter((el) => el.orders_article != orderCartData?.article)
+    dispatch(
+      updAccountingDataList({
+        orders_article: orderCartData?.article,
+        aproved: true,
+      })
     );
     setStoredData(null);
   };
@@ -97,13 +88,6 @@ const AccountngOrderCard = React.memo(() => {
     const updatedOrderCartData = list_of_orders.find(
       (order) => order.article === storedData.orders_article
     );
-
-    if (updatedOrderCartData?.shipping_date) {
-      setOrderCartData((prev) => ({
-        ...prev,
-        shipping_date: updatedOrderCartData.shipping_date,
-      }));
-    }
 
     const accounting_status = getAccountingStatus(updatedOrderCartData?.status);
 
@@ -133,6 +117,9 @@ const AccountngOrderCard = React.memo(() => {
       }));
     }
   }, []);
+  // useEffect(() => {
+  //   console.log('accountingDataList aoc', accountingDataList);
+  // }, [accountingDataList]);
 
   return (
     <>

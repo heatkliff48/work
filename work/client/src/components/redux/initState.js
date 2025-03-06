@@ -24,6 +24,7 @@ const initState = {
   filesOrder: [],
   filesProduct: [],
   stockBalance: [],
+  accountingDataList: [],
 };
 
 export default initState;
