@@ -47,14 +47,15 @@ const DeliveryAddress = ({ clickFunk = null, showSearch = false }) => {
       >
         <thead>
           <tr>
-            <th>street</th>
-            <th>additional_info</th>
-            <th>city</th>
-            <th>zip_code</th>
-            <th>province</th>
-            <th>country</th>
-            <th>phone_number</th>
-            <th>email</th>
+            <th>Project name</th>
+            <th>Street</th>
+            <th>Additional info</th>
+            <th>City</th>
+            <th>ZIP code</th>
+            <th>Province</th>
+            <th>Country</th>
+            <th>Phone number</th>
+            <th>Email</th>
           </tr>
         </thead>
         <tbody>
@@ -68,6 +69,7 @@ const DeliveryAddress = ({ clickFunk = null, showSearch = false }) => {
                   clickFunk(entrie.id);
                 }}
               >
+                <td>{entrie?.project_name}</td>
                 <td>{entrie?.street}</td>
                 <td>{entrie?.additional_info}</td>
                 <td>{entrie?.city}</td>

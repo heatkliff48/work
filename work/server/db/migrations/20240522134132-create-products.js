@@ -102,6 +102,9 @@ module.exports = {
       volumeBlock: {
         type: Sequelize.FLOAT,
       },
+      productCode: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -19,6 +19,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import FilesMain from '#components/FileUpload/Product/FilesMain.jsx';
+import BarcodeGenerator from './BarcodeGenerator';
 
 const ProductCardModal = React.memo(() => {
   const { productCardData, setProductCardData } = useProjectContext();
@@ -163,25 +164,30 @@ const ProductCardModal = React.memo(() => {
                 el.accessor === 'version'
               )
                 return null;
-              return (
-                <Card
-                  className="my-2"
-                  color="secondary"
-                  outline
-                  style={{
-                    width: '8rem',
-                  }}
-                >
-                  <CardHeader>{el.Header}</CardHeader>
-                  <CardBody>
-                    <CardText>
-                      {['article', 'id', 'version'].includes(el.accessor)
-                        ? null
-                        : productCardData?.[el.accessor] || ''}
-                    </CardText>
-                  </CardBody>
-                </Card>
-              );
+              if (el.accessor != 'productCode')
+                return (
+                  <Card
+                    className="my-2"
+                    color="secondary"
+                    outline
+                    style={{
+                      width: '8rem',
+                    }}
+                  >
+                    <CardHeader>{el.Header}</CardHeader>
+                    <CardBody>
+                      <CardText>
+                        {['article', 'id', 'version'].includes(el.accessor)
+                          ? null
+                          : productCardData?.[el.accessor] || ''}
+                      </CardText>
+                    </CardBody>
+                  </Card>
+                );
+              else
+                return (
+                  <BarcodeGenerator productCode={productCardData?.productCode} />
+                );
             })}
           </div>
           <FilesMain userAccess={userAccess} />

@@ -50,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
       price: DataTypes.FLOAT,
       quantityBlockOnPallet: DataTypes.FLOAT,
       volumeBlock: DataTypes.FLOAT,
+      productCode: DataTypes.STRING,
     },
     {
       sequelize,

@@ -310,6 +310,10 @@ export const ProductsContextProvider = ({ children }) => {
       filter: 'between',
       sortType: 'number',
     },
+    {
+      Header: 'Product code',
+      accessor: 'productCode',
+    },
   ];
 
   const selectOptions = useMemo(

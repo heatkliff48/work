@@ -66,7 +66,9 @@ function ProductsTypeJournalModal(props) {
       dialogClassName="modal-auto-size"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Add User</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Add {props.title}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Container>
@@ -109,7 +111,7 @@ function ProductsTypeJournalModal(props) {
       </Modal.Body>
       <Modal.Footer>
         <Button form="addClientModel" type="submit">
-          Add
+          Add {props.title}
         </Button>
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
@@ -128,7 +130,7 @@ function ShowProductsTypeJournalModal(props) {
           setModalShow(true);
         }}
       >
-        Add User
+        Add {props.title}
       </Button>
 
       <ProductsTypeJournalModal
@@ -136,6 +138,7 @@ function ShowProductsTypeJournalModal(props) {
         onHide={() => setModalShow(false)}
         table={props.table}
         target={props.target}
+        title={props.title}
       />
     </>
   );

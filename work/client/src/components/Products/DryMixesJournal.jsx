@@ -67,7 +67,11 @@ const DryMixesJournal = () => {
 
   return (
     <Fragment>
-      <ShowProductsTypeJournalModal table={dry_mixes_journal_table} target={1} />{' '}
+      <ShowProductsTypeJournalModal
+        table={dry_mixes_journal_table}
+        target={1}
+        title={'dry mix'}
+      />{' '}
       <Table
         COLUMN_DATA={dry_mixes_journal_table}
         dataOfTable={dryMixesJournalDataList}

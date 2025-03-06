@@ -70,7 +70,10 @@ const RelatedMaterialsJournal = () => {
 
   return (
     <Fragment>
-      <ShowProductsTypeJournalModal table={related_materials_journal_table} />{' '}
+      <ShowProductsTypeJournalModal
+        table={related_materials_journal_table}
+        title={'related material'}
+      />{' '}
       <Table
         COLUMN_DATA={related_materials_journal_table}
         dataOfTable={relatedMaterialsJournalDataList}
