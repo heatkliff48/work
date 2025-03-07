@@ -1,6 +1,9 @@
 // import { useNavigate } from 'react-router-dom';
 import { DropdownFilter } from '#components/Table/filters';
-import { getOrders } from '#components/redux/actions/ordersAction.js';
+import {
+  addAccountingDataList,
+  getOrders,
+} from '#components/redux/actions/ordersAction.js';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -134,6 +137,7 @@ const OrderContextProvider = ({ children }) => {
   const [currentOrder, setCurrentOrder] = useState();
   const [isOrderReady, setIsOrderReady] = useState(false);
   const [storedData, setStoredData] = useState(null);
+  const [accDataList, setAccDataList] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [orderCartData, setOrderCartData] = useState({});
   const [productOfOrder, setProductOfOrder] = useState({});
@@ -141,11 +145,11 @@ const OrderContextProvider = ({ children }) => {
   const [autoclave, setAutoclave] = useState([]);
   const [batchOrderIDs, setBatchOrderIDs] = useState([]);
   const [ordersDataList, setOrdersDataList] = useState([]);
-  const [accountingDataList, setAccountingDataList] = useState([]);
   const [personsInChargeList, setPersonsInChargeList] = useState([]);
   const [productionBatchDesigner, setProductonBatchDesigner] = useState([]);
 
   const list_of_orders = useSelector((state) => state.orders);
+  const accountingDataList = useSelector((state) => state.accountingDataList);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
@@ -199,7 +203,7 @@ const OrderContextProvider = ({ children }) => {
       },
     ];
 
-    filteredUsersList.forEach((element) => {
+    filteredUsersList?.forEach((element) => {
       const label = usersInfo.find((user) => user.id === element.id)?.fullName;
       const value = element.id;
 
@@ -241,22 +245,54 @@ const OrderContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (list_of_orders.length === 0) return;
-    list_of_orders.forEach((order) => {
+    list_of_orders?.forEach((order) => {
       if (
         accountingAccessStatusList.find((el) => el == order.status) &&
-        !accountingDataList.some((el) => el.orders_article == order.article)
+        !accountingDataList?.some((el) => el.orders_article == order.article)
       ) {
-        const orders_status = getAccountingStatus(order.status);
-        setAccountingDataList((prev) => [
-          ...prev,
-          {
+        dispatch(
+          addAccountingDataList({
             orders_article: order.article,
-            orders_status,
-          },
-        ]);
+            orders_status: order.status,
+            aproved: false,
+          })
+        );
       }
     });
   }, [list_of_orders]);
+
+  // useEffect(() => {
+  //   console.log('accountingDataList', accountingDataList);
+  // }, [accountingDataList]);
+
+  useEffect(() => {
+    if (list_of_orders && clients && deliveryAddresses) {
+      const newArray = list_of_orders.map((order) => {
+        const { id, article, status, shipping_date, person_in_charge } = order;
+        const client = clients.find((client) => client.id === order.owner);
+        const deliveryAddress = deliveryAddresses.find(
+          (address) =>
+            address.id === order.del_adr_id && address.client_id === order.owner
+        );
+
+        return {
+          id,
+          article,
+          status:
+            status_list?.find((stat) => stat.accessor == status)?.Header || status,
+          owner: client ? client.c_name : '',
+          del_adr_id: deliveryAddress ? deliveryAddress.street : '',
+          shipping_date,
+          person_in_charge:
+            person_in_charge != 0
+              ? usersInfo.find((user) => user.id === person_in_charge)?.fullName
+              : 'None',
+        };
+      });
+
+      setOrdersDataList(newArray);
+    }
+  }, [list_of_orders, clients, deliveryAddresses]);
 
   return (
     <OrderContext.Provider
@@ -294,10 +330,12 @@ const OrderContextProvider = ({ children }) => {
         batchOrderIDs,
         setBatchOrderIDs,
         accountingDataList,
-        setAccountingDataList,
         accountingStatusList,
         storedData,
         setStoredData,
+        accDataList,
+        setAccDataList,
+        getAccountingStatus,
       }}
     >
       {children}

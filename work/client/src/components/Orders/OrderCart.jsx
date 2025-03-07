@@ -11,8 +11,10 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import {
   addDataShipOrder,
+  deleteAccountingData,
   deleteOrder,
   getDeleteProductOfOrder,
+  updAccountingDataList,
   updateOrderInCharge,
   updateOrderStatus,
 } from '#components/redux/actions/ordersAction.js';
@@ -195,7 +197,7 @@ const OrderCart = React.memo(() => {
       return alert('This status cannot be set');
     }
 
-    if (aproveAccounting) {
+    if (!aproveAccounting) {
       return alert("Please await accounting's verification");
     }
 
@@ -217,7 +219,7 @@ const OrderCart = React.memo(() => {
       );
     }
 
-    updatedProductListOrder.forEach((product) => {
+    updatedProductListOrder?.forEach((product) => {
       const loc = latestProducts.find(
         (el) => el.id == product.product_id
       )?.placeOfProduction;
@@ -256,6 +258,18 @@ const OrderCart = React.memo(() => {
 
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
+
+    if (status.accessor == 6 || status.accessor == 8) {
+      dispatch(
+        updAccountingDataList({
+          orders_article: orderCartData?.article,
+          aproved: false,
+        })
+      );
+    }
+    if (status.accessor == 10) {
+      dispatch(deleteAccountingData(orderCartData?.article));
+    }
 
     dispatch(
       updateOrderStatus({
@@ -393,18 +407,16 @@ const OrderCart = React.memo(() => {
       setFilteredWarehouseByProduct(filteredWarehouse);
       setReserveModalShow(true);
     }
-
-    // const filteredWarehouse = warehouse_data.filter(
-    //   (entry) => entry.product_article === product.product_article
-    // );
   };
 
   useEffect(() => {
-    if (
-      accountingDataList.some((el) => el.orders_article == orderCartData?.article)
-    ) {
-      setAproveAccounting(true);
-    }
+    const result = accountingDataList.find(
+      (el) => el.orders_article == orderCartData?.article
+    )?.aproved;
+    console.log('accountingDataList', accountingDataList);
+    console.log('result', result);
+
+    setAproveAccounting(result);
   }, [accountingDataList]);
 
   return (
@@ -599,7 +611,7 @@ const OrderCart = React.memo(() => {
           </div>
           {orderStatusAccess?.canRead && (
             <div className="status-table">
-              {aproveAccounting && (
+              {!aproveAccounting && (
                 <div className="status-row" style={{ backgroundColor: 'yellow' }}>
                   Awaiting accounting approval
                 </div>
@@ -607,7 +619,6 @@ const OrderCart = React.memo(() => {
               {status_list.map((item) => (
                 <div key={item.accessor} className="status-row">
                   <div className="header">{item.Header}</div>
-
                   <input
                     id={item.accessor}
                     type="checkbox"

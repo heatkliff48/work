@@ -26,6 +26,7 @@ const initState = {
   stockBalance: [],
   dryMixesJournal: [],
   relatedMaterialsJournal: [],
+  accountingDataList: [],
 };
 
 export default initState;

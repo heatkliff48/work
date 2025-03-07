@@ -19,16 +19,11 @@ function OrdersTable() {
     setProductOfOrder,
     setNewOrder,
     ordersDataList,
-    setOrdersDataList,
-    status_list,
-    usersInfo,
   } = useOrderContext();
   const { clientModalOrder, setClientModalOrder } = useModalContext();
   const { setCurrentClient } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
-  const orders = useSelector((state) => state.orders);
-  const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
 
   const dispatch = useDispatch();
@@ -47,41 +42,13 @@ function OrdersTable() {
     }
   }, [user, roles]);
 
-  useEffect(() => {
-    if (orders && clients && deliveryAddresses) {
-      const newArray = orders.map((order) => {
-        const { id, article, status, shipping_date, person_in_charge } = order;
-        const client = clients.find((client) => client.id === order.owner);
-        const deliveryAddress = deliveryAddresses.find(
-          (address) =>
-            address.id === order.del_adr_id && address.client_id === order.owner
-        );
-
-        return {
-          id,
-          article,
-          status:
-            status_list?.find((stat) => stat.accessor == status)?.Header || status,
-          owner: client ? client.c_name : '',
-          del_adr_id: deliveryAddress ? deliveryAddress.street : '',
-          shipping_date,
-          person_in_charge:
-            person_in_charge != 0
-              ? usersInfo.find((user) => user.id === person_in_charge)?.fullName
-              : 'None',
-        };
-      });
-
-      setOrdersDataList(newArray);
-    }
-  }, [orders, clients, deliveryAddresses]);
+  
 
   useEffect(() => {
     dispatch(getOrders());
   }, [deliveryAddresses]);
 
   useEffect(() => {
-    //CLEAR data
     setProductOfOrder({});
     setNewOrder({});
     setCurrentClient({});

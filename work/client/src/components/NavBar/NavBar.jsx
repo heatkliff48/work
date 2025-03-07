@@ -1,7 +1,8 @@
+import { clearAccountingDataList } from '#components/redux/actions/ordersAction.js';
+import { delUser } from '../redux/actions/userAction';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { delUser } from '../redux/actions/userAction';
 
 function NavBar() {
   const navigate = useNavigate();
@@ -66,6 +67,7 @@ function NavBar() {
               className="nav_link"
               onClick={() => {
                 window.localStorage.clear();
+                dispatch(clearAccountingDataList());
                 dispatch(delUser());
                 navigate('/sign-in');
               }}
