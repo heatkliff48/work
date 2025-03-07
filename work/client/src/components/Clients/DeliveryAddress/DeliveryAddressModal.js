@@ -8,6 +8,7 @@ import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
 
 function DeliveryAddressModal(props) {
+  const [project_name, setProjectName] = useState('');
   const [street, setStreet] = useState('');
   const [additional_info, setAddInfo] = useState('');
   const [city, setCity] = useState('');
@@ -29,6 +30,7 @@ function DeliveryAddressModal(props) {
       const currentClientID = currentClient.id;
       const deliveryAddress = {
         currentClientID,
+        project_name,
         street,
         additional_info,
         city,
@@ -40,6 +42,7 @@ function DeliveryAddressModal(props) {
       };
       dispatch(addNewDeliveryAddress({ deliveryAddress }));
       props.onHide();
+      setProjectName('');
       setStreet('');
       setAddInfo('');
       setCity('');
@@ -61,9 +64,7 @@ function DeliveryAddressModal(props) {
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Add Delivery Address
-        </Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">Add Project</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <form
@@ -71,6 +72,25 @@ function DeliveryAddressModal(props) {
           className="w-full max-w-sm"
           onSubmit={onSubmitForm}
         >
+          <div className="md:flex md:items-center mb-6">
+            <div className="md:w-1/3">
+              <label
+                className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                for="version"
+              >
+                Project name
+              </label>
+            </div>
+            <div className="md:w-2/3">
+              <input
+                className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                id="project_name"
+                type="text"
+                value={project_name}
+                onChange={(e) => setProjectName(e.target.value)}
+              />
+            </div>
+          </div>
           <div className="md:flex md:items-center mb-6">
             <div className="md:w-1/3">
               <label

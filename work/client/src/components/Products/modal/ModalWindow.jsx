@@ -64,11 +64,16 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       1
     )}${density}${width}${height}${lengths}`;
 
+    let productCode = '0001';
+    const articleId = products.length === 0 ? 1 : products.length + 1;
+    productCode = `00000${articleId}`.slice(-5);
+
     const updatedProduct = {
       ...formInput,
       placeOfProduction: rightPlaceOfProduction,
       typeOfPackaging: rightTypeOfPackaging,
       article: prodArticle,
+      productCode,
     };
 
     const isExistingProduct = products.some(
@@ -82,6 +87,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       setPromProduct({
         ...updatedProduct,
         id: existingProduct.id,
+        productCode: existingProduct.productCode,
       });
       setModalUpdate(!modalUpdate);
     } else {
@@ -426,7 +432,12 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
         </ModalHeader>
         <div className="item_content">
           {list.map((el) => {
-            if (el.accessor === 'id' || el.accessor === 'article') return null;
+            if (
+              el.accessor === 'id' ||
+              el.accessor === 'article' ||
+              el.accessor === 'productCode'
+            )
+              return null;
             if (el.accessor === 'version') {
               return (
                 <div className="item_topic" key={el.id}>

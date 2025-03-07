@@ -10,6 +10,7 @@ deliveryAddress.post('/', async (req, res) => {
   try {
     const {
       currentClientID,
+      project_name,
       street,
       additional_info,
       city,
@@ -22,6 +23,7 @@ deliveryAddress.post('/', async (req, res) => {
 
     const deliveryAddress = await DeliveryAddresses.create({
       client_id: currentClientID,
+      project_name,
       street,
       additional_info,
       city,

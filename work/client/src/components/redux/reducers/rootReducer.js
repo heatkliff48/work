@@ -20,6 +20,10 @@ import { pagesReducer } from './pagesReducer';
 import { productionBatchLogReducer } from './productionBatchLogReducer';
 import { productsOfOrdersReducer } from './productsOfOrdersReducer';
 import { productsReducer } from './productsReducer';
+import {
+  dryMixesJournalReducer,
+  relatedMaterialsJournalReducer,
+} from './productsTypeJournalReducer';
 import { recipeReducer } from './recipeReducer';
 import { reservedProductsReducer } from './reservedProductsReducer';
 import { rolesReducer } from './rolesReducer';
@@ -57,5 +61,7 @@ export const rootReducer = combineReducers({
   filesOrder: filesOrderReducer,
   filesProduct: filesProductReducer,
   stockBalance: stockBalanceReducer,
+  dryMixesJournal: dryMixesJournalReducer,
+  relatedMaterialsJournal: relatedMaterialsJournalReducer,
   accountingDataList: accountingReducer,
 });

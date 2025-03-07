@@ -1,10 +1,12 @@
 import {
   addDatashipOrderSocket,
+  addNewDryMixesJournalSocket,
   addNewFilesOrderSocket,
   addNewFilesProductSocket,
   addNewFilesWarehouseSocket,
   addNewOrderSocket,
   addNewProductSocket,
+  addNewRelatedMaterialsJournalSocket,
   addNewRecipeSocket,
   addNewStockBalanceSocket,
   addNewWarehouseSocket,
@@ -16,7 +18,9 @@ import {
   deleteRecipeSocket,
   deleteReservedProductSocket,
   saveMaterialPlanSocket,
+  updateDryMixesJournalSocket,
   updateProductSocket,
+  updateRelatedMaterialsJournalSocket,
   updateRemainingStockSocket,
   updateRolesActiveSocket,
   updateRolesSocket,
@@ -72,6 +76,10 @@ import {
   DELETE_FILES_PRODUCT_SOCKET,
   UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
   ADD_NEW_STOCK_BALANCE_SOCKET,
+  ADD_NEW_DRY_MIXES_JOURNAL_SOCKET,
+  ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
+  UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
+  UPDATE_DRY_MIXES_JOURNAL_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -210,6 +218,22 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_STOCK_BALANCE_SOCKET:
       dispatch(addNewStockBalanceSocket(payload));
+      break;
+
+    case ADD_NEW_DRY_MIXES_JOURNAL_SOCKET:
+      dispatch(addNewDryMixesJournalSocket(payload));
+      break;
+
+    case UPDATE_DRY_MIXES_JOURNAL_SOCKET:
+      dispatch(updateDryMixesJournalSocket(payload));
+      break;
+
+    case ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET:
+      dispatch(addNewRelatedMaterialsJournalSocket(payload));
+      break;
+
+    case UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET:
+      dispatch(updateRelatedMaterialsJournalSocket(payload));
       break;
 
     default:

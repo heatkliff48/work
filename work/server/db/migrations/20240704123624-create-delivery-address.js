@@ -7,7 +7,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       client_id: {
         allowNull: false,
@@ -17,41 +17,44 @@ module.exports = {
           key: 'id',
         },
       },
+      project_name: {
+        type: Sequelize.TEXT,
+      },
       street: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       additional_info: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       city: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       zip_code: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       province: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       country: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       phone_number: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       email: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('DeliveryAddresses');
-  }
+  },
 };

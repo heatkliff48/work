@@ -66,9 +66,18 @@ function Main() {
           </button>
         )}
 
+      {checkUserAccess(user, roles, 'Roles')?.canRead && (
+        <button onClick={() => navigate('/roles')}>Roles</button>
+      )}
+      {checkUserAccess(user, roles, 'Products')?.canRead && (
+        <button onClick={() => navigate('/products_type_journal')}>
+          Products Type Journal
+        </button>
+      )}
         <button className="nav-button" onClick={() => navigate('/statistics')}>
           Statistics
         </button>
+
 
         {checkUserAccess(user, roles, 'Orders')?.canRead && (
           <button className="nav-button" onClick={() => navigate('/orders')}>
