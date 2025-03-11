@@ -246,9 +246,15 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       }
 
       if (formInput?.density) {
-        values.densityDryMax = Number(formInput?.density) + 50;
-        updateFuncs.densityDryMax = (value) =>
-          setFormInput((prev) => ({ ...prev, densityDryMax: value }));
+        if (formInput?.certificate === 'CE') {
+          values.densityDryMax = Number(formInput?.density) + 50;
+          updateFuncs.densityDryMax = (value) =>
+            setFormInput((prev) => ({ ...prev, densityDryMax: value }));
+        } else if (formInput?.certificate === 'DAU') {
+          values.densityDryMax = Number(formInput?.density) + 25;
+          updateFuncs.densityDryMax = (value) =>
+            setFormInput((prev) => ({ ...prev, densityDryMax: value }));
+        }
       }
 
       // Вычисление densityDryDef
@@ -314,6 +320,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       formInput.humidity,
       formInput.palletSize,
       formInput.palletHeight,
+      formInput.certificate,
     ]
   );
 

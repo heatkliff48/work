@@ -257,7 +257,7 @@ function DeliveryAddressModal(props) {
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <button form="addProductModal">Add Delivery Address</button>
+        <button form="addProductModal">Add Project</button>
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>
@@ -270,7 +270,7 @@ function ShowDeliveryAddressModal() {
   return (
     <>
       <Button variant="primary" onClick={() => setModalShow(true)}>
-        Add Delivery Address
+        Add Project
       </Button>
 
       <DeliveryAddressModal show={modalShow} onHide={() => setModalShow(false)} />

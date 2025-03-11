@@ -328,7 +328,6 @@ export const ProductsContextProvider = ({ children }) => {
       certificate: [
         { value: 'CE', label: 'CE' },
         { value: 'DAU', label: 'DAU' },
-        { value: 'DoP', label: 'DoP' },
       ],
       placeOfProduction: [
         { value: 0, label: 'Spain' },
@@ -435,25 +434,24 @@ export const ProductsContextProvider = ({ children }) => {
     if (typeof inputValue === 'number') {
       return inputValue; // Если это число, возвращаем как есть
     }
-  
+
     if (!isNaN(Number(inputValue))) {
       return Number(inputValue); // Если это строка с числом, конвертируем
     }
-  
+
     // Проверяем, существует ли такая категория в selectOptions
     if (!selectOptions[category]) {
       console.warn(`Категория ${category} не найдена в selectOptions`);
       return null;
     }
-  
+
     // Ищем соответствие по label или value
     const matchedOption = selectOptions[category].find(
       (el) => el.label === inputValue || el.value === inputValue
     );
-  
+
     return matchedOption ? matchedOption.value : null;
   };
-  
 
   return (
     <ProductsContext.Provider
