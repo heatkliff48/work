@@ -27,6 +27,10 @@ import {
   updInChargeOrderSocket,
   updProductOfOrderSocket,
   updStatusOfOrderSocket,
+  addNewAnchorSocket,
+  updateAnchorSocket,
+  addNewToolSocket,
+  updateToolSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -80,6 +84,10 @@ import {
   ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
   UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
   UPDATE_DRY_MIXES_JOURNAL_SOCKET,
+  ADD_NEW_ANCHOR_SOCKET,
+  UPDATE_ANCHOR_SOCKET,
+  ADD_NEW_TOOL_SOCKET,
+  UPDATE_TOOL_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -234,6 +242,22 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET:
       dispatch(updateRelatedMaterialsJournalSocket(payload));
+      break;
+
+    case ADD_NEW_ANCHOR_SOCKET:
+      dispatch(addNewAnchorSocket(payload));
+      break;
+
+    case UPDATE_ANCHOR_SOCKET:
+      dispatch(updateAnchorSocket(payload));
+      break;
+
+    case ADD_NEW_TOOL_SOCKET:
+      dispatch(addNewToolSocket(payload));
+      break;
+
+    case UPDATE_TOOL_SOCKET:
+      dispatch(updateToolSocket(payload));
       break;
 
     default:

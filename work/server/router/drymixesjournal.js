@@ -23,14 +23,32 @@ dryMixesJournalRouter.get('/', async (req, res) => {
 });
 
 dryMixesJournalRouter.post('/', async (req, res) => {
-  const { product_name, units_per_pack, price_per_pack, type } = req.body;
+  const {
+    name,
+    article,
+    units_of_measurement,
+    number_of_bags,
+    description,
+    place_of_production,
+    price,
+    product_code,
+  } = req.body.productsTypeJournalInput;
+
+  console.log(
+    'req.body.productsTypeJournalInput----------------------------------------------------',
+    req.body.productsTypeJournalInput
+  );
 
   try {
     const dryMixesJournal = await DryMixesJournal.create({
-      product_name,
-      units_per_pack,
-      price_per_pack,
-      type,
+      name,
+      article,
+      units_of_measurement,
+      number_of_bags,
+      description,
+      place_of_production,
+      price,
+      product_code,
     });
 
     myEmitter.emit(ADD_NEW_DRY_MIXES_JOURNAL_SOCKET, dryMixesJournal);
@@ -42,15 +60,29 @@ dryMixesJournalRouter.post('/', async (req, res) => {
 });
 
 dryMixesJournalRouter.post('/update', async (req, res) => {
-  const { id, product_name, units_per_pack, price_per_pack, type } = req.body;
+  const {
+    id,
+    name,
+    article,
+    units_of_measurement,
+    number_of_bags,
+    description,
+    place_of_production,
+    price,
+    product_code,
+  } = req.body.productsTypeJournalInput;
 
   try {
     const dryMixesJournal = await DryMixesJournal.update(
       {
-        product_name,
-        units_per_pack,
-        price_per_pack,
-        type,
+        name,
+        article,
+        units_of_measurement,
+        number_of_bags,
+        description,
+        place_of_production,
+        price,
+        product_code,
       },
       {
         where: {
@@ -68,20 +100,5 @@ dryMixesJournalRouter.post('/update', async (req, res) => {
     return res.status(500).json(err);
   }
 });
-
-// delete
-
-// dryMixesJournalRouter.post('/delete', async (req, res) => {
-//   const { batch_id } = req.body;
-
-//   try {
-//     await DryMixesJournal.destroy({ where: { id: batch_id } });
-
-//     myEmitter.emit(DELETE_BATCH_OUTSIDE_SOCKET, batch_id);
-//     return res.json(batch_id).status(200);
-//   } catch (err) {
-//     return ErrorUtils.catchError(res, err);
-//   }
-// });
 
 module.exports = dryMixesJournalRouter;

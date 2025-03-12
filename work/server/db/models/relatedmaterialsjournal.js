@@ -13,10 +13,13 @@ module.exports = (sequelize, DataTypes) => {
   }
   RelatedMaterialsJournal.init(
     {
-      product_name: DataTypes.STRING,
-      units_per_pack: DataTypes.INTEGER,
-      price_per_pack: DataTypes.INTEGER,
-      type: DataTypes.STRING,
+      name: DataTypes.STRING,
+      article: DataTypes.STRING,
+      units_of_measurement: DataTypes.STRING,
+      description: DataTypes.TEXT,
+      place_of_production: DataTypes.STRING,
+      price: DataTypes.FLOAT,
+      product_code: DataTypes.STRING,
     },
     {
       sequelize,

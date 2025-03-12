@@ -33,6 +33,12 @@ function ProductsTypeJournal() {
         >
           Related materials journal
         </button>
+        <button className="nav-button" onClick={() => navigate('/anchors')}>
+          Anchors
+        </button>
+        <button className="nav-button" onClick={() => navigate('/tools')}>
+          Tools
+        </button>
       </div>
     </div>
   );

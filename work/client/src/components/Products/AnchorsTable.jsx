@@ -1,29 +1,29 @@
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { getDryMixesJournal } from '#components/redux/actions/productsTypeJournalAction.js';
+import { getAnchor } from '#components/redux/actions/productsTypeJournalAction.js';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ShowProductsTypeJournalModal from './modal/ProductsTypeJournalModal';
-import ProductsTypeJournalInfoModal from './modal/ProductsTypeJournalInfoModal';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import ProductsTypeJournalInfoModal from './modal/ProductsTypeJournalInfoModal';
 
-const DryMixesJournal = () => {
+const AnchorsTable = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const dryMixesJournal = useSelector((state) => state.dryMixesJournal);
+  const anchor = useSelector((state) => state.anchor);
 
-  const [dryMixesJournalDataList, setDryMixesJournalDataList] = useState([]);
+  const [anchorDataList, setAnchorDataList] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [productCode, setProductCode] = useState('');
   const { selectedProductsType, setSelectedProductsType, dataTable, setDataTable } =
     useProductsTypeJournalContext();
 
-  const dry_mixes_journal_table = [
+  const anchors_table = [
     {
       Header: 'Product name',
       accessor: 'name',
@@ -37,11 +37,6 @@ const DryMixesJournal = () => {
     {
       Header: 'Units of measurement',
       accessor: 'units_of_measurement',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Number of bags',
-      accessor: 'number_of_bags',
       Filter: TextSearchFilter,
     },
     {
@@ -62,20 +57,19 @@ const DryMixesJournal = () => {
   ];
 
   useEffect(() => {
-    if (dryMixesJournal) {
-      setDryMixesJournalDataList(dryMixesJournal);
+    if (anchor) {
+      setAnchorDataList(anchor);
       let code = '0001';
-      const articleId =
-        dryMixesJournal.length === 0 ? 1 : dryMixesJournal.length + 1;
-      code = `1` + `0000${articleId}`.slice(-4);
+      const articleId = anchor.length === 0 ? 1 : anchor.length + 1;
+      code = `2` + `0000${articleId}`.slice(-4);
       setProductCode(code);
     }
-  }, [dryMixesJournal]);
+  }, [anchor]);
 
-  const dryMixesJournalHandler = (id) => {
-    setDataTable(dry_mixes_journal_table);
-    const dryMix = dryMixesJournal.find((el) => el.id === id);
-    setSelectedProductsType(dryMix);
+  const anchorHandler = (id) => {
+    setDataTable(anchors_table);
+    const selectedAnchor = anchor.find((el) => el.id === id);
+    setSelectedProductsType(selectedAnchor);
     setModalShow(true);
   };
 
@@ -92,34 +86,34 @@ const DryMixesJournal = () => {
 
   useEffect(() => {
     // if (userAccess?.canRead) {
-    dispatch(getDryMixesJournal());
+    dispatch(getAnchor());
     // }
   }, []);
 
   return (
     <Fragment>
       <ShowProductsTypeJournalModal
-        table={dry_mixes_journal_table}
-        target={1}
-        title={'dry mix'}
+        table={anchors_table}
+        target={3}
+        title={'anchor'}
         productCode={productCode}
       />{' '}
       <Table
-        COLUMN_DATA={dry_mixes_journal_table}
-        dataOfTable={dryMixesJournalDataList}
-        tableName={'Dry mixes journal'}
+        COLUMN_DATA={anchors_table}
+        dataOfTable={anchorDataList}
+        tableName={'Anchors'}
         userAccess={userAccess}
         handleRowClick={(row) => {
-          dryMixesJournalHandler(row.original.id);
+          anchorHandler(row.original.id);
         }}
       />
       <ProductsTypeJournalInfoModal
         show={modalShow}
         onHide={() => setModalShow(false)}
-        title={'Dry mix card'}
+        title={'Anchor'}
       />
     </Fragment>
   );
 };
 
-export default DryMixesJournal;
+export default AnchorsTable;

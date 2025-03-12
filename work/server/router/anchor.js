@@ -1,28 +1,25 @@
-const relatedMaterialsJournalRouter = require('express').Router();
-const { RelatedMaterialsJournal } = require('../db/models/index.js');
-const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
+const anchorRouter = require('express').Router();
+const { Anchor } = require('../db/models/index.js');
 const myEmitter = require('../src/ee.js');
 const {
-  ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
-  UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
+  ADD_NEW_ANCHOR_SOCKET,
+  UPDATE_ANCHOR_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 
-relatedMaterialsJournalRouter.get('/', async (req, res) => {
+anchorRouter.get('/', async (req, res) => {
   try {
-    const relatedMaterialsJournal = await RelatedMaterialsJournal.findAll({
+    const anchor = await Anchor.findAll({
       order: [['id', 'ASC']],
     });
 
-    return res.status(200).json({ relatedMaterialsJournal });
+    return res.status(200).json({ anchor });
   } catch (err) {
     console.error(err.message);
   }
 });
 
-relatedMaterialsJournalRouter.post('/', async (req, res) => {
+anchorRouter.post('/', async (req, res) => {
   const {
     name,
     article,
@@ -34,7 +31,7 @@ relatedMaterialsJournalRouter.post('/', async (req, res) => {
   } = req.body.productsTypeJournalInput;
 
   try {
-    const relatedMaterialsJournal = await RelatedMaterialsJournal.create({
+    const anchor = await Anchor.create({
       name,
       article,
       units_of_measurement,
@@ -44,18 +41,15 @@ relatedMaterialsJournalRouter.post('/', async (req, res) => {
       product_code,
     });
 
-    myEmitter.emit(
-      ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
-      relatedMaterialsJournal
-    );
-    return res.json(relatedMaterialsJournal).status(200);
+    myEmitter.emit(ADD_NEW_ANCHOR_SOCKET, anchor);
+    return res.json(anchor).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
   }
 });
 
-relatedMaterialsJournalRouter.post('/update', async (req, res) => {
+anchorRouter.post('/update', async (req, res) => {
   const {
     id,
     name,
@@ -68,7 +62,7 @@ relatedMaterialsJournalRouter.post('/update', async (req, res) => {
   } = req.body.productsTypeJournalInput;
 
   try {
-    const relatedMaterialsJournal = await RelatedMaterialsJournal.update(
+    const anchor = await Anchor.update(
       {
         name,
         article,
@@ -87,12 +81,12 @@ relatedMaterialsJournalRouter.post('/update', async (req, res) => {
       }
     );
 
-    myEmitter.emit(UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET, relatedMaterialsJournal);
-    return res.json(relatedMaterialsJournal).status(200);
+    myEmitter.emit(UPDATE_ANCHOR_SOCKET, anchor);
+    return res.json(anchor).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
   }
 });
 
-module.exports = relatedMaterialsJournalRouter;
+module.exports = anchorRouter;

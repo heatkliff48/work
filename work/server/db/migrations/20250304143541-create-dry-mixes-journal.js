@@ -7,31 +7,43 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
-      product_name: {
-        type: Sequelize.STRING
+      name: {
+        type: Sequelize.STRING,
       },
-      units_per_pack: {
-        type: Sequelize.INTEGER
+      article: {
+        type: Sequelize.STRING,
       },
-      price_per_pack: {
-        type: Sequelize.INTEGER
+      units_of_measurement: {
+        type: Sequelize.STRING,
       },
-      type: {
-        type: Sequelize.STRING
+      number_of_bags: {
+        type: Sequelize.INTEGER,
+      },
+      description: {
+        type: Sequelize.TEXT,
+      },
+      place_of_production: {
+        type: Sequelize.STRING,
+      },
+      price: {
+        type: Sequelize.FLOAT,
+      },
+      product_code: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('DryMixesJournals');
-  }
+  },
 };
