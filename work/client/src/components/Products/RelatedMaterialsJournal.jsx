@@ -6,6 +6,8 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ShowProductsTypeJournalModal from './modal/ProductsTypeJournalModal';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import ProductsTypeJournalInfoModal from './modal/ProductsTypeJournalInfoModal';
 
 const RelatedMaterialsJournal = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
@@ -19,37 +21,63 @@ const RelatedMaterialsJournal = () => {
 
   const [relatedMaterialsJournalDataList, setRelatedMaterialsJournalDataList] =
     useState([]);
+  const [modalShow, setModalShow] = useState(false);
+  const [productCode, setProductCode] = useState('');
+  const { selectedProductsType, setSelectedProductsType, dataTable, setDataTable } =
+    useProductsTypeJournalContext();
 
   const related_materials_journal_table = [
     {
       Header: 'Product name',
-      accessor: 'product_name',
+      accessor: 'name',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Units per Pack',
-      accessor: 'units_per_pack',
+      Header: 'Article',
+      accessor: 'article',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Price per Pack',
-      accessor: 'price_per_pack',
+      Header: 'Units of measurement',
+      accessor: 'units_of_measurement',
       Filter: TextSearchFilter,
     },
-    // {
-    //   Header: 'Type',
-    //   accessor: 'type',
-    //   Filter: TextSearchFilter,
-    // },
+    {
+      Header: 'Description',
+      accessor: 'description',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Place of production',
+      accessor: 'place_of_production',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Price',
+      accessor: 'price',
+      Filter: TextSearchFilter,
+    },
   ];
 
   useEffect(() => {
     if (relatedMaterialsJournal) {
       setRelatedMaterialsJournalDataList(relatedMaterialsJournal);
+      let code = '0001';
+      const articleId =
+        relatedMaterialsJournal.length === 0
+          ? 1
+          : relatedMaterialsJournal.length + 1;
+      code = `4` + `0000${articleId}`.slice(-4);
+      setProductCode(code);
     }
   }, [relatedMaterialsJournal]);
 
-  const relatedMaterialsJournalHandler = (id) => {};
+  const relatedMaterialsJournalHandler = (id) => {
+    setDataTable(related_materials_journal_table);
+    const relatedMaterial = relatedMaterialsJournal.find((el) => el.id === id);
+    setSelectedProductsType(relatedMaterial);
+    setModalShow(true);
+  };
 
   // useEffect(() => {
   //   if (user && roles.length > 0) {
@@ -72,7 +100,9 @@ const RelatedMaterialsJournal = () => {
     <Fragment>
       <ShowProductsTypeJournalModal
         table={related_materials_journal_table}
+        target={2}
         title={'related material'}
+        productCode={productCode}
       />{' '}
       <Table
         COLUMN_DATA={related_materials_journal_table}
@@ -82,6 +112,11 @@ const RelatedMaterialsJournal = () => {
         handleRowClick={(row) => {
           relatedMaterialsJournalHandler(row.original.id);
         }}
+      />
+      <ProductsTypeJournalInfoModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        title={'Related material card'}
       />
     </Fragment>
   );

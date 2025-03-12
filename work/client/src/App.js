@@ -30,6 +30,8 @@ import { useNavigate } from 'react-router-dom';
 import ProductsTypeJournal from '#components/Products/ProductsTypeJournal.jsx';
 import DryMixesJournal from '#components/Products/DryMixesJournal.jsx';
 import RelatedMaterialsJournal from '#components/Products/RelatedMaterialsJournal.jsx';
+import AnchorsTable from '#components/Products/AnchorsTable.jsx';
+import ToolsTable from '#components/Products/ToolsTable.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -90,6 +92,8 @@ function App() {
             path="/related_materials_journal"
             element={<RelatedMaterialsJournal />}
           />
+          <Route path="/anchors" element={<AnchorsTable />} />
+          <Route path="/tools" element={<ToolsTable />} />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>

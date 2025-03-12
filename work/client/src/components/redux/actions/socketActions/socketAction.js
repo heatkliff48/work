@@ -27,6 +27,10 @@ import {
   NEED_UPDATE_DRY_MIXES_JOURNAL_SOCKET,
   NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
   NEED_UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
+  NEW_ANCHOR_SOCKET,
+  NEED_UPDATE_ANCHOR_SOCKET,
+  NEW_TOOL_SOCKET,
+  NEED_UPDATE_TOOL_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -222,5 +226,33 @@ export const updateRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => 
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
+  };
+};
+
+export const addNewAnchorSocket = (anchor) => {
+  return {
+    type: NEW_ANCHOR_SOCKET,
+    payload: anchor,
+  };
+};
+
+export const updateAnchorSocket = (anchor) => {
+  return {
+    type: NEED_UPDATE_ANCHOR_SOCKET,
+    payload: anchor,
+  };
+};
+
+export const addNewToolSocket = (tool) => {
+  return {
+    type: NEW_TOOL_SOCKET,
+    payload: tool,
+  };
+};
+
+export const updateToolSocket = (tool) => {
+  return {
+    type: NEED_UPDATE_TOOL_SOCKET,
+    payload: tool,
   };
 };

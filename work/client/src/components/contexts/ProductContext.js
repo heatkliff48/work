@@ -460,6 +460,8 @@ export const ProductsContextProvider = ({ children }) => {
         COLUMNS,
         latestProducts,
         selectOptions,
+        rightPlaceOfProductionFunc,
+        rightTypeOfPackagingFunc,
         getOptionValue,
       }}
     >

@@ -27,6 +27,8 @@ const initState = {
   dryMixesJournal: [],
   relatedMaterialsJournal: [],
   accountingDataList: [],
+  anchor: [],
+  tool: [],
 };
 
 export default initState;

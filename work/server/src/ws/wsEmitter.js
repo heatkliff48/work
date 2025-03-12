@@ -36,6 +36,10 @@ const {
   UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
   ADD_NEW_DRY_MIXES_JOURNAL_SOCKET,
   UPDATE_DRY_MIXES_JOURNAL_SOCKET,
+  ADD_NEW_ANCHOR_SOCKET,
+  UPDATE_ANCHOR_SOCKET,
+  ADD_NEW_TOOL_SOCKET,
+  UPDATE_TOOL_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -455,6 +459,50 @@ function registerWsEmitter(map) {
       }
     }
   );
+
+  myEmitter.on(ADD_NEW_ANCHOR_SOCKET, (anchor) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_ANCHOR_SOCKET,
+          payload: anchor,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_ANCHOR_SOCKET, (anchor) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_ANCHOR_SOCKET,
+          payload: anchor,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_TOOL_SOCKET, (tool) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_TOOL_SOCKET,
+          payload: tool,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_TOOL_SOCKET, (tool) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_TOOL_SOCKET,
+          payload: tool,
+        })
+      );
+    }
+  });
 
   // myEmitter.on(CHECK_CARD_SOCKET, (gameusers, street, dohod, isFree, money) => {
   //   for (let [id, userConnect] of map) {

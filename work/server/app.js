@@ -37,6 +37,8 @@ const filesOrderRouter = require('./router/FilesOrder.js');
 const filesProductRouter = require('./router/FilesProduct.js');
 const dryMixesJournalRouter = require('./router/drymixesjournal.js');
 const relatedMaterialsJournalRouter = require('./router/relatedmaterialsjournal.js');
+const anchorRouter = require('./router/anchor.js');
+const toolRouter = require('./router/tool.js');
 
 const app = express();
 const map = new Map();
@@ -107,6 +109,8 @@ app.use('/filesProduct', filesProductRouter);
 app.use('/stockBalance', StockBalanceRootRouter);
 app.use('/dryMixesJournal', dryMixesJournalRouter);
 app.use('/relatedMaterialsJournal', relatedMaterialsJournalRouter);
+app.use('/anchor', anchorRouter);
+app.use('/tool', toolRouter);
 
 // Обработка WebSocket соединений
 server.on('upgrade', function (req, socket, head) {

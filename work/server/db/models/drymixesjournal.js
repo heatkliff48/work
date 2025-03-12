@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class DryMixesJournal extends Model {
     /**
@@ -13,14 +11,21 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  DryMixesJournal.init({
-    product_name: DataTypes.STRING,
-    units_per_pack: DataTypes.INTEGER,
-    price_per_pack: DataTypes.INTEGER,
-    type: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'DryMixesJournal',
-  });
+  DryMixesJournal.init(
+    {
+      name: DataTypes.STRING,
+      article: DataTypes.STRING,
+      units_of_measurement: DataTypes.STRING,
+      number_of_bags: DataTypes.INTEGER,
+      description: DataTypes.TEXT,
+      place_of_production: DataTypes.STRING,
+      price: DataTypes.FLOAT,
+      product_code: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: 'DryMixesJournal',
+    }
+  );
   return DryMixesJournal;
 };

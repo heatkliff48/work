@@ -21,8 +21,10 @@ import { productionBatchLogReducer } from './productionBatchLogReducer';
 import { productsOfOrdersReducer } from './productsOfOrdersReducer';
 import { productsReducer } from './productsReducer';
 import {
+  anchorReducer,
   dryMixesJournalReducer,
   relatedMaterialsJournalReducer,
+  toolReducer,
 } from './productsTypeJournalReducer';
 import { recipeReducer } from './recipeReducer';
 import { reservedProductsReducer } from './reservedProductsReducer';
@@ -64,4 +66,6 @@ export const rootReducer = combineReducers({
   dryMixesJournal: dryMixesJournalReducer,
   relatedMaterialsJournal: relatedMaterialsJournalReducer,
   accountingDataList: accountingReducer,
+  anchor: anchorReducer,
+  tool: toolReducer,
 });

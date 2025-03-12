@@ -62,7 +62,6 @@ function ClientsModal(props) {
     const categoryOption = options.find(
       (option) => option.value === clientInput?.[accessor]
     );
-    // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
     return categoryOption || options[0];
   };
 

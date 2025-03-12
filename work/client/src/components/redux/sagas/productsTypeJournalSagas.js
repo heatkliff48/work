@@ -3,14 +3,22 @@ import { setToken } from '../actions/jwtAction';
 import axios from 'axios';
 import { put, call, takeLatest, select } from 'redux-saga/effects';
 import {
+  ADD_NEW_ANCHOR,
   ADD_NEW_DRY_MIXES_JOURNAL,
   ADD_NEW_RELATED_MATERIALS_JOURNAL,
+  ADD_NEW_TOOL,
+  FULL_ANCHOR,
   FULL_DRY_MIXES_JOURNAL,
   FULL_RELATED_MATERIALS_JOURNAL,
+  FULL_TOOL,
+  GET_FULL_ANCHOR,
   GET_FULL_DRY_MIXES_JOURNAL,
   GET_FULL_RELATED_MATERIALS_JOURNAL,
+  GET_FULL_TOOL,
+  NEW_ANCHOR,
   NEW_DRY_MIXES_JOURNAL,
   NEW_RELATED_MATERIALS_JOURNAL,
+  NEW_TOOL,
 } from '../types/productsTypeJournalTypes';
 
 const url = axios.create({
@@ -48,6 +56,42 @@ const getRelatedMaterialsJournal = () => {
 const addNewRelatedMaterialsJournal = (relatedMaterialsJournal) => {
   return url
     .post('/relatedMaterialsJournal', relatedMaterialsJournal)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getAnchor = () => {
+  return url
+    .get('/anchor')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewAnchor = (anchor) => {
+  return url
+    .post('/anchor', anchor)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getTool = () => {
+  return url
+    .get('/tool')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewTool = (tool) => {
+  return url
+    .post('/tool', tool)
     .then((res) => {
       return res.data;
     })
@@ -123,6 +167,66 @@ function* addNewRelatedMaterialsJournalWorker(action) {
   }
 }
 
+function* getAnchorWorker(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+    // const { allClients, accessToken, accessTokenExpiration } = yield call(
+    const { anchor } = yield call(getAnchor);
+
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: FULL_ANCHOR, payload: anchor });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: FULL_ANCHOR, payload: [] });
+  }
+}
+
+function* addNewAnchorWorker(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+
+    // const { client, accessToken, accessTokenExpiration } = yield call(
+    const { anchor } = yield call(addNewAnchor, action.payload);
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: NEW_ANCHOR, payload: anchor });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: NEW_ANCHOR, payload: [] });
+  }
+}
+
+function* getToolWorker(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+    // const { allClients, accessToken, accessTokenExpiration } = yield call(
+    const { tool } = yield call(getTool);
+
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: FULL_TOOL, payload: tool });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: FULL_TOOL, payload: [] });
+  }
+}
+
+function* addNewToolWorker(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+
+    // const { client, accessToken, accessTokenExpiration } = yield call(
+    const { tool } = yield call(addNewTool, action.payload);
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: NEW_TOOL, payload: tool });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: NEW_TOOL, payload: [] });
+  }
+}
+
 // watchers
 
 function* productsTypeJournalWatcher() {
@@ -136,6 +240,10 @@ function* productsTypeJournalWatcher() {
     ADD_NEW_RELATED_MATERIALS_JOURNAL,
     addNewRelatedMaterialsJournalWorker
   );
+  yield takeLatest(GET_FULL_ANCHOR, getAnchorWorker);
+  yield takeLatest(ADD_NEW_ANCHOR, addNewAnchorWorker);
+  yield takeLatest(GET_FULL_TOOL, getToolWorker);
+  yield takeLatest(ADD_NEW_TOOL, addNewToolWorker);
 }
 
 export default productsTypeJournalWatcher;

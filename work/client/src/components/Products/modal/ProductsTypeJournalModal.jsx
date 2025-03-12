@@ -1,22 +1,31 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import React, { useCallback, useEffect, useState } from 'react';
-import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
 import Select from 'react-select';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useDispatch } from 'react-redux';
-import { addNewProductsTypeJournal } from '#components/redux/actions/usersInfoAction';
 import './styles.css';
 import {
+  addNewAnchor,
   addNewDryMixesJournal,
   addNewRelatedMaterialsJournal,
+  addNewTool,
 } from '#components/redux/actions/productsTypeJournalAction.js';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
 function ProductsTypeJournalModal(props) {
+  const { dryMixesJournal, relatedMaterialsJournal, anchor, tool } =
+    useProductsTypeJournalContext();
   const [productsTypeJournalInput, setProductsTypeJournalInput] = useState({});
+
+  const unitsOfMeasurementOptions = [
+    { value: 'pieces', label: 'Pieces' },
+    { value: 'kilograms', label: 'Kilograms' },
+    { value: 'bags', label: 'Bags' },
+  ];
 
   const dispatch = useDispatch();
 
@@ -27,9 +36,29 @@ function ProductsTypeJournalModal(props) {
     }));
   }, []);
 
-  // useEffect(() => {
-  //   setProductsTypeJournalInput((prev) => ({ ...prev, role: roleOptions[0].value }));
-  // }, [props.show]);
+  const handleSelectUnitsOfMeasurementChange = (selectedOption, key) => {
+    setProductsTypeJournalInput((prev) => ({
+      ...prev,
+      [key]: selectedOption.value,
+    }));
+  };
+
+  const getSelectedUnitsOfMeasurementOption = (accessor) => {
+    const options = unitsOfMeasurementOptions;
+    if (!options) return null;
+    const unitsOfMeasurementOption = options.find(
+      (option) => option.value === productsTypeJournalInput?.[accessor]
+    );
+    return unitsOfMeasurementOption || options[0];
+  };
+
+  useEffect(() => {
+    setProductsTypeJournalInput((prev) => ({
+      ...prev,
+      units_of_measurement: unitsOfMeasurementOptions[0].value,
+      product_code: props?.productCode,
+    }));
+  }, [props.show]);
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
@@ -37,17 +66,25 @@ function ProductsTypeJournalModal(props) {
     if (props.target == 1) {
       dispatch(
         addNewDryMixesJournal({
-          product_name: productsTypeJournalInput.product_name,
-          units_per_pack: productsTypeJournalInput.units_per_pack,
-          price_per_pack: productsTypeJournalInput.price_per_pack,
+          productsTypeJournalInput,
         })
       );
-    } else {
+    } else if (props.target == 2) {
       dispatch(
         addNewRelatedMaterialsJournal({
-          product_name: productsTypeJournalInput.product_name,
-          units_per_pack: productsTypeJournalInput.units_per_pack,
-          price_per_pack: productsTypeJournalInput.price_per_pack,
+          productsTypeJournalInput,
+        })
+      );
+    } else if (props.target == 3) {
+      dispatch(
+        addNewAnchor({
+          productsTypeJournalInput,
+        })
+      );
+    } else if (props.target == 4) {
+      dispatch(
+        addNewTool({
+          productsTypeJournalInput,
         })
       );
     }
@@ -93,14 +130,26 @@ function ProductsTypeJournalModal(props) {
                       </label>
                     </div>
                     <div className="md:w-2/3">
-                      <input
-                        className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                        id={el.accessor}
-                        name={el.accessor}
-                        type="text"
-                        value={productsTypeJournalInput[el.accessor] || ''}
-                        onChange={(e) => handleProductsTypeJournalInputChange(e)}
-                      />
+                      {el.accessor === 'units_of_measurement' ? (
+                        <Select
+                          defaultValue={getSelectedUnitsOfMeasurementOption(
+                            el.accessor
+                          )}
+                          onChange={(v) => {
+                            handleSelectUnitsOfMeasurementChange(v, el.accessor);
+                          }}
+                          options={unitsOfMeasurementOptions}
+                        />
+                      ) : (
+                        <input
+                          className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                          id={el.accessor}
+                          name={el.accessor}
+                          type="text"
+                          value={productsTypeJournalInput[el.accessor] || ''}
+                          onChange={(e) => handleProductsTypeJournalInputChange(e)}
+                        />
+                      )}
                     </div>
                   </div>
                 </Col>
@@ -139,6 +188,7 @@ function ShowProductsTypeJournalModal(props) {
         table={props.table}
         target={props.target}
         title={props.title}
+        productCode={props.productCode}
       />
     </>
   );
