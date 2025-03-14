@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
 import ListOfOrderedProductionReserveModal from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProductionReserveModal.jsx';
-import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
@@ -22,7 +21,7 @@ import {
   addNewListOfOrderedProduction,
   addNewListOfOrderedProductionOEM,
 } from '#components/redux/actions/warehouseAction.js';
-import DownloadOrderPDF from './OrdersPDF.jsx';
+import PDFgenerate from './OrdersPDF.jsx';
 import AddProductOrderModal from './modal/AddProductOrderModal.jsx';
 import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
 import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
@@ -32,6 +31,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Button } from 'reactstrap';
+import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
 
 const OrderCart = React.memo(() => {
   const {
@@ -413,8 +413,6 @@ const OrderCart = React.memo(() => {
     const result = accountingDataList.find(
       (el) => el.orders_article == orderCartData?.article
     )?.aproved;
-    console.log('accountingDataList', accountingDataList);
-    console.log('result', result);
 
     setAproveAccounting(result);
   }, [accountingDataList]);
@@ -634,18 +632,18 @@ const OrderCart = React.memo(() => {
           )}
         </div>
       </div>
-      <FilesMain userAccess={userAccess} />
+      <PDFgenerate
+        orderData={orderCartData}
+        productList={updatedProductListOrder}
+        vatValue={vatValue}
+      />
       {/* {orderCartData &&
         Object.keys(orderCartData)?.length !== 0 &&
         Array.isArray(updatedProductListOrder) &&
         updatedProductListOrder?.length > 0 &&
-        vatValue !== 0 && (
-          <DownloadOrderPDF
-            orderCartData={orderCartData}
-            updatedProductListOrder={updatedProductListOrder}
-            vatValue={vatValue}
-          />
-        )} */}
+        vatValue !== 0 && <PDFgenerate />} */}
+
+      {/* <FilesMain userAccess={userAccess} /> */}
     </>
   );
 });

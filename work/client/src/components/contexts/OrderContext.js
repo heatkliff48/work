@@ -248,7 +248,7 @@ const OrderContextProvider = ({ children }) => {
     list_of_orders?.forEach((order) => {
       if (
         accountingAccessStatusList.find((el) => el == order.status) &&
-        !accountingDataList?.some((el) => el.orders_article == order.article)
+        !accountingDataList?.some((el) => el.orders_artiвcle == order.article)
       ) {
         dispatch(
           addAccountingDataList({
