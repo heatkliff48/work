@@ -4,7 +4,7 @@ import { FileContext } from './FileContext';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 
 const FileDownload = () => {
-  const {  message, setMessage, filesOrder } = useContext(FileContext);
+  const { message, setMessage, filesOrder } = useContext(FileContext);
   const [selectedFile, setSelectedFile] = useState('');
   const [filteredFiles, setFilteredFiles] = useState(filesOrder);
   const { orderCartData } = useOrderContext();
@@ -51,7 +51,11 @@ const FileDownload = () => {
             </option>
           ))}
         </select>
-        <button type="submit" disabled={!selectedFile}>
+        <button
+          type="submit"
+          disabled={!selectedFile}
+          style={{ marginLeft: '20px' }}
+        >
           Download
         </button>
       </form>

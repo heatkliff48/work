@@ -7,8 +7,10 @@ const FilesMain = ({ userAccess }) => {
   return (
     <FileProvider>
       <div>
-        {userAccess?.canWrite && <FileUpload />}
-        <FileDownload />
+        <div className="footer_button">{userAccess?.canWrite && <FileUpload />}</div>
+        <div className="footer_button">
+          <FileDownload />
+        </div>
       </div>
     </FileProvider>
   );
