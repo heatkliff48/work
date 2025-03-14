@@ -18,6 +18,101 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [pdfData, setPdfData] = useState({});
 
+  const generatePDF = async () => {
+    if (!orderData || !productList) {
+      console.error('❌ Ошибка: orderData не загружено');
+      return;
+    }
+
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    try {
+      const img = await loadImage();
+      const pageWidth = doc.internal.pageSize.getWidth(); // Ширина страницы
+      const imgWidth = pageWidth - 20; // Отступы 10 мм слева и справа
+      const imgHeight = (imgWidth * img.height) / img.width; // Пропорциональная высота
+
+      doc.addImage(img, 'JPEG', 10, 10, imgWidth, imgHeight);
+
+      // Смещаем начало текста на высоту изображения + отступ
+      let yPosition = 10 + imgHeight + 10; // 10 мм отступ после картинки
+
+      // Основные данные заказа
+      doc.setFontSize(10);
+      doc.text(`Ref.: ${pdfData.ref}`, 10, yPosition);
+      doc.text(`Cliente: ${pdfData.client}`, 10, yPosition + 10);
+      doc.text(`CIF: ${pdfData.cif}`, 10, yPosition + 20);
+      doc.text(`Dirección: ${pdfData.address}`, 10, yPosition + 30);
+
+      doc.text(`Contacto: ${pdfData.contact}`, 120, yPosition);
+      doc.text(`Email: ${pdfData.email}`, 120, yPosition + 10);
+      doc.text(`Teléfono: ${pdfData.phone}`, 120, yPosition + 20);
+      doc.text(`Válido hasta: ${pdfData.validUntil}`, 120, yPosition + 30);
+
+      // Таблица с товарами (начинается ниже текста)
+      autoTable(doc, {
+        startY: yPosition + 40, // Отступ от информации о заказе
+        head: [
+          [
+            'Ref.:',
+            'Descripción',
+            'Medición de proyecto, m2',
+            'Total paletas, Ud',
+            'm3/pal',
+            'm2/pal',
+            'blq/pal, Ud',
+            'Total m2',
+            'PVP neto € / m2',
+            'Total, Ud',
+            'PVP neto €/Ud',
+            'Subtotal €',
+          ],
+        ],
+        body: pdfData.items?.map((item) => [
+          item.ref,
+          item.descripcion,
+          item.medición_de_proyecto,
+          item.total_paletas,
+          item.m3_pal,
+          item.m2_pal,
+          item.blq_pal,
+          item.total_m2,
+          item.pvp_neto_m2,
+          item.total,
+          item.pvp_neto_ud,
+          item.subtotal,
+        ]),
+        styles: { fontSize: 6 },
+      });
+
+      const startY = doc.lastAutoTable
+        ? doc.lastAutoTable.finalY + 10
+        : yPosition + 50;
+
+      autoTable(doc, {
+        startY,
+        head: [['Condiciones Generales de Compraventa']],
+        body: [[pdfData.terms]],
+        styles: { fontSize: 9, cellWidth: 'wrap' },
+        columnStyles: { 0: { cellWidth: 180 } },
+      });
+
+      // Добавляем футер внизу страницы
+      doc.setFontSize(8);
+      doc.text(pdfData.footer, 10, doc.internal.pageSize.getHeight() - 10, {
+        maxWidth: 190,
+      });
+
+      // Генерация PDF URL
+      const pdfBlob = doc.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      setPdfUrl(pdfUrl);
+
+      return doc;
+    } catch (error) {
+      console.error('❌ Ошибка загрузки изображения:', error);
+    }
+  };
   useEffect(() => {
     console.log('🔄 Данные заказа обновлены:', orderData);
     const { deliveryAddress, contactInfo, owner, article } = orderData;
@@ -129,99 +224,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
     setPdfUrl(null); // Сбрасываем предыдущий PDF
   }, [orderData]);
 
-  const generatePDF = async () => {
-    if (!orderData || !productList) {
-      console.error('❌ Ошибка: orderData не загружено');
-      return;
-    }
-
-    const doc = new jsPDF('p', 'mm', 'a4');
-
-    try {
-      const img = await loadImage();
-      const pageWidth = doc.internal.pageSize.getWidth(); // Ширина страницы
-      const imgWidth = pageWidth - 20; // Отступы 10 мм слева и справа
-      const imgHeight = (imgWidth * img.height) / img.width; // Пропорциональная высота
-
-      doc.addImage(img, 'JPEG', 10, 10, imgWidth, imgHeight);
-
-      // Смещаем начало текста на высоту изображения + отступ
-      let yPosition = 10 + imgHeight + 10; // 10 мм отступ после картинки
-
-      // Основные данные заказа
-      doc.setFontSize(10);
-      doc.text(`Ref.: ${pdfData.ref}`, 10, yPosition);
-      doc.text(`Cliente: ${pdfData.client}`, 10, yPosition + 10);
-      doc.text(`CIF: ${pdfData.cif}`, 10, yPosition + 20);
-      doc.text(`Dirección: ${pdfData.address}`, 10, yPosition + 30);
-
-      doc.text(`Contacto: ${pdfData.contact}`, 120, yPosition);
-      doc.text(`Email: ${pdfData.email}`, 120, yPosition + 10);
-      doc.text(`Teléfono: ${pdfData.phone}`, 120, yPosition + 20);
-      doc.text(`Válido hasta: ${pdfData.validUntil}`, 120, yPosition + 30);
-
-      // Таблица с товарами (начинается ниже текста)
-      autoTable(doc, {
-        startY: yPosition + 40, // Отступ от информации о заказе
-        head: [
-          [
-            'Ref.:',
-            'Descripción',
-            'Medición de proyecto, m2',
-            'Total paletas, Ud',
-            'm3/pal',
-            'm2/pal',
-            'blq/pal, Ud',
-            'Total m2',
-            'PVP neto € / m2',
-            'Total, Ud',
-            'PVP neto €/Ud',
-            'Subtotal €',
-          ],
-        ],
-        body: pdfData.items?.map((item) => [
-          item.ref,
-          item.descripcion,
-          item.medición_de_proyecto,
-          item.total_paletas,
-          item.m3_pal,
-          item.m2_pal,
-          item.blq_pal,
-          item.total_m2,
-          item.pvp_neto_m2,
-          item.total,
-          item.pvp_neto_ud,
-          item.subtotal,
-        ]),
-        styles: { fontSize: 6 }
-      });
-
-      const startY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50;
-
-      autoTable(doc, {
-        startY,
-        head: [['Condiciones Generales de Compraventa']],
-        body: [[pdfData.terms]],
-        styles: { fontSize: 9, cellWidth: 'wrap' },
-        columnStyles: { 0: { cellWidth: 180 } },
-      });
-
-      // Добавляем футер внизу страницы
-      doc.setFontSize(8);
-      doc.text(pdfData.footer, 10, doc.internal.pageSize.getHeight() - 10, {
-        maxWidth: 190,
-      });
-
-      // Генерация PDF URL
-      const pdfBlob = doc.output('blob');
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      setPdfUrl(pdfUrl);
-
-      return doc;
-    } catch (error) {
-      console.error('❌ Ошибка загрузки изображения:', error);
-    }
-  };
+  useEffect(() => {
+    generatePDF();
+  }, [orderData]);
 
   const downloadPDF = async () => {
     const doc = await generatePDF();
@@ -229,8 +234,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
   };
 
   return (
-    <div>
-      <button onClick={generatePDF}>Предпросмотр PDF</button>
+    <div className="pdf-preview-container">
       {pdfUrl && (
         <div>
           <iframe

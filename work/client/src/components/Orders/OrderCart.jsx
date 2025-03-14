@@ -552,6 +552,12 @@ const OrderCart = React.memo(() => {
         <div className="footer_data">
           <div className="vat_container">
             <div className="vat">
+              <div className="vat_euro">
+                <div>
+                  <p>VAT, EURO</p>
+                  <p>{vatValue.vat_euro}</p>
+                </div>
+              </div>
               <div className="vat_procent">
                 <div>
                   <p>VAT, %</p>
@@ -595,7 +601,7 @@ const OrderCart = React.memo(() => {
             </div>
             {checkUserAccess(user, roles, 'orders_change_person_in_charge')
               ?.canWrite && (
-              <div className="person_in_charge">
+              <div className="footer_button">
                 <p>Person in charge</p>
                 <Select
                   defaultValue={getSelectedOption(orderCartData.person_in_charge)}
@@ -606,6 +612,15 @@ const OrderCart = React.memo(() => {
                 />
               </div>
             )}
+            <FilesMain userAccess={userAccess} />
+
+            <div className="footer_button_pdf">
+              <PDFgenerate
+                orderData={orderCartData}
+                productList={updatedProductListOrder}
+                vatValue={vatValue}
+              />
+            </div>
           </div>
           {orderStatusAccess?.canRead && (
             <div className="status-table">
@@ -632,18 +647,6 @@ const OrderCart = React.memo(() => {
           )}
         </div>
       </div>
-      <PDFgenerate
-        orderData={orderCartData}
-        productList={updatedProductListOrder}
-        vatValue={vatValue}
-      />
-      {/* {orderCartData &&
-        Object.keys(orderCartData)?.length !== 0 &&
-        Array.isArray(updatedProductListOrder) &&
-        updatedProductListOrder?.length > 0 &&
-        vatValue !== 0 && <PDFgenerate />} */}
-
-      {/* <FilesMain userAccess={userAccess} /> */}
     </>
   );
 });
