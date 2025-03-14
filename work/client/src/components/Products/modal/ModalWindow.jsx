@@ -20,8 +20,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
   } = useProjectContext();
   const { modal, setModal, modalUpdate, setModalUpdate, setModalProductCard } =
     useModalContext();
-  const { selectOptions, rightPlaceOfProductionFunc, rightTypeOfPackagingFunc } =
-    useProductsContext();
+  const { selectOptions, getOptionValue } = useProductsContext();
 
   const [formInput, setFormInput] = useState({});
   const [haveMath, setHaveMath] = useState({});
@@ -56,8 +55,11 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       typeOfPackaging,
     } = formInput;
 
-    const rightPlaceOfProduction = rightPlaceOfProductionFunc(placeOfProduction);
-    const rightTypeOfPackaging = rightTypeOfPackagingFunc(typeOfPackaging);
+    const rightPlaceOfProduction = getOptionValue(
+      'placeOfProduction',
+      placeOfProduction
+    );
+    const rightTypeOfPackaging = getOptionValue('typeOfPackaging', typeOfPackaging);
 
     const prodArticle = `T.${form?.toUpperCase()}${rightPlaceOfProduction}${rightTypeOfPackaging}0${certificate?.substr(
       0,

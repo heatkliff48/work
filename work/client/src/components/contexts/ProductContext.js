@@ -390,46 +390,6 @@ export const ProductsContextProvider = ({ children }) => {
     return newlatestProducts;
   }, [products]);
 
-  const rightPlaceOfProductionFunc = (placeOfProduction) => {
-    if (typeof placeOfProduction === 'number') {
-      // Если это число, вернуть его как есть
-      return placeOfProduction;
-    }
-
-    if (!isNaN(Number(placeOfProduction))) {
-      // Если это строка, представляющая число, преобразовать в число
-      return Number(placeOfProduction);
-    }
-
-    // Если это строка, попытаться найти в `selectOptions.placeOfProduction`
-    const matchedOption = selectOptions.placeOfProduction.find(
-      (el) => el.label === placeOfProduction || el.value === placeOfProduction
-    );
-
-    // Вернуть найденное значение или null, если не найдено
-    return matchedOption ? Number(matchedOption.value) : null;
-  };
-
-  const rightTypeOfPackagingFunc = (typeOfPackaging) => {
-    if (typeof typeOfPackaging === 'number') {
-      // Если это число, вернуть его как есть
-      return typeOfPackaging;
-    }
-
-    if (!isNaN(Number(typeOfPackaging))) {
-      // Если это строка, представляющая число, преобразовать в число
-      return Number(typeOfPackaging);
-    }
-
-    // Если это строка, попытаться найти в `selectOptions.typeOfPackaging`
-    const matchedOption = selectOptions.typeOfPackaging.find(
-      (el) => el.label === typeOfPackaging || el.value === typeOfPackaging
-    );
-
-    // Вернуть найденное значение или null, если не найдено
-    return matchedOption ? Number(matchedOption.value) : null;
-  };
-
   const getOptionValue = (category, inputValue) => {
     if (typeof inputValue === 'number') {
       return inputValue; // Если это число, возвращаем как есть
@@ -460,8 +420,6 @@ export const ProductsContextProvider = ({ children }) => {
         COLUMNS,
         latestProducts,
         selectOptions,
-        rightPlaceOfProductionFunc,
-        rightTypeOfPackagingFunc,
         getOptionValue,
       }}
     >
