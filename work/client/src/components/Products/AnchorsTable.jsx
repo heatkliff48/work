@@ -20,8 +20,12 @@ const AnchorsTable = () => {
   const [anchorDataList, setAnchorDataList] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [productCode, setProductCode] = useState('');
-  const { selectedProductsType, setSelectedProductsType, dataTable, setDataTable } =
-    useProductsTypeJournalContext();
+  const {
+    unitsOfMeasurementOptions,
+    placeOfProductionOptions,
+    setSelectedProductsType,
+    setDataTable,
+  } = useProductsTypeJournalContext();
 
   const anchors_table = [
     {
@@ -37,6 +41,26 @@ const AnchorsTable = () => {
     {
       Header: 'Units of measurement',
       accessor: 'units_of_measurement',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Pieces per box',
+      accessor: 'pieces_per_box',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Boxes on a pallet',
+      accessor: 'boxes_on_a_pallet',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Box weight',
+      accessor: 'box_weight',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Pallet weight',
+      accessor: 'pallet_weight',
       Filter: TextSearchFilter,
     },
     {
@@ -58,7 +82,20 @@ const AnchorsTable = () => {
 
   useEffect(() => {
     if (anchor) {
-      setAnchorDataList(anchor);
+      const newData = anchor.map((piece) => {
+        return {
+          ...piece,
+          units_of_measurement:
+            unitsOfMeasurementOptions.find(
+              (unit) => unit.value == piece.units_of_measurement
+            )?.label || piece.units_of_measurement,
+          place_of_production:
+            placeOfProductionOptions.find(
+              (place) => place.value == piece.place_of_production
+            )?.label || '',
+        };
+      });
+      setAnchorDataList(newData);
       let code = '0001';
       const articleId = anchor.length === 0 ? 1 : anchor.length + 1;
       code = `2` + `0000${articleId}`.slice(-4);

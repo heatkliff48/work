@@ -7,40 +7,52 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       article: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       units_of_measurement: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+      },
+      pieces_per_box: {
+        type: Sequelize.INTEGER,
+      },
+      boxes_on_a_pallet: {
+        type: Sequelize.INTEGER,
+      },
+      box_weight: {
+        type: Sequelize.FLOAT,
+      },
+      pallet_weight: {
+        type: Sequelize.FLOAT,
       },
       description: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       place_of_production: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       price: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
       },
       product_code: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Anchors');
-  }
+  },
 };

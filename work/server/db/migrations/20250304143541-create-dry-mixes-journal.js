@@ -21,6 +21,15 @@ module.exports = {
       number_of_bags: {
         type: Sequelize.INTEGER,
       },
+      bag_weight: {
+        type: Sequelize.FLOAT,
+      },
+      pallet_weight: {
+        type: Sequelize.FLOAT,
+      },
+      type_of_mix: {
+        type: Sequelize.STRING,
+      },
       description: {
         type: Sequelize.TEXT,
       },
@@ -28,6 +37,9 @@ module.exports = {
         type: Sequelize.STRING,
       },
       price: {
+        type: Sequelize.FLOAT,
+      },
+      price_per_kilogram: {
         type: Sequelize.FLOAT,
       },
       product_code: {

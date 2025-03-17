@@ -28,9 +28,13 @@ dryMixesJournalRouter.post('/', async (req, res) => {
     article,
     units_of_measurement,
     number_of_bags,
+    bag_weight,
+    pallet_weight,
+    type_of_mix,
     description,
     place_of_production,
     price,
+    price_per_kilogram,
     product_code,
   } = req.body.productsTypeJournalInput;
 
@@ -45,9 +49,13 @@ dryMixesJournalRouter.post('/', async (req, res) => {
       article,
       units_of_measurement,
       number_of_bags,
+      bag_weight,
+      pallet_weight,
+      type_of_mix,
       description,
       place_of_production,
       price,
+      price_per_kilogram,
       product_code,
     });
 
@@ -66,9 +74,13 @@ dryMixesJournalRouter.post('/update', async (req, res) => {
     article,
     units_of_measurement,
     number_of_bags,
+    bag_weight,
+    pallet_weight,
+    type_of_mix,
     description,
     place_of_production,
     price,
+    price_per_kilogram,
     product_code,
   } = req.body.productsTypeJournalInput;
 
@@ -79,9 +91,13 @@ dryMixesJournalRouter.post('/update', async (req, res) => {
         article,
         units_of_measurement,
         number_of_bags,
+        bag_weight,
+        pallet_weight,
+        type_of_mix,
         description,
         place_of_production,
         price,
+        price_per_kilogram,
         product_code,
       },
       {

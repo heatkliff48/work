@@ -20,8 +20,13 @@ const DryMixesJournal = () => {
   const [dryMixesJournalDataList, setDryMixesJournalDataList] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [productCode, setProductCode] = useState('');
-  const { selectedProductsType, setSelectedProductsType, dataTable, setDataTable } =
-    useProductsTypeJournalContext();
+  const {
+    unitsOfMeasurementOptions,
+    typeOfMixOptions,
+    placeOfProductionOptions,
+    setSelectedProductsType,
+    setDataTable,
+  } = useProductsTypeJournalContext();
 
   const dry_mixes_journal_table = [
     {
@@ -45,6 +50,21 @@ const DryMixesJournal = () => {
       Filter: TextSearchFilter,
     },
     {
+      Header: 'Bag weight',
+      accessor: 'bag_weight',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Pallet weight',
+      accessor: 'pallet_weight',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Type of mix',
+      accessor: 'type_of_mix',
+      Filter: TextSearchFilter,
+    },
+    {
       Header: 'Description',
       accessor: 'description',
       Filter: TextSearchFilter,
@@ -59,11 +79,32 @@ const DryMixesJournal = () => {
       accessor: 'price',
       Filter: TextSearchFilter,
     },
+    {
+      Header: 'Price per kilogram',
+      accessor: 'price_per_kilogram',
+      Filter: TextSearchFilter,
+    },
   ];
 
   useEffect(() => {
     if (dryMixesJournal) {
-      setDryMixesJournalDataList(dryMixesJournal);
+      const newData = dryMixesJournal.map((dry) => {
+        return {
+          ...dry,
+          units_of_measurement:
+            unitsOfMeasurementOptions.find(
+              (unit) => unit.value == dry.units_of_measurement
+            )?.label || dry.units_of_measurement,
+          type_of_mix:
+            typeOfMixOptions.find((type) => type.value == dry.type_of_mix)?.label ||
+            '',
+          place_of_production:
+            placeOfProductionOptions.find(
+              (place) => place.value == dry.place_of_production
+            )?.label || '',
+        };
+      });
+      setDryMixesJournalDataList(newData);
       let code = '0001';
       const articleId =
         dryMixesJournal.length === 0 ? 1 : dryMixesJournal.length + 1;
