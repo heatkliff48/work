@@ -131,7 +131,6 @@ function ProductsTypeJournalModal(props) {
     e.preventDefault();
 
     if (props.target == 1) {
-      console.log('productsTypeJournalInput', productsTypeJournalInput);
       dispatch(
         addNewDryMixesJournal({
           productsTypeJournalInput,
