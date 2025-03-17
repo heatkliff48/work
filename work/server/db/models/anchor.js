@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Anchor extends Model {
     /**
@@ -13,17 +11,24 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Anchor.init({
-    name: DataTypes.STRING,
-    article: DataTypes.STRING,
-    units_of_measurement: DataTypes.STRING,
-    description: DataTypes.TEXT,
-    place_of_production: DataTypes.STRING,
-    price: DataTypes.FLOAT,
-    product_code: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Anchor',
-  });
+  Anchor.init(
+    {
+      name: DataTypes.STRING,
+      article: DataTypes.STRING,
+      units_of_measurement: DataTypes.STRING,
+      pieces_per_box: DataTypes.INTEGER,
+      boxes_on_a_pallet: DataTypes.INTEGER,
+      box_weight: DataTypes.FLOAT,
+      pallet_weight: DataTypes.FLOAT,
+      description: DataTypes.TEXT,
+      place_of_production: DataTypes.STRING,
+      price: DataTypes.FLOAT,
+      product_code: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: 'Anchor',
+    }
+  );
   return Anchor;
 };

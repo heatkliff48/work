@@ -20,8 +20,12 @@ const ToolsTable = () => {
   const [toolDataList, setToolDataList] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [productCode, setProductCode] = useState('');
-  const { selectedProductsType, setSelectedProductsType, dataTable, setDataTable } =
-    useProductsTypeJournalContext();
+  const {
+    unitsOfMeasurementOptions,
+    placeOfProductionOptions,
+    setSelectedProductsType,
+    setDataTable,
+  } = useProductsTypeJournalContext();
 
   const tools_table = [
     {
@@ -37,6 +41,11 @@ const ToolsTable = () => {
     {
       Header: 'Units of measurement',
       accessor: 'units_of_measurement',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Piece weight',
+      accessor: 'piece_weight',
       Filter: TextSearchFilter,
     },
     {
@@ -58,7 +67,20 @@ const ToolsTable = () => {
 
   useEffect(() => {
     if (tool) {
-      setToolDataList(tool);
+      const newData = tool.map((piece) => {
+        return {
+          ...piece,
+          units_of_measurement:
+            unitsOfMeasurementOptions.find(
+              (unit) => unit.value == piece.units_of_measurement
+            )?.label || piece.units_of_measurement,
+          place_of_production:
+            placeOfProductionOptions.find(
+              (place) => place.value == piece.place_of_production
+            )?.label || '',
+        };
+      });
+      setToolDataList(newData);
       let code = '0001';
       const articleId = tool.length === 0 ? 1 : tool.length + 1;
       code = `3` + `0000${articleId}`.slice(-4);

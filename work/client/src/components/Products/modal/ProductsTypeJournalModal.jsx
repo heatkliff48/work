@@ -17,15 +17,19 @@ import {
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
 function ProductsTypeJournalModal(props) {
-  const { dryMixesJournal, relatedMaterialsJournal, anchor, tool } =
-    useProductsTypeJournalContext();
-  const [productsTypeJournalInput, setProductsTypeJournalInput] = useState({});
-
-  const unitsOfMeasurementOptions = [
-    { value: 'pieces', label: 'Pieces' },
-    { value: 'kilograms', label: 'Kilograms' },
-    { value: 'bags', label: 'Bags' },
-  ];
+  const {
+    unitsOfMeasurementOptions,
+    typeOfMixOptions,
+    placeOfProductionOptions,
+    dryMixesJournal,
+    relatedMaterialsJournal,
+    anchor,
+    tool,
+  } = useProductsTypeJournalContext();
+  const [productsTypeJournalInput, setProductsTypeJournalInput] = useState({
+    // type_of_mix: 0,
+    // place_of_production: 0,
+  });
 
   const dispatch = useDispatch();
 
@@ -36,7 +40,44 @@ function ProductsTypeJournalModal(props) {
     }));
   }, []);
 
-  const handleSelectUnitsOfMeasurementChange = (selectedOption, key) => {
+  useEffect(() => {
+    const { bag_weight, number_of_bags } = productsTypeJournalInput;
+    if (bag_weight && number_of_bags) {
+      const palletWeight = parseFloat(bag_weight) * parseFloat(number_of_bags) + 23;
+      setProductsTypeJournalInput((prev) => ({
+        ...prev,
+        pallet_weight: palletWeight,
+      }));
+    }
+  }, [productsTypeJournalInput.bag_weight, productsTypeJournalInput.number_of_bags]);
+
+  useEffect(() => {
+    const { price, bag_weight } = productsTypeJournalInput;
+    if (price && bag_weight) {
+      const pricePerKilo = parseFloat(price) / parseFloat(bag_weight);
+      setProductsTypeJournalInput((prev) => ({
+        ...prev,
+        price_per_kilogram: pricePerKilo,
+      }));
+    }
+  }, [productsTypeJournalInput.price, productsTypeJournalInput.bag_weight]);
+
+  useEffect(() => {
+    const { boxes_on_a_pallet, box_weight } = productsTypeJournalInput;
+    if (boxes_on_a_pallet && box_weight) {
+      const palletWeight =
+        parseFloat(boxes_on_a_pallet) * parseFloat(box_weight) + 23;
+      setProductsTypeJournalInput((prev) => ({
+        ...prev,
+        pallet_weight: palletWeight,
+      }));
+    }
+  }, [
+    productsTypeJournalInput.boxes_on_a_pallet,
+    productsTypeJournalInput.box_weight,
+  ]);
+
+  const handleProductsTypeJournalSelectChange = (selectedOption, key) => {
     setProductsTypeJournalInput((prev) => ({
       ...prev,
       [key]: selectedOption.value,
@@ -46,16 +87,42 @@ function ProductsTypeJournalModal(props) {
   const getSelectedUnitsOfMeasurementOption = (accessor) => {
     const options = unitsOfMeasurementOptions;
     if (!options) return null;
+    const inputValue = productsTypeJournalInput?.[accessor];
     const unitsOfMeasurementOption = options.find(
       (option) => option.value === productsTypeJournalInput?.[accessor]
     );
     return unitsOfMeasurementOption || options[0];
   };
 
+  const getSelectedTypeOfMixOption = (accessor) => {
+    const options = typeOfMixOptions;
+    if (!options) return null;
+    // const inputValue = productsTypeJournalInput?.[accessor];
+    // const numericValue = inputValue !== undefined ? Number(inputValue) : undefined;
+    // if (numericValue === undefined) return options[0];
+    const typeOfMixOption = options.find((option) =>
+      (option.value == productsTypeJournalInput?.[accessor]) !== undefined
+        ? Number(productsTypeJournalInput?.[accessor])
+        : undefined
+    );
+    return typeOfMixOption || options[0];
+  };
+
+  const getSelectedPlaceOfProductionOption = (accessor) => {
+    const options = placeOfProductionOptions;
+    if (!options) return null;
+    const placeOfProductionOption = options.find(
+      (option) => option.value === productsTypeJournalInput?.[accessor]
+    );
+    return placeOfProductionOption || options[0];
+  };
+
   useEffect(() => {
     setProductsTypeJournalInput((prev) => ({
       ...prev,
       units_of_measurement: unitsOfMeasurementOptions[0].value,
+      type_of_mix: typeOfMixOptions[0].value,
+      place_of_production: placeOfProductionOptions[0].value,
       product_code: props?.productCode,
     }));
   }, [props.show]);
@@ -119,40 +186,56 @@ function ProductsTypeJournalModal(props) {
             <h3></h3>
             <Row>
               {props.table.map((el) => (
-                <Col key={el.id}>
-                  <div className="md:flex md:items-center mb-6">
-                    <div className="md:w-1/3">
-                      <label
-                        className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
-                        for="version"
-                      >
-                        {el.Header}
-                      </label>
-                    </div>
-                    <div className="md:w-2/3">
-                      {el.accessor === 'units_of_measurement' ? (
-                        <Select
-                          defaultValue={getSelectedUnitsOfMeasurementOption(
-                            el.accessor
-                          )}
-                          onChange={(v) => {
-                            handleSelectUnitsOfMeasurementChange(v, el.accessor);
-                          }}
-                          options={unitsOfMeasurementOptions}
-                        />
-                      ) : (
-                        <input
-                          className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                          id={el.accessor}
-                          name={el.accessor}
-                          type="text"
-                          value={productsTypeJournalInput[el.accessor] || ''}
-                          onChange={(e) => handleProductsTypeJournalInputChange(e)}
-                        />
-                      )}
-                    </div>
+                <div className="md:flex md:items-center mb-6">
+                  <div className="md:w-1/3">
+                    <label
+                      className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                      for="version"
+                    >
+                      {el.Header}
+                    </label>
                   </div>
-                </Col>
+                  <div className="md:w-2/3">
+                    {el.accessor === 'units_of_measurement' ? (
+                      <Select
+                        defaultValue={getSelectedUnitsOfMeasurementOption(
+                          el.accessor
+                        )}
+                        onChange={(v) => {
+                          handleProductsTypeJournalSelectChange(v, el.accessor);
+                        }}
+                        options={unitsOfMeasurementOptions}
+                      />
+                    ) : el.accessor === 'type_of_mix' ? (
+                      <Select
+                        defaultValue={getSelectedTypeOfMixOption(el.accessor)}
+                        onChange={(v) => {
+                          handleProductsTypeJournalSelectChange(v, el.accessor);
+                        }}
+                        options={typeOfMixOptions}
+                      />
+                    ) : el.accessor === 'place_of_production' ? (
+                      <Select
+                        defaultValue={getSelectedPlaceOfProductionOption(
+                          el.accessor
+                        )}
+                        onChange={(v) => {
+                          handleProductsTypeJournalSelectChange(v, el.accessor);
+                        }}
+                        options={placeOfProductionOptions}
+                      />
+                    ) : (
+                      <input
+                        className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                        id={el.accessor}
+                        name={el.accessor}
+                        type="text"
+                        value={productsTypeJournalInput[el.accessor] || ''}
+                        onChange={(e) => handleProductsTypeJournalInputChange(e)}
+                      />
+                    )}
+                  </div>
+                </div>
               ))}
             </Row>
           </form>
