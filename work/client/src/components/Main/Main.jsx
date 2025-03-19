@@ -1,5 +1,6 @@
 // import axios from 'axios';
 
+import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 // import { dataFetchedChange } from '#components/redux/actions/userAction.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
@@ -18,7 +19,7 @@ import {
   getListOfOrderedProductionOEM,
   getListOfReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,7 +28,7 @@ function Main() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   // const dataFetched = useSelector((state) => state.dataFetched);
-
+  const { setStoredData } = useOrderContext();
   const { roles, checkUserAccess } = useUsersContext();
 
   useEffect(() => {
@@ -48,6 +49,7 @@ function Main() {
     dispatch(getRecipeOrdersData());
     dispatch(clearBatchState());
     dispatch(getAllStockBalance());
+    setStoredData(null);
     //dispatch(dataFetchedChange(true));
   }, []);
 

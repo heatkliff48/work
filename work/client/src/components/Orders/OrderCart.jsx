@@ -259,7 +259,7 @@ const OrderCart = React.memo(() => {
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
 
-    if (status.accessor == 6 || status.accessor == 8) {
+    if (status.accessor == 7 || status.accessor == 9) {
       dispatch(
         updAccountingDataList({
           orders_article: orderCartData?.article,
@@ -414,7 +414,7 @@ const OrderCart = React.memo(() => {
       (el) => el.orders_article == orderCartData?.article
     )?.aproved;
 
-    setAproveAccounting(result);
+    setAproveAccounting(result ?? true);
   }, [accountingDataList]);
 
   return (
@@ -507,8 +507,6 @@ const OrderCart = React.memo(() => {
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
-                          // setWarehouseInfoCurIdModal(product?.warehouse_id);
-                          // setWarehouseInfoModal(!warehouseInfoModal);
                           productHandler(product);
                         }}
                       >
