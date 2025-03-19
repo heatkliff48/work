@@ -348,7 +348,7 @@ function Autoclave({ acData, batchFromBD }) {
                   3 +
                 position.product.free_product_package
               : position.product.id_list_of_ordered_production == null
-              ? position.product.cakes_in_batch
+              ? position.product.cakes_in_batch * 3
               : null,
           position_in_autoclave: position.positionInBatch,
           id_list_of_ordered_production:
