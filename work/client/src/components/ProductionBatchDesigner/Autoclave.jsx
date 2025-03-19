@@ -3,9 +3,7 @@ import {
   unlockButton,
   updateBatchState,
 } from '#components/redux/actions/batchDesignerAction.js';
-import {
-  addNewBatchOutside,
-} from '#components/redux/actions/batchOutsideAction.js';
+import { addNewBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -300,7 +298,6 @@ function Autoclave({ acData, batchFromBD }) {
     batchOrderIDs?.forEach((id) => {
       // const product = productionBatchDesigner.find((p) => p.id === id);
       const product = batchDesigner.find((p) => p.id === id);
-
       if (product) {
         batchPositions.push({
           product,
@@ -325,6 +322,7 @@ function Autoclave({ acData, batchFromBD }) {
         lastItem.product.cakes_in_batch += current.product.cakes_in_batch; // Sum cakes_in_batch
         lastItem.product.free_product_package +=
           current.product.free_product_package;
+        lastItem.product.total_cakes += current.product.total_cakes;
       } else {
         // Add a new entry
         acc.push({
@@ -341,7 +339,17 @@ function Autoclave({ acData, batchFromBD }) {
         addNewBatchOutside({
           product_article: position.product.product_article,
           quantity_pallets: position.product.cakes_in_batch * 3,
-          quantity_free: position.product.free_product_package ?? null,
+          quantity_free:
+            position.product.id_list_of_ordered_production !== null &&
+            position.product.cakes_in_batch &&
+            position.product.total_cakes &&
+            position.product.free_product_package >= 0
+              ? (position.product.cakes_in_batch - position.product.total_cakes) *
+                  3 +
+                position.product.free_product_package
+              : position.product.id_list_of_ordered_production == null
+              ? position.product.cakes_in_batch
+              : null,
           position_in_autoclave: position.positionInBatch,
           id_list_of_ordered_production:
             position.product.id_list_of_ordered_production !== null

@@ -84,6 +84,7 @@ function ProductionBatchDesigner() {
           product_article: article,
           cakes_in_batch: 1,
           cakes_residue: 0,
+          total_cakes: 1,
         })
       );
 
@@ -176,6 +177,7 @@ function ProductionBatchDesigner() {
             cakes_in_batch,
             cakes_residue,
             free_product_package,
+            total_cakes,
           })
         );
       }
