@@ -14,6 +14,13 @@ const ProjectContextProvider = ({ children }) => {
     price_m2: 'Price, EURO per m2',
     discount: 'Discount, %',
     final_price: 'Final price, EURO',
+    dry_mixed_id: 'Dry mixed product id',
+    quantity_dry: 'Quantity, Ud',
+    quantity_palet_dry: 'Quantity of pallets',
+    quantity_real_dry: 'Real quantity, Ud',
+    total_dry: 'Total, kg',
+    pvp_dry: 'PVP',
+    final_price_dry: 'Final price, EURO',
     c_name: 'Name of owner',
     cif_vat: 'CIF/VAT',
     category: 'Category',
@@ -234,6 +241,7 @@ const ProjectContextProvider = ({ children }) => {
   return (
     <ProjectContext.Provider
       value={{
+        user,
         displayNames,
         promProduct,
         setPromProduct,

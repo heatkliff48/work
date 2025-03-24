@@ -1,3 +1,4 @@
+import { TextSearchFilter } from '#components/Table/filters.js';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -5,6 +6,155 @@ import { useNavigate } from 'react-router-dom';
 const ProductsTypeJournalContext = createContext();
 
 const ProductsTypeJournalContextProvider = ({ children }) => {
+  const COLUMNS_DRY_MIXED_PRODUCT = [
+    {
+      Header: 'Product name',
+      accessor: 'name',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Article',
+      accessor: 'article',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Units of measurement',
+      accessor: 'units_of_measurement',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Number of bags',
+      accessor: 'number_of_bags',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Bag weight',
+      accessor: 'bag_weight',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Pallet weight',
+      accessor: 'pallet_weight',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Type of mix',
+      accessor: 'type_of_mix',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Description',
+      accessor: 'description',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Place of production',
+      accessor: 'place_of_production',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Price',
+      accessor: 'price',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Price per kilogram',
+      accessor: 'price_per_kilogram',
+      Filter: TextSearchFilter,
+    },
+  ];
+
+  const COLUMNS_ANCHOR_PRODUCT = [
+    {
+      Header: 'Product name',
+      accessor: 'name',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Article',
+      accessor: 'article',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Units of measurement',
+      accessor: 'units_of_measurement',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Pieces per box',
+      accessor: 'pieces_per_box',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Boxes on a pallet',
+      accessor: 'boxes_on_a_pallet',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Box weight',
+      accessor: 'box_weight',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Pallet weight',
+      accessor: 'pallet_weight',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Description',
+      accessor: 'description',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Place of production',
+      accessor: 'place_of_production',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Price',
+      accessor: 'price',
+      Filter: TextSearchFilter,
+    },
+  ];
+
+  const COLUMNS_TOOLS_PRODUCT = [
+    {
+      Header: 'Product name',
+      accessor: 'name',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Article',
+      accessor: 'article',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Units of measurement',
+      accessor: 'units_of_measurement',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Piece weight',
+      accessor: 'piece_weight',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Description',
+      accessor: 'description',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Place of production',
+      accessor: 'place_of_production',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Price',
+      accessor: 'price',
+      Filter: TextSearchFilter,
+    },
+  ];
+
   const unitsOfMeasurementOptions = [
     { value: 'pieces', label: 'Pieces' },
     { value: 'kilograms', label: 'Kilograms' },
@@ -34,6 +184,9 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
   return (
     <ProductsTypeJournalContext.Provider
       value={{
+        COLUMNS_DRY_MIXED_PRODUCT,
+        COLUMNS_ANCHOR_PRODUCT,
+        COLUMNS_TOOLS_PRODUCT,
         unitsOfMeasurementOptions,
         typeOfMixOptions,
         placeOfProductionOptions,

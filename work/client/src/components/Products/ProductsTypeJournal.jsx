@@ -1,18 +1,6 @@
-import {
-  getDryMixesJournal,
-  getRelatedMaterialsJournal,
-} from '#components/redux/actions/productsTypeJournalAction.js';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 function ProductsTypeJournal() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    // dispatch(getDryMixesJournal());
-    dispatch(getRelatedMaterialsJournal());
-  }, []);
 
   return (
     <div className="main-container">

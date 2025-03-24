@@ -29,6 +29,14 @@ import {
   GET_PRODUCTS_OF_ORDER,
   UPDATE_PERSON_IN_CHARGE_OF_ORDER,
   PERSON_IN_CHARGE_OF_ORDER,
+  GET_DRY_MIXED_PRODUCTS_OF_ORDER,
+  DRY_MIXED_PRODUCTS_OF_ORDER,
+  ANCHOR_PRODUCTS_OF_ORDER,
+  TOOL_PRODUCTS_OF_ORDER,
+  GET_ANCHOR_PRODUCTS_OF_ORDER,
+  GET_TOOL_PRODUCTS_OF_ORDER,
+  UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
+  GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
 const url = axios.create({
@@ -65,7 +73,34 @@ const addDataShipOrder = (date) => {
 
 const getProductsOfOrder = () => {
   return url
-    .get('/orders/products', {})
+    .get('/orders/products')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getDryMixedProductsOfOrder = () => {
+  return url
+    .get('/orders/dry_mixed_products', {})
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getAnchorProductsOfOrder = () => {
+  return url
+    .get('/orders/anchor_products', {})
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getToolProductsOfOrder = () => {
+  return url
+    .get('/orders/tool_products', {})
     .then((res) => {
       return res.data;
     })
@@ -89,6 +124,33 @@ const getUpdateProductsOfOrder = (newProductsOfOrder) => {
     })
     .catch(showErrorMessage);
 };
+
+const getUpdateDryMixedProductsOfOrder = (newDryMixedProductsOfOrder) => {
+  return url
+    .post('/orders/dry_mixed_products/add', newDryMixedProductsOfOrder)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+// const getUpdateProductsOfOrder = (newProductsOfOrder) => {
+//   return url
+//     .post('/orders/products/add', newProductsOfOrder)
+//     .then((res) => {
+//       return res.data;
+//     })
+//     .catch(showErrorMessage);
+// };
+
+// const getUpdateProductsOfOrder = (newProductsOfOrder) => {
+//   return url
+//     .post('/orders/products/add', newProductsOfOrder)
+//     .then((res) => {
+//       return res.data;
+//     })
+//     .catch(showErrorMessage);
+// };
 
 const getUpdateProductInfoOfOrder = (productOfOrder) => {
   return url
@@ -215,6 +277,60 @@ function* getProductsOfOrderWatcher(action) {
   }
 }
 
+function* getDryMixedProductsOfOrderWatcher(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+
+    // const { product_list, accessToken, accessTokenExpiration } = yield call(
+    const dry_mixed_product_list = yield call(getDryMixedProductsOfOrder);
+
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({
+      type: DRY_MIXED_PRODUCTS_OF_ORDER,
+      payload: dry_mixed_product_list,
+    });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: DRY_MIXED_PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
+function* getAnchorProductsOfOrderWatcher(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+
+    // const { product_list, accessToken, accessTokenExpiration } = yield call(
+    const { anchor_product_list } = yield call(getAnchorProductsOfOrder);
+
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: ANCHOR_PRODUCTS_OF_ORDER, payload: anchor_product_list });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: ANCHOR_PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
+function* getToolProductsOfOrderWatcher(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+
+    // const { product_list, accessToken, accessTokenExpiration } = yield call(
+    const { tool_product_list } = yield call(getToolProductsOfOrder);
+
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: TOOL_PRODUCTS_OF_ORDER, payload: tool_product_list });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: TOOL_PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
 function* getCurrentProductsOfOrderWatcher(action) {
   try {
     // accessTokenFront = yield select((state) => state.jwt);
@@ -238,7 +354,7 @@ function* getUpdateProductInfoOfOrderWatcher(action) {
     const { payload } = action;
 
     // const { accessToken, accessTokenExpiration } = yield call(
-   const upd_prod_info =  yield call(getUpdateProductInfoOfOrder, payload);
+    const upd_prod_info = yield call(getUpdateProductInfoOfOrder, payload);
 
     // window.localStorage.setItem('jwt', accessToken);
 
@@ -266,6 +382,22 @@ function* getUpdateProductsOfOrderWatcher(action) {
   } catch (err) {
     console.error(err);
     yield put({ type: UPDATE_PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
+function* getUpdateDryMixedProductsOfOrderWatcher(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(getUpdateDryMixedProductsOfOrder, payload);
+
+    // window.localStorage.setItem('jwt', accessToken);
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER, payload: [] });
   }
 }
 
@@ -364,7 +496,17 @@ function* ordersWatcher() {
   yield takeLatest(ADD_DATA_SHIP_ORDER, addDataShipOrderWatcher);
   yield takeLatest(GET_CURRENT_PRODUCTS_OF_ORDER, getCurrentProductsOfOrderWatcher);
   yield takeLatest(GET_PRODUCTS_OF_ORDER, getProductsOfOrderWatcher);
+  yield takeLatest(
+    GET_DRY_MIXED_PRODUCTS_OF_ORDER,
+    getDryMixedProductsOfOrderWatcher
+  );
+  yield takeLatest(GET_ANCHOR_PRODUCTS_OF_ORDER, getAnchorProductsOfOrderWatcher);
+  yield takeLatest(GET_TOOL_PRODUCTS_OF_ORDER, getToolProductsOfOrderWatcher);
   yield takeLatest(GET_UPDATE_PRODUCTS_OF_ORDER, getUpdateProductsOfOrderWatcher);
+  yield takeLatest(
+    GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
+    getUpdateDryMixedProductsOfOrderWatcher
+  );
   yield takeLatest(
     GET_UPDATE_PRODUCT_INFO_OF_ORDER,
     getUpdateProductInfoOfOrderWatcher

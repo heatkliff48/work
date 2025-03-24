@@ -31,6 +31,7 @@ import {
   NEED_UPDATE_ANCHOR_SOCKET,
   NEW_TOOL_SOCKET,
   NEED_UPDATE_TOOL_SOCKET,
+  UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -72,6 +73,13 @@ export const updProductOfOrderSocket = (product_of_order) => {
   return {
     type: UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET,
     payload: product_of_order,
+  };
+};
+
+export const updDryMixedProductOfOrderSocket = (dry_mixed_product_of_order) => {
+  return {
+    type: UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+    payload: dry_mixed_product_of_order,
   };
 };
 

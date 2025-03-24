@@ -113,6 +113,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       console.error('❌ Ошибка загрузки изображения:', error);
     }
   };
+
   useEffect(() => {
     console.log('🔄 Данные заказа обновлены:', orderData);
     const { deliveryAddress, contactInfo, owner, article } = orderData;
@@ -222,11 +223,11 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
     });
 
     setPdfUrl(null); // Сбрасываем предыдущий PDF
-  }, [orderData]);
+  }, [orderData, productList]);
 
   useEffect(() => {
     generatePDF();
-  }, [orderData]);
+  }, [pdfData]);
 
   const downloadPDF = async () => {
     const doc = await generatePDF();

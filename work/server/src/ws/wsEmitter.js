@@ -15,6 +15,7 @@ const {
   ADD_DELIVERY_ADDRESSES_SOCKET,
   ADD_CONTACT_INFO_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_SOCKET,
+  UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   UPDATE_REMAINING_STOCK_SOCKET,
@@ -138,6 +139,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_PRODUCT_OF_ORDER_SOCKET,
           payload: product_of_order,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET, (dry_mixed_product_of_order) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+          payload: dry_mixed_product_of_order,
         })
       );
     }

@@ -31,6 +31,7 @@ import {
   updateAnchorSocket,
   addNewToolSocket,
   updateToolSocket,
+  updDryMixedProductOfOrderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -88,6 +89,7 @@ import {
   UPDATE_ANCHOR_SOCKET,
   ADD_NEW_TOOL_SOCKET,
   UPDATE_TOOL_SOCKET,
+  UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -118,6 +120,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_PRODUCT_OF_ORDER_SOCKET:
       dispatch(updProductOfOrderSocket(payload));
+      break;
+
+    case UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET:
+      dispatch(updDryMixedProductOfOrderSocket(payload));
       break;
 
     case GET_DELETE_PRODUCT_OF_ORDER_SOCKET:

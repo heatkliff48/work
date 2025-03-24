@@ -32,18 +32,25 @@ import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Button } from 'reactstrap';
 import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
+import BlocksJournalTableOrder from './product_table_order/BlocksJournalTableOrder.jsx';
+import DryMixesJournalTableOrder from './product_table_order/DryMixesJournalTableOrder.jsx';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import AddDryMixesProductModal from './modal/AddDryMixesProductModal.jsx';
 
 const OrderCart = React.memo(() => {
   const {
     orderCartData,
     setOrderCartData,
-    setNewOrder,
     status_list,
     list_of_orders,
     setSelectedProduct,
     setProductOfOrder,
     personsInChargeList,
     accountingDataList,
+    productsOfOrders,
+    dryMixedProductsOfOrders,
+    anchorProductsOfOrders,
+    toolProductsOfOrders,
   } = useOrderContext();
   const {
     productModalOrder,
@@ -53,10 +60,13 @@ const OrderCart = React.memo(() => {
     warehouseInfoModal,
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
+    dryMixedProductModalOrder,
+    setDryMixedProductModalOrder,
   } = useModalContext();
-  const { displayNames } = useProjectContext();
+  const { displayNames, user } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { latestProducts } = useProductsContext();
+  const { dryMixesJournal, anchor, tool } = useProductsTypeJournalContext();
   const {
     warehouse_data,
     list_of_reserved_products,
@@ -68,19 +78,14 @@ const OrderCart = React.memo(() => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const user = useSelector((state) => state.user);
-  const productListOrder = useSelector((state) => state.productsOfOrders);
   const reservedProducts = useSelector((state) => state.reservedProducts);
 
+  const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
   const [dataValue, setDataValue] = useState(new Date());
   const [formatDataValue, setFormatDataValue] = useState(null);
   const [aproveAccounting, setAproveAccounting] = useState(false);
+  const [reserveModalShow, setReserveModalShow] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState([]);
-  const [vatValue, setVatValue] = useState({
-    vat_procent: 21,
-    vat_euro: 0,
-    vat_result: 0,
-  });
   const [orderStatusAccess, setOrderStatusAccess] = useState({
     canRead: true,
     canWrite: false,
@@ -89,9 +94,58 @@ const OrderCart = React.memo(() => {
     canRead: true,
     canWrite: false,
   });
-  const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
-  const [reserveModalShow, setReserveModalShow] = useState(false);
+  const [vatValue, setVatValue] = useState({
+    vat_euro_origin: 0,
+    vat_procent: 21,
+    vat_euro: 0,
+    vat_result: 0,
+  });
   const [currentOrderedProduct, setCurrentOrderedProduct] = useState({});
+
+  const [productLists, setProductLists] = useState({
+    products: [],
+    dryMixes: [],
+    anchors: [],
+    tools: [],
+  });
+
+  const correctProductTable = (arrName) => {
+    switch (arrName) {
+      case 'products':
+        return latestProducts;
+
+      case 'dryMixes':
+        return dryMixesJournal;
+
+      case 'anchors':
+        return anchor;
+
+      case 'tools':
+        return tool;
+
+      default:
+        break;
+    }
+  };
+
+  const getCorrectProductId = (arrName) => {
+    switch (arrName) {
+      case 'products':
+        return 'product_id';
+
+      case 'dryMixes':
+        return 'dry_mixed_id';
+
+      case 'anchors':
+        return 'anchor_id';
+
+      case 'tools':
+        return 'tool_id';
+
+      default:
+        break;
+    }
+  };
 
   const filterKeys = useMemo(
     () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
@@ -149,13 +203,13 @@ const OrderCart = React.memo(() => {
   }, [orderCartData?.shipping_date]);
 
   const addProductArticleToOrderList = useCallback(
-    (productListOrder, latestProducts) => {
-      if (!productListOrder || !latestProducts) return [];
+    (productsOfOrders, productsTable, arrayName) => {
+      if (!productsOfOrders || !productsTable || !arrayName) return [];
 
-      return productListOrder.map((orderProduct) => {
-        const product = latestProducts.find(
-          (p) => p.id === orderProduct?.product_id
-        );
+      const updatedOrderProducts = productsOfOrders.map((orderProduct) => {
+        const id = getCorrectProductId(arrayName);
+
+        const product = productsTable.find((p) => p.id === orderProduct?.[id]);
 
         if (product) {
           return {
@@ -165,13 +219,42 @@ const OrderCart = React.memo(() => {
         }
         return { ...orderProduct, product_article: 'Unknown' };
       });
+
+      setProductLists((prevState) => {
+        return {
+          ...prevState,
+          [arrayName]: updatedOrderProducts,
+        };
+      });
+
+      return updatedOrderProducts;
     },
-    [productListOrder]
+    []
   );
 
   const updatedProductListOrder = useMemo(() => {
-    return addProductArticleToOrderList(productListOrder, latestProducts);
-  }, [productListOrder]);
+    return addProductArticleToOrderList(
+      productsOfOrders,
+      latestProducts,
+      'products'
+    );
+  }, [productsOfOrders, latestProducts]);
+
+  const updatedDryMixesListOrder = useMemo(() => {
+    return addProductArticleToOrderList(
+      dryMixedProductsOfOrders,
+      dryMixesJournal,
+      'dryMixes'
+    );
+  }, [dryMixedProductsOfOrders, dryMixesJournal]);
+
+  const updatedAnchorsListOrder = useMemo(() => {
+    return addProductArticleToOrderList(anchorProductsOfOrders, anchor, 'anchors');
+  }, [anchorProductsOfOrders, anchor]);
+
+  const updatedToolsListOrder = useMemo(() => {
+    return addProductArticleToOrderList(toolProductsOfOrders, tool, 'tools');
+  }, [toolProductsOfOrders, tool]);
 
   const handleInputChange = (e) => {
     setVatValue((prev) => ({
@@ -287,8 +370,24 @@ const OrderCart = React.memo(() => {
   };
 
   useEffect(() => {
+    const allProducts = [
+      ...productLists['products'],
+      ...productLists['dryMixes'],
+      ...productLists['anchors'],
+      ...productLists['tools'],
+    ];
+
+    // Считаем финальную цену для всех продуктов
     const final_price_product =
-      updatedProductListOrder.reduce((acc, el) => acc + el?.final_price, 0) || 0;
+      allProducts.reduce(
+        (acc, el) =>
+          acc +
+          (el?.final_price ||
+            el?.final_price_dry ||
+            el?.final_price_anchor ||
+            el?.final_price_tool),
+        0
+      ) || 0;
 
     if (!final_price_product || !vatValue.vat_procent) {
       setVatValue((prev) => ({
@@ -304,11 +403,12 @@ const OrderCart = React.memo(() => {
 
       setVatValue((prev) => ({
         ...prev,
+        vat_euro_origin: final_price_product,
         vat_result: vat_result,
         vat_euro,
       }));
     }
-  }, [updatedProductListOrder, vatValue.vat_procent]);
+  }, [productLists, vatValue.vat_procent]);
 
   useEffect(() => {
     const storedData = localStorage.getItem('orderCartData')
@@ -382,9 +482,7 @@ const OrderCart = React.memo(() => {
   };
 
   const productHandler = (product) => {
-    // console.log(product);
-
-    const reservedProduct = productListOrder.find(
+    const reservedProduct = productsOfOrders.find(
       (orderedProduct) =>
         orderedProduct.order_id === product.order_id &&
         orderedProduct.product_id === product.product_id
@@ -429,6 +527,12 @@ const OrderCart = React.memo(() => {
         <AddProductOrderModal
           isOpen={productModalOrder}
           toggle={() => setProductModalOrder(!productModalOrder)}
+        />
+      )}
+      {dryMixedProductModalOrder && (
+        <AddDryMixesProductModal
+          isOpen={dryMixedProductModalOrder}
+          toggle={() => setDryMixedProductModalOrder(!dryMixedProductModalOrder)}
         />
       )}
       {warehouseInfoModal && (
@@ -487,73 +591,31 @@ const OrderCart = React.memo(() => {
             </Button>
           )}
         </div>
-        <table className="product-table">
-          <thead>
-            <tr>
-              <td>Products</td>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(updatedProductListOrder) &&
-              updatedProductListOrder?.map((product) => (
-                <tr key={product?.id || Math.random()} className="product-row">
-                  <td
-                    onClick={() => {
-                      onProductClickHandler(product);
-                    }}
-                  >
-                    {filterAndMapData(product, filterKeys)}
-                    {product?.warehouse_id !== null ? (
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          productHandler(product);
-                        }}
-                      >
-                        Show batch
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteHandler(product);
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            {userAccess?.canWrite && (
-              <tr>
-                <td colSpan="100%">
-                  <Button
-                    onClick={() => {
-                      setNewOrder((prev) => ({
-                        ...prev,
-                        article: orderCartData.article,
-                        owner: orderCartData.owner?.id,
-                        status: orderCartData.status,
-                        del_adr_id: orderCartData.deliveryAddress?.id,
-                      }));
-                      setProductModalOrder(!productModalOrder);
-                    }}
-                  >
-                    Add product
-                  </Button>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+
+        <BlocksJournalTableOrder
+          productListOrder={updatedProductListOrder}
+          onProductClickHandler={onProductClickHandler}
+          filterAndMapData={filterAndMapData}
+          filterKeys={filterKeys}
+          productHandler={productHandler}
+          deleteHandler={deleteHandler}
+        />
+        <DryMixesJournalTableOrder
+          productListOrder={updatedDryMixesListOrder}
+          onProductClickHandler={onProductClickHandler}
+          filterAndMapData={filterAndMapData}
+          filterKeys={filterKeys}
+          productHandler={productHandler}
+          deleteHandler={deleteHandler}
+        />
+
         <div className="footer_data">
           <div className="vat_container">
             <div className="vat">
               <div className="vat_euro">
                 <div>
-                  <p>VAT, EURO</p>
-                  <p>{vatValue.vat_euro}</p>
+                  <p>VAT ORIGIN, EURO</p>
+                  <p>{vatValue.vat_euro_origin}</p>
                 </div>
               </div>
               <div className="vat_procent">
@@ -612,13 +674,13 @@ const OrderCart = React.memo(() => {
             )}
             <FilesMain userAccess={userAccess} />
 
-            <div className="footer_button_pdf">
+            {/* <div className="footer_button_pdf">
               <PDFgenerate
                 orderData={orderCartData}
-                productList={updatedProductListOrder}
+                productList={productLists}
                 vatValue={vatValue}
               />
-            </div>
+            </div> */}
           </div>
           {orderStatusAccess?.canRead && (
             <div className="status-table">

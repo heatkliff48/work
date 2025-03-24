@@ -11,6 +11,9 @@ export const ModalContextProvider = ({ children }) => {
   const [modalProductCard, setModalProductCard] = useState(false);
   const [clientModalOrder, setClientModalOrder] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
+  const [dryMixedProductModalOrder, setDryMixedProductModalOrder] = useState(false);
+  const [anchorProductModalOrder, setAnchorProductModalOrder] = useState(false);
+  const [toolProductModalOrder, setToolProductModalOrder] = useState(false);
   const [reserveProductModal, setReserveProductModal] = useState(false);
   const [warehouseInfoModal, setWarehouseInfoModal] = useState(false);
   const [warehouseInfoCurIdModal, setWarehouseInfoCurIdModal] = useState(null);
@@ -35,6 +38,12 @@ export const ModalContextProvider = ({ children }) => {
         setClientModalOrder,
         productModalOrder,
         setProductModalOrder,
+        dryMixedProductModalOrder,
+        setDryMixedProductModalOrder,
+        anchorProductModalOrder,
+        setAnchorProductModalOrder,
+        toolProductModalOrder,
+        setToolProductModalOrder,
         productInfoModalOrder,
         setProductInfoModalOrder,
         warehouseModal,

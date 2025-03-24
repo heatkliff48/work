@@ -89,6 +89,125 @@ const OrderContextProvider = ({ children }) => {
     },
   ];
 
+  const COLUMNS_ORDER_DRY_MIXES = [
+    {
+      Header: 'Product id',
+      accessor: 'dry_mixed_id',
+      disableSortBy: true,
+    },
+    {
+      Header: 'Quantity, Ud',
+      accessor: 'quantity_dry',
+      sortType: 'number',
+    },
+    {
+      Header: 'Quantity of pallets',
+      accessor: 'quantity_palet_dry',
+      sortType: 'number',
+    },
+    {
+      Header: 'Real quantity, ud',
+      accessor: 'quantity_real_dry',
+      sortType: 'number',
+    },
+    {
+      Header: 'Total, kg',
+      accessor: 'total_dry',
+      sortType: 'number',
+    },
+    {
+      Header: 'Discount, %',
+      accessor: 'discount',
+      defaultValue: 0,
+    },
+    {
+      Header: 'PVP',
+      accessor: 'pvp_dry',
+      defaultValue: 0,
+    },
+    {
+      Header: 'Final price, EURO',
+      accessor: 'final_price_dry',
+      sortType: 'number',
+    },
+  ];
+
+  const COLUMNS_ORDER_ANCHOR = [
+    {
+      Header: 'Product id',
+      accessor: 'anchor_id',
+      disableSortBy: true,
+    },
+    {
+      Header: 'Quantity, Ud',
+      accessor: 'quantity_anchor',
+      sortType: 'number',
+    },
+    {
+      Header: 'Quantity of pallets',
+      accessor: 'quantity_palet_anchor',
+      sortType: 'number',
+    },
+    {
+      Header: 'Real quantity, ud',
+      accessor: 'quantity_real_anchor',
+      sortType: 'number',
+    },
+    {
+      Header: 'Total, kg',
+      accessor: 'total_anchor',
+      sortType: 'number',
+    },
+    {
+      Header: 'Discount, %',
+      accessor: 'discount',
+      defaultValue: 0,
+    },
+    {
+      Header: 'PVP',
+      accessor: 'pvp_anchor',
+      defaultValue: 0,
+    },
+    {
+      Header: 'Final price, EURO',
+      accessor: 'final_price_anchor',
+      sortType: 'number',
+    },
+  ];
+
+  const COLUMNS_ORDER_TOOL = [
+    {
+      Header: 'Product id',
+      accessor: 'tool_id',
+      disableSortBy: true,
+    },
+    {
+      Header: 'Quantity, Ud',
+      accessor: 'quantity_tool',
+      sortType: 'number',
+    },
+    {
+      Header: 'Total, kg',
+      accessor: 'total_tool',
+      sortType: 'number',
+    },
+    {
+      Header: 'Discount, %',
+      accessor: 'discount',
+      defaultValue: 0,
+    },
+    {
+      Header: 'PVP',
+      accessor: 'pvp_tool',
+      defaultValue: 0,
+    },
+    {
+      Header: 'Final price, EURO',
+      accessor: 'final_price_tool',
+      sortType: 'number',
+    },
+  ];
+
   const status_list = [
     {
       Header: 'Initial contact',
@@ -151,6 +270,13 @@ const OrderContextProvider = ({ children }) => {
   const list_of_orders = useSelector((state) => state.orders);
   const accountingDataList = useSelector((state) => state.accountingDataList);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
+  const dryMixedProductsOfOrders = useSelector(
+    (state) => state.dryMixedProductsOfOrders
+  );
+  const anchorProductsOfOrders = useSelector(
+    (state) => state.anchorProductsOfOrders
+  );
+  const toolProductsOfOrders = useSelector((state) => state.toolProductsOfOrders);
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
   const contactInfos = useSelector((state) => state.contactInfo);
@@ -301,12 +427,18 @@ const OrderContextProvider = ({ children }) => {
         COLUMNS_ORDERS,
         COLUMNS_ACCOUNTING,
         COLUMNS_ORDER_PRODUCT,
+        COLUMNS_ORDER_DRY_MIXES,
+        COLUMNS_ORDER_ANCHOR,
+        COLUMNS_ORDER_TOOL,
         currentOrder,
         setCurrentOrder,
         newOrder,
         setNewOrder,
         list_of_orders,
         productsOfOrders,
+        dryMixedProductsOfOrders,
+        anchorProductsOfOrders,
+        toolProductsOfOrders,
         status_list,
         productOfOrder,
         setProductOfOrder,

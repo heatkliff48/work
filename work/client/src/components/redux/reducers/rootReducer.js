@@ -18,7 +18,12 @@ import { listOfOrderedProductionReducer } from './listOfOrderedProductionReducer
 import { ordersReducer } from './orderReducer';
 import { pagesReducer } from './pagesReducer';
 import { productionBatchLogReducer } from './productionBatchLogReducer';
-import { productsOfOrdersReducer } from './productsOfOrdersReducer';
+import {
+  anchorProductsOfOrdersReducer,
+  dryMixedProductsOfOrdersReducer,
+  productsOfOrdersReducer,
+  toolProductsOfOrdersReducer,
+} from './productsOfOrdersReducer';
 import { productsReducer } from './productsReducer';
 import {
   anchorReducer,
@@ -48,6 +53,9 @@ export const rootReducer = combineReducers({
   pages: pagesReducer,
   orders: ordersReducer,
   productsOfOrders: productsOfOrdersReducer,
+  dryMixedProductsOfOrders: dryMixedProductsOfOrdersReducer,
+  anchorProductsOfOrders: anchorProductsOfOrdersReducer,
+  toolProductsOfOrders: toolProductsOfOrdersReducer,
   warehouse: warehouseReducer,
   usersInfo: usersInfoReducer,
   usersMainInfo: usersMainInfoReducer,
