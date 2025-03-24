@@ -342,7 +342,7 @@ const OrderCart = React.memo(() => {
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
 
-    if (status.accessor == 6 || status.accessor == 8) {
+    if (status.accessor == 7 || status.accessor == 9) {
       dispatch(
         updAccountingDataList({
           orders_article: orderCartData?.article,
@@ -512,7 +512,7 @@ const OrderCart = React.memo(() => {
       (el) => el.orders_article == orderCartData?.article
     )?.aproved;
 
-    setAproveAccounting(result);
+    setAproveAccounting(result ?? true);
   }, [accountingDataList]);
 
   return (
@@ -591,6 +591,7 @@ const OrderCart = React.memo(() => {
             </Button>
           )}
         </div>
+
         <BlocksJournalTableOrder
           productListOrder={updatedProductListOrder}
           onProductClickHandler={onProductClickHandler}
@@ -607,6 +608,7 @@ const OrderCart = React.memo(() => {
           productHandler={productHandler}
           deleteHandler={deleteHandler}
         />
+
         <div className="footer_data">
           <div className="vat_container">
             <div className="vat">

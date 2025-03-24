@@ -27,6 +27,8 @@ const AccountngOrderCard = React.memo(() => {
     vat_result: 0,
   });
 
+  const [status, setStatus] = useState();
+
   const filterKeys = useMemo(
     () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
     []
@@ -117,9 +119,11 @@ const AccountngOrderCard = React.memo(() => {
       }));
     }
   }, []);
-  // useEffect(() => {
-  //   console.log('accountingDataList aoc', accountingDataList);
-  // }, [accountingDataList]);
+
+  useEffect(() => {
+    const result = getAccountingStatus(orderCartData?.status);
+    setStatus(result);
+  }, []);
 
   return (
     <>
@@ -187,7 +191,7 @@ const AccountngOrderCard = React.memo(() => {
                 <input
                   id={item.accessor}
                   type="checkbox"
-                  checked={item.accessor === orderCartData?.status}
+                  checked={item.accessor == status}
                   onChange={() => {
                     statusChangeHandler();
                   }}
