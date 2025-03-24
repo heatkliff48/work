@@ -16,6 +16,12 @@ import {
   ADD_ACCOUTING_DATA_LIST,
   DELETE_ACCOUTING_DATA_LIST,
   CLEAR_ACCOUTING_DATA_LIST,
+  GET_DRY_MIXED_PRODUCTS_OF_ORDER,
+  GET_ANCHOR_PRODUCTS_OF_ORDER,
+  GET_TOOL_PRODUCTS_OF_ORDER,
+  GET_UPDATE_TOOL_PRODUCTS_OF_ORDER,
+  GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
+  GET_UPDATE_ANCHOR_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -71,6 +77,87 @@ export const getDeleteProductOfOrder = (product_id) => {
     payload: product_id,
   };
 };
+
+export const getDryMixedProductsOfOrders = () => {
+  return {
+    type: GET_DRY_MIXED_PRODUCTS_OF_ORDER,
+  };
+};
+
+export const getUpdateDryMixedProductOfOrders = (newDryMixedProductsOfOrder) => {
+  return {
+    type: GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
+    payload: newDryMixedProductsOfOrder,
+  };
+};
+
+// export const getUpdateProductInfoOfOrders = (productOfOrder) => {
+//   return {
+//     type: GET_UPDATE_PRODUCT_INFO_OF_ORDER,
+//     payload: productOfOrder,
+//   };
+// };
+
+// export const getDeleteDryMixedProductOfOrder = (product_id) => {
+//   return {
+//     type: GET_DELETE_PRODUCT_OF_ORDER,
+//     payload: product_id,
+//   };
+// };
+
+export const getAnchorProductsOfOrders = () => {
+  return {
+    type: GET_ANCHOR_PRODUCTS_OF_ORDER,
+  };
+};
+
+export const getUpdateAnchorProductOfOrders = (newAnchorProductsOfOrder) => {
+  return {
+    type: GET_UPDATE_ANCHOR_PRODUCTS_OF_ORDER,
+    payload: newAnchorProductsOfOrder,
+  };
+};
+
+// export const getUpdateProductInfoOfOrders = (productOfOrder) => {
+//   return {
+//     type: GET_UPDATE_PRODUCT_INFO_OF_ORDER,
+//     payload: productOfOrder,
+//   };
+// };
+
+// export const getDeleteAnchorProductOfOrder = (product_id) => {
+//   return {
+//     type: GET_DELETE_PRODUCT_OF_ORDER,
+//     payload: product_id,
+//   };
+// };
+
+export const getToolProductsOfOrders = () => {
+  return {
+    type: GET_TOOL_PRODUCTS_OF_ORDER,
+  };
+};
+
+export const getUpdateToolProductOfOrders = (newToolProductsOfOrder) => {
+  return {
+    type: GET_UPDATE_TOOL_PRODUCTS_OF_ORDER,
+    payload: newToolProductsOfOrder,
+  };
+};
+
+// export const getUpdateProductInfoOfOrders = (productOfOrder) => {
+//   return {
+//     type: GET_UPDATE_PRODUCT_INFO_OF_ORDER,
+//     payload: productOfOrder,
+//   };
+// };
+
+// export const getDeleteToolProductOfOrder = (product_id) => {
+//   return {
+//     type: GET_DELETE_PRODUCT_OF_ORDER,
+//     payload: product_id,
+//   };
+// };
 
 export const deleteOrder = (order_id) => {
   return {

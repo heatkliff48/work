@@ -1,5 +1,10 @@
-const { where } = require('sequelize');
-const { Orders, OrdersProducts } = require('../db/models');
+const {
+  Orders,
+  OrdersProducts,
+  OrderDryMixedProducts,
+  OrderAnchorProducts,
+  OrderToolProducts,
+} = require('../db/models');
 
 class OrdersRepository {
   static async getOrdersListData() {
@@ -62,6 +67,73 @@ class OrdersRepository {
     }
   }
 
+  static async getDryMixedProductsOfOrder() {
+    try {
+      const dry_mixed_product_list = await OrderDryMixedProducts.findAll({
+        attributes: [
+          'id',
+          'order_id',
+          'dry_mixed_id',
+          'quantity_dry',
+          'quantity_palet_dry',
+          'quantity_real_dry',
+          'total_dry',
+          'discount',
+          'pvp_dry',
+          'final_price_dry',
+        ],
+      });
+
+      return dry_mixed_product_list;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getAnchorProductsOfOrder() {
+    try {
+      const anchor_product_list = await OrderAnchorProducts.findAll({
+        attributes: [
+          'id',
+          'order_id',
+          'anchor_id',
+          'quantity_anchor',
+          'quantity_palet_anchor',
+          'quantity_real_anchor',
+          'total_anchor',
+          'discount',
+          'pvp_anchor',
+          'final_price_anchor',
+        ],
+      });
+      return anchor_product_list;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+  static async getToolProductsOfOrder() {
+    try {
+      const tool_product_list = await OrderToolProducts.findAll({
+        attributes: [
+          'id',
+          'order_id',
+          'tool_id',
+          'quantity_tool',
+          'total_tool',
+          'discount',
+          'pvp_tool',
+          'final_price_tool',
+        ],
+      });
+      return tool_product_list;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
   static async getCurrentProductsOfOrder({ order_id }) {
     try {
       const product_list = await OrdersProducts.findAll({
@@ -102,19 +174,17 @@ class OrdersRepository {
         warehouse_id,
       } = productOfOrder;
 
-      const product_of_order = await OrdersProducts.create(
-        {
-          order_id,
-          product_id,
-          quantity_m2,
-          quantity_palet,
-          quantity_real,
-          price_m2,
-          discount,
-          final_price,
-          warehouse_id,
-        }
-      );
+      const product_of_order = await OrdersProducts.create({
+        order_id,
+        product_id,
+        quantity_m2,
+        quantity_palet,
+        quantity_real,
+        price_m2,
+        discount,
+        final_price,
+        warehouse_id,
+      });
 
       const allOrdrProd = await OrdersProducts.findAll({
         attributes: [
@@ -138,6 +208,156 @@ class OrdersRepository {
       return error;
     }
   }
+
+  static async getUpdateDryMixedProductsOfOrder(newDryMixedProductsOfOrder) {
+    try {
+      const { order_id, productOfOrder } = newDryMixedProductsOfOrder;
+
+      const {
+        dry_mixed_id,
+        quantity_dry,
+        quantity_palet_dry,
+        quantity_real_dry,
+        total_dry,
+        discount,
+        final_price_dry,
+        pvp_dry,
+      } = productOfOrder;
+
+      const product_of_order = await OrderDryMixedProducts.create({
+        order_id,
+        dry_mixed_id,
+        quantity_dry,
+        quantity_palet_dry,
+        quantity_real_dry,
+        total_dry,
+        discount,
+        pvp_dry,
+        final_price_dry,
+      });
+
+      const allOrdrProd = await OrderDryMixedProducts.findAll({
+        attributes: [
+          'id',
+          'order_id',
+          'dry_mixed_id',
+          'quantity_dry',
+          'quantity_palet_dry',
+          'quantity_real_dry',
+          'total_dry',
+          'discount',
+          'pvp_dry',
+          'final_price_dry',
+        ],
+      });
+
+      const tid = allOrdrProd[allOrdrProd.length - 1].id;
+      return { id: tid, ...product_of_order.toJSON() };
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  // static async getUpdateProductsOfOrder(newProductsOfOrder) {
+  //   try {
+  //     const { order_id, productOfOrder } = newProductsOfOrder;
+
+  //     const {
+  //       product_id,
+  //       quantity_m2,
+  //       quantity_palet,
+  //       quantity_real,
+  //       price_m2,
+  //       discount,
+  //       final_price,
+  //       warehouse_id,
+  //     } = productOfOrder;
+
+  //     const product_of_order = await OrdersProducts.create({
+  //       order_id,
+  //       product_id,
+  //       quantity_m2,
+  //       quantity_palet,
+  //       quantity_real,
+  //       price_m2,
+  //       discount,
+  //       final_price,
+  //       warehouse_id,
+  //     });
+
+  //     const allOrdrProd = await OrdersProducts.findAll({
+  //       attributes: [
+  //         'id',
+  //         'order_id',
+  //         'product_id',
+  //         'quantity_m2',
+  //         'quantity_palet',
+  //         'quantity_real',
+  //         'price_m2',
+  //         'discount',
+  //         'final_price',
+  //         'warehouse_id',
+  //       ],
+  //     });
+
+  //     const tid = allOrdrProd[allOrdrProd.length - 1].id;
+  //     return { id: tid, ...product_of_order.toJSON() };
+  //   } catch (error) {
+  //     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+  //     return error;
+  //   }
+  // }
+
+  // static async getUpdateProductsOfOrder(newProductsOfOrder) {
+  //   try {
+  //     const { order_id, productOfOrder } = newProductsOfOrder;
+
+  //     const {
+  //       product_id,
+  //       quantity_m2,
+  //       quantity_palet,
+  //       quantity_real,
+  //       price_m2,
+  //       discount,
+  //       final_price,
+  //       warehouse_id,
+  //     } = productOfOrder;
+
+  //     const product_of_order = await OrdersProducts.create({
+  //       order_id,
+  //       product_id,
+  //       quantity_m2,
+  //       quantity_palet,
+  //       quantity_real,
+  //       price_m2,
+  //       discount,
+  //       final_price,
+  //       warehouse_id,
+  //     });
+
+  //     const allOrdrProd = await OrdersProducts.findAll({
+  //       attributes: [
+  //         'id',
+  //         'order_id',
+  //         'product_id',
+  //         'quantity_m2',
+  //         'quantity_palet',
+  //         'quantity_real',
+  //         'price_m2',
+  //         'discount',
+  //         'final_price',
+  //         'warehouse_id',
+  //       ],
+  //     });
+
+  //     const tid = allOrdrProd[allOrdrProd.length - 1].id;
+  //     return { id: tid, ...product_of_order.toJSON() };
+  //   } catch (error) {
+  //     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+  //     return error;
+  //   }
+  // }
 
   static async getUpdateProductInfoOfOrder(productOfOrder) {
     try {

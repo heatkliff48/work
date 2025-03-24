@@ -1,7 +1,6 @@
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { getTool } from '#components/redux/actions/productsTypeJournalAction.js';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +12,6 @@ const ToolsTable = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const tool = useSelector((state) => state.tool);
 
@@ -21,49 +19,12 @@ const ToolsTable = () => {
   const [modalShow, setModalShow] = useState(false);
   const [productCode, setProductCode] = useState('');
   const {
+    COLUMNS_TOOLS_PRODUCT,
     unitsOfMeasurementOptions,
     placeOfProductionOptions,
     setSelectedProductsType,
     setDataTable,
   } = useProductsTypeJournalContext();
-
-  const tools_table = [
-    {
-      Header: 'Product name',
-      accessor: 'name',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Article',
-      accessor: 'article',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Units of measurement',
-      accessor: 'units_of_measurement',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Piece weight',
-      accessor: 'piece_weight',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Description',
-      accessor: 'description',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Place of production',
-      accessor: 'place_of_production',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Price',
-      accessor: 'price',
-      Filter: TextSearchFilter,
-    },
-  ];
 
   useEffect(() => {
     if (tool) {
@@ -89,7 +50,7 @@ const ToolsTable = () => {
   }, [tool]);
 
   const toolHandler = (id) => {
-    setDataTable(tools_table);
+    setDataTable(COLUMNS_TOOLS_PRODUCT);
     const selectedTool = tool.find((el) => el.id === id);
     setSelectedProductsType(selectedTool);
     setModalShow(true);
@@ -106,22 +67,16 @@ const ToolsTable = () => {
   //   }
   // }, [user, roles]);
 
-  useEffect(() => {
-    // if (userAccess?.canRead) {
-    dispatch(getTool());
-    // }
-  }, []);
-
   return (
     <Fragment>
       <ShowProductsTypeJournalModal
-        table={tools_table}
+        table={COLUMNS_TOOLS_PRODUCT}
         target={4}
         title={'tool'}
         productCode={productCode}
       />{' '}
       <Table
-        COLUMN_DATA={tools_table}
+        COLUMN_DATA={COLUMNS_TOOLS_PRODUCT}
         dataOfTable={toolDataList}
         tableName={'Tools'}
         userAccess={userAccess}

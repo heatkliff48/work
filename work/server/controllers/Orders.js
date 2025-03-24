@@ -5,6 +5,7 @@ const {
   ADD_NEW_ORDER_SOCKET,
   ADD_DATASHIP_ORDER_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_SOCKET,
+  UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
   UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
@@ -60,9 +61,40 @@ class OrdersController {
 
   static async getProductsOfOrder(req, res) {
     try {
-      const product_list = await OrdersService.getProductsOfOrder({});
+      const product_list = await OrdersService.getProductsOfOrder();
 
       return res.status(200).json({ product_list });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getDryMixedProductsOfOrder(req, res) {
+    try {
+      const dry_mixed_product_list =
+        await OrdersService.getDryMixedProductsOfOrder();
+
+      return res.status(200).json(dry_mixed_product_list);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getAnchorProductsOfOrder(req, res) {
+    try {
+      const anchor_product_list = await OrdersService.getAnchorProductsOfOrder();
+
+      return res.status(200).json(anchor_product_list);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getToolProductsOfOrder(req, res) {
+    try {
+      const tool_product_list = await OrdersService.getToolProductsOfOrder();
+
+      return res.status(200).json(tool_product_list);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -85,9 +117,9 @@ class OrdersController {
     const { newProductsOfOrder } = req.body;
 
     try {
-      const product_of_order = await OrdersService.getUpdateProductsOfOrder({
-        newProductsOfOrder,
-      });
+      const product_of_order = await OrdersService.getUpdateProductsOfOrder(
+        newProductsOfOrder
+      );
 
       myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
 
@@ -96,6 +128,58 @@ class OrdersController {
       return ErrorUtils.catchError(res, err);
     }
   }
+
+  static async getUpdateDryMixedProductsOfOrder(req, res) {
+    const newDryMixedProductsOfOrder = req.body;
+
+    try {
+      const dry_mixed_product_of_order =
+        await OrdersService.getUpdateDryMixedProductsOfOrder(
+          newDryMixedProductsOfOrder
+        );
+
+      myEmitter.emit(
+        UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+        dry_mixed_product_of_order
+      );
+
+      return res.status(200).json(dry_mixed_product_of_order);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  // static async getUpdateProductsOfOrder(req, res) {
+  //   const { newProductsOfOrder } = req.body;
+
+  //   try {
+  //     const product_of_order = await OrdersService.getUpdateProductsOfOrder({
+  //       newProductsOfOrder,
+  //     });
+
+  //     myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
+
+  //     return res.status(200);
+  //   } catch (err) {
+  //     return ErrorUtils.catchError(res, err);
+  //   }
+  // }
+
+  // static async getUpdateProductsOfOrder(req, res) {
+  //   const { newProductsOfOrder } = req.body;
+
+  //   try {
+  //     const product_of_order = await OrdersService.getUpdateProductsOfOrder({
+  //       newProductsOfOrder,
+  //     });
+
+  //     myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
+
+  //     return res.status(200);
+  //   } catch (err) {
+  //     return ErrorUtils.catchError(res, err);
+  //   }
+  // }
 
   static async getUpdateProductInfoOfOrder(req, res) {
     const productOfOrder = req.body;

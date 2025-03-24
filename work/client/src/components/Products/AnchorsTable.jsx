@@ -1,7 +1,6 @@
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { getAnchor } from '#components/redux/actions/productsTypeJournalAction.js';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +12,6 @@ const AnchorsTable = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const anchor = useSelector((state) => state.anchor);
 
@@ -21,64 +19,12 @@ const AnchorsTable = () => {
   const [modalShow, setModalShow] = useState(false);
   const [productCode, setProductCode] = useState('');
   const {
+    COLUMNS_ANCHOR_PRODUCT,
     unitsOfMeasurementOptions,
     placeOfProductionOptions,
     setSelectedProductsType,
     setDataTable,
   } = useProductsTypeJournalContext();
-
-  const anchors_table = [
-    {
-      Header: 'Product name',
-      accessor: 'name',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Article',
-      accessor: 'article',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Units of measurement',
-      accessor: 'units_of_measurement',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Pieces per box',
-      accessor: 'pieces_per_box',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Boxes on a pallet',
-      accessor: 'boxes_on_a_pallet',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Box weight',
-      accessor: 'box_weight',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Pallet weight',
-      accessor: 'pallet_weight',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Description',
-      accessor: 'description',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Place of production',
-      accessor: 'place_of_production',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Price',
-      accessor: 'price',
-      Filter: TextSearchFilter,
-    },
-  ];
 
   useEffect(() => {
     if (anchor) {
@@ -104,7 +50,7 @@ const AnchorsTable = () => {
   }, [anchor]);
 
   const anchorHandler = (id) => {
-    setDataTable(anchors_table);
+    setDataTable(COLUMNS_ANCHOR_PRODUCT);
     const selectedAnchor = anchor.find((el) => el.id === id);
     setSelectedProductsType(selectedAnchor);
     setModalShow(true);
@@ -121,22 +67,16 @@ const AnchorsTable = () => {
   //   }
   // }, [user, roles]);
 
-  useEffect(() => {
-    // if (userAccess?.canRead) {
-    dispatch(getAnchor());
-    // }
-  }, []);
-
   return (
     <Fragment>
       <ShowProductsTypeJournalModal
-        table={anchors_table}
+        table={COLUMNS_ANCHOR_PRODUCT}
         target={3}
         title={'anchor'}
         productCode={productCode}
       />{' '}
       <Table
-        COLUMN_DATA={anchors_table}
+        COLUMN_DATA={COLUMNS_ANCHOR_PRODUCT}
         dataOfTable={anchorDataList}
         tableName={'Anchors'}
         userAccess={userAccess}

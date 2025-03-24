@@ -39,6 +39,25 @@ class OrdersService {
     return product_list;
   }
 
+  static async getDryMixedProductsOfOrder() {
+    const dry_mixed_product_list =
+      await OrdersRepository.getDryMixedProductsOfOrder();
+
+    return dry_mixed_product_list;
+  }
+
+  static async getAnchorProductsOfOrder() {
+    const anchor_product_list = await OrdersRepository.getAnchorProductsOfOrder();
+
+    return anchor_product_list;
+  }
+
+  static async getToolProductsOfOrder() {
+    const tool_product_list = await OrdersRepository.getToolProductsOfOrder();
+
+    return tool_product_list;
+  }
+
   static async getCurrentProductsOfOrder({ order_id }) {
     const product_list = await OrdersRepository.getCurrentProductsOfOrder({
       order_id,
@@ -47,7 +66,7 @@ class OrdersService {
     return product_list;
   }
 
-  static async getUpdateProductsOfOrder({ newProductsOfOrder }) {
+  static async getUpdateProductsOfOrder(newProductsOfOrder) {
     const product_of_order = await OrdersRepository.getUpdateProductsOfOrder(
       newProductsOfOrder
     );
@@ -55,8 +74,34 @@ class OrdersService {
     return product_of_order;
   }
 
+  static async getUpdateDryMixedProductsOfOrder(newDryMixedProductsOfOrder) {
+    const dry_mixed_product_of_order = await OrdersRepository.getUpdateDryMixedProductsOfOrder(
+      newDryMixedProductsOfOrder
+    );
+
+    return dry_mixed_product_of_order;
+  }
+
+  // static async getUpdateProductsOfOrder({ newProductsOfOrder }) {
+  //   const product_of_order = await OrdersRepository.getUpdateProductsOfOrder(
+  //     newProductsOfOrder
+  //   );
+
+  //   return product_of_order;
+  // }
+
+  // static async getUpdateProductsOfOrder({ newProductsOfOrder }) {
+  //   const product_of_order = await OrdersRepository.getUpdateProductsOfOrder(
+  //     newProductsOfOrder
+  //   );
+
+  //   return product_of_order;
+  // }
+
   static async getUpdateProductInfoOfOrder({ productOfOrder }) {
-    const upd_prod_info = await OrdersRepository.getUpdateProductInfoOfOrder(productOfOrder);
+    const upd_prod_info = await OrdersRepository.getUpdateProductInfoOfOrder(
+      productOfOrder
+    );
 
     return upd_prod_info;
   }

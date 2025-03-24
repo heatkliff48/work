@@ -5,10 +5,14 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
 import {
   getAccountingDataList,
+  getAnchorProductsOfOrders,
+  getDryMixedProductsOfOrders,
   getOrders,
   getProductsOfOrders,
+  getToolProductsOfOrders,
 } from '#components/redux/actions/ordersAction.js';
 import { getAllProducts } from '#components/redux/actions/productsAction.js';
+import { getAnchor, getDryMixesJournal, getRelatedMaterialsJournal, getTool } from '#components/redux/actions/productsTypeJournalAction.js';
 import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
 import { getAllRoles } from '#components/redux/actions/rolesAction.js';
 import { getAllStockBalance } from '#components/redux/actions/stockBalanceAction.js';
@@ -39,8 +43,15 @@ function Main() {
   useEffect(() => {
     dispatch(getAllRoles());
     dispatch(getAllProducts());
+    dispatch(getDryMixesJournal());
+    dispatch(getRelatedMaterialsJournal());
+    dispatch(getAnchor());
+    dispatch(getTool());
     dispatch(getAllWarehouse());
     dispatch(getProductsOfOrders());
+    dispatch(getDryMixedProductsOfOrders());
+    dispatch(getAnchorProductsOfOrders());
+    dispatch(getToolProductsOfOrders());
     dispatch(getListOfReservedProducts());
     dispatch(getListOfOrderedProduction());
     dispatch(getListOfOrderedProductionOEM());
