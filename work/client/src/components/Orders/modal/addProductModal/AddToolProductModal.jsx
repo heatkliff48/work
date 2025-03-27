@@ -1,30 +1,31 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { useOrderContext } from '../../contexts/OrderContext';
+import { useOrderContext } from '../../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
-import { getUpdateProductOfOrders } from '#components/redux/actions/ordersAction.js';
+import { getUpdateDryMixedProductOfOrders } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
 import '#components/Styles/modals.css';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
-const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
+const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
   const {
-    COLUMNS_ORDER_PRODUCT,
+    COLUMNS_ORDER_TOOL,
     productOfOrder,
     setProductOfOrder,
     setSelectedProduct,
-    list_of_orders,
-    newOrder,
     selectedProduct,
+    newOrder,
+    list_of_orders,
   } = useOrderContext();
-  const { COLUMNS, latestProducts } = useProductsContext();
+
+  const { COLUMNS_ANCHOR_PRODUCT, anchor } = useProductsTypeJournalContext();
 
   const dispatch = useDispatch();
 
   const haveProduct = useMemo(
-    () => productOfOrder?.product_id ?? false,
-    [productOfOrder?.product_id]
+    () => selectedProduct?.id ?? false,
+    [selectedProduct?.id]
   );
 
   const haveOrderClient = list_of_orders.find(
@@ -32,10 +33,10 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   );
 
   const handlerAddProductOrder = useCallback((row) => {
-    const product = latestProducts.filter((el) => el.id === row.original.id)[0];
+    const product = anchor.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
-    setProductOfOrder((prev) => ({ ...prev, product_id: product?.id }));
+    setProductOfOrder((prev) => ({ ...prev, dry_mixed_id: product?.id }));
   }, []);
 
   const handleProductListOrderChange = (e) => {
@@ -44,66 +45,59 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
   const quantity_palet_value = useMemo(() => {
     if (!selectedProduct) return;
-    if (!productOfOrder?.quantity_m2) productOfOrder.quantity_m2 = 0;
+    if (!productOfOrder?.quantity_ud) productOfOrder.quantity_ud = 0;
     const result = Math.ceil(
-      productOfOrder?.quantity_m2 / (selectedProduct?.m2 || 1)
+      productOfOrder?.quantity_ud / (selectedProduct?.number_of_bags || 1)
     );
 
     setProductOfOrder((prev) => ({
       ...prev,
-      quantity_palet: result,
+      quantity_palet_ud: result,
     }));
     return result;
-  }, [productOfOrder.quantity_m2, selectedProduct?.m2]);
+  }, [productOfOrder.quantity_ud, selectedProduct?.number_of_bags]);
 
-  const quantity_real_value = useMemo(() => {
-    const result = Math.ceil(quantity_palet_value * (selectedProduct?.m2 || 1));
+  const total_value = useMemo(() => {
+    const result = quantity_palet_value * selectedProduct?.number_of_bags;
 
     setProductOfOrder((prev) => ({
       ...prev,
-      quantity_real: result,
-    }));
-    return result;
-  }, [quantity_palet_value, selectedProduct?.m2]);
-
-  const price_m2_value = useMemo(() => {
-    const result =
-      (selectedProduct?.price * selectedProduct?.volumeBlockOnPallet) /
-      selectedProduct?.m2;
-
-    setProductOfOrder((prev) => ({
-      ...prev,
-      price_m2: result.toFixed(2),
+      total: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [
-    selectedProduct?.price,
-    selectedProduct?.m2,
-    selectedProduct?.volumeBlockOnPallet,
-  ]);
+  }, [quantity_palet_value, selectedProduct?.number_of_bags]);
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
+
     const result =
-      (price_m2_value * quantity_real_value * Math.abs(100 - discount)) / 100;
+      (selectedProduct?.price  * Math.abs(100 - discount)) /
+      100;
 
     setProductOfOrder((prev) => ({
       ...prev,
       final_price: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [price_m2_value, quantity_real_value, productOfOrder?.discount]);
+  }, [selectedProduct?.price, productOfOrder?.discount]);
+
+  const pvp_value = useMemo(() => {
+    const result = total_value > 1 ? final_price_value / total_value : 0;
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      pvp: result.toFixed(2),
+    }));
+    return result.toFixed(2);
+  }, [final_price_value, total_value]);
 
   const addProductOrder = async () => {
     if (haveOrderClient) {
-      dispatch(
-        getUpdateProductOfOrders({
-          newProductsOfOrder: {
-            order_id: haveOrderClient.id,
-            productOfOrder,
-          },
-        })
-      );
+      const newDryMixedProductsOfOrder = {
+        order_id: haveOrderClient.id,
+        productOfOrder,
+      };
+      dispatch(getUpdateDryMixedProductOfOrders(newDryMixedProductsOfOrder));
       setProductOfOrder({});
       setSelectedProduct({});
     }
@@ -112,11 +106,12 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
   useEffect(() => {
     const discount = productOfOrder?.discount ?? 0;
+
     setProductOfOrder((prev) => ({
       ...prev,
       discount,
     }));
-  }, []);
+  }, [productOfOrder?.discount]);
 
   return (
     <div>
@@ -140,16 +135,15 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
           {haveProduct ? (
             <p>Fill in the remaining parameters</p>
           ) : (
-            <p>Select product</p>
+            <p>Select anchor product</p>
           )}
         </ModalHeader>
         <ModalBody>
           {haveProduct ? (
             <>
-              {COLUMNS_ORDER_PRODUCT?.map((el) => {
-                console.log('productOfOrder', productOfOrder);
+              {COLUMNS_ORDER_TOOL?.map((el) => {
                 if (el.accessor === 'article') return null;
-                if (el.accessor === 'dry_mixed_id')
+                if (el.accessor === 'tool_id')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
@@ -157,12 +151,12 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                         type="text"
                         id={el.accessor}
                         name={el.accessor}
-                        value={productOfOrder['id'] || ''}
+                        value={productOfOrder[el.accessor] || ''}
                         readOnly
                       />
                     </>
                   );
-                if (el.accessor === 'quantity_palet')
+                if (el.accessor === 'total')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
@@ -170,12 +164,12 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                         type="text"
                         id={el.accessor}
                         name={el.accessor}
-                        value={quantity_palet_value}
+                        value={total_value}
                         readOnly
                       />
                     </>
                   );
-                if (el.accessor === 'quantity_real')
+                if (el.accessor === 'pvp')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
@@ -183,20 +177,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                         type="text"
                         id={el.accessor}
                         name={el.accessor}
-                        value={quantity_real_value}
-                        readOnly
-                      />
-                    </>
-                  );
-                if (el.accessor === 'price_m2')
-                  return (
-                    <>
-                      <ModalBody>{el.Header}:</ModalBody>
-                      <input
-                        type="text"
-                        id={el.accessor}
-                        name={el.accessor}
-                        value={price_m2_value}
+                        value={pvp_value}
                         readOnly
                       />
                     </>
@@ -227,12 +208,12 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
           ) : (
             <>
               <Table
-                COLUMN_DATA={COLUMNS}
-                dataOfTable={latestProducts}
+                COLUMN_DATA={COLUMNS_ANCHOR_PRODUCT}
+                dataOfTable={anchor}
                 // userAccess={userAccess}
                 onClickButton={() => {}}
                 buttonText={''}
-                tableName={'Products'}
+                tableName={'Tool journal'}
                 handleRowClick={(row) => {
                   handlerAddProductOrder(row);
                 }}
@@ -241,10 +222,10 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
           )}
         </ModalBody>
         <ModalFooter>
-          <button onClick={addProductOrder}>Add product</button>
+          <button onClick={addProductOrder}>Add anchor product</button>
         </ModalFooter>
       </Modal>
     </div>
   );
 });
-export default AddProductOrderModal;
+export default AddToolProductModal;

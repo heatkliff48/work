@@ -2,32 +2,31 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { Button } from 'reactstrap';
-import AddProductOrderModal from '../modal/addProductModal/AddProductOrderModal';
+import AddDryMixesProductModal from '../modal/addProductModal/AddDryMixesProductModal';
 
-const BlocksJournalTableOrder = ({
+const AnchorJournalTableOrder = ({
   productListOrder,
   onProductClickHandler,
   filterAndMapData,
   filterKeys,
-  productHandler,
   deleteHandler,
 }) => {
   const { setNewOrder, orderCartData } = useOrderContext();
-  const { productModalOrder, setProductModalOrder } = useModalContext();
+  const { anchorProductModalOrder, setAnchorProductModalOrder } = useModalContext();
   const { userAccess } = useUsersContext();
 
   return (
     <>
-      {productModalOrder && (
-        <AddProductOrderModal
-          isOpen={productModalOrder}
-          toggle={() => setProductModalOrder(!productModalOrder)}
+      {anchorProductModalOrder && (
+        <AddDryMixesProductModal
+          isOpen={anchorProductModalOrder}
+          toggle={() => setAnchorProductModalOrder(!anchorProductModalOrder)}
         />
       )}
       <table className="product-table">
         <thead>
           <tr>
-            <td>Blocks Journal Product</td>
+            <td>Anchor Journal Products</td>
           </tr>
         </thead>
         <tbody>
@@ -40,25 +39,14 @@ const BlocksJournalTableOrder = ({
                   }}
                 >
                   {filterAndMapData(product, filterKeys)}
-                  {product?.warehouse_id !== null ? (
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        productHandler(product);
-                      }}
-                    >
-                      Show batch
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteHandler(product);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  )}
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteHandler(product);
+                    }}
+                  >
+                    Delete
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -74,7 +62,7 @@ const BlocksJournalTableOrder = ({
                       status: orderCartData.status,
                       del_adr_id: orderCartData.deliveryAddress?.id,
                     }));
-                    setProductModalOrder(!productModalOrder);
+                    setAnchorProductModalOrder(!anchorProductModalOrder);
                   }}
                 >
                   Add product
@@ -88,4 +76,4 @@ const BlocksJournalTableOrder = ({
   );
 };
 
-export default BlocksJournalTableOrder;
+export default AnchorJournalTableOrder;

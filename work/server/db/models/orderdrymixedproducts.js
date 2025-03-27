@@ -16,13 +16,13 @@ module.exports = (sequelize, DataTypes) => {
   OrderDryMixedProducts.init({
     order_id: DataTypes.INTEGER,
     dry_mixed_id: DataTypes.INTEGER,
-    quantity_dry: DataTypes.FLOAT,
+    quantity_ud: DataTypes.FLOAT,
     quantity_palet_dry: DataTypes.FLOAT,
-    quantity_real_dry: DataTypes.FLOAT,
-    total_dry: DataTypes.FLOAT,
+    quantity_real_ud: DataTypes.FLOAT,
+    total: DataTypes.FLOAT,
     discount: DataTypes.INTEGER,
-    pvp_dry: DataTypes.FLOAT,
-    final_price_dry: DataTypes.FLOAT
+    pvp: DataTypes.FLOAT,
+    final_price: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'OrderDryMixedProducts',

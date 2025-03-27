@@ -97,7 +97,7 @@ const OrderContextProvider = ({ children }) => {
     },
     {
       Header: 'Quantity, Ud',
-      accessor: 'quantity_dry',
+      accessor: 'quantity_ud',
       sortType: 'number',
     },
     {
@@ -107,12 +107,12 @@ const OrderContextProvider = ({ children }) => {
     },
     {
       Header: 'Real quantity, ud',
-      accessor: 'quantity_real_dry',
+      accessor: 'quantity_real_ud',
       sortType: 'number',
     },
     {
       Header: 'Total, kg',
-      accessor: 'total_dry',
+      accessor: 'total',
       sortType: 'number',
     },
     {
@@ -122,25 +122,25 @@ const OrderContextProvider = ({ children }) => {
     },
     {
       Header: 'PVP',
-      accessor: 'pvp_dry',
+      accessor: 'pvp',
       defaultValue: 0,
     },
     {
       Header: 'Final price, EURO',
-      accessor: 'final_price_dry',
+      accessor: 'final_price',
       sortType: 'number',
     },
   ];
 
   const COLUMNS_ORDER_ANCHOR = [
     {
-      Header: 'Product id',
+      Header: 'Anchor product id',
       accessor: 'anchor_id',
       disableSortBy: true,
     },
     {
       Header: 'Quantity, Ud',
-      accessor: 'quantity_anchor',
+      accessor: 'quantity_ud',
       sortType: 'number',
     },
     {
@@ -150,12 +150,12 @@ const OrderContextProvider = ({ children }) => {
     },
     {
       Header: 'Real quantity, ud',
-      accessor: 'quantity_real_anchor',
+      accessor: 'quantity_real_ud',
       sortType: 'number',
     },
     {
       Header: 'Total, kg',
-      accessor: 'total_anchor',
+      accessor: 'total',
       sortType: 'number',
     },
     {
@@ -165,12 +165,12 @@ const OrderContextProvider = ({ children }) => {
     },
     {
       Header: 'PVP',
-      accessor: 'pvp_anchor',
+      accessor: 'pvp',
       defaultValue: 0,
     },
     {
       Header: 'Final price, EURO',
-      accessor: 'final_price_anchor',
+      accessor: 'final_price',
       sortType: 'number',
     },
   ];
@@ -183,12 +183,12 @@ const OrderContextProvider = ({ children }) => {
     },
     {
       Header: 'Quantity, Ud',
-      accessor: 'quantity_tool',
+      accessor: 'quantity_ud',
       sortType: 'number',
     },
     {
       Header: 'Total, kg',
-      accessor: 'total_tool',
+      accessor: 'total',
       sortType: 'number',
     },
     {
@@ -198,12 +198,12 @@ const OrderContextProvider = ({ children }) => {
     },
     {
       Header: 'PVP',
-      accessor: 'pvp_tool',
+      accessor: 'pvp',
       defaultValue: 0,
     },
     {
       Header: 'Final price, EURO',
-      accessor: 'final_price_tool',
+      accessor: 'final_price',
       sortType: 'number',
     },
   ];

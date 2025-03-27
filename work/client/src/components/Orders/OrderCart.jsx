@@ -22,7 +22,6 @@ import {
   addNewListOfOrderedProductionOEM,
 } from '#components/redux/actions/warehouseAction.js';
 import PDFgenerate from './OrdersPDF.jsx';
-import AddProductOrderModal from './modal/AddProductOrderModal.jsx';
 import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
 import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
 import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
@@ -35,7 +34,8 @@ import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedPro
 import BlocksJournalTableOrder from './product_table_order/BlocksJournalTableOrder.jsx';
 import DryMixesJournalTableOrder from './product_table_order/DryMixesJournalTableOrder.jsx';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
-import AddDryMixesProductModal from './modal/AddDryMixesProductModal.jsx';
+import AnchorJournalTableOrder from './product_table_order/AnchorJournalTableOrder.jsx';
+import ToolJournalTableOrder from './product_table_order/ToolJournalTableOrder.jsx';
 
 const OrderCart = React.memo(() => {
   const {
@@ -53,15 +53,11 @@ const OrderCart = React.memo(() => {
     toolProductsOfOrders,
   } = useOrderContext();
   const {
-    productModalOrder,
-    setProductModalOrder,
     productInfoModalOrder,
     setProductInfoModalOrder,
     warehouseInfoModal,
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
-    dryMixedProductModalOrder,
-    setDryMixedProductModalOrder,
   } = useModalContext();
   const { displayNames, user } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
@@ -109,24 +105,24 @@ const OrderCart = React.memo(() => {
     tools: [],
   });
 
-  const correctProductTable = (arrName) => {
-    switch (arrName) {
-      case 'products':
-        return latestProducts;
+  // const correctProductTable = (arrName) => {
+  //   switch (arrName) {
+  //     case 'products':
+  //       return latestProducts;
 
-      case 'dryMixes':
-        return dryMixesJournal;
+  //     case 'dryMixes':
+  //       return dryMixesJournal;
 
-      case 'anchors':
-        return anchor;
+  //     case 'anchors':
+  //       return anchor;
 
-      case 'tools':
-        return tool;
+  //     case 'tools':
+  //       return tool;
 
-      default:
-        break;
-    }
-  };
+  //     default:
+  //       break;
+  //   }
+  // };
 
   const getCorrectProductId = (arrName) => {
     switch (arrName) {
@@ -523,18 +519,6 @@ const OrderCart = React.memo(() => {
           toggle={() => setProductInfoModalOrder(!productInfoModalOrder)}
         />
       )}
-      {productModalOrder && (
-        <AddProductOrderModal
-          isOpen={productModalOrder}
-          toggle={() => setProductModalOrder(!productModalOrder)}
-        />
-      )}
-      {dryMixedProductModalOrder && (
-        <AddDryMixesProductModal
-          isOpen={dryMixedProductModalOrder}
-          toggle={() => setDryMixedProductModalOrder(!dryMixedProductModalOrder)}
-        />
-      )}
       {warehouseInfoModal && (
         <ListOfReservedProductsModal
           isOpen={warehouseInfoModal}
@@ -605,7 +589,20 @@ const OrderCart = React.memo(() => {
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeys}
-          productHandler={productHandler}
+          deleteHandler={deleteHandler}
+        />
+        <AnchorJournalTableOrder
+          productListOrder={updatedAnchorsListOrder}
+          onProductClickHandler={onProductClickHandler}
+          filterAndMapData={filterAndMapData}
+          filterKeys={filterKeys}
+          deleteHandler={deleteHandler}
+        />
+        <ToolJournalTableOrder
+          productListOrder={updatedToolsListOrder}
+          onProductClickHandler={onProductClickHandler}
+          filterAndMapData={filterAndMapData}
+          filterKeys={filterKeys}
           deleteHandler={deleteHandler}
         />
 

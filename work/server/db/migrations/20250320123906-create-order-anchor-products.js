@@ -15,25 +15,25 @@ module.exports = {
       anchor_id: {
         type: Sequelize.INTEGER
       },
-      quantity_anchor: {
+      quantity_ud: {
         type: Sequelize.FLOAT
       },
       quantity_palet_anchor: {
         type: Sequelize.FLOAT
       },
-      quantity_real_anchor: {
+      quantity_real_ud: {
         type: Sequelize.FLOAT
       },
-      total_anchor: {
+      total: {
         type: Sequelize.FLOAT
       },
       discount: {
         type: Sequelize.INTEGER
       },
-      pvp_anchor: {
+      pvp: {
         type: Sequelize.FLOAT
       },
-      final_price_anchor: {
+      final_price: {
         type: Sequelize.FLOAT
       },
       createdAt: {

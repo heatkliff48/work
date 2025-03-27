@@ -15,25 +15,25 @@ module.exports = {
       dry_mixed_id: {
         type: Sequelize.INTEGER
       },
-      quantity_dry: {
+      quantity_ud: {
         type: Sequelize.FLOAT
       },
       quantity_palet_dry: {
         type: Sequelize.FLOAT
       },
-      quantity_real_dry: {
+      quantity_real_ud: {
         type: Sequelize.FLOAT
       },
-      total_dry: {
+      total: {
         type: Sequelize.FLOAT
       },
       discount: {
         type: Sequelize.INTEGER
       },
-      pvp_dry: {
+      pvp: {
         type: Sequelize.FLOAT
       },
-      final_price_dry: {
+      final_price: {
         type: Sequelize.FLOAT
       },
       createdAt: {

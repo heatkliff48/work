@@ -16,13 +16,13 @@ module.exports = (sequelize, DataTypes) => {
   OrderAnchorProducts.init({
     order_id: DataTypes.INTEGER,
     anchor_id: DataTypes.INTEGER,
-    quantity_anchor: DataTypes.FLOAT,
+    quantity_ud: DataTypes.FLOAT,
     quantity_palet_anchor: DataTypes.FLOAT,
-    quantity_real_anchor: DataTypes.FLOAT,
-    total_anchor: DataTypes.FLOAT,
+    quantity_real_ud: DataTypes.FLOAT,
+    total: DataTypes.FLOAT,
     discount: DataTypes.INTEGER,
-    pvp_anchor: DataTypes.FLOAT,
-    final_price_anchor: DataTypes.FLOAT
+    pvp: DataTypes.FLOAT,
+    final_price: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'OrderAnchorProducts',
