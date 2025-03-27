@@ -15,19 +15,19 @@ module.exports = {
       tool_id: {
         type: Sequelize.INTEGER
       },
-      quantity_tool: {
+      quantity_ud: {
         type: Sequelize.FLOAT
       },
-      total_tool: {
+      total: {
         type: Sequelize.FLOAT
       },
       discount: {
         type: Sequelize.INTEGER
       },
-      pvp_tool: {
+      pvp: {
         type: Sequelize.FLOAT
       },
-      final_price_tool: {
+      final_price: {
         type: Sequelize.FLOAT
       },
       createdAt: {

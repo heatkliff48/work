@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { useOrderContext } from '../../contexts/OrderContext';
+import { useOrderContext } from '../../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
 import {
   getUpdateDryMixedProductOfOrders,
-  getUpdateProductOfOrders,
 } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 import '#components/Styles/modals.css';
@@ -49,17 +48,17 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
 
   const quantity_palet_value = useMemo(() => {
     if (!selectedProduct) return;
-    if (!productOfOrder?.quantity_dry) productOfOrder.quantity_dry = 0;
+    if (!productOfOrder?.quantity_ud) productOfOrder.quantity_ud = 0;
     const result = Math.ceil(
-      productOfOrder?.quantity_dry / (selectedProduct?.number_of_bags || 1)
+      productOfOrder?.quantity_ud / (selectedProduct?.number_of_bags || 1)
     );
 
     setProductOfOrder((prev) => ({
       ...prev,
-      quantity_palet_dry: result,
+      quantity_palet_anchor: result,
     }));
     return result;
-  }, [productOfOrder.quantity_dry, selectedProduct?.number_of_bags]);
+  }, [productOfOrder.quantity_ud, selectedProduct?.number_of_bags]);
 
   const quantity_real_value = useMemo(() => {
     const result = Math.ceil(
@@ -68,7 +67,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
 
     setProductOfOrder((prev) => ({
       ...prev,
-      quantity_real_dry: result,
+      quantity_real_ud: result,
     }));
     return result;
   }, [quantity_palet_value, selectedProduct?.m2]);
@@ -78,7 +77,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
 
     setProductOfOrder((prev) => ({
       ...prev,
-      total_dry: result.toFixed(2),
+      total: result.toFixed(2),
     }));
     return result.toFixed(2);
   }, [quantity_palet_value, selectedProduct?.number_of_bags]);
@@ -92,7 +91,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
 
     setProductOfOrder((prev) => ({
       ...prev,
-      final_price_dry: result.toFixed(2),
+      final_price: result.toFixed(2),
     }));
     return result.toFixed(2);
   }, [selectedProduct?.price, quantity_real_value, productOfOrder?.discount]);
@@ -172,7 +171,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
                       />
                     </>
                   );
-                if (el.accessor === 'quantity_palet_dry')
+                if (el.accessor === 'quantity_palet')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
@@ -185,7 +184,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
                       />
                     </>
                   );
-                if (el.accessor === 'quantity_real_dry')
+                if (el.accessor === 'quantity_real_ud')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
@@ -198,7 +197,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
                       />
                     </>
                   );
-                if (el.accessor === 'total_dry')
+                if (el.accessor === 'total')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
@@ -211,7 +210,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
                       />
                     </>
                   );
-                if (el.accessor === 'pvp_dry')
+                if (el.accessor === 'pvp')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
@@ -224,7 +223,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
                       />
                     </>
                   );
-                if (el.accessor === 'final_price_dry')
+                if (el.accessor === 'final_price')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>

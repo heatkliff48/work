@@ -16,11 +16,11 @@ module.exports = (sequelize, DataTypes) => {
   OrderToolProducts.init({
     order_id: DataTypes.INTEGER,
     tool_id: DataTypes.INTEGER,
-    quantity_tool: DataTypes.FLOAT,
-    total_tool: DataTypes.FLOAT,
+    quantity_ud: DataTypes.FLOAT,
+    total: DataTypes.FLOAT,
     discount: DataTypes.INTEGER,
-    pvp_tool: DataTypes.FLOAT,
-    final_price_tool: DataTypes.FLOAT
+    pvp: DataTypes.FLOAT,
+    final_price: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'OrderToolProducts',
