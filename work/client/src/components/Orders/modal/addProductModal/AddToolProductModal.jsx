@@ -3,7 +3,10 @@ import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useOrderContext } from '../../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
-import { getUpdateDryMixedProductOfOrders } from '#components/redux/actions/ordersAction.js';
+import {
+  getUpdateDryMixedProductOfOrders,
+  getUpdateToolProductOfOrders,
+} from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 import '#components/Styles/modals.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
@@ -56,9 +59,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
 
-    const result =
-      (selectedProduct?.price  * Math.abs(100 - discount)) /
-      100;
+    const result = (selectedProduct?.price * Math.abs(100 - discount)) / 100;
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -79,11 +80,11 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
 
   const addProductOrder = async () => {
     if (haveOrderClient) {
-      const newDryMixedProductsOfOrder = {
+      const newToolProductsOfOrder = {
         order_id: haveOrderClient.id,
         productOfOrder,
       };
-      dispatch(getUpdateDryMixedProductOfOrders(newDryMixedProductsOfOrder));
+      dispatch(getUpdateToolProductOfOrders(newToolProductsOfOrder));
       setProductOfOrder({});
       setSelectedProduct({});
     }

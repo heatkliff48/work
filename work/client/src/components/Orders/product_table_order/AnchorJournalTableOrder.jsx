@@ -3,6 +3,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { Button } from 'reactstrap';
 import AddDryMixesProductModal from '../modal/addProductModal/AddDryMixesProductModal';
+import AddAnchorProductModal from '../modal/addProductModal/AddAnchorProductModal';
 
 const AnchorJournalTableOrder = ({
   productListOrder,
@@ -18,7 +19,7 @@ const AnchorJournalTableOrder = ({
   return (
     <>
       {anchorProductModalOrder && (
-        <AddDryMixesProductModal
+        <AddAnchorProductModal
           isOpen={anchorProductModalOrder}
           toggle={() => setAnchorProductModalOrder(!anchorProductModalOrder)}
         />

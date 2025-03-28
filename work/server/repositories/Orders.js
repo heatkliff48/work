@@ -107,6 +107,7 @@ class OrdersRepository {
           'final_price',
         ],
       });
+
       return anchor_product_list;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
@@ -259,105 +260,105 @@ class OrdersRepository {
     }
   }
 
-  // static async getUpdateProductsOfOrder(newProductsOfOrder) {
-  //   try {
-  //     const { order_id, productOfOrder } = newProductsOfOrder;
+  static async getUpdateAnchorProductsOfOrder(newAnchorProductsOfOrder) {
+    try {
+      const { order_id, productOfOrder } = newAnchorProductsOfOrder;
 
-  //     const {
-  //       product_id,
-  //       quantity_m2,
-  //       quantity_palet,
-  //       quantity_real,
-  //       price_m2,
-  //       discount,
-  //       final_price,
-  //       warehouse_id,
-  //     } = productOfOrder;
+      const {
+        anchor_id,
+        quantity_ud,
+        quantity_palet_anchor,
+        quantity_real_ud,
+        total,
+        discount,
+        final_price,
+        pvp,
+      } = productOfOrder;
 
-  //     const product_of_order = await OrdersProducts.create({
-  //       order_id,
-  //       product_id,
-  //       quantity_m2,
-  //       quantity_palet,
-  //       quantity_real,
-  //       price_m2,
-  //       discount,
-  //       final_price,
-  //       warehouse_id,
-  //     });
+      const product_of_order = await OrderAnchorProducts.create({
+        order_id,
+        anchor_id,
+        quantity_ud,
+        quantity_palet_anchor,
+        quantity_real_ud,
+        total,
+        discount,
+        pvp,
+        final_price,
+      });
 
-  //     const allOrdrProd = await OrdersProducts.findAll({
-  //       attributes: [
-  //         'id',
-  //         'order_id',
-  //         'product_id',
-  //         'quantity_m2',
-  //         'quantity_palet',
-  //         'quantity_real',
-  //         'price_m2',
-  //         'discount',
-  //         'final_price',
-  //         'warehouse_id',
-  //       ],
-  //     });
+      const allOrdrProd = await OrderAnchorProducts.findAll({
+        attributes: [
+          'id',
+          'order_id',
+          'anchor_id',
+          'quantity_ud',
+          'quantity_palet_anchor',
+          'quantity_real_ud',
+          'total',
+          'discount',
+          'pvp',
+          'final_price',
+        ],
+      });
 
-  //     const tid = allOrdrProd[allOrdrProd.length - 1].id;
-  //     return { id: tid, ...product_of_order.toJSON() };
-  //   } catch (error) {
-  //     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
-  //     return error;
-  //   }
-  // }
+      const tid = allOrdrProd[allOrdrProd.length - 1].id;
+      return { id: tid, ...product_of_order.toJSON() };
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
 
-  // static async getUpdateProductsOfOrder(newProductsOfOrder) {
-  //   try {
-  //     const { order_id, productOfOrder } = newProductsOfOrder;
+  static async getUpdateToolProductsOfOrder(newToolProductsOfOrder) {
+    try {
+      const { order_id, productOfOrder } = newToolProductsOfOrder;
 
-  //     const {
-  //       product_id,
-  //       quantity_m2,
-  //       quantity_palet,
-  //       quantity_real,
-  //       price_m2,
-  //       discount,
-  //       final_price,
-  //       warehouse_id,
-  //     } = productOfOrder;
+      const {
+        tool_id,
+        quantity_ud,
+        quantity_palet_tool,
+        quantity_real_ud,
+        total,
+        discount,
+        final_price,
+        pvp,
+      } = productOfOrder;
 
-  //     const product_of_order = await OrdersProducts.create({
-  //       order_id,
-  //       product_id,
-  //       quantity_m2,
-  //       quantity_palet,
-  //       quantity_real,
-  //       price_m2,
-  //       discount,
-  //       final_price,
-  //       warehouse_id,
-  //     });
+      const product_of_order = await OrderToolProducts.create({
+        order_id,
+        tool_id,
+        quantity_ud,
+        quantity_palet_tool,
+        quantity_real_ud,
+        total,
+        discount,
+        pvp,
+        final_price,
+      });
 
-  //     const allOrdrProd = await OrdersProducts.findAll({
-  //       attributes: [
-  //         'id',
-  //         'order_id',
-  //         'product_id',
-  //         'quantity_m2',
-  //         'quantity_palet',
-  //         'quantity_real',
-  //         'price_m2',
-  //         'discount',
-  //         'final_price',
-  //         'warehouse_id',
-  //       ],
-  //     });
+      const allOrdrProd = await OrderToolProducts.findAll({
+        attributes: [
+          'id',
+          'order_id',
+          'tool_id',
+          'quantity_ud',
+          'quantity_palet_tool',
+          'quantity_real_ud',
+          'total',
+          'discount',
+          'pvp',
+          'final_price',
+        ],
+      });
 
-  //     const tid = allOrdrProd[allOrdrProd.length - 1].id;
-  //     return { id: tid, ...product_of_order.toJSON() };
-  //   } catch (error) {
-  //     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
-  //     return error;
-  //   }
-  // }
+      const tid = allOrdrProd[allOrdrProd.length - 1].id;
+      return { id: tid, ...product_of_order.toJSON() };
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
 
   static async getUpdateProductInfoOfOrder(productOfOrder) {
     try {

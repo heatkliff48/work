@@ -32,6 +32,8 @@ import {
   NEW_TOOL_SOCKET,
   NEED_UPDATE_TOOL_SOCKET,
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+  UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+  UPDATE_TOOL_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
   NEED_UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
   NEED_DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
@@ -83,6 +85,20 @@ export const updDryMixedProductOfOrderSocket = (dry_mixed_product_of_order) => {
   return {
     type: UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET,
     payload: dry_mixed_product_of_order,
+  };
+};
+
+export const updAnchorProductOfOrderSocket = (anchor_product_of_order) => {
+  return {
+    type: UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+    payload: anchor_product_of_order,
+  };
+};
+
+export const updToolProductOfOrderSocket = (tool_product_of_order) => {
+  return {
+    type: UPDATE_TOOL_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+    payload: tool_product_of_order,
   };
 };
 

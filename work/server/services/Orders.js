@@ -75,28 +75,29 @@ class OrdersService {
   }
 
   static async getUpdateDryMixedProductsOfOrder(newDryMixedProductsOfOrder) {
-    const dry_mixed_product_of_order = await OrdersRepository.getUpdateDryMixedProductsOfOrder(
-      newDryMixedProductsOfOrder
-    );
+    const dry_mixed_product_of_order =
+      await OrdersRepository.getUpdateDryMixedProductsOfOrder(
+        newDryMixedProductsOfOrder
+      );
 
     return dry_mixed_product_of_order;
   }
 
-  // static async getUpdateProductsOfOrder({ newProductsOfOrder }) {
-  //   const product_of_order = await OrdersRepository.getUpdateProductsOfOrder(
-  //     newProductsOfOrder
-  //   );
+  static async getUpdateAnchorProductsOfOrder(newAnchorProductsOfOrder) {
+    const anchor_product_of_order =
+      await OrdersRepository.getUpdateAnchorProductsOfOrder(
+        newAnchorProductsOfOrder
+      );
 
-  //   return product_of_order;
-  // }
+    return anchor_product_of_order;
+  }
 
-  // static async getUpdateProductsOfOrder({ newProductsOfOrder }) {
-  //   const product_of_order = await OrdersRepository.getUpdateProductsOfOrder(
-  //     newProductsOfOrder
-  //   );
+  static async getUpdateToolProductsOfOrder(newToolProductsOfOrder) {
+    const tool_product_of_order =
+      await OrdersRepository.getUpdateToolProductsOfOrder(newToolProductsOfOrder);
 
-  //   return product_of_order;
-  // }
+    return tool_product_of_order;
+  }
 
   static async getUpdateProductInfoOfOrder({ productOfOrder }) {
     const upd_prod_info = await OrdersRepository.getUpdateProductInfoOfOrder(
