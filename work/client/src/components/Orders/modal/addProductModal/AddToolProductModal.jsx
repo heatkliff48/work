@@ -43,29 +43,15 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const quantity_palet_value = useMemo(() => {
-    if (!selectedProduct) return;
-    if (!productOfOrder?.quantity_ud) productOfOrder.quantity_ud = 0;
-    const result = Math.ceil(
-      productOfOrder?.quantity_ud / (selectedProduct?.number_of_bags || 1)
-    );
-
-    setProductOfOrder((prev) => ({
-      ...prev,
-      quantity_palet_ud: result,
-    }));
-    return result;
-  }, [productOfOrder.quantity_ud, selectedProduct?.number_of_bags]);
-
   const total_value = useMemo(() => {
-    const result = quantity_palet_value * selectedProduct?.number_of_bags;
+    const result = productOfOrder.quantity_ud * selectedProduct?.number_of_bags;
 
     setProductOfOrder((prev) => ({
       ...prev,
       total: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [quantity_palet_value, selectedProduct?.number_of_bags]);
+  }, [productOfOrder.quantity_ud, selectedProduct?.number_of_bags]);
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;

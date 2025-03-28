@@ -55,7 +55,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
 
     setProductOfOrder((prev) => ({
       ...prev,
-      quantity_palet_anchor: result,
+      quantity_palet_dry: result,
     }));
     return result;
   }, [productOfOrder.quantity_ud, selectedProduct?.number_of_bags]);

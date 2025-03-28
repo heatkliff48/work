@@ -51,23 +51,20 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
   }
 };
 
-export const dryMixedProductsOfOrdersReducer = (
-  dryMixedProductsOfOrders = [],
-  action
-) => {
+export const dryMixedProductsOfOrdersReducer = (state = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case DRY_MIXED_PRODUCTS_OF_ORDER: {
-      return payload;
+      return payload ?? state;
     }
 
     case UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...dryMixedProductsOfOrders, payload];
+      return [...state, payload];
     }
 
     // case UPDATE_PRODUCT_INFO_OF_ORDER: {
     //   console.log('UPDATE_PRODUCT_INFO_OF_ORDER', payload);
-    //   const result = dryMixedProductsOfOrders.map((el) => {
+    //   const result = state.map((el) => {
     //     if (el?.id === payload?.id) {
     //       return { ...payload };
     //     }
@@ -79,33 +76,30 @@ export const dryMixedProductsOfOrdersReducer = (
     // }
 
     // case DELETE_PRODUCT_OF_ORDER_SOCKET: {
-    //   const result = dryMixedProductsOfOrders.filter((el) => el.id !== payload);
+    //   const result = state.filter((el) => el.id !== payload);
     //   return result;
     // }
 
     default:
-      return dryMixedProductsOfOrders;
+      return state;
   }
 };
 
-export const anchorProductsOfOrdersReducer = (
-  anchorProductsOfOrders = [],
-  action
-) => {
+export const anchorProductsOfOrdersReducer = (state = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case ANCHOR_PRODUCTS_OF_ORDER: {
-      return payload;
+      return payload ?? state;
     }
 
     case UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
       console.log();
-      return [...anchorProductsOfOrders, payload];
+      return [...state, payload];
     }
 
     // case UPDATE_PRODUCT_INFO_OF_ORDER: {
     //   console.log('UPDATE_PRODUCT_INFO_OF_ORDER', payload);
-    //   const result = anchorProductsOfOrders.map((el) => {
+    //   const result = state.map((el) => {
     //     if (el?.id === payload?.id) {
     //       return { ...payload };
     //     }
@@ -117,29 +111,29 @@ export const anchorProductsOfOrdersReducer = (
     // }
 
     // case DELETE_PRODUCT_OF_ORDER_SOCKET: {
-    //   const result = anchorProductsOfOrders.filter((el) => el.id !== payload);
+    //   const result = state.filter((el) => el.id !== payload);
     //   return result;
     // }
 
     default:
-      return anchorProductsOfOrders;
+      return state;
   }
 };
 
-export const toolProductsOfOrdersReducer = (toolProductsOfOrders = [], action) => {
+export const toolProductsOfOrdersReducer = (state = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case TOOL_PRODUCTS_OF_ORDER: {
-      return payload;
+      return payload ?? state;
     }
 
     case UPDATE_TOOL_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...toolProductsOfOrders, payload];
+      return [...state, payload];
     }
 
     // case UPDATE_PRODUCT_INFO_OF_ORDER: {
     //   console.log('UPDATE_PRODUCT_INFO_OF_ORDER', payload);
-    //   const result = toolProductsOfOrders.map((el) => {
+    //   const result = state.map((el) => {
     //     if (el?.id === payload?.id) {
     //       return { ...payload };
     //     }
@@ -151,11 +145,11 @@ export const toolProductsOfOrdersReducer = (toolProductsOfOrders = [], action) =
     // }
 
     // case DELETE_PRODUCT_OF_ORDER_SOCKET: {
-    //   const result = toolProductsOfOrders.filter((el) => el.id !== payload);
+    //   const result = state.filter((el) => el.id !== payload);
     //   return result;
     // }
 
     default:
-      return toolProductsOfOrders;
+      return state;
   }
 };

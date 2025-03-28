@@ -52,7 +52,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
 
     setProductOfOrder((prev) => ({
       ...prev,
-      quantity_palet_dry: result,
+      quantity_palet_anchor: result,
     }));
     return result;
   }, [productOfOrder.quantity_ud, selectedProduct?.number_of_bags]);

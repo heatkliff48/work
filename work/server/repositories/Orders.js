@@ -74,13 +74,13 @@ class OrdersRepository {
           'id',
           'order_id',
           'dry_mixed_id',
-          'quantity_dry',
+          'quantity_ud',
           'quantity_palet_dry',
-          'quantity_real_dry',
-          'total_dry',
+          'quantity_real_ud',
+          'total',
           'discount',
-          'pvp_dry',
-          'final_price_dry',
+          'pvp',
+          'final_price',
         ],
       });
 
@@ -98,13 +98,13 @@ class OrdersRepository {
           'id',
           'order_id',
           'anchor_id',
-          'quantity_anchor',
+          'quantity_ud',
           'quantity_palet_anchor',
-          'quantity_real_anchor',
-          'total_anchor',
+          'quantity_real_ud',
+          'total',
           'discount',
-          'pvp_anchor',
-          'final_price_anchor',
+          'pvp',
+          'final_price',
         ],
       });
       return anchor_product_list;
@@ -120,11 +120,11 @@ class OrdersRepository {
           'id',
           'order_id',
           'tool_id',
-          'quantity_tool',
-          'total_tool',
+          'quantity_ud',
+          'total',
           'discount',
-          'pvp_tool',
-          'final_price_tool',
+          'pvp',
+          'final_price',
         ],
       });
       return tool_product_list;
@@ -215,25 +215,25 @@ class OrdersRepository {
 
       const {
         dry_mixed_id,
-        quantity_dry,
+        quantity_ud,
         quantity_palet_dry,
-        quantity_real_dry,
-        total_dry,
+        quantity_real_ud,
+        total,
         discount,
-        final_price_dry,
-        pvp_dry,
+        final_price,
+        pvp,
       } = productOfOrder;
 
       const product_of_order = await OrderDryMixedProducts.create({
         order_id,
         dry_mixed_id,
-        quantity_dry,
+        quantity_ud,
         quantity_palet_dry,
-        quantity_real_dry,
-        total_dry,
+        quantity_real_ud,
+        total,
         discount,
-        pvp_dry,
-        final_price_dry,
+        pvp,
+        final_price,
       });
 
       const allOrdrProd = await OrderDryMixedProducts.findAll({
@@ -241,13 +241,13 @@ class OrdersRepository {
           'id',
           'order_id',
           'dry_mixed_id',
-          'quantity_dry',
+          'quantity_ud',
           'quantity_palet_dry',
-          'quantity_real_dry',
-          'total_dry',
+          'quantity_real_ud',
+          'total',
           'discount',
-          'pvp_dry',
-          'final_price_dry',
+          'pvp',
+          'final_price',
         ],
       });
 
