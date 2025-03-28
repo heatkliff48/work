@@ -32,6 +32,7 @@ const initState = {
   accountingDataList: [],
   anchor: [],
   tool: [],
+  qualityManagementData: [],
 };
 
 export default initState;

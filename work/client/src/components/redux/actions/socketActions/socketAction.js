@@ -32,6 +32,9 @@ import {
   NEW_TOOL_SOCKET,
   NEED_UPDATE_TOOL_SOCKET,
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+  NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
+  NEED_UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
+  NEED_DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -262,5 +265,26 @@ export const updateToolSocket = (tool) => {
   return {
     type: NEED_UPDATE_TOOL_SOCKET,
     payload: tool,
+  };
+};
+
+export const addNewQualityManagementSocket = (qualityManagementData) => {
+  return {
+    type: NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
+    payload: qualityManagementData,
+  };
+};
+
+export const updateQualityManagementSocket = (qualityManagementData) => {
+  return {
+    type: NEED_UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
+    payload: qualityManagementData,
+  };
+};
+
+export const deleteQualityManagementSocket = (qualityManagementDataID) => {
+  return {
+    type: NEED_DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
+    payload: qualityManagementDataID,
   };
 };

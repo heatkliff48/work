@@ -32,6 +32,7 @@ import DryMixesJournal from '#components/Products/DryMixesJournal.jsx';
 import RelatedMaterialsJournal from '#components/Products/RelatedMaterialsJournal.jsx';
 import AnchorsTable from '#components/Products/AnchorsTable.jsx';
 import ToolsTable from '#components/Products/ToolsTable.jsx';
+import QualityManagementTable from '#components/QualityManagement/QualityManagementTable.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -94,6 +95,7 @@ function App() {
           />
           <Route path="/anchors" element={<AnchorsTable />} />
           <Route path="/tools" element={<ToolsTable />} />
+          <Route path="/quality_management" element={<QualityManagementTable />} />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>
