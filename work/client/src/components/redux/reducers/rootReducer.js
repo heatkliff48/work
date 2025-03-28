@@ -31,6 +31,7 @@ import {
   relatedMaterialsJournalReducer,
   toolReducer,
 } from './productsTypeJournalReducer';
+import { qualityManagementReducer } from './qualityManagementReducer';
 import { recipeReducer } from './recipeReducer';
 import { reservedProductsReducer } from './reservedProductsReducer';
 import { rolesReducer } from './rolesReducer';
@@ -76,4 +77,5 @@ export const rootReducer = combineReducers({
   accountingDataList: accountingReducer,
   anchor: anchorReducer,
   tool: toolReducer,
+  qualityManagementData: qualityManagementReducer,
 });

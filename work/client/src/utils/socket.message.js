@@ -32,6 +32,9 @@ import {
   addNewToolSocket,
   updateToolSocket,
   updDryMixedProductOfOrderSocket,
+  addNewQualityManagementSocket,
+  updateQualityManagementSocket,
+  deleteQualityManagementSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -90,6 +93,9 @@ import {
   ADD_NEW_TOOL_SOCKET,
   UPDATE_TOOL_SOCKET,
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+  ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
+  UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
+  DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -264,6 +270,18 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_TOOL_SOCKET:
       dispatch(updateToolSocket(payload));
+      break;
+
+    case ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET:
+      dispatch(addNewQualityManagementSocket(payload));
+      break;
+
+    case UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET:
+      dispatch(updateQualityManagementSocket(payload));
+      break;
+
+    case DELETE_QUALITY_MANAGEMENT_DATA_SOCKET:
+      dispatch(deleteQualityManagementSocket(payload));
       break;
 
     default:

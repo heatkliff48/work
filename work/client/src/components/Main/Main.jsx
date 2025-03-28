@@ -13,7 +13,12 @@ import {
   getToolProductsOfOrders,
 } from '#components/redux/actions/ordersAction.js';
 import { getAllProducts } from '#components/redux/actions/productsAction.js';
-import { getAnchor, getDryMixesJournal, getRelatedMaterialsJournal, getTool } from '#components/redux/actions/productsTypeJournalAction.js';
+import {
+  getAnchor,
+  getDryMixesJournal,
+  getRelatedMaterialsJournal,
+  getTool,
+} from '#components/redux/actions/productsTypeJournalAction.js';
 import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
 import { getAllRoles } from '#components/redux/actions/rolesAction.js';
 import { getAllStockBalance } from '#components/redux/actions/stockBalanceAction.js';
@@ -165,6 +170,14 @@ function Main() {
             Recipe Orders
           </button>
         )}
+        {/* {checkUserAccess(user, roles, 'quality_management')?.canRead && ( */}
+        <button
+          className="nav-button"
+          onClick={() => navigate('/quality_management')}
+        >
+          Quality Management
+        </button>
+        {/* )} */}
       </div>
     </div>
   );

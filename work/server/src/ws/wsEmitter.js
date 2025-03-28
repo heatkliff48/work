@@ -41,6 +41,9 @@ const {
   UPDATE_ANCHOR_SOCKET,
   ADD_NEW_TOOL_SOCKET,
   UPDATE_TOOL_SOCKET,
+  ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
+  UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
+  DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -144,16 +147,19 @@ function registerWsEmitter(map) {
     }
   });
 
-  myEmitter.on(UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET, (dry_mixed_product_of_order) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
-          payload: dry_mixed_product_of_order,
-        })
-      );
+  myEmitter.on(
+    UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+    (dry_mixed_product_of_order) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+            payload: dry_mixed_product_of_order,
+          })
+        );
+      }
     }
-  });
+  );
 
   myEmitter.on(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, (product_id) => {
     for (let [id, userConnect] of map) {
@@ -511,6 +517,39 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_TOOL_SOCKET,
           payload: tool,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET, (qualityManagementData) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
+          payload: qualityManagementData,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET, (qualityManagementData) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
+          payload: qualityManagementData,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_QUALITY_MANAGEMENT_DATA_SOCKET, (qualityManagementDataID) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
+          payload: qualityManagementDataID,
         })
       );
     }
