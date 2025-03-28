@@ -9,6 +9,8 @@ const {
   GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
   UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
+  UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+  UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -149,37 +151,36 @@ class OrdersController {
     }
   }
 
-  // static async getUpdateProductsOfOrder(req, res) {
-  //   const { newProductsOfOrder } = req.body;
+  static async getUpdateAnchorProductsOfOrder(req, res) {
+    const newAnchorProductsOfOrder = req.body;
 
-  //   try {
-  //     const product_of_order = await OrdersService.getUpdateProductsOfOrder({
-  //       newProductsOfOrder,
-  //     });
+    try {
+      const anchor_product_of_order =
+        await OrdersService.getUpdateAnchorProductsOfOrder(newAnchorProductsOfOrder);
 
-  //     myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
+      myEmitter.emit(UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET, anchor_product_of_order);
 
-  //     return res.status(200);
-  //   } catch (err) {
-  //     return ErrorUtils.catchError(res, err);
-  //   }
-  // }
+      return res.status(200).json(anchor_product_of_order);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
 
-  // static async getUpdateProductsOfOrder(req, res) {
-  //   const { newProductsOfOrder } = req.body;
+  static async getUpdateToolProductsOfOrder(req, res) {
+    const newToolProductsOfOrder = req.body;
 
-  //   try {
-  //     const product_of_order = await OrdersService.getUpdateProductsOfOrder({
-  //       newProductsOfOrder,
-  //     });
+    try {
+      const tool_product_of_order = await OrdersService.getUpdateToolProductsOfOrder(
+        newToolProductsOfOrder
+      );
 
-  //     myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
+      myEmitter.emit(UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET, tool_product_of_order);
 
-  //     return res.status(200);
-  //   } catch (err) {
-  //     return ErrorUtils.catchError(res, err);
-  //   }
-  // }
+      return res.status(200).json(tool_product_of_order);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
 
   static async getUpdateProductInfoOfOrder(req, res) {
     const productOfOrder = req.body;

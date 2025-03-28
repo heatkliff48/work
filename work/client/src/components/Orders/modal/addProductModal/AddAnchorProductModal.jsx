@@ -3,10 +3,10 @@ import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useOrderContext } from '../../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
-import { getUpdateDryMixedProductOfOrders } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 import '#components/Styles/modals.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import { getUpdateAnchorProductOfOrders } from '#components/redux/actions/ordersAction.js';
 
 const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -105,11 +105,11 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
 
   const addProductOrder = async () => {
     if (haveOrderClient) {
-      const newDryMixedProductsOfOrder = {
+      const newAnchorProductsOfOrder = {
         order_id: haveOrderClient.id,
         productOfOrder,
       };
-      dispatch(getUpdateDryMixedProductOfOrders(newDryMixedProductsOfOrder));
+      dispatch(getUpdateAnchorProductOfOrders(newAnchorProductsOfOrder));
       setProductOfOrder({});
       setSelectedProduct({});
     }

@@ -32,6 +32,8 @@ import {
   addNewToolSocket,
   updateToolSocket,
   updDryMixedProductOfOrderSocket,
+  updAnchorProductOfOrderSocket,
+  updToolProductOfOrderSocket,
   addNewQualityManagementSocket,
   updateQualityManagementSocket,
   deleteQualityManagementSocket,
@@ -93,6 +95,8 @@ import {
   ADD_NEW_TOOL_SOCKET,
   UPDATE_TOOL_SOCKET,
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+  UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+  UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
   UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
   DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
@@ -130,6 +134,14 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET:
       dispatch(updDryMixedProductOfOrderSocket(payload));
+      break;
+
+    case UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET:
+      dispatch(updAnchorProductOfOrderSocket(payload));
+      break;
+
+    case UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET:
+      dispatch(updToolProductOfOrderSocket(payload));
       break;
 
     case GET_DELETE_PRODUCT_OF_ORDER_SOCKET:

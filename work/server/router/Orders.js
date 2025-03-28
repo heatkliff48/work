@@ -14,9 +14,12 @@ router.post('/current/products', OrdersController.getCurrentProductsOfOrder);
 router.post('/delete', OrdersController.getDeleteOrder);
 router.post('/delete/product', OrdersController.getDeleteProductOfOrder);
 router.post('/products/add', OrdersController.getUpdateProductsOfOrder);
-router.post('/dry_mixed_products/add', OrdersController.getUpdateDryMixedProductsOfOrder);
-// router.post('/products/add', OrdersController.getUpdateProductsOfOrder);
-// router.post('/products/add', OrdersController.getUpdateProductsOfOrder);
+router.post(
+  '/dry_mixed_products/add',
+  OrdersController.getUpdateDryMixedProductsOfOrder
+);
+router.post('/anchor_products/add', OrdersController.getUpdateAnchorProductsOfOrder);
+router.post('/tool_products/add', OrdersController.getUpdateToolProductsOfOrder);
 router.post('/product/update/info', OrdersController.getUpdateProductInfoOfOrder);
 router.post('/update/contact', OrdersController.getUpdateContactInfoOfOrder);
 router.post(
