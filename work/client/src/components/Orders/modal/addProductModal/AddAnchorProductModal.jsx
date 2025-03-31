@@ -43,24 +43,24 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const pieces_per_pallet =
+    selectedProduct.pieces_per_box * selectedProduct.box_on_a_pallet;
+
   const quantity_palet_value = useMemo(() => {
     if (!selectedProduct) return;
     if (!productOfOrder?.quantity_ud) productOfOrder.quantity_ud = 0;
-    const result = Math.ceil(
-      productOfOrder?.quantity_ud / (selectedProduct?.number_of_bags || 1)
-    );
+
+    const result = Math.ceil(productOfOrder?.quantity_ud / (pieces_per_pallet || 1));
 
     setProductOfOrder((prev) => ({
       ...prev,
       quantity_palet_anchor: result,
     }));
     return result;
-  }, [productOfOrder.quantity_ud, selectedProduct?.number_of_bags]);
+  }, [productOfOrder.quantity_ud]);
 
   const quantity_real_value = useMemo(() => {
-    const result = Math.ceil(
-      quantity_palet_value * (selectedProduct?.number_of_bags || 1)
-    );
+    const result = Math.ceil(quantity_palet_value * (pieces_per_pallet || 1));
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -70,14 +70,14 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
   }, [quantity_palet_value, selectedProduct?.m2]);
 
   const total_value = useMemo(() => {
-    const result = quantity_palet_value * selectedProduct?.number_of_bags;
+    const result = quantity_palet_value * pieces_per_pallet;
 
     setProductOfOrder((prev) => ({
       ...prev,
       total: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [quantity_palet_value, selectedProduct?.number_of_bags]);
+  }, [quantity_palet_value]);
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;

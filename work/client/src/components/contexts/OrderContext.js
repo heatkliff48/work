@@ -187,7 +187,7 @@ const OrderContextProvider = ({ children }) => {
       sortType: 'number',
     },
     {
-      Header: 'Total, kg',
+      Header: 'Total, Ud',
       accessor: 'total',
       sortType: 'number',
     },

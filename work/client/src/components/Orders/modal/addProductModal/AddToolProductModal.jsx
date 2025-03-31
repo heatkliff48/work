@@ -47,14 +47,14 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const total_value = useMemo(() => {
-    const result = productOfOrder.quantity_ud * selectedProduct?.number_of_bags;
+    const result = productOfOrder.quantity_ud * selectedProduct?.piece_weight;
 
     setProductOfOrder((prev) => ({
       ...prev,
       total: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [productOfOrder.quantity_ud, selectedProduct?.number_of_bags]);
+  }, [productOfOrder.quantity_ud, selectedProduct?.piece_weight]);
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
