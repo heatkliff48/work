@@ -22,7 +22,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
     list_of_orders,
   } = useOrderContext();
 
-  const { COLUMNS_ANCHOR_PRODUCT, anchor } = useProductsTypeJournalContext();
+  const { COLUMNS_TOOLS_PRODUCT, tool } = useProductsTypeJournalContext();
 
   const dispatch = useDispatch();
 
@@ -36,7 +36,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
   );
 
   const handlerAddProductOrder = useCallback((row) => {
-    const product = anchor.find((el) => el.id === row.original.id);
+    const product = tool.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
     setProductOfOrder((prev) => ({ ...prev, dry_mixed_id: product?.id }));
@@ -122,7 +122,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
           {haveProduct ? (
             <p>Fill in the remaining parameters</p>
           ) : (
-            <p>Select anchor product</p>
+            <p>Select tool product</p>
           )}
         </ModalHeader>
         <ModalBody>
@@ -195,8 +195,8 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
           ) : (
             <>
               <Table
-                COLUMN_DATA={COLUMNS_ANCHOR_PRODUCT}
-                dataOfTable={anchor}
+                COLUMN_DATA={COLUMNS_TOOLS_PRODUCT}
+                dataOfTable={tool}
                 // userAccess={userAccess}
                 onClickButton={() => {}}
                 buttonText={''}
@@ -209,7 +209,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
           )}
         </ModalBody>
         <ModalFooter>
-          <button onClick={addProductOrder}>Add anchor product</button>
+          <button onClick={addProductOrder}>Add tool product</button>
         </ModalFooter>
       </Modal>
     </div>
