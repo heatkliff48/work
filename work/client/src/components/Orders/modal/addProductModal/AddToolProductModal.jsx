@@ -61,8 +61,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
     console.log();
 
     const result =
-      (
-        selectedProduct?.price *
+      (selectedProduct?.price *
         productOfOrder?.quantity_ud *
         Math.abs(100 - discount)) /
       100;
@@ -72,7 +71,11 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
       final_price: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [selectedProduct?.price, productOfOrder?.discount, productOfOrder?.quantity_ud]);
+  }, [
+    selectedProduct?.price,
+    productOfOrder?.discount,
+    productOfOrder?.quantity_ud,
+  ]);
 
   const pvp_value = useMemo(() => {
     const result = total_value > 1 ? final_price_value / total_value : 0;

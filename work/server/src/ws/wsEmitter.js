@@ -46,6 +46,9 @@ const {
   DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
   UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -190,6 +193,39 @@ function registerWsEmitter(map) {
       userConnect.send(
         JSON.stringify({
           type: GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
+          payload: product_id,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET, (product_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+          payload: product_id,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET, (product_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+          payload: product_id,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET, (product_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
           payload: product_id,
         })
       );

@@ -38,9 +38,15 @@ import {
   UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
   GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
   UPDATE_ANCHOR_PRODUCTS_OF_ORDER,
+  UPDATE_TOOL_PRODUCTS_OF_ORDER,
   GET_UPDATE_ANCHOR_PRODUCTS_OF_ORDER,
   GET_UPDATE_TOOL_PRODUCTS_OF_ORDER,
-  UPDATE_TOOL_PRODUCTS_OF_ORDER,
+  DELETE_TOOL_OF_ORDER,
+  DELETE_ANCHOR_OF_ORDER,
+  DELETE_DRY_MIXED_OF_ORDER,
+  GET_DELETE_ANCHOR_OF_ORDER,
+  GET_DELETE_DRY_MIXED_OF_ORDER,
+  GET_DELETE_TOOL_OF_ORDER,
 } from '../types/ordersTypes';
 
 const url = axios.create({
@@ -156,24 +162,6 @@ const getUpdateToolProductsOfOrder = (newToolProductsOfOrder) => {
     .catch(showErrorMessage);
 };
 
-// const getUpdateProductsOfOrder = (newProductsOfOrder) => {
-//   return url
-//     .post('/orders/products/add', newProductsOfOrder)
-//     .then((res) => {
-//       return res.data;
-//     })
-//     .catch(showErrorMessage);
-// };
-
-// const getUpdateProductsOfOrder = (newProductsOfOrder) => {
-//   return url
-//     .post('/orders/products/add', newProductsOfOrder)
-//     .then((res) => {
-//       return res.data;
-//     })
-//     .catch(showErrorMessage);
-// };
-
 const getUpdateProductInfoOfOrder = (productOfOrder) => {
   return url
     .post('/orders/product/update/info', productOfOrder)
@@ -186,6 +174,33 @@ const getUpdateProductInfoOfOrder = (productOfOrder) => {
 const getDeleteProductOfOrder = (product_id) => {
   return url
     .post('/orders/delete/product', { product_id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getDeleteDryMixedProductOfOrder = (dry_mixed_id) => {
+  return url
+    .post('/orders/delete/dry_mixed_products', { dry_mixed_id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getDeleteAnchorProductOfOrder = (anchor_id) => {
+  return url
+    .post('/orders/delete/anchor_product', { anchor_id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getDeleteToolProductOfOrder = (tool_id) => {
+  return url
+    .post('/orders/delete/tool_product', { tool_id })
     .then((res) => {
       return res.data;
     })
@@ -473,6 +488,60 @@ function* getDeleteProductOfOrderWatcher(action) {
   }
 }
 
+function* getDeleteDryMixedProductOfOrderWatcher(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(getDeleteDryMixedProductOfOrder, payload);
+
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: DELETE_DRY_MIXED_OF_ORDER, payload });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: DELETE_DRY_MIXED_OF_ORDER, payload: [] });
+  }
+}
+
+function* getDeleteAnchorProductOfOrderWatcher(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(getDeleteAnchorProductOfOrder, payload);
+
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: DELETE_ANCHOR_OF_ORDER, payload });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: DELETE_ANCHOR_OF_ORDER, payload: [] });
+  }
+}
+
+function* getDeleteToolProductOfOrderWatcher(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(getDeleteToolProductOfOrder, payload);
+
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: DELETE_TOOL_OF_ORDER, payload });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: DELETE_TOOL_OF_ORDER, payload: [] });
+  }
+}
+
 function* getDeleteOrderWatcher(action) {
   try {
     // accessTokenFront = yield select((state) => state.jwt);
@@ -574,6 +643,9 @@ function* ordersWatcher() {
     getUpdateProductInfoOfOrderWatcher
   );
   yield takeLatest(GET_DELETE_PRODUCT_OF_ORDER, getDeleteProductOfOrderWatcher);
+  yield takeLatest(GET_DELETE_DRY_MIXED_OF_ORDER, getDeleteDryMixedProductOfOrderWatcher);
+  yield takeLatest(GET_DELETE_ANCHOR_OF_ORDER, getDeleteAnchorProductOfOrderWatcher);
+  yield takeLatest(GET_DELETE_TOOL_OF_ORDER, getDeleteToolProductOfOrderWatcher);
   yield takeLatest(GET_DELETE_ORDER, getDeleteOrderWatcher);
   yield takeLatest(UPDATE_CONTACT_OF_ORDER, updateContactOfOrderWorker);
   yield takeLatest(UPDATE_DELIVERY_OF_ORDER, updateDeliveryOfOrderWorker);

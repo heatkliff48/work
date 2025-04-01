@@ -37,6 +37,9 @@ import {
   addNewQualityManagementSocket,
   updateQualityManagementSocket,
   deleteQualityManagementSocket,
+  deleteDryMixedProductOfOrderSocket,
+  deleteAnchorProductOfOrderSocket,
+  deleteToolProductOfOrderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -100,6 +103,9 @@ import {
   ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
   UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
   DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
+  GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -146,6 +152,18 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case GET_DELETE_PRODUCT_OF_ORDER_SOCKET:
       dispatch(deeleteProductOfOrderSocket(payload));
+      break;
+
+    case GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET:
+      dispatch(deleteDryMixedProductOfOrderSocket(payload));
+      break;
+
+    case GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET:
+      dispatch(deleteAnchorProductOfOrderSocket(payload));
+      break;
+
+    case GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET:
+      dispatch(deleteToolProductOfOrderSocket(payload));
       break;
 
     case ADD_DATASHIP_ORDER_SOCKET:

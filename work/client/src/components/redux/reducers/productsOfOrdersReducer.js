@@ -7,7 +7,10 @@ import {
   ANCHOR_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 import {
+  DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+  DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   DELETE_PRODUCT_OF_ORDER_SOCKET,
+  DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET,
@@ -62,23 +65,10 @@ export const dryMixedProductsOfOrdersReducer = (state = [], action) => {
       return [...state, payload];
     }
 
-    // case UPDATE_PRODUCT_INFO_OF_ORDER: {
-    //   console.log('UPDATE_PRODUCT_INFO_OF_ORDER', payload);
-    //   const result = state.map((el) => {
-    //     if (el?.id === payload?.id) {
-    //       return { ...payload };
-    //     }
-
-    //     return el;
-    //   });
-
-    //   return result;
-    // }
-
-    // case DELETE_PRODUCT_OF_ORDER_SOCKET: {
-    //   const result = state.filter((el) => el.id !== payload);
-    //   return result;
-    // }
+    case DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET: {
+      const result = state.filter((el) => el.id !== payload);
+      return result;
+    }
 
     default:
       return state;
@@ -97,23 +87,10 @@ export const anchorProductsOfOrdersReducer = (state = [], action) => {
       return [...state, payload];
     }
 
-    // case UPDATE_PRODUCT_INFO_OF_ORDER: {
-    //   console.log('UPDATE_PRODUCT_INFO_OF_ORDER', payload);
-    //   const result = state.map((el) => {
-    //     if (el?.id === payload?.id) {
-    //       return { ...payload };
-    //     }
-
-    //     return el;
-    //   });
-
-    //   return result;
-    // }
-
-    // case DELETE_PRODUCT_OF_ORDER_SOCKET: {
-    //   const result = state.filter((el) => el.id !== payload);
-    //   return result;
-    // }
+    case DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET: {
+      const result = state.filter((el) => el.id !== payload);
+      return result;
+    }
 
     default:
       return state;
@@ -131,23 +108,10 @@ export const toolProductsOfOrdersReducer = (state = [], action) => {
       return [...state, payload];
     }
 
-    // case UPDATE_PRODUCT_INFO_OF_ORDER: {
-    //   console.log('UPDATE_PRODUCT_INFO_OF_ORDER', payload);
-    //   const result = state.map((el) => {
-    //     if (el?.id === payload?.id) {
-    //       return { ...payload };
-    //     }
-
-    //     return el;
-    //   });
-
-    //   return result;
-    // }
-
-    // case DELETE_PRODUCT_OF_ORDER_SOCKET: {
-    //   const result = state.filter((el) => el.id !== payload);
-    //   return result;
-    // }
+    case DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET: {
+      const result = state.filter((el) => el.id !== payload);
+      return result;
+    }
 
     default:
       return state;

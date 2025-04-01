@@ -22,6 +22,9 @@ import {
   GET_UPDATE_TOOL_PRODUCTS_OF_ORDER,
   GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
   GET_UPDATE_ANCHOR_PRODUCTS_OF_ORDER,
+  GET_DELETE_DRY_MIXED_OF_ORDER,
+  GET_DELETE_ANCHOR_OF_ORDER,
+  GET_DELETE_TOOL_OF_ORDER,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -98,12 +101,12 @@ export const getUpdateDryMixedProductOfOrders = (newDryMixedProductsOfOrder) => 
 //   };
 // };
 
-// export const getDeleteDryMixedProductOfOrder = (product_id) => {
-//   return {
-//     type: GET_DELETE_PRODUCT_OF_ORDER,
-//     payload: product_id,
-//   };
-// };
+export const getDeleteDryMixedProductOfOrder = (product_id) => {
+  return {
+    type: GET_DELETE_DRY_MIXED_OF_ORDER,
+    payload: product_id,
+  };
+};
 
 export const getAnchorProductsOfOrders = () => {
   return {
@@ -119,19 +122,12 @@ export const getUpdateAnchorProductOfOrders = (newAnchorProductsOfOrder) => {
   };
 };
 
-// export const getUpdateProductInfoOfOrders = (productOfOrder) => {
-//   return {
-//     type: GET_UPDATE_PRODUCT_INFO_OF_ORDER,
-//     payload: productOfOrder,
-//   };
-// };
-
-// export const getDeleteAnchorProductOfOrder = (product_id) => {
-//   return {
-//     type: GET_DELETE_PRODUCT_OF_ORDER,
-//     payload: product_id,
-//   };
-// };
+export const getDeleteAnchorProductOfOrder = (product_id) => {
+  return {
+    type: GET_DELETE_ANCHOR_OF_ORDER,
+    payload: product_id,
+  };
+};
 
 export const getToolProductsOfOrders = () => {
   return {
@@ -146,19 +142,12 @@ export const getUpdateToolProductOfOrders = (newToolProductsOfOrder) => {
   };
 };
 
-// export const getUpdateProductInfoOfOrders = (productOfOrder) => {
-//   return {
-//     type: GET_UPDATE_PRODUCT_INFO_OF_ORDER,
-//     payload: productOfOrder,
-//   };
-// };
-
-// export const getDeleteToolProductOfOrder = (product_id) => {
-//   return {
-//     type: GET_DELETE_PRODUCT_OF_ORDER,
-//     payload: product_id,
-//   };
-// };
+export const getDeleteToolProductOfOrder = (product_id) => {
+  return {
+    type: GET_DELETE_TOOL_OF_ORDER,
+    payload: product_id,
+  };
+};
 
 export const deleteOrder = (order_id) => {
   return {
