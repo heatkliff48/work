@@ -353,6 +353,50 @@ class OrdersRepository {
     }
   }
 
+  static async getDeleteProductOfOrder({ product_id }) {
+    try {
+      await OrdersProducts.destroy({ where: { id: product_id } });
+
+      return;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getDeleteDryMixedProductOfOrder({ product_id }) {
+    try {
+      await OrderDryMixedProducts.destroy({ where: { id: product_id } });
+
+      return;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getDeleteAnchorProductOfOrder({ product_id }) {
+    try {
+      await OrderAnchorProducts.destroy({ where: { id: product_id } });
+
+      return;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getDeleteToolProductOfOrder({ product_id }) {
+    try {
+      await OrderToolProducts.destroy({ where: { id: product_id } });
+
+      return;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
   static async getUpdateProductInfoOfOrder(productOfOrder) {
     try {
       const {
@@ -439,17 +483,6 @@ class OrdersRepository {
   static async getUpdateInChargeOrder({ order_id, person_in_charge }) {
     try {
       await Orders.update({ person_in_charge }, { where: { id: order_id } });
-      return;
-    } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
-      return error;
-    }
-  }
-
-  static async getDeleteProductOfOrder({ product_id }) {
-    try {
-      await OrdersProducts.destroy({ where: { id: product_id } });
-
       return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);

@@ -13,6 +13,9 @@ router.post('/date', OrdersController.addShippingDateOrder);
 router.post('/current/products', OrdersController.getCurrentProductsOfOrder);
 router.post('/delete', OrdersController.getDeleteOrder);
 router.post('/delete/product', OrdersController.getDeleteProductOfOrder);
+router.post('/delete/dry_mixed_products', OrdersController.getDeleteDryMixedProductOfOrder);
+router.post('/delete/anchor_product', OrdersController.getDeleteAnchorProductOfOrder);
+router.post('/delete/tool_product', OrdersController.getDeleteToolProductOfOrder);
 router.post('/products/add', OrdersController.getUpdateProductsOfOrder);
 router.post(
   '/dry_mixed_products/add',

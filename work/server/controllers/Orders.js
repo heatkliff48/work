@@ -11,6 +11,9 @@ const {
   UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
   UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+  GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -182,6 +185,66 @@ class OrdersController {
     }
   }
 
+  static async getDeleteProductOfOrder(req, res) {
+    const { product_id } = req.body;
+
+    try {
+      await OrdersService.getDeleteProductOfOrder({
+        product_id,
+      });
+
+      myEmitter.emit(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, product_id);
+      return res.status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getDeleteDryMixedProductOfOrder(req, res) {
+    const { product_id } = req.body;
+
+    try {
+      await OrdersService.getDeleteDryMixedProductOfOrder({
+        product_id,
+      });
+
+      myEmitter.emit(GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET, product_id);
+      return res.status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getDeleteAnchorProductOfOrder(req, res) {
+    const { product_id } = req.body;
+
+    try {
+      await OrdersService.getDeleteAnchorProductOfOrder({
+        product_id,
+      });
+
+      myEmitter.emit(GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET, product_id);
+      return res.status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getDeleteToolProductOfOrder(req, res) {
+    const { product_id } = req.body;
+
+    try {
+      await OrdersService.getDeleteToolProductOfOrder({
+        product_id,
+      });
+
+      myEmitter.emit(GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET, product_id);
+      return res.status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async getUpdateProductInfoOfOrder(req, res) {
     const productOfOrder = req.body;
 
@@ -259,21 +322,6 @@ class OrdersController {
       });
 
       return res.json({ person_in_charge, order_id }).status(200);
-    } catch (err) {
-      return ErrorUtils.catchError(res, err);
-    }
-  }
-
-  static async getDeleteProductOfOrder(req, res) {
-    const { product_id } = req.body;
-
-    try {
-      await OrdersService.getDeleteProductOfOrder({
-        product_id,
-      });
-
-      myEmitter.emit(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

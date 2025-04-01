@@ -99,6 +99,38 @@ class OrdersService {
     return tool_product_of_order;
   }
 
+  static async getDeleteProductOfOrder({ product_id }) {
+    await OrdersRepository.getDeleteProductOfOrder({
+      product_id,
+    });
+
+    return;
+  }
+
+  static async getDeleteDryMixedProductOfOrder({ product_id }) {
+    await OrdersRepository.getDeleteDryMixedProductOfOrder({
+      product_id,
+    });
+
+    return;
+  }
+
+  static async getDeleteAnchorProductOfOrder({ product_id }) {
+    await OrdersRepository.getDeleteAnchorProductOfOrder({
+      product_id,
+    });
+
+    return;
+  }
+
+  static async getDeleteToolProductOfOrder({ product_id }) {
+    await OrdersRepository.getDeleteToolProductOfOrder({
+      product_id,
+    });
+
+    return;
+  }
+
   static async getUpdateProductInfoOfOrder({ productOfOrder }) {
     const upd_prod_info = await OrdersRepository.getUpdateProductInfoOfOrder(
       productOfOrder
@@ -127,14 +159,6 @@ class OrdersService {
 
   static async getUpdateInChargeOrder({ person_in_charge, order_id }) {
     await OrdersRepository.getUpdateInChargeOrder({ person_in_charge, order_id });
-
-    return;
-  }
-
-  static async getDeleteProductOfOrder({ product_id }) {
-    await OrdersRepository.getDeleteProductOfOrder({
-      product_id,
-    });
 
     return;
   }
