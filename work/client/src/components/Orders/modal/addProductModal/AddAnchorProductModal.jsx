@@ -36,7 +36,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
     const product = anchor.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
-    setProductOfOrder((prev) => ({ ...prev, dry_mixed_id: product?.id }));
+    setProductOfOrder((prev) => ({ ...prev, anchor_id: product?.id }));
   }, []);
 
   const handleProductListOrderChange = (e) => {
@@ -44,7 +44,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const pieces_per_pallet =
-    selectedProduct.pieces_per_box * selectedProduct.box_on_a_pallet;
+    selectedProduct?.pieces_per_box * selectedProduct?.boxes_on_a_pallet ?? 0;
 
   const quantity_palet_value = useMemo(() => {
     if (!selectedProduct) return;
@@ -77,7 +77,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
       total: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [quantity_palet_value]);
+  }, [productOfOrder?.quantity_palet_anchor]);
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;

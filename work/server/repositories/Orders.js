@@ -152,6 +152,7 @@ class OrdersRepository {
           'warehouse_id',
         ],
       });
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>product_list', product_list);
 
       return product_list;
     } catch (error) {
@@ -314,23 +315,13 @@ class OrdersRepository {
     try {
       const { order_id, productOfOrder } = newToolProductsOfOrder;
 
-      const {
-        tool_id,
-        quantity_ud,
-        quantity_palet_tool,
-        quantity_real_ud,
-        total,
-        discount,
-        final_price,
-        pvp,
-      } = productOfOrder;
+      const { tool_id, quantity_ud, total, discount, final_price, pvp } =
+        productOfOrder;
 
       const product_of_order = await OrderToolProducts.create({
         order_id,
         tool_id,
         quantity_ud,
-        quantity_palet_tool,
-        quantity_real_ud,
         total,
         discount,
         pvp,
@@ -343,8 +334,6 @@ class OrdersRepository {
           'order_id',
           'tool_id',
           'quantity_ud',
-          'quantity_palet_tool',
-          'quantity_real_ud',
           'total',
           'discount',
           'pvp',
@@ -352,7 +341,11 @@ class OrdersRepository {
         ],
       });
 
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>allOrdrProd', allOrdrProd);
+
       const tid = allOrdrProd[allOrdrProd.length - 1].id;
+      console.log('tid', tid);
+
       return { id: tid, ...product_of_order.toJSON() };
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);

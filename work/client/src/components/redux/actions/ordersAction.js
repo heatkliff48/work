@@ -112,6 +112,7 @@ export const getAnchorProductsOfOrders = () => {
 };
 
 export const getUpdateAnchorProductOfOrders = (newAnchorProductsOfOrder) => {
+  console.log('getUpdateAnchorProductOfOrders');
   return {
     type: GET_UPDATE_ANCHOR_PRODUCTS_OF_ORDER,
     payload: newAnchorProductsOfOrder,

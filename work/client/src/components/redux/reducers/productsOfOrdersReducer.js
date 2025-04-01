@@ -55,7 +55,7 @@ export const dryMixedProductsOfOrdersReducer = (state = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case DRY_MIXED_PRODUCTS_OF_ORDER: {
-      return payload ?? state;
+      return payload;
     }
 
     case UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
@@ -89,7 +89,7 @@ export const anchorProductsOfOrdersReducer = (state = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case ANCHOR_PRODUCTS_OF_ORDER: {
-      return payload ?? state;
+      return payload;
     }
 
     case UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
@@ -124,7 +124,7 @@ export const toolProductsOfOrdersReducer = (state = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case TOOL_PRODUCTS_OF_ORDER: {
-      return payload ?? state;
+      return payload;
     }
 
     case UPDATE_TOOL_PRODUCT_OF_ORDER_REDUCER_SOCKET: {

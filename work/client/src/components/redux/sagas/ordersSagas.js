@@ -37,6 +37,10 @@ import {
   GET_TOOL_PRODUCTS_OF_ORDER,
   UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
   GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
+  UPDATE_ANCHOR_PRODUCTS_OF_ORDER,
+  GET_UPDATE_ANCHOR_PRODUCTS_OF_ORDER,
+  GET_UPDATE_TOOL_PRODUCTS_OF_ORDER,
+  UPDATE_TOOL_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
 const url = axios.create({
@@ -128,6 +132,24 @@ const getUpdateProductsOfOrder = (newProductsOfOrder) => {
 const getUpdateDryMixedProductsOfOrder = (newDryMixedProductsOfOrder) => {
   return url
     .post('/orders/dry_mixed_products/add', newDryMixedProductsOfOrder)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getUpdateAnchorProductsOfOrder = (newAnchorProductsOfOrder) => {
+  return url
+    .post('/orders/anchor_products/add', newAnchorProductsOfOrder)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getUpdateToolProductsOfOrder = (newToolProductsOfOrder) => {
+  return url
+    .post('/orders/tool_products/add', newToolProductsOfOrder)
     .then((res) => {
       return res.data;
     })
@@ -401,6 +423,38 @@ function* getUpdateDryMixedProductsOfOrderWatcher(action) {
   }
 }
 
+function* getUpdateAnchorProductsOfOrderWatcher(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(getUpdateAnchorProductsOfOrder, payload);
+
+    // window.localStorage.setItem('jwt', accessToken);
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: UPDATE_ANCHOR_PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
+function* getUpdateToolProductsOfOrderWatcher(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+    const { payload } = action;
+
+    // const { accessToken, accessTokenExpiration } = yield call(
+    yield call(getUpdateToolProductsOfOrder, payload);
+
+    // window.localStorage.setItem('jwt', accessToken);
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    console.error(err);
+    yield put({ type: UPDATE_TOOL_PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
 function* getDeleteProductOfOrderWatcher(action) {
   try {
     // accessTokenFront = yield select((state) => state.jwt);
@@ -506,6 +560,14 @@ function* ordersWatcher() {
   yield takeLatest(
     GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
     getUpdateDryMixedProductsOfOrderWatcher
+  );
+  yield takeLatest(
+    GET_UPDATE_ANCHOR_PRODUCTS_OF_ORDER,
+    getUpdateAnchorProductsOfOrderWatcher
+  );
+  yield takeLatest(
+    GET_UPDATE_TOOL_PRODUCTS_OF_ORDER,
+    getUpdateToolProductsOfOrderWatcher
   );
   yield takeLatest(
     GET_UPDATE_PRODUCT_INFO_OF_ORDER,

@@ -157,11 +157,18 @@ const OrderCart = React.memo(() => {
       Object.entries(data || {})
         .filter(([key]) => !filterKeys.includes(key))
         .map(([key, value]) => {
-          if (!key || key == 'warehouse_id') return;
+          if (!key || key === 'warehouse_id') return null;
+
+          // Если значение — объект, преобразуем его в строку
+          let displayValue = value;
+          if (displayValue && typeof displayValue === 'object') {
+            displayValue = JSON.stringify(displayValue);
+          }
+
           return (
             <div className="data-text" key={key}>
               <p>
-                {displayNames[key] || key}: {value}
+                {displayNames[key] || key}: {displayValue}
               </p>
             </div>
           );
@@ -202,19 +209,21 @@ const OrderCart = React.memo(() => {
     (productsOfOrders, productsTable, arrayName) => {
       if (!productsOfOrders || !productsTable || !arrayName) return [];
 
-      const updatedOrderProducts = productsOfOrders.map((orderProduct) => {
-        const id = getCorrectProductId(arrayName);
+      const updatedOrderProducts = productsOfOrders
+        .filter((el) => el.order_id == orderCartData.id)
+        .map((orderProduct) => {
+          const id = getCorrectProductId(arrayName);
 
-        const product = productsTable.find((p) => p.id === orderProduct?.[id]);
+          const product = productsTable.find((p) => p.id === orderProduct?.[id]);
 
-        if (product) {
-          return {
-            product_article: product.article,
-            ...orderProduct,
-          };
-        }
-        return { ...orderProduct, product_article: 'Unknown' };
-      });
+          if (product) {
+            return {
+              product_article: product.article,
+              ...orderProduct,
+            };
+          }
+          return { ...orderProduct, product_article: 'Unknown' };
+        });
 
       setProductLists((prevState) => {
         return {
@@ -671,13 +680,13 @@ const OrderCart = React.memo(() => {
             )}
             <FilesMain userAccess={userAccess} />
 
-            {/* <div className="footer_button_pdf">
+            <div className="footer_button_pdf">
               <PDFgenerate
                 orderData={orderCartData}
                 productList={productLists}
                 vatValue={vatValue}
               />
-            </div> */}
+            </div>
           </div>
           {orderStatusAccess?.canRead && (
             <div className="status-table">

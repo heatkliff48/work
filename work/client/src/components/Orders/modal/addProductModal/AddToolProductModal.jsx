@@ -39,7 +39,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
     const product = tool.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
-    setProductOfOrder((prev) => ({ ...prev, dry_mixed_id: product?.id }));
+    setProductOfOrder((prev) => ({ ...prev, tool_id: product?.id }));
   }, []);
 
   const handleProductListOrderChange = (e) => {
@@ -47,26 +47,32 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const total_value = useMemo(() => {
-    const result = productOfOrder.quantity_ud * selectedProduct?.piece_weight;
+    const result = productOfOrder.quantity_ud;
 
     setProductOfOrder((prev) => ({
       ...prev,
-      total: result.toFixed(2),
+      total: result,
     }));
-    return result.toFixed(2);
+    return result;
   }, [productOfOrder.quantity_ud, selectedProduct?.piece_weight]);
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
+    console.log();
 
-    const result = (selectedProduct?.price * Math.abs(100 - discount)) / 100;
+    const result =
+      (
+        selectedProduct?.price *
+        productOfOrder?.quantity_ud *
+        Math.abs(100 - discount)) /
+      100;
 
     setProductOfOrder((prev) => ({
       ...prev,
       final_price: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [selectedProduct?.price, productOfOrder?.discount]);
+  }, [selectedProduct?.price, productOfOrder?.discount, productOfOrder?.quantity_ud]);
 
   const pvp_value = useMemo(() => {
     const result = total_value > 1 ? final_price_value / total_value : 0;

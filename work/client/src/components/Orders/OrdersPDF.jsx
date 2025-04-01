@@ -85,10 +85,16 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           item.pvp_neto_ud,
           item.subtotal,
         ]),
-        styles: { fontSize: 6 },
+        styles: {
+          fontSize: 6,
+        },
+        headStyles: {
+          textColor: 'white',
+          fillColor: [255, 0, 0], // ярко-красный фон
+        },
       });
       autoTable(doc, {
-        startY: yPosition + 40, // Отступ от информации о заказе
+        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
         head: [
           [
             'Ref.:',
@@ -114,9 +120,13 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           item.subtotal,
         ]),
         styles: { fontSize: 6 },
+        headStyles: {
+          textColor: 'white',
+          fillColor: [255, 0, 0], // ярко-красный фон
+        },
       });
       autoTable(doc, {
-        startY: yPosition + 40, // Отступ от информации о заказе
+        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
         head: [
           [
             'Ref.:',
@@ -142,10 +152,14 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           item.subtotal,
         ]),
         styles: { fontSize: 6 },
+        headStyles: {
+          textColor: 'white',
+          fillColor: [255, 0, 0], // ярко-красный фон
+        },
       });
 
       autoTable(doc, {
-        startY: yPosition + 40, // Отступ от информации о заказе
+        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
         head: [['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €']],
         body: pdfData.pdfTools?.map((item) => [
           item.ref,
@@ -155,6 +169,10 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           item.subtotal,
         ]),
         styles: { fontSize: 6 },
+        headStyles: {
+          textColor: 'white',
+          fillColor: [255, 0, 0], // ярко-красный фон
+        },
       });
 
       const startY = doc.lastAutoTable
@@ -166,6 +184,11 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         head: [['Condiciones Generales de Compraventa']],
         body: [[pdfData.terms]],
         styles: { fontSize: 9, cellWidth: 'wrap' },
+        headStyles: {
+          textColor: 'white',
+          fillColor: [255, 0, 0], // ярко-красный фон
+        },
+
         columnStyles: { 0: { cellWidth: 180 } },
       });
 
@@ -248,7 +271,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
     const footer =
       'BAUBLOCK MATERIALES AVANZADOS DE CONSTRUCCIÓN S.L.U. inscrita en el Registro Mercantil de Cádiz el 21 de septiembre de 2021, en el diario 219, asiento 75, al Tomo 2410, folio 49, inscripción 1 con hoja CA-59071 , con domicilio social en Avneida Isaac Newton, num 17,  C.P. 11500, provincia de Cádiz, con N.I.F.  B-16868028. Actualizacion febrero de 2025. Estas CGV pueden verse modificadas o ampliadas por Condiciones Particulares que se negocien entre las Partes.';
 
-    const pdfProducts = productList.products.map((prod) => {
+    const pdfProducts = productList?.products?.map((prod) => {
       const product = latestProducts.find(
         (el) => el.article == prod.product_article
       );
@@ -257,32 +280,30 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const total = (prod.quantity_palet * product.quantityBlockOnPallet).toFixed(0);
 
-      const pvp_neto_ud = (prod.final_price / total).toFixed(0);
+      const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
       return {
         ref: product.article,
         descripcion,
-        medición_de_proyecto: prod.quantity_m2,
+        medición_de_proyecto: prod.quantity_m2.toFixed(2),
         total_paletas: prod.quantity_palet,
-        m3_pal: product.volumeBlockOnPallet,
-        m2_pal: product.m2,
+        m3_pal: product.volumeBlockOnPallet.toFixed(2),
+        m2_pal: product.m2.toFixed(2),
         blq_pal: product.quantityBlockOnPallet,
-        total_m2: prod.quantity_real,
-        pvp_neto_m2: prod.price_m2,
+        total_m2: prod.quantity_real.toFixed(2),
+        pvp_neto_m2: prod.price_m2.toFixed(2),
         total,
         pvp_neto_ud,
-        subtotal: prod.final_price,
+        subtotal: prod.final_price.toFixed(2),
       };
     });
 
-    const pdfDryMixes = productList.dryMixes.map((prod) => {
-      const dryMixes = dryMixesJournal.find(
-        (el) => el.article == prod.dryMixes_article
-      );
+    const pdfDryMixes = productList?.dryMixes?.map((prod) => {
+      const dryMixes = dryMixesJournal.find((el) => el.id == prod.dry_mixed_id);
 
-      const quantity = dryMixes.quantity_ud;
+      const quantity = prod.quantity_ud;
 
-      const descripcion = `${dryMixes.name} BAUBLOCK Sacos de ${dryMixes.pallet_weight}kg`;
+      const descripcion = `${dryMixes?.name} BAUBLOCK Sacos de ${dryMixes.pallet_weight}kg`;
 
       const sacos = dryMixes.number_of_bags;
 
@@ -290,7 +311,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const totalKg = (prod.quantity_palet_dry * dryMixes.pallet_weight).toFixed(0);
 
-      const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(0);
+      const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(2);
 
       return {
         ref: dryMixes.article,
@@ -301,17 +322,17 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         totalSacos,
         totalKg,
         pvp_neto_ud,
-        subtotal: prod.final_price,
+        subtotal: prod.final_price.toFixed(2),
       };
     });
 
-    const pdfAnchor = productList.anchor.map((prod) => {
+    const pdfAnchor = productList?.anchors?.map((prod) => {
       const anchorProd = anchor.find((el) => el.id == prod.anchor_id);
-      const quantity = anchorProd.quantity_ud;
+      const quantity = prod.quantity_ud;
 
       const descripcion = `${anchorProd.name} BAUBLOCK Sacos de ${anchorProd.pallet_weight}kg`;
 
-      const sacos = anchorProd.pieces_per_box * anchorProd.box_on_a_pallet;
+      const sacos = anchorProd.pieces_per_box * anchorProd.boxes_on_a_pallet;
 
       const totalSacos = (quantity * sacos).toFixed(0);
 
@@ -319,34 +340,34 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         prod.quantity_palet_anchor * anchorProd.pallet_weight
       ).toFixed(0);
 
-      const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(0);
+      const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(2);
 
       return {
         ref: anchorProd.article,
         descripcion,
         medición_de_proyecto: quantity,
-        total_paletas: anchorProd.quantity_palet_anchor,
+        total_paletas: prod.quantity_palet_anchor,
         sacos,
         totalSacos,
         totalKg,
         pvp_neto_ud,
-        subtotal: prod.final_price,
+        subtotal: prod.final_price.toFixed(2),
       };
     });
 
-    const pdfTools = productList.tool.map((prod) => {
-      const tool = tool.find((el) => el.id == prod.tool_id);
+    const pdfTools = productList?.tools?.map((prod) => {
+      const pdfTool = tool.find((el) => el.id == prod.tool_id);
 
       const total = prod.total;
 
-      const pvp_neto_ud = (prod.final_price / total).toFixed(0);
+      const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
       return {
-        ref: tool.article,
-        descripcion: tool.description,
+        ref: pdfTool.article,
+        descripcion: pdfTool.description,
         total,
         pvp_neto_ud,
-        subtotal: prod.final_price,
+        subtotal: prod.final_price.toFixed(2),
       };
     });
 
