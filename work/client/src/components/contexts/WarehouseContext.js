@@ -270,6 +270,39 @@ const WarehouseContextProvider = ({ children }) => {
 
     setListOfOrderedCakes(data);
 
+    // Группируем все позиции по order_article
+    const ordersMap = list_of_ordered_production.reduce((acc, item) => {
+      if (!acc.has(item.order_article)) {
+        acc.set(item.order_article, []);
+      }
+      acc.get(item.order_article).push(item);
+      return acc;
+    }, new Map());
+
+    // Проверяем каждый заказ на полную резервацию
+    const fullyReservedOrders = Array.from(ordersMap.entries())
+      .filter(([orderArticle, items]) => {
+        // Проверяем, что ВСЕ позиции заказа имеют quantity === quantity_in_warehouse
+        return items.every((item) => item.quantity === item.quantity_in_warehouse);
+      })
+      .map(([orderArticle]) => orderArticle); // Извлекаем только order_article
+
+    console.log('Полностью зарезервированные заказы:', fullyReservedOrders);
+    fullyReservedOrders.forEach((order_article) => {
+      const currOrder = list_of_orders.find(
+        (order) => order.article === order_article
+      );
+
+      if (currOrder?.id && !order_status.includes(currOrder?.status)) {
+        dispatch(
+          updateOrderStatus({
+            order_id: currOrder.id,
+            status: 7,
+          })
+        );
+      }
+    });
+
     let groupedOrders = processOrders(list_of_ordered_production, {});
 
     groupedOrders = processOrders(list_of_ordered_production_oem, groupedOrders);
@@ -277,6 +310,8 @@ const WarehouseContextProvider = ({ children }) => {
     Object.values(groupedOrders)?.forEach((group) => {
       const order = list_of_orders.find((el) => el.id === group.orderId);
       if (order_status.includes(order?.status)) return;
+
+      console.log('group.products', group.products);
 
       const allMatch = group.products.every(
         (product) => product.total_quantity <= product.total_quantity_in_warehouse
