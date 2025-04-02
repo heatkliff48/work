@@ -40,6 +40,13 @@ class WarehouseService {
     return new_ordered_production;
   }
 
+  static async updateListOfOrderedProduction({ orderedProduction }) {
+    const ordered_production =
+      await WarehouseRepository.updateListOfOrderedProduction(orderedProduction);
+
+    return ordered_production;
+  }
+
   static async addNewListOfOrderedProductionOEM({ orderedProductionOEM }) {
     const new_ordered_production_OEM =
       await WarehouseRepository.addNewListOfOrderedProductionOEM(
@@ -58,7 +65,9 @@ class WarehouseService {
   }
 
   static async updateRemainingStock({ upd_rem_srock }) {
-    const updWarehouse = await WarehouseRepository.updateRemainingStock(upd_rem_srock);
+    const updWarehouse = await WarehouseRepository.updateRemainingStock(
+      upd_rem_srock
+    );
 
     return updWarehouse;
   }

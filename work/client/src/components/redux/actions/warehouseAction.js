@@ -10,6 +10,7 @@ import {
   GET_LIST_OF_ORDERED_PRODUCTION_OEM,
   ADD_NEW_ORDERED_PRODUCTION_OEM,
   UPDATE_ORDERED_PRODUCTION_OEM,
+  UPDATE_ORDERED_PRODUCTION,
 } from '../types/warehouseTypes';
 
 export const getAllWarehouse = () => {
@@ -67,6 +68,13 @@ export const getListOfOrderedProductionOEM = () => {
 export const addNewListOfOrderedProduction = (ordered_production) => {
   return {
     type: ADD_NEW_ORDERED_PRODUCTION,
+    payload: ordered_production,
+  };
+};
+
+export const updListOfOrderedProduction = (ordered_production) => {
+  return {
+    type: UPDATE_ORDERED_PRODUCTION,
     payload: ordered_production,
   };
 };

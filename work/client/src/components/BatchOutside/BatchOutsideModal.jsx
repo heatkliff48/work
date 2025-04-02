@@ -87,8 +87,14 @@ function BatchOutsideModal(props) {
     let incVersion = 1;
     let ok = false;
     if (quality_product) {
-      console.log('log', currentBatch.quantity_pallets - quality_product <= currentBatch.quantity_free);
-      if (currentBatch.quantity_pallets - quality_product <= currentBatch.quantity_free)
+      console.log(
+        'log',
+        currentBatch.quantity_pallets - quality_product <= currentBatch.quantity_free
+      );
+      if (
+        currentBatch.quantity_pallets - quality_product <=
+        currentBatch.quantity_free
+      )
         await dispatch(deleteBatchOutside(currentBatchId));
       const type = 0;
       const articleId =
@@ -97,15 +103,15 @@ function BatchOutsideModal(props) {
       versionNumber = `0000000${articleId}`.slice(-6);
       const warehouse_article = getWarehouseArticle(product, type, versionNumber);
 
-      await dispatch(
-        addNewWarehouse({
-          product_article: product.article,
-          article: warehouse_article,
-          warehouse_loc: 'local',
-          remaining_stock: quality_product,
-          type: 'OK',
-        })
-      );
+      // await dispatch(
+      //   addNewWarehouse({
+      //     product_article: product.article,
+      //     article: warehouse_article,
+      //     warehouse_loc: 'local',
+      //     remaining_stock: quality_product,
+      //     type: 'OK',
+      //   })
+      // );
     }
     if (batchOutsideInput.remnants) {
       const type = 1;
@@ -114,15 +120,15 @@ function BatchOutsideModal(props) {
       versionNumber = `0000000${articleId}`.slice(-6);
       const warehouse_article = getWarehouseArticle(product, type, versionNumber);
 
-      await dispatch(
-        addNewWarehouse({
-          product_article: product.article,
-          article: warehouse_article,
-          warehouse_loc: 'local',
-          remaining_stock: batchOutsideInput.remnants,
-          type: 'Remnants',
-        })
-      );
+      // await dispatch(
+      //   addNewWarehouse({
+      //     product_article: product.article,
+      //     article: warehouse_article,
+      //     warehouse_loc: 'local',
+      //     remaining_stock: batchOutsideInput.remnants,
+      //     type: 'Remnants',
+      //   })
+      // );
     }
     setAutoSave(true);
 
@@ -148,7 +154,6 @@ function BatchOutsideModal(props) {
       const warehouse = warehouse_data.find(
         (el) => el.product_article === product_article && el.remaining_stock !== 0
       );
-
 
       const order_id = list_of_orders.find(
         (order) => order.article === order_article

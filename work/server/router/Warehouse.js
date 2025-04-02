@@ -19,6 +19,10 @@ router.post(
   WarehouseController.addNewListOfOrderedProduction
 );
 router.post(
+  '/ordered_production/update',
+  WarehouseController.updateListOfOrderedProduction
+);
+router.post(
   '/ordered_production_oem/add',
   WarehouseController.addNewListOfOrderedProductionOEM
 );

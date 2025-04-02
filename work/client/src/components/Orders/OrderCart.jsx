@@ -20,6 +20,7 @@ import {
 import {
   addNewListOfOrderedProduction,
   addNewListOfOrderedProductionOEM,
+  updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
 import PDFgenerate from './OrdersPDF.jsx';
 import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
@@ -320,12 +321,51 @@ const OrderCart = React.memo(() => {
         loc === 'Spain' &&
         !haveProductReserve
       ) {
+        const reservedProduct = productsOfOrders.find(
+          (orderedProduct) =>
+            orderedProduct.order_id === product.order_id &&
+            orderedProduct.product_id === product.product_id
+        );
+
+        let remainingToAllocate = reservedProduct.quantity_palet || 0; // Сколько нужно зарезервировать для этого товара
+
+        const matchingWarehouseProducts =
+          warehouse_data?.filter(
+            (warehouseItem) =>
+              warehouseItem.product_article === product?.product_article
+          ) || []; // Если warehouse_data undefined, используем пустой массив
+
+        // Проходим по складу и "забираем" остатки
+        for (const warehouseItem of matchingWarehouseProducts) {
+          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+            const taken = Math.min(
+              warehouseItem.free_quantity_remaining,
+              remainingToAllocate
+            );
+
+            // Обновляем данные склада
+            dispatch(
+              updateRemainingStock({
+                warehouse_id: warehouseItem?.id,
+                free_quantity_remaining:
+                  warehouseItem.free_quantity_remaining - taken,
+                ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
+              })
+            );
+            remainingToAllocate -= taken;
+          }
+        }
+
+        const quantity_in_warehouse =
+          reservedProduct.quantity_palet - remainingToAllocate; // Сколько реально зарезервировали
+
         dispatch(
           addNewListOfOrderedProduction({
             shipping_date: orderCartData?.shipping_date,
             product_article: product?.product_article,
             order_article: orderCartData?.article,
             quantity: product?.quantity_palet,
+            quantity_in_warehouse,
           })
         );
       } else if (

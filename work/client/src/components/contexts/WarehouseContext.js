@@ -1,4 +1,5 @@
 import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
+import { updateRemainingStock } from '#components/redux/actions/warehouseAction.js';
 import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,8 +21,18 @@ const WarehouseContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Remaining stock',
-      accessor: 'remaining_stock',
+      Header: 'Free quantity remaining',
+      accessor: 'free_quantity_remaining',
+      sortType: 'number',
+    },
+    {
+      Header: 'Total quantity',
+      accessor: 'total_quantity',
+      sortType: 'number',
+    },
+    {
+      Header: 'Ordered quantity',
+      accessor: 'ordered_quantity',
       sortType: 'number',
     },
     {
@@ -177,20 +188,60 @@ const WarehouseContextProvider = ({ children }) => {
           (elem) => elem.order_id === orderId && elem.product_id === productId
         );
 
-        const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
-          // Filter to get all matching reserved products
-          const reservedProducts = list_of_reserved_products?.filter(
-            (res_prod) => res_prod?.orders_products_id === elem.id
-          );
+        // const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
+        //   // Filter to get all matching reserved products
+        //   const reservedProducts = list_of_reserved_products?.filter(
+        //     (res_prod) => res_prod?.orders_products_id === elem.id
+        //   );
 
-          // Sum up the 'quantity' of all matching reserved products
-          const totalReservedQuantity = reservedProducts.reduce(
-            (resSum, res_prod) => resSum + res_prod.quantity,
-            0
-          );
+        //   // Sum up the 'quantity' of all matching reserved products
+        //   const totalReservedQuantity = reservedProducts.reduce(
+        //     (resSum, res_prod) => resSum + res_prod.quantity,
+        //     0
+        //   );
 
-          return sum + totalReservedQuantity;
-        }, 0);
+        //   return sum + totalReservedQuantity;
+        // }, 0);
+
+        // const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
+        //   let remainingToAllocate = elem.quantity_palet || 0; // Сколько нужно зарезервировать для этого товара
+
+        //   const matchingWarehouseProducts =
+        //     warehouse_data?.filter(
+        //       (warehouseItem) => warehouseItem.product_article === el.product_article
+        //     ) || []; // Если warehouse_data undefined, используем пустой массив
+
+        //   // Проходим по складу и "забираем" остатки
+        //   for (const warehouseItem of matchingWarehouseProducts) {
+        //     if (
+        //       remainingToAllocate > 0 &&
+        //       warehouseItem.free_quantity_remaining > 0
+        //     ) {
+        //       const taken = Math.min(
+        //         warehouseItem.free_quantity_remaining,
+        //         remainingToAllocate
+        //       );
+
+        //       // Обновляем данные склада
+        //       dispatch(
+        //         updateRemainingStock({
+        //           warehouse_id: warehouseItem?.id,
+        //           free_quantity_remaining:
+        //             warehouseItem.free_quantity_remaining - taken,
+        //           ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
+        //         })
+        //       );
+
+        //       warehouseItem.free_quantity_remaining -= taken;
+        //       warehouseItem.ordered_quantity =
+        //         (warehouseItem.ordered_quantity || 0) + taken;
+
+        //       remainingToAllocate -= taken;
+        //     }
+        //   }
+
+        //   return sum + (elem.quantity_palet - remainingToAllocate); // Сколько реально зарезервировали
+        // }, 0);
 
         // Рассчитать количество в партии
         const quantity_in_batch =
@@ -201,7 +252,7 @@ const WarehouseContextProvider = ({ children }) => {
           ...el,
           quantity_cakes,
           quantity_in_batch,
-          quantity_in_warehouse,
+          // quantity_in_warehouse,
         };
       })
       .reduce((uniqueItems, item) => {
@@ -240,8 +291,6 @@ const WarehouseContextProvider = ({ children }) => {
         );
       }
     });
-
-    
   }, [
     list_of_ordered_production,
     list_of_reserved_products,

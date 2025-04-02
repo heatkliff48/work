@@ -26,7 +26,9 @@ module.exports = (sequelize, DataTypes) => {
     {
       article: DataTypes.STRING,
       product_article: DataTypes.STRING,
-      remaining_stock: DataTypes.INTEGER,
+      free_quantity_remaining: DataTypes.INTEGER,
+      total_quantity: DataTypes.INTEGER,
+      ordered_quantity: DataTypes.INTEGER,
       warehouse_loc: DataTypes.STRING,
       type: DataTypes.STRING,
     },

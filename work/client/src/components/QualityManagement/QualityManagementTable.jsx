@@ -12,11 +12,18 @@ import {
   getQualityManagement,
   updateQualityManagement,
 } from '#components/redux/actions/qualityManagementAction.js';
-import { addNewWarehouse } from '#components/redux/actions/warehouseAction.js';
+import {
+  addNewWarehouse,
+  updListOfOrderedProduction,
+} from '#components/redux/actions/warehouseAction.js';
 import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 const QualityManagementTable = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+
+  const { list_of_reserved_products, list_of_ordered_production } =
+    useWarehouseContext();
 
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -164,24 +171,79 @@ const QualityManagementTable = () => {
     }
   };
   const finishBatchHandler = async () => {
-    const isConfirmed = window.confirm('Pedro, ti uveren?');
+    const isConfirmed = window.confirm(
+      `Are you sure?\nPress 'OK' to confirm or 'Cancel' to exit.`
+    );
     if (isConfirmed) {
       const {
         id,
         batch_id,
         product_article,
+        reserved_quantity_allocated,
         free_quantity_fact,
         production_plan_id,
       } = qualityManagementData[0];
+
+      // 1. Фильтруем резервы для текущего product_article
+      const reservedProducts =
+        list_of_ordered_production?.filter(
+          (item) => item.product_article === product_article
+        ) || [];
+
+      // 2. Сколько осталось "свободного" количества и сколько всего свободной продукции было зарезервированно сразу
+      let remainingFreeQty = free_quantity_fact;
+      let summReserve = 0;
+
+      // 3. Обходим каждый резерв и корректируем остатки
+      const updatedReserves = reservedProducts.map((reservedItem) => {
+        if (reservedItem.product_article !== product_article) {
+          return reservedItem; // Не трогаем резервы других товаров
+        }
+
+        // Если новый товар уже "исчерпан" или кол-во паллет совпадает с кол-вом зарезервированных, ничего не меняем
+        if (
+          remainingFreeQty <= 0 ||
+          reservedItem.quantity == reservedItem.quantity_in_warehouse
+        ) {
+          return reservedItem;
+        }
+
+        // Сколько можно зарезервировать из нового товара для этого резерва
+        const deducted = Math.min(
+          reservedItem.quantity - reservedItem.quantity_in_warehouse, // Сколько нужно для этого резерва
+          remainingFreeQty // Сколько доступно в новом товаре
+        );
+
+        // Уменьшаем остаток нового товара
+        remainingFreeQty -= deducted;
+        summReserve += deducted;
+
+        // Возвращаем обновленный резерв
+        return {
+          ...reservedItem,
+          quantity_in_warehouse: reservedItem.quantity_in_warehouse + deducted,
+        };
+      });
+
       await dispatch(
         addNewWarehouse({
           product_article,
           article: batch_id,
           warehouse_loc: 'local',
-          remaining_stock: free_quantity_fact,
+          free_quantity_remaining: remainingFreeQty, // sprosit pro chisla
+          ordered_quantity: reserved_quantity_allocated + summReserve,
+          total_quantity:
+            reserved_quantity_allocated + summReserve + remainingFreeQty,
           type: 'OK',
+          // reserved_quantity_allocated -> free_quantity_remaining
+          // free_quantity_fact -> ordered_quantity
+          // reserved_quantity_allocated + free_quantity_fact -> total_quantity
         })
       );
+
+      for (const ordered_production of updatedReserves) {
+        await dispatch(updListOfOrderedProduction(ordered_production));
+      }
       await dispatch(deleteQualityManagement(id));
       if (production_plan_id) {
         await dispatch(deleteBatchOutside(production_plan_id));
