@@ -200,29 +200,52 @@ const QualityManagementTable = () => {
           return reservedItem; // Не трогаем резервы других товаров
         }
 
-        // Если новый товар уже "исчерпан" или кол-во паллет совпадает с кол-вом зарезервированных, ничего не меняем
-        if (
-          remainingFreeQty <= 0 ||
-          reservedItem.quantity == reservedItem.quantity_in_warehouse
-        ) {
-          return reservedItem;
+        // Если новый товар уже "исчерпан" и кол-во паллет совпадает с кол-вом зарезервированных, ничего не меняем, если исчерпан и кол-во паллет больше кол-ва зарезервированных, то прибавляем к существующему резерву новый и смотрим, чтобы он не выходил за предел кол-ва паллет общего.
+        if (remainingFreeQty <= 0) {
+          if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
+            return reservedItem;
+          } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
+            return {
+              ...reservedItem,
+              quantity_in_warehouse: Math.min(
+                reservedItem.quantity_in_warehouse + reserved_quantity_allocated,
+                reservedItem.quantity
+              ),
+            };
+          }
         }
 
         // Сколько можно зарезервировать из нового товара для этого резерва
-        const deducted = Math.min(
-          reservedItem.quantity - reservedItem.quantity_in_warehouse, // Сколько нужно для этого резерва
-          remainingFreeQty // Сколько доступно в новом товаре
-        );
+        const deducted = production_plan_id
+          ? Math.min(
+              reservedItem.quantity -
+                reservedItem.quantity_in_warehouse -
+                reserved_quantity_allocated, // Сколько нужно для этого резерва
+              remainingFreeQty // Сколько доступно в новом товаре
+            )
+          : Math.min(
+              reservedItem.quantity - reservedItem.quantity_in_warehouse, // Сколько нужно для этого резерва
+              remainingFreeQty // Сколько доступно в новом товаре
+            );
 
         // Уменьшаем остаток нового товара
         remainingFreeQty -= deducted;
         summReserve += deducted;
 
         // Возвращаем обновленный резерв
-        return {
-          ...reservedItem,
-          quantity_in_warehouse: reservedItem.quantity_in_warehouse + deducted,
-        };
+
+        return production_plan_id
+          ? {
+              ...reservedItem,
+              quantity_in_warehouse:
+                reservedItem.quantity_in_warehouse +
+                reserved_quantity_allocated +
+                deducted,
+            }
+          : {
+              ...reservedItem,
+              quantity_in_warehouse: reservedItem.quantity_in_warehouse + deducted,
+            };
       });
 
       await dispatch(
@@ -230,14 +253,11 @@ const QualityManagementTable = () => {
           product_article,
           article: batch_id,
           warehouse_loc: 'local',
-          free_quantity_remaining: remainingFreeQty, // sprosit pro chisla
+          free_quantity_remaining: remainingFreeQty,
           ordered_quantity: reserved_quantity_allocated + summReserve,
           total_quantity:
             reserved_quantity_allocated + summReserve + remainingFreeQty,
           type: 'OK',
-          // reserved_quantity_allocated -> free_quantity_remaining
-          // free_quantity_fact -> ordered_quantity
-          // reserved_quantity_allocated + free_quantity_fact -> total_quantity
         })
       );
 
@@ -273,26 +293,32 @@ const QualityManagementTable = () => {
         //   qualityManagementHandler(row.original.id);
         // }}
       />
-      <div className="d-flex gap-2 mb-2">
-        <Button variant="success" size="lg">
-          <FaPlus
-            onClick={qualityManagementPlusHandler}
-            style={{ cursor: 'pointer', fontSize: '1.5rem' }}
-          />
-        </Button>
-        <Button variant="danger" size="lg">
-          <FaMinus
-            onClick={qualityManagementMinusHandler}
-            style={{ cursor: 'pointer', fontSize: '1.5rem' }}
-          />
-        </Button>
-      </div>
-      <div className="d-flex gap-2 mb-2">
-        <Button variant="warning" size="lg" onClick={finishBatchHandler}>
-          Finish batch above
-        </Button>
-      </div>
-      <ShowQualityManagementAddModal />
+      {qualityManagementData.length > 0 && (
+        <div className="d-flex gap-2 mb-2">
+          <Button variant="success" size="lg">
+            <FaPlus
+              onClick={qualityManagementPlusHandler}
+              style={{ cursor: 'pointer', fontSize: '1.5rem' }}
+            />
+          </Button>
+          <Button variant="danger" size="lg">
+            <FaMinus
+              onClick={qualityManagementMinusHandler}
+              style={{ cursor: 'pointer', fontSize: '1.5rem' }}
+            />
+          </Button>
+        </div>
+      )}
+      {qualityManagementData.length > 0 && (
+        <div className="d-flex gap-2 mb-2">
+          <Button variant="warning" size="lg" onClick={finishBatchHandler}>
+            Finish batch above
+          </Button>
+        </div>
+      )}
+      {(!qualityManagementData || qualityManagementData.length === 0) && (
+        <ShowQualityManagementAddModal />
+      )}
     </Fragment>
   );
 };

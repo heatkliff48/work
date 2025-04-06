@@ -58,10 +58,10 @@ function QualityManagementAddModal(props) {
       Header: 'Total Qty in batch, plan, pallets',
       accessor: 'total_quantity_plan',
     },
-    {
-      Header: 'Reserved Qty in batch, pallets',
-      accessor: 'reserved_quantity',
-    },
+    // {
+    //   Header: 'Reserved Qty in batch, pallets',
+    //   accessor: 'reserved_quantity',
+    // },
   ];
 
   const dispatch = useDispatch();
@@ -230,9 +230,9 @@ function QualityManagementAddModal(props) {
         batch_id,
         product_article,
         total_quantity_plan,
-        reserved_quantity,
+        reserved_quantity: 0,
         reserved_quantity_allocated: 0,
-        reserved_quantity_remaining: reserved_quantity,
+        reserved_quantity_remaining: 0,
         free_quantity_fact: 0,
         from_production_plan: false,
       })
