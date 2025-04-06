@@ -4,6 +4,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 // import { dataFetchedChange } from '#components/redux/actions/userAction.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
+import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction.js';
 import {
   getAccountingDataList,
   getAnchorProductsOfOrders,
@@ -73,6 +74,13 @@ function Main() {
     <div className="main-container">
       <h1 className="main-title">Main Page</h1>
       <div className="button-container">
+        <button
+          className="nav-button"
+          onClick={() => navigate('/warehouse_manager')}
+        >
+          Warehouse Manager
+        </button>
+
         {checkUserAccess(user, roles, 'Roles')?.canRead && (
           <button className="nav-button" onClick={() => navigate('/roles')}>
             Roles
