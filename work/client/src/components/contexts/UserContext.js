@@ -6,6 +6,7 @@ const UsersContext = createContext();
 export const UsersContextProvider = ({ children }) => {
   const [userAccess, setUserAccess] = useState(null);
   const roles = useSelector((state) => state.roles);
+  const user = useSelector((state) => state.user);
 
   const checkUserAccess = (user, roles, pageName) => {
     if (user?.role === 3) return { canRead: true, canWrite: true };
@@ -27,7 +28,7 @@ export const UsersContextProvider = ({ children }) => {
 
   return (
     <UsersContext.Provider
-      value={{ roles, checkUserAccess, userAccess, setUserAccess }}
+      value={{ user, roles, checkUserAccess, userAccess, setUserAccess }}
     >
       {children}
     </UsersContext.Provider>

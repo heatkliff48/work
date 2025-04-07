@@ -192,6 +192,25 @@ const ProjectContextProvider = ({ children }) => {
     },
   ];
 
+  const WAREHOUSE_MANAGER_TABLE = [
+    {
+      Header: 'Article of order',
+      accessor: 'orders_article',
+    },
+    {
+      Header: 'Project',
+      accessor: 'projects',
+    },
+    {
+      Header: 'Delivery due date',
+      accessor: 'production_date',
+    },
+    {
+      Header: 'Order products',
+      accessor: 'orders_products',
+    },
+  ];
+
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
 
@@ -243,6 +262,7 @@ const ProjectContextProvider = ({ children }) => {
   return (
     <ProjectContext.Provider
       value={{
+        WAREHOUSE_MANAGER_TABLE,
         user,
         displayNames,
         promProduct,

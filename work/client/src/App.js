@@ -33,6 +33,7 @@ import RelatedMaterialsJournal from '#components/Products/RelatedMaterialsJourna
 import AnchorsTable from '#components/Products/AnchorsTable.jsx';
 import ToolsTable from '#components/Products/ToolsTable.jsx';
 import QualityManagementTable from '#components/QualityManagement/QualityManagementTable.jsx';
+import WarehouseManager from '#components/WarehouseManager/WarehouseManager.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -57,20 +58,14 @@ function App() {
         <NavBar />
         <Routes>
           <Route path="/" element={<Main />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/roles" element={<Roles />} />
-          <Route path="/sign-in" element={<LoginForm />} />
-          <Route path="/clients" element={<ClientsInfo />} />
-          <Route path="/orders" element={<OrdersTable />} />
           <Route path="/accounting" element={<Accounting />} />
-          <Route path="/order_card" element={<OrderCart />} />
-          <Route path="/warehouse" element={<Warehouse />} />
-          <Route path="/users_info" element={<UsersInfo />} />
-          <Route
-            path="/production_batch_designer"
-            element={<ProductionBatchDesigner />}
-          />
-          {/* <Route path="/production_batch_log" element={<ProductionBatchLog />} /> */}
+          <Route path="/anchors" element={<AnchorsTable />} />
+
+          <Route path="/batch_outside" element={<BatchOutside />} />
+          <Route path="/clients" element={<ClientsInfo />} />
+          <Route path="/dry_mixes_journal" element={<DryMixesJournal />} />
+
+
           <Route
             path="/list_of_ordered_production"
             element={<ListOfOrderedProduction />}
@@ -79,23 +74,42 @@ function App() {
             path="/list_of_ordered_production_oem"
             element={<ListOfOrderedProductionOEM />}
           />
-          <Route path="/batch_outside" element={<BatchOutside />} />
 
-          <Route path="/recipe_products" element={<ProductsListForRecipes />} />
+
+          <Route path="/orders" element={<OrdersTable />} />
+          <Route path="/order_card" element={<OrderCart />} />
+
+
+          <Route path="/products" element={<Products />} />
+          <Route
+            path="/production_batch_designer"
+            element={<ProductionBatchDesigner />}
+          />
+          <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
+
+
+          <Route path="/quality_management" element={<QualityManagementTable />} />
+
 
           <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
+          <Route path="/recipe_products" element={<ProductsListForRecipes />} />
           <Route path="/recipe_orders" element={<RecipeOrders />} />
-          <Route path="/statistics" element={<Statistics />} />
-          <Route path="/stock_balance" element={<StockBalance />} />
-          <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
-          <Route path="/dry_mixes_journal" element={<DryMixesJournal />} />
           <Route
             path="/related_materials_journal"
             element={<RelatedMaterialsJournal />}
           />
-          <Route path="/anchors" element={<AnchorsTable />} />
+          <Route path="/roles" element={<Roles />} />
+
+
+          <Route path="/sign-in" element={<LoginForm />} />
+          <Route path="/statistics" element={<Statistics />} />
+          <Route path="/stock_balance" element={<StockBalance />} />
+
+
           <Route path="/tools" element={<ToolsTable />} />
-          <Route path="/quality_management" element={<QualityManagementTable />} />
+          <Route path="/users_info" element={<UsersInfo />} />
+          <Route path="/warehouse" element={<Warehouse />} />
+          <Route path="/warehouse_manager" element={<WarehouseManager />} />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />
         </Routes>

@@ -469,6 +469,7 @@ const OrderContextProvider = ({ children }) => {
         accDataList,
         setAccDataList,
         getAccountingStatus,
+        deliveryAddresses
       }}
     >
       {children}
