@@ -16,7 +16,13 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      remaining_stock: {
+      free_quantity_remaining: {
+        type: Sequelize.INTEGER,
+      },
+      total_quantity: {
+        type: Sequelize.INTEGER,
+      },
+      ordered_quantity: {
         type: Sequelize.INTEGER,
       },
       warehouse_loc: {

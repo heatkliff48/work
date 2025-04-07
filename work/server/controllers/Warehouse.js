@@ -77,6 +77,19 @@ class WarehouseController {
     }
   }
 
+  static async updateListOfOrderedProduction(req, res) {
+    const orderedProduction = req.body;
+
+    try {
+      const ordered_production =
+        await WarehouseService.updateListOfOrderedProduction({ orderedProduction });
+
+      return res.status(200).json({ ordered_production });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async addNewListOfOrderedProductionOEM(req, res) {
     const orderedProductionOEM = req.body;
 
@@ -111,7 +124,9 @@ class WarehouseController {
     const upd_rem_srock = req.body;
 
     try {
-      const updWarehouse = await WarehouseService.updateRemainingStock({ upd_rem_srock });
+      const updWarehouse = await WarehouseService.updateRemainingStock({
+        upd_rem_srock,
+      });
 
       myEmitter.emit(UPDATE_REMAINING_STOCK_SOCKET, updWarehouse);
 

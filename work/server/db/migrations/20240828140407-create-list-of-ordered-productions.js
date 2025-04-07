@@ -21,6 +21,9 @@ module.exports = {
       quantity: {
         type: Sequelize.INTEGER,
       },
+      quantity_in_warehouse: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

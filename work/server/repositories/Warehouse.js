@@ -30,6 +30,7 @@ class WarehouseRepository {
           'product_article',
           'order_article',
           'quantity',
+          'quantity_in_warehouse',
         ],
       });
       return orderedProduction ?? [];
@@ -98,10 +99,29 @@ class WarehouseRepository {
           'order_article',
           'quantity',
           'shipping_date',
+          'quantity_in_warehouse',
         ],
         order: [['shipping_date', 'ASC']],
       });
       return new_ordered_production;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async updateListOfOrderedProduction(ordered_production) {
+    console.log(
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateListOfOrderedProduction----------------------------------'
+    );
+
+    try {
+      const { id, quantity_in_warehouse } = ordered_production;
+      await ListOfOrderedProductions.update(
+        { quantity_in_warehouse },
+        { where: { id } }
+      );
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
@@ -149,12 +169,13 @@ class WarehouseRepository {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRemainingStock');
 
     try {
-      const { warehouse_id, new_remaining_stock } = upd_rem_srock;
+      const { warehouse_id, free_quantity_remaining, ordered_quantity } =
+        upd_rem_srock;
       await Warehouses.update(
-        { remaining_stock: new_remaining_stock },
+        { free_quantity_remaining, ordered_quantity },
         { where: { id: warehouse_id } }
       );
-      const updWarehouse = await Warehouses.findAll()
+      const updWarehouse = await Warehouses.findAll();
       return updWarehouse;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
