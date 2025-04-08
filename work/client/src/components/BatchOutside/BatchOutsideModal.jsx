@@ -87,10 +87,6 @@ function BatchOutsideModal(props) {
     let incVersion = 1;
     let ok = false;
     if (quality_product) {
-      console.log(
-        'log',
-        currentBatch.quantity_pallets - quality_product <= currentBatch.quantity_free
-      );
       if (
         currentBatch.quantity_pallets - quality_product <=
         currentBatch.quantity_free

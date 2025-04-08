@@ -287,7 +287,6 @@ const WarehouseContextProvider = ({ children }) => {
       })
       .map(([orderArticle]) => orderArticle); // Извлекаем только order_article
 
-    console.log('Полностью зарезервированные заказы:', fullyReservedOrders);
     fullyReservedOrders.forEach((order_article) => {
       const currOrder = list_of_orders.find(
         (order) => order.article === order_article

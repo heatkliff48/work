@@ -276,7 +276,11 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         (el) => el.article == prod.product_article
       );
 
-      const descripcion = `BAUBLOCK®${product.tradingMark} ${product.lengths}x${product.width}x${product.height}mm ${product.density}kg/м³`;
+      const descripcion = `BAUBLOCK®${
+        product.tradingMark
+      } ${product.lengths.toString()}x${product.width}x${product.height}mm ${
+        product.density
+      }kg/m³`;
 
       const total = (prod.quantity_palet * product.quantityBlockOnPallet).toFixed(0);
 

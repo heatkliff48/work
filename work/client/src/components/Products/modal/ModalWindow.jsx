@@ -53,6 +53,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       density,
       placeOfProduction,
       typeOfPackaging,
+      palletSize,
     } = formInput;
 
     const rightPlaceOfProduction = getOptionValue(
@@ -61,10 +62,18 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
     );
     const rightTypeOfPackaging = getOptionValue('typeOfPackaging', typeOfPackaging);
 
-    const prodArticle = `T.${form?.toUpperCase()}${rightPlaceOfProduction}${rightTypeOfPackaging}0${certificate?.substr(
-      0,
-      1
-    )}${density}${width}${height}${lengths}`;
+    const rightPalletSize = getOptionValue('palletSize', palletSize);
+
+    const prodArticle = `T.${form
+      ?.toUpperCase()
+      .slice(
+        0,
+        1
+      )}${rightPlaceOfProduction}${rightTypeOfPackaging}${rightPalletSize}D${density
+      .toString()
+      .slice(0, 2)}W${width}H${height.toString().slice(0, 2)}L${lengths
+      .toString()
+      .slice(0, 2)}${certificate?.substr(0, 1)}`;
 
     let productCode = '0001';
     const articleId = products.length === 0 ? 1 : products.length + 1;
