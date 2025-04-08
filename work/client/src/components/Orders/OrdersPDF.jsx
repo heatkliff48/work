@@ -52,6 +52,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       doc.text(`Teléfono: ${pdfData.phone}`, 120, yPosition + 20);
       doc.text(`Válido hasta: ${pdfData.validUntil}`, 120, yPosition + 30);
 
+      console.log(pdfData.pdfProducts.map((item) => item.descripcion));
       // Таблица с товарами (начинается ниже текста)
       autoTable(doc, {
         startY: yPosition + 40, // Отступ от информации о заказе
@@ -276,7 +277,11 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         (el) => el.article == prod.product_article
       );
 
-      const descripcion = `BAUBLOCK®${product.tradingMark} ${product.lengths}x${product.width}x${product.height}mm ${product.density}kg/м³`;
+      const descripcion = `BAUBLOCK®${
+        product.tradingMark
+      } ${product.lengths.toString()}x${product.width}x${product.height}mm ${
+        product.density
+      }kg/m³`;
 
       const total = (prod.quantity_palet * product.quantityBlockOnPallet).toFixed(0);
 
