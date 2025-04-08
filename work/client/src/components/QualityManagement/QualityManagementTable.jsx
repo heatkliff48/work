@@ -126,7 +126,6 @@ const QualityManagementTable = () => {
 
   const qualityManagementMinusHandler = async () => {
     if (qualityManagementData) {
-      // console.log('qualityManagementData[0]', qualityManagementData[0]);
       const {
         id,
         batch_id,

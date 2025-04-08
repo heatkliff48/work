@@ -52,7 +52,6 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       doc.text(`Teléfono: ${pdfData.phone}`, 120, yPosition + 20);
       doc.text(`Válido hasta: ${pdfData.validUntil}`, 120, yPosition + 30);
 
-      console.log(pdfData.pdfProducts.map((item) => item.descripcion));
       // Таблица с товарами (начинается ниже текста)
       autoTable(doc, {
         startY: yPosition + 40, // Отступ от информации о заказе

@@ -58,7 +58,6 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
-    console.log();
 
     const result =
       (selectedProduct?.price *
