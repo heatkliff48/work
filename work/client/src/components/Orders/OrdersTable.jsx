@@ -42,8 +42,6 @@ function OrdersTable() {
     }
   }, [user, roles]);
 
-  
-
   useEffect(() => {
     dispatch(getOrders());
   }, [deliveryAddresses]);
