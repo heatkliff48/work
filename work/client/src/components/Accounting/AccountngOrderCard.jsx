@@ -187,6 +187,8 @@ const AccountngOrderCard = React.memo(() => {
           <div className="status-table">
             {accountingStatusList.map((item) => (
               <div key={item.accessor} className="status-row">
+                {console.log('item.accessor', item.accessor)}
+                {console.log('status', status)}
                 <div className="header">{item.Header}</div>
                 <input
                   id={item.accessor}

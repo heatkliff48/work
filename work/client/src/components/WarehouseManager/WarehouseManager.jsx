@@ -8,6 +8,7 @@ import Table from '../Table/Table';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import WMOrderCard from './WMOrderCard/WMOrderCard';
 
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
@@ -15,11 +16,18 @@ function WarehouseManager() {
 
   const { WAREHOUSE_MANAGER_TABLE } = useProjectContext();
   const { latestProducts } = useProductsContext();
-  const { list_of_orders, deliveryAddresses, productsOfOrders } = useOrderContext();
+  const {
+    list_of_orders,
+    deliveryAddresses,
+    productsOfOrders,
+    getCurrentOrderInfoHandler,
+  } = useOrderContext();
+
   const dispatch = useDispatch();
   // const navigate = useNavigate();
 
   const [warehouseMdata, setWarehouseMdata] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   // useEffect(() => {
   //   if (user && roles.length > 0) {
@@ -34,7 +42,7 @@ function WarehouseManager() {
 
   useEffect(() => {
     const result = list_of_orders
-      .filter((el) => el.status === 7)
+      // .filter((el) => el.status === 7)
       .reduce((acc, el) => {
         const del_adr = deliveryAddresses?.find((del) => del?.id == el?.del_adr_id);
 
@@ -47,12 +55,12 @@ function WarehouseManager() {
 
         const obj = {
           orders_article: el.article,
-          projects: del_adr?.project_name || '',
-          production_daterticle: el.shipping_date || '',
+          projects_name: del_adr?.project_name || '',
+          production_date: el.shipping_date || '',
           orders_products: products || [],
         };
-
-        return acc.push(obj);
+        acc.push(obj);
+        return acc;
       }, []);
 
     setWarehouseMdata(result);
@@ -60,17 +68,24 @@ function WarehouseManager() {
 
   return (
     <>
-      <Table
-        COLUMN_DATA={WAREHOUSE_MANAGER_TABLE}
-        dataOfTable={warehouseMdata}
-        // userAccess={userAccess}
-        onClickButton={() => {
-          // setClientModalOrder(!clientModalOrder);
-        }}
-        buttonText={''}
-        tableName={'Warehouse Manager'}
-        handleRowClick={(row) => {}}
-      />
+      {selectedOrder ? (
+        <WMOrderCard selectedOrder={selectedOrder} />
+      ) : (
+        <Table
+          COLUMN_DATA={WAREHOUSE_MANAGER_TABLE}
+          dataOfTable={warehouseMdata}
+          // userAccess={userAccess}
+          onClickButton={() => {}}
+          buttonText={''}
+          tableName={'Warehouse Manager'}
+          handleRowClick={(row) => {
+            getCurrentOrderInfoHandler({ article: row.original.orders_article });
+
+            setSelectedOrder(row.original);
+            console.log('row', row.original);
+          }}
+        />
+      )}
     </>
   );
 }
