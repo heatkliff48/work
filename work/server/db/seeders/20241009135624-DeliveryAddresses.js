@@ -8,6 +8,7 @@ module.exports = {
       [
         {
           client_id: 1,
+          project_name: 'Paleto bay',
           street: 'Calle Mayor, 10',
           additional_info: 'Edificio A, Piso 2',
           city: 'Madrid',
@@ -21,6 +22,7 @@ module.exports = {
         },
         {
           client_id: 1,
+          project_name: 'Ciudad de Marco',
           street: 'Carrer de la Marina, 23',
           additional_info: 'Local B',
           city: 'Barcelona',
@@ -34,6 +36,7 @@ module.exports = {
         },
         {
           client_id: 1,
+          project_name: 'Santa Maria Playa',
           street: 'Avenida de Andalucía, 5',
           additional_info: 'Oficina 3',
           city: 'Sevilla',
