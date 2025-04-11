@@ -87,7 +87,6 @@ function ProductsTypeJournalModal(props) {
   const getSelectedUnitsOfMeasurementOption = (accessor) => {
     const options = unitsOfMeasurementOptions;
     if (!options) return null;
-    const inputValue = productsTypeJournalInput?.[accessor];
     const unitsOfMeasurementOption = options.find(
       (option) => option.value === productsTypeJournalInput?.[accessor]
     );
@@ -97,9 +96,6 @@ function ProductsTypeJournalModal(props) {
   const getSelectedTypeOfMixOption = (accessor) => {
     const options = typeOfMixOptions;
     if (!options) return null;
-    // const inputValue = productsTypeJournalInput?.[accessor];
-    // const numericValue = inputValue !== undefined ? Number(inputValue) : undefined;
-    // if (numericValue === undefined) return options[0];
     const typeOfMixOption = options.find((option) =>
       (option.value == productsTypeJournalInput?.[accessor]) !== undefined
         ? Number(productsTypeJournalInput?.[accessor])
@@ -120,6 +116,15 @@ function ProductsTypeJournalModal(props) {
   useEffect(() => {
     setProductsTypeJournalInput((prev) => ({
       ...prev,
+      article: `X.${
+        props.target == 1
+          ? `M`
+          : props.target == 2
+          ? `P`
+          : props.target == 3
+          ? `F`
+          : `T`
+      }${props?.productCode}`,
       units_of_measurement: unitsOfMeasurementOptions[0].value,
       type_of_mix: typeOfMixOptions[0].value,
       place_of_production: placeOfProductionOptions[0].value,
@@ -224,6 +229,8 @@ function ProductsTypeJournalModal(props) {
                         }}
                         options={placeOfProductionOptions}
                       />
+                    ) : el.accessor === 'article' ? (
+                      <h4>{productsTypeJournalInput[el.accessor] || ''}</h4>
                     ) : (
                       <input
                         className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
