@@ -9,6 +9,9 @@ function ProductsTypeJournal() {
         <button className="nav-button" onClick={() => navigate('/products')}>
           Blocks journal
         </button>
+      </div>
+      <h1 className="main-title">Auxilary Products</h1>
+      <div className="button-container">
         <button
           className="nav-button"
           onClick={() => navigate('/dry_mixes_journal')}

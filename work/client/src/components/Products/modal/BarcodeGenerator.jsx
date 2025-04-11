@@ -24,7 +24,7 @@ const BarcodeGenerator = ({ productCode }) => {
     }
 
     // Формируем основную часть штрих-кода (12 символов)
-    const barcode = '84' + '12345' + productCode.padStart(5, '0').slice(0, 5);
+    const barcode = '84' + '36626' + productCode.padStart(5, '0').slice(0, 5);
     const checksum = calculateEAN13Checksum(barcode); // Вычисляем контрольную сумму
     const fullBarcode = barcode + checksum; // Полный штрих-код (13 символов)
 
