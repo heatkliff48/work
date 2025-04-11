@@ -23,7 +23,7 @@ import BarcodeGenerator from './BarcodeGenerator';
 const ProductCardModal = React.memo(() => {
   const { productCardData, setProductCardData } = useProjectContext();
   const { modalProductCard, setModalProductCard } = useModalContext();
-  const { COLUMNS, selectOptions } = useProductsContext();
+  const { COLUMNS, selectOptions, getOptionValue } = useProductsContext();
   const { userAccess } = useUsersContext();
 
   const [lastVersion, setLastVersion] = useState(1);
@@ -43,24 +43,51 @@ const ProductCardModal = React.memo(() => {
       version,
       placeOfProduction,
       typeOfPackaging,
+      palletSize,
     } = prod;
 
-    let newArticle = '';
+    // Old article
+
+    // let newArticle = '';
+    // let versionNumber = '0001';
+
+    // versionNumber = `000${version}`.slice(-4);
+    // const miniWidth = width?.toString().slice(0, 2);
+    // const miniHeight = height?.toString().slice(0, 2);
+    // const miniLengths = lengths?.toString().slice(0, 2);
+    // const miniPlaceOfProduction = placeOfProduction?.slice(0, 1);
+    // const miniTypeOfPackaging = typeOfPackaging?.slice(0, 1);
+
+    // newArticle = `T.${form?.toUpperCase()}${certificate?.substr(
+    //   0,
+    //   1
+    // )}${miniPlaceOfProduction}${miniTypeOfPackaging}0${density}${miniWidth}${miniHeight}${miniLengths}${versionNumber}`;
+
+    // ---
+
     let versionNumber = '0001';
-
     versionNumber = `000${version}`.slice(-4);
-    const miniWidth = width?.toString().slice(0, 2);
-    const miniHeight = height?.toString().slice(0, 2);
-    const miniLengths = lengths?.toString().slice(0, 2);
-    const miniPlaceOfProduction = placeOfProduction?.slice(0, 1);
-    const miniTypeOfPackaging = typeOfPackaging?.slice(0, 1);
 
-    newArticle = `T.${form?.toUpperCase()}${certificate?.substr(
-      0,
-      1
-    )}${miniPlaceOfProduction}${miniTypeOfPackaging}0${density}${miniWidth}${miniHeight}${miniLengths}${versionNumber}`;
+    const rightPlaceOfProduction = getOptionValue(
+      'placeOfProduction',
+      placeOfProduction
+    );
+    const rightTypeOfPackaging = getOptionValue('typeOfPackaging', typeOfPackaging);
 
-    return newArticle;
+    const rightPalletSize = getOptionValue('palletSize', palletSize);
+
+    const prodArticle = `T.${form
+      ?.toUpperCase()
+      .slice(
+        0,
+        1
+      )}${rightPlaceOfProduction}${rightTypeOfPackaging}${rightPalletSize}D${density
+      .toString()
+      .slice(0, 2)}W${width}H${height.toString().slice(0, 2)}L${lengths
+      .toString()
+      .slice(0, 2)}${certificate?.substr(0, 1)}${versionNumber}`;
+
+    return prodArticle;
   };
 
   const handleSelectChange = (selectedOption) => {
