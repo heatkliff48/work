@@ -224,8 +224,6 @@ function ProductionBatchDesigner() {
   useEffect(() => {
     if (!latestProducts || !listOfOrderedCakes) return;
 
-    console.log('listOfOrderedCakes', listOfOrderedCakes);
-
     const rightListOfOrdered = listOfOrderedCakes.filter(
       (el) =>
         el.quantity !== el.quantity_in_warehouse &&
@@ -251,7 +249,6 @@ function ProductionBatchDesigner() {
 
     Object.keys(groupedByDensity).forEach((densityKey) => {
       const group = groupedByDensity[densityKey];
-      console.log('group', group);
       group.forEach(({ id, quantity, product, quantity_in_warehouse }) => {
         const { volumeBlockOnPallet, normOfBrack, width, density, article } =
           product;
@@ -263,8 +260,8 @@ function ProductionBatchDesigner() {
             width,
             quantity: quantity - quantity_in_warehouse,
             product_with_brack: (
-              quantity -
-              quantity_in_warehouse * (1 + normOfBrack / 100)
+              (quantity - quantity_in_warehouse) *
+              (1 + normOfBrack / 100)
             ).toFixed(2),
             quantity_m3: (normOfBrack * volumeBlockOnPallet).toFixed(2),
             article,
