@@ -262,12 +262,15 @@ function ProductionBatchDesigner() {
             density,
             width,
             quantity: quantity - quantity_in_warehouse,
-            product_with_brack: (quantity * (1 + normOfBrack / 100)).toFixed(2),
+            product_with_brack: (
+              quantity -
+              quantity_in_warehouse * (1 + normOfBrack / 100)
+            ).toFixed(2),
             quantity_m3: (normOfBrack * volumeBlockOnPallet).toFixed(2),
             article,
           });
           prodBatch.push(batch);
-          updatedTotalQuantity += quantity;
+          updatedTotalQuantity += quantity - quantity_in_warehouse;
         }
       });
     });
