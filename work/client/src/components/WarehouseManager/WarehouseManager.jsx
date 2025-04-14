@@ -82,7 +82,6 @@ function WarehouseManager() {
             getCurrentOrderInfoHandler({ article: row.original.orders_article });
 
             setSelectedOrder(row.original);
-            console.log('row', row.original);
           }}
         />
       )}

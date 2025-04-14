@@ -9,9 +9,10 @@ const WMOCTable = ({ product_list }) => {
   const { wmoctModal, setWmoctModal } = useModalContext();
   const { latestProducts } = useProductsContext();
   const [wmoctProduct, setWmoctProduct] = useState();
+  const [selectedProduct, setSelectedProduct] = useState();
 
-  const handlePlus = (productIndex, batchIndex) => {
-
+  const handlePlus = (product) => {
+    setSelectedProduct(product.article);
   };
 
   const handleMinus = (productIndex, batchIndex) => {
@@ -56,6 +57,7 @@ const WMOCTable = ({ product_list }) => {
         toggle={() => {
           setWmoctModal(!wmoctModal);
         }}
+        selectedProduct={selectedProduct}
       />
       <div className="overflow-auto">
         <table className="table-auto border border-gray-300 w-full">
@@ -97,7 +99,12 @@ const WMOCTable = ({ product_list }) => {
                           {el.remainingInBatch}
                           {i === product?.batches?.length ? (
                             <>
-                              <button onClick={() => setWmoctModal(!wmoctModal)}>
+                              <button
+                                onClick={() => {
+                                  setWmoctModal(!wmoctModal);
+                                  handlePlus(product);
+                                }}
+                              >
                                 ＋
                               </button>
                             </>
@@ -106,7 +113,7 @@ const WMOCTable = ({ product_list }) => {
                           )}
                         </td>
                         <td className="border p-1 text-center">
-                          <button onClick={() => handlePlus(el)}>＋</button>
+                          <button onClick={() => handlePlus()}>＋</button>
                           <button onClick={() => handleMinus(el)}>－</button>
                         </td>
                         <td className="border p-1">{el.allocated}</td>
@@ -115,7 +122,16 @@ const WMOCTable = ({ product_list }) => {
                   ) : (
                     <>
                       <td className="border p-1"></td>
-                      <td className="border p-1"></td>
+                      <td className="border p-1">
+                        <button
+                          onClick={() => {
+                            setWmoctModal(!wmoctModal);
+                            handlePlus(product);
+                          }}
+                        >
+                          ＋
+                        </button>
+                      </td>
                       <td className="border p-1 text-center"></td>
                       <td className="border p-1"></td>
                     </>

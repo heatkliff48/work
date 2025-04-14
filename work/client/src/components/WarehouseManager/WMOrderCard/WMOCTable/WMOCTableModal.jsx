@@ -2,17 +2,23 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { Fragment, useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
-const WMOCTableModal = ({ isOpen, toggle }) => {
+const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
   const { warehouse_data } = useWarehouseContext();
   const [wmoctmodal, setWmoctModal] = useState();
 
   const onClickHandler = (batch) => {};
 
   useEffect(() => {
-    const result = warehouse_data.map((el) => ({
-      batch_artcle: el.article,
-      quantity: el.total_quantity,
-    }));
+    const result = warehouse_data
+      .filter((el) => {
+        console.log('el', el.product_article);
+        console.log('selected', selectedProduct);
+       return el.product_article == selectedProduct;
+      })
+      .map((el) => ({
+        batch_artcle: el.article,
+        quantity: el.total_quantity,
+      }));
     setWmoctModal(result);
   }, []);
 
