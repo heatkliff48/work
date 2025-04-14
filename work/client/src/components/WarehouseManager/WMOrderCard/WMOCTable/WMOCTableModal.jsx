@@ -40,9 +40,10 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
 
         return !isArticleInAnyWMOCTBatches;
       })
+      .filter((el) => el.ordered_quantity > 0)
       .map((el) => ({
         batch_article: el.article,
-        quantity: el.total_quantity,
+        quantity: el.ordered_quantity,
       }));
     setWmoctModal(result);
   }, [selectedProduct, wmoctProduct]);

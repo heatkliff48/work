@@ -3,7 +3,11 @@ import WMOCTableModal from './WMOCTableModal';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useDispatch } from 'react-redux';
-import { addNewReservedProducts } from '#components/redux/actions/warehouseAction.js';
+import {
+  addNewReservedProducts,
+  updateWarehouseQuantitys,
+  updReservedProducts,
+} from '#components/redux/actions/warehouseAction.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 
@@ -92,19 +96,52 @@ const WMOCTable = ({ product_list }) => {
   };
 
   const saveHandler = () => {
-    let newReserved = [];
+    const newReserved = [];
+    const wh_arr = [];
+
     wmoctProduct.forEach((el) => {
       const { orders_products_id } = el;
+
       el?.batches?.forEach((elem) => {
-        const wid = warehouse_data.find((el) => el.article == elem.batchId)?.id;
+        const wh = warehouse_data.find((el) => el.article == elem.batchId);
+
+        const haveReserve = list_of_reserved_products.find(
+          (el) =>
+            el.warehouse_id == wh.id && el.orders_products_id == orders_products_id
+        );
+
         const obj = {
-          warehouse_id: wid,
+          warehouse_id: wh.id,
           orders_products_id,
           quantity: elem.allocated,
         };
-        newReserved.push(obj);
+
+        if (!haveReserve) {
+          newReserved.push(obj);
+          wh_arr.push({
+            warehouse_id: wh.id,
+            total_quantity: wh.total_quantity - elem.allocated,
+            ordered_quantity: wh.ordered_quantity - elem.allocated,
+          });
+        }
+
+        if (haveReserve && haveReserve.quantity != elem.allocated) {
+          const quantity = haveReserve.quantity - elem.allocated;
+
+          wh_arr.push({
+            warehouse_id: wh.id,
+            total_quantity: wh.total_quantity + quantity,
+            ordered_quantity: wh.ordered_quantity + quantity,
+          });
+          dispatch(updReservedProducts(obj));
+        }
       });
     });
+
+    wh_arr.forEach((el) => {
+      dispatch(updateWarehouseQuantitys(el));
+    });
+
     dispatch(addNewReservedProducts(newReserved));
   };
 
@@ -142,7 +179,7 @@ const WMOCTable = ({ product_list }) => {
 
           const obj = {
             batchId: wrh_item.article,
-            remainingInBatch: wrh_item.total_quantity,
+            remainingInBatch: wrh_item.ordered_quantity,
             allocated: quantity,
           };
           shipped += quantity;

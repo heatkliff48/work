@@ -25,6 +25,10 @@ import {
   ADD_NEW_ORDERED_PRODUCTION_OEM,
   UPDATE_ORDERED_PRODUCTION_OEM,
   UPDATE_ORDERED_PRODUCTION,
+  UPD_RESERVED_PRODUCT,
+  UPDATE_RESERVED_PRODUCT,
+  WAREHOSE_QUANTITYS,
+  UPDATE_WAREHOSE_QUANTITYS,
 } from '../types/warehouseTypes';
 
 // let accessTokenFront;
@@ -84,9 +88,27 @@ const updateRemStock = (upd_rem_srock) => {
     .catch(showErrorMessage);
 };
 
+const updateWhQuantitys = (upd_rem_srock) => {
+  return url
+    .post('/warehouse/upd/quantitys', upd_rem_srock)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
 const addNewReservedProduct = (reserved_product) => {
   return url
     .post('/warehouse/reserved/product/add', reserved_product)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updReservedProduct = (reserved_product) => {
+  return url
+    .post('/warehouse/reserved/product/upd', reserved_product)
     .then((res) => {
       return res.data;
     })
@@ -209,6 +231,16 @@ function* updRemainingStockWatcher(action) {
   }
 }
 
+function* updateWhQuantitysWatcher(action) {
+  try {
+    const { payload } = action;
+    const updWarehouse = yield call(updateWhQuantitys, payload);
+    yield put({ type: WAREHOSE_QUANTITYS, payload: updWarehouse });
+  } catch (err) {
+    yield put({ type: WAREHOSE_QUANTITYS, payload: [] });
+  }
+}
+
 function* addNewReservedProductWatcher(action) {
   try {
     // accessTokenFront = yield select((state) => state.jwt);
@@ -225,6 +257,22 @@ function* addNewReservedProductWatcher(action) {
     // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_RESERVED_PRODUCT, payload: [] });
+  }
+}
+
+function* updReservedProductWatcher(action) {
+  try {
+    // accessTokenFront = yield select((state) => state.jwt);
+
+    // const { new_reserved_product, accessToken, accessTokenExpiration } = yield call(
+    const { new_reserved_product } = yield call(updReservedProduct, action.payload);
+
+    // window.localStorage.setItem('jwt', accessToken);
+
+    yield put({ type: UPD_RESERVED_PRODUCT, payload: new_reserved_product });
+    // yield put(setToken(accessToken, accessTokenExpiration));
+  } catch (err) {
+    yield put({ type: UPD_RESERVED_PRODUCT, payload: [] });
   }
 }
 
@@ -361,8 +409,13 @@ function* warehouseWatcher() {
   yield takeLatest(GET_ALL_WAREHOUSE, getAllWarehouseWatcher);
   yield takeLatest(GET_LIST_OF_RESERVED_PRODUCTS, getListOfReservedProductsWatcher);
   yield takeLatest(ADD_NEW_WAREHOUSE, addNewWarehouseWatcher);
+  
   yield takeLatest(UPDATE_REMAINING_STOCK, updRemainingStockWatcher);
+  yield takeLatest(UPDATE_WAREHOSE_QUANTITYS, updateWhQuantitysWatcher);
+
   yield takeLatest(ADD_NEW_RESERVED_PRODUCT, addNewReservedProductWatcher);
+  yield takeLatest(UPDATE_RESERVED_PRODUCT, updReservedProductWatcher);
+
   yield takeLatest(
     GET_DELETE_PRODUCT_FROM_RESERVED_LIST,
     deleteReservedProductWatcher

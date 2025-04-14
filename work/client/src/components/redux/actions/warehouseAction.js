@@ -11,6 +11,8 @@ import {
   ADD_NEW_ORDERED_PRODUCTION_OEM,
   UPDATE_ORDERED_PRODUCTION_OEM,
   UPDATE_ORDERED_PRODUCTION,
+  UPDATE_RESERVED_PRODUCT,
+  UPDATE_WAREHOSE_QUANTITYS,
 } from '../types/warehouseTypes';
 
 export const getAllWarehouse = () => {
@@ -39,9 +41,23 @@ export const updateRemainingStock = (upd_rem_srock) => {
   };
 };
 
+export const updateWarehouseQuantitys = (upd_rem_srock) => {
+  return {
+    type: UPDATE_WAREHOSE_QUANTITYS,
+    payload: upd_rem_srock,
+  };
+};
+
 export const addNewReservedProducts = (reserved_product) => {
   return {
     type: ADD_NEW_RESERVED_PRODUCT,
+    payload: reserved_product,
+  };
+};
+
+export const updReservedProducts = (reserved_product) => {
+  return {
+    type: UPDATE_RESERVED_PRODUCT,
     payload: reserved_product,
   };
 };

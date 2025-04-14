@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Table from '../Table/Table';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
@@ -8,7 +8,9 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 
 function Warehouse() {
-  const { COLUMNS_WAREHOUSE } = useWarehouseContext();
+  const { COLUMNS_WAREHOUSE, warehouse_data } =
+    useWarehouseContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const {
     setWarehouseModal,
@@ -17,16 +19,12 @@ function Warehouse() {
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
   } = useModalContext();
-
-  const { warehouse_data } = useWarehouseContext();
+  const user = useSelector((state) => state.user);
 
   const handleRowClick = useCallback((row) => {
     setWarehouseInfoCurIdModal(row.original.id);
     setWarehouseInfoModal(!warehouseInfoModal);
   }, []);
-
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     if (user && roles.length > 0) {

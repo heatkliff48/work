@@ -12,8 +12,12 @@ router.get(
 );
 router.post('/add', WarehouseController.addNewWarehouse);
 router.post('/upd/remaining_stock', WarehouseController.updateRemainingStock);
+router.post('/upd/quantitys', WarehouseController.updateWarehouseQuantitys);
+
 router.post('/reserved/product/add', WarehouseController.addNewReservedProducts);
+router.post('/reserved/product/upd', WarehouseController.updReservedProducts);
 router.post('/reserved/product/delete', WarehouseController.deleteReservedProducts);
+
 router.post(
   '/ordered_production/add',
   WarehouseController.addNewListOfOrderedProduction

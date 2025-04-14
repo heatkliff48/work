@@ -136,11 +136,40 @@ class WarehouseController {
     }
   }
 
+  static async updateWarehouseQuantitys(req, res) {
+    const upd_rem_srock = req.body;
+
+    try {
+      const updWarehouse = await WarehouseService.updateWarehouseQuantitys({
+        upd_rem_srock,
+      });
+
+
+      return res.status(200).json(updWarehouse);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async addNewReservedProducts(req, res) {
     const reserved_product = req.body;
 
     try {
       const new_reserved_product = await WarehouseService.addNewReservedProducts({
+        reserved_product,
+      });
+
+      return res.status(200).json({ new_reserved_product });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async updReservedProducts(req, res) {
+    const reserved_product = req.body;
+
+    try {
+      const new_reserved_product = await WarehouseService.updReservedProducts({
         reserved_product,
       });
 

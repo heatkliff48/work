@@ -183,6 +183,27 @@ class WarehouseRepository {
     }
   }
 
+
+  static async updateWarehouseQuantitys(upd_rem_srock) {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateWarehouseQuantitys');
+
+    try {
+
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
+      const { warehouse_id, total_quantity, ordered_quantity } =
+        upd_rem_srock;
+      await Warehouses.update(
+        { total_quantity, ordered_quantity },
+        { where: { id: warehouse_id } }
+      );
+      const updWarehouse = await Warehouses.findAll();
+      return updWarehouse;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return error;
+    }
+  }
+
   static async addNewReservedProducts(reserved_product) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedProducts');
 
@@ -199,6 +220,25 @@ class WarehouseRepository {
         },
         { where: { id: reserved_product.orders_products_id } }
       );
+
+      return new_reserved_product;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return error;
+    }
+  }
+
+  static async updReservedProducts(reserved_product) {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedProducts');
+    const { warehouse_id, orders_products_id, quantity } = reserved_product;
+    try {
+      await ReservedProducts.update(
+        { quantity },
+        { where: { warehouse_id, orders_products_id } }
+      );
+      const new_reserved_product = await ReservedProducts.findAll({
+        attributes: ['id', 'warehouse_id', 'orders_products_id', 'quantity'],
+      });
 
       return new_reserved_product;
     } catch (error) {

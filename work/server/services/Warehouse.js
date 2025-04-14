@@ -72,8 +72,24 @@ class WarehouseService {
     return updWarehouse;
   }
 
+  static async updateWarehouseQuantitys({ upd_rem_srock }) {
+    const updWarehouse = await WarehouseRepository.updateWarehouseQuantitys(
+      upd_rem_srock
+    );
+
+    return updWarehouse;
+  }
+  
   static async addNewReservedProducts({ reserved_product }) {
     const new_reserved_product = await WarehouseRepository.addNewReservedProducts(
+      reserved_product
+    );
+
+    return new_reserved_product;
+  }
+
+  static async updReservedProducts({ reserved_product }) {
+    const new_reserved_product = await WarehouseRepository.updReservedProducts(
       reserved_product
     );
 
