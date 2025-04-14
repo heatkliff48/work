@@ -31,6 +31,7 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
   useEffect(() => {
     const result = warehouse_data
       .filter((el) => el.product_article == selectedProduct)
+      .flter((el) => {wmoctProduct.})
       .map((el) => ({
         batch_artcle: el.article,
         quantity: el.total_quantity,

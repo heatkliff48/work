@@ -1,43 +1,30 @@
-import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { Fragment, useEffect, useState } from 'react';
 import WMOCTableModal from './WMOCTableModal';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 const WMOCTable = ({ product_list }) => {
-  const { productsOfOrders, list_of_orders } = useOrderContext();
   const { wmoctProduct, setWmoctProduct } = useWarehouseContext();
   const { wmoctModal, setWmoctModal } = useModalContext();
-  const { latestProducts } = useProductsContext();
-  const [selectedProduct, setSelectedProduct] = useState();
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const handlePlus = (product) => {
+  const handlePlusBatch = (product) => {
     setSelectedProduct(product.article);
+    setWmoctModal(true);
   };
 
-  const handleMinus = (productIndex, batchIndex) => {
-    // Уменьшение выделения
+  const handlePlus = (productIndex, batchIndex) => {};
+
+  const handleMinus = (productIndex, batchIndex) => {};
+
+  const haveBatches = (i) => {
+    return wmoctProduct[i]?.batches?.length > 0;
   };
 
   useEffect(() => {
-    const result = product_list.orders_products.map((el) => {
+    const initialProducts = product_list.orders_products.map((el) => {
       const [article, quantityStr] = el.split(':').map((s) => s.trim());
       const quantity = Number(quantityStr);
-
-      const product_from_list_id = latestProducts.find(
-        (el) => el.article == article
-      )?.id;
-
-      const order_from_list_id = list_of_orders.find(
-        (el) => el.article == product_list.orders_article
-      )?.id;
-
-      const product = productsOfOrders.find(
-        (poo) =>
-          poo.product_id === product_from_list_id &&
-          poo.order_id === order_from_list_id
-      );
 
       return {
         article,
@@ -47,8 +34,13 @@ const WMOCTable = ({ product_list }) => {
         batches: [],
       };
     });
-    setWmoctProduct(result);
-  }, []);
+
+    setWmoctProduct(initialProducts);
+  }, [product_list]);
+
+  useEffect(() => {
+    console.log('wmoctProduct', wmoctProduct);
+  }, [wmoctProduct]);
 
   return (
     <>
@@ -56,6 +48,7 @@ const WMOCTable = ({ product_list }) => {
         isOpen={wmoctModal}
         toggle={() => {
           setWmoctModal(!wmoctModal);
+          setSelectedProduct(null);
         }}
         selectedProduct={selectedProduct}
       />
@@ -73,59 +66,41 @@ const WMOCTable = ({ product_list }) => {
               <th className="border px-2">Qty allocated</th>
             </tr>
           </thead>
-
           <tbody>
             {wmoctProduct?.map((product, productIndex) => (
               <Fragment key={productIndex}>
+                {/* Основная строка продукта */}
                 <tr>
-                  <td className="border p-1" rowSpan={product?.batches?.length || 1}>
-                    {product.article}
-                  </td>
-                  <td className="border p-1" rowSpan={product?.batches?.length || 1}>
-                    {product.qty_total}
-                  </td>
-                  <td className="border p-1" rowSpan={product?.batches?.length || 1}>
-                    {product.shipped}
-                  </td>
-                  <td className="border p-1" rowSpan={product?.batches?.length || 1}>
-                    {product.qty_rem}
-                  </td>
-
-                  {product?.batches?.length > 0 ? (
-                    product?.batches.map((el, i) => (
-                      <>
-                        <td className="border p-1">
-                          {el.batchId}
-                          {i === product?.batches?.length-1 ? (
-                            <>
-                              <button
-                                onClick={() => {
-                                  setWmoctModal(!wmoctModal);
-                                  handlePlus(product);
-                                }}
-                              >
-                                ＋
-                              </button>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </td>
-                        <td className="border p-1">{el.remainingInBatch}</td>
-                        <td className="border p-1 text-center">
-                          <button onClick={() => handlePlus()}>＋</button>
-                          <button onClick={() => handleMinus(el)}>－</button>
-                        </td>
-                        <td className="border p-1">{el.allocated}</td>
-                      </>
-                    ))
+                  <td className="border p-1">{product.article}</td>
+                  <td className="border p-1">{product.qty_total}</td>
+                  <td className="border p-1">{product.shipped}</td>
+                  <td className="border p-1">{product.qty_rem}</td>
+                  {haveBatches(productIndex) ? (
+                    <>
+                      <td className="border p-1">{product.batches[0]?.batchId}</td>
+                      <td className="border p-1">
+                        {product.batches[0]?.remainingInBatch}
+                      </td>
+                      <td className="border p-1 text-center">
+                        <button onClick={() => handlePlusBatch(product)}>＋</button>
+                        <button
+                          onClick={() =>
+                            product.batches.length > 0 &&
+                            handleMinus(productIndex, 0)
+                          }
+                        >
+                          －
+                        </button>
+                      </td>
+                      <td className="border p-1">{product.batches[0]?.allocated}</td>
+                    </>
                   ) : (
                     <>
                       <td className="border p-1">
                         <button
                           onClick={() => {
                             setWmoctModal(!wmoctModal);
-                            handlePlus(product);
+                            handlePlusBatch(product);
                           }}
                         >
                           ＋
@@ -137,6 +112,51 @@ const WMOCTable = ({ product_list }) => {
                     </>
                   )}
                 </tr>
+                {/* Дополнительные строки для батчей */}
+                {product.batches?.slice(1).map((batch, batchIndex) => (
+                  <tr key={batchIndex + 1}>
+                    {/* Первые 4 колонки оставляем пустыми, так как они уже отображены в основной строке */}
+                    <td className="border p-1"></td>
+                    <td className="border p-1"></td>
+                    <td className="border p-1"></td>
+                    <td className="border p-1"></td>
+                    <td className="border p-1">{batch.batchId}</td>
+                    <td className="border p-1">{batch.remainingInBatch}</td>
+                    <td className="border p-1 text-center">
+                      <button onClick={() => handlePlusBatch(product)}>＋</button>
+                      <button
+                        onClick={() => handleMinus(productIndex, batchIndex + 1)}
+                      >
+                        －
+                      </button>
+                    </td>
+                    <td className="border p-1">{batch.allocated}</td>
+                  </tr>
+                ))}
+                {/* Всегда отображаем пустую строку для добавления нового батча */}
+                {haveBatches(productIndex) ? (
+                  <tr>
+                    <td className="border p-1"></td>
+                    <td className="border p-1"></td>
+                    <td className="border p-1"></td>
+                    <td className="border p-1"></td>
+                    <td className="border p-1">
+                      <button
+                        onClick={() => {
+                          setWmoctModal(!wmoctModal);
+                          handlePlusBatch(product);
+                        }}
+                      >
+                        ＋
+                      </button>
+                    </td>
+                    <td className="border p-1"></td>
+                    <td className="border p-1 text-center"></td>
+                    <td className="border p-1"></td>
+                  </tr>
+                ) : (
+                  <></>
+                )}
               </Fragment>
             ))}
           </tbody>
