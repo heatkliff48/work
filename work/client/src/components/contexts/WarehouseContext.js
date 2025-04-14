@@ -311,7 +311,6 @@ const WarehouseContextProvider = ({ children }) => {
       const order = list_of_orders.find((el) => el.id === group.orderId);
       if (order_status.includes(order?.status)) return;
 
-      console.log('group.products', group.products);
 
       const allMatch = group.products.every(
         (product) => product.total_quantity <= product.total_quantity_in_warehouse

@@ -8,7 +8,12 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 
 const WMOCTable = ({ product_list }) => {
-  const { wmoctProduct, setWmoctProduct } = useWarehouseContext();
+  const {
+    wmoctProduct,
+    setWmoctProduct,
+    warehouse_data,
+    list_of_reserved_products,
+  } = useWarehouseContext();
   const { productsOfOrders, list_of_orders } = useOrderContext();
   const { wmoctModal, setWmoctModal } = useModalContext();
   const { latestProducts } = useProductsContext();
@@ -88,25 +93,29 @@ const WMOCTable = ({ product_list }) => {
 
   const saveHandler = () => {
     let newReserved = [];
-    wmoctProduct.foreach((el) => {
+    wmoctProduct.forEach((el) => {
       const { orders_products_id } = el;
-      wmoctProduct.foreach((elem) => {
+      el?.batches?.forEach((elem) => {
+        const wid = warehouse_data.find((el) => el.article == elem.batchId)?.id;
         const obj = {
-          warehouse_id: elem.batchId,
+          warehouse_id: wid,
           orders_products_id,
           quantity: elem.allocated,
         };
         newReserved.push(obj);
       });
     });
-    console.log(newReserved);
-    // dispatch(addNewReservedProducts());
+    dispatch(addNewReservedProducts(newReserved));
   };
 
   useEffect(() => {
     const initialProducts = product_list.orders_products.map((el) => {
       const [article, quantityStr] = el.split(':').map((s) => s.trim());
       const quantity = Number(quantityStr);
+
+      const batches = [];
+      let shipped = 0;
+      let qty_rem = quantity;
 
       const product_from_list_id = latestProducts.find(
         (el) => el.article == article
@@ -120,24 +129,40 @@ const WMOCTable = ({ product_list }) => {
         (poo) =>
           poo.product_id === product_from_list_id &&
           poo.order_id === order_from_list_id
+      ).id;
+
+      const list_of_batches = list_of_reserved_products.filter(
+        (el) => el.orders_products_id == product
       );
+
+      if (list_of_batches.length > 0) {
+        list_of_batches.forEach((batch) => {
+          const { quantity } = batch;
+          const wrh_item = warehouse_data.find((el) => el.id == batch.warehouse_id);
+
+          const obj = {
+            batchId: wrh_item.article,
+            remainingInBatch: wrh_item.total_quantity,
+            allocated: quantity,
+          };
+          shipped += quantity;
+          qty_rem -= quantity;
+          batches.push(obj);
+        });
+      }
 
       return {
         article,
         qty_total: quantity,
-        shipped: 0,
-        qty_rem: quantity - 0,
-        batches: [],
-        orders_products_id: product.id,
+        shipped,
+        qty_rem,
+        batches,
+        orders_products_id: product,
       };
     });
 
     setWmoctProduct(initialProducts);
-  }, [product_list]);
-
-  useEffect(() => {
-    console.log('wmoctProduct', wmoctProduct);
-  }, [wmoctProduct]);
+  }, [product_list, latestProducts, list_of_orders, list_of_reserved_products]);
 
   return (
     <>
