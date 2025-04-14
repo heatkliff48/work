@@ -2,20 +2,12 @@ import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
-
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { Button } from 'reactstrap';
 import WMOCTable from './WMOCTable/WMOCTable';
 
 const WMOrderCard = React.memo(({ selectedOrder }) => {
   const { orderCartData, setOrderCartData, list_of_orders } = useOrderContext();
 
   const { displayNames } = useProjectContext();
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const [ordersStatus, setOrdersStatus] = useState([]);
 
   const filterKeys = useMemo(

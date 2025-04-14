@@ -2,11 +2,18 @@ import { Fragment, useEffect, useState } from 'react';
 import WMOCTableModal from './WMOCTableModal';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useDispatch } from 'react-redux';
+import { addNewReservedProducts } from '#components/redux/actions/warehouseAction.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 
 const WMOCTable = ({ product_list }) => {
   const { wmoctProduct, setWmoctProduct } = useWarehouseContext();
+  const { productsOfOrders, list_of_orders } = useOrderContext();
   const { wmoctModal, setWmoctModal } = useModalContext();
+  const { latestProducts } = useProductsContext();
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const dispatch = useDispatch();
 
   const handlePlusBatch = (product) => {
     setSelectedProduct(product.article);
@@ -79,10 +86,41 @@ const WMOCTable = ({ product_list }) => {
     );
   };
 
+  const saveHandler = () => {
+    let newReserved = [];
+    wmoctProduct.foreach((el) => {
+      const { orders_products_id } = el;
+      wmoctProduct.foreach((elem) => {
+        const obj = {
+          warehouse_id: elem.batchId,
+          orders_products_id,
+          quantity: elem.allocated,
+        };
+        newReserved.push(obj);
+      });
+    });
+    console.log(newReserved);
+    // dispatch(addNewReservedProducts());
+  };
+
   useEffect(() => {
     const initialProducts = product_list.orders_products.map((el) => {
       const [article, quantityStr] = el.split(':').map((s) => s.trim());
       const quantity = Number(quantityStr);
+
+      const product_from_list_id = latestProducts.find(
+        (el) => el.article == article
+      )?.id;
+
+      const order_from_list_id = list_of_orders.find(
+        (el) => el.article == product_list.orders_article
+      )?.id;
+
+      const product = productsOfOrders.find(
+        (poo) =>
+          poo.product_id === product_from_list_id &&
+          poo.order_id === order_from_list_id
+      );
 
       return {
         article,
@@ -90,6 +128,7 @@ const WMOCTable = ({ product_list }) => {
         shipped: 0,
         qty_rem: quantity - 0,
         batches: [],
+        orders_products_id: product.id,
       };
     });
 
@@ -227,6 +266,7 @@ const WMOCTable = ({ product_list }) => {
               </Fragment>
             ))}
           </tbody>
+          <button onClick={saveHandler}>SAVE</button>
         </table>
       </div>
     </>
