@@ -187,7 +187,9 @@ class WarehouseRepository {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedProducts');
 
     try {
-      await ReservedProducts.create(reserved_product);
+      for (let i = 0; i < reserved_product.length; i++) {
+        await ReservedProducts.create(reserved_product[i]);
+      }
       const new_reserved_product = await ReservedProducts.findAll({
         attributes: ['id', 'warehouse_id', 'orders_products_id', 'quantity'],
       });
