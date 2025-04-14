@@ -3,12 +3,13 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { Fragment, useEffect, useState } from 'react';
 import WMOCTableModal from './WMOCTableModal';
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 const WMOCTable = ({ product_list }) => {
   const { productsOfOrders, list_of_orders } = useOrderContext();
+  const { wmoctProduct, setWmoctProduct } = useWarehouseContext();
   const { wmoctModal, setWmoctModal } = useModalContext();
   const { latestProducts } = useProductsContext();
-  const [wmoctProduct, setWmoctProduct] = useState();
   const [selectedProduct, setSelectedProduct] = useState();
 
   const handlePlus = (product) => {
@@ -37,7 +38,6 @@ const WMOCTable = ({ product_list }) => {
           poo.product_id === product_from_list_id &&
           poo.order_id === order_from_list_id
       );
-      console.log('product', product);
 
       return {
         article,
@@ -94,10 +94,9 @@ const WMOCTable = ({ product_list }) => {
                   {product?.batches?.length > 0 ? (
                     product?.batches.map((el, i) => (
                       <>
-                        <td className="border p-1">{el.batchId}</td>
                         <td className="border p-1">
-                          {el.remainingInBatch}
-                          {i === product?.batches?.length ? (
+                          {el.batchId}
+                          {i === product?.batches?.length-1 ? (
                             <>
                               <button
                                 onClick={() => {
@@ -112,6 +111,7 @@ const WMOCTable = ({ product_list }) => {
                             <></>
                           )}
                         </td>
+                        <td className="border p-1">{el.remainingInBatch}</td>
                         <td className="border p-1 text-center">
                           <button onClick={() => handlePlus()}>＋</button>
                           <button onClick={() => handleMinus(el)}>－</button>
@@ -121,7 +121,6 @@ const WMOCTable = ({ product_list }) => {
                     ))
                   ) : (
                     <>
-                      <td className="border p-1"></td>
                       <td className="border p-1">
                         <button
                           onClick={() => {
@@ -132,6 +131,7 @@ const WMOCTable = ({ product_list }) => {
                           ＋
                         </button>
                       </td>
+                      <td className="border p-1"></td>
                       <td className="border p-1 text-center"></td>
                       <td className="border p-1"></td>
                     </>

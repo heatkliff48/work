@@ -5,22 +5,38 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
   const { warehouse_data } = useWarehouseContext();
   const [wmoctmodal, setWmoctModal] = useState();
+  const { wmoctProduct, setWmoctProduct } = useWarehouseContext();
 
-  const onClickHandler = (batch) => {};
+  const onClickHandler = (batch) => {
+    setWmoctProduct((prev) => {
+      return prev.map((el) => {
+        if (el.article == selectedProduct)
+          return {
+            ...el,
+            batches: [
+              ...el.batches,
+              {
+                batchId: batch.batch_artcle,
+                remainingInBatch: batch.quantity,
+                allocated: 0,
+              },
+            ],
+          };
+        return el;
+      });
+    });
+    toggle();
+  };
 
   useEffect(() => {
     const result = warehouse_data
-      .filter((el) => {
-        console.log('el', el.product_article);
-        console.log('selected', selectedProduct);
-       return el.product_article == selectedProduct;
-      })
+      .filter((el) => el.product_article == selectedProduct)
       .map((el) => ({
         batch_artcle: el.article,
         quantity: el.total_quantity,
       }));
     setWmoctModal(result);
-  }, []);
+  }, [selectedProduct]);
 
   return (
     <div>

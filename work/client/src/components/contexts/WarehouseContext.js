@@ -108,6 +108,7 @@ const WarehouseContextProvider = ({ children }) => {
   const [currentBatch, setCurrentBatch] = useState();
   const [listOfOrderedCakes, setListOfOrderedCakes] = useState([]);
   const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
+  const [wmoctProduct, setWmoctProduct] = useState();
 
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_orders = useSelector((state) => state.orders);
@@ -356,6 +357,8 @@ const WarehouseContextProvider = ({ children }) => {
         setListOfOrderedCakes,
         filteredWarehouseByProduct,
         setFilteredWarehouseByProduct,
+        wmoctProduct,
+        setWmoctProduct,
       }}
     >
       {children}
