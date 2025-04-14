@@ -16,7 +16,7 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
             batches: [
               ...el.batches,
               {
-                batchId: batch.batch_artcle,
+                batchId: batch.batch_article,
                 remainingInBatch: batch.quantity,
                 allocated: 0,
               },
@@ -31,21 +31,21 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
   useEffect(() => {
     const result = warehouse_data
       .filter((el) => el.product_article == selectedProduct)
-      .flter((warehouseItem) => {
+      .filter((warehouseItem) => {
         const isArticleInAnyWMOCTBatches = wmoctProduct.some((wmoctItem) => {
           return wmoctItem.batches.some((batchItem) => {
-            return batchItem.article === warehouseItem.product_article;
+            return batchItem.batchId == warehouseItem.article;
           });
         });
 
         return !isArticleInAnyWMOCTBatches;
       })
       .map((el) => ({
-        batch_artcle: el.article,
+        batch_article: el.article,
         quantity: el.total_quantity,
       }));
     setWmoctModal(result);
-  }, [selectedProduct]);
+  }, [selectedProduct, wmoctProduct]);
 
   return (
     <div>
@@ -81,7 +81,7 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
                       }}
                     >
                       <td className="border p-1" rowSpan={product?.length || 1}>
-                        {product.batch_artcle}
+                        {product.batch_article}
                       </td>
                       <td className="border p-1" rowSpan={product?.length || 1}>
                         {product.quantity}

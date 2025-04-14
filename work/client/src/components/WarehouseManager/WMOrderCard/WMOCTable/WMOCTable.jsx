@@ -13,12 +13,70 @@ const WMOCTable = ({ product_list }) => {
     setWmoctModal(true);
   };
 
-  const handlePlus = (productIndex, batchIndex) => {};
+  const handlePlus = (batch, batchIndex) => {
+    setWmoctProduct((prev) =>
+      prev.map((wmoctItem) => {
+        if (wmoctItem.article == batch.article) {
+          let { shipped, qty_rem } = wmoctItem;
 
-  const handleMinus = (productIndex, batchIndex) => {};
+          const newBatches = wmoctItem.batches.map((el, i) => {
+            if (i == batchIndex) {
+              const { allocated, remainingInBatch } = el;
+              const canPlus = allocated == remainingInBatch;
+              const result = canPlus ? allocated : allocated + 1;
+
+              shipped = canPlus ? shipped : shipped + 1;
+              qty_rem = canPlus ? qty_rem : qty_rem - 1;
+
+              return { ...el, allocated: result };
+            }
+
+            return el;
+          });
+
+          return { ...wmoctItem, shipped, qty_rem, batches: newBatches };
+        }
+
+        return wmoctItem;
+      })
+    );
+  };
+
+  const handleMinus = (batch, batchIndex) => {
+    setWmoctProduct((prev) =>
+      prev.map((wmoctItem) => {
+        if (wmoctItem.article == batch.article) {
+          let { shipped, qty_rem } = wmoctItem;
+          const newBatches = wmoctItem.batches.map((el, i) => {
+            const { allocated } = el;
+
+            if (i == batchIndex) {
+              const canMinus = allocated != 0;
+
+              const result = canMinus ? allocated - 1 : 0;
+              shipped = canMinus ? shipped - 1 : shipped;
+              qty_rem = canMinus ? qty_rem + 1 : qty_rem;
+
+              return { ...el, allocated: result };
+            }
+            return el;
+          });
+          return { ...wmoctItem, shipped, qty_rem, batches: newBatches };
+        }
+
+        return wmoctItem;
+      })
+    );
+  };
 
   const haveBatches = (i) => {
     return wmoctProduct[i]?.batches?.length > 0;
+  };
+
+  const isDisable = (article) => {
+    return wmoctProduct.some(
+      (el) => el.article == article && el.qty_total == el.shipped
+    );
   };
 
   useEffect(() => {
@@ -82,12 +140,15 @@ const WMOCTable = ({ product_list }) => {
                         {product.batches[0]?.remainingInBatch}
                       </td>
                       <td className="border p-1 text-center">
-                        <button onClick={() => handlePlusBatch(product)}>＋</button>
                         <button
-                          onClick={() =>
-                            product.batches.length > 0 &&
-                            handleMinus(productIndex, 0)
-                          }
+                          disabled={isDisable(product.article)}
+                          onClick={() => handlePlus(product, 0)}
+                        >
+                          ＋
+                        </button>
+                        <button
+                          disabled={isDisable(product.article)}
+                          onClick={() => handleMinus(product, 0)}
                         >
                           －
                         </button>
@@ -123,9 +184,15 @@ const WMOCTable = ({ product_list }) => {
                     <td className="border p-1">{batch.batchId}</td>
                     <td className="border p-1">{batch.remainingInBatch}</td>
                     <td className="border p-1 text-center">
-                      <button onClick={() => handlePlusBatch(product)}>＋</button>
                       <button
-                        onClick={() => handleMinus(productIndex, batchIndex + 1)}
+                        disabled={isDisable(product.article)}
+                        onClick={() => handlePlus(product, batchIndex + 1)}
+                      >
+                        ＋
+                      </button>
+                      <button
+                        disabled={isDisable(product.article)}
+                        onClick={() => handleMinus(product, batchIndex + 1)}
                       >
                         －
                       </button>
