@@ -36,6 +36,7 @@ dryMixesJournalRouter.post('/', async (req, res) => {
     price,
     price_per_kilogram,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   console.log(
@@ -57,6 +58,7 @@ dryMixesJournalRouter.post('/', async (req, res) => {
       price,
       price_per_kilogram,
       product_code,
+      active_status,
     });
 
     myEmitter.emit(ADD_NEW_DRY_MIXES_JOURNAL_SOCKET, dryMixesJournal);
@@ -82,6 +84,7 @@ dryMixesJournalRouter.post('/update', async (req, res) => {
     price,
     price_per_kilogram,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
@@ -99,6 +102,7 @@ dryMixesJournalRouter.post('/update', async (req, res) => {
         price,
         price_per_kilogram,
         product_code,
+        active_status,
       },
       {
         where: {

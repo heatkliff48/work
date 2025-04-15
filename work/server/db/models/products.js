@@ -51,6 +51,7 @@ module.exports = (sequelize, DataTypes) => {
       quantityBlockOnPallet: DataTypes.FLOAT,
       volumeBlock: DataTypes.FLOAT,
       productCode: DataTypes.STRING,
+      activeStatus: DataTypes.BOOLEAN,
     },
     {
       sequelize,

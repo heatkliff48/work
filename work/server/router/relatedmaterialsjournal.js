@@ -31,6 +31,7 @@ relatedMaterialsJournalRouter.post('/', async (req, res) => {
     place_of_production,
     price,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
@@ -42,6 +43,7 @@ relatedMaterialsJournalRouter.post('/', async (req, res) => {
       place_of_production,
       price,
       product_code,
+      active_status,
     });
 
     myEmitter.emit(
@@ -65,6 +67,7 @@ relatedMaterialsJournalRouter.post('/update', async (req, res) => {
     place_of_production,
     price,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
@@ -77,6 +80,7 @@ relatedMaterialsJournalRouter.post('/update', async (req, res) => {
         place_of_production,
         price,
         product_code,
+        active_status,
       },
       {
         where: {

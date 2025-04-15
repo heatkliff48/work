@@ -32,6 +32,7 @@ anchorRouter.post('/', async (req, res) => {
     place_of_production,
     price,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
@@ -47,6 +48,7 @@ anchorRouter.post('/', async (req, res) => {
       place_of_production,
       price,
       product_code,
+      active_status,
     });
 
     myEmitter.emit(ADD_NEW_ANCHOR_SOCKET, anchor);
@@ -71,6 +73,7 @@ anchorRouter.post('/update', async (req, res) => {
     place_of_production,
     price,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
@@ -87,6 +90,7 @@ anchorRouter.post('/update', async (req, res) => {
         place_of_production,
         price,
         product_code,
+        active_status,
       },
       {
         where: {

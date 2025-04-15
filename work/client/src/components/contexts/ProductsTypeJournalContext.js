@@ -1,7 +1,8 @@
-import { TextSearchFilter } from '#components/Table/filters.js';
+import { TextSearchFilter, DropdownFilter } from '#components/Table/filters.js';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 
 const ProductsTypeJournalContext = createContext();
 
@@ -62,6 +63,17 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       accessor: 'price_per_kilogram',
       Filter: TextSearchFilter,
     },
+    {
+      Header: 'Product availability',
+      accessor: 'active_status',
+      Filter: DropdownFilter,
+      Cell: ({ cell }) =>
+        cell.row.values.active_status ? (
+          <FaCheck color="green" size={24} />
+        ) : (
+          <FaTimes color="red" size={24} />
+        ),
+    },
   ];
 
   const COLUMNS_ANCHOR_PRODUCT = [
@@ -115,6 +127,61 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       accessor: 'price',
       Filter: TextSearchFilter,
     },
+    {
+      Header: 'Product availability',
+      accessor: 'active_status',
+      Filter: DropdownFilter,
+      Cell: ({ cell }) =>
+        cell.row.values.active_status ? (
+          <FaCheck color="green" size={24} />
+        ) : (
+          <FaTimes color="red" size={24} />
+        ),
+    },
+  ];
+
+  const COLUMNS_RELATED_MATERIALS_JOURNAL = [
+    {
+      Header: 'Product name',
+      accessor: 'name',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Article',
+      accessor: 'article',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Units of measurement',
+      accessor: 'units_of_measurement',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Description',
+      accessor: 'description',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Place of production',
+      accessor: 'place_of_production',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Price per unit',
+      accessor: 'price',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Product availability',
+      accessor: 'active_status',
+      Filter: DropdownFilter,
+      Cell: ({ cell }) =>
+        cell.row.values.active_status ? (
+          <FaCheck color="green" size={24} />
+        ) : (
+          <FaTimes color="red" size={24} />
+        ),
+    },
   ];
 
   const COLUMNS_TOOLS_PRODUCT = [
@@ -153,6 +220,17 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       accessor: 'price',
       Filter: TextSearchFilter,
     },
+    {
+      Header: 'Product availability',
+      accessor: 'active_status',
+      Filter: DropdownFilter,
+      Cell: ({ cell }) =>
+        cell.row.values.active_status ? (
+          <FaCheck color="green" size={24} />
+        ) : (
+          <FaTimes color="red" size={24} />
+        ),
+    },
   ];
 
   const unitsOfMeasurementOptions = [
@@ -187,6 +265,7 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
         COLUMNS_DRY_MIXED_PRODUCT,
         COLUMNS_ANCHOR_PRODUCT,
         COLUMNS_TOOLS_PRODUCT,
+        COLUMNS_RELATED_MATERIALS_JOURNAL,
         unitsOfMeasurementOptions,
         typeOfMixOptions,
         placeOfProductionOptions,

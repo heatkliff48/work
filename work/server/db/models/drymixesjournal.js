@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       place_of_production: DataTypes.STRING,
       price: DataTypes.FLOAT,
       product_code: DataTypes.STRING,
+      active_status: DataTypes.BOOLEAN,
     },
     {
       sequelize,

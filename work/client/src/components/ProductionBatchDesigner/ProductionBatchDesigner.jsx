@@ -224,10 +224,11 @@ function ProductionBatchDesigner() {
   useEffect(() => {
     if (!latestProducts || !listOfOrderedCakes) return;
 
+    console.log('listOfOrderedCakes', listOfOrderedCakes);
     const rightListOfOrdered = listOfOrderedCakes.filter(
       (el) =>
         el.quantity !== el.quantity_in_warehouse &&
-        el.quantity_cakes > el.quantity_in_batch
+        el.quantity_cakes > el.quantity_in_batch + el.quantity_in_warehouse / 3
     );
 
     const groupedByDensity = rightListOfOrdered.reduce((acc, curr) => {

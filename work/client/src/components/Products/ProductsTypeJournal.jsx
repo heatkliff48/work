@@ -25,7 +25,7 @@ function ProductsTypeJournal() {
           Related materials journal
         </button>
         <button className="nav-button" onClick={() => navigate('/anchors')}>
-          Anchors
+          Fasteners
         </button>
         <button className="nav-button" onClick={() => navigate('/tools')}>
           Tools

@@ -29,6 +29,7 @@ toolRouter.post('/', async (req, res) => {
     place_of_production,
     price,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
@@ -41,6 +42,7 @@ toolRouter.post('/', async (req, res) => {
       place_of_production,
       price,
       product_code,
+      active_status,
     });
 
     myEmitter.emit(ADD_NEW_TOOL_SOCKET, tool);
@@ -62,6 +64,7 @@ toolRouter.post('/update', async (req, res) => {
     place_of_production,
     price,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
@@ -75,6 +78,7 @@ toolRouter.post('/update', async (req, res) => {
         place_of_production,
         price,
         product_code,
+        active_status,
       },
       {
         where: {

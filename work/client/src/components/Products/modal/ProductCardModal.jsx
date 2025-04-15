@@ -204,6 +204,10 @@ const ProductCardModal = React.memo(() => {
                       <CardText>
                         {['article', 'id', 'version'].includes(el.accessor)
                           ? null
+                          : el.accessor === 'activeStatus'
+                          ? productCardData?.[el.accessor]
+                            ? 'Available'
+                            : 'Not available'
                           : productCardData?.[el.accessor] || ''}
                       </CardText>
                     </CardBody>

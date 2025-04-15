@@ -129,6 +129,7 @@ function ProductsTypeJournalModal(props) {
       type_of_mix: typeOfMixOptions[0].value,
       place_of_production: placeOfProductionOptions[0].value,
       product_code: props?.productCode,
+      active_status: true,
     }));
   }, [props.show]);
 
@@ -197,7 +198,7 @@ function ProductsTypeJournalModal(props) {
                       className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
                       for="version"
                     >
-                      {el.Header}
+                      {el.Header === 'Product availability' ? null : el.Header}
                     </label>
                   </div>
                   <div className="md:w-2/3">
@@ -231,7 +232,7 @@ function ProductsTypeJournalModal(props) {
                       />
                     ) : el.accessor === 'article' ? (
                       <h4>{productsTypeJournalInput[el.accessor] || ''}</h4>
-                    ) : (
+                    ) : el.accessor === 'active_status' ? null : (
                       <input
                         className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                         id={el.accessor}
