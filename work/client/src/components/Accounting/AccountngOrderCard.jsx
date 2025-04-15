@@ -76,7 +76,20 @@ const AccountngOrderCard = React.memo(() => {
     return addProductArticleToOrderList(productListOrder, latestProducts);
   }, [productListOrder]);
 
-  const statusChangeHandler = () => {
+  const statusChangeHandler = (newStatus) => {
+    const status_index = accountingStatusList.findIndex(
+      (el) => el.accessor == status
+    );
+
+    const new_status_index = accountingStatusList.findIndex(
+      (el) => el.accessor == newStatus
+    );
+
+    if (new_status_index < status_index || new_status_index - status_index != 1) {
+      alert('Choose another status');
+      return;
+    }
+
     dispatch(
       updAccountingDataList({
         orders_article: orderCartData?.article,
@@ -187,15 +200,15 @@ const AccountngOrderCard = React.memo(() => {
           <div className="status-table">
             {accountingStatusList.map((item) => (
               <div key={item.accessor} className="status-row">
-                {console.log('item.accessor', item.accessor)}
-                {console.log('status', status)}
+                {/* {console.log('item.accessor', item.accessor)}
+                {console.log('status', status)} */}
                 <div className="header">{item.Header}</div>
                 <input
                   id={item.accessor}
                   type="checkbox"
                   checked={item.accessor == status}
                   onChange={() => {
-                    statusChangeHandler();
+                    statusChangeHandler(item.accessor);
                   }}
                 />
               </div>
