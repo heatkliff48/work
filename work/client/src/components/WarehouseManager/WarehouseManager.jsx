@@ -42,7 +42,7 @@ function WarehouseManager() {
 
   useEffect(() => {
     const result = list_of_orders
-      // .filter((el) => el.status === 7)
+      .filter((el) => el.status === 7)
       .reduce((acc, el) => {
         const del_adr = deliveryAddresses?.find((del) => del?.id == el?.del_adr_id);
 
