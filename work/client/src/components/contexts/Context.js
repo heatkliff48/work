@@ -215,16 +215,20 @@ const ProjectContextProvider = ({ children }) => {
   const user = useSelector((state) => state.user);
 
   const [promProduct, setPromProduct] = useState(null);
-  const [productCardData, setProductCardData] = useState({});
+  const [currentContact, setCurrentContact] = useState();
+  const [currentDelivery, setCurrentDelivery] = useState();
+
   const [version, setVersion] = useState(1);
   const [roleId, setRoleId] = useState(0);
   const [currentClientID, setClientID] = useState(1);
-  const [stayDefault, setStayDefault] = useState(true);
+
   const isCheckedAuth = useRef(false);
-  const [clientsDataList, setClientsDataList] = useState([]);
+  const [isRepair, setIsRepair] = useState(false);
+  const [stayDefault, setStayDefault] = useState(true);
+
   const [currentClient, setCurrentClient] = useState({});
-  const [currentDelivery, setCurrentDelivery] = useState();
-  const [currentContact, setCurrentContact] = useState();
+  const [clientsDataList, setClientsDataList] = useState([]);
+  const [productCardData, setProductCardData] = useState({});
   const [currentUsersInfo, setCurrentUsersInfo] = useState({});
   const [usersInfoDataList, setUsersInfoDataList] = useState([]);
   const [productionBatchLogData, setProductionBatchLogData] = useState([]);
@@ -298,6 +302,8 @@ const ProjectContextProvider = ({ children }) => {
         production_batch_log,
         productionBatchLogData,
         setProductionBatchLogData,
+        isRepair,
+        setIsRepair,
       }}
     >
       {children}

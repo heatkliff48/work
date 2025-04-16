@@ -421,8 +421,6 @@ export const ProductsContextProvider = ({ children }) => {
         latestProducts,
         selectOptions,
         getOptionValue,
-        // rightTypeOfPackagingFunc,
-        // rightPlaceOfProductionFunc,
       }}
     >
       {children}

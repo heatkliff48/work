@@ -20,6 +20,7 @@ import {
   saveMaterialPlanSocket,
   updateDryMixesJournalSocket,
   updateProductSocket,
+  repairProductSocket,
   updateRelatedMaterialsJournalSocket,
   updateRemainingStockSocket,
   updateRolesActiveSocket,
@@ -106,6 +107,7 @@ import {
   GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+  REPAIR_PRODUCT_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -120,6 +122,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_PRODUCT_SOCKET:
       dispatch(updateProductSocket(payload));
+      break;
+
+    case REPAIR_PRODUCT_SOCKET:
+      dispatch(repairProductSocket(payload));
       break;
 
     case UPDATE_ROLE_SOCKET:

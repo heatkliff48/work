@@ -164,6 +164,16 @@ label {
   justify-content: space-between;
   align-items: center;
 }
+
+.product_card_btn {
+  width: 10%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .roles-container {
   display: flex;
   flex-direction: column;

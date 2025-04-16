@@ -5,6 +5,7 @@ const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_PRODUCT_SOCKET,
   UPDATE_PRODUCT_SOCKET,
+  REPAIR_PRODUCT_SOCKET,
 } = require('../src/constants/event.js');
 
 class ProductController {
@@ -38,6 +39,20 @@ class ProductController {
       const products = await ProductService.updateProduct({ product });
 
       myEmitter.emit(UPDATE_PRODUCT_SOCKET, products);
+
+      return res.status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async repairProductData(req, res) {
+    const repProduct = req.body;
+
+    try {
+      const products = await ProductService.repairProductData({ repProduct });
+
+      myEmitter.emit(REPAIR_PRODUCT_SOCKET, repProduct);
 
       return res.status(200);
     } catch (err) {
