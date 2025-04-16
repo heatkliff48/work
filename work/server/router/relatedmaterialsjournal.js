@@ -26,10 +26,11 @@ relatedMaterialsJournalRouter.post('/', async (req, res) => {
   const {
     name,
     article,
+    manufacturer_name,
     units_of_measurement,
     description,
     place_of_production,
-    price,
+    price_per_unit,
     product_code,
     active_status,
   } = req.body.productsTypeJournalInput;
@@ -38,10 +39,11 @@ relatedMaterialsJournalRouter.post('/', async (req, res) => {
     const relatedMaterialsJournal = await RelatedMaterialsJournal.create({
       name,
       article,
+      manufacturer_name,
       units_of_measurement,
       description,
       place_of_production,
-      price,
+      price_per_unit,
       product_code,
       active_status,
     });
@@ -62,10 +64,11 @@ relatedMaterialsJournalRouter.post('/update', async (req, res) => {
     id,
     name,
     article,
+    manufacturer_name,
     units_of_measurement,
     description,
     place_of_production,
-    price,
+    price_per_unit,
     product_code,
     active_status,
   } = req.body.productsTypeJournalInput;
@@ -75,10 +78,11 @@ relatedMaterialsJournalRouter.post('/update', async (req, res) => {
       {
         name,
         article,
+        manufacturer_name,
         units_of_measurement,
         description,
         place_of_production,
-        price,
+        price_per_unit,
         product_code,
         active_status,
       },

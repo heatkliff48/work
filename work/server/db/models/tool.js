@@ -15,11 +15,12 @@ module.exports = (sequelize, DataTypes) => {
     {
       name: DataTypes.STRING,
       article: DataTypes.STRING,
+      manufacturer_name: DataTypes.STRING,
       units_of_measurement: DataTypes.STRING,
       piece_weight: DataTypes.FLOAT,
       description: DataTypes.TEXT,
       place_of_production: DataTypes.STRING,
-      price: DataTypes.FLOAT,
+      price_per_unit: DataTypes.FLOAT,
       product_code: DataTypes.STRING,
       active_status: DataTypes.BOOLEAN,
     },

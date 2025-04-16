@@ -15,6 +15,9 @@ module.exports = {
       article: {
         type: Sequelize.STRING,
       },
+      manufacturer_name: {
+        type: Sequelize.STRING,
+      },
       units_of_measurement: {
         type: Sequelize.STRING,
       },
@@ -27,7 +30,7 @@ module.exports = {
       place_of_production: {
         type: Sequelize.STRING,
       },
-      price: {
+      price_per_unit: {
         type: Sequelize.FLOAT,
       },
       product_code: {

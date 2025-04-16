@@ -1,6 +1,6 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import 'react-international-phone/style.css';
 import Select from 'react-select';
 import Container from 'react-bootstrap/Container';
@@ -52,15 +52,15 @@ function ProductsTypeJournalModal(props) {
   }, [productsTypeJournalInput.bag_weight, productsTypeJournalInput.number_of_bags]);
 
   useEffect(() => {
-    const { price, bag_weight } = productsTypeJournalInput;
-    if (price && bag_weight) {
-      const pricePerKilo = parseFloat(price) / parseFloat(bag_weight);
+    const { price_per_unit, bag_weight } = productsTypeJournalInput;
+    if (price_per_unit && bag_weight) {
+      const pricePerKilo = parseFloat(price_per_unit) / parseFloat(bag_weight);
       setProductsTypeJournalInput((prev) => ({
         ...prev,
         price_per_kilogram: pricePerKilo,
       }));
     }
-  }, [productsTypeJournalInput.price, productsTypeJournalInput.bag_weight]);
+  }, [productsTypeJournalInput.price_per_unit, productsTypeJournalInput.bag_weight]);
 
   useEffect(() => {
     const { boxes_on_a_pallet, box_weight } = productsTypeJournalInput;
@@ -110,10 +110,16 @@ function ProductsTypeJournalModal(props) {
     const placeOfProductionOption = options.find(
       (option) => option.value === productsTypeJournalInput?.[accessor]
     );
-    return placeOfProductionOption || options[0];
+    return placeOfProductionOption || options.find((opt) => opt.value === 'ES'); // 'ES' — код Испании
   };
 
   useEffect(() => {
+    const defaultCountry = placeOfProductionOptions.find(
+      (opt) => opt.value === 'ES'
+    );
+    console.log('placeOfProductionOptions', placeOfProductionOptions);
+    // console.log('defaultCountry', defaultCountry);
+
     setProductsTypeJournalInput((prev) => ({
       ...prev,
       article: `X.${
@@ -127,7 +133,8 @@ function ProductsTypeJournalModal(props) {
       }${props?.productCode}`,
       units_of_measurement: unitsOfMeasurementOptions[0].value,
       type_of_mix: typeOfMixOptions[0].value,
-      place_of_production: placeOfProductionOptions[0].value,
+      place_of_production:
+        defaultCountry?.value || placeOfProductionOptions[0].value,
       product_code: props?.productCode,
       active_status: true,
     }));
@@ -232,6 +239,14 @@ function ProductsTypeJournalModal(props) {
                       />
                     ) : el.accessor === 'article' ? (
                       <h4>{productsTypeJournalInput[el.accessor] || ''}</h4>
+                    ) : el.accessor === 'description' ? (
+                      <AutoResizeTextarea
+                        id={el.accessor}
+                        name={el.accessor}
+                        value={productsTypeJournalInput[el.accessor] || ''}
+                        onChange={(e) => handleProductsTypeJournalInputChange(e)}
+                        placeholder=""
+                      />
                     ) : el.accessor === 'active_status' ? null : (
                       <input
                         className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
@@ -284,5 +299,32 @@ function ShowProductsTypeJournalModal(props) {
     </>
   );
 }
+
+const AutoResizeTextarea = ({ value, onChange, ...props }) => {
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'; // Сброс высоты
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Установка новой
+    }
+  }, [value]);
+
+  return (
+    <textarea
+      ref={textareaRef}
+      value={value}
+      onChange={onChange}
+      style={{
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '10px',
+        overflow: 'hidden', // Скрываем scroll при авто-расширении
+        resize: 'none', // Отключаем ручное изменение размера
+      }}
+      {...props}
+    />
+  );
+};
 
 export default ShowProductsTypeJournalModal;

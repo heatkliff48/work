@@ -65,7 +65,6 @@ function App() {
           <Route path="/clients" element={<ClientsInfo />} />
           <Route path="/dry_mixes_journal" element={<DryMixesJournal />} />
 
-
           <Route
             path="/list_of_ordered_production"
             element={<ListOfOrderedProduction />}
@@ -75,10 +74,8 @@ function App() {
             element={<ListOfOrderedProductionOEM />}
           />
 
-
           <Route path="/orders" element={<OrdersTable />} />
           <Route path="/order_card" element={<OrderCart />} />
-
 
           <Route path="/products" element={<Products />} />
           <Route
@@ -87,9 +84,7 @@ function App() {
           />
           <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
 
-
           <Route path="/quality_management" element={<QualityManagementTable />} />
-
 
           <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
           <Route path="/recipe_products" element={<ProductsListForRecipes />} />
@@ -100,11 +95,9 @@ function App() {
           />
           <Route path="/roles" element={<Roles />} />
 
-
           <Route path="/sign-in" element={<LoginForm />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/stock_balance" element={<StockBalance />} />
-
 
           <Route path="/tools" element={<ToolsTable />} />
           <Route path="/users_info" element={<UsersInfo />} />
