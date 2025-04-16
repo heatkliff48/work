@@ -11,6 +11,7 @@ export const ModalContextProvider = ({ children }) => {
   const [modalProductCard, setModalProductCard] = useState(false);
   const [clientModalOrder, setClientModalOrder] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
+  const [isModalWindowOpen, setIsModalWindowOpen] = useState(false);
   const [dryMixedProductModalOrder, setDryMixedProductModalOrder] = useState(false);
   const [anchorProductModalOrder, setAnchorProductModalOrder] = useState(false);
   const [toolProductModalOrder, setToolProductModalOrder] = useState(false);
@@ -61,6 +62,8 @@ export const ModalContextProvider = ({ children }) => {
         setStockBalanceModal,
         wmoctModal,
         setWmoctModal,
+        isModalWindowOpen,
+        setIsModalWindowOpen,
       }}
     >
       {children}

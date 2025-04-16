@@ -6,10 +6,12 @@ class ProductsRepository {
     const products = await Products.findAll();
     return products;
   }
+
   static async addNewProductData(newProduct) {
     const product = await Products.create(newProduct);
     return product;
   }
+
   static async updateProductData(updProduct) {
     // const updateProduct = await Products.update(updProduct, {
     //   where: { id: updProduct.id },
@@ -19,6 +21,14 @@ class ProductsRepository {
     const updateProduct = await Products.create(updProduct);
 
     return updateProduct;
+  }
+
+  static async repairProductData(repProduct) {
+    await Products.update(repProduct, {
+      where: { id: repProduct.id },
+    });
+
+    return repProduct;
   }
 }
 

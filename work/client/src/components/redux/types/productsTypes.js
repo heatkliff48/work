@@ -6,3 +6,6 @@ export const NEW_PRODUCT = 'NEW_PRODUCT';
 
 export const NEED_UPDATE_PRODUCT = 'NEED_UPDATE_PRODUCT';
 export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
+
+export const REPAIR_PRODUCT = 'REPAIR_PRODUCT';
+export const REP_PRODUCT = 'REP_PRODUCT';

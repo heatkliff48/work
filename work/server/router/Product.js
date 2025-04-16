@@ -6,5 +6,6 @@ const router = Router();
 router.get('/all', ProductController.getAllProduct);
 router.post('/add', ProductController.addProduct);
 router.post('/upd', ProductController.updateProduct);
+router.post('/rep', ProductController.repairProductData);
 
 module.exports = router;

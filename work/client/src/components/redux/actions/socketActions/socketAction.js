@@ -40,6 +40,7 @@ import {
   DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+  REP_PRODUCT_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -67,6 +68,13 @@ export const updateProductSocket = (products) => {
   return {
     type: UPD_PRODUCT_SOCKET,
     payload: products,
+  };
+};
+
+export const repairProductSocket = (repProduct) => {
+  return {
+    type: REP_PRODUCT_SOCKET,
+    payload: repProduct,
   };
 };
 

@@ -7,6 +7,8 @@ import {
   GET_ALL_PRODUCTS,
   NEED_UPDATE_PRODUCT,
   NEW_PRODUCT,
+  REP_PRODUCT,
+  REPAIR_PRODUCT,
   UPDATE_PRODUCT,
 } from '../types/productsTypes';
 // import { setToken } from '../actions/jwtAction';
@@ -43,6 +45,15 @@ const getAllProducts = () => {
 const updateProducts = ({ product }) => {
   return url
     .post('/products/upd', { product })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const repairProduct = (repProduct) => {
+  return url
+    .post('/products/rep', repProduct)
     .then((res) => {
       return res.data;
     })
@@ -87,6 +98,14 @@ function* updateProductWatcher(action) {
   }
 }
 
+function* repairProductWatcher(action) {
+  try {
+    yield call(repairProduct, action.payload);
+  } catch (err) {
+    yield put({ type: REP_PRODUCT, payload: [] });
+  }
+}
+
 function* addNewProductWatcher(action) {
   try {
     yield call(addNewProduct, action.payload);
@@ -104,6 +123,7 @@ function* productsWatcher() {
   yield takeLatest(GET_ALL_PRODUCTS, getAllProductsWatcher);
   yield takeLatest(ADD_NEW_PRODUCT, addNewProductWatcher);
   yield takeLatest(NEED_UPDATE_PRODUCT, updateProductWatcher);
+  yield takeLatest(REPAIR_PRODUCT, repairProductWatcher);
 }
 
 export default productsWatcher;

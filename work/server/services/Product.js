@@ -18,6 +18,12 @@ class ProductService {
 
     return products;
   }
+
+  static async repairProductData( repProduct ) {
+    const products = await ProductsRepository.repairProductData(repProduct);
+
+    return repProduct;
+  }
 }
 
 module.exports = ProductService;

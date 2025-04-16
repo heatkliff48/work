@@ -1,7 +1,10 @@
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { addNewProduct } from '#components/redux/actions/productsAction.js';
+import {
+  addNewProduct,
+  repProduct,
+} from '#components/redux/actions/productsAction.js';
 import InputField from '../../InputField/InputField';
 import UpdateModalWindow from './UpdateModalWindow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -9,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
-const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) => {
+const ModalWindow = React.memo(({ list, formData, isOpen, toggle, isRepair }) => {
   const {
     version,
     setVersion,
@@ -54,6 +57,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       placeOfProduction,
       typeOfPackaging,
       palletSize,
+      palletHeight,
     } = formInput;
 
     const rightPlaceOfProduction = getOptionValue(
@@ -63,6 +67,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
     const rightTypeOfPackaging = getOptionValue('typeOfPackaging', typeOfPackaging);
 
     const rightPalletSize = getOptionValue('palletSize', palletSize);
+    const rightPalletHeight = getOptionValue('palletHeight', palletHeight);
 
     const prodArticle = `T.${form
       ?.toUpperCase()
@@ -83,6 +88,8 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       ...formInput,
       placeOfProduction: rightPlaceOfProduction,
       typeOfPackaging: rightTypeOfPackaging,
+      palletSize: rightPalletSize,
+      palletHeight: rightPalletHeight,
       article: prodArticle,
       productCode,
     };
@@ -91,7 +98,9 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       (product) => product.article === prodArticle
     );
 
-    if (isExistingProduct) {
+    if (isRepair) {
+      dispatch(repProduct(updatedProduct));
+    } else if (isExistingProduct) {
       const existingProduct = products.find(
         (product) => product.article === prodArticle
       );
@@ -102,14 +111,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       });
       setModalUpdate(!modalUpdate);
     } else {
-      console.log('formInput', formInput);
-
-      setModal(!modal);
-      setModalProductCard(false);
-      setStayDefault(true);
       dispatch(addNewProduct({ product: updatedProduct }));
-      clearData();
-      setStayDefault(true);
     }
   };
 
@@ -425,6 +427,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
       setFormInput((prev) => ({ ...prev, version }));
     }
   }, [version]);
+
   useEffect(() => {
     console.log('formInput', formInput);
   }, [formInput]);
@@ -446,7 +449,7 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
             toggle();
           }}
         >
-          New product
+          {isRepair ? <p>Repair product</p> : <p>New product</p>}
         </ModalHeader>
         <div className="item_content">
           {list.map((el) => {
@@ -536,12 +539,14 @@ const ModalWindow = React.memo(({ list, formData, isOpen, toggle, updating }) =>
           <Button
             color="primary"
             onClick={() => {
+              setModalProductCard(false);
               updateProductHandler();
               setStayDefault(true);
               clearData();
+              toggle();
             }}
           >
-            Add
+            {isRepair ? <p>Repair</p> : <p>Add</p>}
           </Button>
         </ModalFooter>
       </Modal>
