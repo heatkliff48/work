@@ -20,11 +20,11 @@ import {
   repProduct,
 } from '#components/redux/actions/productsAction.js';
 
-const PreviewProductCardModal = React.memo(() => {
-  const { COLUMNS, getOptionValue } = useProductsContext();
-  const { previewProductData } = useProjectContext();
-  const { previewProductModal, setPreviewProductModal, previewOperationName } =
-    useModalContext();
+const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
+  const { COLUMNS, getOptionValue, selectOptions } = useProductsContext();
+  const { previewProductData, setPreviewOperationName } = useProjectContext();
+  const { previewProductModal, setPreviewProductModal } = useModalContext();
+
   const dispatch = useDispatch();
 
   const memoizedArticle = (prod) => {
@@ -66,7 +66,10 @@ const PreviewProductCardModal = React.memo(() => {
     return prodArticle;
   };
 
-  const toggle = () => setPreviewProductModal(!previewProductModal);
+  const toggle = () => {
+    setPreviewProductModal(!previewProductModal);
+    setPreviewOperationName('');
+  };
 
   const header = {
     add: 'You are creating a new product card',
@@ -75,18 +78,41 @@ const PreviewProductCardModal = React.memo(() => {
   };
 
   const saveHandler = () => {
-    if ('product' in previewProductData) {
-      dispatch(addNewProduct(previewProductData));
+    const { placeOfProduction, typeOfPackaging, palletSize, palletHeight } =
+      previewProductData;
+
+    const rightPlaceOfProduction = getOptionValue(
+      'placeOfProduction',
+      placeOfProduction
+    );
+
+    const rightTypeOfPackaging = getOptionValue('typeOfPackaging', typeOfPackaging);
+
+    const rightPalletSize = getOptionValue('palletSize', palletSize);
+    const rightPalletHeight = getOptionValue('palletHeight', palletHeight);
+
+    const obj = {
+      ...previewProductData,
+      placeOfProduction: rightPlaceOfProduction,
+      typeOfPackaging: rightTypeOfPackaging,
+      palletSize: rightPalletSize,
+      palletHeight: rightPalletHeight,
+    };
+
+    if (['add', 'edit'].includes(previewOperationName)) {
+      dispatch(addNewProduct(obj));
     } else {
-      dispatch(repProduct(previewProductData));
+      dispatch(repProduct(obj));
     }
     setPreviewProductModal(!previewProductModal);
+    setPreviewOperationName('');
   };
+  console.log('previewProductData', previewProductData);
 
   return (
     <div>
       <Modal isOpen={previewProductModal} toggle={toggle} size="lg">
-        <ModalHeader toggle={toggle}>{header.previewOperationName}</ModalHeader>
+        <ModalHeader toggle={toggle}>{header[previewOperationName]}</ModalHeader>
         <ModalHeader>
           <div className="product_card_header">
             <div>
@@ -100,13 +126,36 @@ const PreviewProductCardModal = React.memo(() => {
         <ModalBody className="item">
           <div className="item_content">
             {COLUMNS.map((el) => {
+              const { accessor } = el;
               if (
-                el.accessor === 'id' ||
-                el.accessor === 'article' ||
-                el.accessor === 'version'
-              )
+                accessor === 'id' ||
+                accessor === 'article' ||
+                accessor === 'version'
+              ) {
                 return null;
-              if (el.accessor !== 'productCode')
+              } else if (selectOptions[accessor]) {
+                const data = selectOptions[accessor].find(
+                  (el) =>
+                    el.label == previewProductData[accessor] ||
+                    el.value == previewProductData[accessor]
+                )?.label;
+                console.log('data', data);
+                return (
+                  <Card
+                    className="my-2"
+                    color="secondary"
+                    outline
+                    style={{
+                      width: '8rem',
+                    }}
+                  >
+                    <CardHeader>{el.Header}</CardHeader>
+                    <CardBody>
+                      <CardText>{data}</CardText>
+                    </CardBody>
+                  </Card>
+                );
+              } else if (accessor !== 'productCode')
                 return (
                   <Card
                     className="my-2"
@@ -119,13 +168,13 @@ const PreviewProductCardModal = React.memo(() => {
                     <CardHeader>{el.Header}</CardHeader>
                     <CardBody>
                       <CardText>
-                        {['article', 'id', 'version'].includes(el.accessor)
+                        {['article', 'id', 'version'].includes(accessor)
                           ? null
-                          : el.accessor === 'activeStatus'
-                          ? previewProductData?.[el.accessor]
+                          : accessor === 'activeStatus'
+                          ? previewProductData?.[accessor]
                             ? 'Available'
                             : 'Not available'
-                          : previewProductData?.[el.accessor] || ''}
+                          : previewProductData?.[accessor] || ''}
                       </CardText>
                     </CardBody>
                   </Card>

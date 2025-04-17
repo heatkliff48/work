@@ -61,7 +61,6 @@ const ModalWindow = React.memo(
         placeOfProduction,
         typeOfPackaging,
         palletSize,
-        palletHeight,
       } = formInput;
 
       const rightPlaceOfProduction = getOptionValue(
@@ -74,7 +73,6 @@ const ModalWindow = React.memo(
       );
 
       const rightPalletSize = getOptionValue('palletSize', palletSize);
-      const rightPalletHeight = getOptionValue('palletHeight', palletHeight);
 
       const prodArticle = `T.${form
         ?.toUpperCase()
@@ -93,10 +91,6 @@ const ModalWindow = React.memo(
 
       const updatedProduct = {
         ...formInput,
-        placeOfProduction: rightPlaceOfProduction,
-        typeOfPackaging: rightTypeOfPackaging,
-        palletSize: rightPalletSize,
-        palletHeight: rightPalletHeight,
         article: prodArticle,
         productCode,
         activeStatus: true,
@@ -112,7 +106,7 @@ const ModalWindow = React.memo(
 
       const lastVersion = products.findLast(
         (el) => el.article === prodArticle
-      ).version;
+      )?.version;
 
       if (isRepair) {
         const prevName = isExistingProduct ? 'edit' : 'repair';
@@ -138,21 +132,21 @@ const ModalWindow = React.memo(
           version: lastVersion + 1,
         };
 
-        setPreviewProductData({
-          product: { ...obj },
-        });
+        setPreviewProductData(obj);
       } else if (isEdit) {
         setPreviewOperationName('edit');
 
-        const obj = { ...updatedProduct, version: lastVersion + 1 };
+        const obj = {
+          ...updatedProduct,
+          productCode: existingProduct.productCode,
+          version: lastVersion + 1,
+        };
 
-        setPreviewProductData({
-          product: { ...obj, productCode: existingProduct.productCode },
-        });
+        setPreviewProductData(obj);
       } else {
         setPreviewOperationName('add');
 
-        setPreviewProductData({ product: updatedProduct });
+        setPreviewProductData(updatedProduct);
       }
       setPreviewProductModal(!previewProductModal);
     };

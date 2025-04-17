@@ -217,7 +217,7 @@ const ProjectContextProvider = ({ children }) => {
   const [currentContact, setCurrentContact] = useState();
   const [currentDelivery, setCurrentDelivery] = useState();
   const [previewProductData, setPreviewProductData] = useState();
-  const [previewOperationName, setPreviewOperationName] = useState();
+  const [previewOperationName, setPreviewOperationName] = useState('');
 
   const [version, setVersion] = useState(1);
   const [roleId, setRoleId] = useState(0);
