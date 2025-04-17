@@ -22,7 +22,6 @@ export const usersInfoReducer = (usersInfo = [], action) => {
         return el;
       });
       return updateUsersInfo;
-      // return [...usersInfo, payload];
     }
     default:
       return usersInfo;

@@ -1,4 +1,4 @@
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import {
@@ -75,14 +75,9 @@ const deleteMaterialPlan = (material_plan_id) => {
 
 function* getRecipeWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-    // const { allClients, accessToken, accessTokenExpiration } = yield call(
     const { recipe } = yield call(getRecipe);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: FULL_RECIPE, payload: recipe });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: FULL_RECIPE, payload: [] });
   }
@@ -90,14 +85,9 @@ function* getRecipeWorker(action) {
 
 function* addNewRecipeWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { client, accessToken, accessTokenExpiration } = yield call(
     const { recipe } = yield call(addNewRecipe, action.payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_RECIPE, payload: recipe });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_RECIPE, payload: [] });
   }
@@ -105,21 +95,17 @@ function* addNewRecipeWorker(action) {
 
 function* deleteRecipeWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
 
-    // const { client, accessToken, accessTokenExpiration } = yield call(
     yield call(deleteRecipe, payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEED_DELETE_RECIPE, payload });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEED_DELETE_RECIPE, payload: [] });
   }
 }
 
-function* getRecipeOrdersDataWatcher(action) {
+function* getRecipeOrdersDataWatcher() {
   try {
     const data = yield call(getRecipeOrdersData);
     yield put({ type: RECIPE_ORDERS_DATA, payload: data });

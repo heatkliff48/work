@@ -9,7 +9,7 @@ export const qualityManagementReducer = (qualityManagementData = [], action) => 
   const { type, payload } = action;
   switch (type) {
     case FULL_QUALITY_MANAGEMENT_DATA: {
-      const result = payload; //.filter((el) => el.quantity_pallets !== 0);
+      const result = payload;
       return result;
     }
     case NEW_QUALITY_MANAGEMENT_DATA_SOCKET: {
@@ -24,7 +24,7 @@ export const qualityManagementReducer = (qualityManagementData = [], action) => 
         if (el.id === payload[1].id) return payload[1];
         return el;
       });
-      // .filter((el) => el.quantity_pallets !== 0);
+
       return result;
     }
     default:
