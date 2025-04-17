@@ -204,7 +204,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
             <>
               <Table
                 COLUMN_DATA={COLUMNS_TOOLS_PRODUCT}
-                dataOfTable={tool}
+                dataOfTable={tool.filter((product) => product.activeStatus === true)}
                 // userAccess={userAccess}
                 onClickButton={() => {}}
                 buttonText={''}

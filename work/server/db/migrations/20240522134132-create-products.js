@@ -105,6 +105,9 @@ module.exports = {
       productCode: {
         type: Sequelize.STRING,
       },
+      activeStatus: {
+        type: Sequelize.BOOLEAN,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -15,10 +15,13 @@ module.exports = {
       article: {
         type: Sequelize.STRING,
       },
+      manufacturer_name: {
+        type: Sequelize.STRING,
+      },
       units_of_measurement: {
         type: Sequelize.STRING,
       },
-      pieces_per_box: {
+      pieces_per_unit: {
         type: Sequelize.INTEGER,
       },
       boxes_on_a_pallet: {
@@ -36,11 +39,14 @@ module.exports = {
       place_of_production: {
         type: Sequelize.STRING,
       },
-      price: {
+      price_per_unit: {
         type: Sequelize.FLOAT,
       },
       product_code: {
         type: Sequelize.STRING,
+      },
+      active_status: {
+        type: Sequelize.BOOLEAN,
       },
       createdAt: {
         allowNull: false,

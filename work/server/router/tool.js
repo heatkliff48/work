@@ -23,24 +23,28 @@ toolRouter.post('/', async (req, res) => {
   const {
     name,
     article,
+    manufacturer_name,
     units_of_measurement,
     piece_weight,
     description,
     place_of_production,
-    price,
+    price_per_unit,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
     const tool = await Tool.create({
       name,
       article,
+      manufacturer_name,
       units_of_measurement,
       piece_weight,
       description,
       place_of_production,
-      price,
+      price_per_unit,
       product_code,
+      active_status,
     });
 
     myEmitter.emit(ADD_NEW_TOOL_SOCKET, tool);
@@ -56,12 +60,14 @@ toolRouter.post('/update', async (req, res) => {
     id,
     name,
     article,
+    manufacturer_name,
     units_of_measurement,
     piece_weight,
     description,
     place_of_production,
-    price,
+    price_per_unit,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
@@ -69,12 +75,14 @@ toolRouter.post('/update', async (req, res) => {
       {
         name,
         article,
+        manufacturer_name,
         units_of_measurement,
         piece_weight,
         description,
         place_of_production,
-        price,
+        price_per_unit,
         product_code,
+        active_status,
       },
       {
         where: {

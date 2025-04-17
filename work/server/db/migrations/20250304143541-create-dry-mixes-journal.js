@@ -15,10 +15,13 @@ module.exports = {
       article: {
         type: Sequelize.STRING,
       },
+      manufacturer_name: {
+        type: Sequelize.STRING,
+      },
       units_of_measurement: {
         type: Sequelize.STRING,
       },
-      number_of_bags: {
+      units_per_pallet: {
         type: Sequelize.INTEGER,
       },
       bag_weight: {
@@ -36,7 +39,7 @@ module.exports = {
       place_of_production: {
         type: Sequelize.STRING,
       },
-      price: {
+      price_per_unit: {
         type: Sequelize.FLOAT,
       },
       price_per_kilogram: {
@@ -44,6 +47,9 @@ module.exports = {
       },
       product_code: {
         type: Sequelize.STRING,
+      },
+      active_status: {
+        type: Sequelize.BOOLEAN,
       },
       createdAt: {
         allowNull: false,

@@ -104,6 +104,7 @@ const ModalWindow = React.memo(
         palletHeight: rightPalletHeight,
         article: prodArticle,
         productCode,
+        activeStatus: true,
       };
 
       const isExistingProduct = products.some(

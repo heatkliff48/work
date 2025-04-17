@@ -23,30 +23,34 @@ anchorRouter.post('/', async (req, res) => {
   const {
     name,
     article,
+    manufacturer_name,
     units_of_measurement,
-    pieces_per_box,
+    pieces_per_unit,
     boxes_on_a_pallet,
     box_weight,
     pallet_weight,
     description,
     place_of_production,
-    price,
+    price_per_unit,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
     const anchor = await Anchor.create({
       name,
       article,
+      manufacturer_name,
       units_of_measurement,
-      pieces_per_box,
+      pieces_per_unit,
       boxes_on_a_pallet,
       box_weight,
       pallet_weight,
       description,
       place_of_production,
-      price,
+      price_per_unit,
       product_code,
+      active_status,
     });
 
     myEmitter.emit(ADD_NEW_ANCHOR_SOCKET, anchor);
@@ -62,15 +66,17 @@ anchorRouter.post('/update', async (req, res) => {
     id,
     name,
     article,
+    manufacturer_name,
     units_of_measurement,
-    pieces_per_box,
+    pieces_per_unit,
     boxes_on_a_pallet,
     box_weight,
     pallet_weight,
     description,
     place_of_production,
-    price,
+    price_per_unit,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
@@ -78,15 +84,17 @@ anchorRouter.post('/update', async (req, res) => {
       {
         name,
         article,
+        manufacturer_name,
         units_of_measurement,
-        pieces_per_box,
+        pieces_per_unit,
         boxes_on_a_pallet,
         box_weight,
         pallet_weight,
         description,
         place_of_production,
-        price,
+        price_per_unit,
         product_code,
+        active_status,
       },
       {
         where: {

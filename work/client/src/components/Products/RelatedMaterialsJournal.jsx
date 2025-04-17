@@ -23,41 +23,13 @@ const RelatedMaterialsJournal = () => {
     useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [productCode, setProductCode] = useState('');
-  const { selectedProductsType, setSelectedProductsType, dataTable, setDataTable } =
-    useProductsTypeJournalContext();
-
-  const related_materials_journal_table = [
-    {
-      Header: 'Product name',
-      accessor: 'name',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Article',
-      accessor: 'article',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Units of measurement',
-      accessor: 'units_of_measurement',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Description',
-      accessor: 'description',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Place of production',
-      accessor: 'place_of_production',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Price',
-      accessor: 'price',
-      Filter: TextSearchFilter,
-    },
-  ];
+  const {
+    COLUMNS_RELATED_MATERIALS_JOURNAL,
+    selectedProductsType,
+    setSelectedProductsType,
+    dataTable,
+    setDataTable,
+  } = useProductsTypeJournalContext();
 
   useEffect(() => {
     if (relatedMaterialsJournal) {
@@ -73,7 +45,7 @@ const RelatedMaterialsJournal = () => {
   }, [relatedMaterialsJournal]);
 
   const relatedMaterialsJournalHandler = (id) => {
-    setDataTable(related_materials_journal_table);
+    setDataTable(COLUMNS_RELATED_MATERIALS_JOURNAL);
     const relatedMaterial = relatedMaterialsJournal.find((el) => el.id === id);
     setSelectedProductsType(relatedMaterial);
     setModalShow(true);
@@ -99,13 +71,13 @@ const RelatedMaterialsJournal = () => {
   return (
     <Fragment>
       <ShowProductsTypeJournalModal
-        table={related_materials_journal_table}
+        table={COLUMNS_RELATED_MATERIALS_JOURNAL}
         target={2}
         title={'related material'}
         productCode={productCode}
       />{' '}
       <Table
-        COLUMN_DATA={related_materials_journal_table}
+        COLUMN_DATA={COLUMNS_RELATED_MATERIALS_JOURNAL}
         dataOfTable={relatedMaterialsJournalDataList}
         tableName={'Related materials journal'}
         userAccess={userAccess}

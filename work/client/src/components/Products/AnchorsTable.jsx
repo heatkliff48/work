@@ -72,13 +72,13 @@ const AnchorsTable = () => {
       <ShowProductsTypeJournalModal
         table={COLUMNS_ANCHOR_PRODUCT}
         target={3}
-        title={'anchor'}
+        title={'fastener'}
         productCode={productCode}
       />{' '}
       <Table
         COLUMN_DATA={COLUMNS_ANCHOR_PRODUCT}
         dataOfTable={anchorDataList}
-        tableName={'Anchors'}
+        tableName={'Fasteners'}
         userAccess={userAccess}
         handleRowClick={(row) => {
           anchorHandler(row.original.id);
@@ -87,7 +87,7 @@ const AnchorsTable = () => {
       <ProductsTypeJournalInfoModal
         show={modalShow}
         onHide={() => setModalShow(false)}
-        title={'Anchor'}
+        title={'Fasteners'}
       />
     </Fragment>
   );

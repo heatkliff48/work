@@ -5,6 +5,7 @@ import {
   NumberRangeColumnFilter,
   TextSearchFilter,
 } from '#components/Table/filters.js';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 
 const ProductsContext = createContext();
 
@@ -125,6 +126,17 @@ export const ProductsContextProvider = ({ children }) => {
       Filter: NumberRangeColumnFilter,
       filter: 'between',
       sortType: 'number',
+    },
+    {
+      Header: 'Product availability',
+      accessor: 'activeStatus',
+      Filter: DropdownFilter,
+      Cell: ({ cell }) =>
+        cell.row.values.activeStatus ? (
+          <FaCheck color="green" size={24} />
+        ) : (
+          <FaTimes color="red" size={24} />
+        ),
     },
   ];
 
@@ -312,6 +324,10 @@ export const ProductsContextProvider = ({ children }) => {
     {
       Header: 'Product code',
       accessor: 'productCode',
+    },
+    {
+      Header: 'Product availability',
+      accessor: 'activeStatus',
     },
   ];
 
