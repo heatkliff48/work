@@ -1,16 +1,13 @@
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
-import {
-  addNewProduct,
-  repProduct,
-} from '#components/redux/actions/productsAction.js';
 import InputField from '../../InputField/InputField';
 import UpdateModalWindow from './UpdateModalWindow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import PreviewProductCardModal from './PreviewProductCardModal';
 
 const ModalWindow = React.memo(
   ({ list, formData, isOpen, toggle, isRepair, isEdit }) => {
@@ -21,8 +18,16 @@ const ModalWindow = React.memo(
       setPromProduct,
       stayDefault,
       setStayDefault,
+      setPreviewProductData,
     } = useProjectContext();
-    const { modalUpdate, setModalUpdate, setModalProductCard } = useModalContext();
+
+    const {
+      modalUpdate,
+      setModalUpdate,
+      setModalProductCard,
+      previewProductModal,
+      setPreviewProductModal,
+    } = useModalContext();
     const { selectOptions, getOptionValue } = useProductsContext();
 
     const [formInput, setFormInput] = useState({});
@@ -31,8 +36,6 @@ const ModalWindow = React.memo(
     const [articleId, setArticleId] = useState(-1);
     const [defaultValues, setDefaultValues] = useState({});
     const products = useSelector((state) => state.products);
-
-    const dispatch = useDispatch();
 
     const editableAccessors = [
       'palletHeight',
@@ -112,7 +115,7 @@ const ModalWindow = React.memo(
       );
 
       if (isRepair) {
-        dispatch(repProduct(updatedProduct));
+        setPreviewProductData(updatedProduct);
       } else if (isEdit) {
         const lastVersion = products.findLast(
           (el) => el.article === prodArticle
@@ -120,7 +123,7 @@ const ModalWindow = React.memo(
 
         const obj = { ...updatedProduct, version: lastVersion + 1 };
 
-        dispatch(repProduct(obj));
+        setPreviewProductData({ product: obj });
       } else if (isExistingProduct) {
         const existingProduct = products.find(
           (product) => product.article === prodArticle
@@ -134,8 +137,9 @@ const ModalWindow = React.memo(
 
         setModalUpdate(!modalUpdate);
       } else {
-        dispatch(addNewProduct({ product: updatedProduct }));
+        setPreviewProductData({ product: updatedProduct });
       }
+      setPreviewProductModal(!previewProductModal);
     };
 
     const handleTradingMark = () => {
@@ -567,8 +571,8 @@ const ModalWindow = React.memo(
             <Button
               color="primary"
               onClick={() => {
-                setModalProductCard(false);
                 updateProductHandler();
+                setModalProductCard(false);
                 setStayDefault(true);
                 clearData();
                 toggle();

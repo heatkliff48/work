@@ -70,25 +70,6 @@ const ProductCardModal = React.memo(() => {
       palletSize,
     } = prod;
 
-    // Old article
-
-    // let newArticle = '';
-    // let versionNumber = '0001';
-
-    // versionNumber = `000${version}`.slice(-4);
-    // const miniWidth = width?.toString().slice(0, 2);
-    // const miniHeight = height?.toString().slice(0, 2);
-    // const miniLengths = lengths?.toString().slice(0, 2);
-    // const miniPlaceOfProduction = placeOfProduction?.slice(0, 1);
-    // const miniTypeOfPackaging = typeOfPackaging?.slice(0, 1);
-
-    // newArticle = `T.${form?.toUpperCase()}${certificate?.substr(
-    //   0,
-    //   1
-    // )}${miniPlaceOfProduction}${miniTypeOfPackaging}0${density}${miniWidth}${miniHeight}${miniLengths}${versionNumber}`;
-
-    // ---
-
     let versionNumber = '0001';
     versionNumber = `000${version}`.slice(-4);
 
