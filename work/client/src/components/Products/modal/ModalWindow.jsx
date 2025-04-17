@@ -2,32 +2,24 @@ import { useProjectContext } from '#components/contexts/Context.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import InputField from '../../InputField/InputField';
-import UpdateModalWindow from './UpdateModalWindow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import PreviewProductCardModal from './PreviewProductCardModal';
 
 const ModalWindow = React.memo(
   ({ list, formData, isOpen, toggle, isRepair, isEdit }) => {
     const {
       version,
       setVersion,
-      promProduct,
-      setPromProduct,
       stayDefault,
       setStayDefault,
       setPreviewProductData,
+      setPreviewOperationName,
     } = useProjectContext();
 
-    const {
-      modalUpdate,
-      setModalUpdate,
-      setModalProductCard,
-      previewProductModal,
-      setPreviewProductModal,
-    } = useModalContext();
+    const { setModalProductCard, previewProductModal, setPreviewProductModal } =
+      useModalContext();
     const { selectOptions, getOptionValue } = useProductsContext();
 
     const [formInput, setFormInput] = useState({});
@@ -114,29 +106,52 @@ const ModalWindow = React.memo(
         (product) => product.article === prodArticle
       );
 
+      const existingProduct = products.find(
+        (product) => product.article === prodArticle
+      );
+
+      const lastVersion = products.findLast(
+        (el) => el.article === prodArticle
+      ).version;
+
       if (isRepair) {
-        setPreviewProductData(updatedProduct);
-      } else if (isEdit) {
-        const lastVersion = products.findLast(
-          (el) => el.article === prodArticle
-        ).version;
+        const prevName = isExistingProduct ? 'edit' : 'repair';
+        setPreviewOperationName(prevName);
 
-        const obj = { ...updatedProduct, version: lastVersion + 1 };
+        const obj = {
+          ...updatedProduct,
+          productCode: existingProduct.productCode,
+        };
 
-        setPreviewProductData({ product: obj });
+        if (isExistingProduct) {
+          obj.version = lastVersion + 1;
+        }
+
+        setPreviewProductData(obj);
       } else if (isExistingProduct) {
-        const existingProduct = products.find(
-          (product) => product.article === prodArticle
-        );
+        setPreviewOperationName('edit');
 
-        setPromProduct({
+        const obj = {
           ...updatedProduct,
           id: existingProduct.id,
           productCode: existingProduct.productCode,
-        });
+          version: lastVersion + 1,
+        };
 
-        setModalUpdate(!modalUpdate);
+        setPreviewProductData({
+          product: { ...obj },
+        });
+      } else if (isEdit) {
+        setPreviewOperationName('edit');
+
+        const obj = { ...updatedProduct, version: lastVersion + 1 };
+
+        setPreviewProductData({
+          product: { ...obj, productCode: existingProduct.productCode },
+        });
       } else {
+        setPreviewOperationName('add');
+
         setPreviewProductData({ product: updatedProduct });
       }
       setPreviewProductModal(!previewProductModal);
@@ -408,8 +423,6 @@ const ModalWindow = React.memo(
       if (!stayDefault) return;
       if (formData) {
         setFormInput(formData);
-      } else if (promProduct) {
-        setFormInput(promProduct);
       } else {
         setDefaultValues(memoizedDefaultValues);
         const extractedValues = Object.entries(memoizedNewHaveMath).reduce(
@@ -461,7 +474,6 @@ const ModalWindow = React.memo(
 
     return (
       <div>
-        {modalUpdate && <UpdateModalWindow />}
         <Modal
           isOpen={isOpen}
           toggle={() => {

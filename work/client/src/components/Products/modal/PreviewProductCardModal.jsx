@@ -22,8 +22,9 @@ import {
 
 const PreviewProductCardModal = React.memo(() => {
   const { COLUMNS, getOptionValue } = useProductsContext();
-  const { productCardData, previewProductData } = useProjectContext();
-  const { previewProductModal, setPreviewProductModal } = useModalContext();
+  const { previewProductData } = useProjectContext();
+  const { previewProductModal, setPreviewProductModal, previewOperationName } =
+    useModalContext();
   const dispatch = useDispatch();
 
   const memoizedArticle = (prod) => {
@@ -67,6 +68,12 @@ const PreviewProductCardModal = React.memo(() => {
 
   const toggle = () => setPreviewProductModal(!previewProductModal);
 
+  const header = {
+    add: 'You are creating a new product card',
+    edit: 'You are creating a new version of product',
+    repair: 'You are fixing product whitout changing version',
+  };
+
   const saveHandler = () => {
     if ('product' in previewProductData) {
       dispatch(addNewProduct(previewProductData));
@@ -79,13 +86,13 @@ const PreviewProductCardModal = React.memo(() => {
   return (
     <div>
       <Modal isOpen={previewProductModal} toggle={toggle} size="lg">
-        <ModalHeader toggle={toggle}>Check Product Card Before Save</ModalHeader>
+        <ModalHeader toggle={toggle}>{header.previewOperationName}</ModalHeader>
         <ModalHeader>
           <div className="product_card_header">
             <div>
               <div>Article</div>
               <div className="product_article">
-                {memoizedArticle(productCardData)}
+                {memoizedArticle(previewProductData)}
               </div>
             </div>
           </div>
@@ -115,17 +122,17 @@ const PreviewProductCardModal = React.memo(() => {
                         {['article', 'id', 'version'].includes(el.accessor)
                           ? null
                           : el.accessor === 'activeStatus'
-                          ? productCardData?.[el.accessor]
+                          ? previewProductData?.[el.accessor]
                             ? 'Available'
                             : 'Not available'
-                          : productCardData?.[el.accessor] || ''}
+                          : previewProductData?.[el.accessor] || ''}
                       </CardText>
                     </CardBody>
                   </Card>
                 );
               else
                 return (
-                  <BarcodeGenerator productCode={productCardData?.productCode} />
+                  <BarcodeGenerator productCode={previewProductData?.productCode} />
                 );
             })}
           </div>

@@ -5,7 +5,6 @@ const ModalContext = createContext();
 export const ModalContextProvider = ({ children }) => {
   const [modal, setModal] = useState(false);
   const [wmoctModal, setWmoctModal] = useState(false);
-  const [modalUpdate, setModalUpdate] = useState(false);
   const [modalRoleCard, setModalRoleCard] = useState(false);
   const [warehouseModal, setWarehouseModal] = useState(false);
   const [modalAddClient, setModalAddClient] = useState(false);
@@ -29,8 +28,6 @@ export const ModalContextProvider = ({ children }) => {
       value={{
         modal,
         setModal,
-        modalUpdate,
-        setModalUpdate,
         modalRoleCard,
         setModalRoleCard,
         modalAddClient,

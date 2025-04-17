@@ -214,10 +214,10 @@ const ProjectContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
 
-  const [promProduct, setPromProduct] = useState(null);
   const [currentContact, setCurrentContact] = useState();
   const [currentDelivery, setCurrentDelivery] = useState();
   const [previewProductData, setPreviewProductData] = useState();
+  const [previewOperationName, setPreviewOperationName] = useState();
 
   const [version, setVersion] = useState(1);
   const [roleId, setRoleId] = useState(0);
@@ -271,8 +271,6 @@ const ProjectContextProvider = ({ children }) => {
         WAREHOUSE_MANAGER_TABLE,
         user,
         displayNames,
-        promProduct,
-        setPromProduct,
         version,
         setVersion,
         currentClientID,
@@ -310,6 +308,8 @@ const ProjectContextProvider = ({ children }) => {
         setIsEdit,
         previewProductData,
         setPreviewProductData,
+        previewOperationName,
+        setPreviewOperationName,
       }}
     >
       {children}
