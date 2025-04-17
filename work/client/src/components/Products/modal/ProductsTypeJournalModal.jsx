@@ -31,6 +31,38 @@ function ProductsTypeJournalModal(props) {
     // place_of_production: 0,
   });
 
+  const [errors, setErrors] = useState({});
+
+  const requiredFieldsDryMix = [
+    'name',
+    'place_of_production',
+    'price_per_unit',
+    'bag_weight',
+    'units_per_pallet',
+  ];
+
+  const requiredFieldsRelatedMaterial = [
+    'name',
+    'place_of_production',
+    'price_per_unit',
+  ];
+
+  const requiredFieldsAnchors = [
+    'name',
+    'place_of_production',
+    'price_per_unit',
+    'boxes_on_a_pallet',
+    'box_weight',
+    'pieces_per_unit',
+  ];
+
+  const requiredFieldsTools = [
+    'name',
+    'place_of_production',
+    'price_per_unit',
+    'piece_weight',
+  ];
+
   const dispatch = useDispatch();
 
   const handleProductsTypeJournalInputChange = useCallback((e) => {
@@ -38,18 +70,26 @@ function ProductsTypeJournalModal(props) {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+
+    if (errors[e.target.name]) {
+      setErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
+    }
   }, []);
 
   useEffect(() => {
-    const { bag_weight, number_of_bags } = productsTypeJournalInput;
-    if (bag_weight && number_of_bags) {
-      const palletWeight = parseFloat(bag_weight) * parseFloat(number_of_bags) + 23;
+    const { bag_weight, units_per_pallet } = productsTypeJournalInput;
+    if (bag_weight && units_per_pallet) {
+      const palletWeight =
+        parseFloat(bag_weight) * parseFloat(units_per_pallet) + 23;
       setProductsTypeJournalInput((prev) => ({
         ...prev,
         pallet_weight: palletWeight,
       }));
     }
-  }, [productsTypeJournalInput.bag_weight, productsTypeJournalInput.number_of_bags]);
+  }, [
+    productsTypeJournalInput.bag_weight,
+    productsTypeJournalInput.units_per_pallet,
+  ]);
 
   useEffect(() => {
     const { price_per_unit, bag_weight } = productsTypeJournalInput;
@@ -143,25 +183,75 @@ function ProductsTypeJournalModal(props) {
   const onSubmitForm = async (e) => {
     e.preventDefault();
 
+    const newErrors = {};
+
     if (props.target == 1) {
+      requiredFieldsDryMix.forEach((field) => {
+        const value = productsTypeJournalInput[field];
+        if (!value) {
+          newErrors[field] = 'This field cannot be empty';
+        }
+      });
+
+      setErrors(newErrors);
+
+      if (Object.keys(newErrors).length > 0) {
+        return;
+      }
       dispatch(
         addNewDryMixesJournal({
           productsTypeJournalInput,
         })
       );
     } else if (props.target == 2) {
+      requiredFieldsRelatedMaterial.forEach((field) => {
+        const value = productsTypeJournalInput[field];
+        if (!value) {
+          newErrors[field] = 'This field cannot be empty';
+        }
+      });
+
+      setErrors(newErrors);
+
+      if (Object.keys(newErrors).length > 0) {
+        return;
+      }
       dispatch(
         addNewRelatedMaterialsJournal({
           productsTypeJournalInput,
         })
       );
     } else if (props.target == 3) {
+      requiredFieldsAnchors.forEach((field) => {
+        const value = productsTypeJournalInput[field];
+        if (!value) {
+          newErrors[field] = 'This field cannot be empty';
+        }
+      });
+
+      setErrors(newErrors);
+
+      if (Object.keys(newErrors).length > 0) {
+        return;
+      }
       dispatch(
         addNewAnchor({
           productsTypeJournalInput,
         })
       );
     } else if (props.target == 4) {
+      requiredFieldsTools.forEach((field) => {
+        const value = productsTypeJournalInput[field];
+        if (!value) {
+          newErrors[field] = 'This field cannot be empty';
+        }
+      });
+
+      setErrors(newErrors);
+
+      if (Object.keys(newErrors).length > 0) {
+        return;
+      }
       dispatch(
         addNewTool({
           productsTypeJournalInput,
@@ -190,7 +280,7 @@ function ProductsTypeJournalModal(props) {
       <Modal.Body>
         <Container>
           <form
-            id="addClientModel"
+            id="addAuxilaryModal"
             className="w-full max-w-sm"
             onSubmit={(e) => {
               onSubmitForm(e);
@@ -248,14 +338,28 @@ function ProductsTypeJournalModal(props) {
                         placeholder=""
                       />
                     ) : el.accessor === 'active_status' ? null : (
-                      <input
-                        className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                        id={el.accessor}
-                        name={el.accessor}
-                        type="text"
-                        value={productsTypeJournalInput[el.accessor] || ''}
-                        onChange={(e) => handleProductsTypeJournalInputChange(e)}
-                      />
+                      <div>
+                        <input
+                          className={`${
+                            errors[el.accessor]
+                              ? 'border-red-500'
+                              : 'border-gray-200'
+                          } rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500`}
+                          id={el.accessor}
+                          name={el.accessor}
+                          type="text"
+                          value={productsTypeJournalInput[el.accessor] || ''}
+                          onChange={(e) => handleProductsTypeJournalInputChange(e)}
+                          style={{
+                            border: `${errors[el.accessor] ? 'solid red' : ''}`,
+                          }}
+                        />
+                        {errors[el.accessor] && (
+                          <p className="mt-1 text-sm " style={{ color: '#ef4444' }}>
+                            {errors[el.accessor]}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -265,7 +369,7 @@ function ProductsTypeJournalModal(props) {
         </Container>
       </Modal.Body>
       <Modal.Footer>
-        <Button form="addClientModel" type="submit">
+        <Button form="addAuxilaryModal" type="submit">
           Add {props.title}
         </Button>
         <Button onClick={props.onHide}>Close</Button>
