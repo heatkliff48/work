@@ -19,7 +19,6 @@ function UsersInfoModal(props) {
   const { users_main_info_table, users_additional_info_table } = useProjectContext();
   const [usersInfoInput, setUsersInfoInput] = useState({});
   const [usersMainInfoInput, setUsersMainInfoInput] = useState({});
-  const regexp = new RegExp(`^[0-9]*$`);
 
   const shiftOptions = [
     { value: 'None', label: 'None' },

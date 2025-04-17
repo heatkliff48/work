@@ -1,7 +1,6 @@
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
-// import { setToken } from '../actions/jwtAction';
 import {
   ADD_NEW_ORDERED_PRODUCTION,
   ADD_NEW_RESERVED_PRODUCT,
@@ -31,26 +30,10 @@ import {
   UPDATE_WAREHOSE_QUANTITYS,
 } from '../types/warehouseTypes';
 
-// let accessTokenFront;
-
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
 });
-
-// url.interceptors.request.use(
-//   async (config) => {
-//     if (accessTokenFront) {
-//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-//     }
-
-//     return config;
-//   },
-//   (error) => {
-//     console.log('Interceptor: Request error', error);
-//     return Promise.reject(error);
-//   }
-// );
 
 const getAllWarehouse = () => {
   return url
@@ -180,14 +163,8 @@ const updListOfOrderedProductionOEM = (ordered_production_oem) => {
 
 function* getAllWarehouseWatcher() {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { warehouse, accessToken, accessTokenExpiration } = yield call(
     const { warehouse } = yield call(getAllWarehouse);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
-    // yield put(setToken({ accessToken, accessTokenExpiration }));
     yield put({ type: ALL_WAREHOUSE, payload: warehouse });
   } catch (err) {
     yield put({ type: ALL_WAREHOUSE, payload: [] });
@@ -196,14 +173,8 @@ function* getAllWarehouseWatcher() {
 
 function* getListOfReservedProductsWatcher() {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { listOfReservedProducts, accessToken, accessTokenExpiration } =
     const { listOfReservedProducts } = yield call(getListOfReservedProducts);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
-    // yield put(setToken({ accessToken, accessTokenExpiration }));
     yield put({ type: LIST_OF_RESERVED_PRODUCTS, payload: listOfReservedProducts });
   } catch (err) {
     yield put({ type: LIST_OF_RESERVED_PRODUCTS, payload: [] });
@@ -212,9 +183,6 @@ function* getListOfReservedProductsWatcher() {
 
 function* addNewWarehouseWatcher(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { new_warehouse, accessToken, accessTokenExpiration } = yield call(
     yield call(addNewWarehouse, action.payload);
   } catch (err) {
     yield put({ type: NEW_WAREHOUSE, payload: [] });
@@ -243,18 +211,12 @@ function* updateWhQuantitysWatcher(action) {
 
 function* addNewReservedProductWatcher(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { new_reserved_product, accessToken, accessTokenExpiration } = yield call(
     const { new_reserved_product } = yield call(
       addNewReservedProduct,
       action.payload
     );
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: NEW_RESERVED_PRODUCT, payload: new_reserved_product });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_RESERVED_PRODUCT, payload: [] });
   }
@@ -262,15 +224,9 @@ function* addNewReservedProductWatcher(action) {
 
 function* updReservedProductWatcher(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { new_reserved_product, accessToken, accessTokenExpiration } = yield call(
     const { new_reserved_product } = yield call(updReservedProduct, action.payload);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: UPD_RESERVED_PRODUCT, payload: new_reserved_product });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: UPD_RESERVED_PRODUCT, payload: [] });
   }
@@ -287,14 +243,8 @@ function* deleteReservedProductWatcher(action) {
 
 function* getListOfOrderedProductionWatcher() {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { orderedProduction, accessToken, accessTokenExpiration } = yield call(
     const { orderedProduction } = yield call(getListOfOrderedProduction);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
-    // yield put(setToken({ accessToken, accessTokenExpiration }));
     yield put({ type: LIST_OF_ORDERED_PRODUCTION, payload: orderedProduction });
   } catch (err) {
     yield put({ type: LIST_OF_ORDERED_PRODUCTION, payload: [] });
@@ -303,18 +253,12 @@ function* getListOfOrderedProductionWatcher() {
 
 function* addNewListOfOrderedProductionWatcher(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { new_ordered_production, accessToken, accessTokenExpiration } =
     const { new_ordered_production } = yield call(
       addNewListOfOrderedProduction,
       action.payload
     );
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: NEW_ORDERED_PRODUCTION, payload: new_ordered_production });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_ORDERED_PRODUCTION, payload: [] });
   }
@@ -322,21 +266,15 @@ function* addNewListOfOrderedProductionWatcher(action) {
 
 function* updListOfOrderedProductionWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { new_ordered_production_OEM, accessToken, accessTokenExpiration } =
     const { ordered_production } = yield call(
       updListOfOrderedProduction,
       action.payload
     );
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({
       type: NEW_ORDERED_PRODUCTION,
       payload: ordered_production,
     });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_ORDERED_PRODUCTION, payload: [] });
   }
@@ -344,14 +282,8 @@ function* updListOfOrderedProductionWorker(action) {
 
 function* getListOfOrderedProductionOEMWatcher() {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { orderedProductionOEM, accessToken, accessTokenExpiration } = yield call(
     const { orderedProductionOEM } = yield call(getListOfOrderedProductionOEM);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
-    // yield put(setToken({ accessToken, accessTokenExpiration }));
     yield put({
       type: LIST_OF_ORDERED_PRODUCTION_OEM,
       payload: orderedProductionOEM,
@@ -363,21 +295,15 @@ function* getListOfOrderedProductionOEMWatcher() {
 
 function* addNewListOfOrderedProductionOEMWatcher(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { new_ordered_production_OEM, accessToken, accessTokenExpiration } =
     const { new_ordered_production_OEM } = yield call(
       addNewListOfOrderedProductionOEM,
       action.payload
     );
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({
       type: NEW_ORDERED_PRODUCTION_OEM,
       payload: new_ordered_production_OEM,
     });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_ORDERED_PRODUCTION_OEM, payload: [] });
   }
@@ -385,21 +311,15 @@ function* addNewListOfOrderedProductionOEMWatcher(action) {
 
 function* updListOfOrderedProductionOEMWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { new_ordered_production_OEM, accessToken, accessTokenExpiration } =
     const { upd_ordered_production_oem } = yield call(
       updListOfOrderedProductionOEM,
       action.payload
     );
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({
       type: NEW_ORDERED_PRODUCTION_OEM,
       payload: upd_ordered_production_oem,
     });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_ORDERED_PRODUCTION_OEM, payload: [] });
   }
@@ -409,7 +329,7 @@ function* warehouseWatcher() {
   yield takeLatest(GET_ALL_WAREHOUSE, getAllWarehouseWatcher);
   yield takeLatest(GET_LIST_OF_RESERVED_PRODUCTS, getListOfReservedProductsWatcher);
   yield takeLatest(ADD_NEW_WAREHOUSE, addNewWarehouseWatcher);
-  
+
   yield takeLatest(UPDATE_REMAINING_STOCK, updRemainingStockWatcher);
   yield takeLatest(UPDATE_WAREHOSE_QUANTITYS, updateWhQuantitysWatcher);
 

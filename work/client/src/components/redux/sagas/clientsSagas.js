@@ -1,7 +1,6 @@
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
-import { setToken } from '../actions/jwtAction';
 import {
   GET_ALL_CLIENTS,
   ALL_CLIENTS,
@@ -22,8 +21,6 @@ import {
   ADD_CONTACT_INFO,
   NEW_CONTACT_INFO,
 } from '../types/clientsTypes';
-
-// let accessTokenFront;
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -124,14 +121,9 @@ const addNewContactInfo = ({ contactInfo }) => {
 
 function* getAllClientsWatcher(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-    // const { allClients, accessToken, accessTokenExpiration } = yield call(
     const { allClients } = yield call(getAllClients);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: ALL_CLIENTS, payload: allClients });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: ALL_CLIENTS, payload: [] });
   }
@@ -139,14 +131,9 @@ function* getAllClientsWatcher(action) {
 
 function* addNewClientWatcher(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { client, accessToken, accessTokenExpiration } = yield call(
     const { client } = yield call(addNewClient, action.payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_CLIENTS, payload: client });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_CLIENTS, payload: [] });
   }
@@ -154,14 +141,9 @@ function* addNewClientWatcher(action) {
 
 function* updateClientWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { client, accessToken, accessTokenExpiration } = yield call(
     const { client } = yield call(updateClient, action.payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: UPDATE_CLIENT, payload: client });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: UPDATE_CLIENT, payload: [] });
   }
@@ -169,15 +151,9 @@ function* updateClientWorker(action) {
 
 function* getLegalAddressWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { legalAddress, accessToken, accessTokenExpiration } = yield call(
     const { legalAddress } = yield call(getLegalAddress, action.payload);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: ONE_LEGAL_ADDRESS, payload: legalAddress });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: ONE_LEGAL_ADDRESS, payload: [] });
   }
@@ -185,14 +161,9 @@ function* getLegalAddressWorker(action) {
 
 function* addNewLegalAddressWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { legalAddress, accessToken, accessTokenExpiration } = yield call(
     const { legalAddress } = yield call(addNewLegalAddress, action.payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ONE_LEGAL_ADDRESS, payload: legalAddress });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: ONE_LEGAL_ADDRESS, payload: [] });
   }
@@ -200,14 +171,9 @@ function* addNewLegalAddressWorker(action) {
 
 function* updateLegalAddressWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { legalAddress, accessToken, accessTokenExpiration } = yield call(
     const { legalAddress } = yield call(updateLegalAddress, action.payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ONE_LEGAL_ADDRESS, payload: legalAddress });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: ONE_LEGAL_ADDRESS, payload: [] });
   }
@@ -215,14 +181,9 @@ function* updateLegalAddressWorker(action) {
 
 function* getAllDeliveryAddressesWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { deliveryAddresses, accessToken, accessTokenExpiration } = yield call(
     const { deliveryAddresses } = yield call(getAllDeliveryAddresses);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ALL_DELIVERY_ADDRESSES, payload: deliveryAddresses });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: ALL_DELIVERY_ADDRESSES, payload: [] });
   }
@@ -230,15 +191,9 @@ function* getAllDeliveryAddressesWorker(action) {
 
 function* addNewDeliveryAddressWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { deliveryAddress, accessToken, accessTokenExpiration } = yield call(
     const { deliveryAddress } = yield call(addNewDeliveryAddress, action.payload);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: NEW_DELIVERY_ADDRESSES, payload: deliveryAddress });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_DELIVERY_ADDRESSES, payload: [] });
   }
@@ -246,14 +201,9 @@ function* addNewDeliveryAddressWorker(action) {
 
 function* getAllContactInfoWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { contactInfo, accessToken, accessTokenExpiration } = yield call(
     const { contactInfo } = yield call(getAllContactInfo);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: ALL_CONTACT_INFO, payload: contactInfo });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: ALL_CONTACT_INFO, payload: [] });
   }
@@ -261,21 +211,13 @@ function* getAllContactInfoWorker(action) {
 
 function* addNewContactInfoWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { contactInfo, accessToken, accessTokenExpiration } = yield call(
     const { contactInfo } = yield call(addNewContactInfo, action.payload);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: NEW_CONTACT_INFO, payload: contactInfo });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_CONTACT_INFO, payload: [] });
   }
 }
-
-// watchers
 
 function* clientsWatcher() {
   yield takeLatest(GET_ALL_CLIENTS, getAllClientsWatcher);

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 const UsersContext = createContext();

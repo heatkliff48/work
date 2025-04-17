@@ -5,7 +5,6 @@ import {
   deleteBatchOutside,
   updateBatchOutside,
 } from '#components/redux/actions/batchOutsideAction.js';
-import { deleteMaterialPlan } from '#components/redux/actions/recipeAction.js';
 import {
   addNewReservedProducts,
   addNewWarehouse,
@@ -86,6 +85,8 @@ function BatchOutsideModal(props) {
     let versionNumber = '0001';
     let incVersion = 1;
     let ok = false;
+    const type = quality_product ? 0 : 1;
+
     if (quality_product) {
       if (
         currentBatch.quantity_pallets - quality_product <=
@@ -110,7 +111,6 @@ function BatchOutsideModal(props) {
       // );
     }
     if (batchOutsideInput.remnants) {
-      const type = 1;
       const articleId =
         warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
       versionNumber = `0000000${articleId}`.slice(-6);

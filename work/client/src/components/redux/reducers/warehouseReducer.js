@@ -2,7 +2,11 @@ import {
   NEW_WAREHOUSE_SOCKET,
   REMAINING_STOCK_SOCKET,
 } from '../types/socketTypes/socket';
-import { ALL_WAREHOUSE, REMAINING_STOCK, WAREHOSE_QUANTITYS } from '../types/warehouseTypes';
+import {
+  ALL_WAREHOUSE,
+  REMAINING_STOCK,
+  WAREHOSE_QUANTITYS,
+} from '../types/warehouseTypes';
 
 export const warehouseReducer = (warehouse = [], action) => {
   const { type, payload } = action;

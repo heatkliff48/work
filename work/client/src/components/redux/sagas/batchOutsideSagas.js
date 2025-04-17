@@ -1,5 +1,4 @@
 import showErrorMessage from '../../Utils/showErrorMessage';
-import { setToken } from '../actions/jwtAction';
 import {
   ADD_NEW_BATCH_OUTSIDE,
   DELETE_BATCH_OUTSIDE,
@@ -11,7 +10,7 @@ import {
   UPDATE_NEW_BATCH_OUTSIDE,
 } from '../types/batchOutsideTypes';
 import axios from 'axios';
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, takeLatest } from 'redux-saga/effects';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -56,14 +55,9 @@ const updateBatchOutside = (batchOutside) => {
 
 function* getBatchOutsideWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-    // const { allClients, accessToken, accessTokenExpiration } = yield call(
     const { batchOutside } = yield call(getBatchOutside);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: FULL_BATCH_OUTSIDE, payload: batchOutside });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: FULL_BATCH_OUTSIDE, payload: [] });
   }
@@ -71,14 +65,9 @@ function* getBatchOutsideWorker(action) {
 
 function* addNewBatchOutsideWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { client, accessToken, accessTokenExpiration } = yield call(
     const { batchOutside } = yield call(addNewBatchOutside, action.payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_BATCH_OUTSIDE, payload: batchOutside });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_BATCH_OUTSIDE, payload: [] });
   }
@@ -86,15 +75,11 @@ function* addNewBatchOutsideWorker(action) {
 
 function* deleteBatchOutsideWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
     const { payload } = action;
 
-    // const { client, accessToken, accessTokenExpiration } = yield call(
     yield call(deleteBatchOutside, payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEED_DELETE_BATCH_OUTSIDE, payload });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEED_DELETE_BATCH_OUTSIDE, payload: [] });
   }

@@ -1,7 +1,6 @@
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
-// import { setToken } from '../actions/jwtAction';
 import {
   GET_ALL_USERS_INFO,
   ADD_NEW_USERS_INFO,
@@ -17,25 +16,10 @@ import {
   UPDATE_USERS_MAIN_INFO,
 } from '../types/usersInfoTypes';
 
-// let accessTokenFront;
-
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
   withCredentials: true,
 });
-
-// url.interceptors.request.use(
-//   async (config) => {
-//     if (accessTokenFront) {
-//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     console.log('Interceptor: Request error', error);
-//     return Promise.reject(error);
-//   }
-// );
 
 const getAllUsersInfo = () => {
   return url
@@ -95,16 +79,9 @@ const updateUsersMainInfo = ({ usersMainInfo }) => {
 
 function* getAllUsersInfoWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-    // const { allUsersInfo, accessToken, accessTokenExpiration } = yield call(
-    const { allUsersInfo} = yield call(
-      getAllUsersInfo
-    );
-
-    // window.localStorage.setItem('jwt', accessToken);
+    const { allUsersInfo } = yield call(getAllUsersInfo);
 
     yield put({ type: ALL_USERS_INFO, payload: allUsersInfo });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: ALL_USERS_INFO, payload: [] });
   }
@@ -112,17 +89,9 @@ function* getAllUsersInfoWorker(action) {
 
 function* addNewUsersInfoWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { usersInfo, accessToken, accessTokenExpiration } = yield call(
-    const { usersInfo } = yield call(
-      addNewUsersInfo,
-      action.payload
-    );
-    // window.localStorage.setItem('jwt', accessToken);
+    const { usersInfo } = yield call(addNewUsersInfo, action.payload);
 
     yield put({ type: NEW_USERS_INFO, payload: usersInfo });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_USERS_INFO, payload: [] });
   }
@@ -130,17 +99,9 @@ function* addNewUsersInfoWorker(action) {
 
 function* updateUsersInfoWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { usersInfo, accessToken, accessTokenExpiration } = yield call(
-    const { usersInfo } = yield call(
-      updateUsersInfo,
-      action.payload
-    );
-    // window.localStorage.setItem('jwt', accessToken);
+    const { usersInfo } = yield call(updateUsersInfo, action.payload);
 
     yield put({ type: UPDATE_USERS_INFO, payload: usersInfo });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: UPDATE_USERS_INFO, payload: [] });
   }
@@ -148,18 +109,9 @@ function* updateUsersInfoWorker(action) {
 
 function* getAllUsersMainInfoWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { allUsersMainInfo, accessToken, accessTokenExpiration } = yield call(
-    const { allUsersMainInfo} = yield call(
-      getAllUsersMainInfo,
-      action.payload
-    );
-
-    // window.localStorage.setItem('jwt', accessToken);
+    const { allUsersMainInfo } = yield call(getAllUsersMainInfo, action.payload);
 
     yield put({ type: ALL_USERS_MAIN_INFO, payload: allUsersMainInfo });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: ALL_USERS_MAIN_INFO, payload: [] });
   }
@@ -167,17 +119,9 @@ function* getAllUsersMainInfoWorker(action) {
 
 function* addNewUsersMainInfoWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { usersMainInfo, accessToken, accessTokenExpiration } = yield call(
-    const { usersMainInfo } = yield call(
-      addNewUsersMainInfo,
-      action.payload
-    );
-    // window.localStorage.setItem('jwt', accessToken);
+    const { usersMainInfo } = yield call(addNewUsersMainInfo, action.payload);
 
     yield put({ type: NEW_USERS_MAIN_INFO, payload: usersMainInfo });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_USERS_MAIN_INFO, payload: [] });
   }
@@ -185,17 +129,9 @@ function* addNewUsersMainInfoWorker(action) {
 
 function* updateUsersMainInfoWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { usersMainInfo, accessToken, accessTokenExpiration } = yield call(
-    const { usersMainInfo} = yield call(
-      updateUsersMainInfo,
-      action.payload
-    );
-    // window.localStorage.setItem('jwt', accessToken);
+    const { usersMainInfo } = yield call(updateUsersMainInfo, action.payload);
 
     yield put({ type: UPDATE_USERS_MAIN_INFO, payload: usersMainInfo });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: UPDATE_USERS_MAIN_INFO, payload: [] });
   }

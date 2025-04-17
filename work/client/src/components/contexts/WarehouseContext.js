@@ -1,5 +1,4 @@
 import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
-import { updateRemainingStock } from '#components/redux/actions/warehouseAction.js';
 import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -174,20 +173,20 @@ const WarehouseContextProvider = ({ children }) => {
         // Рассчитать количество тортов
         const quantity_cakes = Math.ceil(el.quantity / 3);
 
-        // Найти ID заказа
-        const orderId = list_of_orders.find(
-          (order) => order.article === el.order_article
-        )?.id;
+        // // Найти ID заказа
+        // const orderId = list_of_orders.find(
+        //   (order) => order.article === el.order_article
+        // )?.id;
 
-        // Найти ID продукта
-        const productId = latestProducts.find(
-          (product) => product.article === el.product_article
-        )?.id;
+        // // Найти ID продукта
+        // const productId = latestProducts.find(
+        //   (product) => product.article === el.product_article
+        // )?.id;
 
-        // Фильтровать продукты заказа
-        const arrOfOrderProduct = productsOfOrders.filter(
-          (elem) => elem.order_id === orderId && elem.product_id === productId
-        );
+        // // Фильтровать продукты заказа
+        // const arrOfOrderProduct = productsOfOrders.filter(
+        //   (elem) => elem.order_id === orderId && elem.product_id === productId
+        // );
 
         // const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
         //   // Filter to get all matching reserved products
@@ -310,7 +309,6 @@ const WarehouseContextProvider = ({ children }) => {
     Object.values(groupedOrders)?.forEach((group) => {
       const order = list_of_orders.find((el) => el.id === group.orderId);
       if (order_status.includes(order?.status)) return;
-
 
       const allMatch = group.products.every(
         (product) => product.total_quantity <= product.total_quantity_in_warehouse

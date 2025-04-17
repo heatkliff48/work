@@ -39,7 +39,7 @@ const AccountngOrderCard = React.memo(() => {
       Object.entries(data || {})
         .filter(([key]) => !filterKeys.includes(key))
         .map(([key, value]) => {
-          if (!key || key == 'warehouse_id') return;
+          if (!key || key == 'warehouse_id') return <></>;
           return (
             <div className="data-text" key={key}>
               <p>

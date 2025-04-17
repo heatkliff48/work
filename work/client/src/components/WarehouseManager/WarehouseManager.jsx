@@ -1,19 +1,15 @@
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-
+// import { useUsersContext } from '#components/contexts/UserContext.js';
 import Table from '../Table/Table';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import WMOrderCard from './WMOrderCard/WMOrderCard';
 
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
   //   useUsersContext();
-
   const { WAREHOUSE_MANAGER_TABLE } = useProjectContext();
   const { latestProducts } = useProductsContext();
   const {
@@ -23,7 +19,6 @@ function WarehouseManager() {
     getCurrentOrderInfoHandler,
   } = useOrderContext();
 
-  const dispatch = useDispatch();
   // const navigate = useNavigate();
 
   const [warehouseMdata, setWarehouseMdata] = useState([]);

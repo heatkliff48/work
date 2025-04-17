@@ -10,11 +10,7 @@ import { useProjectContext } from '#components/contexts/Context.js';
 
 function PasswordChangeModal(props) {
   const { currentUsersInfo, setCurrentUsersInfo } = useProjectContext();
-  const [usersInfoInput, setUsersInfoInput] = useState({});
   const [usersMainInfoInput, setUsersMainInfoInput] = useState(currentUsersInfo);
-  const regexp = new RegExp(`^[0-9]*$`);
-  const isValid = (value) => value !== '' && value !== '-';
-  const [valid, setValid] = useState(isValid(usersInfoInput?.zip_code));
   const [passwordInput, setPasswordInput] = useState('');
 
   const dispatch = useDispatch();

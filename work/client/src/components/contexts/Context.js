@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { DropdownFilter, TextSearchFilter } from '#components/Table/filters.js';
 
@@ -223,6 +223,7 @@ const ProjectContextProvider = ({ children }) => {
   const [currentClientID, setClientID] = useState(1);
 
   const isCheckedAuth = useRef(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [isRepair, setIsRepair] = useState(false);
   const [stayDefault, setStayDefault] = useState(true);
 
@@ -304,6 +305,8 @@ const ProjectContextProvider = ({ children }) => {
         setProductionBatchLogData,
         isRepair,
         setIsRepair,
+        isEdit,
+        setIsEdit,
       }}
     >
       {children}

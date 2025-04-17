@@ -27,9 +27,15 @@ const ProductCardModal = React.memo(() => {
   const { userAccess } = useUsersContext();
   const { productsOfOrders } = useOrderContext();
   const { stock_balance } = useStatisticContext();
-  const { productCardData, setProductCardData, isRepair, setIsRepair } =
-    useProjectContext();
   const { COLUMNS, selectOptions, getOptionValue } = useProductsContext();
+  const {
+    productCardData,
+    setProductCardData,
+    isRepair,
+    setIsRepair,
+    isEdit,
+    setIsEdit,
+  } = useProjectContext();
   const {
     warehouse_data,
     list_of_ordered_production,
@@ -288,6 +294,7 @@ const ProductCardModal = React.memo(() => {
                   style={{ width: '100%' }}
                   onClick={() => {
                     setIsRepair(false);
+                    setIsEdit(true);
                     setIsModalWindowOpen(true);
                   }}
                 >
@@ -298,6 +305,7 @@ const ProductCardModal = React.memo(() => {
                   color="success"
                   onClick={() => {
                     setIsRepair(true);
+                    setIsEdit(false);
                     setIsModalWindowOpen(true);
                   }}
                   disabled={repairButton}
@@ -313,10 +321,18 @@ const ProductCardModal = React.memo(() => {
                 isOpen={isModalWindowOpen}
                 toggle={() => setIsModalWindowOpen(false)}
                 isRepair={isRepair}
+                isEdit={isEdit}
               />
             )}
-            <Button color="primary" disabled>
-              Add
+            <Button
+              color="primary"
+              onClick={() => {
+                setIsRepair(false);
+                setIsEdit(false);
+                setIsModalWindowOpen(true);
+              }}
+            >
+              Duplicate
             </Button>
           </div>
         </ModalFooter>
