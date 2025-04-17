@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { updateProduct } from '#components/redux/actions/productsAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
 
 function UpdateModalWindow() {
   const { promProduct, setPromProduct, setStayDefault } = useProjectContext();
@@ -15,8 +14,6 @@ function UpdateModalWindow() {
     setModalProductCard,
     modalProductCard,
   } = useModalContext();
-  const { rightPlaceOfProductionFunc, rightTypeOfPackagingFunc } =
-    useProductsContext();
 
   const dispatch = useDispatch();
   const productData = useSelector((state) => state.products).findLast(
@@ -24,12 +21,9 @@ function UpdateModalWindow() {
   );
 
   const updateHadler = () => {
-    const { placeOfProduction, typeOfPackaging } = promProduct;
     const updProduct = {
       ...promProduct,
       version: productData.version + 1,
-      placeOfProduction: rightPlaceOfProductionFunc(placeOfProduction),
-      typeOfPackaging: rightTypeOfPackagingFunc(typeOfPackaging),
     };
 
     setStayDefault(true);
@@ -59,8 +53,8 @@ function UpdateModalWindow() {
           Внимание
         </ModalHeader>
         <ModalBody>
-          Продукт с такими параметрами уже существует. Можете обновить или вернуться
-          назад.
+          Продукт с такими параметрами уже существует. Желаете обновить верссию или
+          вернуться назад.
         </ModalBody>
         <ModalFooter>
           <Button

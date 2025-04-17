@@ -31,6 +31,7 @@ const ModalWindow = React.memo(
     const [articleId, setArticleId] = useState(-1);
     const [defaultValues, setDefaultValues] = useState({});
     const products = useSelector((state) => state.products);
+
     const dispatch = useDispatch();
 
     const editableAccessors = [
@@ -109,17 +110,27 @@ const ModalWindow = React.memo(
         (product) => product.article === prodArticle
       );
 
-      if (isRepair || isEdit) {
+      if (isRepair) {
         dispatch(repProduct(updatedProduct));
+      } else if (isEdit) {
+        const lastVersion = products.findLast(
+          (el) => el.article === prodArticle
+        ).version;
+
+        const obj = { ...updatedProduct, version: lastVersion + 1 };
+
+        dispatch(repProduct(obj));
       } else if (isExistingProduct) {
         const existingProduct = products.find(
           (product) => product.article === prodArticle
         );
+
         setPromProduct({
           ...updatedProduct,
           id: existingProduct.id,
           productCode: existingProduct.productCode,
         });
+
         setModalUpdate(!modalUpdate);
       } else {
         dispatch(addNewProduct({ product: updatedProduct }));
@@ -562,7 +573,7 @@ const ModalWindow = React.memo(
                 toggle();
               }}
             >
-              {isRepair ? <p>Repair</p> : <p>Add</p>}
+              Save
             </Button>
           </ModalFooter>
         </Modal>

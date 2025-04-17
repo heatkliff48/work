@@ -320,7 +320,16 @@ const ProductCardModal = React.memo(() => {
                 isEdit={isEdit}
               />
             )}
-            <Button color="primary">Duplicate</Button>
+            <Button
+              color="primary"
+              onClick={() => {
+                setIsRepair(false);
+                setIsEdit(false);
+                setIsModalWindowOpen(true);
+              }}
+            >
+              Duplicate
+            </Button>
           </div>
         </ModalFooter>
       </Modal>
