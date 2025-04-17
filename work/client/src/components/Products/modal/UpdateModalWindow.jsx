@@ -1,11 +1,11 @@
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
-import { updateProduct } from '#components/redux/actions/productsAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 
 function UpdateModalWindow() {
-  const { promProduct, setPromProduct, setStayDefault } = useProjectContext();
+  const { promProduct, setPromProduct, setStayDefault, setPreviewProductData } =
+    useProjectContext();
   const {
     modalUpdate,
     setModalUpdate,
@@ -13,9 +13,10 @@ function UpdateModalWindow() {
     setModal,
     setModalProductCard,
     modalProductCard,
+    previewProductModal,
+    setPreviewProductModal,
   } = useModalContext();
 
-  const dispatch = useDispatch();
   const productData = useSelector((state) => state.products).findLast(
     (el) => el.article === promProduct.article
   );
@@ -27,10 +28,12 @@ function UpdateModalWindow() {
     };
 
     setStayDefault(true);
-    dispatch(updateProduct({ product: updProduct }));
     setPromProduct({});
     setModal(!modal);
     setModalProductCard(!modalProductCard);
+
+    setPreviewProductData({ product: updProduct });
+    setPreviewProductModal(!previewProductModal);
   };
 
   const backHadler = () => {

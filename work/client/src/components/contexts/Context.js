@@ -217,6 +217,7 @@ const ProjectContextProvider = ({ children }) => {
   const [promProduct, setPromProduct] = useState(null);
   const [currentContact, setCurrentContact] = useState();
   const [currentDelivery, setCurrentDelivery] = useState();
+  const [previewProductData, setPreviewProductData] = useState();
 
   const [version, setVersion] = useState(1);
   const [roleId, setRoleId] = useState(0);
@@ -307,6 +308,8 @@ const ProjectContextProvider = ({ children }) => {
         setIsRepair,
         isEdit,
         setIsEdit,
+        previewProductData,
+        setPreviewProductData,
       }}
     >
       {children}
