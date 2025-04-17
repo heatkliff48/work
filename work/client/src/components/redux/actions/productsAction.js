@@ -11,20 +11,20 @@ export const getAllProducts = () => {
   };
 };
 
-export const addNewProduct = ({ product }) => {
+export const addNewProduct = (product) => {
   delete product.id;
   return {
     type: ADD_NEW_PRODUCT,
-    payload: { product },
+    payload: product,
   };
 };
 
-export const updateProduct = ({ product }) => {
+export const updateProduct = (product) => {
   delete product.id;
 
   return {
     type: NEED_UPDATE_PRODUCT,
-    payload: { product },
+    payload: product,
   };
 };
 

@@ -25,7 +25,7 @@ function Products() {
     previewProductModal,
   } = useModalContext();
   const { TABLE_COLUMNS, COLUMNS, latestProducts } = useProductsContext();
-  const { setProductCardData } = useProjectContext();
+  const { setProductCardData, previewOperationName } = useProjectContext();
 
   const columns = useMemo(() => TABLE_COLUMNS, []);
   const data = useMemo(() => latestProducts ?? [], [latestProducts]);
@@ -133,7 +133,9 @@ function Products() {
           toggle={() => setModal(!modal)}
         />
       )}
-      {previewProductModal && <PreviewProductCardModal />}
+      {previewProductModal && (
+        <PreviewProductCardModal previewOperationName={previewOperationName} />
+      )}
 
       {modalProductCard && <ProductCardModal />}
       <h1>Blocks journal</h1>

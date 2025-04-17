@@ -20,10 +20,10 @@ class ProductController {
   }
 
   static async addProduct(req, res) {
-    const { product } = req.body;
+    const product = req.body;
 
     try {
-      const products = await ProductService.addNewProduct({ product });
+      const products = await ProductService.addNewProduct(product);
 
       myEmitter.emit(ADD_NEW_PRODUCT_SOCKET, products);
       return res.status(200);
@@ -33,10 +33,10 @@ class ProductController {
   }
 
   static async updateProduct(req, res) {
-    const { product } = req.body;
+    const product = req.body;
 
     try {
-      const products = await ProductService.updateProduct({ product });
+      const products = await ProductService.updateProduct(product);
 
       myEmitter.emit(UPDATE_PRODUCT_SOCKET, products);
 

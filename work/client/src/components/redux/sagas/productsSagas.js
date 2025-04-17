@@ -26,9 +26,9 @@ const getAllProducts = () => {
     .catch(showErrorMessage);
 };
 
-const updateProducts = ({ product }) => {
+const updateProducts = (product) => {
   return url
-    .post('/products/upd', { product })
+    .post('/products/upd', product)
     .then((res) => {
       return res.data;
     })
@@ -44,9 +44,9 @@ const repairProduct = (repProduct) => {
     .catch(showErrorMessage);
 };
 
-const addNewProduct = ({ product }) => {
+const addNewProduct = (product) => {
   return url
-    .post('/products/add', { product })
+    .post('/products/add', product)
     .then((res) => {
       return res.data;
     })
