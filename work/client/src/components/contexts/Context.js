@@ -223,6 +223,7 @@ const ProjectContextProvider = ({ children }) => {
   const [currentClientID, setClientID] = useState(1);
 
   const isCheckedAuth = useRef(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [isRepair, setIsRepair] = useState(false);
   const [stayDefault, setStayDefault] = useState(true);
 
@@ -304,6 +305,8 @@ const ProjectContextProvider = ({ children }) => {
         setProductionBatchLogData,
         isRepair,
         setIsRepair,
+        isEdit,
+        setIsEdit,
       }}
     >
       {children}

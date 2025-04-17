@@ -2,7 +2,7 @@ import React from 'react';
 import { ModalBody } from 'reactstrap';
 import { useState } from 'react';
 
-const InputField = React.memo(({ el, inputValue, inputValueChange }) => {
+const InputField = React.memo(({ el, inputValue, inputValueChange, isDisabled }) => {
   const [inputDirty, setInputDirty] = useState(false);
   const [inputError, setInputError] = useState("This field can't be empty");
 
@@ -40,6 +40,7 @@ const InputField = React.memo(({ el, inputValue, inputValueChange }) => {
         id={el.accessor}
         name={el.accessor}
         value={inputValue[el.accessor] || ''}
+        readOnly={isDisabled}
         onChange={(e) => {
           if (regexp.test(e.target.value)) inputChangeHandler(e);
         }}

@@ -1,7 +1,6 @@
 import { TextSearchFilter } from '#components/Table/filters.js';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useContext, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const ProductsTypeJournalContext = createContext();
 

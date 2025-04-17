@@ -1,14 +1,8 @@
 import {
   ALL_CLIENTS,
-  NEW_CLIENTS,
-  UPDATE_CLIENT,
   ONE_LEGAL_ADDRESS,
-  NEW_LEGAL_ADDRESS,
-  UPDATE_LEGAL_ADDRESS,
   ALL_DELIVERY_ADDRESSES,
-  NEW_DELIVERY_ADDRESSES,
   ALL_CONTACT_INFO,
-  NEW_CONTACT_INFO,
 } from '../types/clientsTypes';
 import {
   NEED_UPDATE_CLIENT_SOCKET,
@@ -33,7 +27,7 @@ export const clientsReducer = (clients = [], action) => {
         return el;
       });
       return updateClient;
-      // return [...clients, payload];
+
     }
     default:
       return clients;
@@ -49,17 +43,6 @@ export const legalAddressReducer = (legalAddress = {}, action) => {
     case ONE_LEGAL_ADDRESS_SOCKET: {
       return payload;
     }
-
-    // case NEW_LEGAL_ADDRESS: {
-    //   return [...legalAddress, payload];
-    // }
-    // case UPDATE_LEGAL_ADDRESS: {
-    //   const updateLegalAddress = legalAddress.map((el) => {
-    //     if (el.id === payload.id) return payload;
-    //     return el;
-    //   });
-    //   return updateLegalAddress;
-    // }
     default:
       return legalAddress;
   }
