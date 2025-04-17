@@ -3,9 +3,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useOrderContext } from '../../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
-import {
-  getUpdateDryMixedProductOfOrders,
-} from '#components/redux/actions/ordersAction.js';
+import { getUpdateDryMixedProductOfOrders } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 import '#components/Styles/modals.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
@@ -250,7 +248,9 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
             <>
               <Table
                 COLUMN_DATA={COLUMNS_DRY_MIXED_PRODUCT}
-                dataOfTable={dryMixesJournal}
+                dataOfTable={dryMixesJournal.filter(
+                  (product) => product.activeStatus === true
+                )}
                 // userAccess={userAccess}
                 onClickButton={() => {}}
                 buttonText={''}

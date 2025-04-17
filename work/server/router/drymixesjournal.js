@@ -26,16 +26,18 @@ dryMixesJournalRouter.post('/', async (req, res) => {
   const {
     name,
     article,
+    manufacturer_name,
     units_of_measurement,
-    number_of_bags,
+    units_per_pallet,
     bag_weight,
     pallet_weight,
     type_of_mix,
     description,
     place_of_production,
-    price,
+    price_per_unit,
     price_per_kilogram,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   console.log(
@@ -47,16 +49,18 @@ dryMixesJournalRouter.post('/', async (req, res) => {
     const dryMixesJournal = await DryMixesJournal.create({
       name,
       article,
+      manufacturer_name,
       units_of_measurement,
-      number_of_bags,
+      units_per_pallet,
       bag_weight,
       pallet_weight,
       type_of_mix,
       description,
       place_of_production,
-      price,
+      price_per_unit,
       price_per_kilogram,
       product_code,
+      active_status,
     });
 
     myEmitter.emit(ADD_NEW_DRY_MIXES_JOURNAL_SOCKET, dryMixesJournal);
@@ -72,16 +76,18 @@ dryMixesJournalRouter.post('/update', async (req, res) => {
     id,
     name,
     article,
+    manufacturer_name,
     units_of_measurement,
-    number_of_bags,
+    units_per_pallet,
     bag_weight,
     pallet_weight,
     type_of_mix,
     description,
     place_of_production,
-    price,
+    price_per_unit,
     price_per_kilogram,
     product_code,
+    active_status,
   } = req.body.productsTypeJournalInput;
 
   try {
@@ -89,16 +95,18 @@ dryMixesJournalRouter.post('/update', async (req, res) => {
       {
         name,
         article,
+        manufacturer_name,
         units_of_measurement,
-        number_of_bags,
+        units_per_pallet,
         bag_weight,
         pallet_weight,
         type_of_mix,
         description,
         place_of_production,
-        price,
+        price_per_unit,
         price_per_kilogram,
         product_code,
+        active_status,
       },
       {
         where: {

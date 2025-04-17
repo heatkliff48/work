@@ -147,7 +147,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
           {haveProduct ? (
             <p>Fill in the remaining parameters</p>
           ) : (
-            <p>Select anchor product</p>
+            <p>Select fastener product</p>
           )}
         </ModalHeader>
         <ModalBody>
@@ -247,11 +247,13 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
             <>
               <Table
                 COLUMN_DATA={COLUMNS_ANCHOR_PRODUCT}
-                dataOfTable={anchor}
+                dataOfTable={anchor.filter(
+                  (product) => product.activeStatus === true
+                )}
                 // userAccess={userAccess}
                 onClickButton={() => {}}
                 buttonText={''}
-                tableName={'Anchor journal'}
+                tableName={'Fasteners journal'}
                 handleRowClick={(row) => {
                   handlerAddProductOrder(row);
                 }}
@@ -260,7 +262,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
           )}
         </ModalBody>
         <ModalFooter>
-          <button onClick={addProductOrder}>Add anchor product</button>
+          <button onClick={addProductOrder}>Add fastener product</button>
         </ModalFooter>
       </Modal>
     </div>

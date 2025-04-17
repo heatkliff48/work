@@ -66,7 +66,12 @@ function ProductsTypeJournalInfoModal(props) {
                     dataTable.map((el) => (
                       <Row>
                         <h3>
-                          {el.Header}: {selectedProductsType[el.accessor] || 'Empty'}
+                          {el.Header}:{' '}
+                          {el.accessor === 'active_status'
+                            ? selectedProductsType?.[el.accessor]
+                              ? 'Available'
+                              : 'Not available'
+                            : selectedProductsType[el.accessor] || 'Empty'}
                         </h3>
                       </Row>
                     ))}
