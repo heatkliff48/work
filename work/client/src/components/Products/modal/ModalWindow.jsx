@@ -491,7 +491,8 @@ const ModalWindow = React.memo(
               if (
                 el.accessor === 'id' ||
                 el.accessor === 'article' ||
-                el.accessor === 'productCode'
+                el.accessor === 'productCode' ||
+                el.accessor === 'activeStatus'
               )
                 return null;
               if (el.accessor === 'version') {
@@ -580,7 +581,7 @@ const ModalWindow = React.memo(
                 updateProductHandler();
                 setModalProductCard(false);
                 setStayDefault(true);
-                setVersion(1)
+                setVersion(1);
                 clearData();
                 toggle();
               }}

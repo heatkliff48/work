@@ -277,8 +277,6 @@ const OrderCart = React.memo(() => {
   }, [updatedProductListOrder]);
 
   const updatedDryMixesListOrder = useMemo(() => {
-    console.log('dryMixedProductsOfOrders:', dryMixedProductsOfOrders);
-    console.log('dryMixesJournal:', dryMixesJournal);
     return addProductArticleToOrderList(
       dryMixedProductsOfOrders,
       dryMixesJournal,
@@ -297,8 +295,6 @@ const OrderCart = React.memo(() => {
   }, [updatedDryMixesListOrder]);
 
   const updatedAnchorsListOrder = useMemo(() => {
-    console.log('anchorProductsOfOrders:', anchorProductsOfOrders);
-    console.log('anchor:', anchor);
     return addProductArticleToOrderList(anchorProductsOfOrders, anchor, 'anchors');
   }, [anchorProductsOfOrders, anchor, addProductArticleToOrderList]);
 
@@ -312,8 +308,6 @@ const OrderCart = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    console.log('toolProductsOfOrders:', toolProductsOfOrders);
-    console.log('tool:', tool);
     return addProductArticleToOrderList(toolProductsOfOrders, tool, 'tools');
   }, [toolProductsOfOrders, tool, addProductArticleToOrderList]);
 
@@ -325,10 +319,6 @@ const OrderCart = React.memo(() => {
       }));
     }
   }, [updatedToolsListOrder]);
-
-  useEffect(() => {
-    console.log('productLists', productLists);
-  }, [productLists]);
 
   const handleInputChange = (e) => {
     setVatValue((prev) => ({
