@@ -60,7 +60,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
     const discount = productOfOrder?.discount ?? 0;
 
     const result =
-      (selectedProduct?.price *
+      (selectedProduct?.price_per_unit *
         productOfOrder?.quantity_ud *
         Math.abs(100 - discount)) /
       100;
@@ -71,7 +71,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
     }));
     return result.toFixed(2);
   }, [
-    selectedProduct?.price,
+    selectedProduct?.price_per_unit,
     productOfOrder?.discount,
     productOfOrder?.quantity_ud,
   ]);

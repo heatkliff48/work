@@ -48,7 +48,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
     if (!selectedProduct) return;
     if (!productOfOrder?.quantity_ud) productOfOrder.quantity_ud = 0;
     const result = Math.ceil(
-      productOfOrder?.quantity_ud / (selectedProduct?.number_of_bags || 1)
+      productOfOrder?.quantity_ud / (selectedProduct?.units_per_pallet || 1)
     );
 
     setProductOfOrder((prev) => ({
@@ -56,11 +56,11 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
       quantity_palet_dry: result,
     }));
     return result;
-  }, [productOfOrder.quantity_ud, selectedProduct?.number_of_bags]);
+  }, [productOfOrder.quantity_ud, selectedProduct?.units_per_pallet]);
 
   const quantity_real_value = useMemo(() => {
     const result = Math.ceil(
-      quantity_palet_value * (selectedProduct?.number_of_bags || 1)
+      quantity_palet_value * (selectedProduct?.units_per_pallet || 1)
     );
 
     setProductOfOrder((prev) => ({
@@ -71,20 +71,22 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
   }, [quantity_palet_value, selectedProduct?.m2]);
 
   const total_value = useMemo(() => {
-    const result = quantity_palet_value * selectedProduct?.number_of_bags;
+    const result = quantity_palet_value * selectedProduct?.units_per_pallet;
 
     setProductOfOrder((prev) => ({
       ...prev,
       total: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [quantity_palet_value, selectedProduct?.number_of_bags]);
+  }, [quantity_palet_value, selectedProduct?.units_per_pallet]);
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
 
     const result =
-      (selectedProduct?.price * quantity_real_value * Math.abs(100 - discount)) /
+      (selectedProduct?.price_per_unit *
+        quantity_real_value *
+        Math.abs(100 - discount)) /
       100;
 
     setProductOfOrder((prev) => ({
@@ -92,7 +94,11 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
       final_price: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [selectedProduct?.price, quantity_real_value, productOfOrder?.discount]);
+  }, [
+    selectedProduct?.price_per_unit,
+    quantity_real_value,
+    productOfOrder?.discount,
+  ]);
 
   const pvp_value = useMemo(() => {
     const result = total_value > 1 ? final_price_value / total_value : 0;

@@ -44,7 +44,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const pieces_per_pallet =
-    selectedProduct?.pieces_per_box * selectedProduct?.boxes_on_a_pallet ?? 0;
+    selectedProduct?.pieces_per_unit * selectedProduct?.boxes_on_a_pallet ?? 0;
 
   const quantity_palet_value = useMemo(() => {
     if (!selectedProduct) return;
@@ -83,7 +83,9 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
     const discount = productOfOrder?.discount ?? 0;
 
     const result =
-      (selectedProduct?.price * quantity_real_value * Math.abs(100 - discount)) /
+      (selectedProduct?.price_per_unit *
+        quantity_real_value *
+        Math.abs(100 - discount)) /
       100;
 
     setProductOfOrder((prev) => ({
@@ -91,7 +93,11 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
       final_price: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [selectedProduct?.price, quantity_real_value, productOfOrder?.discount]);
+  }, [
+    selectedProduct?.price_per_unit,
+    quantity_real_value,
+    productOfOrder?.discount,
+  ]);
 
   const pvp_value = useMemo(() => {
     const result = total_value > 1 ? final_price_value / total_value : 0;
