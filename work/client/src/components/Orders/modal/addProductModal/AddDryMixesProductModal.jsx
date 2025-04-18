@@ -249,7 +249,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
               <Table
                 COLUMN_DATA={COLUMNS_DRY_MIXED_PRODUCT}
                 dataOfTable={dryMixesJournal.filter(
-                  (product) => product.activeStatus === true
+                  (product) => product.active_status === true
                 )}
                 // userAccess={userAccess}
                 onClickButton={() => {}}
