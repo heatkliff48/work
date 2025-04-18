@@ -89,6 +89,7 @@ const RelatedMaterialsJournal = () => {
         show={modalShow}
         onHide={() => setModalShow(false)}
         title={'Related material card'}
+        target={2}
       />
     </Fragment>
   );

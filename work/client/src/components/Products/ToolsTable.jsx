@@ -88,6 +88,7 @@ const ToolsTable = () => {
         show={modalShow}
         onHide={() => setModalShow(false)}
         title={'Tool'}
+        target={4}
       />
     </Fragment>
   );

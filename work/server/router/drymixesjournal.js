@@ -72,6 +72,10 @@ dryMixesJournalRouter.post('/', async (req, res) => {
 });
 
 dryMixesJournalRouter.post('/update', async (req, res) => {
+  console.log(
+    'dryMixesJournalRouter.post(/update---------------------------------',
+    req.body
+  );
   const {
     id,
     name,
@@ -88,7 +92,7 @@ dryMixesJournalRouter.post('/update', async (req, res) => {
     price_per_kilogram,
     product_code,
     active_status,
-  } = req.body.productsTypeJournalInput;
+  } = req.body;
 
   try {
     const dryMixesJournal = await DryMixesJournal.update(

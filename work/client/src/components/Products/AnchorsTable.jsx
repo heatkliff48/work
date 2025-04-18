@@ -88,6 +88,7 @@ const AnchorsTable = () => {
         show={modalShow}
         onHide={() => setModalShow(false)}
         title={'Fasteners'}
+        target={3}
       />
     </Fragment>
   );

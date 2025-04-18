@@ -6,18 +6,75 @@ import Select from 'react-select';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import './styles.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import BarcodeGenerator from './BarcodeGenerator';
+import {
+  updateAnchor,
+  updateDryMixesJournal,
+  updateRelatedMaterialsJournal,
+  updateTool,
+} from '#components/redux/actions/productsTypeJournalAction.js';
 
 function ProductsTypeJournalInfoModal(props) {
-  const { selectedProductsType, dataTable } = useProductsTypeJournalContext();
+  const { selectedProductsType, setSelectedProductsType, dataTable } =
+    useProductsTypeJournalContext();
+  const dryMixesJournal = useSelector((state) => state.dryMixesJournal);
+  const [isChecked, setIsChecked] = useState(selectedProductsType?.active_status);
   // const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   // const user = useSelector((state) => state.user);
 
   // const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const handleStatusChange = () => {
+    setIsChecked(!isChecked);
+    setSelectedProductsType({
+      ...selectedProductsType,
+      active_status: !selectedProductsType.active_status,
+    });
+    if (props.target == 1) {
+      dispatch(
+        updateDryMixesJournal({
+          ...selectedProductsType,
+          active_status: !selectedProductsType.active_status,
+        })
+      );
+    } else if (props.target == 2) {
+      dispatch(
+        updateRelatedMaterialsJournal({
+          ...selectedProductsType,
+          active_status: !selectedProductsType.active_status,
+        })
+      );
+    } else if (props.target == 3) {
+      dispatch(
+        updateAnchor({
+          ...selectedProductsType,
+          active_status: !selectedProductsType.active_status,
+        })
+      );
+    } else if (props.target == 4) {
+      dispatch(
+        updateTool({
+          ...selectedProductsType,
+          active_status: !selectedProductsType.active_status,
+        })
+      );
+    }
+  };
+
+  useEffect(() => {
+    setIsChecked(selectedProductsType?.active_status);
+  }, [selectedProductsType]);
+
+  // useEffect(() => {
+  //   const dryMix = dryMixesJournal.find((el) => el.id === selectedProductsType?.id);
+  //   setSelectedProductsType(dryMix);
+  // }, [dryMixesJournal]);
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
@@ -77,6 +134,14 @@ function ProductsTypeJournalInfoModal(props) {
                     ))}
                 </Col>
                 <Col xs={6} md={4}>
+                  <div>
+                    <h5>Change product's availability status</h5>
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={handleStatusChange}
+                    />
+                  </div>
                   <BarcodeGenerator
                     productCode={selectedProductsType?.product_code}
                   />
