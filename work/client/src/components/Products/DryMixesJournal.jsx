@@ -94,6 +94,7 @@ const DryMixesJournal = () => {
         show={modalShow}
         onHide={() => setModalShow(false)}
         title={'Dry mix card'}
+        target={1}
       />
     </Fragment>
   );

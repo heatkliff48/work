@@ -228,7 +228,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
               <Table
                 COLUMN_DATA={COLUMNS}
                 dataOfTable={latestProducts.filter(
-                  (product) => product.activeStatus === true
+                  (product) => product.active_status === true
                 )}
                 // userAccess={userAccess}
                 onClickButton={() => {}}

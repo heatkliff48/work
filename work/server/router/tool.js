@@ -68,7 +68,7 @@ toolRouter.post('/update', async (req, res) => {
     price_per_unit,
     product_code,
     active_status,
-  } = req.body.productsTypeJournalInput;
+  } = req.body;
 
   try {
     const tool = await Tool.update(
