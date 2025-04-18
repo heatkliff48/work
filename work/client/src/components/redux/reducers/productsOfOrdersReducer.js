@@ -56,8 +56,10 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
 
 export const dryMixedProductsOfOrdersReducer = (state = [], action) => {
   const { type, payload } = action;
+
   switch (type) {
     case DRY_MIXED_PRODUCTS_OF_ORDER: {
+      console.log('DRY_MIXED_PRODUCTS_OF_ORDER payload', type, payload);
       return payload;
     }
 
@@ -77,8 +79,10 @@ export const dryMixedProductsOfOrdersReducer = (state = [], action) => {
 
 export const anchorProductsOfOrdersReducer = (state = [], action) => {
   const { type, payload } = action;
+
   switch (type) {
     case ANCHOR_PRODUCTS_OF_ORDER: {
+      console.log('ANCHOR_PRODUCTS_OF_ORDER payload', type, payload);
       return payload ?? [];
     }
 

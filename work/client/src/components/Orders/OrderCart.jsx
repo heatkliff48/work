@@ -206,36 +206,57 @@ const OrderCart = React.memo(() => {
     return daysUntil;
   }, [orderCartData?.shipping_date]);
 
+  // const addProductArticleToOrderList = useCallback(
+  //   (productsOfOrders, productsTable, arrayName) => {
+  //     if (!productsOfOrders || !productsTable || !arrayName) return [];
+
+  //     const updatedOrderProducts = productsOfOrders
+  //       .filter((el) => el.order_id == orderCartData.id)
+  //       .map((orderProduct) => {
+  //         const id = getCorrectProductId(arrayName);
+
+  //         const product = productsTable.find((p) => p.id === orderProduct?.[id]);
+
+  //         if (product) {
+  //           return {
+  //             product_article: product.article,
+  //             ...orderProduct,
+  //           };
+  //         }
+  //         return { ...orderProduct, product_article: 'Unknown' };
+  //       });
+
+  //     setProductLists((prevState) => {
+  //       return {
+  //         ...prevState,
+  //         [arrayName]: updatedOrderProducts,
+  //       };
+  //     });
+
+  //     return updatedOrderProducts;
+  //   },
+  //   []
+  // );
+
   const addProductArticleToOrderList = useCallback(
     (productsOfOrders, productsTable, arrayName) => {
-      if (!productsOfOrders || !productsTable || !arrayName) return [];
+      if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
+        return [];
 
       const updatedOrderProducts = productsOfOrders
         .filter((el) => el.order_id == orderCartData.id)
         .map((orderProduct) => {
           const id = getCorrectProductId(arrayName);
-
           const product = productsTable.find((p) => p.id === orderProduct?.[id]);
 
-          if (product) {
-            return {
-              product_article: product.article,
-              ...orderProduct,
-            };
-          }
-          return { ...orderProduct, product_article: 'Unknown' };
+          return product
+            ? { product_article: product.article, ...orderProduct }
+            : { ...orderProduct, product_article: 'Unknown' };
         });
-
-      setProductLists((prevState) => {
-        return {
-          ...prevState,
-          [arrayName]: updatedOrderProducts,
-        };
-      });
 
       return updatedOrderProducts;
     },
-    []
+    [orderCartData?.id] // Добавляем зависимость
   );
 
   const updatedProductListOrder = useMemo(() => {
@@ -244,23 +265,70 @@ const OrderCart = React.memo(() => {
       latestProducts,
       'products'
     );
-  }, [productsOfOrders, latestProducts]);
+  }, [productsOfOrders, latestProducts, addProductArticleToOrderList]);
+
+  useEffect(() => {
+    if (updatedProductListOrder.length > 0) {
+      setProductLists((prevState) => ({
+        ...prevState,
+        products: updatedProductListOrder,
+      }));
+    }
+  }, [updatedProductListOrder]);
 
   const updatedDryMixesListOrder = useMemo(() => {
+    console.log('dryMixedProductsOfOrders:', dryMixedProductsOfOrders);
+    console.log('dryMixesJournal:', dryMixesJournal);
     return addProductArticleToOrderList(
       dryMixedProductsOfOrders,
       dryMixesJournal,
       'dryMixes'
     );
-  }, [dryMixedProductsOfOrders, dryMixesJournal]);
+  }, [dryMixedProductsOfOrders, dryMixesJournal, addProductArticleToOrderList]);
+
+  // Обновляем состояние отдельно
+  useEffect(() => {
+    if (updatedDryMixesListOrder.length > 0) {
+      setProductLists((prevState) => ({
+        ...prevState,
+        dryMixes: updatedDryMixesListOrder,
+      }));
+    }
+  }, [updatedDryMixesListOrder]);
 
   const updatedAnchorsListOrder = useMemo(() => {
+    console.log('anchorProductsOfOrders:', anchorProductsOfOrders);
+    console.log('anchor:', anchor);
     return addProductArticleToOrderList(anchorProductsOfOrders, anchor, 'anchors');
-  }, [anchorProductsOfOrders, anchor]);
+  }, [anchorProductsOfOrders, anchor, addProductArticleToOrderList]);
+
+  useEffect(() => {
+    if (updatedAnchorsListOrder.length > 0) {
+      setProductLists((prevState) => ({
+        ...prevState,
+        anchors: updatedAnchorsListOrder,
+      }));
+    }
+  }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
+    console.log('toolProductsOfOrders:', toolProductsOfOrders);
+    console.log('tool:', tool);
     return addProductArticleToOrderList(toolProductsOfOrders, tool, 'tools');
-  }, [toolProductsOfOrders, tool]);
+  }, [toolProductsOfOrders, tool, addProductArticleToOrderList]);
+
+  useEffect(() => {
+    if (updatedToolsListOrder.length > 0) {
+      setProductLists((prevState) => ({
+        ...prevState,
+        tools: updatedToolsListOrder,
+      }));
+    }
+  }, [updatedToolsListOrder]);
+
+  useEffect(() => {
+    console.log('productLists', productLists);
+  }, [productLists]);
 
   const handleInputChange = (e) => {
     setVatValue((prev) => ({

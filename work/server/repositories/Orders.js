@@ -83,7 +83,6 @@ class OrdersRepository {
           'final_price',
         ],
       });
-
       return dry_mixed_product_list;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
@@ -107,7 +106,6 @@ class OrdersRepository {
           'final_price',
         ],
       });
-
       return anchor_product_list;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
@@ -152,7 +150,10 @@ class OrdersRepository {
           'warehouse_id',
         ],
       });
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>product_list', product_list);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>product_list',
+        product_list
+      );
 
       return product_list;
     } catch (error) {
@@ -341,7 +342,10 @@ class OrdersRepository {
         ],
       });
 
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>allOrdrProd', allOrdrProd);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>allOrdrProd',
+        allOrdrProd
+      );
 
       const tid = allOrdrProd[allOrdrProd.length - 1].id;
       console.log('tid', tid);

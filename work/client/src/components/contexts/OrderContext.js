@@ -277,6 +277,13 @@ const OrderContextProvider = ({ children }) => {
     (state) => state.anchorProductsOfOrders
   );
   const toolProductsOfOrders = useSelector((state) => state.toolProductsOfOrders);
+  useEffect(() => {
+    console.log('dryMixedProductsOfOrders', dryMixedProductsOfOrders);
+  }, [dryMixedProductsOfOrders]);
+  useEffect(() => {
+    console.log('anchorProductsOfOrders', anchorProductsOfOrders);
+  }, [anchorProductsOfOrders]);
+
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
   const contactInfos = useSelector((state) => state.contactInfo);
@@ -468,7 +475,7 @@ const OrderContextProvider = ({ children }) => {
         accDataList,
         setAccDataList,
         getAccountingStatus,
-        deliveryAddresses
+        deliveryAddresses,
       }}
     >
       {children}

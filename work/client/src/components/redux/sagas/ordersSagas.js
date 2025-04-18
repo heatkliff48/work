@@ -310,8 +310,7 @@ function* getDryMixedProductsOfOrderWatcher(action) {
 
 function* getAnchorProductsOfOrderWatcher(action) {
   try {
-
-    const { anchor_product_list } = yield call(getAnchorProductsOfOrder);
+    const anchor_product_list = yield call(getAnchorProductsOfOrder);
 
     yield put({ type: ANCHOR_PRODUCTS_OF_ORDER, payload: anchor_product_list });
   } catch (err) {
@@ -322,8 +321,7 @@ function* getAnchorProductsOfOrderWatcher(action) {
 
 function* getToolProductsOfOrderWatcher(action) {
   try {
-
-    const { tool_product_list } = yield call(getToolProductsOfOrder);
+    const tool_product_list = yield call(getToolProductsOfOrder);
 
     yield put({ type: TOOL_PRODUCTS_OF_ORDER, payload: tool_product_list });
   } catch (err) {
@@ -334,7 +332,6 @@ function* getToolProductsOfOrderWatcher(action) {
 
 function* getCurrentProductsOfOrderWatcher(action) {
   try {
-
     const { product_list } = yield call(getCurrentProductsOfOrder, action.payload);
 
     yield put({ type: CURRENT_PRODUCTS_OF_ORDER, payload: product_list });

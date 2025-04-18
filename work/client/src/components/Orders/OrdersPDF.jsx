@@ -304,24 +304,23 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
     const pdfDryMixes = productList?.dryMixes?.map((prod) => {
       const dryMixes = dryMixesJournal.find((el) => el.id == prod.dry_mixed_id);
-
       const quantity = prod.quantity_ud;
 
       const descripcion = `${dryMixes?.name} BAUBLOCK Sacos de ${dryMixes.pallet_weight}kg`;
 
-      const sacos = dryMixes.number_of_bags;
+      const sacos = dryMixes.units_per_pallet;
 
       const totalSacos = (quantity * sacos).toFixed(0);
 
-      const totalKg = (prod.quantity_palet_dry * dryMixes.pallet_weight).toFixed(0);
+      const totalKg = (prod.quantity_palet_dry * dryMixes?.pallet_weight).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(2);
 
       return {
-        ref: dryMixes.article,
+        ref: dryMixes?.article,
         descripcion,
         medición_de_proyecto: quantity,
-        total_paletas: dryMixes.quantity_palet_dry,
+        total_paletas: prod?.quantity_palet_dry,
         sacos,
         totalSacos,
         totalKg,
@@ -336,7 +335,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const descripcion = `${anchorProd.name} BAUBLOCK Sacos de ${anchorProd.pallet_weight}kg`;
 
-      const sacos = anchorProd.pieces_per_box * anchorProd.boxes_on_a_pallet;
+      const sacos = anchorProd.pieces_per_unit * anchorProd.boxes_on_a_pallet;
 
       const totalSacos = (quantity * sacos).toFixed(0);
 
