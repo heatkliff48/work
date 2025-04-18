@@ -224,7 +224,6 @@ function ProductionBatchDesigner() {
   useEffect(() => {
     if (!latestProducts || !listOfOrderedCakes) return;
 
-    console.log('listOfOrderedCakes', listOfOrderedCakes);
     const rightListOfOrdered = listOfOrderedCakes.filter(
       (el) =>
         el.quantity !== el.quantity_in_warehouse &&
