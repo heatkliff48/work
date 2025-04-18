@@ -50,7 +50,7 @@ class ProductController {
     const repProduct = req.body;
 
     try {
-      const products = await ProductService.repairProductData({ repProduct });
+      const products = await ProductService.repairProductData(repProduct);
 
       myEmitter.emit(REPAIR_PRODUCT_SOCKET, repProduct);
 
