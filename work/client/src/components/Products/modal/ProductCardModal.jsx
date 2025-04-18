@@ -181,6 +181,8 @@ const ProductCardModal = React.memo(() => {
   ]);
 
   useEffect(() => {
+    console.log('productCardData', productCardData);
+
     const searchArticle = productCardData.article
       ? productCardData.article.slice(0, productCardData.article.length)
       : '';
