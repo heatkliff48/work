@@ -1,6 +1,5 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useContext, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const RecipeContext = createContext();
 
@@ -62,18 +61,6 @@ const RecipeContextProvider = ({ children }) => {
       Header: 'Condensate',
       accessor: 'condensate',
     },
-    // {
-    //   Header: 'Density',
-    //   accessor: 'density',
-    // },
-    // {
-    //   Header: 'Form volume, m3',
-    //   accessor: 'form_volume_m3',
-    // },
-    // {
-    //   Header: 'Dry total',
-    //   accessor: 'dry_total',
-    // },
   ];
 
   const [selectedProduct, setSelectedProduct] = useState(null);

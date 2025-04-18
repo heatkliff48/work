@@ -1,6 +1,6 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
@@ -10,7 +10,7 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useNavigate } from 'react-router-dom';
 
 function RecipeInfoModal(props) {
-  const { recipe_info, list_of_recipes, selectedRecipe } = useRecipeContext();
+  const { recipe_info, selectedRecipe } = useRecipeContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);

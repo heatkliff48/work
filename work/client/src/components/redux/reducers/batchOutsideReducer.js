@@ -27,7 +27,6 @@ export const batchOutsideReducer = (batchOutside = [], action) => {
         })
         .filter((el) => el.quantity_pallets !== 0);
       return result;
-      // return [...clients, payload];
     }
     default:
       return batchOutside;

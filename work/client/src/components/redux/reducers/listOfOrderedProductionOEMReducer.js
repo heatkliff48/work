@@ -17,11 +17,6 @@ export const listOfOrderedProductionOEMReducer = (
       return payload;
     }
 
-    // case DELETE_PRODUCT_FROM_RESERVED_LIST: {
-    //   const newReservedProducts = listOfOrderedProduction.filter((el) => el.id !== payload);
-    //   return newReservedProducts;
-    // }
-
     default:
       return listOfOrderedProductionOEM;
   }

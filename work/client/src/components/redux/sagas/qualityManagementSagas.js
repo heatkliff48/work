@@ -1,5 +1,4 @@
 import showErrorMessage from '../../Utils/showErrorMessage';
-import { setToken } from '../actions/jwtAction';
 import {
   ADD_NEW_QUALITY_MANAGEMENT_DATA,
   DELETE_QUALITY_MANAGEMENT_DATA,
@@ -11,7 +10,7 @@ import {
   UPDATE_NEW_QUALITY_MANAGEMENT_DATA,
 } from '../types/qualityManagementTypes';
 import axios from 'axios';
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, takeLatest } from 'redux-saga/effects';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,

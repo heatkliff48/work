@@ -1,11 +1,9 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { createContext, useContext } from 'react';
+import { useSelector } from 'react-redux';
 
 const StatisticContext = createContext();
 
 const StatisticContextProvider = ({ children }) => {
-  const dispatch = useDispatch();
-
   const COLUMNS_STOCK_BALANCE = [
     {
       Header: 'Product type',

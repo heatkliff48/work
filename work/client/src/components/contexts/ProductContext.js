@@ -1,5 +1,5 @@
-import { createContext, useContext, useMemo, useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { createContext, useContext, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import {
   DropdownFilter,
   NumberRangeColumnFilter,
@@ -11,7 +11,6 @@ const ProductsContext = createContext();
 
 export const ProductsContextProvider = ({ children }) => {
   const products = useSelector((state) => state.products);
-  const dispatch = useDispatch();
 
   const TABLE_COLUMNS = [
     {
@@ -437,8 +436,6 @@ export const ProductsContextProvider = ({ children }) => {
         latestProducts,
         selectOptions,
         getOptionValue,
-        // rightTypeOfPackagingFunc,
-        // rightPlaceOfProductionFunc,
       }}
     >
       {children}

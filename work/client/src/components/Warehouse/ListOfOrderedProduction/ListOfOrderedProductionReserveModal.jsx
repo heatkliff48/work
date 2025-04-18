@@ -34,7 +34,7 @@ function ListOfOrderedProductionReserveModal({
   const [remainsToReserve, setRemainsToReserve] = useState(-1);
 
   const handleReserveOrderedProduct = (product) => {
-    const { quantity, product_article, order_article } = currentOrderedProduct;
+    const { product_article, order_article } = currentOrderedProduct;
 
     const warehouse = warehouse_data.find(
       (warehouse) => warehouse.article === product.article

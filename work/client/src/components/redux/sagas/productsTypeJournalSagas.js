@@ -1,7 +1,6 @@
 import showErrorMessage from '../../Utils/showErrorMessage';
-import { setToken } from '../actions/jwtAction';
 import axios from 'axios';
-import { put, call, takeLatest, select } from 'redux-saga/effects';
+import { put, call, takeLatest } from 'redux-saga/effects';
 import {
   ADD_NEW_ANCHOR,
   ADD_NEW_DRY_MIXES_JOURNAL,
@@ -98,16 +97,11 @@ const addNewTool = (tool) => {
     .catch(showErrorMessage);
 };
 
-function* getDryMixesJournalWorker(action) {
+function* getDryMixesJournalWorker() {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-    // const { allClients, accessToken, accessTokenExpiration } = yield call(
     const { dryMixesJournal } = yield call(getDryMixesJournal);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: FULL_DRY_MIXES_JOURNAL, payload: dryMixesJournal });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: FULL_DRY_MIXES_JOURNAL, payload: [] });
   }
@@ -115,32 +109,22 @@ function* getDryMixesJournalWorker(action) {
 
 function* addNewDryMixesJournalWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { client, accessToken, accessTokenExpiration } = yield call(
     const { dryMixesJournal } = yield call(addNewDryMixesJournal, action.payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_DRY_MIXES_JOURNAL, payload: dryMixesJournal });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_DRY_MIXES_JOURNAL, payload: [] });
   }
 }
 
-function* getRelatedMaterialsJournalWorker(action) {
+function* getRelatedMaterialsJournalWorker() {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-    // const { allClients, accessToken, accessTokenExpiration } = yield call(
     const { relatedMaterialsJournal } = yield call(getRelatedMaterialsJournal);
-
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({
       type: FULL_RELATED_MATERIALS_JOURNAL,
       payload: relatedMaterialsJournal,
     });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: FULL_RELATED_MATERIALS_JOURNAL, payload: [] });
   }
@@ -148,35 +132,25 @@ function* getRelatedMaterialsJournalWorker(action) {
 
 function* addNewRelatedMaterialsJournalWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { client, accessToken, accessTokenExpiration } = yield call(
     const { relatedMaterialsJournal } = yield call(
       addNewRelatedMaterialsJournal,
       action.payload
     );
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({
       type: NEW_RELATED_MATERIALS_JOURNAL,
       payload: relatedMaterialsJournal,
     });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_RELATED_MATERIALS_JOURNAL, payload: [] });
   }
 }
 
-function* getAnchorWorker(action) {
+function* getAnchorWorker() {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-    // const { allClients, accessToken, accessTokenExpiration } = yield call(
     const { anchor } = yield call(getAnchor);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: FULL_ANCHOR, payload: anchor });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: FULL_ANCHOR, payload: [] });
   }
@@ -184,29 +158,19 @@ function* getAnchorWorker(action) {
 
 function* addNewAnchorWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { client, accessToken, accessTokenExpiration } = yield call(
     const { anchor } = yield call(addNewAnchor, action.payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_ANCHOR, payload: anchor });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_ANCHOR, payload: [] });
   }
 }
 
-function* getToolWorker(action) {
+function* getToolWorker() {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-    // const { allClients, accessToken, accessTokenExpiration } = yield call(
     const { tool } = yield call(getTool);
 
-    // window.localStorage.setItem('jwt', accessToken);
-
     yield put({ type: FULL_TOOL, payload: tool });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: FULL_TOOL, payload: [] });
   }
@@ -214,14 +178,9 @@ function* getToolWorker(action) {
 
 function* addNewToolWorker(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
-
-    // const { client, accessToken, accessTokenExpiration } = yield call(
     const { tool } = yield call(addNewTool, action.payload);
-    // window.localStorage.setItem('jwt', accessToken);
 
     yield put({ type: NEW_TOOL, payload: tool });
-    // yield put(setToken(accessToken, accessTokenExpiration));
   } catch (err) {
     yield put({ type: NEW_TOOL, payload: [] });
   }

@@ -1,9 +1,3 @@
-import FilesMain from '#components/FileUpload/Product/FilesMain.jsx';
-import { useProjectContext } from '#components/contexts/Context.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import ModalWindow from './ModalWindow';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
@@ -18,18 +12,48 @@ import {
   ModalFooter,
   ModalHeader,
 } from 'reactstrap';
+import FilesMain from '#components/FileUpload/Product/FilesMain.jsx';
+import { useProjectContext } from '#components/contexts/Context.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useStatisticContext } from '#components/contexts/StatisticContext.js';
+import ModalWindow from './ModalWindow';
 import BarcodeGenerator from './BarcodeGenerator';
 
 const ProductCardModal = React.memo(() => {
-  const { productCardData, setProductCardData } = useProjectContext();
-  const { modalProductCard, setModalProductCard } = useModalContext();
-  const { COLUMNS, selectOptions, getOptionValue } = useProductsContext();
   const { userAccess } = useUsersContext();
+  const { productsOfOrders } = useOrderContext();
+  const { stock_balance } = useStatisticContext();
+  const { COLUMNS, selectOptions, getOptionValue } = useProductsContext();
+  const {
+    productCardData,
+    setProductCardData,
+    isRepair,
+    setIsRepair,
+    isEdit,
+    setIsEdit,
+  } = useProjectContext();
+  const {
+    warehouse_data,
+    list_of_ordered_production,
+    list_of_ordered_production_oem,
+  } = useWarehouseContext();
+  const {
+    modalProductCard,
+    setModalProductCard,
+    isModalWindowOpen,
+    setIsModalWindowOpen,
+  } = useModalContext();
+
+  const productionBatchLog = useSelector((state) => state.productionBatchLog);
+  const qualityManagementData = useSelector((state) => state.qualityManagementData);
 
   const [lastVersion, setLastVersion] = useState(1);
-  const [isModalWindowOpen, setIsModalWindowOpen] = useState(false);
+  const [repairButton, setRepairButton] = useState(true);
   const [productByVersion, setProductByVersion] = useState();
-  const [selectedVersion, setSelectedVersion] = useState(null);
   const products = useSelector((state) => state.products);
 
   const memoizedArticle = (prod) => {
@@ -45,25 +69,6 @@ const ProductCardModal = React.memo(() => {
       typeOfPackaging,
       palletSize,
     } = prod;
-
-    // Old article
-
-    // let newArticle = '';
-    // let versionNumber = '0001';
-
-    // versionNumber = `000${version}`.slice(-4);
-    // const miniWidth = width?.toString().slice(0, 2);
-    // const miniHeight = height?.toString().slice(0, 2);
-    // const miniLengths = lengths?.toString().slice(0, 2);
-    // const miniPlaceOfProduction = placeOfProduction?.slice(0, 1);
-    // const miniTypeOfPackaging = typeOfPackaging?.slice(0, 1);
-
-    // newArticle = `T.${form?.toUpperCase()}${certificate?.substr(
-    //   0,
-    //   1
-    // )}${miniPlaceOfProduction}${miniTypeOfPackaging}0${density}${miniWidth}${miniHeight}${miniLengths}${versionNumber}`;
-
-    // ---
 
     let versionNumber = '0001';
     versionNumber = `000${version}`.slice(-4);
@@ -91,8 +96,6 @@ const ProductCardModal = React.memo(() => {
   };
 
   const handleSelectChange = (selectedOption) => {
-    setSelectedVersion(selectedOption.value);
-
     // Найти продукт с выбранной версией
     const selectedProduct = products.find(
       (product) =>
@@ -135,6 +138,49 @@ const ProductCardModal = React.memo(() => {
   }, [modalProductCard]);
 
   useEffect(() => {
+    const { id, article } = productCardData;
+    const have_product_poo = productsOfOrders.find((el) => el.product_id == id);
+    const have_product_whd = warehouse_data.find(
+      (el) => el.product_article == article
+    );
+    const have_product_pb = productionBatchLog.find(
+      (el) => el.product_article == article
+    );
+    const have_product_loop = list_of_ordered_production.find(
+      (el) => el.product_article == article
+    );
+    const have_product_loopoem = list_of_ordered_production_oem.find(
+      (el) => el.product_article == article
+    );
+    const have_product_sb = stock_balance.find(
+      (el) => el.product_article == article
+    );
+    const have_product_qmd = qualityManagementData.find(
+      (el) => el.product_article == article
+    );
+    const rep_dis =
+      have_product_poo ||
+      have_product_whd ||
+      have_product_pb ||
+      have_product_loop ||
+      have_product_loopoem ||
+      have_product_sb ||
+      have_product_qmd
+        ? true
+        : false;
+
+    setRepairButton(rep_dis);
+  }, [
+    productsOfOrders,
+    warehouse_data,
+    productionBatchLog,
+    list_of_ordered_production,
+    list_of_ordered_production_oem,
+    stock_balance,
+    qualityManagementData,
+  ]);
+
+  useEffect(() => {
     const searchArticle = productCardData.article
       ? productCardData.article.slice(0, productCardData.article.length)
       : '';
@@ -163,7 +209,6 @@ const ProductCardModal = React.memo(() => {
           <div className="product_card_header">
             <div>
               <div>Article</div>
-              {/* productCardData.article */}
               <div className="product_article">
                 {memoizedArticle(productCardData)}
               </div>
@@ -189,7 +234,7 @@ const ProductCardModal = React.memo(() => {
                 el.accessor === 'version'
               )
                 return null;
-              if (el.accessor != 'productCode')
+              if (el.accessor !== 'productCode')
                 return (
                   <Card
                     className="my-2"
@@ -224,14 +269,31 @@ const ProductCardModal = React.memo(() => {
         <ModalFooter>
           <div className="product_card">
             {userAccess?.canWrite && (
-              <Button
-                color="success"
-                onClick={() => {
-                  setIsModalWindowOpen(true);
-                }}
-              >
-                Edit
-              </Button>
+              <div className="product_card_btn">
+                <Button
+                  color="success"
+                  style={{ width: '100%' }}
+                  onClick={() => {
+                    setIsRepair(false);
+                    setIsEdit(true);
+                    setIsModalWindowOpen(true);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  style={{ width: '100%' }}
+                  color="success"
+                  onClick={() => {
+                    setIsRepair(true);
+                    setIsEdit(false);
+                    setIsModalWindowOpen(true);
+                  }}
+                  disabled={repairButton}
+                >
+                  Repair
+                </Button>
+              </div>
             )}
             {isModalWindowOpen && (
               <ModalWindow
@@ -239,10 +301,19 @@ const ProductCardModal = React.memo(() => {
                 formData={productCardData}
                 isOpen={isModalWindowOpen}
                 toggle={() => setIsModalWindowOpen(false)}
+                isRepair={isRepair}
+                isEdit={isEdit}
               />
             )}
-            <Button color="primary" disabled>
-              Add
+            <Button
+              color="primary"
+              onClick={() => {
+                setIsRepair(false);
+                setIsEdit(false);
+                setIsModalWindowOpen(true);
+              }}
+            >
+              Duplicate
             </Button>
           </div>
         </ModalFooter>

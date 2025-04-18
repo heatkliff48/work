@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { DropdownFilter, TextSearchFilter } from '#components/Table/filters.js';
 
@@ -214,17 +214,23 @@ const ProjectContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
 
-  const [promProduct, setPromProduct] = useState(null);
-  const [productCardData, setProductCardData] = useState({});
+  const [currentContact, setCurrentContact] = useState();
+  const [currentDelivery, setCurrentDelivery] = useState();
+  const [previewProductData, setPreviewProductData] = useState();
+  const [previewOperationName, setPreviewOperationName] = useState('');
+
   const [version, setVersion] = useState(1);
   const [roleId, setRoleId] = useState(0);
   const [currentClientID, setClientID] = useState(1);
-  const [stayDefault, setStayDefault] = useState(true);
+
   const isCheckedAuth = useRef(false);
-  const [clientsDataList, setClientsDataList] = useState([]);
+  const [isEdit, setIsEdit] = useState(false);
+  const [isRepair, setIsRepair] = useState(false);
+  const [stayDefault, setStayDefault] = useState(true);
+
   const [currentClient, setCurrentClient] = useState({});
-  const [currentDelivery, setCurrentDelivery] = useState();
-  const [currentContact, setCurrentContact] = useState();
+  const [clientsDataList, setClientsDataList] = useState([]);
+  const [productCardData, setProductCardData] = useState({});
   const [currentUsersInfo, setCurrentUsersInfo] = useState({});
   const [usersInfoDataList, setUsersInfoDataList] = useState([]);
   const [productionBatchLogData, setProductionBatchLogData] = useState([]);
@@ -265,8 +271,6 @@ const ProjectContextProvider = ({ children }) => {
         WAREHOUSE_MANAGER_TABLE,
         user,
         displayNames,
-        promProduct,
-        setPromProduct,
         version,
         setVersion,
         currentClientID,
@@ -298,6 +302,14 @@ const ProjectContextProvider = ({ children }) => {
         production_batch_log,
         productionBatchLogData,
         setProductionBatchLogData,
+        isRepair,
+        setIsRepair,
+        isEdit,
+        setIsEdit,
+        previewProductData,
+        setPreviewProductData,
+        previewOperationName,
+        setPreviewOperationName,
       }}
     >
       {children}

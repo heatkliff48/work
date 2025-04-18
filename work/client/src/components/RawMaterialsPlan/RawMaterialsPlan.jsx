@@ -35,22 +35,6 @@ function RawMaterialsPlan() {
     { name: 'Condensate', title: 'condensate', remaining: 0 },
   ];
 
-  const raw_materials_table = [
-    { Header: 'Sand', accessor: 'sand' },
-    { Header: 'Lime Lhoist', accessor: 'lime_lhoist' },
-    { Header: 'Lime Barcelona', accessor: 'lime_barcelona' },
-    { Header: 'Cement', accessor: 'cement' },
-    { Header: 'Gypsum', accessor: 'gypsum' },
-    { Header: 'Alu 1', accessor: 'alu_1' },
-    { Header: 'Alu 2', accessor: 'alu_2' },
-    { Header: 'Return slurry - solids', accessor: 'return_slurry_solids' },
-    { Header: 'Return slurry - water', accessor: 'return_slurry_water' },
-    { Header: 'Water', accessor: 'water' },
-    { Header: 'Water cold', accessor: 'water_cold' },
-    { Header: 'Water hot', accessor: 'water_hot' },
-    { Header: 'Condensate', accessor: 'condensate' },
-  ];
-
   const handleOrderShareChange = (name, value) => {
     setManualOrderShare((prev) => ({ ...prev, [name]: parseFloat(value) || 0 }));
   };

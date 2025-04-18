@@ -13,13 +13,19 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
+import PreviewProductCardModal from './modal/PreviewProductCardModal';
 
 function Products() {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-  const { modal, setModal, modalProductCard, setModalProductCard } =
-    useModalContext();
+  const {
+    modal,
+    setModal,
+    modalProductCard,
+    setModalProductCard,
+    previewProductModal,
+  } = useModalContext();
   const { TABLE_COLUMNS, COLUMNS, latestProducts } = useProductsContext();
-  const { setProductCardData } = useProjectContext();
+  const { setProductCardData, previewOperationName } = useProjectContext();
 
   const columns = useMemo(() => TABLE_COLUMNS, []);
   const data = useMemo(() => latestProducts ?? [], [latestProducts]);
@@ -127,6 +133,10 @@ function Products() {
           toggle={() => setModal(!modal)}
         />
       )}
+      {previewProductModal && (
+        <PreviewProductCardModal previewOperationName={previewOperationName} />
+      )}
+
       {modalProductCard && <ProductCardModal />}
       <h1>Blocks journal</h1>
       {userAccess?.canWrite && (
