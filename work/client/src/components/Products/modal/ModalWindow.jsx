@@ -580,6 +580,7 @@ const ModalWindow = React.memo(
                 updateProductHandler();
                 setModalProductCard(false);
                 setStayDefault(true);
+                setVersion(1)
                 clearData();
                 toggle();
               }}

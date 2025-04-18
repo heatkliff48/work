@@ -107,7 +107,6 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
     setPreviewProductModal(!previewProductModal);
     setPreviewOperationName('');
   };
-  console.log('previewProductData', previewProductData);
 
   return (
     <div>
@@ -139,7 +138,7 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
                     el.label == previewProductData[accessor] ||
                     el.value == previewProductData[accessor]
                 )?.label;
-                console.log('data', data);
+
                 return (
                   <Card
                     className="my-2"
