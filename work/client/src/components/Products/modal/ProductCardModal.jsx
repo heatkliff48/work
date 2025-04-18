@@ -104,18 +104,31 @@ const ProductCardModal = React.memo(() => {
     );
 
     if (selectedProduct) {
+      console.log('selectedProduct', selectedProduct);
       // Обновить productCardData с новой версией
+
       setProductCardData({
         ...selectedProduct,
-        placeOfProduction:
-          selectOptions.placeOfProduction?.find(
-            (place) => place.value == selectedProduct.placeOfProduction
-          )?.label || selectedProduct.placeOfProduction,
-        typeOfPackaging:
-          selectOptions.typeOfPackaging?.find(
-            (place) => place.value == selectedProduct.typeOfPackaging
-          )?.label || selectedProduct.typeOfPackaging,
-        // article: memoizedArticle(selectedProduct),
+        placeOfProduction: selectOptions.placeOfProduction.find(
+          (el) =>
+            el.label == selectedProduct.placeOfProduction ||
+            el.value == selectedProduct.placeOfProduction
+        )?.label,
+        typeOfPackaging: selectOptions.typeOfPackaging.find(
+          (el) =>
+            el.label == selectedProduct.typeOfPackaging ||
+            el.value == selectedProduct.typeOfPackaging
+        )?.label,
+        palletSize: selectOptions.palletSize.find(
+          (el) =>
+            el.label == selectedProduct.palletSize ||
+            el.value == selectedProduct.palletSize
+        )?.label,
+        palletHeight: selectOptions.palletHeight.find(
+          (el) =>
+            el.label == selectedProduct.palletHeight ||
+            el.value == selectedProduct.palletHeight
+        )?.label,
       });
     }
   };
