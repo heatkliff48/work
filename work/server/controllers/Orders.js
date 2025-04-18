@@ -201,7 +201,7 @@ class OrdersController {
   }
 
   static async getDeleteDryMixedProductOfOrder(req, res) {
-    const { product_id } = req.body;
+    const product_id = req.body.dry_mixed_id;
 
     try {
       await OrdersService.getDeleteDryMixedProductOfOrder({
@@ -216,7 +216,7 @@ class OrdersController {
   }
 
   static async getDeleteAnchorProductOfOrder(req, res) {
-    const { product_id } = req.body;
+    const product_id = req.body.anchor_id;
 
     try {
       await OrdersService.getDeleteAnchorProductOfOrder({
@@ -231,7 +231,7 @@ class OrdersController {
   }
 
   static async getDeleteToolProductOfOrder(req, res) {
-    const { product_id } = req.body;
+    const product_id = req.body.tool_id;
 
     try {
       await OrdersService.getDeleteToolProductOfOrder({

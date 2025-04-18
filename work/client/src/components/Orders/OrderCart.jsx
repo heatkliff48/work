@@ -37,6 +37,11 @@ import DryMixesJournalTableOrder from './product_table_order/DryMixesJournalTabl
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import AnchorJournalTableOrder from './product_table_order/AnchorJournalTableOrder.jsx';
 import ToolJournalTableOrder from './product_table_order/ToolJournalTableOrder.jsx';
+import {
+  getDeleteAnchorProductOfOrder,
+  getDeleteDryMixedProductOfOrder,
+  getDeleteToolProductOfOrder,
+} from '#components/redux/actions/ordersAction.js';
 
 const OrderCart = React.memo(() => {
   const {
@@ -467,9 +472,17 @@ const OrderCart = React.memo(() => {
 
   const deleteHandler = (product) => {
     const res_prod = list_of_reserved_products.find((el) => el.id === product.id);
-
+    console.log('product', product);
     if (res_prod) alert('Этот продукт зарервировван на складе');
-    dispatch(getDeleteProductOfOrder(product?.id));
+    if (product?.product_article.charAt(0) === 'T') {
+      dispatch(getDeleteProductOfOrder(product?.id));
+    } else if (product?.product_article.charAt(2) === 'M') {
+      dispatch(getDeleteDryMixedProductOfOrder(product?.id));
+    } else if (product?.product_article.charAt(2) === 'F') {
+      dispatch(getDeleteAnchorProductOfOrder(product?.id));
+    } else if (product?.product_article.charAt(2) === 'T') {
+      dispatch(getDeleteToolProductOfOrder(product?.id));
+    }
   };
 
   useEffect(() => {
