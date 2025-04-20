@@ -51,6 +51,9 @@ module.exports = {
       active_status: {
         type: Sequelize.BOOLEAN,
       },
+      version: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -157,8 +157,6 @@ function ProductsTypeJournalModal(props) {
     const defaultCountry = placeOfProductionOptions.find(
       (opt) => opt.value === 'ES'
     );
-    console.log('placeOfProductionOptions', placeOfProductionOptions);
-    // console.log('defaultCountry', defaultCountry);
 
     setProductsTypeJournalInput((prev) => ({
       ...prev,
@@ -172,13 +170,27 @@ function ProductsTypeJournalModal(props) {
           : `T`
       }${props?.productCode}`,
       units_of_measurement: unitsOfMeasurementOptions[0].value,
-      type_of_mix: typeOfMixOptions[0].value,
+      ...(props.target == 1 && { type_of_mix: typeOfMixOptions[0].value }), // Добавляем только если условие true
       place_of_production:
         defaultCountry?.value || placeOfProductionOptions[0].value,
       product_code: props?.productCode,
       active_status: true,
+      version: 1,
     }));
   }, [props.show]);
+
+  function hasMatchingObject(array, newObj, excludedAttrs) {
+    return array.findLast((item) => {
+      // Получаем все ключи нового объекта, исключая указанные атрибуты
+      const keys = Object.keys(newObj).filter((key) => !excludedAttrs.includes(key));
+      // Проверяем, что все соответствующие значения совпадают
+      return keys.every((key) => {
+        // Проверяем, что ключ существует в объекте из массива
+        // и его значение совпадает со значением в новом объекте
+        return item.hasOwnProperty(key) && item[key] == newObj[key];
+      });
+    });
+  }
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
@@ -198,11 +210,37 @@ function ProductsTypeJournalModal(props) {
       if (Object.keys(newErrors).length > 0) {
         return;
       }
-      dispatch(
-        addNewDryMixesJournal({
-          productsTypeJournalInput,
-        })
+
+      const existingProduct = hasMatchingObject(
+        dryMixesJournal,
+        productsTypeJournalInput,
+        [
+          'price_per_unit',
+          'price_per_kilogram',
+          'description',
+          'article',
+          'product_code',
+          'active_status',
+          'version',
+        ]
       );
+
+      if (existingProduct) {
+        dispatch(
+          addNewDryMixesJournal({
+            ...productsTypeJournalInput,
+            article: existingProduct.article,
+            version: existingProduct.version + 1,
+            product_code: existingProduct.product_code,
+          })
+        );
+      } else {
+        dispatch(
+          addNewDryMixesJournal({
+            ...productsTypeJournalInput,
+          })
+        );
+      }
     } else if (props.target == 2) {
       requiredFieldsRelatedMaterial.forEach((field) => {
         const value = productsTypeJournalInput[field];
@@ -216,11 +254,38 @@ function ProductsTypeJournalModal(props) {
       if (Object.keys(newErrors).length > 0) {
         return;
       }
-      dispatch(
-        addNewRelatedMaterialsJournal({
-          productsTypeJournalInput,
-        })
+
+      const existingProduct = hasMatchingObject(
+        relatedMaterialsJournal,
+        productsTypeJournalInput,
+        [
+          'price_per_unit',
+          'description',
+          'article',
+          'product_code',
+          'active_status',
+          'version',
+        ]
       );
+
+      console.log(existingProduct);
+
+      if (existingProduct) {
+        dispatch(
+          addNewRelatedMaterialsJournal({
+            ...productsTypeJournalInput,
+            article: existingProduct.article,
+            version: existingProduct.version + 1,
+            product_code: existingProduct.product_code,
+          })
+        );
+      } else {
+        dispatch(
+          addNewRelatedMaterialsJournal({
+            ...productsTypeJournalInput,
+          })
+        );
+      }
     } else if (props.target == 3) {
       requiredFieldsAnchors.forEach((field) => {
         const value = productsTypeJournalInput[field];
@@ -234,11 +299,32 @@ function ProductsTypeJournalModal(props) {
       if (Object.keys(newErrors).length > 0) {
         return;
       }
-      dispatch(
-        addNewAnchor({
-          productsTypeJournalInput,
-        })
-      );
+
+      const existingProduct = hasMatchingObject(anchor, productsTypeJournalInput, [
+        'price_per_unit',
+        'description',
+        'article',
+        'product_code',
+        'active_status',
+        'version',
+      ]);
+
+      if (existingProduct) {
+        dispatch(
+          addNewAnchor({
+            ...productsTypeJournalInput,
+            article: existingProduct.article,
+            version: existingProduct.version + 1,
+            product_code: existingProduct.product_code,
+          })
+        );
+      } else {
+        dispatch(
+          addNewAnchor({
+            ...productsTypeJournalInput,
+          })
+        );
+      }
     } else if (props.target == 4) {
       requiredFieldsTools.forEach((field) => {
         const value = productsTypeJournalInput[field];
@@ -252,11 +338,32 @@ function ProductsTypeJournalModal(props) {
       if (Object.keys(newErrors).length > 0) {
         return;
       }
-      dispatch(
-        addNewTool({
-          productsTypeJournalInput,
-        })
-      );
+
+      const existingProduct = hasMatchingObject(tool, productsTypeJournalInput, [
+        'price_per_unit',
+        'description',
+        'article',
+        'product_code',
+        'active_status',
+        'version',
+      ]);
+
+      if (existingProduct) {
+        dispatch(
+          addNewTool({
+            ...productsTypeJournalInput,
+            article: existingProduct.article,
+            version: existingProduct.version + 1,
+            product_code: existingProduct.product_code,
+          })
+        );
+      } else {
+        dispatch(
+          addNewTool({
+            ...productsTypeJournalInput,
+          })
+        );
+      }
     }
 
     // setModalShow(false);
@@ -309,7 +416,7 @@ function ProductsTypeJournalModal(props) {
                         }}
                         options={unitsOfMeasurementOptions}
                       />
-                    ) : el.accessor === 'type_of_mix' ? (
+                    ) : el.accessor === 'type_of_mix' && props.target == 1 ? (
                       <Select
                         defaultValue={getSelectedTypeOfMixOption(el.accessor)}
                         onChange={(v) => {

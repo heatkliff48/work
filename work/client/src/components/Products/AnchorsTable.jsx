@@ -24,11 +24,12 @@ const AnchorsTable = () => {
     placeOfProductionOptions,
     setSelectedProductsType,
     setDataTable,
+    latestAnchors,
   } = useProductsTypeJournalContext();
 
   useEffect(() => {
-    if (anchor) {
-      const newData = anchor.map((piece) => {
+    if (latestAnchors) {
+      const newData = latestAnchors.map((piece) => {
         return {
           ...piece,
           units_of_measurement:
@@ -47,11 +48,11 @@ const AnchorsTable = () => {
       code = `2` + `0000${articleId}`.slice(-4);
       setProductCode(code);
     }
-  }, [anchor]);
+  }, [latestAnchors]);
 
   const anchorHandler = (id) => {
     setDataTable(COLUMNS_ANCHOR_PRODUCT);
-    const selectedAnchor = anchor.find((el) => el.id === id);
+    const selectedAnchor = latestAnchors.find((el) => el.id === id);
     setSelectedProductsType(selectedAnchor);
     setModalShow(true);
   };

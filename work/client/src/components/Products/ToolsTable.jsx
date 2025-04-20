@@ -24,11 +24,12 @@ const ToolsTable = () => {
     placeOfProductionOptions,
     setSelectedProductsType,
     setDataTable,
+    latestTools,
   } = useProductsTypeJournalContext();
 
   useEffect(() => {
-    if (tool) {
-      const newData = tool.map((piece) => {
+    if (latestTools) {
+      const newData = latestTools.map((piece) => {
         return {
           ...piece,
           units_of_measurement:
@@ -47,11 +48,11 @@ const ToolsTable = () => {
       code = `3` + `0000${articleId}`.slice(-4);
       setProductCode(code);
     }
-  }, [tool]);
+  }, [latestTools]);
 
   const toolHandler = (id) => {
     setDataTable(COLUMNS_TOOLS_PRODUCT);
-    const selectedTool = tool.find((el) => el.id === id);
+    const selectedTool = latestTools.find((el) => el.id === id);
     setSelectedProductsType(selectedTool);
     setModalShow(true);
   };

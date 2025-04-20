@@ -33,7 +33,8 @@ relatedMaterialsJournalRouter.post('/', async (req, res) => {
     price_per_unit,
     product_code,
     active_status,
-  } = req.body.productsTypeJournalInput;
+    version,
+  } = req.body;
 
   try {
     const relatedMaterialsJournal = await RelatedMaterialsJournal.create({
@@ -46,6 +47,7 @@ relatedMaterialsJournalRouter.post('/', async (req, res) => {
       price_per_unit,
       product_code,
       active_status,
+      version,
     });
 
     myEmitter.emit(
@@ -71,6 +73,7 @@ relatedMaterialsJournalRouter.post('/update', async (req, res) => {
     price_per_unit,
     product_code,
     active_status,
+    version,
   } = req.body;
 
   try {
@@ -85,6 +88,7 @@ relatedMaterialsJournalRouter.post('/update', async (req, res) => {
         price_per_unit,
         product_code,
         active_status,
+        version,
       },
       {
         where: {

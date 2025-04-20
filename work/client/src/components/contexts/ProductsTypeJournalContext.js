@@ -1,6 +1,5 @@
-
 import { TextSearchFilter, DropdownFilter } from '#components/Table/filters.js';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { FaCheck, FaTimes } from 'react-icons/fa';
@@ -293,6 +292,66 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
   const anchor = useSelector((state) => state.anchor);
   const tool = useSelector((state) => state.tool);
 
+  // Старый вариант, где порядок не важен
+
+  // function getLatestAuxilaryProducts(products) {
+  //   const newProductList = products?.reduce((acc, product) => {
+  //     const { article, version } = product;
+  //     const existingProduct = acc.find((p) => p.article === article);
+  //     if (!existingProduct) {
+  //       acc.push(product);
+  //     } else if (version > existingProduct.version) {
+  //       acc = acc.map((p) => (p.article === article ? product : p));
+  //     }
+  //     return acc;
+  //   }, []);
+
+  //   newProductList?.sort((a, b) => a.id - b.id);
+
+  //   return newProductList;
+  // }
+
+  function getLatestAuxilaryProducts(products) {
+    // Сначала находим последние версии всех продуктов
+    const latestVersionsMap = products?.reduce((acc, product) => {
+      const { article, version } = product;
+      if (!acc.has(article) || version > acc.get(article).version) {
+        acc.set(article, product);
+      }
+      return acc;
+    }, new Map());
+
+    // Фильтруем исходный массив, оставляя только первое вхождение каждого артикула,
+    // но заменяем его на последнюю версию из latestVersionsMap
+    const uniqueProductsInOriginalOrder = products
+      ?.filter((product, index, self) => {
+        // Оставляем только первое вхождение артикула в исходном массиве
+        return self.findIndex((p) => p.article === product.article) === index;
+      })
+      .map((product) => {
+        // Заменяем продукт на его последнюю версию из мапы
+        return latestVersionsMap.get(product.article);
+      });
+
+    return uniqueProductsInOriginalOrder || [];
+  }
+
+  const latestDryMix = useMemo(() => {
+    return getLatestAuxilaryProducts(dryMixesJournal);
+  }, [dryMixesJournal]);
+
+  const latestRelatedMaterials = useMemo(() => {
+    return getLatestAuxilaryProducts(relatedMaterialsJournal);
+  }, [relatedMaterialsJournal]);
+
+  const latestAnchors = useMemo(() => {
+    return getLatestAuxilaryProducts(anchor);
+  }, [anchor]);
+
+  const latestTools = useMemo(() => {
+    return getLatestAuxilaryProducts(tool);
+  }, [tool]);
+
   return (
     <ProductsTypeJournalContext.Provider
       value={{
@@ -311,6 +370,10 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
         relatedMaterialsJournal,
         anchor,
         tool,
+        latestDryMix,
+        latestRelatedMaterials,
+        latestAnchors,
+        latestTools,
       }}
     >
       {children}

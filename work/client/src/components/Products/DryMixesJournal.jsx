@@ -26,11 +26,12 @@ const DryMixesJournal = () => {
     placeOfProductionOptions,
     setSelectedProductsType,
     setDataTable,
+    latestDryMix,
   } = useProductsTypeJournalContext();
 
   useEffect(() => {
-    if (dryMixesJournal) {
-      const newData = dryMixesJournal.map((dry) => {
+    if (latestDryMix) {
+      const newData = latestDryMix.map((dry) => {
         return {
           ...dry,
           units_of_measurement:
@@ -53,11 +54,11 @@ const DryMixesJournal = () => {
       code = `1` + `0000${articleId}`.slice(-4);
       setProductCode(code);
     }
-  }, [dryMixesJournal]);
+  }, [latestDryMix]);
 
   const dryMixesJournalHandler = (id) => {
     setDataTable(COLUMNS_DRY_MIXED_PRODUCT);
-    const dryMix = dryMixesJournal.find((el) => el.id === id);
+    const dryMix = latestDryMix.find((el) => el.id === id);
     setSelectedProductsType(dryMix);
     setModalShow(true);
   };

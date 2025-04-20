@@ -29,11 +29,12 @@ const RelatedMaterialsJournal = () => {
     setSelectedProductsType,
     dataTable,
     setDataTable,
+    latestRelatedMaterials,
   } = useProductsTypeJournalContext();
 
   useEffect(() => {
-    if (relatedMaterialsJournal) {
-      setRelatedMaterialsJournalDataList(relatedMaterialsJournal);
+    if (latestRelatedMaterials) {
+      setRelatedMaterialsJournalDataList(latestRelatedMaterials);
       let code = '0001';
       const articleId =
         relatedMaterialsJournal.length === 0
@@ -42,11 +43,11 @@ const RelatedMaterialsJournal = () => {
       code = `4` + `0000${articleId}`.slice(-4);
       setProductCode(code);
     }
-  }, [relatedMaterialsJournal]);
+  }, [latestRelatedMaterials]);
 
   const relatedMaterialsJournalHandler = (id) => {
     setDataTable(COLUMNS_RELATED_MATERIALS_JOURNAL);
-    const relatedMaterial = relatedMaterialsJournal.find((el) => el.id === id);
+    const relatedMaterial = latestRelatedMaterials.find((el) => el.id === id);
     setSelectedProductsType(relatedMaterial);
     setModalShow(true);
   };
