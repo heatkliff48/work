@@ -109,12 +109,12 @@ const ModalWindow = React.memo(
       )?.version;
 
       if (isRepair) {
-        //const prevName = isExistingProduct ? 'edit' : 'repair';
-        setPreviewOperationName('repair');
+        const prevName = isExistingProduct ? 'edit' : 'repair';
+        setPreviewOperationName(prevName);
 
         if (isExistingProduct) {
           updatedProduct.version = lastVersion + 1;
-          updatedProduct.productCode = existingProduct.productCode;
+          updatedProduct.productCode  = existingProduct.productCode
         }
 
         setPreviewProductData(updatedProduct);
