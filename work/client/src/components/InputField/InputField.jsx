@@ -40,7 +40,7 @@ const InputField = React.memo(({ el, inputValue, inputValueChange, isDisabled })
         id={el.accessor}
         name={el.accessor}
         value={inputValue[el.accessor] || ''}
-        readOnly={isDisabled}
+        disabled={isDisabled}
         onChange={(e) => {
           if (regexp.test(e.target.value)) inputChangeHandler(e);
         }}
