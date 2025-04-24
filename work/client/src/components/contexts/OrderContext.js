@@ -3,6 +3,7 @@ import { DropdownFilter } from '#components/Table/filters';
 import {
   addAccountingDataList,
   getOrders,
+  updAccountingDataList,
 } from '#components/redux/actions/ordersAction.js';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -317,6 +318,23 @@ const OrderContextProvider = ({ children }) => {
   useEffect(() => {
     dispatch(getOrders());
   }, [isOrderReady]);
+
+  useEffect(() => {
+    list_of_orders.forEach((el) => {
+      const haveAproved = accDataList?.find(
+        (acc) => acc.orders_article == el.article
+      );
+
+      if (el.status == 7 && haveAproved?.aproved) {
+        dispatch(
+          updAccountingDataList({
+            orders_article: el?.article,
+            aproved: false,
+          })
+        );
+      }
+    });
+  }, [list_of_orders, accDataList]);
 
   useEffect(() => {
     const filteredUsersList = usersMainInfo.filter(

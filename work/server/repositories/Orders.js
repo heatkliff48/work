@@ -150,10 +150,6 @@ class OrdersRepository {
           'warehouse_id',
         ],
       });
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>product_list',
-        product_list
-      );
 
       return product_list;
     } catch (error) {

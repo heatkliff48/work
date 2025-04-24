@@ -123,7 +123,6 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
                     <input
-                      style={{ width: '50%' }}
                       type="text"
                       id={el.accessor}
                       name={el.accessor}
@@ -137,7 +136,6 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
                     <input
-                      style={{ width: '50%' }}
                       type="text"
                       id={el.accessor}
                       name={el.accessor}
@@ -151,7 +149,6 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
                     <input
-                      style={{ width: '50%' }}
                       type="text"
                       id={el.accessor}
                       name={el.accessor}
@@ -164,9 +161,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                 return (
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
-                    <input
-                      style={{ width: '50%' }}
-                      type="text"
+                    <input                      type="text"
                       id={el.accessor}
                       name={el.accessor}
                       value={final_price_value}

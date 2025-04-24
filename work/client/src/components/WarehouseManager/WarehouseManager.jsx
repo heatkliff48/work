@@ -13,7 +13,8 @@ function WarehouseManager() {
   //   useUsersContext();
   const { WAREHOUSE_MANAGER_TABLE } = useProjectContext();
   const { latestProducts } = useProductsContext();
-  const { setWmoctProductShippedBD } = useWarehouseContext();
+  const { setWmoctProductShippedBD, selectedOrder, setSelectedOrder } =
+    useWarehouseContext();
   const {
     list_of_orders,
     deliveryAddresses,
@@ -24,7 +25,6 @@ function WarehouseManager() {
   // const navigate = useNavigate();
 
   const [warehouseMdata, setWarehouseMdata] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
 
   // useEffect(() => {
   //   if (user && roles.length > 0) {
@@ -38,6 +38,8 @@ function WarehouseManager() {
   // }, [user, roles]);
 
   useEffect(() => {
+    setSelectedOrder(null);
+
     const result = list_of_orders
       .filter((el) => el.status === 8)
       .reduce((acc, el) => {
@@ -62,7 +64,6 @@ function WarehouseManager() {
 
     setWarehouseMdata(result);
     setWmoctProductShippedBD([]);
-
   }, [list_of_orders]);
 
   return (

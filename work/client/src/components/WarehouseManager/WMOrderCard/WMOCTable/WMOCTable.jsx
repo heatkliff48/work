@@ -37,11 +37,12 @@ const WMOCTable = ({ product_list, orderCartData }) => {
           const newBatches = wmoctItem.batches.map((el, i) => {
             if (i == batchIndex) {
               const { allocated, remainingInBatch } = el;
-              const canPlus = allocated == remainingInBatch;
-              const result = canPlus ? allocated : allocated + 1;
 
-              shipped = canPlus ? shipped : shipped + 1;
-              qty_rem = canPlus ? qty_rem : qty_rem - 1;
+              const canPlus = remainingInBatch > 0 && qty_rem > 0;
+              const result = canPlus ? allocated + 1 : allocated;
+
+              shipped = canPlus ? shipped + 1 : shipped;
+              qty_rem = canPlus ? qty_rem - 1 : qty_rem;
 
               return { ...el, allocated: result };
             }
@@ -88,10 +89,14 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     return wmoctProduct[i]?.batches?.length > 0;
   };
 
-  const isDisable = (article) => {
+  const isDisablePlus = (article) => {
     return wmoctProduct.some(
       (el) => el.article == article && el.qty_total == el.shipped
     );
+  };
+
+  const isDisableMinus = (article, batch) => {
+    return wmoctProduct.some((el) => el.article == article && batch.allocated == 0);
   };
 
   useEffect(() => {
@@ -206,13 +211,16 @@ const WMOCTable = ({ product_list, orderCartData }) => {
                       </td>
                       <td className="border p-1 text-center">
                         <button
-                          disabled={isDisable(product.article)}
+                          disabled={isDisablePlus(product.article)}
                           onClick={() => handlePlus(product, 0)}
                         >
                           ＋
                         </button>
                         <button
-                          disabled={isDisable(product.article)}
+                          disabled={isDisableMinus(
+                            product.article,
+                            product.batches[0]
+                          )}
                           onClick={() => handleMinus(product, 0)}
                         >
                           －
@@ -250,13 +258,13 @@ const WMOCTable = ({ product_list, orderCartData }) => {
                     <td className="border p-1">{batch.remainingInBatch}</td>
                     <td className="border p-1 text-center">
                       <button
-                        disabled={isDisable(product.article)}
+                        disabled={isDisablePlus(product.article)}
                         onClick={() => handlePlus(product, batchIndex + 1)}
                       >
                         ＋
                       </button>
                       <button
-                        disabled={isDisable(product.article)}
+                        disabled={isDisableMinus(product.article, batch)}
                         onClick={() => handleMinus(product, batchIndex + 1)}
                       >
                         －

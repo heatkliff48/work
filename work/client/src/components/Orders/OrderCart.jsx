@@ -112,25 +112,6 @@ const OrderCart = React.memo(() => {
     tools: [],
   });
 
-  // const correctProductTable = (arrName) => {
-  //   switch (arrName) {
-  //     case 'products':
-  //       return latestProducts;
-
-  //     case 'dryMixes':
-  //       return dryMixesJournal;
-
-  //     case 'anchors':
-  //       return anchor;
-
-  //     case 'tools':
-  //       return tool;
-
-  //     default:
-  //       break;
-  //   }
-  // };
-
   const getCorrectProductId = (arrName) => {
     switch (arrName) {
       case 'products':
@@ -253,7 +234,10 @@ const OrderCart = React.memo(() => {
         .filter((el) => el.order_id == orderCartData.id)
         .map((orderProduct) => {
           const id = getCorrectProductId(arrayName);
-          const product = productsTable.find((p) => p.id === orderProduct?.[id]);
+
+          const product = productsTable.find(
+            (p) => p.id === orderProduct?.[id]
+          );
 
           return product
             ? { product_article: product.article, ...orderProduct }
@@ -378,8 +362,9 @@ const OrderCart = React.memo(() => {
 
     updatedProductListOrder?.forEach((product) => {
       const loc = latestProducts.find(
-        (el) => el.id == product.product_id
+        (el) => el.article == product.product_article
       )?.placeOfProduction;
+
       const haveProductReserve = list_of_reserved_products.find(
         (el) => el.orders_products_id == product.id
       );

@@ -33,7 +33,6 @@ const InputField = React.memo(({ el, inputValue, inputValueChange, isDisabled })
       {inputDirty && inputError && <div style={{ color: 'red' }}>{inputError}</div>}
       <input
         className={valid ? '' : 'invalid'}
-        style={{ width: '50%' }}
         type="text"
         required
         min={el.min}

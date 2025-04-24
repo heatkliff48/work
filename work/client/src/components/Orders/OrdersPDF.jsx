@@ -277,12 +277,12 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       );
 
       const descripcion = `BAUBLOCK®${
-        product.tradingMark
-      } ${product.lengths.toString()}x${product.width}x${product.height}mm ${
-        product.density
+        product?.tradingMark
+      } ${product?.lengths.toString()}x${product?.width}x${product?.height}mm ${
+        product?.density
       }kg/m³`;
 
-      const total = (prod.quantity_palet * product.quantityBlockOnPallet).toFixed(0);
+      const total = (prod.quantity_palet * product?.quantityBlockOnPallet).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
@@ -408,15 +408,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
   };
 
   return (
-    <div className="pdf-preview-container">
+    <div >
       {pdfUrl && (
         <div>
-          <iframe
-            src={pdfUrl}
-            width="100%"
-            height="500px"
-            title="PDF Preview"
-          ></iframe>
           <button onClick={downloadPDF}>Скачать PDF</button>
         </div>
       )}

@@ -78,6 +78,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
         const order_id = list_of_orders.find(
           (el) => el.article === order_article
         )?.id;
+
         dispatch(
           updateOrderStatus({
             order_id,

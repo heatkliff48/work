@@ -2,6 +2,7 @@ import { DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET } from '../types/socketTypes/s
 import {
   LIST_OF_RESERVED_PRODUCTS,
   NEW_RESERVED_PRODUCT,
+  UPD_RESERVED_PRODUCT,
 } from '../types/warehouseTypes';
 
 export const reservedProductsReducer = (reservedProducts = [], action) => {
@@ -12,6 +13,10 @@ export const reservedProductsReducer = (reservedProducts = [], action) => {
     }
 
     case NEW_RESERVED_PRODUCT: {
+      return payload;
+    }
+
+    case UPD_RESERVED_PRODUCT: {
       return payload;
     }
 

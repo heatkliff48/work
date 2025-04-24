@@ -45,7 +45,7 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
       : null;
 
     const updatedOrderCartData = list_of_orders.find(
-      (order) => order.id === storedData.id
+      (order) => order.id === storedData?.id
     );
 
     if (storedData) {

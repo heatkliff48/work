@@ -23,8 +23,8 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const dispatch = useDispatch();
 
   const haveProduct = useMemo(
-    () => productOfOrder?.product_id ?? false,
-    [productOfOrder?.product_id]
+    () => productOfOrder?.product_article ?? false,
+    [productOfOrder?.product_article]
   );
 
   const haveOrderClient = list_of_orders.find(
@@ -35,7 +35,11 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     const product = latestProducts.filter((el) => el.id === row.original.id)[0];
 
     setSelectedProduct(product);
-    setProductOfOrder((prev) => ({ ...prev, product_id: product?.id }));
+    setProductOfOrder((prev) => ({
+      ...prev,
+      product_article: row.original.article,
+      product_id: product?.id
+    }));
   }, []);
 
   const handleProductListOrderChange = (e) => {
@@ -147,8 +151,8 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
           {haveProduct ? (
             <>
               {COLUMNS_ORDER_PRODUCT?.map((el) => {
-                if (el.accessor === 'article') return null;
-                if (el.accessor === 'product_id')
+                if (el.accessor === 'product_id') return null;
+                if (el.accessor === 'product_article')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
@@ -156,7 +160,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                         type="text"
                         id={el.accessor}
                         name={el.accessor}
-                        value={productOfOrder['id'] || ''}
+                        value={productOfOrder['product_article'] || ''}
                         readOnly
                       />
                     </>

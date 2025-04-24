@@ -4,6 +4,7 @@ import {
   updateWarehouseQuantitys,
   updReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
+import { useNavigate } from 'react-router-dom';
 import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +13,7 @@ const WarehouseContext = createContext();
 
 const WarehouseContextProvider = ({ children }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const COLUMNS_WAREHOUSE = [
     {
@@ -106,6 +108,9 @@ const WarehouseContextProvider = ({ children }) => {
   const list_of_ordered_production_oem = useSelector(
     (state) => state.listOfOrderedProductionOEM
   );
+
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
   const [filteredProducts, setFilteredProducts] = useState();
   const [currentOrderedProducts, setCurrentOrderedProducts] = useState({});
   const [currentBatchId, setCurrentBatchId] = useState(0);
@@ -165,7 +170,6 @@ const WarehouseContextProvider = ({ children }) => {
   };
 
   const saveHandler = () => {
-    console.log('wmoctProduct', wmoctProduct);
     const newReserved = [];
     const wh_arr = [];
 
@@ -214,6 +218,7 @@ const WarehouseContextProvider = ({ children }) => {
 
     dispatch(addNewReservedProducts(newReserved));
     setWmoctProductShippedBD([]);
+    setSelectedOrder(null);
   };
 
   useEffect(() => {
@@ -417,6 +422,8 @@ const WarehouseContextProvider = ({ children }) => {
         wmoctProductShippedBD,
         setWmoctProductShippedBD,
         saveHandler,
+        selectedOrder,
+        setSelectedOrder,
       }}
     >
       {children}
