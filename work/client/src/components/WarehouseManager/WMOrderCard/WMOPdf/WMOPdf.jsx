@@ -141,9 +141,9 @@ const WMOPdf = ({ orderCartData, toggle }) => {
         product.density
       }kg/m³`;
 
-      pallet_sum += shipped - bd_ship.shipped;
+      pallet_sum += shipped - bd_ship?.shipped;
 
-      const palet = shipped - bd_ship.shipped;
+      const palet = shipped - bd_ship?.shipped;
 
       const unidades = palet * product.quantityBlockOnPallet;
 
