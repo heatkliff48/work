@@ -569,7 +569,12 @@ const ModalWindow = React.memo(
                   el={el}
                   inputValue={formInput}
                   inputValueChange={handleInputChange}
-                  isDisabled={isDisabled}
+                  isDisabled={
+                    formInput?.form == 'Forjado' &&
+                    (el.accessor == 'lengths' || el.accessor == 'height')
+                      ? true
+                      : false
+                  }
                 />
               );
             })}

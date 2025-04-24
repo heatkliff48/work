@@ -39,7 +39,13 @@ const InputField = React.memo(({ el, inputValue, inputValueChange, isDisabled })
         max={el.max}
         id={el.accessor}
         name={el.accessor}
-        value={inputValue[el.accessor] || ''}
+        value={
+          inputValue?.form == 'Forjado' && el.accessor == 'lengths'
+            ? 600
+            : inputValue?.form == 'Forjado' && el.accessor == 'height'
+            ? 500
+            : inputValue[el.accessor] || ''
+        }
         readOnly={isDisabled}
         onChange={(e) => {
           if (regexp.test(e.target.value)) inputChangeHandler(e);

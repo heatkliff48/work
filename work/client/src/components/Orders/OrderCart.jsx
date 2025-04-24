@@ -816,7 +816,7 @@ const OrderCart = React.memo(() => {
                     onChange={() => {
                       statusChangeHandler(item);
                     }}
-                    disabled={!orderStatusAccess?.canWrite}
+                    disabled={!orderStatusAccess?.canWrite || item?.accessor == 7} //
                   />
                 </div>
               ))}

@@ -336,7 +336,6 @@ export const ProductsContextProvider = ({ children }) => {
       form: [
         { value: 'normal', label: 'Normal' },
         { value: 'U-block', label: 'U-block' },
-        { value: 'Lintel', label: 'Lintel' },
         { value: 'O-block', label: 'O-block' },
         { value: 'Forjado', label: 'Forjado' },
       ],
