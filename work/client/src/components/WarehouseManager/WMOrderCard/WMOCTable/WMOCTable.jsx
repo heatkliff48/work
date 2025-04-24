@@ -2,7 +2,6 @@ import { Fragment, useEffect, useState } from 'react';
 import WMOCTableModal from './WMOCTableModal';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useDispatch } from 'react-redux';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import WMOCPDFModal from '../WMOPdf/WMOPDFModal';
@@ -12,7 +11,6 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     wmoctProduct,
     setWmoctProduct,
     setWmoctProductShippedBD,
-    wmoctProductShippedBD,
     warehouse_data,
     list_of_reserved_products,
   } = useWarehouseContext();
@@ -21,7 +19,6 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     useModalContext();
   const { latestProducts } = useProductsContext();
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const dispatch = useDispatch();
 
   const handlePlusBatch = (product) => {
     setSelectedProduct(product.article);
@@ -150,6 +147,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
 
       return {
         article,
+        order_id: order_from_list_id,
         qty_total: quantity,
         shipped,
         qty_rem,

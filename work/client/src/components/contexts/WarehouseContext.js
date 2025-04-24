@@ -173,8 +173,12 @@ const WarehouseContextProvider = ({ children }) => {
     const newReserved = [];
     const wh_arr = [];
 
+    let orderId;
+
+    console.log('wmoctProduct', wmoctProduct);
     wmoctProduct.forEach((el) => {
-      const { orders_products_id } = el;
+      const { orders_products_id, order_id } = el;
+      orderId = order_id;
 
       el?.batches?.forEach((elem) => {
         const wh = warehouse_data.find((el) => el.article == elem.batchId);
@@ -215,6 +219,17 @@ const WarehouseContextProvider = ({ children }) => {
     wh_arr.forEach((el) => {
       dispatch(updateWarehouseQuantitys(el));
     });
+
+    const allShipped = wmoctProduct.every((el) => el.qty_total === el.shipped);
+
+    if (allShipped) {
+      dispatch(
+        updateOrderStatus({
+          order_id: orderId,
+          status: 9,
+        })
+      );
+    }
 
     dispatch(addNewReservedProducts(newReserved));
     setWmoctProductShippedBD([]);

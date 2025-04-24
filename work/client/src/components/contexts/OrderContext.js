@@ -406,10 +406,6 @@ const OrderContextProvider = ({ children }) => {
     });
   }, [list_of_orders]);
 
-  // useEffect(() => {
-  //   console.log('accountingDataList', accountingDataList);
-  // }, [accountingDataList]);
-
   useEffect(() => {
     if (list_of_orders && clients && deliveryAddresses) {
       const newArray = list_of_orders.map((order) => {
