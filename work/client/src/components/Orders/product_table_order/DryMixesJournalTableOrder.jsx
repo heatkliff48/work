@@ -27,7 +27,7 @@ const DryMixesJournalTableOrder = ({
       <table className="product-table">
         <thead>
           <tr>
-            <td>Dry Mixes Journal Products</td>
+            <td>Dry Mixes</td>
           </tr>
         </thead>
         <tbody>

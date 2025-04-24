@@ -48,17 +48,17 @@ function ProductionBatchDesigner() {
   const headers = useMemo(
     () => [
       { Header: 'ID', accessor: 'id' },
-      { Header: 'Плотность', accessor: 'density' },
-      { Header: 'Ширина', accessor: 'width' },
-      { Header: 'Количество', accessor: 'quantity' },
-      { Header: 'Продукт + Брак', accessor: 'product_with_brack' },
-      { Header: 'К-во, м3', accessor: 'quantity_m3' },
-      { Header: 'Кол-во тортов', accessor: 'cakes_quantity' },
-      { Header: 'Свободная продукция (cakes)', accessor: 'free_product_cakes' },
-      { Header: 'Свободная продукция (упаковка)', accessor: 'free_product_package' },
-      { Header: 'Итоговое кол-во cakes', accessor: 'total_cakes' },
-      { Header: 'Cakes, размещенные', accessor: 'cakes_in_batch' },
-      { Header: 'Cakes, остаток', accessor: 'cakes_residue' },
+      { Header: 'Плотность, кг/м³', accessor: 'density' },
+      { Header: 'Ширина, мм', accessor: 'width' },
+      { Header: 'Количество, паллет', accessor: 'quantity' },
+      { Header: 'Продукт + Брак, паллет', accessor: 'product_with_brack' },
+      { Header: 'К-во, м³', accessor: 'quantity_m3' },
+      { Header: 'Кол-во, массив', accessor: 'cakes_quantity' },
+      { Header: 'Свободная продукция, массив', accessor: 'free_product_cakes' },
+      { Header: 'Свободная продукция, паллет', accessor: 'free_product_package' },
+      { Header: 'Итоговое кол-во, массив', accessor: 'total_cakes' },
+      { Header: 'Размещено, массив', accessor: 'cakes_in_batch' },
+      { Header: 'Осталось разместить, массив', accessor: 'cakes_residue' },
     ],
     []
   );

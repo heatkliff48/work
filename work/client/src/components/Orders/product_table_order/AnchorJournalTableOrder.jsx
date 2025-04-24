@@ -27,7 +27,7 @@ const AnchorJournalTableOrder = ({
       <table className="product-table">
         <thead>
           <tr>
-            <td>Fastener Journal Products</td>
+            <td>Fasteners</td>
           </tr>
         </thead>
         <tbody>

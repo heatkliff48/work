@@ -27,7 +27,7 @@ const BlocksJournalTableOrder = ({
       <table className="product-table">
         <thead>
           <tr>
-            <td>Blocks Journal Product</td>
+            <td>HCCA Blocks</td>
           </tr>
         </thead>
         <tbody>

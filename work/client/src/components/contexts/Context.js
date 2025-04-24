@@ -7,7 +7,7 @@ const ProjectContext = createContext();
 
 const ProjectContextProvider = ({ children }) => {
   const displayNames = {
-    product_article: 'Product article',
+    product_article: 'Order number',
     quantity_m2: 'Quantity, m2',
     quantity_ud: 'Quantity, Ud',
     quantity_palet: 'Quantity of pallets',
@@ -194,7 +194,7 @@ const ProjectContextProvider = ({ children }) => {
 
   const WAREHOUSE_MANAGER_TABLE = [
     {
-      Header: 'Article of order',
+      Header: 'Order number',
       accessor: 'orders_article',
     },
     {

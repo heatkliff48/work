@@ -12,7 +12,7 @@ const OrderContext = createContext();
 const OrderContextProvider = ({ children }) => {
   const COLUMNS_ORDERS = [
     {
-      Header: 'Article',
+      Header: 'Order number',
       accessor: 'article',
       disableSortBy: true,
     },
@@ -40,7 +40,7 @@ const OrderContextProvider = ({ children }) => {
 
   const COLUMNS_ACCOUNTING = [
     {
-      Header: 'Article of order',
+      Header: 'Order number',
       accessor: 'orders_article',
       disableSortBy: true,
     },

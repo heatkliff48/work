@@ -136,7 +136,7 @@ function Products() {
       )}
 
       {modalProductCard && <ProductCardModal />}
-      <h1>Blocks journal</h1>
+      <h1>HCCA Blocks</h1>
       {userAccess?.canWrite && (
         <button
           onClick={() => setModal(!modal)}
