@@ -19,7 +19,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
     list_of_orders,
   } = useOrderContext();
 
-  const { COLUMNS_ANCHOR_PRODUCT, anchor } = useProductsTypeJournalContext();
+  const { COLUMNS_ANCHOR_PRODUCT, latestAnchors } = useProductsTypeJournalContext();
 
   const dispatch = useDispatch();
 
@@ -33,7 +33,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
   );
 
   const handlerAddProductOrder = useCallback((row) => {
-    const product = anchor.find((el) => el.id === row.original.id);
+    const product = latestAnchors.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
     setProductOfOrder((prev) => ({ ...prev, anchor_id: product?.id }));
@@ -253,7 +253,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
             <>
               <Table
                 COLUMN_DATA={COLUMNS_ANCHOR_PRODUCT}
-                dataOfTable={anchor.filter(
+                dataOfTable={latestAnchors.filter(
                   (product) => product.active_status === true
                 )}
                 // userAccess={userAccess}

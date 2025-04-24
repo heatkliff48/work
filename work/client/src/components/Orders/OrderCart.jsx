@@ -68,7 +68,8 @@ const OrderCart = React.memo(() => {
   const { displayNames, user } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { latestProducts } = useProductsContext();
-  const { dryMixesJournal, anchor, tool } = useProductsTypeJournalContext();
+  const { dryMixesJournal, anchor, tool, latestDryMix, latestAnchors, latestTools } =
+    useProductsTypeJournalContext();
   const {
     warehouse_data,
     list_of_reserved_products,
@@ -284,10 +285,10 @@ const OrderCart = React.memo(() => {
   const updatedDryMixesListOrder = useMemo(() => {
     return addProductArticleToOrderList(
       dryMixedProductsOfOrders,
-      dryMixesJournal,
+      latestDryMix,
       'dryMixes'
     );
-  }, [dryMixedProductsOfOrders, dryMixesJournal, addProductArticleToOrderList]);
+  }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
 
   // Обновляем состояние отдельно
   useEffect(() => {
@@ -300,8 +301,12 @@ const OrderCart = React.memo(() => {
   }, [updatedDryMixesListOrder]);
 
   const updatedAnchorsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(anchorProductsOfOrders, anchor, 'anchors');
-  }, [anchorProductsOfOrders, anchor, addProductArticleToOrderList]);
+    return addProductArticleToOrderList(
+      anchorProductsOfOrders,
+      latestAnchors,
+      'anchors'
+    );
+  }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedAnchorsListOrder.length > 0) {
@@ -313,8 +318,8 @@ const OrderCart = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(toolProductsOfOrders, tool, 'tools');
-  }, [toolProductsOfOrders, tool, addProductArticleToOrderList]);
+    return addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools');
+  }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedToolsListOrder.length > 0) {
@@ -676,15 +681,19 @@ const OrderCart = React.memo(() => {
               <h4>Contact Person</h4>
               {filterAndMapData(orderCartData?.contactInfo, filterKeys)}
             </div>
-            {userAccess?.canWrite && <ShowOrderContactEditModal />}
+            {userAccess?.canWrite && orderCartData?.status < 3 && (
+              <ShowOrderContactEditModal />
+            )}
           </div>
 
           <div className="delivery-address">
             <h4>Delivery Address</h4>
             {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
-            {userAccess?.canWrite && <ShowOrderDeliveryEditModal />}
+            {userAccess?.canWrite && orderCartData?.status < 3 && (
+              <ShowOrderDeliveryEditModal />
+            )}
           </div>
-          {deleteOrderAccess?.canWrite && (
+          {deleteOrderAccess?.canWrite && orderCartData?.status < 3 && (
             <Button
               onClick={() => {
                 dispatch(deleteOrder(orderCartData?.id));
@@ -746,6 +755,7 @@ const OrderCart = React.memo(() => {
                     onChange={(e) => {
                       handleInputChange(e);
                     }}
+                    readOnly={orderCartData?.status < 3 ? false : true}
                   />
                 </div>
               </div>
@@ -786,6 +796,7 @@ const OrderCart = React.memo(() => {
                     handleSelectChange(v);
                   }}
                   options={personsInChargeList}
+                  isDisabled={orderCartData?.status < 3 ? false : true}
                 />
               </div>
             )}

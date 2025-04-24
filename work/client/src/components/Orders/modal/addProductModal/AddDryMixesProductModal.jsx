@@ -19,7 +19,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
     list_of_orders,
   } = useOrderContext();
 
-  const { COLUMNS_DRY_MIXED_PRODUCT, dryMixesJournal } =
+  const { COLUMNS_DRY_MIXED_PRODUCT, latestDryMix } =
     useProductsTypeJournalContext();
 
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
   );
 
   const handlerAddProductOrder = useCallback((row) => {
-    const product = dryMixesJournal.find((el) => el.id === row.original.id);
+    const product = latestDryMix.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
     setProductOfOrder((prev) => ({ ...prev, dry_mixed_id: product?.id }));
@@ -254,7 +254,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
             <>
               <Table
                 COLUMN_DATA={COLUMNS_DRY_MIXED_PRODUCT}
-                dataOfTable={dryMixesJournal.filter(
+                dataOfTable={latestDryMix.filter(
                   (product) => product.active_status === true
                 )}
                 // userAccess={userAccess}

@@ -50,19 +50,21 @@ const BlocksJournalTableOrder = ({
                       Show batch
                     </Button>
                   ) : (
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteHandler(product);
-                      }}
-                    >
-                      Delete
-                    </Button>
+                    orderCartData?.status < 3 && (
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteHandler(product);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    )
                   )}
                 </td>
               </tr>
             ))}
-          {userAccess?.canWrite && (
+          {userAccess?.canWrite && orderCartData?.status < 3 && (
             <tr>
               <td colSpan="100%">
                 <Button

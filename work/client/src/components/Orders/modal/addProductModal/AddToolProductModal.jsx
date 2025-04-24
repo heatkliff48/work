@@ -22,7 +22,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
     list_of_orders,
   } = useOrderContext();
 
-  const { COLUMNS_TOOLS_PRODUCT, tool } = useProductsTypeJournalContext();
+  const { COLUMNS_TOOLS_PRODUCT, latestTools } = useProductsTypeJournalContext();
 
   const dispatch = useDispatch();
 
@@ -36,7 +36,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
   );
 
   const handlerAddProductOrder = useCallback((row) => {
-    const product = tool.find((el) => el.id === row.original.id);
+    const product = latestTools.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
     setProductOfOrder((prev) => ({ ...prev, tool_id: product?.id }));
@@ -204,7 +204,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
             <>
               <Table
                 COLUMN_DATA={COLUMNS_TOOLS_PRODUCT}
-                dataOfTable={tool.filter(
+                dataOfTable={latestTools.filter(
                   (product) => product.active_status === true
                 )}
                 // userAccess={userAccess}

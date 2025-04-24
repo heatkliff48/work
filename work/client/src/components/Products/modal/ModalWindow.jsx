@@ -187,7 +187,7 @@ const ModalWindow = React.memo(
 
     const calculatePalletDimensions = (palletSize, palletHeight) => {
       // Определение ширины и длины паллета
-      const palletWidthValue = palletSize === 0 ? 1000 : 800;
+      const palletWidthValue = parseInt(palletSize) === 0 ? 1000 : 800;
       const palletLengthValue = 1200;
 
       // Определение высоты паллета
