@@ -5,6 +5,7 @@ const ModalContext = createContext();
 export const ModalContextProvider = ({ children }) => {
   const [modal, setModal] = useState(false);
   const [wmoctModal, setWmoctModal] = useState(false);
+  const [wmoctPdfModal, setWmoctPdfModal] = useState(false);
   const [modalRoleCard, setModalRoleCard] = useState(false);
   const [warehouseModal, setWarehouseModal] = useState(false);
   const [modalAddClient, setModalAddClient] = useState(false);
@@ -64,6 +65,8 @@ export const ModalContextProvider = ({ children }) => {
         setIsModalWindowOpen,
         previewProductModal,
         setPreviewProductModal,
+        wmoctPdfModal,
+        setWmoctPdfModal,
       }}
     >
       {children}
