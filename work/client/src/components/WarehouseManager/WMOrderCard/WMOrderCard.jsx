@@ -81,7 +81,7 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
         </div>
       </div>
 
-      <WMOCTable product_list={selectedOrder} />
+      <WMOCTable product_list={selectedOrder} orderCartData={orderCartData} />
     </div>
   );
 });

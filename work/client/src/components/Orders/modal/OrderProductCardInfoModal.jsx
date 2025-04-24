@@ -103,12 +103,13 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
         <ModalBody>
           <>
             {COLUMNS_ORDER_PRODUCT?.map((el) => {
-              if (el.accessor === 'article') return null;
-              if (el.accessor === 'product_id')
+              if (el.accessor === 'product_id') return null;
+              if (el.accessor === 'product_article')
                 return (
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
                     <input
+                      style={{ width: '50%' }}
                       type="text"
                       id={el.accessor}
                       name={el.accessor}
@@ -122,6 +123,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
                     <input
+                      style={{ width: '50%' }}
                       type="text"
                       id={el.accessor}
                       name={el.accessor}
@@ -135,6 +137,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
                     <input
+                      style={{ width: '50%' }}
                       type="text"
                       id={el.accessor}
                       name={el.accessor}
@@ -148,6 +151,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
                     <input
+                      style={{ width: '50%' }}
                       type="text"
                       id={el.accessor}
                       name={el.accessor}
@@ -161,6 +165,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
                     <input
+                      style={{ width: '50%' }}
                       type="text"
                       id={el.accessor}
                       name={el.accessor}

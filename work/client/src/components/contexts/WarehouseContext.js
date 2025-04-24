@@ -1,4 +1,9 @@
 import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
+import {
+  addNewReservedProducts,
+  updateWarehouseQuantitys,
+  updReservedProducts,
+} from '#components/redux/actions/warehouseAction.js';
 import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -108,6 +113,7 @@ const WarehouseContextProvider = ({ children }) => {
   const [listOfOrderedCakes, setListOfOrderedCakes] = useState([]);
   const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
   const [wmoctProduct, setWmoctProduct] = useState();
+  const [wmoctProductShippedBD, setWmoctProductShippedBD] = useState([]);
 
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_orders = useSelector((state) => state.orders);
@@ -156,6 +162,58 @@ const WarehouseContextProvider = ({ children }) => {
 
       return acc;
     }, groupedOrders);
+  };
+
+  const saveHandler = () => {
+    console.log('wmoctProduct', wmoctProduct);
+    const newReserved = [];
+    const wh_arr = [];
+
+    wmoctProduct.forEach((el) => {
+      const { orders_products_id } = el;
+
+      el?.batches?.forEach((elem) => {
+        const wh = warehouse_data.find((el) => el.article == elem.batchId);
+
+        const haveReserve = list_of_reserved_products.find(
+          (el) =>
+            el.warehouse_id == wh.id && el.orders_products_id == orders_products_id
+        );
+
+        const obj = {
+          warehouse_id: wh.id,
+          orders_products_id,
+          quantity: elem.allocated,
+        };
+
+        if (!haveReserve) {
+          newReserved.push(obj);
+          wh_arr.push({
+            warehouse_id: wh.id,
+            total_quantity: wh.total_quantity - elem.allocated,
+            ordered_quantity: wh.ordered_quantity - elem.allocated,
+          });
+        }
+
+        if (haveReserve && haveReserve.quantity != elem.allocated) {
+          const quantity = haveReserve.quantity - elem.allocated;
+
+          wh_arr.push({
+            warehouse_id: wh.id,
+            total_quantity: wh.total_quantity + quantity,
+            ordered_quantity: wh.ordered_quantity + quantity,
+          });
+          dispatch(updReservedProducts(obj));
+        }
+      });
+    });
+
+    wh_arr.forEach((el) => {
+      dispatch(updateWarehouseQuantitys(el));
+    });
+
+    dispatch(addNewReservedProducts(newReserved));
+    setWmoctProductShippedBD([]);
   };
 
   useEffect(() => {
@@ -356,6 +414,9 @@ const WarehouseContextProvider = ({ children }) => {
         setFilteredWarehouseByProduct,
         wmoctProduct,
         setWmoctProduct,
+        wmoctProductShippedBD,
+        setWmoctProductShippedBD,
+        saveHandler,
       }}
     >
       {children}
