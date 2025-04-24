@@ -3,23 +3,22 @@ import WMOCTableModal from './WMOCTableModal';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useDispatch } from 'react-redux';
-import {
-  addNewReservedProducts,
-  updateWarehouseQuantitys,
-  updReservedProducts,
-} from '#components/redux/actions/warehouseAction.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
+import WMOCPDFModal from '../WMOPdf/WMOPDFModal';
 
-const WMOCTable = ({ product_list }) => {
+const WMOCTable = ({ product_list, orderCartData }) => {
   const {
     wmoctProduct,
     setWmoctProduct,
+    setWmoctProductShippedBD,
+    wmoctProductShippedBD,
     warehouse_data,
     list_of_reserved_products,
   } = useWarehouseContext();
   const { productsOfOrders, list_of_orders } = useOrderContext();
-  const { wmoctModal, setWmoctModal } = useModalContext();
+  const { wmoctModal, setWmoctModal, wmoctPdfModal, setWmoctPdfModal } =
+    useModalContext();
   const { latestProducts } = useProductsContext();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const dispatch = useDispatch();
@@ -95,56 +94,6 @@ const WMOCTable = ({ product_list }) => {
     );
   };
 
-  const saveHandler = () => {
-    const newReserved = [];
-    const wh_arr = [];
-
-    wmoctProduct.forEach((el) => {
-      const { orders_products_id } = el;
-
-      el?.batches?.forEach((elem) => {
-        const wh = warehouse_data.find((el) => el.article == elem.batchId);
-
-        const haveReserve = list_of_reserved_products.find(
-          (el) =>
-            el.warehouse_id == wh.id && el.orders_products_id == orders_products_id
-        );
-
-        const obj = {
-          warehouse_id: wh.id,
-          orders_products_id,
-          quantity: elem.allocated,
-        };
-
-        if (!haveReserve) {
-          newReserved.push(obj);
-          wh_arr.push({
-            warehouse_id: wh.id,
-            total_quantity: wh.total_quantity - elem.allocated,
-            ordered_quantity: wh.ordered_quantity - elem.allocated,
-          });
-        }
-
-        if (haveReserve && haveReserve.quantity != elem.allocated) {
-          const quantity = haveReserve.quantity - elem.allocated;
-
-          wh_arr.push({
-            warehouse_id: wh.id,
-            total_quantity: wh.total_quantity + quantity,
-            ordered_quantity: wh.ordered_quantity + quantity,
-          });
-          dispatch(updReservedProducts(obj));
-        }
-      });
-    });
-
-    wh_arr.forEach((el) => {
-      dispatch(updateWarehouseQuantitys(el));
-    });
-
-    dispatch(addNewReservedProducts(newReserved));
-  };
-
   useEffect(() => {
     const initialProducts = product_list.orders_products.map((el) => {
       const [article, quantityStr] = el.split(':').map((s) => s.trim());
@@ -188,6 +137,12 @@ const WMOCTable = ({ product_list }) => {
         });
       }
 
+      setWmoctProductShippedBD((prev) => {
+        const haveProd = prev.find((el) => el.article == article);
+        if (haveProd) return prev;
+        return [...prev, { article, shipped }];
+      });
+
       return {
         article,
         qty_total: quantity,
@@ -211,6 +166,13 @@ const WMOCTable = ({ product_list }) => {
         }}
         selectedProduct={selectedProduct}
       />
+      <WMOCPDFModal
+        isOpen={wmoctPdfModal}
+        toggle={() => {
+          setWmoctPdfModal(!wmoctPdfModal);
+        }}
+        orderCartData={orderCartData}
+      />
       <div className="overflow-auto">
         <table className="table-auto border border-gray-300 w-full">
           <thead className="bg-gray-100">
@@ -230,7 +192,9 @@ const WMOCTable = ({ product_list }) => {
               <Fragment key={productIndex}>
                 {/* Основная строка продукта */}
                 <tr>
-                  <td className="border p-1">{product.article}</td>
+                  <td className="border p-1" style={{ width: '25%' }}>
+                    {product.article}
+                  </td>
                   <td className="border p-1">{product.qty_total}</td>
                   <td className="border p-1">{product.shipped}</td>
                   <td className="border p-1">{product.qty_rem}</td>
@@ -328,7 +292,13 @@ const WMOCTable = ({ product_list }) => {
               </Fragment>
             ))}
           </tbody>
-          <button onClick={saveHandler}>SAVE</button>
+          <button
+            onClick={() => {
+              setWmoctPdfModal(!wmoctPdfModal);
+            }}
+          >
+            SAVE
+          </button>
         </table>
       </div>
     </>

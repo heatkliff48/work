@@ -6,12 +6,14 @@ import Table from '../Table/Table';
 import { useEffect, useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import WMOrderCard from './WMOrderCard/WMOrderCard';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
   //   useUsersContext();
   const { WAREHOUSE_MANAGER_TABLE } = useProjectContext();
   const { latestProducts } = useProductsContext();
+  const { setWmoctProductShippedBD } = useWarehouseContext();
   const {
     list_of_orders,
     deliveryAddresses,
@@ -37,7 +39,7 @@ function WarehouseManager() {
 
   useEffect(() => {
     const result = list_of_orders
-      .filter((el) => el.status === 7)
+      .filter((el) => el.status === 8)
       .reduce((acc, el) => {
         const del_adr = deliveryAddresses?.find((del) => del?.id == el?.del_adr_id);
 
@@ -59,6 +61,8 @@ function WarehouseManager() {
       }, []);
 
     setWarehouseMdata(result);
+    setWmoctProductShippedBD([]);
+
   }, [list_of_orders]);
 
   return (

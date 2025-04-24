@@ -53,8 +53,8 @@ const OrderContextProvider = ({ children }) => {
 
   const COLUMNS_ORDER_PRODUCT = [
     {
-      Header: 'Product id',
-      accessor: 'product_id',
+      Header: 'Product article',
+      accessor: 'product_article',
       disableSortBy: true,
     },
     {
@@ -91,8 +91,8 @@ const OrderContextProvider = ({ children }) => {
 
   const COLUMNS_ORDER_DRY_MIXES = [
     {
-      Header: 'Product id',
-      accessor: 'dry_mixed_id',
+      Header: 'Product article',
+      accessor: 'article',
       disableSortBy: true,
     },
     {
@@ -134,8 +134,8 @@ const OrderContextProvider = ({ children }) => {
 
   const COLUMNS_ORDER_ANCHOR = [
     {
-      Header: 'Anchor product id',
-      accessor: 'anchor_id',
+      Header: 'Product article',
+      accessor: 'article',
       disableSortBy: true,
     },
     {
@@ -177,8 +177,8 @@ const OrderContextProvider = ({ children }) => {
 
   const COLUMNS_ORDER_TOOL = [
     {
-      Header: 'Product id',
-      accessor: 'tool_id',
+      Header: 'Product article',
+      accessor: 'article',
       disableSortBy: true,
     },
     {

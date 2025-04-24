@@ -22,7 +22,13 @@ import {
 
 const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
   const { COLUMNS, getOptionValue, selectOptions } = useProductsContext();
-  const { previewProductData, setPreviewOperationName } = useProjectContext();
+  const {
+    previewProductData,
+    setPreviewOperationName,
+    isRepair,
+    setIsRepair,
+    setIsEdit,
+  } = useProjectContext();
   const { previewProductModal, setPreviewProductModal } = useModalContext();
 
   const dispatch = useDispatch();
@@ -106,6 +112,8 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
     }
     setPreviewProductModal(!previewProductModal);
     setPreviewOperationName('');
+    setIsEdit(false);
+    setIsRepair(false);
   };
 
   return (

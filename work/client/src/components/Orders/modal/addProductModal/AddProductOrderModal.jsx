@@ -148,7 +148,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
             <>
               {COLUMNS_ORDER_PRODUCT?.map((el) => {
                 if (el.accessor === 'article') return null;
-                if (el.accessor === 'dry_mixed_id')
+                if (el.accessor === 'product_id')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
