@@ -216,13 +216,13 @@ const WMOCTable = ({ product_list }) => {
           <thead className="bg-gray-100">
             <tr>
               <th className="border px-2">Product article</th>
-              <th className="border px-2">Qty total</th>
-              <th className="border px-2">Qty shipped</th>
-              <th className="border px-2">Qty remaining</th>
+              <th className="border px-2">Qty total, pallet</th>
+              <th className="border px-2">Qty shipped, pallet</th>
+              <th className="border px-2">Qty remaining, pallet</th>
               <th className="border px-2">Batch ID</th>
-              <th className="border px-2">Qty in batch</th>
+              <th className="border px-2">Qty in batch, pallet</th>
               <th className="border px-2">Controls</th>
-              <th className="border px-2">Qty allocated</th>
+              <th className="border px-2">Qty allocated, pallet</th>
             </tr>
           </thead>
           <tbody>

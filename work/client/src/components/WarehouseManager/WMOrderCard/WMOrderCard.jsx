@@ -60,7 +60,7 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
 
   return (
     <div className="page-container">
-      <h4>Order Card: {orderCartData?.article}</h4>
+      <h4>Order number: {orderCartData?.article}</h4>
 
       <div className="header-container">
         <div className="owner-info">
