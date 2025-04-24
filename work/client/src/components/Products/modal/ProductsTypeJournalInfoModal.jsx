@@ -16,10 +16,18 @@ import {
   updateRelatedMaterialsJournal,
   updateTool,
 } from '#components/redux/actions/productsTypeJournalAction.js';
+import ShowProductsTypeJournalModal from './ProductsTypeJournalModal';
 
 function ProductsTypeJournalInfoModal(props) {
-  const { selectedProductsType, setSelectedProductsType, dataTable } =
-    useProductsTypeJournalContext();
+  const {
+    COLUMNS_DRY_MIXED_PRODUCT,
+    COLUMNS_ANCHOR_PRODUCT,
+    COLUMNS_TOOLS_PRODUCT,
+    COLUMNS_RELATED_MATERIALS_JOURNAL,
+    selectedProductsType,
+    setSelectedProductsType,
+    dataTable,
+  } = useProductsTypeJournalContext();
   const products = useSelector((state) =>
     props.target == 1
       ? state.dryMixesJournal
@@ -32,6 +40,9 @@ function ProductsTypeJournalInfoModal(props) {
   const [isChecked, setIsChecked] = useState(selectedProductsType?.active_status);
   const [lastVersion, setLastVersion] = useState(1);
   const [productByVersion, setProductByVersion] = useState();
+  const [currentVersion, setCurrentVersion] = useState(
+    selectedProductsType?.version
+  );
   // const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   // const user = useSelector((state) => state.user);
@@ -105,6 +116,7 @@ function ProductsTypeJournalInfoModal(props) {
 
   useEffect(() => {
     setIsChecked(selectedProductsType?.active_status);
+    console.log('lastVersion', lastVersion);
 
     const searchArticle = selectedProductsType?.article
       ? selectedProductsType?.article.slice(0, selectedProductsType?.article.length)
@@ -123,22 +135,25 @@ function ProductsTypeJournalInfoModal(props) {
     }, 1);
 
     if (lastVersion < lastVers) {
-      console.log('lastVersion', lastVersion);
-      console.log('lastVers', lastVers);
       setLastVersion(lastVers);
     }
     setProductByVersion(prodArrVers);
   }, [selectedProductsType, products]);
 
-  // useEffect(() => {
-  //   const dryMix = dryMixesJournal.find((el) => el.id === selectedProductsType?.id);
-  //   setSelectedProductsType(dryMix);
-  // }, [dryMixesJournal]);
+  useEffect(() => {
+    setCurrentVersion(getSelectedOption('version'));
+  }, [props.show, productByVersion]);
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
 
+    setLastVersion(1);
     props.onHide();
+  };
+
+  const handleCloseModal = () => {
+    props.onHide();
+    setLastVersion(1);
   };
 
   // useEffect(() => {
@@ -158,7 +173,7 @@ function ProductsTypeJournalInfoModal(props) {
     <>
       <Modal
         show={props.show}
-        onHide={props.onHide}
+        onHide={handleCloseModal}
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
@@ -199,7 +214,7 @@ function ProductsTypeJournalInfoModal(props) {
                   <Select
                     onChange={handleSelectChange}
                     options={productByVersion}
-                    defaultValue={getSelectedOption('version')}
+                    value={currentVersion}
                   />
                   <div>
                     <h5>Change product's availability status</h5>
@@ -218,6 +233,29 @@ function ProductsTypeJournalInfoModal(props) {
           </Container>
         </Modal.Body>
         <Modal.Footer>
+          <ShowProductsTypeJournalModal
+            table={
+              props.target == 1
+                ? COLUMNS_DRY_MIXED_PRODUCT
+                : props.target == 2
+                ? COLUMNS_RELATED_MATERIALS_JOURNAL
+                : props.target == 3
+                ? COLUMNS_ANCHOR_PRODUCT
+                : COLUMNS_TOOLS_PRODUCT
+            }
+            target={props.target}
+            title={
+              props.target == 1
+                ? 'dry mix'
+                : props.target == 2
+                ? 'related material'
+                : props.target == 3
+                ? 'fastener'
+                : 'tool'
+            }
+            productCode={selectedProductsType?.productCode}
+            addNewVersion={true}
+          />
           <Button onClick={props.onHide}>Close</Button>
         </Modal.Footer>
       </Modal>

@@ -25,11 +25,10 @@ function ProductsTypeJournalModal(props) {
     relatedMaterialsJournal,
     anchor,
     tool,
+    selectedProductsType,
+    setSelectedProductsType,
   } = useProductsTypeJournalContext();
-  const [productsTypeJournalInput, setProductsTypeJournalInput] = useState({
-    // type_of_mix: 0,
-    // place_of_production: 0,
-  });
+  const [productsTypeJournalInput, setProductsTypeJournalInput] = useState({});
 
   const [errors, setErrors] = useState({});
 
@@ -157,26 +156,29 @@ function ProductsTypeJournalModal(props) {
     const defaultCountry = placeOfProductionOptions.find(
       (opt) => opt.value === 'ES'
     );
-
-    setProductsTypeJournalInput((prev) => ({
-      ...prev,
-      article: `X.${
-        props.target == 1
-          ? `M`
-          : props.target == 2
-          ? `P`
-          : props.target == 3
-          ? `F`
-          : `T`
-      }${props?.productCode}`,
-      units_of_measurement: unitsOfMeasurementOptions[0].value,
-      ...(props.target == 1 && { type_of_mix: typeOfMixOptions[0].value }), // Добавляем только если условие true
-      place_of_production:
-        defaultCountry?.value || placeOfProductionOptions[0].value,
-      product_code: props?.productCode,
-      active_status: true,
-      version: 1,
-    }));
+    if (props.addNewVersion) {
+      setProductsTypeJournalInput({ ...selectedProductsType });
+    } else {
+      setProductsTypeJournalInput((prev) => ({
+        ...prev,
+        article: `X.${
+          props.target == 1
+            ? `M`
+            : props.target == 2
+            ? `P`
+            : props.target == 3
+            ? `F`
+            : `T`
+        }${props?.productCode}`,
+        units_of_measurement: unitsOfMeasurementOptions[0].value,
+        ...(props.target == 1 && { type_of_mix: typeOfMixOptions[0].value }), // Добавляем только если условие true
+        place_of_production:
+          defaultCountry?.value || placeOfProductionOptions[0].value,
+        product_code: props?.productCode,
+        active_status: true,
+        version: 1,
+      }));
+    }
   }, [props.show]);
 
   function hasMatchingObject(array, newObj, excludedAttrs) {
@@ -226,6 +228,15 @@ function ProductsTypeJournalModal(props) {
       );
 
       if (existingProduct) {
+        setSelectedProductsType({
+          ...productsTypeJournalInput,
+          id: parseInt(
+            dryMixesJournal.length === 0 ? 1 : dryMixesJournal.length + 1
+          ),
+          article: existingProduct.article,
+          version: existingProduct.version + 1,
+          product_code: existingProduct.product_code,
+        });
         dispatch(
           addNewDryMixesJournal({
             ...productsTypeJournalInput,
@@ -268,9 +279,18 @@ function ProductsTypeJournalModal(props) {
         ]
       );
 
-      console.log(existingProduct);
-
       if (existingProduct) {
+        setSelectedProductsType({
+          ...productsTypeJournalInput,
+          id: parseInt(
+            relatedMaterialsJournal.length === 0
+              ? 1
+              : relatedMaterialsJournal.length + 1
+          ),
+          article: existingProduct.article,
+          version: existingProduct.version + 1,
+          product_code: existingProduct.product_code,
+        });
         dispatch(
           addNewRelatedMaterialsJournal({
             ...productsTypeJournalInput,
@@ -310,6 +330,13 @@ function ProductsTypeJournalModal(props) {
       ]);
 
       if (existingProduct) {
+        setSelectedProductsType({
+          ...productsTypeJournalInput,
+          id: parseInt(anchor.length === 0 ? 1 : anchor.length + 1),
+          article: existingProduct.article,
+          version: existingProduct.version + 1,
+          product_code: existingProduct.product_code,
+        });
         dispatch(
           addNewAnchor({
             ...productsTypeJournalInput,
@@ -349,6 +376,13 @@ function ProductsTypeJournalModal(props) {
       ]);
 
       if (existingProduct) {
+        setSelectedProductsType({
+          ...productsTypeJournalInput,
+          id: parseInt(tool.length === 0 ? 1 : tool.length + 1),
+          article: existingProduct.article,
+          version: existingProduct.version + 1,
+          product_code: existingProduct.product_code,
+        });
         dispatch(
           addNewTool({
             ...productsTypeJournalInput,
@@ -369,6 +403,36 @@ function ProductsTypeJournalModal(props) {
     // setModalShow(false);
     props.onHide();
     setProductsTypeJournalInput({});
+  };
+
+  useEffect(() => {
+    console.log('productsTypeJournalInput', productsTypeJournalInput);
+  }, [productsTypeJournalInput]);
+
+  const isFieldDisabled = (fieldName) => {
+    if (props?.addNewVersion) {
+      return props.target == 1
+        ? [
+            'name',
+            'manufacturer_name',
+            'units_per_pallet',
+            'bag_weight',
+            'pallet_weight',
+          ].includes(fieldName)
+        : props.target == 2
+        ? ['name', 'manufacturer_name'].includes(fieldName)
+        : props.target == 3
+        ? [
+            'name',
+            'manufacturer_name',
+            'pieces_per_unit',
+            'boxes_on_a_pallet',
+            'box_weight',
+            'pallet_weight',
+          ].includes(fieldName)
+        : ['name', 'manufacturer_name', 'piece_weight'].includes(fieldName);
+    }
+    return false;
   };
 
   return (
@@ -408,6 +472,7 @@ function ProductsTypeJournalModal(props) {
                   <div className="md:w-2/3">
                     {el.accessor === 'units_of_measurement' ? (
                       <Select
+                        isDisabled={props?.addNewVersion || false}
                         defaultValue={getSelectedUnitsOfMeasurementOption(
                           el.accessor
                         )}
@@ -418,6 +483,7 @@ function ProductsTypeJournalModal(props) {
                       />
                     ) : el.accessor === 'type_of_mix' && props.target == 1 ? (
                       <Select
+                        isDisabled={props?.addNewVersion || false}
                         defaultValue={getSelectedTypeOfMixOption(el.accessor)}
                         onChange={(v) => {
                           handleProductsTypeJournalSelectChange(v, el.accessor);
@@ -426,6 +492,7 @@ function ProductsTypeJournalModal(props) {
                       />
                     ) : el.accessor === 'place_of_production' ? (
                       <Select
+                        isDisabled={props?.addNewVersion || false}
                         defaultValue={getSelectedPlaceOfProductionOption(
                           el.accessor
                         )}
@@ -447,6 +514,7 @@ function ProductsTypeJournalModal(props) {
                     ) : el.accessor === 'active_status' ? null : (
                       <div>
                         <input
+                          disabled={isFieldDisabled(el.accessor)}
                           className={`${
                             errors[el.accessor]
                               ? 'border-red-500'
@@ -490,14 +558,25 @@ function ShowProductsTypeJournalModal(props) {
 
   return (
     <>
-      <Button
-        variant="primary"
-        onClick={() => {
-          setModalShow(true);
-        }}
-      >
-        Add {props.title}
-      </Button>
+      {props.addNewVersion ? (
+        <Button
+          variant="primary"
+          onClick={() => {
+            setModalShow(true);
+          }}
+        >
+          Add new version of {props.title}
+        </Button>
+      ) : (
+        <Button
+          variant="primary"
+          onClick={() => {
+            setModalShow(true);
+          }}
+        >
+          Add {props.title}
+        </Button>
+      )}
 
       <ProductsTypeJournalModal
         show={modalShow}
@@ -506,6 +585,7 @@ function ShowProductsTypeJournalModal(props) {
         target={props.target}
         title={props.title}
         productCode={props.productCode}
+        addNewVersion={props.addNewVersion || false}
       />
     </>
   );
