@@ -20,8 +20,18 @@ import {
 function ProductsTypeJournalInfoModal(props) {
   const { selectedProductsType, setSelectedProductsType, dataTable } =
     useProductsTypeJournalContext();
-  const dryMixesJournal = useSelector((state) => state.dryMixesJournal);
+  const products = useSelector((state) =>
+    props.target == 1
+      ? state.dryMixesJournal
+      : props.target == 2
+      ? state.relatedMaterialsJournal
+      : props.target == 3
+      ? state.anchor
+      : state.tool
+  );
   const [isChecked, setIsChecked] = useState(selectedProductsType?.active_status);
+  const [lastVersion, setLastVersion] = useState(1);
+  const [productByVersion, setProductByVersion] = useState();
   // const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   // const user = useSelector((state) => state.user);
@@ -67,9 +77,58 @@ function ProductsTypeJournalInfoModal(props) {
     }
   };
 
+  const handleSelectChange = (selectedOption) => {
+    // Найти продукт с выбранной версией
+    const selectedProduct = products.find(
+      (product) =>
+        product.article === selectedProductsType.article && // .slice(0, -4)
+        product.version === parseInt(selectedOption.value)
+    );
+
+    if (selectedProduct) {
+      console.log('selectedProduct', selectedProduct);
+      // Обновить productCardData с новой версией
+
+      setSelectedProductsType({
+        ...selectedProduct,
+      });
+    }
+  };
+
+  const getSelectedOption = (accessor) => {
+    if (!selectedProductsType?.[accessor]) return null;
+
+    return productByVersion?.find(
+      (option) => option.value === selectedProductsType?.[accessor]?.toString()
+    );
+  };
+
   useEffect(() => {
     setIsChecked(selectedProductsType?.active_status);
-  }, [selectedProductsType]);
+
+    const searchArticle = selectedProductsType?.article
+      ? selectedProductsType?.article.slice(0, selectedProductsType?.article.length)
+      : '';
+    const prodArrVers = products?.reduce((acc, el) => {
+      const { article, version } = el;
+      if (article === searchArticle)
+        acc.push({ value: `${version}`, label: `Version: ${version}` });
+      return acc;
+    }, []);
+
+    const lva = products?.filter((el) => el.article === searchArticle);
+
+    const lastVers = lva?.reduce((max, product) => {
+      return product.version > max ? product.version : max;
+    }, 1);
+
+    if (lastVersion < lastVers) {
+      console.log('lastVersion', lastVersion);
+      console.log('lastVers', lastVers);
+      setLastVersion(lastVers);
+    }
+    setProductByVersion(prodArrVers);
+  }, [selectedProductsType, products]);
 
   // useEffect(() => {
   //   const dryMix = dryMixesJournal.find((el) => el.id === selectedProductsType?.id);
@@ -134,6 +193,14 @@ function ProductsTypeJournalInfoModal(props) {
                     ))}
                 </Col>
                 <Col xs={6} md={4}>
+                  <div>
+                    <h5>Last version: {lastVersion}</h5>
+                  </div>
+                  <Select
+                    onChange={handleSelectChange}
+                    options={productByVersion}
+                    defaultValue={getSelectedOption('version')}
+                  />
                   <div>
                     <h5>Change product's availability status</h5>
                     <input
