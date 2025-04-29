@@ -39,7 +39,11 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
     const product = latestTools.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
-    setProductOfOrder((prev) => ({ ...prev, tool_id: product?.id }));
+    setProductOfOrder((prev) => ({
+      ...prev,
+      tool_article: row.original.article,
+      tool_id: product?.id,
+    }));
   }, []);
 
   const handleProductListOrderChange = (e) => {
@@ -137,8 +141,8 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
           {haveProduct ? (
             <>
               {COLUMNS_ORDER_TOOL?.map((el) => {
-                if (el.accessor === 'article') return null;
-                if (el.accessor === 'tool_id')
+                if (el.accessor === 'tool_id') return null;
+                if (el.accessor === 'tool_article')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>

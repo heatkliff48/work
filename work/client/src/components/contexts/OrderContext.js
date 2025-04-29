@@ -93,7 +93,7 @@ const OrderContextProvider = ({ children }) => {
   const COLUMNS_ORDER_DRY_MIXES = [
     {
       Header: 'Product article',
-      accessor: 'article',
+      accessor: 'dry_mixed_article',
       disableSortBy: true,
     },
     {
@@ -136,7 +136,7 @@ const OrderContextProvider = ({ children }) => {
   const COLUMNS_ORDER_ANCHOR = [
     {
       Header: 'Product article',
-      accessor: 'article',
+      accessor: 'anchor_article',
       disableSortBy: true,
     },
     {
@@ -179,7 +179,7 @@ const OrderContextProvider = ({ children }) => {
   const COLUMNS_ORDER_TOOL = [
     {
       Header: 'Product article',
-      accessor: 'article',
+      accessor: 'tool_article',
       disableSortBy: true,
     },
     {
