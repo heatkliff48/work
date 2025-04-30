@@ -45,6 +45,15 @@ function ProductionBatchDesigner() {
     []
   );
 
+  const addEmptyAutoclaveRow = (autoclave) => {
+    const newRow = Array.from({ length: 21 }, () => ({
+      id: null,
+      density: '',
+      width: '',
+    }));
+    return [...autoclave, newRow];
+  };
+
   const headers = useMemo(
     () => [
       { Header: 'ID', accessor: 'id' },
@@ -288,45 +297,35 @@ function ProductionBatchDesigner() {
   useEffect(() => {
     if (currId !== null) {
       setAutoclave((prevAutoclave) => {
-        const newAutoclaveState = prevAutoclave.map((autoclaveRow) =>
-          autoclaveRow.map((cell) => ({ ...cell }))
-        );
-        const flatAutoclave = prevAutoclave.flat();
-        let lastIndex = flatAutoclave.map((el) => el.id).lastIndexOf(currId);
-
-        const haveElInAutoclave = lastIndex >= 0;
-        const newAutoclave = [];
-
-        let cakesPlaced = 0;
-        let count = 0;
-
+        let updatedAutoclave = prevAutoclave.map((row) => [...row]);
+        let flat = updatedAutoclave.flat();
         const row = productionBatchDesigner.find((r) => r.id === currId);
-        if (row) {
-          const { id, density, width, cakes_residue } = row;
-          if (haveElInAutoclave) {
-            for (let i = 0; i < cakes_residue; i++) {
-              flatAutoclave.splice(lastIndex + 1, 0, { id, density, width });
-              lastIndex++;
-            }
-            while (flatAutoclave.length) {
-              newAutoclave.push(flatAutoclave.splice(0, 21));
-            }
-          } else {
-            for (let i = 0; i < newAutoclaveState.length; i++) {
-              for (let j = 0; j < newAutoclaveState[i].length; j++) {
-                if (!newAutoclaveState[i][j].id && cakesPlaced < cakes_residue) {
-                  newAutoclaveState[i][j] = { id, density, width };
-                  cakesPlaced++;
-                  count++;
-                }
-              }
-              if (cakesPlaced >= cakes_residue) break;
+
+        if (!row) return prevAutoclave;
+
+        const { id, density, width, cakes_residue } = row;
+
+        let freeSpaces = flat.filter((cell) => !cell.id).length;
+        let required = cakes_residue;
+
+        while (freeSpaces < required) {
+          updatedAutoclave = addEmptyAutoclaveRow(updatedAutoclave);
+          flat = updatedAutoclave.flat();
+          freeSpaces = flat.filter((cell) => !cell.id).length;
+        }
+
+        let placed = 0;
+        for (let i = 0; i < updatedAutoclave.length && placed < required; i++) {
+          for (let j = 0; j < updatedAutoclave[i].length && placed < required; j++) {
+            if (!updatedAutoclave[i][j].id) {
+              updatedAutoclave[i][j] = { id, density, width };
+              placed++;
             }
           }
         }
 
-        countRef.current = count;
-        return haveElInAutoclave ? newAutoclave : newAutoclaveState;
+        countRef.current = placed;
+        return updatedAutoclave;
       });
     }
   }, [currId]);

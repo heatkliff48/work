@@ -37,7 +37,9 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
     const product = latestDryMix.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
-    setProductOfOrder((prev) => ({ ...prev, dry_mixed_id: product?.id }));
+    setProductOfOrder((prev) => ({ ...prev, 
+      dry_mixed_article: row.original.article,
+      dry_mixed_id: product?.id }));
   }, []);
 
   const handleProductListOrderChange = (e) => {
@@ -161,8 +163,8 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
           {haveProduct ? (
             <>
               {COLUMNS_ORDER_DRY_MIXES?.map((el) => {
-                if (el.accessor === 'article') return null;
-                if (el.accessor === 'dry_mixed_id')
+                if (el.accessor === 'dry_mixed_id') return null;
+                if (el.accessor === 'dry_mixed_article')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>

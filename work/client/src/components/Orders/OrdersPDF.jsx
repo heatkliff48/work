@@ -53,127 +53,139 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       doc.text(`Válido hasta: ${pdfData.validUntil}`, 120, yPosition + 30);
 
       // Таблица с товарами (начинается ниже текста)
-      autoTable(doc, {
-        startY: yPosition + 40, // Отступ от информации о заказе
-        head: [
-          [
-            'Ref.:',
-            'Descripción',
-            'Medición de proyecto, m2',
-            'Total paletas, Ud',
-            'm3/pal',
-            'm2/pal',
-            'blq/pal, Ud',
-            'Total m2',
-            'PVP neto € / m2',
-            'Total, Ud',
-            'PVP neto €/Ud',
-            'Subtotal €',
+      if (pdfData.pdfProducts?.length) {
+        autoTable(doc, {
+          startY: yPosition + 40, // Отступ от информации о заказе
+          head: [
+            [
+              'Ref.:',
+              'Descripción',
+              'Medición de proyecto, m2',
+              'Total paletas, Ud',
+              'm3/pal',
+              'm2/pal',
+              'blq/pal, Ud',
+              'Total m2',
+              'PVP neto € / m2',
+              'Total, Ud',
+              'PVP neto €/Ud',
+              'Subtotal €',
+            ],
           ],
-        ],
-        body: pdfData.pdfProducts?.map((item) => [
-          item.ref,
-          item.descripcion,
-          item.medición_de_proyecto,
-          item.total_paletas,
-          item.m3_pal,
-          item.m2_pal,
-          item.blq_pal,
-          item.total_m2,
-          item.pvp_neto_m2,
-          item.total,
-          item.pvp_neto_ud,
-          item.subtotal,
-        ]),
-        styles: {
-          fontSize: 6,
-        },
-        headStyles: {
-          textColor: 'white',
-          fillColor: [255, 0, 0], // ярко-красный фон
-        },
-      });
-      autoTable(doc, {
-        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
-        head: [
-          [
-            'Ref.:',
-            'Descripción',
-            'Medición de proyecto, Ud',
-            'Total paletas, Ud',
-            'sacos/pal',
-            'Total sacos, Ud',
-            'Total, kg',
-            'PVP neto €/Ud',
-            'Subtotal €',
-          ],
-        ],
-        body: pdfData.pdfDryMixes?.map((item) => [
-          item.ref,
-          item.descripcion,
-          item.medición_de_proyecto,
-          item.total_paletas,
-          item.sacos,
-          item.totalSacos,
-          item.totalKg,
-          item.pvp_neto_ud,
-          item.subtotal,
-        ]),
-        styles: { fontSize: 6 },
-        headStyles: {
-          textColor: 'white',
-          fillColor: [255, 0, 0], // ярко-красный фон
-        },
-      });
-      autoTable(doc, {
-        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
-        head: [
-          [
-            'Ref.:',
-            'Descripción',
-            'Medición de proyecto, Ud',
-            'Total paletas, Ud',
-            'sacos/pal',
-            'Total sacos, Ud',
-            'Total, kg',
-            'PVP neto €/Ud',
-            'Subtotal €',
-          ],
-        ],
-        body: pdfData.pdfAnchor?.map((item) => [
-          item.ref,
-          item.descripcion,
-          item.medición_de_proyecto,
-          item.total_paletas,
-          item.sacos,
-          item.totalSacos,
-          item.totalKg,
-          item.pvp_neto_ud,
-          item.subtotal,
-        ]),
-        styles: { fontSize: 6 },
-        headStyles: {
-          textColor: 'white',
-          fillColor: [255, 0, 0], // ярко-красный фон
-        },
-      });
+          body: pdfData.pdfProducts?.map((item) => [
+            item.ref,
+            item.descripcion,
+            item.medición_de_proyecto,
+            item.total_paletas,
+            item.m3_pal,
+            item.m2_pal,
+            item.blq_pal,
+            item.total_m2,
+            item.pvp_neto_m2,
+            item.total,
+            item.pvp_neto_ud,
+            item.subtotal,
+          ]),
+          styles: {
+            fontSize: 6,
+          },
+          headStyles: {
+            textColor: 'white',
+            fillColor: [255, 0, 0], // ярко-красный фон
+          },
+        });
+      }
 
-      autoTable(doc, {
-        startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
-        head: [['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €']],
-        body: pdfData.pdfTools?.map((item) => [
-          item.ref,
-          item.descripcion,
-          item.total,
-          item.pvp_neto_ud,
-          item.subtotal,
-        ]),
-        styles: { fontSize: 6 },
-        headStyles: {
-          textColor: 'white',
-          fillColor: [255, 0, 0], // ярко-красный фон
-        },
-      });
+      if (pdfData.pdfDryMixes?.length) {
+        autoTable(doc, {
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          head: [
+            [
+              'Ref.:',
+              'Descripción',
+              'Medición de proyecto, Ud',
+              'Total paletas, Ud',
+              'sacos/pal',
+              'Total sacos, Ud',
+              'Total, kg',
+              'PVP neto €/Ud',
+              'Subtotal €',
+            ],
+          ],
+          body: pdfData.pdfDryMixes?.map((item) => [
+            item.ref,
+            item.descripcion,
+            item.medición_de_proyecto,
+            item.total_paletas,
+            item.sacos,
+            item.totalSacos,
+            item.totalKg,
+            item.pvp_neto_ud,
+            item.subtotal,
+          ]),
+          styles: { fontSize: 6 },
+          headStyles: {
+            textColor: 'white',
+            fillColor: [255, 0, 0], // ярко-красный фон
+          },
+        });
+      }
+
+      if (pdfData.pdfAnchor?.length) {
+        autoTable(doc, {
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          head: [
+            [
+              'Ref.:',
+              'Descripción',
+              'Medición de proyecto, Ud',
+              'Total paletas, Ud',
+              'sacos/pal',
+              'Total sacos, Ud',
+              'Total, kg',
+              'PVP neto €/Ud',
+              'Subtotal €',
+            ],
+          ],
+          body: pdfData.pdfAnchor?.map((item) => [
+            item.ref,
+            item.descripcion,
+            item.medición_de_proyecto,
+            item.total_paletas,
+            item.sacos,
+            item.totalSacos,
+            item.totalKg,
+            item.pvp_neto_ud,
+            item.subtotal,
+          ]),
+          styles: { fontSize: 6 },
+          headStyles: {
+            textColor: 'white',
+            fillColor: [255, 0, 0], // ярко-красный фон
+          },
+        });
+      }
+
+      if (pdfData.pdfTools?.length) {
+        autoTable(doc, {
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          head: [
+            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
+          ],
+          body: pdfData.pdfTools?.map((item) => [
+            item.ref,
+            item.descripcion,
+            item.total,
+            item.pvp_neto_ud,
+            item.subtotal,
+          ]),
+          styles: { fontSize: 6 },
+          headStyles: {
+            textColor: 'white',
+            fillColor: [255, 0, 0], // ярко-красный фон
+          },
+        });
+      }
 
       const startY = doc.lastAutoTable
         ? doc.lastAutoTable.finalY + 10
@@ -282,7 +294,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         product?.density
       }kg/m³`;
 
-      const total = (prod.quantity_palet * product?.quantityBlockOnPallet).toFixed(0);
+      const total = (prod.quantity_palet * product?.quantityBlockOnPallet).toFixed(
+        0
+      );
 
       const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
@@ -408,7 +422,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
   };
 
   return (
-    <div >
+    <div>
       {pdfUrl && (
         <div>
           <button onClick={downloadPDF}>Скачать PDF</button>

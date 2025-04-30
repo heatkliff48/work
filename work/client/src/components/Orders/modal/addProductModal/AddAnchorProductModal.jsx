@@ -36,7 +36,11 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
     const product = latestAnchors.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
-    setProductOfOrder((prev) => ({ ...prev, anchor_id: product?.id }));
+    setProductOfOrder((prev) => ({
+      ...prev,
+      anchor_article: row.original.article,
+      anchor_id: product?.id,
+    }));
   }, []);
 
   const handleProductListOrderChange = (e) => {
@@ -160,8 +164,8 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
           {haveProduct ? (
             <>
               {COLUMNS_ORDER_ANCHOR?.map((el) => {
-                if (el.accessor === 'article') return null;
-                if (el.accessor === 'anchor_id')
+                if (el.accessor === 'anchor_id') return null;
+                if (el.accessor === 'anchor_article')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
