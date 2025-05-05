@@ -120,6 +120,7 @@ const WMOPdf = ({ orderCartData, toggle }) => {
     const { article, contactInfo, owner } = orderCartData;
 
     let pallet_sum = 0;
+    let pallet_weight = 0;
 
     const today = new Date();
     const nextMonthDate = new Date(today);
@@ -148,6 +149,8 @@ const WMOPdf = ({ orderCartData, toggle }) => {
       const unidades = palet * product.quantityBlockOnPallet;
 
       if (palet == 0) return {};
+
+      pallet_weight += product.weightDef;
       return {
         código: article,
         descripcion,
@@ -170,11 +173,13 @@ const WMOPdf = ({ orderCartData, toggle }) => {
       telefono: contactInfo?.phone_number_mobile,
     };
 
+    const peso = pallet_sum * pallet_weight;
+
     setPdfData({
       cliente,
       lugar,
       formattedDate: formattedDate || '',
-      peso: 0,
+      peso,
       palet: pallet_sum,
       pdfProducts,
     });
