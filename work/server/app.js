@@ -40,6 +40,10 @@ const relatedMaterialsJournalRouter = require('./router/relatedmaterialsjournal.
 const anchorRouter = require('./router/anchor.js');
 const toolRouter = require('./router/tool.js');
 const qualityManagementRouter = require('./router/qualitymanagement.js');
+const dryMixesWarehouseRouter = require('./router/drymixeswarehouse.js');
+const relatedMaterialsWarehouseRouter = require('./router/relatedmaterialswarehouse.js');
+const anchorsWarehouseRouter = require('./router/anchorswarehouse.js');
+const toolsWarehouseRouter = require('./router/toolswarehouse.js');
 
 const app = express();
 const map = new Map();
@@ -112,6 +116,10 @@ app.use('/dryMixesJournal', dryMixesJournalRouter);
 app.use('/relatedMaterialsJournal', relatedMaterialsJournalRouter);
 app.use('/anchor', anchorRouter);
 app.use('/tool', toolRouter);
+app.use('/dryMixesWarehouse', dryMixesWarehouseRouter);
+app.use('/relatedMaterialsWarehouse', relatedMaterialsWarehouseRouter);
+app.use('/anchorsWarehouse', anchorsWarehouseRouter);
+app.use('/toolsWarehouse', toolsWarehouseRouter);
 app.use('/qualityManagement', qualityManagementRouter);
 
 // Обработка WebSocket соединений

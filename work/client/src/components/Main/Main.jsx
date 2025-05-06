@@ -114,7 +114,10 @@ function Main() {
           </button>
         )}
         {checkUserAccess(user, roles, 'Warehouse')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/warehouse')}>
+          <button
+            className="nav-button"
+            onClick={() => navigate('/warehouse_products_type')}
+          >
             Warehouse
           </button>
         )}

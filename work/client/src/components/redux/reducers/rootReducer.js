@@ -31,6 +31,12 @@ import {
   relatedMaterialsJournalReducer,
   toolReducer,
 } from './productsTypeJournalReducer';
+import {
+  anchorsWarehouseReducer,
+  dryMixesWarehouseReducer,
+  relatedMaterialsWarehouseReducer,
+  toolsWarehouseReducer,
+} from './productsTypeWarehouseReducer';
 import { qualityManagementReducer } from './qualityManagementReducer';
 import { recipeReducer } from './recipeReducer';
 import { reservedProductsReducer } from './reservedProductsReducer';
@@ -77,5 +83,9 @@ export const rootReducer = combineReducers({
   accountingDataList: accountingReducer,
   anchor: anchorReducer,
   tool: toolReducer,
+  dryMixesWarehouse: dryMixesWarehouseReducer,
+  relatedMaterialsWarehouse: relatedMaterialsWarehouseReducer,
+  anchorsWarehouse: anchorsWarehouseReducer,
+  toolsWarehouse: toolsWarehouseReducer,
   qualityManagementData: qualityManagementReducer,
 });

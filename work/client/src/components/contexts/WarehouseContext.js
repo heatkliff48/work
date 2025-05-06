@@ -101,6 +101,12 @@ const WarehouseContextProvider = ({ children }) => {
   const order_status = [7, 8, 9, 10];
 
   const warehouse_data = useSelector((state) => state.warehouse);
+  const dry_mixes_warehouse_data = useSelector((state) => state.dryMixesWarehouse);
+  const related_materials_warehouse_data = useSelector(
+    (state) => state.relatedMaterialsWarehouse
+  );
+  const anchors_warehouse_data = useSelector((state) => state.anchorsWarehouse);
+  const tools_warehouse_data = useSelector((state) => state.toolsWarehouse);
   const list_of_reserved_products = useSelector((state) => state.reservedProducts);
   const list_of_ordered_production = useSelector(
     (state) => state.listOfOrderedProduction
@@ -416,6 +422,10 @@ const WarehouseContextProvider = ({ children }) => {
         COLUMNS_LIST_OF_ORDERED_PRODUCTION,
         COLUMNS_LIST_OF_ORDERED_PRODUCTION_OEM,
         warehouse_data,
+        dry_mixes_warehouse_data,
+        related_materials_warehouse_data,
+        anchors_warehouse_data,
+        tools_warehouse_data,
         list_of_reserved_products,
         list_of_ordered_production,
         list_of_ordered_production_oem,

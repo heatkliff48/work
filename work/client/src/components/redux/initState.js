@@ -32,6 +32,10 @@ const initState = {
   accountingDataList: [],
   anchor: [],
   tool: [],
+  dryMixesWarehouse: [],
+  relatedMaterialsWarehouse: [],
+  anchorsWarehouse: [],
+  toolsWarehouse: [],
   qualityManagementData: [],
 };
 

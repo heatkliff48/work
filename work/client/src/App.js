@@ -13,6 +13,10 @@ import UsersInfo from '#components/UsersInfo/usersInfo.jsx';
 import ListOfOrderedProduction from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProduction.jsx';
 import ListOfOrderedProductionOEM from '#components/Warehouse/ListOfOrderedProductionOEM/ListOfOrderedProductionOEM.jsx';
 import Warehouse from '#components/Warehouse/Warehouse.jsx';
+import DryMixesWarehouse from '#components/Warehouse/DryMixesWarehouse.jsx';
+import RelatedMaterialsWarehouse from '#components/Warehouse/RelatedMaterialsWarehouse.jsx';
+import AnchorsWarehouse from '#components/Warehouse/AnchorsWarehouse.jsx';
+import ToolsWarehouse from '#components/Warehouse/ToolsWarehouse.jsx';
 import MainContextProvider from '#components/contexts/MainContex.js';
 import WebSocketClient from '#utils/WebSockeetClient.js';
 import { createSocketOnMessage } from '#utils/socket.message.js';
@@ -37,6 +41,7 @@ import AnchorsTable from '#components/Products/AnchorsTable.jsx';
 import ToolsTable from '#components/Products/ToolsTable.jsx';
 import QualityManagementTable from '#components/QualityManagement/QualityManagementTable.jsx';
 import WarehouseManager from '#components/WarehouseManager/WarehouseManager.jsx';
+import ProductsTypeWarehouse from '#components/Warehouse/ProductsTypeWarehouse.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -103,7 +108,18 @@ function App() {
 
           <Route path="/tools" element={<ToolsTable />} />
           <Route path="/users_info" element={<UsersInfo />} />
-          <Route path="/warehouse" element={<Warehouse />} />
+          <Route path="/warehouse_HCCA_blocks" element={<Warehouse />} />
+          <Route path="/warehouse_dry_mixes" element={<DryMixesWarehouse />} />
+          <Route
+            path="/warehouse_related_materials"
+            element={<RelatedMaterialsWarehouse />}
+          />
+          <Route path="/warehouse_anchors" element={<AnchorsWarehouse />} />
+          <Route path="/warehouse_tools" element={<ToolsWarehouse />} />
+          <Route
+            path="/warehouse_products_type"
+            element={<ProductsTypeWarehouse />}
+          />
           <Route path="/warehouse_manager" element={<WarehouseManager />} />
 
           <Route path="*" element={<Navigate to={'sign-in'} />} />

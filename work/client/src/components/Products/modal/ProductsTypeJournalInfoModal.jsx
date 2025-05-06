@@ -97,7 +97,6 @@ function ProductsTypeJournalInfoModal(props) {
     );
 
     if (selectedProduct) {
-      console.log('selectedProduct', selectedProduct);
       // Обновить productCardData с новой версией
 
       setSelectedProductsType({
@@ -116,7 +115,6 @@ function ProductsTypeJournalInfoModal(props) {
 
   useEffect(() => {
     setIsChecked(selectedProductsType?.active_status);
-    console.log('lastVersion', lastVersion);
 
     const searchArticle = selectedProductsType?.article
       ? selectedProductsType?.article.slice(0, selectedProductsType?.article.length)

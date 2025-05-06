@@ -50,6 +50,14 @@ const {
   GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   REPAIR_PRODUCT_SOCKET,
+  ADD_NEW_DRY_MIXES_WAREHOUSE_SOCKET,
+  UPDATE_DRY_MIXES_WAREHOUSE_SOCKET,
+  ADD_NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+  UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+  ADD_NEW_ANCHORS_WAREHOUSE_SOCKET,
+  UPDATE_ANCHORS_WAREHOUSE_SOCKET,
+  ADD_NEW_TOOLS_WAREHOUSE_SOCKET,
+  UPDATE_TOOLS_WAREHOUSE_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -589,6 +597,100 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_TOOL_SOCKET,
           payload: tool,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_DRY_MIXES_WAREHOUSE_SOCKET, (dryMixesWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_DRY_MIXES_WAREHOUSE_SOCKET,
+          payload: dryMixesWarehouse,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_DRY_MIXES_WAREHOUSE_SOCKET, (dryMixesWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_DRY_MIXES_WAREHOUSE_SOCKET,
+          payload: dryMixesWarehouse,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(
+    ADD_NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+    (relatedMaterialsWarehouse) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: ADD_NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+            payload: relatedMaterialsWarehouse,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+    (relatedMaterialsWarehouse) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+            payload: relatedMaterialsWarehouse,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(ADD_NEW_ANCHORS_WAREHOUSE_SOCKET, (anchorsWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_ANCHORS_WAREHOUSE_SOCKET,
+          payload: anchorsWarehouse,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_ANCHORS_WAREHOUSE_SOCKET, (anchorsWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_ANCHORS_WAREHOUSE_SOCKET,
+          payload: anchorsWarehouse,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_TOOLS_WAREHOUSE_SOCKET, (toolsWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_TOOLS_WAREHOUSE_SOCKET,
+          payload: toolsWarehouse,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_TOOLS_WAREHOUSE_SOCKET, (toolsWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_TOOLS_WAREHOUSE_SOCKET,
+          payload: toolsWarehouse,
         })
       );
     }

@@ -41,6 +41,14 @@ import {
   deleteDryMixedProductOfOrderSocket,
   deleteAnchorProductOfOrderSocket,
   deleteToolProductOfOrderSocket,
+  addNewDryMixesWarehouseSocket,
+  updateDryMixesWarehouseSocket,
+  addNewRelatedMaterialsWarehouseSocket,
+  updateRelatedMaterialsWarehouseSocket,
+  addNewAnchorsWarehouseSocket,
+  updateAnchorsWarehouseSocket,
+  addNewToolsWarehouseSocket,
+  updateToolsWarehouseSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -108,6 +116,14 @@ import {
   GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   REPAIR_PRODUCT_SOCKET,
+  ADD_NEW_DRY_MIXES_WAREHOUSE_SOCKET,
+  UPDATE_DRY_MIXES_WAREHOUSE_SOCKET,
+  ADD_NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+  UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+  ADD_NEW_ANCHORS_WAREHOUSE_SOCKET,
+  UPDATE_ANCHORS_WAREHOUSE_SOCKET,
+  ADD_NEW_TOOLS_WAREHOUSE_SOCKET,
+  UPDATE_TOOLS_WAREHOUSE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -306,6 +322,38 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_TOOL_SOCKET:
       dispatch(updateToolSocket(payload));
+      break;
+
+    case ADD_NEW_DRY_MIXES_WAREHOUSE_SOCKET:
+      dispatch(addNewDryMixesWarehouseSocket(payload));
+      break;
+
+    case UPDATE_DRY_MIXES_WAREHOUSE_SOCKET:
+      dispatch(updateDryMixesWarehouseSocket(payload));
+      break;
+
+    case ADD_NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET:
+      dispatch(addNewRelatedMaterialsWarehouseSocket(payload));
+      break;
+
+    case UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET:
+      dispatch(updateRelatedMaterialsWarehouseSocket(payload));
+      break;
+
+    case ADD_NEW_ANCHORS_WAREHOUSE_SOCKET:
+      dispatch(addNewAnchorsWarehouseSocket(payload));
+      break;
+
+    case UPDATE_ANCHORS_WAREHOUSE_SOCKET:
+      dispatch(updateAnchorsWarehouseSocket(payload));
+      break;
+
+    case ADD_NEW_TOOLS_WAREHOUSE_SOCKET:
+      dispatch(addNewToolsWarehouseSocket(payload));
+      break;
+
+    case UPDATE_TOOLS_WAREHOUSE_SOCKET:
+      dispatch(updateToolsWarehouseSocket(payload));
       break;
 
     case ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET:
