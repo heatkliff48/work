@@ -13,6 +13,10 @@ import {
   addNewDryMixesJournal,
   addNewRelatedMaterialsJournal,
   addNewTool,
+  updateAnchor,
+  updateDryMixesJournal,
+  updateRelatedMaterialsJournal,
+  updateTool,
 } from '#components/redux/actions/productsTypeJournalAction.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
@@ -25,6 +29,10 @@ function ProductsTypeJournalModal(props) {
     relatedMaterialsJournal,
     anchor,
     tool,
+    latestDryMix,
+    latestRelatedMaterials,
+    latestAnchors,
+    latestTools,
     selectedProductsType,
     setSelectedProductsType,
   } = useProductsTypeJournalContext();
@@ -156,8 +164,51 @@ function ProductsTypeJournalModal(props) {
     const defaultCountry = placeOfProductionOptions.find(
       (opt) => opt.value === 'ES'
     );
-    if (props.addNewVersion) {
+    if (props.addNewVersion || props.repair) {
       setProductsTypeJournalInput({ ...selectedProductsType });
+    } else if (props.duplicate) {
+      let code = '0001';
+      const articleId =
+        props.target == 1
+          ? latestDryMix.length === 0
+            ? 1
+            : latestDryMix.length + 1
+          : props.target == 2
+          ? latestRelatedMaterials.length === 0
+            ? 1
+            : latestRelatedMaterials.length + 1
+          : props.target == 3
+          ? latestAnchors.length === 0
+            ? 1
+            : latestAnchors.length + 1
+          : latestTools.length === 0
+          ? 1
+          : latestTools.length + 1;
+
+      // dryMixesJournal.length === 0 ? 1 : dryMixesJournal.length + 1;
+      code =
+        (props.target == 1
+          ? `1`
+          : props.target == 2
+          ? `4`
+          : props.target == 3
+          ? `2`
+          : `3`) + `0000${articleId}`.slice(-4);
+      console.log('code', code);
+      setProductsTypeJournalInput({
+        ...selectedProductsType,
+        article: `X.${
+          props.target == 1
+            ? `M`
+            : props.target == 2
+            ? `P`
+            : props.target == 3
+            ? `F`
+            : `T`
+        }${code}`,
+        product_code: code,
+        version: 1,
+      });
     } else {
       setProductsTypeJournalInput((prev) => ({
         ...prev,
@@ -213,44 +264,58 @@ function ProductsTypeJournalModal(props) {
         return;
       }
 
-      const existingProduct = hasMatchingObject(
-        dryMixesJournal,
-        productsTypeJournalInput,
-        [
-          'price_per_unit',
-          'price_per_kilogram',
-          'description',
-          'article',
-          'product_code',
-          'active_status',
-          'version',
-        ]
-      );
-
-      if (existingProduct) {
+      if (props.repair) {
         setSelectedProductsType({
           ...productsTypeJournalInput,
-          id: parseInt(
-            dryMixesJournal.length === 0 ? 1 : dryMixesJournal.length + 1
-          ),
-          article: existingProduct.article,
-          version: existingProduct.version + 1,
-          product_code: existingProduct.product_code,
         });
         dispatch(
-          addNewDryMixesJournal({
+          updateDryMixesJournal({
             ...productsTypeJournalInput,
-            article: existingProduct.article,
-            version: existingProduct.version + 1,
-            product_code: existingProduct.product_code,
           })
         );
       } else {
-        dispatch(
-          addNewDryMixesJournal({
-            ...productsTypeJournalInput,
-          })
+        const existingProduct = hasMatchingObject(
+          dryMixesJournal,
+          productsTypeJournalInput,
+          [
+            'price_per_unit',
+            'price_per_kilogram',
+            'description',
+            'article',
+            'product_code',
+            'active_status',
+            'version',
+          ]
         );
+
+        if (existingProduct) {
+          setSelectedProductsType({
+            ...productsTypeJournalInput,
+            id: parseInt(
+              dryMixesJournal.length === 0 ? 1 : dryMixesJournal.length + 1
+            ),
+            article: existingProduct.article,
+            version: existingProduct.version + 1,
+            product_code: existingProduct.product_code,
+          });
+          dispatch(
+            addNewDryMixesJournal({
+              ...productsTypeJournalInput,
+              article: existingProduct.article,
+              version: existingProduct.version + 1,
+              product_code: existingProduct.product_code,
+            })
+          );
+        } else {
+          setSelectedProductsType({
+            ...productsTypeJournalInput,
+          });
+          dispatch(
+            addNewDryMixesJournal({
+              ...productsTypeJournalInput,
+            })
+          );
+        }
       }
     } else if (props.target == 2) {
       requiredFieldsRelatedMaterial.forEach((field) => {
@@ -266,45 +331,59 @@ function ProductsTypeJournalModal(props) {
         return;
       }
 
-      const existingProduct = hasMatchingObject(
-        relatedMaterialsJournal,
-        productsTypeJournalInput,
-        [
-          'price_per_unit',
-          'description',
-          'article',
-          'product_code',
-          'active_status',
-          'version',
-        ]
-      );
-
-      if (existingProduct) {
+      if (props.repair) {
         setSelectedProductsType({
           ...productsTypeJournalInput,
-          id: parseInt(
-            relatedMaterialsJournal.length === 0
-              ? 1
-              : relatedMaterialsJournal.length + 1
-          ),
-          article: existingProduct.article,
-          version: existingProduct.version + 1,
-          product_code: existingProduct.product_code,
         });
         dispatch(
-          addNewRelatedMaterialsJournal({
+          updateRelatedMaterialsJournal({
             ...productsTypeJournalInput,
-            article: existingProduct.article,
-            version: existingProduct.version + 1,
-            product_code: existingProduct.product_code,
           })
         );
       } else {
-        dispatch(
-          addNewRelatedMaterialsJournal({
-            ...productsTypeJournalInput,
-          })
+        const existingProduct = hasMatchingObject(
+          relatedMaterialsJournal,
+          productsTypeJournalInput,
+          [
+            'price_per_unit',
+            'description',
+            'article',
+            'product_code',
+            'active_status',
+            'version',
+          ]
         );
+
+        if (existingProduct) {
+          setSelectedProductsType({
+            ...productsTypeJournalInput,
+            id: parseInt(
+              relatedMaterialsJournal.length === 0
+                ? 1
+                : relatedMaterialsJournal.length + 1
+            ),
+            article: existingProduct.article,
+            version: existingProduct.version + 1,
+            product_code: existingProduct.product_code,
+          });
+          dispatch(
+            addNewRelatedMaterialsJournal({
+              ...productsTypeJournalInput,
+              article: existingProduct.article,
+              version: existingProduct.version + 1,
+              product_code: existingProduct.product_code,
+            })
+          );
+        } else {
+          setSelectedProductsType({
+            ...productsTypeJournalInput,
+          });
+          dispatch(
+            addNewRelatedMaterialsJournal({
+              ...productsTypeJournalInput,
+            })
+          );
+        }
       }
     } else if (props.target == 3) {
       requiredFieldsAnchors.forEach((field) => {
@@ -320,37 +399,51 @@ function ProductsTypeJournalModal(props) {
         return;
       }
 
-      const existingProduct = hasMatchingObject(anchor, productsTypeJournalInput, [
-        'price_per_unit',
-        'description',
-        'article',
-        'product_code',
-        'active_status',
-        'version',
-      ]);
-
-      if (existingProduct) {
+      if (props.repair) {
         setSelectedProductsType({
           ...productsTypeJournalInput,
-          id: parseInt(anchor.length === 0 ? 1 : anchor.length + 1),
-          article: existingProduct.article,
-          version: existingProduct.version + 1,
-          product_code: existingProduct.product_code,
         });
         dispatch(
-          addNewAnchor({
+          updateAnchor({
             ...productsTypeJournalInput,
-            article: existingProduct.article,
-            version: existingProduct.version + 1,
-            product_code: existingProduct.product_code,
           })
         );
       } else {
-        dispatch(
-          addNewAnchor({
+        const existingProduct = hasMatchingObject(anchor, productsTypeJournalInput, [
+          'price_per_unit',
+          'description',
+          'article',
+          'product_code',
+          'active_status',
+          'version',
+        ]);
+
+        if (existingProduct) {
+          setSelectedProductsType({
             ...productsTypeJournalInput,
-          })
-        );
+            id: parseInt(anchor.length === 0 ? 1 : anchor.length + 1),
+            article: existingProduct.article,
+            version: existingProduct.version + 1,
+            product_code: existingProduct.product_code,
+          });
+          dispatch(
+            addNewAnchor({
+              ...productsTypeJournalInput,
+              article: existingProduct.article,
+              version: existingProduct.version + 1,
+              product_code: existingProduct.product_code,
+            })
+          );
+        } else {
+          setSelectedProductsType({
+            ...productsTypeJournalInput,
+          });
+          dispatch(
+            addNewAnchor({
+              ...productsTypeJournalInput,
+            })
+          );
+        }
       }
     } else if (props.target == 4) {
       requiredFieldsTools.forEach((field) => {
@@ -366,37 +459,51 @@ function ProductsTypeJournalModal(props) {
         return;
       }
 
-      const existingProduct = hasMatchingObject(tool, productsTypeJournalInput, [
-        'price_per_unit',
-        'description',
-        'article',
-        'product_code',
-        'active_status',
-        'version',
-      ]);
-
-      if (existingProduct) {
+      if (props.repair) {
         setSelectedProductsType({
           ...productsTypeJournalInput,
-          id: parseInt(tool.length === 0 ? 1 : tool.length + 1),
-          article: existingProduct.article,
-          version: existingProduct.version + 1,
-          product_code: existingProduct.product_code,
         });
         dispatch(
-          addNewTool({
+          updateTool({
             ...productsTypeJournalInput,
-            article: existingProduct.article,
-            version: existingProduct.version + 1,
-            product_code: existingProduct.product_code,
           })
         );
       } else {
-        dispatch(
-          addNewTool({
+        const existingProduct = hasMatchingObject(tool, productsTypeJournalInput, [
+          'price_per_unit',
+          'description',
+          'article',
+          'product_code',
+          'active_status',
+          'version',
+        ]);
+
+        if (existingProduct) {
+          setSelectedProductsType({
             ...productsTypeJournalInput,
-          })
-        );
+            id: parseInt(tool.length === 0 ? 1 : tool.length + 1),
+            article: existingProduct.article,
+            version: existingProduct.version + 1,
+            product_code: existingProduct.product_code,
+          });
+          dispatch(
+            addNewTool({
+              ...productsTypeJournalInput,
+              article: existingProduct.article,
+              version: existingProduct.version + 1,
+              product_code: existingProduct.product_code,
+            })
+          );
+        } else {
+          setSelectedProductsType({
+            ...productsTypeJournalInput,
+          });
+          dispatch(
+            addNewTool({
+              ...productsTypeJournalInput,
+            })
+          );
+        }
       }
     }
 
@@ -558,25 +665,20 @@ function ShowProductsTypeJournalModal(props) {
 
   return (
     <>
-      {props.addNewVersion ? (
-        <Button
-          variant="primary"
-          onClick={() => {
-            setModalShow(true);
-          }}
-        >
-          Add new version of {props.title}
-        </Button>
-      ) : (
-        <Button
-          variant="primary"
-          onClick={() => {
-            setModalShow(true);
-          }}
-        >
-          Add {props.title}
-        </Button>
-      )}
+      <Button
+        variant="primary"
+        onClick={() => {
+          setModalShow(true);
+        }}
+      >
+        {props.addNewVersion
+          ? `Edit`
+          : props.repair
+          ? `Repair`
+          : props.duplicate
+          ? `Duplicate`
+          : `Add ${props.title}`}
+      </Button>
 
       <ProductsTypeJournalModal
         show={modalShow}
@@ -586,6 +688,8 @@ function ShowProductsTypeJournalModal(props) {
         title={props.title}
         productCode={props.productCode}
         addNewVersion={props.addNewVersion || false}
+        repair={props.repair || false}
+        duplicate={props.duplicate || false}
       />
     </>
   );

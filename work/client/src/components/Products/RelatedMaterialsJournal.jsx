@@ -37,9 +37,7 @@ const RelatedMaterialsJournal = () => {
       setRelatedMaterialsJournalDataList(latestRelatedMaterials);
       let code = '0001';
       const articleId =
-        relatedMaterialsJournal.length === 0
-          ? 1
-          : relatedMaterialsJournal.length + 1;
+        latestRelatedMaterials.length === 0 ? 1 : latestRelatedMaterials.length + 1;
       code = `4` + `0000${articleId}`.slice(-4);
       setProductCode(code);
     }

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import ShowProductsTypeJournalModal from './modal/ProductsTypeJournalModal';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import ProductsTypeJournalInfoModal from './modal/ProductsTypeJournalInfoModal';
+import { getAnchor } from '#components/redux/actions/productsTypeJournalAction.js';
 
 const AnchorsTable = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
@@ -27,6 +28,12 @@ const AnchorsTable = () => {
     latestAnchors,
   } = useProductsTypeJournalContext();
 
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAnchor());
+  }, []);
+
   useEffect(() => {
     if (latestAnchors) {
       const newData = latestAnchors.map((piece) => {
@@ -44,7 +51,7 @@ const AnchorsTable = () => {
       });
       setAnchorDataList(newData);
       let code = '0001';
-      const articleId = anchor.length === 0 ? 1 : anchor.length + 1;
+      const articleId = latestAnchors.length === 0 ? 1 : latestAnchors.length + 1;
       code = `2` + `0000${articleId}`.slice(-4);
       setProductCode(code);
     }

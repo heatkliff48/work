@@ -252,7 +252,53 @@ function ProductsTypeJournalInfoModal(props) {
                 : 'tool'
             }
             productCode={selectedProductsType?.productCode}
+            repair={true}
+          />
+          <ShowProductsTypeJournalModal
+            table={
+              props.target == 1
+                ? COLUMNS_DRY_MIXED_PRODUCT
+                : props.target == 2
+                ? COLUMNS_RELATED_MATERIALS_JOURNAL
+                : props.target == 3
+                ? COLUMNS_ANCHOR_PRODUCT
+                : COLUMNS_TOOLS_PRODUCT
+            }
+            target={props.target}
+            title={
+              props.target == 1
+                ? 'dry mix'
+                : props.target == 2
+                ? 'related material'
+                : props.target == 3
+                ? 'fastener'
+                : 'tool'
+            }
+            productCode={selectedProductsType?.productCode}
             addNewVersion={true}
+          />
+          <ShowProductsTypeJournalModal
+            table={
+              props.target == 1
+                ? COLUMNS_DRY_MIXED_PRODUCT
+                : props.target == 2
+                ? COLUMNS_RELATED_MATERIALS_JOURNAL
+                : props.target == 3
+                ? COLUMNS_ANCHOR_PRODUCT
+                : COLUMNS_TOOLS_PRODUCT
+            }
+            target={props.target}
+            title={
+              props.target == 1
+                ? 'dry mix'
+                : props.target == 2
+                ? 'related material'
+                : props.target == 3
+                ? 'fastener'
+                : 'tool'
+            }
+            productCode={selectedProductsType?.productCode}
+            duplicate={true}
           />
           <Button onClick={props.onHide}>Close</Button>
         </Modal.Footer>
