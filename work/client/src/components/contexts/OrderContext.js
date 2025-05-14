@@ -325,7 +325,10 @@ const OrderContextProvider = ({ children }) => {
         (acc) => acc.orders_article == el.article
       );
 
-      if (el.status == 7 && haveAproved?.aproved) {
+      if (
+        (el.status == 7 || el.status == 10 || el.status == 9) &&
+        haveAproved?.aproved
+      ) {
         dispatch(
           updAccountingDataList({
             orders_article: el?.article,
@@ -334,7 +337,7 @@ const OrderContextProvider = ({ children }) => {
         );
       }
     });
-  }, [list_of_orders, accDataList]);
+  }, [list_of_orders, accDataList, accountingDataList]);
 
   useEffect(() => {
     const filteredUsersList = usersMainInfo.filter(
