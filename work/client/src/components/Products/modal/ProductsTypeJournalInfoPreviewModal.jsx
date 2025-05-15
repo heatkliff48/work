@@ -31,9 +31,11 @@ function ProductsTypeJournalInfoPreviewModal(props) {
     relatedMaterialsJournal,
     anchor,
     tool,
+    typeOfMixOptions,
     selectedProductsType,
     setSelectedProductsType,
     dataTable,
+    setDataTable,
     productsTypeJournalPreviewInput,
     setProductsTypeJournalPreviewInput,
   } = useProductsTypeJournalContext();
@@ -309,6 +311,18 @@ function ProductsTypeJournalInfoPreviewModal(props) {
     props.onHide();
   };
 
+  useEffect(() => {
+    setDataTable(
+      props.target == 1
+        ? COLUMNS_DRY_MIXED_PRODUCT
+        : props.target == 2
+        ? COLUMNS_RELATED_MATERIALS_JOURNAL
+        : props.target == 3
+        ? COLUMNS_ANCHOR_PRODUCT
+        : COLUMNS_TOOLS_PRODUCT
+    );
+  }, []);
+
   const handleCloseModal = () => {
     props.onHide();
     // setLastVersion(1);
@@ -370,7 +384,13 @@ function ProductsTypeJournalInfoPreviewModal(props) {
                             ? productsTypeJournalPreviewInput?.[el.accessor]
                               ? 'Available'
                               : 'Not available'
-                            : productsTypeJournalPreviewInput[el.accessor] ||
+                            : el.accessor === 'type_of_mix'
+                            ? typeOfMixOptions.find(
+                                (type) =>
+                                  type.value ==
+                                  productsTypeJournalPreviewInput?.type_of_mix
+                              )?.label || ''
+                            : productsTypeJournalPreviewInput[el.accessor] ??
                               'Empty'}
                         </h3>
                       </Row>

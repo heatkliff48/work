@@ -27,6 +27,7 @@ function ProductsTypeJournalInfoModal(props) {
     selectedProductsType,
     setSelectedProductsType,
     dataTable,
+    typeOfMixOptions,
   } = useProductsTypeJournalContext();
   const products = useSelector((state) =>
     props.target == 1
@@ -200,7 +201,12 @@ function ProductsTypeJournalInfoModal(props) {
                             ? selectedProductsType?.[el.accessor]
                               ? 'Available'
                               : 'Not available'
-                            : selectedProductsType[el.accessor] || 'Empty'}
+                            : el.accessor === 'type_of_mix'
+                            ? typeOfMixOptions.find(
+                                (type) =>
+                                  type.value == selectedProductsType?.type_of_mix
+                              )?.label || ''
+                            : selectedProductsType[el.accessor] ?? 'Empty'}
                         </h3>
                       </Row>
                     ))}
