@@ -8,6 +8,7 @@ import {
 } from '../types/ordersTypes';
 import {
   DATASHIP_ORDER_SOCKET,
+  DESCRIPTIOM_ORDER_SOCKET,
   NEW_ORDER_SOCKET,
   PERSON_IN_CHARGE_OF_ORDER_SOCKET,
   STATUS_OF_ORDER_SOCKET,
@@ -37,6 +38,19 @@ export const ordersReducer = (orders = [], action) => {
         }
         return order;
       });
+      return result;
+    }
+
+    case DESCRIPTIOM_ORDER_SOCKET: {
+      const { order_id, description } = payload;
+
+      const result = orders.map((order) => {
+        if (order.id === order_id) {
+          return { ...order, description };
+        }
+        return order;
+      });
+
       return result;
     }
 

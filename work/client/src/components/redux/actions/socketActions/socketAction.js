@@ -41,6 +41,7 @@ import {
   DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   REP_PRODUCT_SOCKET,
+  DESCRIPTIOM_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -145,6 +146,13 @@ export const addDatashipOrderSocket = (date) => {
   return {
     type: DATASHIP_ORDER_SOCKET,
     payload: date,
+  };
+};
+
+export const addDescOrderSocket = (desc) => {
+  return {
+    type: DESCRIPTIOM_ORDER_SOCKET,
+    payload: desc,
   };
 };
 
