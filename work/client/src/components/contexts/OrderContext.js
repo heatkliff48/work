@@ -337,7 +337,7 @@ const OrderContextProvider = ({ children }) => {
         );
       }
     });
-  }, [list_of_orders, accDataList, accountingDataList]);
+  }, [list_of_orders, accDataList]);
 
   useEffect(() => {
     const filteredUsersList = usersMainInfo.filter(
