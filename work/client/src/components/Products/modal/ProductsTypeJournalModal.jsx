@@ -186,7 +186,6 @@ function ProductsTypeJournalModal(props) {
           : props.target == 3
           ? `2`
           : `3`) + `0000${articleId}`.slice(-4);
-      console.log('code', code);
       setProductsTypeJournalInput({
         ...selectedProductsType,
         article: `X.${
@@ -289,10 +288,6 @@ function ProductsTypeJournalModal(props) {
     props.onHide();
     setProductsTypeJournalInput({});
   };
-
-  // useEffect(() => {
-  //   console.log('productsTypeJournalInput -------', productsTypeJournalInput);
-  // }, [productsTypeJournalInput]);
 
   const isFieldDisabled = (fieldName) => {
     if (props?.addNewVersion) {

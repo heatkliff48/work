@@ -72,8 +72,6 @@ function ProductsTypeJournalInfoPreviewModal(props) {
       return keys.every((key) => {
         // Проверяем, что ключ существует в объекте из массива
         // и его значение совпадает со значением в новом объекте
-        console.log('item[key]', item[key]);
-        console.log('newObj[key]', newObj[key]);
         return item.hasOwnProperty(key) && item[key] == newObj[key];
       });
     });
@@ -81,8 +79,6 @@ function ProductsTypeJournalInfoPreviewModal(props) {
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
-
-    console.log('CONFIRM!');
 
     if (props.target == 1) {
       if (props.repair) {
