@@ -41,6 +41,7 @@ import {
   deleteDryMixedProductOfOrderSocket,
   deleteAnchorProductOfOrderSocket,
   deleteToolProductOfOrderSocket,
+  addDescOrderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -60,6 +61,7 @@ import {
   ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
   ADD_CONTACT_INFO_SOCKET,
   ADD_DATASHIP_ORDER_SOCKET,
+  ADD_DESCRIPTIOM_ORDER_SOCKET,
   ADD_DELIVERY_ADDRESSES_SOCKET,
   ADD_NEW_BATCH_OUTSIDE_SOCKET,
   ADD_NEW_CLIENT_SOCKET,
@@ -174,6 +176,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_DATASHIP_ORDER_SOCKET:
       dispatch(addDatashipOrderSocket(payload));
+      break;
+
+    case ADD_DESCRIPTIOM_ORDER_SOCKET:
+      dispatch(addDescOrderSocket(payload));
       break;
 
     case UPDATE_STATUS_OF_ORDER_SOCKET:

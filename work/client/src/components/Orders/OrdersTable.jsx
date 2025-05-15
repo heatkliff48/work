@@ -70,6 +70,7 @@ function OrdersTable() {
         buttonText={'Add new order'}
         tableName={'Orders'}
         handleRowClick={(row) => {
+          console.log('row.original', row.original);
           getCurrentOrderInfoHandler(row.original);
           dispatch(getCurrentProductsOfOrders(row.original.id));
           navigate('/order_card');

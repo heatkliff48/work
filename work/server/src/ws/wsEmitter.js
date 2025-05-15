@@ -50,6 +50,7 @@ const {
   GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   REPAIR_PRODUCT_SOCKET,
+  ADD_DESCRIPTIOM_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -126,6 +127,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_DATASHIP_ORDER_SOCKET,
           payload: date,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_DESCRIPTIOM_ORDER_SOCKET, (desc) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_DESCRIPTIOM_ORDER_SOCKET,
+          payload: desc,
         })
       );
     }
