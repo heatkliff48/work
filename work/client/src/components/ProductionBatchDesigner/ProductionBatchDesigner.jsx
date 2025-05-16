@@ -61,8 +61,7 @@ function ProductionBatchDesigner() {
       { Header: 'Ширина, мм', accessor: 'width' },
       { Header: 'Количество, паллет', accessor: 'quantity' },
       { Header: 'Продукт + Брак, паллет', accessor: 'product_with_brack' },
-      { Header: 'К-во, м³', accessor: 'quantity_m3' },
-      { Header: 'Кол-во, массив', accessor: 'cakes_quantity' },
+      { Header: 'Кол-во, м³', accessor: 'quantity_m3' },
       { Header: 'Свободная продукция, массив', accessor: 'free_product_cakes' },
       { Header: 'Свободная продукция, паллет', accessor: 'free_product_package' },
       { Header: 'Итоговое кол-во, массив', accessor: 'total_cakes' },
@@ -132,15 +131,14 @@ function ProductionBatchDesigner() {
   const addCakesData = useCallback(
     (prodBatchData) => {
       const { id, product_with_brack, article } = prodBatchData;
-      const quantity_cakes = Math.ceil(product_with_brack);
 
       const free_product_cakes = (
-        Math.ceil(quantity_cakes) - quantity_cakes
+        Math.ceil(product_with_brack) - product_with_brack
       ).toFixed(2);
-      const free_product_package = Math.ceil(free_product_cakes * 3);
+      const free_product_package = Math.floor(free_product_cakes * 3);
 
       const haveBatch = batchDesigner.length > 0;
-      const total_cakes = Math.ceil(quantity_cakes);
+      const total_cakes = Math.ceil(product_with_brack);
 
       const cakes_in_batch = haveBatch
         ? batchDesigner.find((el) => el.id === id).cakes_in_batch
@@ -153,7 +151,6 @@ function ProductionBatchDesigner() {
 
       const updatedProdBatch = {
         ...prodBatchData,
-        cakes_quantity: quantity_cakes,
         free_product_cakes,
         free_product_package,
         total_cakes,
@@ -272,6 +269,7 @@ function ProductionBatchDesigner() {
         if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
           const rightQuantity = quantity - quantity_in_warehouse;
           const quantity_m3 = (rightQuantity * volumeBlockOnPallet).toFixed(2);
+
           const batch = addCakesData({
             id,
             density,
@@ -340,10 +338,16 @@ function ProductionBatchDesigner() {
     if (autoclave.length !== 0) {
       setProductonBatchDesigner((prev) => {
         return prev.map((batchItem) => {
+          const { cakes_in_batch, free_product_package, id } = batchItem;
           for (let i = 0; i < batchDesigner.length; i++) {
-            if (batchDesigner[i].id === batchItem.id) {
+            if (batchDesigner[i].id === id) {
+              const free = (batchDesigner[i].cakes_in_batch - cakes_in_batch) * 3;
+
+              const new_free_product_package =
+                free > 0 ? free_product_package + free : free_product_package;
               return {
                 ...batchItem,
+                free_product_package: new_free_product_package,
                 cakes_in_batch: batchDesigner[i].cakes_in_batch,
                 cakes_residue: batchDesigner[i].cakes_residue,
               };

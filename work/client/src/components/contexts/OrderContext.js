@@ -363,7 +363,6 @@ const OrderContextProvider = ({ children }) => {
 
   const getCurrentOrderInfoHandler = useCallback(
     (order_info) => {
-      console.log('order_info', order_info);
       const order = list_of_orders.find((el) => el.article === order_info?.article);
       const client = clients.find((client) => client.id === order?.owner);
       const deliveryAddress = deliveryAddresses.find(
@@ -420,7 +419,7 @@ const OrderContextProvider = ({ children }) => {
           (address) =>
             address.id === order.del_adr_id && address.client_id === order.owner
         );
-        console.log('order', order);
+
         return {
           id,
           article,
