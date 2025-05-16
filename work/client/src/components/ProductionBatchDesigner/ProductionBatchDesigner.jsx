@@ -132,7 +132,8 @@ function ProductionBatchDesigner() {
   const addCakesData = useCallback(
     (prodBatchData) => {
       const { id, product_with_brack, article } = prodBatchData;
-      const quantity_cakes = (product_with_brack / 3).toFixed(2);
+      const quantity_cakes = Math.ceil(product_with_brack);
+
       const free_product_cakes = (
         Math.ceil(quantity_cakes) - quantity_cakes
       ).toFixed(2);
@@ -259,24 +260,29 @@ function ProductionBatchDesigner() {
     Object.keys(groupedByDensity).forEach((densityKey) => {
       const group = groupedByDensity[densityKey];
       group.forEach(({ id, quantity, product, quantity_in_warehouse }) => {
-        const { volumeBlockOnPallet, normOfBrack, width, density, article } =
-          product;
+        const {
+          volumeBlockOnPallet,
+          normOfBrack,
+          width,
+          density,
+          article,
+          m3InArray,
+        } = product;
 
         if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
+          const rightQuantity = quantity - quantity_in_warehouse;
+          const quantity_m3 = (rightQuantity * volumeBlockOnPallet).toFixed(2);
           const batch = addCakesData({
             id,
             density,
             width,
-            quantity: quantity - quantity_in_warehouse,
-            product_with_brack: (
-              (quantity - quantity_in_warehouse) *
-              (1 + normOfBrack / 100)
-            ).toFixed(2),
-            quantity_m3: (normOfBrack * volumeBlockOnPallet).toFixed(2),
+            quantity: rightQuantity,
+            product_with_brack: ((quantity_m3 + normOfBrack) / m3InArray).toFixed(2),
+            quantity_m3,
             article,
           });
           prodBatch.push(batch);
-          updatedTotalQuantity += quantity - quantity_in_warehouse;
+          updatedTotalQuantity += rightQuantity;
         }
       });
     });
