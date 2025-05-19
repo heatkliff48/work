@@ -4,6 +4,7 @@ const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_ORDER_SOCKET,
   ADD_DATASHIP_ORDER_SOCKET,
+  ADD_DESCRIPTIOM_ORDER_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
@@ -58,6 +59,19 @@ class OrdersController {
       });
 
       myEmitter.emit(ADD_DATASHIP_ORDER_SOCKET, date);
+      return res.status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async addDescriptionOrder(req, res) {
+    const desc = req.body;
+
+    try {
+      await OrdersService.addDescriptionOrder(desc);
+
+      myEmitter.emit(ADD_DESCRIPTIOM_ORDER_SOCKET, desc);
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);

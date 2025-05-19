@@ -325,7 +325,10 @@ const OrderContextProvider = ({ children }) => {
         (acc) => acc.orders_article == el.article
       );
 
-      if (el.status == 7 && haveAproved?.aproved) {
+      if (
+        (el.status == 7 || el.status == 10 || el.status == 9) &&
+        haveAproved?.aproved
+      ) {
         dispatch(
           updAccountingDataList({
             orders_article: el?.article,
@@ -377,6 +380,7 @@ const OrderContextProvider = ({ children }) => {
         status: order?.status,
         owner: client,
         deliveryAddress,
+        description: order?.description,
         contactInfo,
         shipping_date: order?.shipping_date,
         person_in_charge: order?.person_in_charge,
@@ -419,6 +423,7 @@ const OrderContextProvider = ({ children }) => {
         return {
           id,
           article,
+          description: order?.description,
           status:
             status_list?.find((stat) => stat.accessor == status)?.Header || status,
           owner: client ? client.c_name : '',

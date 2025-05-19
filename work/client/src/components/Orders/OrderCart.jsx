@@ -10,6 +10,7 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import {
   addDataShipOrder,
+  addDescription,
   deleteAccountingData,
   deleteOrder,
   getDeleteProductOfOrder,
@@ -70,7 +71,7 @@ const OrderCart = React.memo(() => {
   const { displayNames, user } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { latestProducts } = useProductsContext();
-  const { dryMixesJournal, anchor, tool, latestDryMix, latestAnchors, latestTools } =
+  const { latestDryMix, latestAnchors, latestTools } =
     useProductsTypeJournalContext();
   const {
     warehouse_data,
@@ -91,7 +92,9 @@ const OrderCart = React.memo(() => {
 
   const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
   const [dataValue, setDataValue] = useState(new Date());
+  const [newDescription, setNewDescription] = useState('');
   const [formatDataValue, setFormatDataValue] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState([]);
@@ -146,6 +149,10 @@ const OrderCart = React.memo(() => {
     return orderCartData?.shipping_date ?? false;
   }, [orderCartData]);
 
+  const hasDescription = useMemo(() => {
+    return orderCartData?.description?.length > 0;
+  }, [orderCartData]);
+
   const filterAndMapData = useCallback(
     (data, filterKeys) =>
       Object.entries(data || {})
@@ -188,6 +195,11 @@ const OrderCart = React.memo(() => {
     [dataValue]
   );
 
+  const onEditHandler = () => {
+    setNewDescription(orderCartData?.description);
+    setIsEditing(true);
+  };
+
   const handleDayBeforShipping = useCallback(() => {
     const currentDate = new Date();
     const shippingDateString = orderCartData?.shipping_date;
@@ -199,37 +211,10 @@ const OrderCart = React.memo(() => {
     return daysUntil;
   }, [orderCartData?.shipping_date]);
 
-  // const addProductArticleToOrderList = useCallback(
-  //   (productsOfOrders, productsTable, arrayName) => {
-  //     if (!productsOfOrders || !productsTable || !arrayName) return [];
-
-  //     const updatedOrderProducts = productsOfOrders
-  //       .filter((el) => el.order_id == orderCartData.id)
-  //       .map((orderProduct) => {
-  //         const id = getCorrectProductId(arrayName);
-
-  //         const product = productsTable.find((p) => p.id === orderProduct?.[id]);
-
-  //         if (product) {
-  //           return {
-  //             product_article: product.article,
-  //             ...orderProduct,
-  //           };
-  //         }
-  //         return { ...orderProduct, product_article: 'Unknown' };
-  //       });
-
-  //     setProductLists((prevState) => {
-  //       return {
-  //         ...prevState,
-  //         [arrayName]: updatedOrderProducts,
-  //       };
-  //     });
-
-  //     return updatedOrderProducts;
-  //   },
-  //   []
-  // );
+  const onSaveDescription = (str) => {
+    dispatch(addDescription({ order_id: orderCartData.id, description: str }));
+    setIsEditing(false)
+  };
 
   const addProductArticleToOrderList = useCallback(
     (productsOfOrders, productsTable, arrayName) => {
@@ -619,8 +604,13 @@ const OrderCart = React.memo(() => {
       setOrderCartData((prev) => ({ ...prev, status: updatedOrderCartData.status }));
     }
 
-    if (!ordersStatus.includes(updatedOrderCartData.status))
-      setOrdersStatus((prev) => [...prev, updatedOrderCartData.status]);
+    if (!ordersStatus.includes(updatedOrderCartData?.status))
+      setOrdersStatus((prev) => [...prev, updatedOrderCartData?.status]);
+
+    setOrderCartData((prev) => ({
+      ...prev,
+      description: updatedOrderCartData?.description,
+    }));
 
     localStorage.setItem('orderCartData', JSON.stringify(storedData));
   }, [list_of_orders]);
@@ -757,6 +747,33 @@ const OrderCart = React.memo(() => {
               <ShowOrderDeliveryEditModal />
             )}
           </div>
+          <div className="description">
+            <h4>Description</h4>
+
+            {orderCartData?.description && !isEditing ? (
+              <>
+                <p>{orderCartData.description}</p>
+                <button className="edit-button" onClick={onEditHandler}>
+                  Edit
+                </button>
+              </>
+            ) : (
+              <div className="input-wrapper">
+                <textarea
+                  placeholder="Enter description..."
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                />
+                <button
+                  className="save-button"
+                  onClick={() => onSaveDescription(newDescription)}
+                >
+                  Save
+                </button>
+              </div>
+            )}
+          </div>
+
           {deleteOrderAccess?.canWrite && orderCartData?.status < 3 && (
             <Button
               onClick={() => {

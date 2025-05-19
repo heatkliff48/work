@@ -51,6 +51,7 @@ import {
   NEED_UPDATE_ANCHORS_WAREHOUSE_SOCKET,
   NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
   NEED_UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
+  DESCRIPTIOM_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -155,6 +156,13 @@ export const addDatashipOrderSocket = (date) => {
   return {
     type: DATASHIP_ORDER_SOCKET,
     payload: date,
+  };
+};
+
+export const addDescOrderSocket = (desc) => {
+  return {
+    type: DESCRIPTIOM_ORDER_SOCKET,
+    payload: desc,
   };
 };
 

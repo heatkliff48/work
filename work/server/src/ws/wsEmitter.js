@@ -60,6 +60,7 @@ const {
   UPDATE_TOOLS_WAREHOUSE_SOCKET,
   ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
   UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
+  ADD_DESCRIPTIOM_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -136,6 +137,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_DATASHIP_ORDER_SOCKET,
           payload: date,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_DESCRIPTIOM_ORDER_SOCKET, (desc) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_DESCRIPTIOM_ORDER_SOCKET,
+          payload: desc,
         })
       );
     }

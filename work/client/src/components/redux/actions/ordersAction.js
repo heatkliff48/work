@@ -25,6 +25,7 @@ import {
   GET_DELETE_DRY_MIXED_OF_ORDER,
   GET_DELETE_ANCHOR_OF_ORDER,
   GET_DELETE_TOOL_OF_ORDER,
+  ADD_ORDER_DESCRIPTION,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -44,6 +45,13 @@ export const addDataShipOrder = (date) => {
   return {
     type: ADD_DATA_SHIP_ORDER,
     payload: date,
+  };
+};
+
+export const addDescription = (desc) => {
+  return {
+    type: ADD_ORDER_DESCRIPTION,
+    payload: desc,
   };
 };
 

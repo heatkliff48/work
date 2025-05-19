@@ -47,6 +47,8 @@ import {
   GET_DELETE_ANCHOR_OF_ORDER,
   GET_DELETE_DRY_MIXED_OF_ORDER,
   GET_DELETE_TOOL_OF_ORDER,
+  ORDER_DESCRIPTION,
+  ADD_ORDER_DESCRIPTION,
 } from '../types/ordersTypes';
 
 const url = axios.create({
@@ -75,6 +77,15 @@ const addNewOrder = (order) => {
 const addDataShipOrder = (date) => {
   return url
     .post('/orders/date', date)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addDescriptionOrder = (desc) => {
+  return url
+    .post('/orders/desc', desc)
     .then((res) => {
       return res.data;
     })
@@ -280,6 +291,16 @@ function* addDataShipOrderWatcher(action) {
   } catch (err) {
     console.error(err);
     yield put({ type: DATA_SHIP_ORDER, payload: [] });
+  }
+}
+
+function* addDescriptionOrderWatcher(action) {
+  try {
+    const { payload } = action;
+    yield call(addDescriptionOrder, payload);
+  } catch (err) {
+    console.error(err);
+    yield put({ type: ORDER_DESCRIPTION, payload: [] });
   }
 }
 
@@ -514,6 +535,7 @@ function* ordersWatcher() {
   yield takeLatest(GET_ORDERS_LIST, getOrdersListWatcher);
   yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
   yield takeLatest(ADD_DATA_SHIP_ORDER, addDataShipOrderWatcher);
+  yield takeLatest(ADD_ORDER_DESCRIPTION, addDescriptionOrderWatcher);
   yield takeLatest(GET_CURRENT_PRODUCTS_OF_ORDER, getCurrentProductsOfOrderWatcher);
   yield takeLatest(GET_PRODUCTS_OF_ORDER, getProductsOfOrderWatcher);
   yield takeLatest(

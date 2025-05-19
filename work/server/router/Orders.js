@@ -10,6 +10,7 @@ router.get('/anchor_products', OrdersController.getAnchorProductsOfOrder);
 router.get('/tool_products', OrdersController.getToolProductsOfOrder);
 router.post('/add', OrdersController.addNewOrder);
 router.post('/date', OrdersController.addShippingDateOrder);
+router.post('/desc', OrdersController.addDescriptionOrder);
 router.post('/current/products', OrdersController.getCurrentProductsOfOrder);
 router.post('/delete', OrdersController.getDeleteOrder);
 router.post('/delete/product', OrdersController.getDeleteProductOfOrder);

@@ -44,6 +44,24 @@ class OrdersRepository {
     }
   }
 
+  static async addDescriptionOrder({ order_id, description }) {
+    try {
+      await Orders.update(
+        {
+          description,
+        },
+        { where: { id: order_id } }
+      );
+
+      const order_desc = await Orders.findOne({ where: { id: order_id } });
+
+      return order_desc;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
   static async getProductsOfOrder() {
     try {
       const product_list = await OrdersProducts.findAll({

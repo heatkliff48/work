@@ -1,4 +1,7 @@
-import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
+import {
+  updAccountingDataList,
+  updateOrderStatus,
+} from '#components/redux/actions/ordersAction.js';
 import {
   addNewReservedProducts,
   updateWarehouseQuantitys,
@@ -252,10 +255,18 @@ const WarehouseContextProvider = ({ children }) => {
     const allShipped = wmoctProduct.every((el) => el.qty_total === el.shipped);
 
     if (allShipped) {
+      const article = list_of_orders.find((el) => el.id == orderId)?.article;
       dispatch(
         updateOrderStatus({
           order_id: orderId,
           status: 9,
+        })
+      );
+
+      dispatch(
+        updAccountingDataList({
+          orders_article: article,
+          aproved: false,
         })
       );
     }
@@ -404,6 +415,12 @@ const WarehouseContextProvider = ({ children }) => {
           updateOrderStatus({
             order_id: currOrder.id,
             status: 7,
+          })
+        );
+        dispatch(
+          updAccountingDataList({
+            orders_article: order_article,
+            aproved: false,
           })
         );
       }

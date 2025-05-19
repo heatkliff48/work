@@ -33,6 +33,12 @@ class OrdersService {
     return;
   }
 
+  static async addDescriptionOrder(desc) {
+    const order_desc = await OrdersRepository.addDescriptionOrder(desc);
+
+    return order_desc;
+  }
+
   static async getProductsOfOrder() {
     const product_list = await OrdersRepository.getProductsOfOrder();
 
