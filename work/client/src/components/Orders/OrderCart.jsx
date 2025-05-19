@@ -88,6 +88,7 @@ const OrderCart = React.memo(() => {
   const [dataValue, setDataValue] = useState(new Date());
   const [newDescription, setNewDescription] = useState('');
   const [formatDataValue, setFormatDataValue] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState([]);
@@ -188,6 +189,11 @@ const OrderCart = React.memo(() => {
     [dataValue]
   );
 
+  const onEditHandler = () => {
+    setNewDescription(orderCartData?.description);
+    setIsEditing(true);
+  };
+
   const handleDayBeforShipping = useCallback(() => {
     const currentDate = new Date();
     const shippingDateString = orderCartData?.shipping_date;
@@ -201,6 +207,7 @@ const OrderCart = React.memo(() => {
 
   const onSaveDescription = (str) => {
     dispatch(addDescription({ order_id: orderCartData.id, description: str }));
+    setIsEditing(false)
   };
 
   const addProductArticleToOrderList = useCallback(
@@ -662,15 +669,12 @@ const OrderCart = React.memo(() => {
           <div className="description">
             <h4>Description</h4>
 
-            {hasDescription ? (
+            {orderCartData?.description && !isEditing ? (
               <>
                 <p>{orderCartData.description}</p>
-                {/* <button
-                  className="edit-button"
-                  onClick={() => onEditHandler()}
-                >
+                <button className="edit-button" onClick={onEditHandler}>
                   Edit
-                </button> */}
+                </button>
               </>
             ) : (
               <div className="input-wrapper">
