@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import ShowProductsTypeJournalModal from './modal/ProductsTypeJournalModal';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import ProductsTypeJournalInfoModal from './modal/ProductsTypeJournalInfoModal';
+import { getTool } from '#components/redux/actions/productsTypeJournalAction.js';
 
 const ToolsTable = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
@@ -27,6 +28,12 @@ const ToolsTable = () => {
     latestTools,
   } = useProductsTypeJournalContext();
 
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getTool());
+  }, []);
+
   useEffect(() => {
     if (latestTools) {
       const newData = latestTools.map((piece) => {
@@ -44,7 +51,7 @@ const ToolsTable = () => {
       });
       setToolDataList(newData);
       let code = '0001';
-      const articleId = tool.length === 0 ? 1 : tool.length + 1;
+      const articleId = latestTools.length === 0 ? 1 : latestTools.length + 1;
       code = `3` + `0000${articleId}`.slice(-4);
       setProductCode(code);
     }

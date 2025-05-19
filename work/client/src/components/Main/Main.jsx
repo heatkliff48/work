@@ -21,6 +21,7 @@ import {
   getTool,
 } from '#components/redux/actions/productsTypeJournalAction.js';
 import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
+import { getRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 import { getAllRoles } from '#components/redux/actions/rolesAction.js';
 import { getAllStockBalance } from '#components/redux/actions/stockBalanceAction.js';
 import {
@@ -66,6 +67,7 @@ function Main() {
     dispatch(getRecipeOrdersData());
     dispatch(clearBatchState());
     dispatch(getAllStockBalance());
+    dispatch(getRelatedMaterialsBackorder());
     setStoredData(null);
     //dispatch(dataFetchedChange(true));
   }, []);
@@ -114,7 +116,10 @@ function Main() {
           </button>
         )}
         {checkUserAccess(user, roles, 'Warehouse')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/warehouse')}>
+          <button
+            className="nav-button"
+            onClick={() => navigate('/warehouse_products_type')}
+          >
             Warehouse
           </button>
         )}
@@ -150,6 +155,14 @@ function Main() {
             onClick={() => navigate('/list_of_ordered_production_oem')}
           >
             List of ordered production OEM
+          </button>
+        )}
+        {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
+          <button
+            className="nav-button"
+            onClick={() => navigate('/related_materials_backorder_list')}
+          >
+            Related materials backorder list
           </button>
         )}
         {checkUserAccess(user, roles, 'batch_outside')?.canRead && (

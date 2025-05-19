@@ -1,0 +1,50 @@
+import { useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Table from '../Table/Table';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import ShowProductsTypeWarehouseModal from './Modal/ProductsTypeWarehouseModal';
+import { getDryMixesWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
+
+function Warehouse() {
+  const { COLUMNS_WAREHOUSE, dry_mixes_warehouse_data } = useWarehouseContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+
+  const user = useSelector((state) => state.user);
+
+  // const handleRowClick = useCallback((row) => {
+  //   setWarehouseInfoCurIdModal(row.original.id);
+  //   setWarehouseInfoModal(!warehouseInfoModal);
+  // }, []);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Warehouse');
+
+      if (JSON.stringify(access) !== JSON.stringify(userAccess)) {
+        setUserAccess(access);
+      }
+    }
+  }, [user, roles, checkUserAccess, userAccess, setUserAccess]);
+
+  useEffect(() => {
+    dispatch(getDryMixesWarehouse());
+  }, []);
+
+  return (
+    <>
+      <ShowProductsTypeWarehouseModal target={1} title={'dry mix'} />
+
+      <Table
+        COLUMN_DATA={COLUMNS_WAREHOUSE}
+        dataOfTable={dry_mixes_warehouse_data}
+        userAccess={userAccess}
+        tableName={'Dry Mixes Warehouse'}
+        // handleRowClick={handleRowClick}
+      />
+    </>
+  );
+}
+export default Warehouse;

@@ -43,6 +43,8 @@ import {
   getDeleteDryMixedProductOfOrder,
   getDeleteToolProductOfOrder,
 } from '#components/redux/actions/ordersAction.js';
+import { updateDryMixesWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
+import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 
 const OrderCart = React.memo(() => {
   const {
@@ -73,6 +75,10 @@ const OrderCart = React.memo(() => {
     useProductsTypeJournalContext();
   const {
     warehouse_data,
+    dry_mixes_warehouse_data,
+    related_materials_warehouse_data,
+    anchors_warehouse_data,
+    tools_warehouse_data,
     list_of_reserved_products,
     ordered_production_oem_status,
     filteredWarehouseByProduct,
@@ -343,6 +349,8 @@ const OrderCart = React.memo(() => {
       );
     }
 
+    // blocks
+
     updatedProductListOrder?.forEach((product) => {
       const loc = latestProducts.find(
         (el) => el.article == product.product_article
@@ -420,6 +428,75 @@ const OrderCart = React.memo(() => {
       }
     });
 
+    // dry mix
+
+    updatedDryMixesListOrder?.forEach((product) => {
+      const loc = latestDryMix.find(
+        (el) => el.article == product.product_article
+      )?.place_of_production;
+
+      console.log('product', product);
+
+      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+        const reservedProduct = dryMixedProductsOfOrders.find(
+          (orderedProduct) =>
+            orderedProduct.order_id === product.order_id &&
+            orderedProduct.dry_mixed_id === product.dry_mixed_id
+        );
+
+        console.log('dryMixedProductsOfOrders', dryMixedProductsOfOrders);
+        console.log('reservedProduct', reservedProduct);
+
+        let remainingToAllocate = reservedProduct.quantity_palet_dry || 0; // Сколько нужно зарезервировать для этого товара
+
+        const matchingWarehouseProducts =
+          dry_mixes_warehouse_data?.filter(
+            (warehouseItem) =>
+              warehouseItem.product_article === product?.product_article
+          ) || []; // Если dry_mixes_warehouse_data undefined, используем пустой массив
+
+        console.log('matchingWarehouseProducts', matchingWarehouseProducts);
+
+        // Проходим по складу и "забираем" остатки
+        for (const warehouseItem of matchingWarehouseProducts) {
+          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+            const taken = Math.min(
+              warehouseItem.free_quantity_remaining,
+              remainingToAllocate
+            );
+
+            console.log('warehouseItem', warehouseItem);
+
+            // Обновляем данные склада
+            dispatch(
+              updateDryMixesWarehouse({
+                id: warehouseItem?.id,
+                free_quantity_remaining:
+                  warehouseItem.free_quantity_remaining - taken,
+                ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
+              })
+            );
+            remainingToAllocate -= taken;
+          }
+        }
+
+        const quantity_in_warehouse =
+          reservedProduct.quantity_palet_dry - remainingToAllocate; // Сколько реально зарезервировали
+
+        dispatch(
+          addNewRelatedMaterialsBackorder({
+            shipping_date: orderCartData?.shipping_date,
+            product_article: product?.product_article,
+            order_article: orderCartData?.article,
+            quantity: product?.quantity_palet_dry,
+            quantity_in_warehouse,
+          })
+        );
+      }
+    });
+
+    // related mats
+
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
 
@@ -442,6 +519,10 @@ const OrderCart = React.memo(() => {
       })
     );
   };
+
+  useEffect(() => {
+    console.log('productsOfOrders', productsOfOrders);
+  }, [productsOfOrders]);
 
   const deleteHandler = (product) => {
     const res_prod = list_of_reserved_products.find((el) => el.id === product.id);

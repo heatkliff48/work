@@ -41,6 +41,16 @@ import {
   DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   REP_PRODUCT_SOCKET,
+  NEW_DRY_MIXES_WAREHOUSE_SOCKET,
+  NEED_UPDATE_DRY_MIXES_WAREHOUSE_SOCKET,
+  NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+  NEED_UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+  NEW_ANCHORS_WAREHOUSE_SOCKET,
+  NEW_TOOLS_WAREHOUSE_SOCKET,
+  NEED_UPDATE_TOOLS_WAREHOUSE_SOCKET,
+  NEED_UPDATE_ANCHORS_WAREHOUSE_SOCKET,
+  NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
+  NEED_UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
   DESCRIPTIOM_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
@@ -324,6 +334,62 @@ export const updateToolSocket = (tool) => {
   };
 };
 
+export const addNewDryMixesWarehouseSocket = (dryMixesWarehouse) => {
+  return {
+    type: NEW_DRY_MIXES_WAREHOUSE_SOCKET,
+    payload: dryMixesWarehouse,
+  };
+};
+
+export const updateDryMixesWarehouseSocket = (dryMixesWarehouse) => {
+  return {
+    type: NEED_UPDATE_DRY_MIXES_WAREHOUSE_SOCKET,
+    payload: dryMixesWarehouse,
+  };
+};
+
+export const addNewRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
+  return {
+    type: NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+    payload: relatedMaterialsWarehouse,
+  };
+};
+
+export const updateRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
+  return {
+    type: NEED_UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
+    payload: relatedMaterialsWarehouse,
+  };
+};
+
+export const addNewAnchorsWarehouseSocket = (anchorsWarehouse) => {
+  return {
+    type: NEW_ANCHORS_WAREHOUSE_SOCKET,
+    payload: anchorsWarehouse,
+  };
+};
+
+export const updateAnchorsWarehouseSocket = (anchorsWarehouse) => {
+  return {
+    type: NEED_UPDATE_ANCHORS_WAREHOUSE_SOCKET,
+    payload: anchorsWarehouse,
+  };
+};
+
+export const addNewToolsWarehouseSocket = (toolsWarehouse) => {
+  return {
+    type: NEW_TOOLS_WAREHOUSE_SOCKET,
+    payload: toolsWarehouse,
+  };
+};
+
+export const updateToolsWarehouseSocket = (toolsWarehouse) => {
+  return {
+    type: NEED_UPDATE_TOOLS_WAREHOUSE_SOCKET,
+    payload: toolsWarehouse,
+  };
+};
+
 export const addNewQualityManagementSocket = (qualityManagementData) => {
   return {
     type: NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
@@ -342,5 +408,23 @@ export const deleteQualityManagementSocket = (qualityManagementDataID) => {
   return {
     type: NEED_DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
     payload: qualityManagementDataID,
+  };
+};
+
+export const addNewRelatedMaterialsBackorderSocket = (
+  relatedMaterialsBackorderList
+) => {
+  return {
+    type: NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
+    payload: relatedMaterialsBackorderList,
+  };
+};
+
+export const updateRelatedMaterialsBackorderSocket = (
+  relatedMaterialsBackorderList
+) => {
+  return {
+    type: NEED_UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
+    payload: relatedMaterialsBackorderList,
   };
 };

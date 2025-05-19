@@ -8,6 +8,7 @@ import ShowProductsTypeJournalModal from './modal/ProductsTypeJournalModal';
 import ProductsTypeJournalInfoModal from './modal/ProductsTypeJournalInfoModal';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { getDryMixesJournal } from '#components/redux/actions/productsTypeJournalAction.js';
 
 const DryMixesJournal = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
@@ -29,6 +30,12 @@ const DryMixesJournal = () => {
     latestDryMix,
   } = useProductsTypeJournalContext();
 
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getDryMixesJournal());
+  }, []);
+
   useEffect(() => {
     if (latestDryMix) {
       const newData = latestDryMix.map((dry) => {
@@ -49,8 +56,7 @@ const DryMixesJournal = () => {
       });
       setDryMixesJournalDataList(newData);
       let code = '0001';
-      const articleId =
-        dryMixesJournal.length === 0 ? 1 : dryMixesJournal.length + 1;
+      const articleId = latestDryMix.length === 0 ? 1 : latestDryMix.length + 1;
       code = `1` + `0000${articleId}`.slice(-4);
       setProductCode(code);
     }
