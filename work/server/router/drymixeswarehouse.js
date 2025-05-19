@@ -53,27 +53,13 @@ dryMixesWarehouseRouter.post('/', async (req, res) => {
 });
 
 dryMixesWarehouseRouter.post('/update', async (req, res) => {
-  const {
-    id,
-    article,
-    product_article,
-    free_quantity_remaining,
-    total_quantity,
-    ordered_quantity,
-    warehouse_loc,
-    type,
-  } = req.body;
+  const { id, free_quantity_remaining, ordered_quantity } = req.body;
 
   try {
     const dryMixesWarehouse = await DryMixesWarehouse.update(
       {
-        article,
-        product_article,
         free_quantity_remaining,
-        total_quantity,
         ordered_quantity,
-        warehouse_loc,
-        type,
       },
       {
         where: {

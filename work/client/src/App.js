@@ -42,6 +42,7 @@ import ToolsTable from '#components/Products/ToolsTable.jsx';
 import QualityManagementTable from '#components/QualityManagement/QualityManagementTable.jsx';
 import WarehouseManager from '#components/WarehouseManager/WarehouseManager.jsx';
 import ProductsTypeWarehouse from '#components/Warehouse/ProductsTypeWarehouse.jsx';
+import RelatedMaterialsBackorderList from '#components/Warehouse/RelatedMaterialsBackorderList/RelatedMaterialsBackorderList.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -80,7 +81,10 @@ function App() {
             path="/list_of_ordered_production_oem"
             element={<ListOfOrderedProductionOEM />}
           />
-
+          <Route
+            path="/related_materials_backorder_list"
+            element={<RelatedMaterialsBackorderList />}
+          />
           <Route path="/orders" element={<OrdersTable />} />
           <Route path="/order_card" element={<OrderCart />} />
 

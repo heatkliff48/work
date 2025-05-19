@@ -49,6 +49,8 @@ import {
   updateAnchorsWarehouseSocket,
   addNewToolsWarehouseSocket,
   updateToolsWarehouseSocket,
+  addNewRelatedMaterialsBackorderSocket,
+  updateRelatedMaterialsBackorderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -124,6 +126,8 @@ import {
   UPDATE_ANCHORS_WAREHOUSE_SOCKET,
   ADD_NEW_TOOLS_WAREHOUSE_SOCKET,
   UPDATE_TOOLS_WAREHOUSE_SOCKET,
+  ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
+  UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -366,6 +370,14 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case DELETE_QUALITY_MANAGEMENT_DATA_SOCKET:
       dispatch(deleteQualityManagementSocket(payload));
+      break;
+
+    case ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET:
+      dispatch(addNewRelatedMaterialsBackorderSocket(payload));
+      break;
+
+    case UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET:
+      dispatch(updateRelatedMaterialsBackorderSocket(payload));
       break;
 
     default:

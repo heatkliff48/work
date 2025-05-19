@@ -49,6 +49,8 @@ import {
   NEW_TOOLS_WAREHOUSE_SOCKET,
   NEED_UPDATE_TOOLS_WAREHOUSE_SOCKET,
   NEED_UPDATE_ANCHORS_WAREHOUSE_SOCKET,
+  NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
+  NEED_UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -398,5 +400,23 @@ export const deleteQualityManagementSocket = (qualityManagementDataID) => {
   return {
     type: NEED_DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
     payload: qualityManagementDataID,
+  };
+};
+
+export const addNewRelatedMaterialsBackorderSocket = (
+  relatedMaterialsBackorderList
+) => {
+  return {
+    type: NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
+    payload: relatedMaterialsBackorderList,
+  };
+};
+
+export const updateRelatedMaterialsBackorderSocket = (
+  relatedMaterialsBackorderList
+) => {
+  return {
+    type: NEED_UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
+    payload: relatedMaterialsBackorderList,
   };
 };

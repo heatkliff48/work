@@ -11,6 +11,7 @@ import productsTypeJournalWatcher from './productsTypeJournalSagas';
 import productsTypeWarehouseWatcher from './productsTypeWarehouseSagas';
 import qualityManagementWatcher from './qualityManagementSagas';
 import recipeWatcher from './recipeSagas';
+import relatedMaterialsBackorderListWatcher from './relatedMaterialsBackorderListSagas';
 import rolesWatcher from './rolesSagas';
 import stockBalanceWatcher from './stockBalanceSagas';
 import userWatcher from './userSagas';
@@ -38,5 +39,6 @@ export default function* rootSaga() {
     productsTypeJournalWatcher(),
     productsTypeWarehouseWatcher(),
     qualityManagementWatcher(),
+    relatedMaterialsBackorderListWatcher(),
   ]);
 }

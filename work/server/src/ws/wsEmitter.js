@@ -58,6 +58,8 @@ const {
   UPDATE_ANCHORS_WAREHOUSE_SOCKET,
   ADD_NEW_TOOLS_WAREHOUSE_SOCKET,
   UPDATE_TOOLS_WAREHOUSE_SOCKET,
+  ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
+  UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -728,6 +730,34 @@ function registerWsEmitter(map) {
       );
     }
   });
+
+  myEmitter.on(
+    ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
+    (relatedMaterialsBackorderList) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
+            payload: relatedMaterialsBackorderList,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
+    (relatedMaterialsBackorderList) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
+            payload: relatedMaterialsBackorderList,
+          })
+        );
+      }
+    }
+  );
 
   // myEmitter.on(CHECK_CARD_SOCKET, (gameusers, street, dohod, isFree, money) => {
   //   for (let [id, userConnect] of map) {

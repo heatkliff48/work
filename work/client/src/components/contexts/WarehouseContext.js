@@ -79,6 +79,18 @@ const WarehouseContextProvider = ({ children }) => {
     { Header: 'Status', accessor: 'status', sortType: 'string' },
   ];
 
+  const COLUMNS_RELATED_MATERIALS_BACKORDER_LIST = [
+    { Header: 'Date of shipping', accessor: 'shipping_date', sortType: 'string' },
+    { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
+    { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
+    { Header: 'Quantity', accessor: 'quantity', sortType: 'number' },
+    {
+      Header: 'Quantity in warehouse, pallets',
+      accessor: 'quantity_in_warehouse',
+      sortType: 'number',
+    },
+  ];
+
   const ordered_production_oem_status = [
     {
       Header: 'Not startered',
@@ -114,6 +126,9 @@ const WarehouseContextProvider = ({ children }) => {
   const list_of_ordered_production_oem = useSelector(
     (state) => state.listOfOrderedProductionOEM
   );
+  const related_materials_backorder_list = useSelector(
+    (state) => state.relatedMaterialsBackorderList
+  );
 
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -125,10 +140,18 @@ const WarehouseContextProvider = ({ children }) => {
   const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
   const [wmoctProduct, setWmoctProduct] = useState();
   const [wmoctProductShippedBD, setWmoctProductShippedBD] = useState([]);
+  const [listOfOrderedAuxilary, setListOfOrderedAuxilary] = useState([]);
 
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_orders = useSelector((state) => state.orders);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
+  const dryMixedProductsOfOrders = useSelector(
+    (state) => state.dryMixedProductsOfOrders
+  );
+  const anchorProductsOfOrders = useSelector(
+    (state) => state.anchorProductsOfOrders
+  );
+  const toolProductsOfOrders = useSelector((state) => state.toolProductsOfOrders);
   const { latestProducts } = useProductsContext();
 
   const processOrders = (orderedProduction, groupedOrders) => {
@@ -415,12 +438,84 @@ const WarehouseContextProvider = ({ children }) => {
     productsOfOrders,
   ]);
 
+  useEffect(() => {
+    console.log(
+      'related_materials_backorder_list',
+      related_materials_backorder_list
+    );
+    const dryMixOrderedData = related_materials_backorder_list
+      ?.filter((el) => {
+        // Определение статуса заказа
+        const orderStatus = list_of_orders?.find(
+          (order) => order.article === el.order_article
+        )?.status;
+
+        console.log('orderStatus', orderStatus);
+        // Исключение заказов с указанными статусами
+        return ![8, 9, 10].includes(orderStatus); // 7
+      })
+      .map((el) => {
+        return {
+          ...el,
+        };
+      })
+      .reduce((uniqueItems, item) => {
+        if (
+          !uniqueItems.some(
+            (el) =>
+              el.product_article === item.product_article &&
+              el.order_article === item.order_article
+          )
+        ) {
+          uniqueItems.push(item);
+        }
+        return uniqueItems;
+      }, []);
+
+    console.log('dryMixOrderedData', dryMixOrderedData);
+
+    setListOfOrderedAuxilary(dryMixOrderedData);
+
+    // Группируем все позиции по order_article
+    const ordersMap = related_materials_backorder_list.reduce((acc, item) => {
+      if (!acc.has(item.order_article)) {
+        acc.set(item.order_article, []);
+      }
+      acc.get(item.order_article).push(item);
+      return acc;
+    }, new Map());
+
+    // Проверяем каждый заказ на полную резервацию
+    const fullyReservedOrders = Array.from(ordersMap.entries())
+      .filter(([orderArticle, items]) => {
+        // Проверяем, что ВСЕ позиции заказа имеют quantity === quantity_in_warehouse
+        return items.every((item) => item.quantity === item.quantity_in_warehouse);
+      })
+      .map(([orderArticle]) => orderArticle); // Извлекаем только order_article
+
+    fullyReservedOrders.forEach((order_article) => {
+      const currOrder = list_of_orders.find(
+        (order) => order.article === order_article
+      );
+
+      if (currOrder?.id && !order_status.includes(currOrder?.status)) {
+        dispatch(
+          updateOrderStatus({
+            order_id: currOrder.id,
+            status: 7,
+          })
+        );
+      }
+    });
+  }, [related_materials_backorder_list, list_of_orders, dryMixedProductsOfOrders]);
+
   return (
     <WarehouseContext.Provider
       value={{
         COLUMNS_WAREHOUSE,
         COLUMNS_LIST_OF_ORDERED_PRODUCTION,
         COLUMNS_LIST_OF_ORDERED_PRODUCTION_OEM,
+        COLUMNS_RELATED_MATERIALS_BACKORDER_LIST,
         warehouse_data,
         dry_mixes_warehouse_data,
         related_materials_warehouse_data,
@@ -429,6 +524,7 @@ const WarehouseContextProvider = ({ children }) => {
         list_of_reserved_products,
         list_of_ordered_production,
         list_of_ordered_production_oem,
+        related_materials_backorder_list,
         ordered_production_oem_status,
         filteredProducts,
         setFilteredProducts,
@@ -440,6 +536,8 @@ const WarehouseContextProvider = ({ children }) => {
         setCurrentBatch,
         listOfOrderedCakes,
         setListOfOrderedCakes,
+        listOfOrderedAuxilary,
+        setListOfOrderedAuxilary,
         filteredWarehouseByProduct,
         setFilteredWarehouseByProduct,
         wmoctProduct,
