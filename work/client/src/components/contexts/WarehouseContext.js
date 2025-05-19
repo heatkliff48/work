@@ -456,10 +456,6 @@ const WarehouseContextProvider = ({ children }) => {
   ]);
 
   useEffect(() => {
-    console.log(
-      'related_materials_backorder_list',
-      related_materials_backorder_list
-    );
     const dryMixOrderedData = related_materials_backorder_list
       ?.filter((el) => {
         // Определение статуса заказа
@@ -467,9 +463,8 @@ const WarehouseContextProvider = ({ children }) => {
           (order) => order.article === el.order_article
         )?.status;
 
-        console.log('orderStatus', orderStatus);
         // Исключение заказов с указанными статусами
-        return ![8, 9, 10].includes(orderStatus); // 7
+        return ![7, 8, 9, 10].includes(orderStatus);
       })
       .map((el) => {
         return {
@@ -488,8 +483,6 @@ const WarehouseContextProvider = ({ children }) => {
         }
         return uniqueItems;
       }, []);
-
-    console.log('dryMixOrderedData', dryMixOrderedData);
 
     setListOfOrderedAuxilary(dryMixOrderedData);
 

@@ -43,7 +43,11 @@ import {
   getDeleteDryMixedProductOfOrder,
   getDeleteToolProductOfOrder,
 } from '#components/redux/actions/ordersAction.js';
-import { updateDryMixesWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
+import {
+  updateAnchorsWarehouse,
+  updateDryMixesWarehouse,
+  updateToolsWarehouse,
+} from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 
 const OrderCart = React.memo(() => {
@@ -213,7 +217,7 @@ const OrderCart = React.memo(() => {
 
   const onSaveDescription = (str) => {
     dispatch(addDescription({ order_id: orderCartData.id, description: str }));
-    setIsEditing(false)
+    setIsEditing(false);
   };
 
   const addProductArticleToOrderList = useCallback(
@@ -435,17 +439,12 @@ const OrderCart = React.memo(() => {
         (el) => el.article == product.product_article
       )?.place_of_production;
 
-      console.log('product', product);
-
       if (status.accessor === status_list[5].accessor && loc === 'ES') {
         const reservedProduct = dryMixedProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
             orderedProduct.dry_mixed_id === product.dry_mixed_id
         );
-
-        console.log('dryMixedProductsOfOrders', dryMixedProductsOfOrders);
-        console.log('reservedProduct', reservedProduct);
 
         let remainingToAllocate = reservedProduct.quantity_palet_dry || 0; // Сколько нужно зарезервировать для этого товара
 
@@ -455,8 +454,6 @@ const OrderCart = React.memo(() => {
               warehouseItem.product_article === product?.product_article
           ) || []; // Если dry_mixes_warehouse_data undefined, используем пустой массив
 
-        console.log('matchingWarehouseProducts', matchingWarehouseProducts);
-
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
@@ -464,8 +461,6 @@ const OrderCart = React.memo(() => {
               warehouseItem.free_quantity_remaining,
               remainingToAllocate
             );
-
-            console.log('warehouseItem', warehouseItem);
 
             // Обновляем данные склада
             dispatch(
@@ -495,7 +490,121 @@ const OrderCart = React.memo(() => {
       }
     });
 
-    // related mats
+    // fastners
+
+    updatedAnchorsListOrder?.forEach((product) => {
+      const loc = latestAnchors.find(
+        (el) => el.article == product.product_article
+      )?.place_of_production;
+
+      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+        const reservedProduct = anchorProductsOfOrders.find(
+          (orderedProduct) =>
+            orderedProduct.order_id === product.order_id &&
+            orderedProduct.anchor_id === product.anchor_id
+        );
+
+        let remainingToAllocate = reservedProduct.quantity_palet_anchor || 0; // Сколько нужно зарезервировать для этого товара
+
+        const matchingWarehouseProducts =
+          anchors_warehouse_data?.filter(
+            (warehouseItem) =>
+              warehouseItem.product_article === product?.product_article
+          ) || []; // Если anchors_warehouse_data undefined, используем пустой массив
+
+        // Проходим по складу и "забираем" остатки
+        for (const warehouseItem of matchingWarehouseProducts) {
+          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+            const taken = Math.min(
+              warehouseItem.free_quantity_remaining,
+              remainingToAllocate
+            );
+
+            // Обновляем данные склада
+            dispatch(
+              updateAnchorsWarehouse({
+                id: warehouseItem?.id,
+                free_quantity_remaining:
+                  warehouseItem.free_quantity_remaining - taken,
+                ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
+              })
+            );
+            remainingToAllocate -= taken;
+          }
+        }
+
+        const quantity_in_warehouse =
+          reservedProduct.quantity_palet_anchor - remainingToAllocate; // Сколько реально зарезервировали
+
+        dispatch(
+          addNewRelatedMaterialsBackorder({
+            shipping_date: orderCartData?.shipping_date,
+            product_article: product?.product_article,
+            order_article: orderCartData?.article,
+            quantity: product?.quantity_palet_anchor,
+            quantity_in_warehouse,
+          })
+        );
+      }
+    });
+
+    // tools
+
+    updatedToolsListOrder?.forEach((product) => {
+      const loc = latestTools.find(
+        (el) => el.article == product.product_article
+      )?.place_of_production;
+
+      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+        const reservedProduct = toolProductsOfOrders.find(
+          (orderedProduct) =>
+            orderedProduct.order_id === product.order_id &&
+            orderedProduct.tool_id === product.tool_id
+        );
+
+        let remainingToAllocate = reservedProduct.quantity_ud || 0; // Сколько нужно зарезервировать для этого товара
+
+        const matchingWarehouseProducts =
+          anchors_warehouse_data?.filter(
+            (warehouseItem) =>
+              warehouseItem.product_article === product?.product_article
+          ) || []; // Если anchors_warehouse_data undefined, используем пустой массив
+
+        // Проходим по складу и "забираем" остатки
+        for (const warehouseItem of matchingWarehouseProducts) {
+          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+            const taken = Math.min(
+              warehouseItem.free_quantity_remaining,
+              remainingToAllocate
+            );
+
+            // Обновляем данные склада
+            dispatch(
+              updateToolsWarehouse({
+                id: warehouseItem?.id,
+                free_quantity_remaining:
+                  warehouseItem.free_quantity_remaining - taken,
+                ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
+              })
+            );
+            remainingToAllocate -= taken;
+          }
+        }
+
+        const quantity_in_warehouse =
+          reservedProduct.quantity_ud - remainingToAllocate; // Сколько реально зарезервировали
+
+        dispatch(
+          addNewRelatedMaterialsBackorder({
+            shipping_date: orderCartData?.shipping_date,
+            product_article: product?.product_article,
+            order_article: orderCartData?.article,
+            quantity: product?.quantity_ud,
+            quantity_in_warehouse,
+          })
+        );
+      }
+    });
 
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
@@ -520,13 +629,8 @@ const OrderCart = React.memo(() => {
     );
   };
 
-  useEffect(() => {
-    console.log('productsOfOrders', productsOfOrders);
-  }, [productsOfOrders]);
-
   const deleteHandler = (product) => {
     const res_prod = list_of_reserved_products.find((el) => el.id === product.id);
-    console.log('product', product);
     if (res_prod) alert('Этот продукт зарервировван на складе');
     if (product?.product_article.charAt(0) === 'T') {
       dispatch(getDeleteProductOfOrder(product?.id));
