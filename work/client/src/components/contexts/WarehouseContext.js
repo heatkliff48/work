@@ -388,8 +388,52 @@ const WarehouseContextProvider = ({ children }) => {
 
     setListOfOrderedCakes(data);
 
+    const dryMixOrderedData = related_materials_backorder_list
+      ?.filter((el) => {
+        // Определение статуса заказа
+        const orderStatus = list_of_orders?.find(
+          (order) => order.article === el.order_article
+        )?.status;
+
+        // Исключение заказов с указанными статусами
+        return ![7, 8, 9, 10].includes(orderStatus);
+      })
+      .map((el) => {
+        return {
+          ...el,
+        };
+      })
+      .reduce((uniqueItems, item) => {
+        if (
+          !uniqueItems.some(
+            (el) =>
+              el.product_article === item.product_article &&
+              el.order_article === item.order_article
+          )
+        ) {
+          uniqueItems.push(item);
+        }
+        return uniqueItems;
+      }, []);
+
+    setListOfOrderedAuxilary(dryMixOrderedData);
+
+    const combinedList = [
+      ...related_materials_backorder_list,
+      ...list_of_ordered_production,
+    ];
+
+    // // Группируем все позиции по order_article
+    // const ordersMap = related_materials_backorder_list.reduce((acc, item) => {
+    //   if (!acc.has(item.order_article)) {
+    //     acc.set(item.order_article, []);
+    //   }
+    //   acc.get(item.order_article).push(item);
+    //   return acc;
+    // }, new Map());
+
     // Группируем все позиции по order_article
-    const ordersMap = list_of_ordered_production.reduce((acc, item) => {
+    const ordersMap = combinedList.reduce((acc, item) => {
       if (!acc.has(item.order_article)) {
         acc.set(item.order_article, []);
       }
@@ -430,6 +474,8 @@ const WarehouseContextProvider = ({ children }) => {
 
     groupedOrders = processOrders(list_of_ordered_production_oem, groupedOrders);
 
+    groupedOrders = processOrders(related_materials_backorder_list, groupedOrders);
+
     Object.values(groupedOrders)?.forEach((group) => {
       const order = list_of_orders.find((el) => el.id === group.orderId);
       if (order_status.includes(order?.status)) return;
@@ -450,74 +496,12 @@ const WarehouseContextProvider = ({ children }) => {
   }, [
     list_of_ordered_production,
     list_of_reserved_products,
+    related_materials_backorder_list,
     batchOutside,
     list_of_orders,
     productsOfOrders,
+    dryMixedProductsOfOrders,
   ]);
-
-  useEffect(() => {
-    const dryMixOrderedData = related_materials_backorder_list
-      ?.filter((el) => {
-        // Определение статуса заказа
-        const orderStatus = list_of_orders?.find(
-          (order) => order.article === el.order_article
-        )?.status;
-
-        // Исключение заказов с указанными статусами
-        return ![7, 8, 9, 10].includes(orderStatus);
-      })
-      .map((el) => {
-        return {
-          ...el,
-        };
-      })
-      .reduce((uniqueItems, item) => {
-        if (
-          !uniqueItems.some(
-            (el) =>
-              el.product_article === item.product_article &&
-              el.order_article === item.order_article
-          )
-        ) {
-          uniqueItems.push(item);
-        }
-        return uniqueItems;
-      }, []);
-
-    setListOfOrderedAuxilary(dryMixOrderedData);
-
-    // Группируем все позиции по order_article
-    const ordersMap = related_materials_backorder_list.reduce((acc, item) => {
-      if (!acc.has(item.order_article)) {
-        acc.set(item.order_article, []);
-      }
-      acc.get(item.order_article).push(item);
-      return acc;
-    }, new Map());
-
-    // Проверяем каждый заказ на полную резервацию
-    const fullyReservedOrders = Array.from(ordersMap.entries())
-      .filter(([orderArticle, items]) => {
-        // Проверяем, что ВСЕ позиции заказа имеют quantity === quantity_in_warehouse
-        return items.every((item) => item.quantity === item.quantity_in_warehouse);
-      })
-      .map(([orderArticle]) => orderArticle); // Извлекаем только order_article
-
-    fullyReservedOrders.forEach((order_article) => {
-      const currOrder = list_of_orders.find(
-        (order) => order.article === order_article
-      );
-
-      if (currOrder?.id && !order_status.includes(currOrder?.status)) {
-        dispatch(
-          updateOrderStatus({
-            order_id: currOrder.id,
-            status: 7,
-          })
-        );
-      }
-    });
-  }, [related_materials_backorder_list, list_of_orders, dryMixedProductsOfOrders]);
 
   return (
     <WarehouseContext.Provider
