@@ -4,12 +4,17 @@ import { useDispatch } from 'react-redux';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
 import Select from 'react-select';
-import { addNewWarehouse } from '#components/redux/actions/warehouseAction.js';
+import {
+  addNewWarehouse,
+  updListOfOrderedProduction,
+} from '#components/redux/actions/warehouseAction.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 const WarehouseAddModal = React.memo(
   ({ isOpen, toggle, COLUMNS_WAREHOUSE, warehouse_data }) => {
     const { COLUMNS, latestProducts } = useProductsContext();
+    const { list_of_ordered_production } = useWarehouseContext();
     const dispatch = useDispatch();
 
     const [warehouseData, setWarehouseData] = useState([]);
@@ -111,7 +116,74 @@ const WarehouseAddModal = React.memo(
     };
 
     const addProductOrder = async () => {
-      dispatch(addNewWarehouse(warehouseData));
+      const { article, product_article, ordered_quantity, free_quantity_remaining } =
+        warehouseData;
+
+      // 1. Фильтруем резервы для текущего product_article
+      const reservedProducts =
+        list_of_ordered_production?.filter(
+          (item) => item.product_article === product_article
+        ) || [];
+
+      // 2. Сколько осталось "свободного" количества и сколько всего свободной продукции было зарезервированно сразу
+      let remainingFreeQty = parseInt(free_quantity_remaining);
+      let summReserve = 0;
+
+      // 3. Обходим каждый резерв и корректируем остатки
+      const updatedReserves = reservedProducts.map((reservedItem) => {
+        if (reservedItem.product_article !== product_article) {
+          return reservedItem; // Не трогаем резервы других товаров
+        }
+
+        // Если новый товар уже "исчерпан" и кол-во паллет совпадает с кол-вом зарезервированных, ничего не меняем, если исчерпан и кол-во паллет больше кол-ва зарезервированных, то прибавляем к существующему резерву новый и смотрим, чтобы он не выходил за предел кол-ва паллет общего.
+        if (remainingFreeQty <= 0) {
+          if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
+            return reservedItem;
+          } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
+            return {
+              ...reservedItem,
+              quantity_in_warehouse: Math.min(
+                reservedItem.quantity_in_warehouse + parseInt(ordered_quantity),
+                reservedItem.quantity
+              ),
+            };
+          }
+        }
+
+        // Сколько можно зарезервировать из нового товара для этого резерва
+        const deducted = Math.min(
+          reservedItem.quantity -
+            reservedItem.quantity_in_warehouse -
+            parseInt(ordered_quantity), // Сколько нужно для этого резерва
+          remainingFreeQty // Сколько доступно в новом товаре
+        );
+
+        // Уменьшаем остаток нового товара
+        remainingFreeQty -= deducted;
+        summReserve += deducted;
+
+        // Возвращаем обновленный резерв
+        return {
+          ...reservedItem,
+          quantity_in_warehouse:
+            reservedItem.quantity_in_warehouse +
+            parseInt(ordered_quantity) +
+            deducted,
+        };
+      });
+
+      dispatch(
+        addNewWarehouse({
+          ...warehouseData,
+          free_quantity_remaining: remainingFreeQty,
+          ordered_quantity: parseInt(ordered_quantity) + summReserve,
+          total_quantity:
+            parseInt(ordered_quantity) + summReserve + remainingFreeQty,
+        })
+      );
+      for (const ordered_production of updatedReserves) {
+        await dispatch(updListOfOrderedProduction(ordered_production));
+      }
       setWarehouseData({});
       toggle();
     };
