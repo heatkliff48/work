@@ -15,6 +15,7 @@ import {
   addNewToolsWarehouse,
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import '#components/Styles/modals.css';
+import { updateRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 
 function ProductsTypeWarehouseModal(props) {
   const {
@@ -27,7 +28,11 @@ function ProductsTypeWarehouseModal(props) {
     latestAnchors,
     latestTools,
   } = useProductsTypeJournalContext();
-  const { COLUMNS_WAREHOUSE, dry_mixes_warehouse_data } = useWarehouseContext();
+  const {
+    COLUMNS_WAREHOUSE,
+    dry_mixes_warehouse_data,
+    related_materials_backorder_list,
+  } = useWarehouseContext();
   const [productsTypeWarehouseInput, setProductsTypeWarehouseInput] = useState({});
   const [warehouseData, setWarehouseData] = useState([]);
 
@@ -105,10 +110,6 @@ function ProductsTypeWarehouseModal(props) {
     [latestProductsType]
   );
 
-  useEffect(() => {
-    console.log('warehouseData', warehouseData);
-  }, [warehouseData]);
-
   const handleWareHouseInput = (e) => {
     setWarehouseData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -152,14 +153,105 @@ function ProductsTypeWarehouseModal(props) {
   const onSubmitForm = async (e) => {
     e.preventDefault();
 
+    const { article, product_article, ordered_quantity, free_quantity_remaining } =
+      warehouseData;
+
+    // 1. Фильтруем резервы для текущего product_article
+    const reservedProducts =
+      related_materials_backorder_list?.filter(
+        (item) => item.product_article === product_article
+      ) || [];
+
+    // 2. Сколько осталось "свободного" количества и сколько всего свободной продукции было зарезервированно сразу
+    let remainingFreeQty = parseInt(free_quantity_remaining);
+    let summReserve = 0;
+
+    // 3. Обходим каждый резерв и корректируем остатки
+    const updatedReserves = reservedProducts.map((reservedItem) => {
+      if (reservedItem.product_article !== product_article) {
+        return reservedItem; // Не трогаем резервы других товаров
+      }
+
+      // Если новый товар уже "исчерпан" и кол-во паллет совпадает с кол-вом зарезервированных, ничего не меняем, если исчерпан и кол-во паллет больше кол-ва зарезервированных, то прибавляем к существующему резерву новый и смотрим, чтобы он не выходил за предел кол-ва паллет общего.
+      if (remainingFreeQty <= 0) {
+        if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
+          return reservedItem;
+        } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
+          return {
+            ...reservedItem,
+            quantity_in_warehouse: Math.min(
+              reservedItem.quantity_in_warehouse + parseInt(ordered_quantity),
+              reservedItem.quantity
+            ),
+          };
+        }
+      }
+
+      // Сколько можно зарезервировать из нового товара для этого резерва
+      const deducted = Math.min(
+        reservedItem.quantity -
+          reservedItem.quantity_in_warehouse -
+          parseInt(ordered_quantity), // Сколько нужно для этого резерва
+        remainingFreeQty // Сколько доступно в новом товаре
+      );
+
+      // Уменьшаем остаток нового товара
+      remainingFreeQty -= deducted;
+      summReserve += deducted;
+
+      // Возвращаем обновленный резерв
+      return {
+        ...reservedItem,
+        quantity_in_warehouse:
+          reservedItem.quantity_in_warehouse + parseInt(ordered_quantity) + deducted,
+      };
+    });
+
+    console.log('updatedReserves', updatedReserves);
+
     if (props.target == 1) {
-      dispatch(addNewDryMixesWarehouse(warehouseData));
+      dispatch(
+        addNewDryMixesWarehouse({
+          ...warehouseData,
+          free_quantity_remaining: remainingFreeQty,
+          ordered_quantity: parseInt(ordered_quantity) + summReserve,
+          total_quantity:
+            parseInt(ordered_quantity) + summReserve + remainingFreeQty,
+        })
+      );
     } else if (props.target == 2) {
-      dispatch(addNewRelatedMaterialsWarehouse(warehouseData));
+      dispatch(
+        addNewRelatedMaterialsWarehouse({
+          ...warehouseData,
+          free_quantity_remaining: remainingFreeQty,
+          ordered_quantity: parseInt(ordered_quantity) + summReserve,
+          total_quantity:
+            parseInt(ordered_quantity) + summReserve + remainingFreeQty,
+        })
+      );
     } else if (props.target == 3) {
-      dispatch(addNewAnchorsWarehouse(warehouseData));
+      dispatch(
+        addNewAnchorsWarehouse({
+          ...warehouseData,
+          free_quantity_remaining: remainingFreeQty,
+          ordered_quantity: parseInt(ordered_quantity) + summReserve,
+          total_quantity:
+            parseInt(ordered_quantity) + summReserve + remainingFreeQty,
+        })
+      );
     } else {
-      dispatch(addNewToolsWarehouse(warehouseData));
+      dispatch(
+        addNewToolsWarehouse({
+          ...warehouseData,
+          free_quantity_remaining: remainingFreeQty,
+          ordered_quantity: parseInt(ordered_quantity) + summReserve,
+          total_quantity:
+            parseInt(ordered_quantity) + summReserve + remainingFreeQty,
+        })
+      );
+    }
+    for (const ordered_production of updatedReserves) {
+      await dispatch(updateRelatedMaterialsBackorder(ordered_production));
     }
 
     setWarehouseData({});
@@ -283,6 +375,7 @@ function ProductsTypeWarehouseModal(props) {
           <Button form="addAuxilaryModal" type="submit">
             Add {props.title}
           </Button>
+
           <Button onClick={props.onHide}>Close</Button>
         </Modal.Footer>
       </Modal>
