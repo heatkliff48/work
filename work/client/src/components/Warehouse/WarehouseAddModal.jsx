@@ -172,8 +172,6 @@ const WarehouseAddModal = React.memo(
         };
       });
 
-      console.log('updatedReserves', updatedReserves);
-
       dispatch(
         addNewWarehouse({
           ...warehouseData,

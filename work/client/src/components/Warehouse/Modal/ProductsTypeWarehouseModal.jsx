@@ -207,8 +207,6 @@ function ProductsTypeWarehouseModal(props) {
       };
     });
 
-    console.log('updatedReserves', updatedReserves);
-
     if (props.target == 1) {
       dispatch(
         addNewDryMixesWarehouse({
