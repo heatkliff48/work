@@ -5,6 +5,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { updAccountingDataList } from '#components/redux/actions/ordersAction.js';
 import { useDispatch, useSelector } from 'react-redux';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
 const AccountngOrderCard = React.memo(() => {
   const {
@@ -15,9 +16,14 @@ const AccountngOrderCard = React.memo(() => {
     setOrderCartData,
     getAccountingStatus,
     accountingStatusList,
+    dryMixedProductsOfOrders,
+    anchorProductsOfOrders,
+    toolProductsOfOrders,
   } = useOrderContext();
   const { displayNames } = useProjectContext();
   const { latestProducts } = useProductsContext();
+  const { latestDryMix, latestRelatedMaterials, latestAnchors, latestTools } =
+    useProductsTypeJournalContext();
   const productListOrder = useSelector((state) => state.productsOfOrders);
   const dispatch = useDispatch();
 
@@ -33,6 +39,32 @@ const AccountngOrderCard = React.memo(() => {
     () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
     []
   );
+
+  const [productLists, setProductLists] = useState({
+    products: [],
+    dryMixes: [],
+    anchors: [],
+    tools: [],
+  });
+
+  const getCorrectProductId = (arrName) => {
+    switch (arrName) {
+      case 'products':
+        return 'product_id';
+
+      case 'dryMixes':
+        return 'dry_mixed_id';
+
+      case 'anchors':
+        return 'anchor_id';
+
+      case 'tools':
+        return 'tool_id';
+
+      default:
+        break;
+    }
+  };
 
   const filterAndMapData = useCallback(
     (data, filterKeys) =>
@@ -52,29 +84,95 @@ const AccountngOrderCard = React.memo(() => {
   );
 
   const addProductArticleToOrderList = useCallback(
-    (productListOrder, latestProducts) => {
-      if (!productListOrder || !latestProducts) return [];
+    (productsOfOrders, productsTable, arrayName) => {
+      if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
+        return [];
 
-      return productListOrder.map((orderProduct) => {
-        const product = latestProducts.find(
-          (p) => p.id === orderProduct?.product_id
-        );
+      console.log('productsOfOrders', productsOfOrders);
+      console.log('productsTable', productsTable);
 
-        if (product) {
-          return {
-            product_article: product.article,
-            ...orderProduct,
-          };
-        }
-        return { ...orderProduct, product_article: 'Unknown' };
-      });
+      const updatedOrderProducts = productsOfOrders
+        .filter((el) => el.order_id == orderCartData.id)
+        .map((orderProduct) => {
+          const id = getCorrectProductId(arrayName);
+
+          const product = productsTable.find((p) => p.id === orderProduct?.[id]);
+
+          return product
+            ? { product_article: product.article, ...orderProduct }
+            : { ...orderProduct, product_article: 'Unknown' };
+        });
+
+      return updatedOrderProducts;
     },
-    [productListOrder]
+    [orderCartData?.id] // Добавляем зависимость
   );
 
   const updatedProductListOrder = useMemo(() => {
-    return addProductArticleToOrderList(productListOrder, latestProducts);
-  }, [productListOrder]);
+    return addProductArticleToOrderList(
+      productListOrder,
+      latestProducts,
+      'products'
+    );
+  }, [productListOrder, latestProducts, addProductArticleToOrderList]);
+
+  useEffect(() => {
+    if (updatedProductListOrder.length > 0) {
+      setProductLists((prevState) => ({
+        ...prevState,
+        products: updatedProductListOrder,
+      }));
+    }
+  }, [updatedProductListOrder]);
+
+  const updatedDryMixesListOrder = useMemo(() => {
+    console.log('dryMixedProductsOfOrders', dryMixedProductsOfOrders);
+    console.log('latestDryMix', latestDryMix);
+    return addProductArticleToOrderList(
+      dryMixedProductsOfOrders,
+      latestDryMix,
+      'dryMixes'
+    );
+  }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
+
+  useEffect(() => {
+    if (updatedDryMixesListOrder.length > 0) {
+      setProductLists((prevState) => ({
+        ...prevState,
+        dryMixes: updatedDryMixesListOrder,
+      }));
+    }
+  }, [updatedDryMixesListOrder]);
+
+  const updatedAnchorsListOrder = useMemo(() => {
+    return addProductArticleToOrderList(
+      anchorProductsOfOrders,
+      latestAnchors,
+      'anchors'
+    );
+  }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
+
+  useEffect(() => {
+    if (updatedAnchorsListOrder.length > 0) {
+      setProductLists((prevState) => ({
+        ...prevState,
+        anchors: updatedAnchorsListOrder,
+      }));
+    }
+  }, [updatedAnchorsListOrder]);
+
+  const updatedToolsListOrder = useMemo(() => {
+    return addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools');
+  }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
+
+  useEffect(() => {
+    if (updatedToolsListOrder.length > 0) {
+      setProductLists((prevState) => ({
+        ...prevState,
+        tools: updatedToolsListOrder,
+      }));
+    }
+  }, [updatedToolsListOrder]);
 
   const statusChangeHandler = (newStatus) => {
     const status_index = accountingStatusList.findIndex(
@@ -110,8 +208,24 @@ const AccountngOrderCard = React.memo(() => {
   }, []);
 
   useEffect(() => {
+    const allProducts = [
+      ...productLists['products'],
+      ...productLists['dryMixes'],
+      ...productLists['anchors'],
+      ...productLists['tools'],
+    ];
+
+    // Считаем финальную цену для всех продуктов
     const final_price_product =
-      updatedProductListOrder.reduce((acc, el) => acc + el?.final_price, 0) || 0;
+      allProducts.reduce(
+        (acc, el) =>
+          acc +
+          (el?.final_price ||
+            el?.final_price_dry ||
+            el?.final_price_anchor ||
+            el?.final_price_tool),
+        0
+      ) || 0;
 
     if (!final_price_product || !vatValue.vat_procent) {
       setVatValue((prev) => ({
@@ -127,11 +241,12 @@ const AccountngOrderCard = React.memo(() => {
 
       setVatValue((prev) => ({
         ...prev,
+        vat_euro_origin: final_price_product,
         vat_result: vat_result,
         vat_euro,
       }));
     }
-  }, []);
+  }, [productLists, vatValue.vat_procent]);
 
   useEffect(() => {
     const result = getAccountingStatus(orderCartData?.status);
@@ -170,6 +285,51 @@ const AccountngOrderCard = React.memo(() => {
           <tbody>
             {Array.isArray(updatedProductListOrder) &&
               updatedProductListOrder?.map((product) => (
+                <tr key={product?.id || Math.random()} className="product-row">
+                  <td>{filterAndMapData(product, filterKeys)}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+        <table className="dry-mixes-table">
+          <thead>
+            <tr>
+              <td>Dry Mixes</td>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.isArray(updatedDryMixesListOrder) &&
+              updatedDryMixesListOrder?.map((product) => (
+                <tr key={product?.id || Math.random()} className="product-row">
+                  <td>{filterAndMapData(product, filterKeys)}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+        <table className="anchors-table">
+          <thead>
+            <tr>
+              <td>Fastners</td>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.isArray(updatedAnchorsListOrder) &&
+              updatedAnchorsListOrder?.map((product) => (
+                <tr key={product?.id || Math.random()} className="product-row">
+                  <td>{filterAndMapData(product, filterKeys)}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+        <table className="tools-table">
+          <thead>
+            <tr>
+              <td>Tools</td>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.isArray(updatedToolsListOrder) &&
+              updatedToolsListOrder?.map((product) => (
                 <tr key={product?.id || Math.random()} className="product-row">
                   <td>{filterAndMapData(product, filterKeys)}</td>
                 </tr>
