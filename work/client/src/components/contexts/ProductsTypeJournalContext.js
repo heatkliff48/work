@@ -342,6 +342,10 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
     return getLatestAuxilaryProducts(dryMixesJournal);
   }, [dryMixesJournal]);
 
+  useEffect(() => {
+    console.log('latestDryMix', latestDryMix);
+  }, [latestDryMix]);
+
   const latestRelatedMaterials = useMemo(() => {
     return getLatestAuxilaryProducts(relatedMaterialsJournal);
   }, [relatedMaterialsJournal]);
