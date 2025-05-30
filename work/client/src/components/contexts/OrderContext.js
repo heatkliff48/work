@@ -361,6 +361,17 @@ const OrderContextProvider = ({ children }) => {
     setPersonsInChargeList(tempPersonsInChargeList);
   }, [usersMainInfo]);
 
+  useEffect(() => {
+    const order = list_of_orders.find((el) => el.id == orderCartData.id);
+    setOrderCartData((prev) => {
+      const secondaryContact = order?.secondary_contact
+        ? contactInfos.find((contact) => contact.id === order.secondary_contact)
+        : order?.secondary_contact;
+
+      return { ...prev, secondaryContact };
+    });
+  }, [list_of_orders]);
+
   const getCurrentOrderInfoHandler = useCallback(
     (order_info) => {
       const order = list_of_orders.find((el) => el.article === order_info?.article);
@@ -374,6 +385,10 @@ const OrderContextProvider = ({ children }) => {
           contact.id === order?.contact_id && contact.client_id === order?.owner
       );
 
+      const secondaryContact = order?.secondary_contact
+        ? contactInfos.find((contact) => contact.id == order.secondary_contact)
+        : order?.secondary_contact;
+
       const currentOrder = {
         id: order?.id,
         article: order?.article,
@@ -381,7 +396,8 @@ const OrderContextProvider = ({ children }) => {
         owner: client,
         deliveryAddress,
         description: order?.description,
-        contactInfo,
+        contactInfo: contactInfo,
+        secondaryContact,
         shipping_date: order?.shipping_date,
         person_in_charge: order?.person_in_charge,
       };

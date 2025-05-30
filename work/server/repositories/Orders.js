@@ -62,6 +62,25 @@ class OrdersRepository {
     }
   }
 
+  static async addSecondaryContact({ secondary_contact, order_id }) {
+    try {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.secondary_contact', secondary_contact);
+      await Orders.update(
+        {
+          secondary_contact,
+        },
+        { where: { id: order_id } }
+      );
+
+      const order_newContact = await Orders.findOne({ where: { id: order_id } });
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.order_newContact', order_newContact);
+      return order_newContact;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
   static async getProductsOfOrder() {
     try {
       const product_list = await OrdersProducts.findAll({

@@ -49,6 +49,8 @@ import {
   GET_DELETE_TOOL_OF_ORDER,
   ORDER_DESCRIPTION,
   ADD_ORDER_DESCRIPTION,
+  ADD_SECONDARY_CONTACT,
+  SECONDARY_CONTACT,
 } from '../types/ordersTypes';
 
 const url = axios.create({
@@ -86,6 +88,15 @@ const addDataShipOrder = (date) => {
 const addDescriptionOrder = (desc) => {
   return url
     .post('/orders/desc', desc)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addSecondaryContact = (sec_cnt) => {
+  return url
+    .post('/orders/sec_cnt', sec_cnt)
     .then((res) => {
       return res.data;
     })
@@ -301,6 +312,16 @@ function* addDescriptionOrderWatcher(action) {
   } catch (err) {
     console.error(err);
     yield put({ type: ORDER_DESCRIPTION, payload: [] });
+  }
+}
+
+function* addSecondaryContactWatcher(action) {
+  try {
+    const { payload } = action;
+    yield call(addSecondaryContact, payload);
+  } catch (err) {
+    console.error(err);
+    yield put({ type: SECONDARY_CONTACT, payload: [] });
   }
 }
 
@@ -536,6 +557,7 @@ function* ordersWatcher() {
   yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
   yield takeLatest(ADD_DATA_SHIP_ORDER, addDataShipOrderWatcher);
   yield takeLatest(ADD_ORDER_DESCRIPTION, addDescriptionOrderWatcher);
+  yield takeLatest(ADD_SECONDARY_CONTACT, addSecondaryContactWatcher);
   yield takeLatest(GET_CURRENT_PRODUCTS_OF_ORDER, getCurrentProductsOfOrderWatcher);
   yield takeLatest(GET_PRODUCTS_OF_ORDER, getProductsOfOrderWatcher);
   yield takeLatest(

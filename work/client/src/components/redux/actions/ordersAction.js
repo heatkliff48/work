@@ -26,6 +26,7 @@ import {
   GET_DELETE_ANCHOR_OF_ORDER,
   GET_DELETE_TOOL_OF_ORDER,
   ADD_ORDER_DESCRIPTION,
+  ADD_SECONDARY_CONTACT,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -52,6 +53,13 @@ export const addDescription = (desc) => {
   return {
     type: ADD_ORDER_DESCRIPTION,
     payload: desc,
+  };
+};
+
+export const addSecondaryContact = (sec_cnt) => {
+  return {
+    type: ADD_SECONDARY_CONTACT,
+    payload: sec_cnt,
   };
 };
 

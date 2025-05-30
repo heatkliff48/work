@@ -28,10 +28,9 @@ module.exports = {
       },
       contact_id: {
         type: Sequelize.INTEGER,
-        // references: {
-        //   model: 'DeliveryAddresses',
-        //   key: 'id',
-        // },
+      },
+      secondary_contact: {
+        type: Sequelize.INTEGER,
       },
       status: {
         type: Sequelize.INTEGER,

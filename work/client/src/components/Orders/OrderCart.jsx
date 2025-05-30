@@ -11,6 +11,7 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import {
   addDataShipOrder,
   addDescription,
+  addSecondaryContact,
   deleteAccountingData,
   deleteOrder,
   getDeleteProductOfOrder,
@@ -43,6 +44,7 @@ import {
   getDeleteDryMixedProductOfOrder,
   getDeleteToolProductOfOrder,
 } from '#components/redux/actions/ordersAction.js';
+import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo.js';
 import {
   updateAnchorsWarehouse,
   updateDryMixesWarehouse,
@@ -72,7 +74,8 @@ const OrderCart = React.memo(() => {
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
   } = useModalContext();
-  const { displayNames, user } = useProjectContext();
+  const { displayNames, user, setCurrentClient } = useProjectContext();
+
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { latestProducts } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools } =
@@ -99,6 +102,7 @@ const OrderCart = React.memo(() => {
   const [newDescription, setNewDescription] = useState('');
   const [formatDataValue, setFormatDataValue] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isAddSecCont, setIsAddSecCont] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState([]);
@@ -151,10 +155,6 @@ const OrderCart = React.memo(() => {
 
   const haveShipDate = useMemo(() => {
     return orderCartData?.shipping_date ?? false;
-  }, [orderCartData]);
-
-  const hasDescription = useMemo(() => {
-    return orderCartData?.description?.length > 0;
   }, [orderCartData]);
 
   const filterAndMapData = useCallback(
@@ -218,6 +218,21 @@ const OrderCart = React.memo(() => {
   const onSaveDescription = (str) => {
     dispatch(addDescription({ order_id: orderCartData.id, description: str }));
     setIsEditing(false);
+  };
+
+  const addSecondaryContactHandler = () => {
+    setIsAddSecCont(true);
+  };
+
+  const haveSecondaryContact = useMemo(() => {
+    return orderCartData?.secondaryContact ?? false;
+  }, [orderCartData?.secondaryContact]);
+
+  const addSecCntFunc = (secCnt) => {
+    dispatch(
+      addSecondaryContact({ secondary_contact: secCnt, order_id: orderCartData.id })
+    );
+    setIsAddSecCont(false);
   };
 
   const addProductArticleToOrderList = useCallback(
@@ -832,6 +847,32 @@ const OrderCart = React.memo(() => {
           <div className="owner-info">
             <h4>Client Information</h4>
             {filterAndMapData(orderCartData?.owner, filterKeys)}
+
+            <div className="description">
+              <h4>Description</h4>
+              {orderCartData?.description && !isEditing ? (
+                <>
+                  <p style={{ height: '90%' }}>{orderCartData.description}</p>
+                  <button className="edit-button" onClick={onEditHandler}>
+                    Edit
+                  </button>
+                </>
+              ) : (
+                <div className="input-wrapper">
+                  <textarea
+                    placeholder="Enter description..."
+                    value={newDescription}
+                    onChange={(e) => setNewDescription(e.target.value)}
+                  />
+                  <button
+                    className="save-button"
+                    onClick={() => onSaveDescription(newDescription)}
+                  >
+                    Save
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="contact-info">
@@ -851,30 +892,18 @@ const OrderCart = React.memo(() => {
               <ShowOrderDeliveryEditModal />
             )}
           </div>
-          <div className="description">
-            <h4>Description</h4>
-
-            {orderCartData?.description && !isEditing ? (
+          <div className="secondary-contact">
+            <h4>Secondary Contacts</h4>
+            {haveSecondaryContact ? (
+              filterAndMapData(orderCartData?.secondaryContact, filterKeys)
+            ) : isAddSecCont ? (
               <>
-                <p>{orderCartData.description}</p>
-                <button className="edit-button" onClick={onEditHandler}>
-                  Edit
-                </button>
+                <ClientsContactInfo clickFunk={addSecCntFunc} showSearch={true} />
               </>
             ) : (
-              <div className="input-wrapper">
-                <textarea
-                  placeholder="Enter description..."
-                  value={newDescription}
-                  onChange={(e) => setNewDescription(e.target.value)}
-                />
-                <button
-                  className="save-button"
-                  onClick={() => onSaveDescription(newDescription)}
-                >
-                  Save
-                </button>
-              </div>
+              <button onClick={() => addSecondaryContactHandler()}>
+                Add secondary contact
+              </button>
             )}
           </div>
 
@@ -976,7 +1005,7 @@ const OrderCart = React.memo(() => {
               <div className="footer_button">
                 <p>Person in charge</p>
                 <Select
-                  defaultValue={getSelectedOption(orderCartData.person_in_charge)}
+                  defaultValue={getSelectedOption(orderCartData?.person_in_charge)}
                   onChange={(v) => {
                     handleSelectChange(v);
                   }}

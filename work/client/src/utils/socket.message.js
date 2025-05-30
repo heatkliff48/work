@@ -52,6 +52,7 @@ import {
   addNewRelatedMaterialsBackorderSocket,
   updateRelatedMaterialsBackorderSocket,
   addDescOrderSocket,
+  addSecondaryContactSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -120,6 +121,7 @@ import {
   GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   REPAIR_PRODUCT_SOCKET,
+  ADD_SECONDARY_CONTACT_ORDER_SOCKET,
   ADD_NEW_DRY_MIXES_WAREHOUSE_SOCKET,
   UPDATE_DRY_MIXES_WAREHOUSE_SOCKET,
   ADD_NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
@@ -200,6 +202,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_DESCRIPTIOM_ORDER_SOCKET:
       dispatch(addDescOrderSocket(payload));
+      break;
+
+    case ADD_SECONDARY_CONTACT_ORDER_SOCKET:
+      dispatch(addSecondaryContactSocket(payload));
       break;
 
     case UPDATE_STATUS_OF_ORDER_SOCKET:

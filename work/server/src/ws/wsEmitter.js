@@ -61,6 +61,7 @@ const {
   ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
   UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
   ADD_DESCRIPTIOM_ORDER_SOCKET,
+  ADD_SECONDARY_CONTACT_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -148,6 +149,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_DESCRIPTIOM_ORDER_SOCKET,
           payload: desc,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_SECONDARY_CONTACT_ORDER_SOCKET, (sec_cnt) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_SECONDARY_CONTACT_ORDER_SOCKET,
+          payload: sec_cnt,
         })
       );
     }

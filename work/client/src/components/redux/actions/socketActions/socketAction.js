@@ -52,6 +52,7 @@ import {
   NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
   NEED_UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
   DESCRIPTIOM_ORDER_SOCKET,
+  SECONDARY_CONTACT_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -163,6 +164,13 @@ export const addDescOrderSocket = (desc) => {
   return {
     type: DESCRIPTIOM_ORDER_SOCKET,
     payload: desc,
+  };
+};
+
+export const addSecondaryContactSocket = (sec_cnt) => {
+  return {
+    type: SECONDARY_CONTACT_ORDER_SOCKET,
+    payload: sec_cnt,
   };
 };
 
