@@ -284,6 +284,8 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
 
   const [selectedProductsType, setSelectedProductsType] = useState(null);
   const [dataTable, setDataTable] = useState([]);
+  const [productsTypeJournalPreviewInput, setProductsTypeJournalPreviewIInput] =
+    useState({});
 
   const dryMixesJournal = useSelector((state) => state.dryMixesJournal);
   const relatedMaterialsJournal = useSelector(
@@ -340,6 +342,10 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
     return getLatestAuxilaryProducts(dryMixesJournal);
   }, [dryMixesJournal]);
 
+  useEffect(() => {
+    console.log('latestDryMix', latestDryMix);
+  }, [latestDryMix]);
+
   const latestRelatedMaterials = useMemo(() => {
     return getLatestAuxilaryProducts(relatedMaterialsJournal);
   }, [relatedMaterialsJournal]);
@@ -364,6 +370,8 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
         placeOfProductionOptions,
         selectedProductsType,
         setSelectedProductsType,
+        productsTypeJournalPreviewInput,
+        setProductsTypeJournalPreviewIInput,
         dataTable,
         setDataTable,
         dryMixesJournal,

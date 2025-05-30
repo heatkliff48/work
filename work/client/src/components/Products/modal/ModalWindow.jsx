@@ -46,6 +46,7 @@ const ModalWindow = React.memo(
     };
 
     const handleInputChange = useCallback((e) => {
+      console.log(e.target.name, e.target.value);
       setStayDefault(false);
       setFormInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     }, []);
@@ -114,7 +115,7 @@ const ModalWindow = React.memo(
 
         if (isExistingProduct) {
           updatedProduct.version = lastVersion + 1;
-          updatedProduct.productCode  = existingProduct.productCode
+          updatedProduct.productCode = existingProduct.productCode;
         }
 
         setPreviewProductData(updatedProduct);
@@ -537,6 +538,13 @@ const ModalWindow = React.memo(
                           ...prev,
                           [el.accessor]: option.value,
                         }));
+                        if (el.accessor == 'form' && option.value == 'Forjado') {
+                          setFormInput((prev) => ({
+                            ...prev,
+                            lengths: 600,
+                            height: 500,
+                          }));
+                        }
                       }}
                       options={selectOptions[el.accessor]}
                       isDisabled={isDisabled}

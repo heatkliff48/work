@@ -8,8 +8,10 @@ import pagesWatcher from './pagesSagas';
 import productionBatchLogWatcher from './productionBatchLogSagas';
 import productsWatcher from './productsSagas';
 import productsTypeJournalWatcher from './productsTypeJournalSagas';
+import productsTypeWarehouseWatcher from './productsTypeWarehouseSagas';
 import qualityManagementWatcher from './qualityManagementSagas';
 import recipeWatcher from './recipeSagas';
+import relatedMaterialsBackorderListWatcher from './relatedMaterialsBackorderListSagas';
 import rolesWatcher from './rolesSagas';
 import stockBalanceWatcher from './stockBalanceSagas';
 import userWatcher from './userSagas';
@@ -35,6 +37,8 @@ export default function* rootSaga() {
     filesProductWatcher(),
     stockBalanceWatcher(),
     productsTypeJournalWatcher(),
+    productsTypeWarehouseWatcher(),
     qualityManagementWatcher(),
+    relatedMaterialsBackorderListWatcher(),
   ]);
 }
