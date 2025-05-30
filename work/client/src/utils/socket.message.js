@@ -42,6 +42,7 @@ import {
   deleteAnchorProductOfOrderSocket,
   deleteToolProductOfOrderSocket,
   addDescOrderSocket,
+  addSecondaryContactSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -110,6 +111,7 @@ import {
   GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   REPAIR_PRODUCT_SOCKET,
+  ADD_SECONDARY_CONTACT_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -180,6 +182,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_DESCRIPTIOM_ORDER_SOCKET:
       dispatch(addDescOrderSocket(payload));
+      break;
+
+    case ADD_SECONDARY_CONTACT_ORDER_SOCKET:
+      dispatch(addSecondaryContactSocket(payload));
       break;
 
     case UPDATE_STATUS_OF_ORDER_SOCKET:

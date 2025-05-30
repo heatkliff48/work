@@ -39,6 +39,12 @@ class OrdersService {
     return order_desc;
   }
 
+  static async addSecondaryContact(sec_cnt) {
+    const order_newContact = await OrdersRepository.addSecondaryContact(sec_cnt);
+
+    return order_newContact;
+  }
+
   static async getProductsOfOrder() {
     const product_list = await OrdersRepository.getProductsOfOrder();
 

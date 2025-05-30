@@ -2,8 +2,8 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 
-const ClientsContactInfo = ({ clickFunk = null, showSearch = false }) => {
-  const { currentClient, currentContact, setCurrentContact } = useProjectContext();
+const ClientsContactInfo = ({ clickFunk = null, showSearch = false, filter = false }) => {
+  const { currentClient, currentContact } = useProjectContext();
 
   const contactInfo = useSelector((state) => state.contactInfo);
 

@@ -42,6 +42,7 @@ import {
   DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   REP_PRODUCT_SOCKET,
   DESCRIPTIOM_ORDER_SOCKET,
+  SECONDARY_CONTACT_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -153,6 +154,13 @@ export const addDescOrderSocket = (desc) => {
   return {
     type: DESCRIPTIOM_ORDER_SOCKET,
     payload: desc,
+  };
+};
+
+export const addSecondaryContactSocket = (sec_cnt) => {
+  return {
+    type: SECONDARY_CONTACT_ORDER_SOCKET,
+    payload: sec_cnt,
   };
 };
 

@@ -15,6 +15,7 @@ const {
   GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+  ADD_SECONDARY_CONTACT_ORDER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -72,6 +73,19 @@ class OrdersController {
       await OrdersService.addDescriptionOrder(desc);
 
       myEmitter.emit(ADD_DESCRIPTIOM_ORDER_SOCKET, desc);
+      return res.status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async addSecondaryContact(req, res) {
+    const sec_cnt = req.body;
+
+    try {
+      await OrdersService.addSecondaryContact(sec_cnt);
+
+      myEmitter.emit(ADD_SECONDARY_CONTACT_ORDER_SOCKET, sec_cnt);
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);

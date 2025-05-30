@@ -11,6 +11,7 @@ import {
   DESCRIPTIOM_ORDER_SOCKET,
   NEW_ORDER_SOCKET,
   PERSON_IN_CHARGE_OF_ORDER_SOCKET,
+  SECONDARY_CONTACT_ORDER_SOCKET,
   STATUS_OF_ORDER_SOCKET,
 } from '../types/socketTypes/socket';
 
@@ -47,6 +48,19 @@ export const ordersReducer = (orders = [], action) => {
       const result = orders.map((order) => {
         if (order.id === order_id) {
           return { ...order, description };
+        }
+        return order;
+      });
+
+      return result;
+    }
+
+    case SECONDARY_CONTACT_ORDER_SOCKET: {
+      const { order_id, secondary_contact } = payload;
+
+      const result = orders.map((order) => {
+        if (order.id === order_id) {
+          return { ...order, secondary_contact };
         }
         return order;
       });
