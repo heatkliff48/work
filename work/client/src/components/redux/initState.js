@@ -37,7 +37,7 @@ const initState = {
   anchorsWarehouse: [],
   toolsWarehouse: [],
   qualityManagementData: [],
-  relatedMaterialsBackorderListReducer: [],
+  relatedMaterialsBackorderList: [],
   aldabaran: [],
 };
 
