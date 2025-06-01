@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import WMOrderCard from './WMOrderCard/WMOrderCard';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useDispatch } from 'react-redux';
+import { getAldabaran } from '#components/redux/actions/aldabaranAction.js';
 
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
@@ -22,6 +24,7 @@ function WarehouseManager() {
     getCurrentOrderInfoHandler,
   } = useOrderContext();
 
+  const dispatch = useDispatch();
   // const navigate = useNavigate();
 
   const [warehouseMdata, setWarehouseMdata] = useState([]);
@@ -36,6 +39,10 @@ function WarehouseManager() {
   //     }
   //   }
   // }, [user, roles]);
+
+  useEffect(() => {
+    dispatch(getAldabaran());
+  }, []);
 
   useEffect(() => {
     setSelectedOrder(null);

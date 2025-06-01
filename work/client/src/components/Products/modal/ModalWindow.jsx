@@ -46,7 +46,6 @@ const ModalWindow = React.memo(
     };
 
     const handleInputChange = useCallback((e) => {
-      console.log(e.target.name, e.target.value);
       setStayDefault(false);
       setFormInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     }, []);

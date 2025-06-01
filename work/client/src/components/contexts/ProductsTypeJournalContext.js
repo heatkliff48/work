@@ -273,10 +273,6 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
     { value: 2, label: 'Glue' },
   ];
 
-  // const placeOfProductionOptions = getData();
-  //   code: 'ES',
-  //   name: 'Spain'
-
   const placeOfProductionOptions = getData().map(({ code, name }) => ({
     value: code,
     label: name,
@@ -293,25 +289,6 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
   );
   const anchor = useSelector((state) => state.anchor);
   const tool = useSelector((state) => state.tool);
-
-  // Старый вариант, где порядок не важен
-
-  // function getLatestAuxilaryProducts(products) {
-  //   const newProductList = products?.reduce((acc, product) => {
-  //     const { article, version } = product;
-  //     const existingProduct = acc.find((p) => p.article === article);
-  //     if (!existingProduct) {
-  //       acc.push(product);
-  //     } else if (version > existingProduct.version) {
-  //       acc = acc.map((p) => (p.article === article ? product : p));
-  //     }
-  //     return acc;
-  //   }, []);
-
-  //   newProductList?.sort((a, b) => a.id - b.id);
-
-  //   return newProductList;
-  // }
 
   function getLatestAuxilaryProducts(products) {
     // Сначала находим последние версии всех продуктов
@@ -341,10 +318,6 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
   const latestDryMix = useMemo(() => {
     return getLatestAuxilaryProducts(dryMixesJournal);
   }, [dryMixesJournal]);
-
-  useEffect(() => {
-    console.log('latestDryMix', latestDryMix);
-  }, [latestDryMix]);
 
   const latestRelatedMaterials = useMemo(() => {
     return getLatestAuxilaryProducts(relatedMaterialsJournal);

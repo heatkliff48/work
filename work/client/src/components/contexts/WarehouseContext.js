@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { addNewAldabaran } from '#components/redux/actions/aldabaranAction.js';
 
 const WarehouseContext = createContext();
 
@@ -133,9 +134,13 @@ const WarehouseContextProvider = ({ children }) => {
     (state) => state.relatedMaterialsBackorderList
   );
 
+  const aldabaran = useSelector((state) => state.aldabaran);
+
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [aldabaranNum, setAldabaranNum] = useState(null);
 
   const [filteredProducts, setFilteredProducts] = useState();
+  const [additionalInfoPDF, setAdditionalInfoPDF] = useState({});
   const [currentOrderedProducts, setCurrentOrderedProducts] = useState({});
   const [currentBatchId, setCurrentBatchId] = useState(0);
   const [currentBatch, setCurrentBatch] = useState();
@@ -207,7 +212,6 @@ const WarehouseContextProvider = ({ children }) => {
 
     let orderId;
 
-    console.log('wmoctProduct', wmoctProduct);
     wmoctProduct.forEach((el) => {
       const { orders_products_id, order_id } = el;
       orderId = order_id;
@@ -271,6 +275,15 @@ const WarehouseContextProvider = ({ children }) => {
       );
     }
 
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const now = new Date();
+    const dateTimeStr =
+      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+      console.log('aldabaranNum', aldabaranNum);
+    dispatch(addNewAldabaran({ num: aldabaranNum, data: dateTimeStr }));
     dispatch(addNewReservedProducts(newReserved));
     setWmoctProductShippedBD([]);
     setSelectedOrder(null);
@@ -541,6 +554,11 @@ const WarehouseContextProvider = ({ children }) => {
         saveHandler,
         selectedOrder,
         setSelectedOrder,
+        additionalInfoPDF,
+        setAdditionalInfoPDF,
+        aldabaranNum,
+        setAldabaranNum,
+        aldabaran,
       }}
     >
       {children}

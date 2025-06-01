@@ -5,6 +5,7 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import WMOCPDFModal from '../WMOPdf/WMOPDFModal';
+import WMOCTableDataModal from './WMOCTableDataModal';
 
 const WMOCTable = ({ product_list, orderCartData }) => {
   const {
@@ -13,10 +14,19 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     setWmoctProductShippedBD,
     warehouse_data,
     list_of_reserved_products,
+    aldabaranNum,
+    setAldabaranNum,
+    aldabaran,
   } = useWarehouseContext();
   const { productsOfOrders, list_of_orders } = useOrderContext();
-  const { wmoctModal, setWmoctModal, wmoctPdfModal, setWmoctPdfModal } =
-    useModalContext();
+  const {
+    wmoctModal,
+    setWmoctModal,
+    wmoctPdfModal,
+    setWmoctPdfModal,
+    wmoctPdfAddDataModal,
+    setWmoctPdfAddDataModal,
+  } = useModalContext();
   const { latestProducts } = useProductsContext();
   const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -159,6 +169,12 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     setWmoctProduct(initialProducts);
   }, [product_list, latestProducts, list_of_orders, list_of_reserved_products]);
 
+  useEffect(() => {
+    const lastNum = aldabaran.length > 0 ? aldabaran.length + 1 : 1;
+    console.log('aldabaran', aldabaran);
+    setAldabaranNum(lastNum);
+  }, [aldabaran]);
+
   return (
     <>
       <WMOCTableModal
@@ -175,6 +191,12 @@ const WMOCTable = ({ product_list, orderCartData }) => {
           setWmoctPdfModal(!wmoctPdfModal);
         }}
         orderCartData={orderCartData}
+      />
+      <WMOCTableDataModal
+        isOpen={wmoctPdfAddDataModal}
+        toggle={() => {
+          setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
+        }}
       />
       <div className="overflow-auto">
         <table className="table-auto border border-gray-300 w-full">
@@ -300,7 +322,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
           </tbody>
           <button
             onClick={() => {
-              setWmoctPdfModal(!wmoctPdfModal);
+              setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
             }}
           >
             SAVE

@@ -18,6 +18,7 @@ export const ModalContextProvider = ({ children }) => {
   const [warehouseInfoModal, setWarehouseInfoModal] = useState(false);
   const [reserveProductModal, setReserveProductModal] = useState(false);
   const [previewProductModal, setPreviewProductModal] = useState(false);
+  const [wmoctPdfAddDataModal, setWmoctPdfAddDataModal] = useState(false);
   const [toolProductModalOrder, setToolProductModalOrder] = useState(false);
   const [productInfoModalOrder, setProductInfoModalOrder] = useState(false);
   const [anchorProductModalOrder, setAnchorProductModalOrder] = useState(false);
@@ -67,6 +68,8 @@ export const ModalContextProvider = ({ children }) => {
         setPreviewProductModal,
         wmoctPdfModal,
         setWmoctPdfModal,
+        wmoctPdfAddDataModal,
+        setWmoctPdfAddDataModal,
       }}
     >
       {children}

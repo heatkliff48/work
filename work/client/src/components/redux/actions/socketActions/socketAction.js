@@ -53,6 +53,7 @@ import {
   NEED_UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
   DESCRIPTIOM_ORDER_SOCKET,
   SECONDARY_CONTACT_ORDER_SOCKET,
+  NEW_ALDABARAN_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -434,5 +435,12 @@ export const updateRelatedMaterialsBackorderSocket = (
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
     payload: relatedMaterialsBackorderList,
+  };
+};
+
+export const addNewAldabaranSocket = (currentAldabaran) => {
+  return {
+    type: NEW_ALDABARAN_SOCKET,
+    payload: currentAldabaran,
   };
 };

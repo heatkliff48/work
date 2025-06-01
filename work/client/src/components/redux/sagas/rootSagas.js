@@ -1,3 +1,4 @@
+import aldabaranWatcher from './aldabaranSagas';
 import batchOutsideWatcher from './batchOutsideSagas';
 import clientsWatcher from './clientsSagas';
 import filesOrderWatcher from './filesOrderSagas';
@@ -40,5 +41,6 @@ export default function* rootSaga() {
     productsTypeWarehouseWatcher(),
     qualityManagementWatcher(),
     relatedMaterialsBackorderListWatcher(),
+    aldabaranWatcher(),
   ]);
 }

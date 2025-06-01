@@ -85,7 +85,6 @@ export const anchorProductsOfOrdersReducer = (state = [], action) => {
     }
 
     case UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      console.log();
       return [...state, payload];
     }
 
