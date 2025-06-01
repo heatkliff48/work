@@ -53,6 +53,7 @@ import {
   updateRelatedMaterialsBackorderSocket,
   addDescOrderSocket,
   addSecondaryContactSocket,
+  addNewAldabaranSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -132,6 +133,7 @@ import {
   UPDATE_TOOLS_WAREHOUSE_SOCKET,
   ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
   UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
+  ADD_NEW_ALDABARAN_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -390,6 +392,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET:
       dispatch(updateRelatedMaterialsBackorderSocket(payload));
+      break;
+
+    case ADD_NEW_ALDABARAN_SOCKET:
+      dispatch(addNewAldabaranSocket(payload));
       break;
 
     default:

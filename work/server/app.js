@@ -15,6 +15,7 @@ const Fingerprint = require('express-fingerprint');
 const cookieParser = require('cookie-parser');
 const registerWsEmitter = require('./src/ws/wsEmitter');
 
+const AldabaranRootRouter = require('./router/aldabaran.js');
 const AuthRootRouter = require('./router/Auth.js');
 const ProductRootRouter = require('./router/Product.js');
 const OrdersRootRouter = require('./router/Orders.js');
@@ -93,6 +94,7 @@ app.use((err, req, res, next) => {
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 
+app.use('/aldabaran', AldabaranRootRouter);
 app.use('/auth', AuthRootRouter);
 app.use('/products', ProductRootRouter);
 app.use('/roles', RolesRootRouter);

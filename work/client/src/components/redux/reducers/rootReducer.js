@@ -1,5 +1,6 @@
 import { recipeOrdersReducer } from './RecipeOrdersReducer';
 import { accountingReducer } from './accoutingReducer';
+import { aldabaranReducer } from './aldabaranReducer';
 import batchDesignerReducer from './batchDesignerReducer';
 import { batchOutsideReducer } from './batchOutsideReducer';
 import {
@@ -90,4 +91,5 @@ export const rootReducer = combineReducers({
   toolsWarehouse: toolsWarehouseReducer,
   qualityManagementData: qualityManagementReducer,
   relatedMaterialsBackorderList: relatedMaterialsBackorderListReducer,
+  aldabaran: aldabaranReducer,
 });

@@ -88,9 +88,6 @@ const AccountngOrderCard = React.memo(() => {
       if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
         return [];
 
-      console.log('productsOfOrders', productsOfOrders);
-      console.log('productsTable', productsTable);
-
       const updatedOrderProducts = productsOfOrders
         .filter((el) => el.order_id == orderCartData.id)
         .map((orderProduct) => {
@@ -126,8 +123,6 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedProductListOrder]);
 
   const updatedDryMixesListOrder = useMemo(() => {
-    console.log('dryMixedProductsOfOrders', dryMixedProductsOfOrders);
-    console.log('latestDryMix', latestDryMix);
     return addProductArticleToOrderList(
       dryMixedProductsOfOrders,
       latestDryMix,
@@ -360,8 +355,6 @@ const AccountngOrderCard = React.memo(() => {
           <div className="status-table">
             {accountingStatusList.map((item) => (
               <div key={item.accessor} className="status-row">
-                {/* {console.log('item.accessor', item.accessor)}
-                {console.log('status', status)} */}
                 <div className="header">{item.Header}</div>
                 <input
                   id={item.accessor}

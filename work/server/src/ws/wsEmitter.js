@@ -62,6 +62,7 @@ const {
   UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
   ADD_DESCRIPTIOM_ORDER_SOCKET,
   ADD_SECONDARY_CONTACT_ORDER_SOCKET,
+  ADD_NEW_ALDABARAN_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -72,6 +73,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_PRODUCT_SOCKET,
           payload: products,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_ALDABARAN_SOCKET, (currentAldabaran) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_ALDABARAN_SOCKET,
+          payload: currentAldabaran,
         })
       );
     }

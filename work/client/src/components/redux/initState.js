@@ -38,6 +38,7 @@ const initState = {
   toolsWarehouse: [],
   qualityManagementData: [],
   relatedMaterialsBackorderListReducer: [],
+  aldabaran: [],
 };
 
 export default initState;

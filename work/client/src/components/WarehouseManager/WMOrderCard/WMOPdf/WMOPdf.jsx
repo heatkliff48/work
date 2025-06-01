@@ -15,7 +15,13 @@ const loadImage = () => {
 };
 
 const WMOPdf = ({ orderCartData, toggle }) => {
-  const { wmoctProduct, wmoctProductShippedBD, saveHandler } = useWarehouseContext();
+  const {
+    wmoctProduct,
+    wmoctProductShippedBD,
+    saveHandler,
+    additionalInfoPDF,
+    aldabaranNum,
+  } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
 
   const [pdfUrl, setPdfUrl] = useState(null);
@@ -49,14 +55,14 @@ const WMOPdf = ({ orderCartData, toggle }) => {
       doc.text(`DOMICILIO: ${pdfData?.cliente.domicilio}`, 10, yPosition + 12);
       doc.text(`CIF: ${pdfData?.cliente.cif}`, 10, yPosition + 18);
       doc.text(`TELÉFONO: ${pdfData?.cliente.telefono}`, 10, yPosition + 24);
-      doc.text(`S/REFERENCIA: ${pdfData?.facturar}`, 10, yPosition + 30);
+      doc.text(`S/REFERENCIA: ${pdfData?.cliente?.referencia}`, 10, yPosition + 30);
       doc.text(`PEDIDO Nº: ${pdfData?.cliente.pedido}`, 10, yPosition + 36);
 
       // Правая часть: ALBARAN DE SALIDA + FECHA
       doc.setFont(undefined, `bold`);
       doc.text(`ALBARAN DE SALIDA `, 140, yPosition);
       doc.setFont(undefined, `normal`);
-      doc.text(`Nº ALBARAN: ${pdfData?.facturar}`, 140, yPosition + 6);
+      doc.text(`Nº ALBARAN: ${aldabaranNum}`, 140, yPosition + 6);
       doc.text(`FECHA: ${pdfData?.formattedDate}`, 140, yPosition + 20);
 
       // Сдвигаем y для следующего блока
@@ -69,14 +75,20 @@ const WMOPdf = ({ orderCartData, toggle }) => {
       doc.text(`DOMICILIO: ${pdfData?.lugar.domicilio}`, 10, yPosition + 6);
       doc.text(`CONTACTO: ${pdfData?.lugar.contacto}`, 10, yPosition + 12);
       doc.text(`TELÉFONO: ${pdfData?.lugar.telefono}`, 10, yPosition + 18);
-      doc.text(`LUGAR DE CARGA: ${pdfData?.facturar}`, 10, yPosition + 24);
+      doc.text(`LUGAR DE CARGA: ${pdfData?.lugar.carga}`, 10, yPosition + 24, {
+        maxWidth: 80,
+      });
 
       // Правая часть: TRANSPORTE
       doc.setFont(undefined, `bold`);
       doc.text(`TRANSPORTE`, 140, yPosition);
       doc.setFont(undefined, `normal`);
-      doc.text(`AGENCIA TRANSPORTE: ${pdfData?.facturar}`, 140, yPosition + 6);
-      doc.text(`MATRÍCULA: ${pdfData?.facturar}`, 140, yPosition + 12);
+      doc.text(
+        `AGENCIA TRANSPORTE: ${pdfData?.transporte.agencia}`,
+        140,
+        yPosition + 6
+      );
+      doc.text(`MATRÍCULA: ${pdfData?.transporte.matricula}`, 140, yPosition + 12);
 
       doc.setFont(undefined, `bold`);
       doc.text(`PALET`, 140, yPosition + 20);
@@ -159,18 +171,27 @@ const WMOPdf = ({ orderCartData, toggle }) => {
       };
     });
 
+    const carga = 'Avenida Isaac Newton N17, 11500 El Pto. Sta. Maria Cadiz';
+
     const cliente = {
       facturar: owner?.c_name,
       domicilio: contactInfo?.address,
       cif: owner?.cif_vat,
       telefono: contactInfo?.phone_number_mobile,
       pedido: article,
+      referencia: additionalInfoPDF?.referencia,
     };
 
     const lugar = {
       domicilio: contactInfo.address,
       contacto: `${contactInfo.first_name} ${contactInfo.last_name}`,
       telefono: contactInfo?.phone_number_mobile,
+      carga,
+    };
+
+    const transporte = {
+      agencia: additionalInfoPDF?.agencia,
+      matricula: additionalInfoPDF?.matricula,
     };
 
     const peso = pallet_sum * pallet_weight;
@@ -178,6 +199,7 @@ const WMOPdf = ({ orderCartData, toggle }) => {
     setPdfData({
       cliente,
       lugar,
+      transporte,
       formattedDate: formattedDate || '',
       peso,
       palet: pallet_sum,
