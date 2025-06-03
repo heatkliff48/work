@@ -16,7 +16,8 @@ const loadImage = () => {
 
 const PDFGenerator = ({ orderData, productList, vatValue }) => {
   const { latestProducts } = useProductsContext();
-  const { dryMixesJournal, anchor, tool } = useProductsTypeJournalContext();
+  const { dryMixesJournal, anchor, tool, relatedMaterialsJournal } =
+    useProductsTypeJournalContext();
 
   const [pdfUrl, setPdfUrl] = useState(null);
   const [pdfData, setPdfData] = useState({});
@@ -173,6 +174,27 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
             ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
           ],
           body: pdfData.pdfTools?.map((item) => [
+            item.ref,
+            item.descripcion,
+            item.total,
+            item.pvp_neto_ud,
+            item.subtotal,
+          ]),
+          styles: { fontSize: 6 },
+          headStyles: {
+            textColor: 'white',
+            fillColor: [255, 0, 0], // ярко-красный фон
+          },
+        });
+      }
+
+      if (pdfData.pdfRelMat?.length) {
+        autoTable(doc, {
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          head: [
+            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
+          ],
+          body: pdfData.pdfRelMat?.map((item) => [
             item.ref,
             item.descripcion,
             item.total,
@@ -388,6 +410,24 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       };
     });
 
+    const pdfRelMat = productList?.related_materials?.map((prod) => {
+      const pdfRelMat = relatedMaterialsJournal.find(
+        (el) => el.id == prod.rel_mat_id
+      );
+
+      const total = prod.total;
+
+      const pvp_neto_ud = (prod.final_price / total).toFixed(2);
+
+      return {
+        ref: pdfRelMat.article,
+        descripcion: pdfRelMat.description,
+        total,
+        pvp_neto_ud,
+        subtotal: prod.final_price.toFixed(2),
+      };
+    });
+
     setPdfData({
       ref: article || '',
       client: owner?.c_name || '',
@@ -403,6 +443,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       pdfDryMixes,
       pdfAnchor,
       pdfTools,
+      pdfRelMat,
       tax: vatValue.vat_procent || 0,
       finalTotal: vatValue.vat_result || 0,
       terms,
