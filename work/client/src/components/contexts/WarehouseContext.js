@@ -156,10 +156,7 @@ const WarehouseContextProvider = ({ children }) => {
   const dryMixedProductsOfOrders = useSelector(
     (state) => state.dryMixedProductsOfOrders
   );
-  const anchorProductsOfOrders = useSelector(
-    (state) => state.anchorProductsOfOrders
-  );
-  const toolProductsOfOrders = useSelector((state) => state.toolProductsOfOrders);
+
   const { latestProducts } = useProductsContext();
 
   const processOrders = (orderedProduction, groupedOrders) => {
@@ -282,7 +279,6 @@ const WarehouseContextProvider = ({ children }) => {
       `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
       `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
-      console.log('aldabaranNum', aldabaranNum);
     dispatch(addNewAldabaran({ num: aldabaranNum, data: dateTimeStr }));
     dispatch(addNewReservedProducts(newReserved));
     setWmoctProductShippedBD([]);

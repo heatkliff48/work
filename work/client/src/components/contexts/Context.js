@@ -23,6 +23,7 @@ const ProjectContextProvider = ({ children }) => {
     anchor_id: 'Anchor product id',
     quantity_palet_anchor: 'Quantity of pallets',
     tool_id: 'Tool product id',
+    rel_mat_id: 'Related material product id',
     c_name: 'Name of owner',
     cif_vat: 'CIF/VAT',
     category: 'Category',

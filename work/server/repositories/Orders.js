@@ -4,6 +4,7 @@ const {
   OrderDryMixedProducts,
   OrderAnchorProducts,
   OrderToolProducts,
+  OrderRelMatProducts,
 } = require('../db/models');
 
 class OrdersRepository {
@@ -64,7 +65,10 @@ class OrdersRepository {
 
   static async addSecondaryContact({ secondary_contact, order_id }) {
     try {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.secondary_contact', secondary_contact);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.secondary_contact',
+        secondary_contact
+      );
       await Orders.update(
         {
           secondary_contact,
@@ -73,7 +77,10 @@ class OrdersRepository {
       );
 
       const order_newContact = await Orders.findOne({ where: { id: order_id } });
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.order_newContact', order_newContact);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.order_newContact',
+        order_newContact
+      );
       return order_newContact;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
@@ -149,6 +156,7 @@ class OrdersRepository {
       return error;
     }
   }
+
   static async getToolProductsOfOrder() {
     try {
       const tool_product_list = await OrderToolProducts.findAll({
@@ -164,6 +172,27 @@ class OrdersRepository {
         ],
       });
       return tool_product_list;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getRelMatProductsOfOrder() {
+    try {
+      const rel_mat_product_list = await OrderRelMatProducts.findAll({
+        attributes: [
+          'id',
+          'order_id',
+          'rel_mat_id',
+          'quantity_rel_mat',
+          'total',
+          'discount',
+          'pvp',
+          'final_price',
+        ],
+      });
+      return rel_mat_product_list;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
@@ -382,6 +411,45 @@ class OrdersRepository {
 
       const tid = allOrdrProd[allOrdrProd.length - 1].id;
       console.log('tid', tid);
+
+      return { id: tid, ...product_of_order.toJSON() };
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getUpdateRelMatProductsOfOrder(newRelMatProductsOfOrder) {
+    try {
+      const { order_id, productOfOrder } = newRelMatProductsOfOrder;
+
+      const { rel_mat_id, quantity_ud, total, discount, final_price, pvp } =
+        productOfOrder;
+
+      const product_of_order = await OrderRelMatProducts.create({
+        order_id,
+        rel_mat_id,
+        quantity_ud,
+        total,
+        discount,
+        pvp,
+        final_price,
+      });
+
+      const allOrdrProd = await OrderRelMatProducts.findAll({
+        attributes: [
+          'id',
+          'order_id',
+          'rel_mat_id',
+          'quantity_ud',
+          'total',
+          'discount',
+          'pvp',
+          'final_price',
+        ],
+      });
+
+      const tid = allOrdrProd[allOrdrProd.length - 1].id;
 
       return { id: tid, ...product_of_order.toJSON() };
     } catch (error) {

@@ -14,6 +14,7 @@ const initState = {
   dryMixedProductsOfOrders: [],
   anchorProductsOfOrders: [],
   toolProductsOfOrders: [],
+  relMatProductsOfOrders: [],
   warehouse: [],
   usersInfo: [],
   usersMainInfo: [],

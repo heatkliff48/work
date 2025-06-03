@@ -54,6 +54,7 @@ import {
   DESCRIPTIOM_ORDER_SOCKET,
   SECONDARY_CONTACT_ORDER_SOCKET,
   NEW_ALDABARAN_SOCKET,
+  UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -123,6 +124,13 @@ export const updToolProductOfOrderSocket = (tool_product_of_order) => {
   return {
     type: UPDATE_TOOL_PRODUCT_OF_ORDER_REDUCER_SOCKET,
     payload: tool_product_of_order,
+  };
+};
+
+export const updRelMatProductOfOrderSocket = (rel_mat_product_of_order) => {
+  return {
+    type: UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+    payload: rel_mat_product_of_order,
   };
 };
 

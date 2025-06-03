@@ -8,6 +8,7 @@ router.get('/products', OrdersController.getProductsOfOrder);
 router.get('/dry_mixed_products', OrdersController.getDryMixedProductsOfOrder);
 router.get('/anchor_products', OrdersController.getAnchorProductsOfOrder);
 router.get('/tool_products', OrdersController.getToolProductsOfOrder);
+router.get('/rel_mat_products', OrdersController.getRelMatProductsOfOrder);
 router.post('/add', OrdersController.addNewOrder);
 router.post('/date', OrdersController.addShippingDateOrder);
 router.post('/desc', OrdersController.addDescriptionOrder);
@@ -25,6 +26,7 @@ router.post(
 );
 router.post('/anchor_products/add', OrdersController.getUpdateAnchorProductsOfOrder);
 router.post('/tool_products/add', OrdersController.getUpdateToolProductsOfOrder);
+router.post('/rel_mat_products/add', OrdersController.getUpdateRelMatProductsOfOrder);
 router.post('/product/update/info', OrdersController.getUpdateProductInfoOfOrder);
 router.post('/update/contact', OrdersController.getUpdateContactInfoOfOrder);
 router.post(
