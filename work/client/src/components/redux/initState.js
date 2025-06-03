@@ -14,6 +14,7 @@ const initState = {
   dryMixedProductsOfOrders: [],
   anchorProductsOfOrders: [],
   toolProductsOfOrders: [],
+  relMatProductsOfOrders: [],
   warehouse: [],
   usersInfo: [],
   usersMainInfo: [],
@@ -37,7 +38,7 @@ const initState = {
   anchorsWarehouse: [],
   toolsWarehouse: [],
   qualityManagementData: [],
-  relatedMaterialsBackorderListReducer: [],
+  relatedMaterialsBackorderList: [],
   aldabaran: [],
 };
 

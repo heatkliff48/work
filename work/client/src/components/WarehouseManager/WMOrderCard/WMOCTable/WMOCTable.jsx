@@ -171,7 +171,6 @@ const WMOCTable = ({ product_list, orderCartData }) => {
 
   useEffect(() => {
     const lastNum = aldabaran.length > 0 ? aldabaran.length + 1 : 1;
-    console.log('aldabaran', aldabaran);
     setAldabaranNum(lastNum);
   }, [aldabaran]);
 

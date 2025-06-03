@@ -15,6 +15,7 @@ import {
   deleteAccountingData,
   deleteOrder,
   getDeleteProductOfOrder,
+  getDeleteRelMatProductOfOrder,
   updAccountingDataList,
   updateOrderInCharge,
   updateOrderStatus,
@@ -51,6 +52,7 @@ import {
   updateToolsWarehouse,
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
+import RelatedMaterialJournalTableOrder from './product_table_order/RelatedMaterialJournalTableOrder.jsx';
 
 const OrderCart = React.memo(() => {
   const {
@@ -66,6 +68,7 @@ const OrderCart = React.memo(() => {
     dryMixedProductsOfOrders,
     anchorProductsOfOrders,
     toolProductsOfOrders,
+    relMatProductsOfOrders,
   } = useOrderContext();
   const {
     productInfoModalOrder,
@@ -74,22 +77,21 @@ const OrderCart = React.memo(() => {
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
   } = useModalContext();
-  const { displayNames, user, setCurrentClient } = useProjectContext();
+  const { displayNames, user } = useProjectContext();
 
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { latestProducts } = useProductsContext();
-  const { latestDryMix, latestAnchors, latestTools } =
+  const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterial } =
     useProductsTypeJournalContext();
   const {
     warehouse_data,
     dry_mixes_warehouse_data,
-    related_materials_warehouse_data,
     anchors_warehouse_data,
-    tools_warehouse_data,
     list_of_reserved_products,
     ordered_production_oem_status,
     filteredWarehouseByProduct,
     setFilteredWarehouseByProduct,
+    relatedMaterialsJournal,
   } = useWarehouseContext();
 
   const dispatch = useDispatch();
@@ -127,6 +129,7 @@ const OrderCart = React.memo(() => {
     dryMixes: [],
     anchors: [],
     tools: [],
+    related_materials: [],
   });
 
   const getCorrectProductId = (arrName) => {
@@ -142,6 +145,9 @@ const OrderCart = React.memo(() => {
 
       case 'tools':
         return 'tool_id';
+
+      case 'related_materials':
+        return 'rel_mat_id';
 
       default:
         break;
@@ -321,6 +327,27 @@ const OrderCart = React.memo(() => {
       }));
     }
   }, [updatedToolsListOrder]);
+
+  const updatedRelatedMaterialsListOrder = useMemo(() => {
+    return addProductArticleToOrderList(
+      relMatProductsOfOrders,
+      latestRelatedMaterial,
+      'related_materials'
+    );
+  }, [relMatProductsOfOrders, latestRelatedMaterial, addProductArticleToOrderList]);
+
+  useEffect(() => {
+    if (updatedRelatedMaterialsListOrder.length > 0) {
+      console.log(
+        'updatedRelatedMaterialsListOrder',
+        updatedRelatedMaterialsListOrder
+      );
+      setProductLists((prevState) => ({
+        ...prevState,
+        related_materials: updatedRelatedMaterialsListOrder,
+      }));
+    }
+  }, [updatedRelatedMaterialsListOrder]);
 
   const handleInputChange = (e) => {
     setVatValue((prev) => ({
@@ -621,6 +648,63 @@ const OrderCart = React.memo(() => {
       }
     });
 
+    //related material
+    // updatedRelatedMaterialsListOrder?.forEach((product) => {
+    //   const loc = latestRelatedMaterial.find(
+    //     (el) => el.article == product.product_article
+    //   )?.place_of_production;
+
+    //   if (status.accessor === status_list[5].accessor && loc === 'ES') {
+    //     const reservedProduct = relMatProductsOfOrders.find(
+    //       (orderedProduct) =>
+    //         orderedProduct.order_id === product.order_id &&
+    //         orderedProduct.rel_mat_id === product.rel_mat_id
+    //     );
+
+    //     let remainingToAllocate = reservedProduct.quantity_ud || 0; // Сколько нужно зарезервировать для этого товара
+
+    //     const matchingWarehouseProducts =
+    //       anchors_warehouse_data?.filter(
+    //         (warehouseItem) =>
+    //           warehouseItem.product_article === product?.product_article
+    //       ) || []; // Если anchors_warehouse_data undefined, используем пустой массив
+
+    //     // Проходим по складу и "забираем" остатки
+    //     for (const warehouseItem of matchingWarehouseProducts) {
+    //       if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+    //         const taken = Math.min(
+    //           warehouseItem.free_quantity_remaining,
+    //           remainingToAllocate
+    //         );
+
+    //         // Обновляем данные склада
+    //         dispatch(
+    //           updateToolsWarehouse({
+    //             id: warehouseItem?.id,
+    //             free_quantity_remaining:
+    //               warehouseItem.free_quantity_remaining - taken,
+    //             ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
+    //           })
+    //         );
+    //         remainingToAllocate -= taken;
+    //       }
+    //     }
+
+    //     const quantity_in_warehouse =
+    //       reservedProduct.quantity_ud - remainingToAllocate; // Сколько реально зарезервировали
+
+    //     dispatch(
+    //       addNewRelatedMaterialsBackorder({
+    //         shipping_date: orderCartData?.shipping_date,
+    //         product_article: product?.product_article,
+    //         order_article: orderCartData?.article,
+    //         quantity: product?.quantity_ud,
+    //         quantity_in_warehouse,
+    //       })
+    //     );
+    //   }
+    // });
+
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
 
@@ -655,6 +739,8 @@ const OrderCart = React.memo(() => {
       dispatch(getDeleteAnchorProductOfOrder(product?.id));
     } else if (product?.product_article.charAt(2) === 'T') {
       dispatch(getDeleteToolProductOfOrder(product?.id));
+    } else if (product?.product_article.charAt(2) === 'X') {
+      dispatch(getDeleteRelMatProductOfOrder(product?.id));
     }
   };
 
@@ -664,6 +750,7 @@ const OrderCart = React.memo(() => {
       ...productLists['dryMixes'],
       ...productLists['anchors'],
       ...productLists['tools'],
+      ...productLists['related_materials'],
     ];
 
     // Считаем финальную цену для всех продуктов
@@ -674,7 +761,8 @@ const OrderCart = React.memo(() => {
           (el?.final_price ||
             el?.final_price_dry ||
             el?.final_price_anchor ||
-            el?.final_price_tool),
+            el?.final_price_tool ||
+            el?.final_price_rel_mat),
         0
       ) || 0;
 
@@ -943,6 +1031,13 @@ const OrderCart = React.memo(() => {
         />
         <ToolJournalTableOrder
           productListOrder={updatedToolsListOrder}
+          onProductClickHandler={onProductClickHandler}
+          filterAndMapData={filterAndMapData}
+          filterKeys={filterKeys}
+          deleteHandler={deleteHandler}
+        />
+        <RelatedMaterialJournalTableOrder
+          productListOrder={updatedRelatedMaterialsListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeys}

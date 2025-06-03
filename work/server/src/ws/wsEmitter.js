@@ -63,6 +63,7 @@ const {
   ADD_DESCRIPTIOM_ORDER_SOCKET,
   ADD_SECONDARY_CONTACT_ORDER_SOCKET,
   ADD_NEW_ALDABARAN_SOCKET,
+  UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -245,6 +246,20 @@ function registerWsEmitter(map) {
       );
     }
   });
+
+  myEmitter.on(
+    UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+    (rel_mat_product_of_order) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+            payload: rel_mat_product_of_order,
+          })
+        );
+      }
+    }
+  );
 
   myEmitter.on(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, (product_id) => {
     for (let [id, userConnect] of map) {

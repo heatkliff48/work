@@ -70,6 +70,12 @@ class OrdersService {
     return tool_product_list;
   }
 
+  static async getRelMatProductsOfOrder() {
+    const rel_mat_product_list = await OrdersRepository.getRelMatProductsOfOrder();
+
+    return rel_mat_product_list;
+  }
+
   static async getCurrentProductsOfOrder({ order_id }) {
     const product_list = await OrdersRepository.getCurrentProductsOfOrder({
       order_id,
@@ -109,6 +115,13 @@ class OrdersService {
       await OrdersRepository.getUpdateToolProductsOfOrder(newToolProductsOfOrder);
 
     return tool_product_of_order;
+  }
+
+  static async getUpdateRelMatProductsOfOrder(newRelMatProductsOfOrder) {
+    const rel_mat_product_of_order =
+      await OrdersRepository.getUpdateRelMatProductsOfOrder(newRelMatProductsOfOrder);
+
+    return rel_mat_product_of_order;
   }
 
   static async getDeleteProductOfOrder({ product_id }) {

@@ -27,6 +27,9 @@ import {
   GET_DELETE_TOOL_OF_ORDER,
   ADD_ORDER_DESCRIPTION,
   ADD_SECONDARY_CONTACT,
+  GET_REL_MAT_PRODUCTS_OF_ORDER,
+  GET_UPDATE_REL_MAT_PRODUCTS_OF_ORDER,
+  GET_DELETE_REL_MAT_OF_ORDER,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -110,13 +113,6 @@ export const getUpdateDryMixedProductOfOrders = (newDryMixedProductsOfOrder) => 
   };
 };
 
-// export const getUpdateProductInfoOfOrders = (productOfOrder) => {
-//   return {
-//     type: GET_UPDATE_PRODUCT_INFO_OF_ORDER,
-//     payload: productOfOrder,
-//   };
-// };
-
 export const getDeleteDryMixedProductOfOrder = (product_id) => {
   return {
     type: GET_DELETE_DRY_MIXED_OF_ORDER,
@@ -160,6 +156,26 @@ export const getUpdateToolProductOfOrders = (newToolProductsOfOrder) => {
 export const getDeleteToolProductOfOrder = (product_id) => {
   return {
     type: GET_DELETE_TOOL_OF_ORDER,
+    payload: product_id,
+  };
+};
+
+export const getRelMatProductsOfOrders = () => {
+  return {
+    type: GET_REL_MAT_PRODUCTS_OF_ORDER,
+  };
+};
+
+export const getUpdateRelMatProductOfOrders = (newRelMatProductsOfOrder) => {
+  return {
+    type: GET_UPDATE_REL_MAT_PRODUCTS_OF_ORDER,
+    payload: newRelMatProductsOfOrder,
+  };
+};
+
+export const getDeleteRelMatProductOfOrder = (product_id) => {
+  return {
+    type: GET_DELETE_REL_MAT_OF_ORDER,
     payload: product_id,
   };
 };

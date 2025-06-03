@@ -23,6 +23,7 @@ import {
   anchorProductsOfOrdersReducer,
   dryMixedProductsOfOrdersReducer,
   productsOfOrdersReducer,
+  relMatProductsOfOrdersReducer,
   toolProductsOfOrdersReducer,
 } from './productsOfOrdersReducer';
 import { productsReducer } from './productsReducer';
@@ -65,6 +66,7 @@ export const rootReducer = combineReducers({
   dryMixedProductsOfOrders: dryMixedProductsOfOrdersReducer,
   anchorProductsOfOrders: anchorProductsOfOrdersReducer,
   toolProductsOfOrders: toolProductsOfOrdersReducer,
+  relMatProductsOfOrders: relMatProductsOfOrdersReducer,
   warehouse: warehouseReducer,
   usersInfo: usersInfoReducer,
   usersMainInfo: usersMainInfoReducer,

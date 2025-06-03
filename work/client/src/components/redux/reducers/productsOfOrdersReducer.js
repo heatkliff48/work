@@ -5,15 +5,18 @@ import {
   DRY_MIXED_PRODUCTS_OF_ORDER,
   TOOL_PRODUCTS_OF_ORDER,
   ANCHOR_PRODUCTS_OF_ORDER,
+  REL_MAT_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 import {
   DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   DELETE_PRODUCT_OF_ORDER_SOCKET,
+  DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+  UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_TOOL_PRODUCT_OF_ORDER_REDUCER_SOCKET,
 } from '../types/socketTypes/socket';
 
@@ -110,6 +113,27 @@ export const toolProductsOfOrdersReducer = (state = [], action) => {
     }
 
     case DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET: {
+      const result = state.filter((el) => el.id !== payload);
+      return result;
+    }
+
+    default:
+      return state;
+  }
+};
+
+export const relMatProductsOfOrdersReducer = (state = [], action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case REL_MAT_PRODUCTS_OF_ORDER: {
+      return payload ?? [];
+    }
+
+    case UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
+      return [...state, payload];
+    }
+
+    case DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET: {
       const result = state.filter((el) => el.id !== payload);
       return result;
     }

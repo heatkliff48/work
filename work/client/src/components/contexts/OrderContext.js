@@ -209,6 +209,39 @@ const OrderContextProvider = ({ children }) => {
     },
   ];
 
+  const COLUMNS_ORDER_RELATED_MATERIAL = [
+    {
+      Header: 'Product article',
+      accessor: 'rel_mat_article',
+      disableSortBy: true,
+    },
+    {
+      Header: 'Quantity, Ud',
+      accessor: 'quantity_ud',
+      sortType: 'number',
+    },
+    {
+      Header: 'Total, Ud',
+      accessor: 'total',
+      sortType: 'number',
+    },
+    {
+      Header: 'Discount, %',
+      accessor: 'discount',
+      defaultValue: 0,
+    },
+    {
+      Header: 'PVP',
+      accessor: 'pvp',
+      defaultValue: 0,
+    },
+    {
+      Header: 'Final price, EURO',
+      accessor: 'final_price',
+      sortType: 'number',
+    },
+  ];
+
   const status_list = [
     {
       Header: 'Initial contact',
@@ -274,10 +307,14 @@ const OrderContextProvider = ({ children }) => {
   const dryMixedProductsOfOrders = useSelector(
     (state) => state.dryMixedProductsOfOrders
   );
+
   const anchorProductsOfOrders = useSelector(
     (state) => state.anchorProductsOfOrders
   );
+
   const toolProductsOfOrders = useSelector((state) => state.toolProductsOfOrders);
+
+  const relMatProductsOfOrders = useSelector((state) => state.relMatProductsOfOrders);
 
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
@@ -465,6 +502,7 @@ const OrderContextProvider = ({ children }) => {
         COLUMNS_ORDER_DRY_MIXES,
         COLUMNS_ORDER_ANCHOR,
         COLUMNS_ORDER_TOOL,
+        COLUMNS_ORDER_RELATED_MATERIAL,
         currentOrder,
         setCurrentOrder,
         newOrder,
@@ -474,6 +512,7 @@ const OrderContextProvider = ({ children }) => {
         dryMixedProductsOfOrders,
         anchorProductsOfOrders,
         toolProductsOfOrders,
+        relMatProductsOfOrders,
         status_list,
         productOfOrder,
         setProductOfOrder,

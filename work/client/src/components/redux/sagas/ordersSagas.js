@@ -51,6 +51,12 @@ import {
   ADD_ORDER_DESCRIPTION,
   ADD_SECONDARY_CONTACT,
   SECONDARY_CONTACT,
+  REL_MAT_PRODUCTS_OF_ORDER,
+  UPDATE_REL_MAT_PRODUCTS_OF_ORDER,
+  DELETE_REL_MAT_OF_ORDER,
+  GET_REL_MAT_PRODUCTS_OF_ORDER,
+  GET_UPDATE_REL_MAT_PRODUCTS_OF_ORDER,
+  GET_DELETE_REL_MAT_OF_ORDER,
 } from '../types/ordersTypes';
 
 const url = axios.create({
@@ -139,6 +145,15 @@ const getToolProductsOfOrder = () => {
     .catch(showErrorMessage);
 };
 
+const getRelMatProductsOfOrder = () => {
+  return url
+    .get('/orders/rel_mat_products', {})
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
 const getCurrentProductsOfOrder = (order_id) => {
   return url
     .post('/orders/current/products', { order_id })
@@ -184,6 +199,15 @@ const getUpdateToolProductsOfOrder = (newToolProductsOfOrder) => {
     .catch(showErrorMessage);
 };
 
+const getUpdateRelMatProductsOfOrder = (newRelMatProductsOfOrder) => {
+  return url
+    .post('/orders/rel_mat_products/add', newRelMatProductsOfOrder)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
 const getUpdateProductInfoOfOrder = (productOfOrder) => {
   return url
     .post('/orders/product/update/info', productOfOrder)
@@ -223,6 +247,15 @@ const getDeleteAnchorProductOfOrder = (anchor_id) => {
 const getDeleteToolProductOfOrder = (tool_id) => {
   return url
     .post('/orders/delete/tool_product', { tool_id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getDeleteRelMatProductOfOrder = (rel_mat_id) => {
+  return url
+    .post('/orders/delete/rel_mat_product', { rel_mat_id })
     .then((res) => {
       return res.data;
     })
@@ -372,6 +405,17 @@ function* getToolProductsOfOrderWatcher(action) {
   }
 }
 
+function* getRelMatProductsOfOrderWatcher(action) {
+  try {
+    const rel_mat_product_list = yield call(getRelMatProductsOfOrder);
+
+    yield put({ type: REL_MAT_PRODUCTS_OF_ORDER, payload: rel_mat_product_list });
+  } catch (err) {
+    console.error(err);
+    yield put({ type: REL_MAT_PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
 function* getCurrentProductsOfOrderWatcher(action) {
   try {
     const { product_list } = yield call(getCurrentProductsOfOrder, action.payload);
@@ -443,6 +487,17 @@ function* getUpdateToolProductsOfOrderWatcher(action) {
   }
 }
 
+function* getUpdateRelMatProductsOfOrderWatcher(action) {
+  try {
+    const { payload } = action;
+
+    yield call(getUpdateRelMatProductsOfOrder, payload);
+  } catch (err) {
+    console.error(err);
+    yield put({ type: UPDATE_REL_MAT_PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
 function* getDeleteProductOfOrderWatcher(action) {
   try {
     const { payload } = action;
@@ -492,6 +547,19 @@ function* getDeleteToolProductOfOrderWatcher(action) {
   } catch (err) {
     console.error(err);
     yield put({ type: DELETE_TOOL_OF_ORDER, payload: [] });
+  }
+}
+
+function* getDeleteRelMatProductOfOrderWatcher(action) {
+  try {
+    const { payload } = action;
+
+    yield call(getDeleteRelMatProductOfOrder, payload);
+
+    yield put({ type: DELETE_REL_MAT_OF_ORDER, payload });
+  } catch (err) {
+    console.error(err);
+    yield put({ type: DELETE_REL_MAT_OF_ORDER, payload: [] });
   }
 }
 
@@ -566,6 +634,7 @@ function* ordersWatcher() {
   );
   yield takeLatest(GET_ANCHOR_PRODUCTS_OF_ORDER, getAnchorProductsOfOrderWatcher);
   yield takeLatest(GET_TOOL_PRODUCTS_OF_ORDER, getToolProductsOfOrderWatcher);
+  yield takeLatest(GET_REL_MAT_PRODUCTS_OF_ORDER, getRelMatProductsOfOrderWatcher);
   yield takeLatest(GET_UPDATE_PRODUCTS_OF_ORDER, getUpdateProductsOfOrderWatcher);
   yield takeLatest(
     GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
@@ -580,6 +649,10 @@ function* ordersWatcher() {
     getUpdateToolProductsOfOrderWatcher
   );
   yield takeLatest(
+    GET_UPDATE_REL_MAT_PRODUCTS_OF_ORDER,
+    getUpdateRelMatProductsOfOrderWatcher
+  );
+  yield takeLatest(
     GET_UPDATE_PRODUCT_INFO_OF_ORDER,
     getUpdateProductInfoOfOrderWatcher
   );
@@ -590,6 +663,7 @@ function* ordersWatcher() {
   );
   yield takeLatest(GET_DELETE_ANCHOR_OF_ORDER, getDeleteAnchorProductOfOrderWatcher);
   yield takeLatest(GET_DELETE_TOOL_OF_ORDER, getDeleteToolProductOfOrderWatcher);
+  yield takeLatest(GET_DELETE_REL_MAT_OF_ORDER, getDeleteRelMatProductOfOrderWatcher);
   yield takeLatest(GET_DELETE_ORDER, getDeleteOrderWatcher);
   yield takeLatest(UPDATE_CONTACT_OF_ORDER, updateContactOfOrderWorker);
   yield takeLatest(UPDATE_DELIVERY_OF_ORDER, updateDeliveryOfOrderWorker);
