@@ -19,6 +19,7 @@ const AccountngOrderCard = React.memo(() => {
     dryMixedProductsOfOrders,
     anchorProductsOfOrders,
     toolProductsOfOrders,
+    relMatProductsOfOrders,
   } = useOrderContext();
   const { displayNames } = useProjectContext();
   const { latestProducts } = useProductsContext();
@@ -45,6 +46,7 @@ const AccountngOrderCard = React.memo(() => {
     dryMixes: [],
     anchors: [],
     tools: [],
+    related_materials: [],
   });
 
   const getCorrectProductId = (arrName) => {
@@ -60,6 +62,9 @@ const AccountngOrderCard = React.memo(() => {
 
       case 'tools':
         return 'tool_id';
+
+      case 'related_materials':
+        return 'rel_mat_id';
 
       default:
         break;
@@ -169,6 +174,23 @@ const AccountngOrderCard = React.memo(() => {
     }
   }, [updatedToolsListOrder]);
 
+  const updatedRelatedMaterialsListOrder = useMemo(() => {
+    return addProductArticleToOrderList(
+      relMatProductsOfOrders,
+      latestRelatedMaterials,
+      'related_materials'
+    );
+  }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
+
+  useEffect(() => {
+    if (updatedRelatedMaterialsListOrder.length > 0) {
+      setProductLists((prevState) => ({
+        ...prevState,
+        related_materials: updatedRelatedMaterialsListOrder,
+      }));
+    }
+  }, [updatedRelatedMaterialsListOrder]);
+
   const statusChangeHandler = (newStatus) => {
     const status_index = accountingStatusList.findIndex(
       (el) => el.accessor == status
@@ -208,6 +230,7 @@ const AccountngOrderCard = React.memo(() => {
       ...productLists['dryMixes'],
       ...productLists['anchors'],
       ...productLists['tools'],
+      ...productLists['related_materials'],
     ];
 
     // Считаем финальную цену для всех продуктов
@@ -218,7 +241,8 @@ const AccountngOrderCard = React.memo(() => {
           (el?.final_price ||
             el?.final_price_dry ||
             el?.final_price_anchor ||
-            el?.final_price_tool),
+            el?.final_price_tool ||
+            el?.final_price_rel_mat),
         0
       ) || 0;
 
@@ -325,6 +349,21 @@ const AccountngOrderCard = React.memo(() => {
           <tbody>
             {Array.isArray(updatedToolsListOrder) &&
               updatedToolsListOrder?.map((product) => (
+                <tr key={product?.id || Math.random()} className="product-row">
+                  <td>{filterAndMapData(product, filterKeys)}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+        <table className="related-materials-table">
+          <thead>
+            <tr>
+              <td>Related materials</td>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.isArray(updatedRelatedMaterialsListOrder) &&
+              updatedRelatedMaterialsListOrder?.map((product) => (
                 <tr key={product?.id || Math.random()} className="product-row">
                   <td>{filterAndMapData(product, filterKeys)}</td>
                 </tr>
