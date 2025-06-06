@@ -49,6 +49,7 @@ import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsCo
 import {
   updateAnchorsWarehouse,
   updateDryMixesWarehouse,
+  updateRelatedMaterialsWarehouse,
   updateToolsWarehouse,
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
@@ -86,7 +87,9 @@ const OrderCart = React.memo(() => {
   const {
     warehouse_data,
     dry_mixes_warehouse_data,
+    related_materials_warehouse_data,
     anchors_warehouse_data,
+    tools_warehouse_data,
     list_of_reserved_products,
     ordered_production_oem_status,
     filteredWarehouseByProduct,
@@ -338,10 +341,6 @@ const OrderCart = React.memo(() => {
 
   useEffect(() => {
     if (updatedRelatedMaterialsListOrder.length > 0) {
-      console.log(
-        'updatedRelatedMaterialsListOrder',
-        updatedRelatedMaterialsListOrder
-      );
       setProductLists((prevState) => ({
         ...prevState,
         related_materials: updatedRelatedMaterialsListOrder,
@@ -607,10 +606,10 @@ const OrderCart = React.memo(() => {
         let remainingToAllocate = reservedProduct.quantity_ud || 0; // Сколько нужно зарезервировать для этого товара
 
         const matchingWarehouseProducts =
-          anchors_warehouse_data?.filter(
+          tools_warehouse_data?.filter(
             (warehouseItem) =>
               warehouseItem.product_article === product?.product_article
-          ) || []; // Если anchors_warehouse_data undefined, используем пустой массив
+          ) || []; // Если tools_warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
@@ -648,62 +647,62 @@ const OrderCart = React.memo(() => {
       }
     });
 
-    //related material
-    // updatedRelatedMaterialsListOrder?.forEach((product) => {
-    //   const loc = latestRelatedMaterial.find(
-    //     (el) => el.article == product.product_article
-    //   )?.place_of_production;
+    // related material
+    updatedRelatedMaterialsListOrder?.forEach((product) => {
+      const loc = latestRelatedMaterial.find(
+        (el) => el.article == product.product_article
+      )?.place_of_production;
 
-    //   if (status.accessor === status_list[5].accessor && loc === 'ES') {
-    //     const reservedProduct = relMatProductsOfOrders.find(
-    //       (orderedProduct) =>
-    //         orderedProduct.order_id === product.order_id &&
-    //         orderedProduct.rel_mat_id === product.rel_mat_id
-    //     );
+      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+        const reservedProduct = relMatProductsOfOrders.find(
+          (orderedProduct) =>
+            orderedProduct.order_id === product.order_id &&
+            orderedProduct.rel_mat_id === product.rel_mat_id
+        );
 
-    //     let remainingToAllocate = reservedProduct.quantity_ud || 0; // Сколько нужно зарезервировать для этого товара
+        let remainingToAllocate = reservedProduct.quantity_ud || 0; // Сколько нужно зарезервировать для этого товара
 
-    //     const matchingWarehouseProducts =
-    //       anchors_warehouse_data?.filter(
-    //         (warehouseItem) =>
-    //           warehouseItem.product_article === product?.product_article
-    //       ) || []; // Если anchors_warehouse_data undefined, используем пустой массив
+        const matchingWarehouseProducts =
+          related_materials_warehouse_data?.filter(
+            (warehouseItem) =>
+              warehouseItem.product_article === product?.product_article
+          ) || []; // Если related_materials_warehouse_data undefined, используем пустой массив
 
-    //     // Проходим по складу и "забираем" остатки
-    //     for (const warehouseItem of matchingWarehouseProducts) {
-    //       if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
-    //         const taken = Math.min(
-    //           warehouseItem.free_quantity_remaining,
-    //           remainingToAllocate
-    //         );
+        // Проходим по складу и "забираем" остатки
+        for (const warehouseItem of matchingWarehouseProducts) {
+          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+            const taken = Math.min(
+              warehouseItem.free_quantity_remaining,
+              remainingToAllocate
+            );
 
-    //         // Обновляем данные склада
-    //         dispatch(
-    //           updateToolsWarehouse({
-    //             id: warehouseItem?.id,
-    //             free_quantity_remaining:
-    //               warehouseItem.free_quantity_remaining - taken,
-    //             ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-    //           })
-    //         );
-    //         remainingToAllocate -= taken;
-    //       }
-    //     }
+            // Обновляем данные склада
+            dispatch(
+              updateRelatedMaterialsWarehouse({
+                id: warehouseItem?.id,
+                free_quantity_remaining:
+                  warehouseItem.free_quantity_remaining - taken,
+                ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
+              })
+            );
+            remainingToAllocate -= taken;
+          }
+        }
 
-    //     const quantity_in_warehouse =
-    //       reservedProduct.quantity_ud - remainingToAllocate; // Сколько реально зарезервировали
+        const quantity_in_warehouse =
+          reservedProduct.quantity_ud - remainingToAllocate; // Сколько реально зарезервировали
 
-    //     dispatch(
-    //       addNewRelatedMaterialsBackorder({
-    //         shipping_date: orderCartData?.shipping_date,
-    //         product_article: product?.product_article,
-    //         order_article: orderCartData?.article,
-    //         quantity: product?.quantity_ud,
-    //         quantity_in_warehouse,
-    //       })
-    //     );
-    //   }
-    // });
+        dispatch(
+          addNewRelatedMaterialsBackorder({
+            shipping_date: orderCartData?.shipping_date,
+            product_article: product?.product_article,
+            order_article: orderCartData?.article,
+            quantity: product?.quantity_ud,
+            quantity_in_warehouse,
+          })
+        );
+      }
+    });
 
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
