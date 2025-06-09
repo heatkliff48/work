@@ -11,6 +11,8 @@ import ShowClientsModal from '#components/Clients/ClientsInfo/ClientsInfoModal.j
 import ShowDeliveryAddressModal from '#components/Clients/DeliveryAddress/DeliveryAddressModal';
 import ShowClientsContactInfoModal from '#components/Clients/ClientsContactInfo/ClientsContactInfoModal';
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import Table from '#components/Table/Table';
+import '#components/Styles/modals.css';
 
 const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -23,7 +25,8 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setIsOrderReady,
   } = useOrderContext();
   const { clientModalOrder, setClientModalOrder } = useModalContext();
-  const { setCurrentClient } = useProjectContext();
+  const { setCurrentClient, clients_info_table, clientsDataList } =
+    useProjectContext();
 
   const dispatch = useDispatch();
   const list_of_clients = useSelector((state) => state.clients);
@@ -68,17 +71,17 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     return orderArticle;
   };
 
-  const addClientOrderHendler = async (e, owner) => {
-    e.preventDefault();
+  const addClientOrderHendler = async (id) => {
     const article = getOrderArticle();
+    const client = list_of_clients.find((el) => el.id === id);
 
     setNewOrder({
       article,
-      owner: owner.id,
+      owner: id,
       status: status_list[0].accessor,
       person_in_charge: 0,
     });
-    setCurrentClient(owner);
+    setCurrentClient(client);
     setSearchFilter('');
   };
 
@@ -130,6 +133,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   return (
     <div>
       <Modal
+        autoWidth
         isOpen={isOpen}
         toggle={() => {
           setNewOrder({});
@@ -176,45 +180,14 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
           ) : (
             <ModalBody>
               <ShowClientsModal />
-              <div>
-                <h4>Search clients</h4>
-                <input
-                  value={searchFilter}
-                  onChange={(e) => {
-                    filterListOfClientsHandler(e);
-                  }}
-                />
-              </div>
-              <table
-                className="table mt-5 table-bordered text-center table-striped table-hover"
-                align="left"
-              >
-                <thead>
-                  <tr>
-                    <th key={'c_name'}>c_name</th>
-                    <th key={'cif_vat'}>cif_vat</th>
-                    <th key={'category'}>category</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {listOfClientsFiltered?.map((entrie) => {
-                    if (!entrie) return;
-                    return (
-                      <tr
-                        key={entrie.id}
-                        onClick={(e) => {
-                          addClientOrderHendler(e, entrie);
-                        }}
-                      >
-                        <td>{entrie?.c_name}</td>
-                        <td>{entrie?.cif_vat}</td>
-                        <td>{entrie?.category}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <Table
+                COLUMN_DATA={clients_info_table}
+                dataOfTable={clientsDataList}
+                tableName={'Clients'}
+                handleRowClick={(row) => {
+                  addClientOrderHendler(row.original.id);
+                }}
+              />
             </ModalBody>
           )}
         </Fragment>

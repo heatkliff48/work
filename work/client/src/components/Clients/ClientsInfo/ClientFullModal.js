@@ -83,10 +83,9 @@ function MydModalWithGrid({ show, onHide }) {
             </Col>
           </Row>
 
-          <Row>
-            {userAccess?.canWrite && <ShowDeliveryAddressModal />}
-            <DeliveryAddress />
-          </Row>
+          {userAccess?.canWrite && <ShowDeliveryAddressModal />}
+          <DeliveryAddress />
+
           {userAccess?.canWrite && <ShowClientsContactInfoModal />}
           <ClientsContactInfo />
         </Container>

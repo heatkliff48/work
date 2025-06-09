@@ -114,6 +114,92 @@ const ProjectContextProvider = ({ children }) => {
     },
   ];
 
+  const clients_delivery_addresses_table = [
+    {
+      Header: 'Project name',
+      accessor: 'project_name',
+    },
+    {
+      Header: 'Street',
+      accessor: 'street',
+    },
+    {
+      Header: 'Additional info',
+      accessor: 'additional_info',
+    },
+    {
+      Header: 'City',
+      accessor: 'city',
+    },
+    {
+      Header: 'ZIP code',
+      accessor: 'zip_code',
+    },
+    {
+      Header: 'Province',
+      accessor: 'province',
+    },
+    {
+      Header: 'Country',
+      accessor: 'country',
+    },
+    {
+      Header: 'Phone number',
+      accessor: 'phone_number',
+    },
+    {
+      Header: 'Email',
+      accessor: 'email',
+    },
+  ];
+
+  const clients_contact_information_table = [
+    {
+      Header: 'First name',
+      accessor: 'first_name',
+    },
+    {
+      Header: 'Last name',
+      accessor: 'last_name',
+    },
+    {
+      Header: 'Address',
+      accessor: 'address',
+    },
+    {
+      Header: 'Formal position',
+      accessor: 'formal_position',
+    },
+    {
+      Header: 'Role in the organization',
+      accessor: 'role_in_the_org',
+    },
+    {
+      Header: 'Phone number - office',
+      accessor: 'phone_number_office',
+    },
+    {
+      Header: 'Phone number - mobile',
+      accessor: 'phone_number_mobile',
+    },
+    {
+      Header: 'Phone number - messenger',
+      accessor: 'phone_number_messenger',
+    },
+    {
+      Header: 'Email',
+      accessor: 'email',
+    },
+    {
+      Header: 'Linkedin',
+      accessor: 'linkedin',
+    },
+    {
+      Header: 'Social',
+      accessor: 'social',
+    },
+  ];
+
   const users_info_table = [
     {
       Header: 'E-mail',
@@ -285,6 +371,8 @@ const ProjectContextProvider = ({ children }) => {
         roleTable,
         clients_info_table,
         clients_legal_address_table,
+        clients_delivery_addresses_table,
+        clients_contact_information_table,
         currentClient,
         setCurrentClient,
         currentDelivery,
