@@ -58,8 +58,6 @@ function ListOfOrderedProductionReserveModal({
       (order) => order.order_article === order_article
     );
 
-    // console.log(result);
-
     if (remainsToReserve == 0) {
       alert('Fully reserved!');
       return;

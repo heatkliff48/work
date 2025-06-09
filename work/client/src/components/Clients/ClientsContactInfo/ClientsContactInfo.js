@@ -1,13 +1,14 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
+import Table from '#components/Table/Table';
 
-const ClientsContactInfo = ({ clickFunk = null, showSearch = false, filter = false }) => {
-  const { currentClient, currentContact } = useProjectContext();
+const ClientsContactInfo = ({ clickFunk = null }) => {
+  const { currentClient, currentContact, clients_contact_information_table } =
+    useProjectContext();
 
   const contactInfo = useSelector((state) => state.contactInfo);
 
-  const [searchFilter, setSearchFilter] = useState('');
   const [listOfContactsFiltered, setListOfContactsFiltered] =
     useState(currentContact);
 
@@ -18,75 +19,18 @@ const ClientsContactInfo = ({ clickFunk = null, showSearch = false, filter = fal
     setListOfContactsFiltered(currentContactInfo);
   }, [contactInfo, currentClient]);
 
-  const filterListOfContactsHandler = (e) => {
-    setSearchFilter(e.target.value);
-    let filtered = contactInfo.filter((el) => {
-      if (el.client_id === currentClient.id) {
-        return el.last_name?.toLowerCase().includes(e.target.value.toLowerCase());
-      }
-    });
-    setListOfContactsFiltered(filtered);
-  };
-
   return (
     <Fragment>
-      {showSearch == true && (
-        <div>
-          <h4>Search delivery address</h4>
-          <input
-            value={searchFilter}
-            onChange={(e) => {
-              filterListOfContactsHandler(e);
-            }}
-          />
-        </div>
-      )}
-      <table
-        className="table mt-5 table-bordered text-center table-striped table-hover"
-        align="left"
-      >
-        <thead>
-          <tr>
-            <th>first_name</th>
-            <th>last_name</th>
-            <th>address</th>
-            <th>formal_position</th>
-            <th>role_in_the_org</th>
-            <th>phone_number_office</th>
-            <th>phone_number_mobile</th>
-            <th>phone_number_messenger</th>
-            <th>email</th>
-            <th>linkedin</th>
-            <th>social</th>
-          </tr>
-        </thead>
-        <tbody>
-          {listOfContactsFiltered?.map((entrie) => {
-            if (!entrie) return;
-            return (
-              <tr
-                onClick={() => {
-                  if (!clickFunk) return;
+      <Table
+        COLUMN_DATA={clients_contact_information_table}
+        dataOfTable={listOfContactsFiltered}
+        tableName={'Contact information'}
+        handleRowClick={(row) => {
+          if (!clickFunk) return;
 
-                  clickFunk(entrie.id);
-                }}
-              >
-                <td>{entrie?.first_name}</td>
-                <td>{entrie?.last_name}</td>
-                <td>{entrie?.address}</td>
-                <td>{entrie?.formal_position}</td>
-                <td>{entrie?.role_in_the_org}</td>
-                <td>{entrie?.phone_number_office}</td>
-                <td>{entrie?.phone_number_mobile}</td>
-                <td>{entrie?.phone_number_messenger}</td>
-                <td>{entrie?.email}</td>
-                <td>{entrie?.linkedin}</td>
-                <td>{entrie?.social}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+          clickFunk(row.original.id);
+        }}
+      />
     </Fragment>
   );
 };
