@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 import Table from '#components/Table/Table';
 
-const ClientsContactInfo = ({ clickFunk = null }) => {
+const ClientsContactInfo = ({ clickFunk = null, fullContact = false }) => {
   const { currentClient, currentContact, clients_contact_information_table } =
     useProjectContext();
 
@@ -13,11 +13,27 @@ const ClientsContactInfo = ({ clickFunk = null }) => {
     useState(currentContact);
 
   useEffect(() => {
-    const currentContactInfo = contactInfo.filter(
+  if (!contactInfo) return;
+
+  let filteredContacts;
+
+  if (fullContact) {
+    const matching = contactInfo.filter(
       (el) => el.client_id === currentClient?.id
     );
-    setListOfContactsFiltered(currentContactInfo);
-  }, [contactInfo, currentClient]);
+    const others = contactInfo.filter(
+      (el) => el.client_id !== currentClient?.id
+    );
+    filteredContacts = [...matching, ...others];
+  } else {
+    filteredContacts = contactInfo.filter(
+      (el) => el.client_id === currentClient?.id
+    );
+  }
+
+  setListOfContactsFiltered(filteredContacts);
+}, [contactInfo, currentClient]);
+
 
   return (
     <Fragment>

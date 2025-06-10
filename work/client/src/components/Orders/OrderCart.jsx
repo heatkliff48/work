@@ -985,7 +985,7 @@ const OrderCart = React.memo(() => {
               filterAndMapData(orderCartData?.secondaryContact, filterKeys)
             ) : isAddSecCont ? (
               <>
-                <ClientsContactInfo clickFunk={addSecCntFunc} showSearch={true} />
+                <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
               </>
             ) : (
               <button onClick={() => addSecondaryContactHandler()}>
