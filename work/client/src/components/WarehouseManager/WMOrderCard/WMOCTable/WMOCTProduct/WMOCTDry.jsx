@@ -1,0 +1,156 @@
+ import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { Fragment } from 'react';
+
+const WMOCTProduct = ({
+  haveBatches,
+  handlePlusBatch,
+  handlePlus,
+  handleMinus,
+  isDisablePlus,
+  isDisableMinus,
+}) => {
+  const { wmoctProduct } = useWarehouseContext();
+  const {
+    wmoctModal,
+    setWmoctModal,
+    wmoctPdfAddDataModal,
+    setWmoctPdfAddDataModal,
+  } = useModalContext();
+
+  return (
+    <div className="overflow-auto">
+      <table className="table-auto border border-gray-300 w-full">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="border px-2">Product article</th>
+            <th className="border px-2">Qty total, pallet</th>
+            <th className="border px-2">Qty shipped, pallet</th>
+            <th className="border px-2">Qty remaining, pallet</th>
+            <th className="border px-2">Batch ID</th>
+            <th className="border px-2">Qty in batch, pallet</th>
+            <th className="border px-2">Controls</th>
+            <th className="border px-2">Qty allocated, pallet</th>
+          </tr>
+        </thead>
+        <tbody>
+          {wmoctProduct?.map((product, productIndex) => (
+            <Fragment key={productIndex}>
+              {/* Основная строка продукта */}
+              <tr>
+                <td className="border p-1" style={{ width: '25%' }}>
+                  {product.article}
+                </td>
+                <td className="border p-1">{product.qty_total}</td>
+                <td className="border p-1">{product.shipped}</td>
+                <td className="border p-1">{product.qty_rem}</td>
+                {haveBatches(productIndex) ? (
+                  <>
+                    <td className="border p-1">{product.batches[0]?.batchId}</td>
+                    <td className="border p-1">
+                      {product.batches[0]?.remainingInBatch}
+                    </td>
+                    <td className="border p-1 text-center">
+                      <button
+                        disabled={isDisablePlus(product.article)}
+                        onClick={() => handlePlus(product, 0)}
+                      >
+                        ＋
+                      </button>
+                      <button
+                        disabled={isDisableMinus(
+                          product.article,
+                          product.batches[0]
+                        )}
+                        onClick={() => handleMinus(product, 0)}
+                      >
+                        －
+                      </button>
+                    </td>
+                    <td className="border p-1">{product.batches[0]?.allocated}</td>
+                  </>
+                ) : (
+                  <>
+                    <td className="border p-1">
+                      <button
+                        onClick={() => {
+                          setWmoctModal(!wmoctModal);
+                          handlePlusBatch(product);
+                        }}
+                      >
+                        ＋
+                      </button>
+                    </td>
+                    <td className="border p-1"></td>
+                    <td className="border p-1 text-center"></td>
+                    <td className="border p-1"></td>
+                  </>
+                )}
+              </tr>
+              {/* Дополнительные строки для батчей */}
+              {product.batches?.slice(1).map((batch, batchIndex) => (
+                <tr key={batchIndex + 1}>
+                  {/* Первые 4 колонки оставляем пустыми, так как они уже отображены в основной строке */}
+                  <td className="border p-1"></td>
+                  <td className="border p-1"></td>
+                  <td className="border p-1"></td>
+                  <td className="border p-1"></td>
+                  <td className="border p-1">{batch.batchId}</td>
+                  <td className="border p-1">{batch.remainingInBatch}</td>
+                  <td className="border p-1 text-center">
+                    <button
+                      disabled={isDisablePlus(product.article)}
+                      onClick={() => handlePlus(product, batchIndex + 1)}
+                    >
+                      ＋
+                    </button>
+                    <button
+                      disabled={isDisableMinus(product.article, batch)}
+                      onClick={() => handleMinus(product, batchIndex + 1)}
+                    >
+                      －
+                    </button>
+                  </td>
+                  <td className="border p-1">{batch.allocated}</td>
+                </tr>
+              ))}
+              {/* Всегда отображаем пустую строку для добавления нового батча */}
+              {haveBatches(productIndex) ? (
+                <tr>
+                  <td className="border p-1"></td>
+                  <td className="border p-1"></td>
+                  <td className="border p-1"></td>
+                  <td className="border p-1"></td>
+                  <td className="border p-1">
+                    <button
+                      onClick={() => {
+                        setWmoctModal(!wmoctModal);
+                        handlePlusBatch(product);
+                      }}
+                    >
+                      ＋
+                    </button>
+                  </td>
+                  <td className="border p-1"></td>
+                  <td className="border p-1 text-center"></td>
+                  <td className="border p-1"></td>
+                </tr>
+              ) : (
+                <></>
+              )}
+            </Fragment>
+          ))}
+        </tbody>
+        <button
+          onClick={() => {
+            setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
+          }}
+        >
+          SAVE
+        </button>
+      </table>
+    </div>
+  );
+};
+
+export default WMOCTProduct;
