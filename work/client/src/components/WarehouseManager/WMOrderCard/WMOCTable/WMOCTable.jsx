@@ -126,7 +126,6 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   };
 
   useEffect(() => {
-    console.log('wmoctProduct', wmoctProduct);
     const initialProducts = product_list.orders_products.map((el) => {
       const [article, quantityStr] = el.split(':').map((s) => s.trim());
       const quantity = Number(quantityStr.slice(0, -1));
