@@ -331,10 +331,6 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
     return getLatestAuxilaryProducts(tool);
   }, [tool]);
 
-  const latestRelatedMaterial = useMemo(() => {
-    return getLatestAuxilaryProducts(relatedMaterialsJournal);
-  }, [relatedMaterialsJournal]);
-
   return (
     <ProductsTypeJournalContext.Provider
       value={{
@@ -359,7 +355,6 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
         latestRelatedMaterials,
         latestAnchors,
         latestTools,
-        latestRelatedMaterial,
       }}
     >
       {children}

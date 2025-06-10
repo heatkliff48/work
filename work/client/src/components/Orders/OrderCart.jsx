@@ -82,7 +82,7 @@ const OrderCart = React.memo(() => {
 
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { latestProducts } = useProductsContext();
-  const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterial } =
+  const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
   const {
     warehouse_data,
@@ -334,10 +334,10 @@ const OrderCart = React.memo(() => {
   const updatedRelatedMaterialsListOrder = useMemo(() => {
     return addProductArticleToOrderList(
       relMatProductsOfOrders,
-      latestRelatedMaterial,
+      latestRelatedMaterials,
       'related_materials'
     );
-  }, [relMatProductsOfOrders, latestRelatedMaterial, addProductArticleToOrderList]);
+  }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedRelatedMaterialsListOrder.length > 0) {
@@ -649,7 +649,7 @@ const OrderCart = React.memo(() => {
 
     // related material
     updatedRelatedMaterialsListOrder?.forEach((product) => {
-      const loc = latestRelatedMaterial.find(
+      const loc = latestRelatedMaterials.find(
         (el) => el.article == product.product_article
       )?.place_of_production;
 

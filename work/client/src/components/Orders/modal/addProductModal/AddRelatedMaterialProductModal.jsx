@@ -3,9 +3,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useOrderContext } from '../../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
-import {
-  getUpdateRelMatProductOfOrders,
-} from '#components/redux/actions/ordersAction.js';
+import { getUpdateRelMatProductOfOrders } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 import '#components/Styles/modals.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
@@ -21,7 +19,7 @@ const AddRelatedMaterialProductModal = React.memo(({ isOpen, toggle }) => {
     list_of_orders,
   } = useOrderContext();
 
-  const { COLUMNS_RELATED_MATERIALS_JOURNAL, latestRelatedMaterial } =
+  const { COLUMNS_RELATED_MATERIALS_JOURNAL, latestRelatedMaterials } =
     useProductsTypeJournalContext();
 
   const dispatch = useDispatch();
@@ -36,7 +34,7 @@ const AddRelatedMaterialProductModal = React.memo(({ isOpen, toggle }) => {
   );
 
   const handlerAddProductOrder = useCallback((row) => {
-    const product = latestRelatedMaterial.find((el) => el.id === row.original.id);
+    const product = latestRelatedMaterials.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
     setProductOfOrder((prev) => ({
@@ -208,7 +206,7 @@ const AddRelatedMaterialProductModal = React.memo(({ isOpen, toggle }) => {
             <>
               <Table
                 COLUMN_DATA={COLUMNS_RELATED_MATERIALS_JOURNAL}
-                dataOfTable={latestRelatedMaterial.filter(
+                dataOfTable={latestRelatedMaterials.filter(
                   (product) => product.active_status === true
                 )}
                 // userAccess={userAccess}
