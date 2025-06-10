@@ -6,6 +6,8 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import WMOCPDFModal from '../WMOPdf/WMOPDFModal';
 import WMOCTableDataModal from './WMOCTableDataModal';
+import WMOCTProduct from './WMOCTProduct/WMOCTProduct';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
 const WMOCTable = ({ product_list, orderCartData }) => {
   const {
@@ -14,11 +16,18 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     setWmoctProductShippedBD,
     warehouse_data,
     list_of_reserved_products,
-    aldabaranNum,
     setAldabaranNum,
     aldabaran,
+    getProductType,
   } = useWarehouseContext();
-  const { productsOfOrders, list_of_orders } = useOrderContext();
+  const {
+    productsOfOrders,
+    list_of_orders,
+    dryMixedProductsOfOrders,
+    anchorProductsOfOrders,
+    toolProductsOfOrders,
+    relMatProductsOfOrders,
+  } = useOrderContext();
   const {
     wmoctModal,
     setWmoctModal,
@@ -29,6 +38,16 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   } = useModalContext();
   const { latestProducts } = useProductsContext();
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
+    useProductsTypeJournalContext();
+
+  const productMap = {
+    product: [latestProducts, productsOfOrders],
+    dryMixed: [latestDryMix, dryMixedProductsOfOrders],
+    anchor: [latestAnchors, anchorProductsOfOrders],
+    tool: [latestTools, toolProductsOfOrders],
+    relMat: [latestRelatedMaterials, relMatProductsOfOrders],
+  };
 
   const handlePlusBatch = (product) => {
     setSelectedProduct(product.article);
@@ -107,45 +126,52 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   };
 
   useEffect(() => {
+    console.log('wmoctProduct', wmoctProduct);
     const initialProducts = product_list.orders_products.map((el) => {
       const [article, quantityStr] = el.split(':').map((s) => s.trim());
-      const quantity = Number(quantityStr);
+      const quantity = Number(quantityStr.slice(0, -1));
 
-      const batches = [];
       let shipped = 0;
       let qty_rem = quantity;
+      const batches = [];
 
-      const product_from_list_id = latestProducts.find(
-        (el) => el.article == article
-      )?.id;
+      const productType = getProductType(article);
+
+      const [arr, orderArr] = productMap[productType] || [[], []];
+
+      const product_from_list_id = arr?.find((p) => p.article === article)?.id;
 
       const order_from_list_id = list_of_orders.find(
-        (el) => el.article == product_list.orders_article
+        (o) => o.article === product_list.orders_article
       )?.id;
 
-      const product = productsOfOrders.find(
-        (poo) =>
-          poo.product_id === product_from_list_id &&
-          poo.order_id === order_from_list_id
-      ).id;
+      const orders_products_id = orderArr?.find((poo) => {
+        const productId =
+          poo.product_id ||
+          poo.dry_mixed_id ||
+          poo.anchor_id ||
+          poo.tool_id ||
+          poo.rel_mat_id;
+        return (
+          productId === product_from_list_id && poo.order_id === order_from_list_id
+        );
+      })?.id;
 
       const list_of_batches = list_of_reserved_products.filter(
-        (el) => el.orders_products_id == product
+        (batch) => batch.orders_products_id === orders_products_id
       );
 
       if (list_of_batches.length > 0) {
         list_of_batches.forEach((batch) => {
           const { quantity } = batch;
           const wrh_item = warehouse_data.find((el) => el.id == batch.warehouse_id);
-
-          const obj = {
+          batches.push({
             batchId: wrh_item.article,
             remainingInBatch: wrh_item.ordered_quantity,
             allocated: quantity,
-          };
+          });
           shipped += quantity;
           qty_rem -= quantity;
-          batches.push(obj);
         });
       }
 
@@ -155,15 +181,17 @@ const WMOCTable = ({ product_list, orderCartData }) => {
         return [...prev, { article, shipped }];
       });
 
-      return {
+      let productObj = {
         article,
         order_id: order_from_list_id,
         qty_total: quantity,
         shipped,
         qty_rem,
         batches,
-        orders_products_id: product,
+        orders_products_id,
       };
+
+      return productObj;
     });
 
     setWmoctProduct(initialProducts);
@@ -197,137 +225,14 @@ const WMOCTable = ({ product_list, orderCartData }) => {
           setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
         }}
       />
-      <div className="overflow-auto">
-        <table className="table-auto border border-gray-300 w-full">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border px-2">Product article</th>
-              <th className="border px-2">Qty total, pallet</th>
-              <th className="border px-2">Qty shipped, pallet</th>
-              <th className="border px-2">Qty remaining, pallet</th>
-              <th className="border px-2">Batch ID</th>
-              <th className="border px-2">Qty in batch, pallet</th>
-              <th className="border px-2">Controls</th>
-              <th className="border px-2">Qty allocated, pallet</th>
-            </tr>
-          </thead>
-          <tbody>
-            {wmoctProduct?.map((product, productIndex) => (
-              <Fragment key={productIndex}>
-                {/* Основная строка продукта */}
-                <tr>
-                  <td className="border p-1" style={{ width: '25%' }}>
-                    {product.article}
-                  </td>
-                  <td className="border p-1">{product.qty_total}</td>
-                  <td className="border p-1">{product.shipped}</td>
-                  <td className="border p-1">{product.qty_rem}</td>
-                  {haveBatches(productIndex) ? (
-                    <>
-                      <td className="border p-1">{product.batches[0]?.batchId}</td>
-                      <td className="border p-1">
-                        {product.batches[0]?.remainingInBatch}
-                      </td>
-                      <td className="border p-1 text-center">
-                        <button
-                          disabled={isDisablePlus(product.article)}
-                          onClick={() => handlePlus(product, 0)}
-                        >
-                          ＋
-                        </button>
-                        <button
-                          disabled={isDisableMinus(
-                            product.article,
-                            product.batches[0]
-                          )}
-                          onClick={() => handleMinus(product, 0)}
-                        >
-                          －
-                        </button>
-                      </td>
-                      <td className="border p-1">{product.batches[0]?.allocated}</td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="border p-1">
-                        <button
-                          onClick={() => {
-                            setWmoctModal(!wmoctModal);
-                            handlePlusBatch(product);
-                          }}
-                        >
-                          ＋
-                        </button>
-                      </td>
-                      <td className="border p-1"></td>
-                      <td className="border p-1 text-center"></td>
-                      <td className="border p-1"></td>
-                    </>
-                  )}
-                </tr>
-                {/* Дополнительные строки для батчей */}
-                {product.batches?.slice(1).map((batch, batchIndex) => (
-                  <tr key={batchIndex + 1}>
-                    {/* Первые 4 колонки оставляем пустыми, так как они уже отображены в основной строке */}
-                    <td className="border p-1"></td>
-                    <td className="border p-1"></td>
-                    <td className="border p-1"></td>
-                    <td className="border p-1"></td>
-                    <td className="border p-1">{batch.batchId}</td>
-                    <td className="border p-1">{batch.remainingInBatch}</td>
-                    <td className="border p-1 text-center">
-                      <button
-                        disabled={isDisablePlus(product.article)}
-                        onClick={() => handlePlus(product, batchIndex + 1)}
-                      >
-                        ＋
-                      </button>
-                      <button
-                        disabled={isDisableMinus(product.article, batch)}
-                        onClick={() => handleMinus(product, batchIndex + 1)}
-                      >
-                        －
-                      </button>
-                    </td>
-                    <td className="border p-1">{batch.allocated}</td>
-                  </tr>
-                ))}
-                {/* Всегда отображаем пустую строку для добавления нового батча */}
-                {haveBatches(productIndex) ? (
-                  <tr>
-                    <td className="border p-1"></td>
-                    <td className="border p-1"></td>
-                    <td className="border p-1"></td>
-                    <td className="border p-1"></td>
-                    <td className="border p-1">
-                      <button
-                        onClick={() => {
-                          setWmoctModal(!wmoctModal);
-                          handlePlusBatch(product);
-                        }}
-                      >
-                        ＋
-                      </button>
-                    </td>
-                    <td className="border p-1"></td>
-                    <td className="border p-1 text-center"></td>
-                    <td className="border p-1"></td>
-                  </tr>
-                ) : (
-                  <></>
-                )}
-              </Fragment>
-            ))}
-          </tbody>
-          <button
-            onClick={() => {
-              setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
-            }}
-          >
-            SAVE
-          </button>
-        </table>
-      </div>
+      <WMOCTProduct
+        haveBatches={haveBatches}
+        handlePlusBatch={handlePlusBatch}
+        handlePlus={handlePlus}
+        handleMinus={handleMinus}
+        isDisablePlus={isDisablePlus}
+        isDisableMinus={isDisableMinus}
+      />
     </>
   );
 };

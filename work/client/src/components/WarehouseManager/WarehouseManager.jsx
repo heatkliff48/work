@@ -9,19 +9,30 @@ import WMOrderCard from './WMOrderCard/WMOrderCard';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useDispatch } from 'react-redux';
 import { getAldabaran } from '#components/redux/actions/aldabaranAction.js';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
   //   useUsersContext();
   const { WAREHOUSE_MANAGER_TABLE } = useProjectContext();
   const { latestProducts } = useProductsContext();
-  const { setWmoctProductShippedBD, selectedOrder, setSelectedOrder } =
-    useWarehouseContext();
+  const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
+    useProductsTypeJournalContext();
+  const {
+    setWmoctProductShippedBD,
+    selectedOrder,
+    setSelectedOrder,
+    getProductsByOrder,
+  } = useWarehouseContext();
   const {
     list_of_orders,
     deliveryAddresses,
     productsOfOrders,
     getCurrentOrderInfoHandler,
+    dryMixedProductsOfOrders,
+    anchorProductsOfOrders,
+    toolProductsOfOrders,
+    relMatProductsOfOrders,
   } = useOrderContext();
 
   const dispatch = useDispatch();
@@ -52,12 +63,17 @@ function WarehouseManager() {
       .reduce((acc, el) => {
         const del_adr = deliveryAddresses?.find((del) => del?.id == el?.del_adr_id);
 
-        const products = productsOfOrders
-          .filter((prod) => prod.order_id == el.id)
-          .map((prod) => {
-            const lProduct = latestProducts.find((lp) => lp.id == prod.product_id);
-            return `${lProduct.article}: ${prod.quantity_palet}`;
-          });
+        const products = [
+          ...getProductsByOrder(el.id, productsOfOrders, latestProducts),
+          ...getProductsByOrder(el.id, dryMixedProductsOfOrders, latestDryMix),
+          ...getProductsByOrder(el.id, anchorProductsOfOrders, latestAnchors),
+          ...getProductsByOrder(el.id, toolProductsOfOrders, latestTools),
+          ...getProductsByOrder(
+            el.id,
+            relMatProductsOfOrders,
+            latestRelatedMaterials
+          ),
+        ];
 
         const obj = {
           orders_article: el.article,
@@ -65,6 +81,7 @@ function WarehouseManager() {
           production_date: el.shipping_date || '',
           orders_products: products || [],
         };
+
         acc.push(obj);
         return acc;
       }, []);

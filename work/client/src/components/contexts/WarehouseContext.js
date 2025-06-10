@@ -7,7 +7,6 @@ import {
   updateWarehouseQuantitys,
   updReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
-import { useNavigate } from 'react-router-dom';
 import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,7 +16,6 @@ const WarehouseContext = createContext();
 
 const WarehouseContextProvider = ({ children }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const COLUMNS_WAREHOUSE = [
     {
@@ -202,6 +200,34 @@ const WarehouseContextProvider = ({ children }) => {
       return acc;
     }, groupedOrders);
   };
+
+  const getProductsByOrder = (orderId, productsOfType, productArr) => {
+    return productsOfType
+      .filter((prod) => prod.order_id === orderId)
+      .map((prod) => {
+        const productId =
+          prod.product_id ||
+          prod.dry_mixed_id ||
+          prod.anchor_id ||
+          prod.tool_id ||
+          prod.rel_mat_id;
+
+        const lProduct = productArr?.find((lp) => lp.id === productId);
+
+        const quantity = prod.quantity_palet || prod.quantity_ud;
+
+        return `${lProduct?.article || '???'}: ${quantity}, `;
+      });
+  };
+
+  function getProductType(article) {
+    if (article.startsWith('T.')) return 'product';
+    if (article.startsWith('X.P')) return 'relMat';
+    if (article.startsWith('X.T')) return 'tool';
+    if (article.startsWith('X.M')) return 'dryMixed';
+    if (article.startsWith('X.F')) return 'anchor';
+    return 'UNKNOWN';
+  }
 
   const saveHandler = () => {
     const newReserved = [];
@@ -530,6 +556,7 @@ const WarehouseContextProvider = ({ children }) => {
         related_materials_backorder_list,
         ordered_production_oem_status,
         filteredProducts,
+        getProductsByOrder,
         setFilteredProducts,
         currentOrderedProducts,
         setCurrentOrderedProducts,
@@ -555,6 +582,7 @@ const WarehouseContextProvider = ({ children }) => {
         aldabaranNum,
         setAldabaranNum,
         aldabaran,
+        getProductType,
       }}
     >
       {children}
