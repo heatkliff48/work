@@ -17,6 +17,7 @@ const {
   GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   ADD_SECONDARY_CONTACT_ORDER_SOCKET,
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+  DELETE_SECONDARY_CONTACT_ORDER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -87,6 +88,19 @@ class OrdersController {
       await OrdersService.addSecondaryContact(sec_cnt);
 
       myEmitter.emit(ADD_SECONDARY_CONTACT_ORDER_SOCKET, sec_cnt);
+      return res.status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async deleteSecondaryContact(req, res) {
+    const { order_id } = req.body;
+
+    try {
+      await OrdersService.deleteSecondaryContact(order_id);
+
+      myEmitter.emit(DELETE_SECONDARY_CONTACT_ORDER_SOCKET, order_id);
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -228,11 +242,13 @@ class OrdersController {
     const newRelMatProductsOfOrder = req.body;
 
     try {
-      const rel_mat_product_of_order = await OrdersService.getUpdateRelMatProductsOfOrder(
-        newRelMatProductsOfOrder
-      );
+      const rel_mat_product_of_order =
+        await OrdersService.getUpdateRelMatProductsOfOrder(newRelMatProductsOfOrder);
 
-      myEmitter.emit(UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET, rel_mat_product_of_order);
+      myEmitter.emit(
+        UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+        rel_mat_product_of_order
+      );
 
       return res.status(200).json(rel_mat_product_of_order);
     } catch (err) {

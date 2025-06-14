@@ -57,6 +57,8 @@ import {
   GET_REL_MAT_PRODUCTS_OF_ORDER,
   GET_UPDATE_REL_MAT_PRODUCTS_OF_ORDER,
   GET_DELETE_REL_MAT_OF_ORDER,
+  REMOVE_SECONDARY_CONTACT,
+  DELETE_SECONDARY_CONTACT,
 } from '../types/ordersTypes';
 
 const url = axios.create({
@@ -103,6 +105,15 @@ const addDescriptionOrder = (desc) => {
 const addSecondaryContact = (sec_cnt) => {
   return url
     .post('/orders/sec_cnt', sec_cnt)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const deleteSecondaryContact = (sec_cnt) => {
+  return url
+    .post('/orders/delete/sec_cnt', { order_id: sec_cnt })
     .then((res) => {
       return res.data;
     })
@@ -355,6 +366,17 @@ function* addSecondaryContactWatcher(action) {
   } catch (err) {
     console.error(err);
     yield put({ type: SECONDARY_CONTACT, payload: [] });
+  }
+}
+
+function* deleteSecondaryContactWatcher(action) {
+  try {
+    const { payload } = action;
+
+    yield call(deleteSecondaryContact, payload);
+  } catch (err) {
+    console.error(err);
+    yield put({ type: REMOVE_SECONDARY_CONTACT, payload: [] });
   }
 }
 
@@ -626,6 +648,7 @@ function* ordersWatcher() {
   yield takeLatest(ADD_DATA_SHIP_ORDER, addDataShipOrderWatcher);
   yield takeLatest(ADD_ORDER_DESCRIPTION, addDescriptionOrderWatcher);
   yield takeLatest(ADD_SECONDARY_CONTACT, addSecondaryContactWatcher);
+  yield takeLatest(DELETE_SECONDARY_CONTACT, deleteSecondaryContactWatcher);
   yield takeLatest(GET_CURRENT_PRODUCTS_OF_ORDER, getCurrentProductsOfOrderWatcher);
   yield takeLatest(GET_PRODUCTS_OF_ORDER, getProductsOfOrderWatcher);
   yield takeLatest(
@@ -663,7 +686,10 @@ function* ordersWatcher() {
   );
   yield takeLatest(GET_DELETE_ANCHOR_OF_ORDER, getDeleteAnchorProductOfOrderWatcher);
   yield takeLatest(GET_DELETE_TOOL_OF_ORDER, getDeleteToolProductOfOrderWatcher);
-  yield takeLatest(GET_DELETE_REL_MAT_OF_ORDER, getDeleteRelMatProductOfOrderWatcher);
+  yield takeLatest(
+    GET_DELETE_REL_MAT_OF_ORDER,
+    getDeleteRelMatProductOfOrderWatcher
+  );
   yield takeLatest(GET_DELETE_ORDER, getDeleteOrderWatcher);
   yield takeLatest(UPDATE_CONTACT_OF_ORDER, updateContactOfOrderWorker);
   yield takeLatest(UPDATE_DELIVERY_OF_ORDER, updateDeliveryOfOrderWorker);

@@ -317,6 +317,13 @@ label {
   border-radius: 4px;
   margin-bottom: 20px;
 }
+
+.sec-cont-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .description {
   height: 60%;
   padding: 1rem;

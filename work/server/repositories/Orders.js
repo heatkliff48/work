@@ -88,6 +88,24 @@ class OrdersRepository {
     }
   }
 
+  static async deleteSecondaryContact(order_id) {
+    try {
+      await Orders.update(
+        {
+          secondary_contact: null,
+        },
+        { where: { id: order_id } }
+      );
+
+      const order_newContact = await Orders.findOne({ where: { id: order_id } });
+
+      return order_newContact;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
   static async getProductsOfOrder() {
     try {
       const product_list = await OrdersProducts.findAll({

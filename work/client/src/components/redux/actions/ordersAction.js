@@ -30,6 +30,7 @@ import {
   GET_REL_MAT_PRODUCTS_OF_ORDER,
   GET_UPDATE_REL_MAT_PRODUCTS_OF_ORDER,
   GET_DELETE_REL_MAT_OF_ORDER,
+  DELETE_SECONDARY_CONTACT,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -62,6 +63,13 @@ export const addDescription = (desc) => {
 export const addSecondaryContact = (sec_cnt) => {
   return {
     type: ADD_SECONDARY_CONTACT,
+    payload: sec_cnt,
+  };
+};
+
+export const delSecondaryContact = (sec_cnt) => {
+  return {
+    type: DELETE_SECONDARY_CONTACT,
     payload: sec_cnt,
   };
 };
