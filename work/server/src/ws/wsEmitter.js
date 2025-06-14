@@ -64,6 +64,7 @@ const {
   ADD_SECONDARY_CONTACT_ORDER_SOCKET,
   ADD_NEW_ALDABARAN_SOCKET,
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+  DELETE_SECONDARY_CONTACT_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -172,6 +173,17 @@ function registerWsEmitter(map) {
       userConnect.send(
         JSON.stringify({
           type: ADD_SECONDARY_CONTACT_ORDER_SOCKET,
+          payload: sec_cnt,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_SECONDARY_CONTACT_ORDER_SOCKET, (sec_cnt) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_SECONDARY_CONTACT_ORDER_SOCKET,
           payload: sec_cnt,
         })
       );

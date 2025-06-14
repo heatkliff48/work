@@ -55,6 +55,7 @@ import {
   SECONDARY_CONTACT_ORDER_SOCKET,
   NEW_ALDABARAN_SOCKET,
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+  REMOVE_SECONDARY_CONTACT_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -179,6 +180,13 @@ export const addDescOrderSocket = (desc) => {
 export const addSecondaryContactSocket = (sec_cnt) => {
   return {
     type: SECONDARY_CONTACT_ORDER_SOCKET,
+    payload: sec_cnt,
+  };
+};
+
+export const deleteSecondaryContactSocket = (sec_cnt) => {
+  return {
+    type: REMOVE_SECONDARY_CONTACT_ORDER_SOCKET,
     payload: sec_cnt,
   };
 };

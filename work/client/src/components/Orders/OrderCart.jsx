@@ -14,6 +14,7 @@ import {
   addSecondaryContact,
   deleteAccountingData,
   deleteOrder,
+  delSecondaryContact,
   getDeleteProductOfOrder,
   getDeleteRelMatProductOfOrder,
   updAccountingDataList,
@@ -241,6 +242,7 @@ const OrderCart = React.memo(() => {
     dispatch(
       addSecondaryContact({ secondary_contact: secCnt, order_id: orderCartData.id })
     );
+
     setIsAddSecCont(false);
   };
 
@@ -852,7 +854,7 @@ const OrderCart = React.memo(() => {
     );
   };
 
-  const getSelectedOption = (accessor) => {
+  const getSelectedOption = () => {
     const options = personsInChargeList;
     if (!options) return null;
     const personInChargeOption = options.find(
@@ -895,6 +897,20 @@ const OrderCart = React.memo(() => {
 
     setAproveAccounting(result ?? true);
   }, [accountingDataList]);
+
+  useEffect(() => {
+    if (orderCartData?.id) {
+      const updatedOrder = list_of_orders.find(
+        (order) => order.id === orderCartData.id
+      );
+      if (updatedOrder?.secondaryContact) {
+        setOrderCartData((prev) => ({
+          ...prev,
+          secondaryContact: updatedOrder.secondaryContact,
+        }));
+      }
+    }
+  }, [list_of_orders, orderCartData?.id]);
 
   return (
     <>
@@ -980,7 +996,19 @@ const OrderCart = React.memo(() => {
             )}
           </div>
           <div className="secondary-contact">
-            <h4>Secondary Contacts</h4>
+            <div className="sec-cont-container">
+              <h4>Secondary Contacts</h4>
+              {haveSecondaryContact && (
+                <button
+                  style={{ marginTop: '0' }}
+                  onClick={() => {
+                    dispatch(delSecondaryContact(orderCartData?.id));
+                  }}
+                >
+                  Delete
+                </button>
+              )}
+            </div>
             {haveSecondaryContact ? (
               filterAndMapData(orderCartData?.secondaryContact, filterKeys)
             ) : isAddSecCont ? (
