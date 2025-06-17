@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Button,
   Card,
@@ -27,6 +27,7 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
     setPreviewOperationName,
     isRepair,
     setIsRepair,
+    isEdit,
     setIsEdit,
   } = useProjectContext();
   const { previewProductModal, setPreviewProductModal } = useModalContext();
@@ -115,6 +116,12 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
     setIsEdit(false);
     setIsRepair(false);
   };
+
+  useEffect(() => {
+    console.log('isRepaer', isRepair);
+    console.log('isEdit', isEdit);
+    console.log('previewOperationName',previewOperationName );
+  }, [isEdit, isRepair]);
 
   return (
     <div>

@@ -126,6 +126,7 @@ const OrderCart = React.memo(() => {
     vat_euro: 0,
     vat_result: 0,
   });
+  const [delivery, setDelivery] = useState(0);
   const [currentOrderedProduct, setCurrentOrderedProduct] = useState({});
 
   const [productLists, setProductLists] = useState({
@@ -777,7 +778,9 @@ const OrderCart = React.memo(() => {
         2
       );
 
-      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
+      const vat_result = Number(
+        final_price_product + Number(vat_euro) + Number(orderCartData.delivery)
+      ).toFixed(2);
 
       setVatValue((prev) => ({
         ...prev,
@@ -786,7 +789,7 @@ const OrderCart = React.memo(() => {
         vat_euro,
       }));
     }
-  }, [productLists, vatValue.vat_procent]);
+  }, [productLists, vatValue.vat_procent, orderCartData.delivery]);
 
   useEffect(() => {
     const storedData = localStorage.getItem('orderCartData')
@@ -897,6 +900,10 @@ const OrderCart = React.memo(() => {
 
     setAproveAccounting(result ?? true);
   }, [accountingDataList]);
+
+  useEffect(() => {
+    console.log('order Card', orderCartData);
+  }, [orderCartData]);
 
   useEffect(() => {
     if (orderCartData?.id) {
@@ -1091,6 +1098,14 @@ const OrderCart = React.memo(() => {
                     onChange={(e) => {
                       handleInputChange(e);
                     }}
+                    onBlur={() => {
+                      if (vatValue.vat_procent.trim() === '') {
+                        setVatValue((prev) => ({
+                          ...prev,
+                          vat_procent: 21,
+                        }));
+                      }
+                    }}
                     readOnly={orderCartData?.status < 3 ? false : true}
                   />
                 </div>
@@ -1099,6 +1114,36 @@ const OrderCart = React.memo(() => {
                 <div>
                   <p>VAT, EURO</p>
                   <p>{vatValue.vat_euro}</p>
+                </div>
+              </div>
+              <div className="vat_procent">
+                <div>
+                  <p>Delivery</p>
+                  <input
+                    type="text"
+                    id="delivery"
+                    name="delivery"
+                    value={orderCartData.delivery ?? 0}
+                    onChange={(e) => {
+                      setOrderCartData((prev) => ({
+                        ...prev,
+                        delivery: e.target.value,
+                      }));
+                    }}
+                    //onBlur={() => {
+                    //    if (orderCartData?.delivery?.trim() ?? '' === '')
+                    //     setOrderCartData((prev) => ({ ...prev, delivery: 0 }));
+                    // }}
+                    readOnly={orderCartData?.status < 3 ? false : true}
+                  />
+                  <button
+                    style={{
+                      padding: '4px 10px',
+                      marginLeft: '20px',
+                    }}
+                  >
+                    Save
+                  </button>
                 </div>
               </div>
               <div className="vat_result">
@@ -1163,7 +1208,7 @@ const OrderCart = React.memo(() => {
                     onChange={() => {
                       statusChangeHandler(item);
                     }}
-                    disabled={!orderStatusAccess?.canWrite || item?.accessor == 7} //
+                    disabled={!orderStatusAccess?.canWrite || item?.accessor == 7 || item?.accessor == 9} //
                   />
                 </div>
               ))}

@@ -36,6 +36,10 @@ const ModalWindow = React.memo(
       'normOfBrack',
       'humidity',
     ];
+    useEffect(() => {
+      console.log('isRepaer', isRepair);
+      console.log('isEdit', isEdit);
+    }, [isEdit, isRepair]);
 
     const clearData = () => {
       setTrMark('');
@@ -108,8 +112,12 @@ const ModalWindow = React.memo(
         (el) => el.article === prodArticle
       )?.version;
 
+      const needRepair = products.some(
+        (product) => product.article === prodArticle && product.density != density
+      );
+
       if (isRepair) {
-        const prevName = isExistingProduct ? 'edit' : 'repair';
+        const prevName = needRepair ? 'repair' : 'edit';
         setPreviewOperationName(prevName);
 
         if (isExistingProduct) {
@@ -281,12 +289,12 @@ const ModalWindow = React.memo(
         // Вычисление m3InArray
         if (values.volumeBlock && values.widthInArray) {
           // values.m3InArray = (
-//             1 *
-            // Math.floor(6000 / formInput?.height) *
-            // values.widthInArray *
-            // values.volumeBlock
+          //             1 *
+          // Math.floor(6000 / formInput?.height) *
+          // values.widthInArray *
+          // values.volumeBlock
           // ).toFixed(2);
-          values.m3InArray = (values.volumeBlockOnPallet*3).toFixed(2);
+          values.m3InArray = (values.volumeBlockOnPallet * 3).toFixed(2);
           updateFuncs.m3InArray = (value) =>
             setFormInput((prev) => ({ ...prev, m3InArray: value }));
         }

@@ -64,7 +64,8 @@ const WMOCTable = ({ product_list, orderCartData }) => {
             if (i == batchIndex) {
               const { allocated, remainingInBatch } = el;
 
-              const canPlus = remainingInBatch > 0 && qty_rem > 0;
+              const canPlus =
+                remainingInBatch > 0 && qty_rem > 0 && allocated < remainingInBatch;
               const result = canPlus ? allocated + 1 : allocated;
 
               shipped = canPlus ? shipped + 1 : shipped;

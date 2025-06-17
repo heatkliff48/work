@@ -47,6 +47,7 @@ function RecipeOrders() {
   useEffect(() => {
     const updatedData = recipeOrders
       .map((el) => {
+
         const batch = batchOutside.find((batch) => batch.id === el.id_batch);
         const recipe = list_of_recipes.find((recipe) => recipe.id === el.id_recipe);
 
@@ -55,7 +56,7 @@ function RecipeOrders() {
         return {
           id: el.id,
           recipe_article: recipe?.article || 'Unknown Recipe',
-          batch_article: batch?.id_warehouse_batch || 'Unknown Batch',
+          batch_article: batch?.product_article || 'Unknown Batch',
           production_volume: el.production_volume || 0,
         };
       })

@@ -44,6 +44,9 @@ module.exports = {
       description: {
         type: Sequelize.STRING,
       },
+      delivery: {
+        type: Sequelize.FLOAT,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

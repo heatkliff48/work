@@ -314,7 +314,9 @@ const OrderContextProvider = ({ children }) => {
 
   const toolProductsOfOrders = useSelector((state) => state.toolProductsOfOrders);
 
-  const relMatProductsOfOrders = useSelector((state) => state.relMatProductsOfOrders);
+  const relMatProductsOfOrders = useSelector(
+    (state) => state.relMatProductsOfOrders
+  );
 
   const clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
@@ -437,6 +439,7 @@ const OrderContextProvider = ({ children }) => {
         secondaryContact,
         shipping_date: order?.shipping_date,
         person_in_charge: order?.person_in_charge,
+        delivery: 0,
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));

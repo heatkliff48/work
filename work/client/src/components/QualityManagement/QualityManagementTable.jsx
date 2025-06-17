@@ -293,17 +293,11 @@ const QualityManagementTable = () => {
       />
       {qualityManagementData.length > 0 && (
         <div className="d-flex gap-2 mb-2">
-          <Button variant="success" size="lg">
-            <FaPlus
-              onClick={qualityManagementPlusHandler}
-              style={{ cursor: 'pointer', fontSize: '1.5rem' }}
-            />
+          <Button variant="success" size="lg" onClick={qualityManagementPlusHandler}>
+            <FaPlus style={{ cursor: 'pointer', fontSize: '1.5rem' }} />
           </Button>
-          <Button variant="danger" size="lg">
-            <FaMinus
-              onClick={qualityManagementMinusHandler}
-              style={{ cursor: 'pointer', fontSize: '1.5rem' }}
-            />
+          <Button variant="danger" size="lg" onClick={qualityManagementMinusHandler}>
+            <FaMinus style={{ cursor: 'pointer', fontSize: '1.5rem' }} />
           </Button>
         </div>
       )}

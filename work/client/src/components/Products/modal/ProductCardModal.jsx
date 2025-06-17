@@ -192,6 +192,13 @@ const ProductCardModal = React.memo(() => {
     qualityManagementData,
   ]);
 
+  useEffect(()=>{
+
+    console.log('isRepaer', isRepair);
+    console.log('isEdit', isEdit);
+
+  }, [isEdit, isRepair])
+
   useEffect(() => {
     const searchArticle = productCardData.article
       ? productCardData.article.slice(0, productCardData.article.length)

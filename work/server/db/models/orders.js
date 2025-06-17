@@ -37,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       shipping_date: DataTypes.STRING,
       person_in_charge: DataTypes.INTEGER,
       description: DataTypes.STRING,
+      delivery: DataTypes.FLOAT,
     },
     {
       sequelize,
