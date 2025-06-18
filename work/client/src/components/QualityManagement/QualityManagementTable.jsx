@@ -15,6 +15,7 @@ import {
 import {
   addNewWarehouse,
   updListOfOrderedProduction,
+  getListOfOrderedProduction,
 } from '#components/redux/actions/warehouseAction.js';
 import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
@@ -259,8 +260,12 @@ const QualityManagementTable = () => {
         })
       );
 
+      // console.log('updatedReserves', updatedReserves);
+
       for (const ordered_production of updatedReserves) {
+        // console.log('ordered_production', ordered_production);
         await dispatch(updListOfOrderedProduction(ordered_production));
+        // await dispatch(getListOfOrderedProduction());
       }
       await dispatch(deleteQualityManagement(id));
       if (production_plan_id) {

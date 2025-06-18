@@ -63,7 +63,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   }, [productOfOrder.quantity_m2, selectedProduct?.m2]);
 
   const quantity_real_value = useMemo(() => {
-    const result = quantity_palet_value * (selectedProduct?.m2 || 1);
+    const result = Math.ceil(quantity_palet_value * (selectedProduct?.m2 || 1));
 
     setProductOfOrder((prev) => ({
       ...prev,

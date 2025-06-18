@@ -112,7 +112,8 @@ class WarehouseRepository {
 
   static async updateListOfOrderedProduction(ordered_production) {
     console.log(
-      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateListOfOrderedProduction----------------------------------'
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateListOfOrderedProduction----------------------------------',
+      ordered_production
     );
 
     try {
@@ -183,15 +184,12 @@ class WarehouseRepository {
     }
   }
 
-
   static async updateWarehouseQuantitys(upd_rem_srock) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateWarehouseQuantitys');
 
     try {
-
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
-      const { warehouse_id, total_quantity, ordered_quantity } =
-        upd_rem_srock;
+      const { warehouse_id, total_quantity, ordered_quantity } = upd_rem_srock;
       await Warehouses.update(
         { total_quantity, ordered_quantity },
         { where: { id: warehouse_id } }

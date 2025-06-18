@@ -4,7 +4,11 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 // import { dataFetchedChange } from '#components/redux/actions/userAction.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
-import { getAllDeliveryAddresses } from '#components/redux/actions/clientAction.js';
+import {
+  getAllClients,
+  getAllContactInfo,
+  getAllDeliveryAddresses,
+} from '#components/redux/actions/clientAction.js';
 import {
   getAccountingDataList,
   getAnchorProductsOfOrders,
@@ -52,6 +56,9 @@ function Main() {
   useEffect(() => {
     dispatch(getAllRoles());
     dispatch(getAllProducts());
+    dispatch(getAllClients());
+    dispatch(getAllDeliveryAddresses());
+    dispatch(getAllContactInfo());
     dispatch(getDryMixesJournal());
     dispatch(getRelatedMaterialsJournal());
     dispatch(getAnchor());

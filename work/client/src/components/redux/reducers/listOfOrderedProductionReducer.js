@@ -14,7 +14,7 @@ export const listOfOrderedProductionReducer = (
     }
 
     case NEW_ORDERED_PRODUCTION: {
-      return payload;
+      return [...listOfOrderedProduction, ...payload];
     }
 
     // case DELETE_PRODUCT_FROM_RESERVED_LIST: {
