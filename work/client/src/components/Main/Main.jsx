@@ -12,6 +12,7 @@ import {
   getOrders,
   getProductsOfOrders,
   getToolProductsOfOrders,
+  getRelMatProductsOfOrders,
 } from '#components/redux/actions/ordersAction.js';
 import { getAllProducts } from '#components/redux/actions/productsAction.js';
 import {
@@ -60,6 +61,7 @@ function Main() {
     dispatch(getDryMixedProductsOfOrders());
     dispatch(getAnchorProductsOfOrders());
     dispatch(getToolProductsOfOrders());
+    dispatch(getRelMatProductsOfOrders());
     dispatch(getListOfReservedProducts());
     dispatch(getListOfOrderedProduction());
     dispatch(getListOfOrderedProductionOEM());

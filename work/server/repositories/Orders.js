@@ -203,7 +203,7 @@ class OrdersRepository {
           'id',
           'order_id',
           'rel_mat_id',
-          'quantity_rel_mat',
+          'quantity_ud',
           'total',
           'discount',
           'pvp',

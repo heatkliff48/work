@@ -287,9 +287,7 @@ const QualityManagementTable = () => {
         dataOfTable={qualityManagementDataList}
         tableName={'Quality Management'}
         userAccess={userAccess}
-        // handleRowClick={(row) => {
-        //   qualityManagementHandler(row.original.id);
-        // }}
+        handleRowClick={(row) => {}}
       />
       {qualityManagementData.length > 0 && (
         <div className="d-flex gap-2 mb-2">

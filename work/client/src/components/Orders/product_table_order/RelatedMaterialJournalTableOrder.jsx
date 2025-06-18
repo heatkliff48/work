@@ -21,7 +21,9 @@ const RelatedMaterialJournalTableOrder = ({
       {relatedMaterialProductModalOrder && (
         <AddRelatedMaterialProductModal
           isOpen={relatedMaterialProductModalOrder}
-          toggle={() => setRelatedMaterialProductModalOrder(!relatedMaterialProductModalOrder)}
+          toggle={() =>
+            setRelatedMaterialProductModalOrder(!relatedMaterialProductModalOrder)
+          }
         />
       )}{' '}
       <table className="product-table">
@@ -65,7 +67,9 @@ const RelatedMaterialJournalTableOrder = ({
                       status: orderCartData.status,
                       del_adr_id: orderCartData.deliveryAddress?.id,
                     }));
-                    setRelatedMaterialProductModalOrder(!relatedMaterialProductModalOrder);
+                    setRelatedMaterialProductModalOrder(
+                      !relatedMaterialProductModalOrder
+                    );
                   }}
                 >
                   Add product
