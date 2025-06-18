@@ -17,6 +17,8 @@ import {
   updateTool,
 } from '#components/redux/actions/productsTypeJournalAction.js';
 import ShowProductsTypeJournalModal from './ProductsTypeJournalModal';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 function ProductsTypeJournalInfoModal(props) {
   const {
@@ -29,6 +31,13 @@ function ProductsTypeJournalInfoModal(props) {
     dataTable,
     typeOfMixOptions,
   } = useProductsTypeJournalContext();
+  const {
+    dryMixedProductsOfOrders,
+    anchorProductsOfOrders,
+    toolProductsOfOrders,
+    relMatProductsOfOrders,
+  } = useOrderContext();
+  const { related_materials_backorder_list } = useWarehouseContext();
   const products = useSelector((state) =>
     props.target == 1
       ? state.dryMixesJournal
@@ -44,11 +53,39 @@ function ProductsTypeJournalInfoModal(props) {
   const [currentVersion, setCurrentVersion] = useState(
     selectedProductsType?.version
   );
+  const [repairButton, setRepairButton] = useState(true);
   // const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   // const user = useSelector((state) => state.user);
 
   // const navigate = useNavigate();
+
+  useEffect(() => {
+    const { id, article } = products;
+
+    const have_product_poo =
+      props.target == 1
+        ? dryMixedProductsOfOrders.find((el) => el.product_id == id)
+        : props.target == 2
+        ? relMatProductsOfOrders.find((el) => el.product_id == id)
+        : props.target == 3
+        ? anchorProductsOfOrders.find((el) => el.product_id == id)
+        : toolProductsOfOrders.find((el) => el.product_id == id);
+
+    const have_product_backorder = related_materials_backorder_list.find(
+      (el) => el.product_article == article
+    );
+
+    const rep_dis = have_product_poo || have_product_backorder ? true : false;
+
+    setRepairButton(rep_dis);
+  }, [
+    dryMixedProductsOfOrders,
+    anchorProductsOfOrders,
+    toolProductsOfOrders,
+    relMatProductsOfOrders,
+    related_materials_backorder_list,
+  ]);
 
   const dispatch = useDispatch();
 
@@ -258,6 +295,7 @@ function ProductsTypeJournalInfoModal(props) {
                 : 'tool'
             }
             productCode={selectedProductsType?.productCode}
+            disabled={repairButton}
             repair={true}
           />
           <ShowProductsTypeJournalModal

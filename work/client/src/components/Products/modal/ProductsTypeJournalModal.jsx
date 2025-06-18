@@ -459,6 +459,7 @@ function ShowProductsTypeJournalModal(props) {
         onClick={() => {
           setModalShow(true);
         }}
+        disabled={props.disabled}
       >
         {props.addNewVersion
           ? `Edit`
