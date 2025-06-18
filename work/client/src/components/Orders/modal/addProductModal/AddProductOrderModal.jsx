@@ -38,7 +38,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder((prev) => ({
       ...prev,
       product_article: row.original.article,
-      product_id: product?.id
+      product_id: product?.id,
     }));
   }, []);
 
@@ -50,7 +50,9 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     if (!selectedProduct) return;
     if (!productOfOrder?.quantity_m2) productOfOrder.quantity_m2 = 0;
     const result = Math.ceil(
-      productOfOrder?.quantity_m2 / (selectedProduct?.m2 || 1)
+      selectedProduct?.form === 'U-block'
+        ? productOfOrder?.quantity_m2 / (selectedProduct?.m || 1)
+        : productOfOrder?.quantity_m2 / (selectedProduct?.m2 || 1)
     );
 
     setProductOfOrder((prev) => ({
@@ -61,7 +63,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   }, [productOfOrder.quantity_m2, selectedProduct?.m2]);
 
   const quantity_real_value = useMemo(() => {
-    const result = Math.ceil(quantity_palet_value * (selectedProduct?.m2 || 1));
+    const result = quantity_palet_value * (selectedProduct?.m2 || 1);
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -216,6 +218,19 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                         readOnly
                       />
                     </>
+                  );
+                if (
+                  selectedProduct?.form === 'U-block' &&
+                  el.accessor === 'quantity_m2'
+                )
+                  return (
+                    <InputField
+                      key={el.id}
+                      el={el}
+                      inputValue={productOfOrder}
+                      inputValueChange={handleProductListOrderChange}
+                      uBlockHeader="Quantity, linear metre"
+                    />
                   );
                 return (
                   <InputField
