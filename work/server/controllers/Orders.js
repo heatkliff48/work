@@ -56,6 +56,7 @@ class OrdersController {
 
   static async addDeliveryPrice(req, res) {
     const { order_id, delivery } = req.body;
+    console.log('req.body>>>>>>>>>>>', req.body);
 
     try {
       await OrdersService.addDeliveryPrice({ order_id, delivery });

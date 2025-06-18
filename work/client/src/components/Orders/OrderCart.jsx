@@ -11,6 +11,7 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import {
   addDataShipOrder,
   addDescription,
+  addNewDeliveryPrice,
   addSecondaryContact,
   deleteAccountingData,
   deleteOrder,
@@ -1127,19 +1128,27 @@ const OrderCart = React.memo(() => {
                     onChange={(e) => {
                       setOrderCartData((prev) => ({
                         ...prev,
-                        delivery: e.target.value,
+                        delivery: Number(e.target.value),
                       }));
                     }}
-                    //onBlur={() => {
-                    //    if (orderCartData?.delivery?.trim() ?? '' === '')
-                    //     setOrderCartData((prev) => ({ ...prev, delivery: 0 }));
-                    // }}
                     readOnly={orderCartData?.status < 3 ? false : true}
                   />
                   <button
                     style={{
                       padding: '4px 10px',
                       marginLeft: '20px',
+                    }}
+                    onClick={() => {
+                      console.log({
+                        order_id: orderCartData.id,
+                        delivery: orderCartData.delivery,
+                      });
+                      dispatch(
+                        addNewDeliveryPrice({
+                          order_id: orderCartData.id,
+                          delivery: orderCartData.delivery,
+                        })
+                      );
                     }}
                   >
                     Save
@@ -1208,7 +1217,11 @@ const OrderCart = React.memo(() => {
                     onChange={() => {
                       statusChangeHandler(item);
                     }}
-                    disabled={!orderStatusAccess?.canWrite || item?.accessor == 7 || item?.accessor == 9} //
+                    disabled={
+                      !orderStatusAccess?.canWrite ||
+                      item?.accessor == 7 ||
+                      item?.accessor == 9
+                    } //
                   />
                 </div>
               ))}
