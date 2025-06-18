@@ -23,6 +23,7 @@ function RelatedMaterialsBackorderList() {
         onClickButton={() => {}}
         buttonText={''}
         tableName={'Related materials backorder list'}
+        handleRowClick={(row) => {}}
       />
     </>
   );
