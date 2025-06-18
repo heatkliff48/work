@@ -902,10 +902,6 @@ const OrderCart = React.memo(() => {
   }, [accountingDataList]);
 
   useEffect(() => {
-    console.log('order Card', orderCartData);
-  }, [orderCartData]);
-
-  useEffect(() => {
     if (orderCartData?.id) {
       const updatedOrder = list_of_orders.find(
         (order) => order.id === orderCartData.id

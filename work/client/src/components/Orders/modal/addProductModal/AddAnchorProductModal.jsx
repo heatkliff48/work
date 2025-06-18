@@ -47,8 +47,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const pieces_per_pallet =
-    selectedProduct?.pieces_per_unit * selectedProduct?.boxes_on_a_pallet ?? 0;
+  const pieces_per_pallet = selectedProduct?.pieces_per_unit ?? 0;
 
   const quantity_palet_value = useMemo(() => {
     if (!selectedProduct) return;

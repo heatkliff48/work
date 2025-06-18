@@ -144,11 +144,11 @@ const OrderContextProvider = ({ children }) => {
       accessor: 'quantity_ud',
       sortType: 'number',
     },
-    {
-      Header: 'Quantity of pallets',
-      accessor: 'quantity_palet_anchor',
-      sortType: 'number',
-    },
+    // {
+    //   Header: 'Quantity of pallets',
+    //   accessor: 'quantity_palet_anchor',
+    //   sortType: 'number',
+    // },
     {
       Header: 'Real quantity, ud',
       accessor: 'quantity_real_ud',
