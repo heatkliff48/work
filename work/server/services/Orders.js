@@ -27,6 +27,12 @@ class OrdersService {
     return newOrder;
   }
 
+  static async addDeliveryPrice(data) {
+    await OrdersRepository.addDeliveryPrice(data);
+
+    return;
+  }
+
   static async addShippingDateOrder({ date }) {
     await OrdersRepository.addShippingDateOrder(date);
 
@@ -125,7 +131,9 @@ class OrdersService {
 
   static async getUpdateRelMatProductsOfOrder(newRelMatProductsOfOrder) {
     const rel_mat_product_of_order =
-      await OrdersRepository.getUpdateRelMatProductsOfOrder(newRelMatProductsOfOrder);
+      await OrdersRepository.getUpdateRelMatProductsOfOrder(
+        newRelMatProductsOfOrder
+      );
 
     return rel_mat_product_of_order;
   }

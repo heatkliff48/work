@@ -56,6 +56,7 @@ import {
   addNewAldabaranSocket,
   updRelMatProductOfOrderSocket,
   deleteSecondaryContactSocket,
+  addNewDeliveryPriceSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -138,6 +139,7 @@ import {
   ADD_NEW_ALDABARAN_SOCKET,
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   DELETE_SECONDARY_CONTACT_ORDER_SOCKET,
+  ADD_NEW_DELIVERY_PRICE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -168,6 +170,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_ORDER_SOCKET:
       dispatch(addNewOrderSocket(payload));
+      break;
+
+    case ADD_NEW_DELIVERY_PRICE_SOCKET:
+      dispatch(addNewDeliveryPriceSocket(payload));
       break;
 
     case UPDATE_PRODUCT_OF_ORDER_SOCKET:

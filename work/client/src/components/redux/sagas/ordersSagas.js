@@ -59,6 +59,8 @@ import {
   GET_DELETE_REL_MAT_OF_ORDER,
   REMOVE_SECONDARY_CONTACT,
   DELETE_SECONDARY_CONTACT,
+  NEW_DELIVERY_PRICE,
+  ADD_NEW_DELIVERY_PRICE,
 } from '../types/ordersTypes';
 
 const url = axios.create({
@@ -78,6 +80,15 @@ const getAllOrders = () => {
 const addNewOrder = (order) => {
   return url
     .post('/orders/add', { order })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewDeliveryPrice = (order) => {
+  return url
+    .post('/orders/delivery', order)
     .then((res) => {
       return res.data;
     })
@@ -336,6 +347,17 @@ function* addNewOrderWatcher(action) {
   } catch (err) {
     console.error(err);
     yield put({ type: NEW_ORDER, payload: [] });
+  }
+}
+
+function* addNewDeliveryPriceWatcher(action) {
+  try {
+    const newOrder = yield call(addNewDeliveryPrice, action.payload);
+
+    yield put({ type: NEW_DELIVERY_PRICE, payload: newOrder });
+  } catch (err) {
+    console.error(err);
+    yield put({ type: NEW_DELIVERY_PRICE, payload: [] });
   }
 }
 
@@ -645,6 +667,7 @@ function* updateInChargeOfOrderWorker(action) {
 function* ordersWatcher() {
   yield takeLatest(GET_ORDERS_LIST, getOrdersListWatcher);
   yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
+  yield takeLatest(ADD_NEW_DELIVERY_PRICE, addNewDeliveryPriceWatcher);
   yield takeLatest(ADD_DATA_SHIP_ORDER, addDataShipOrderWatcher);
   yield takeLatest(ADD_ORDER_DESCRIPTION, addDescriptionOrderWatcher);
   yield takeLatest(ADD_SECONDARY_CONTACT, addSecondaryContactWatcher);

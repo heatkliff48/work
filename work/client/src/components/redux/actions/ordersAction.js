@@ -31,6 +31,7 @@ import {
   GET_UPDATE_REL_MAT_PRODUCTS_OF_ORDER,
   GET_DELETE_REL_MAT_OF_ORDER,
   DELETE_SECONDARY_CONTACT,
+  ADD_NEW_DELIVERY_PRICE,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -42,6 +43,13 @@ export const getOrders = () => {
 export const addNewOrder = (order) => {
   return {
     type: ADD_NEW_ORDER,
+    payload: order,
+  };
+};
+
+export const addNewDeliveryPrice = (order) => {
+  return {
+    type: ADD_NEW_DELIVERY_PRICE,
     payload: order,
   };
 };

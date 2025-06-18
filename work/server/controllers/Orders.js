@@ -18,6 +18,7 @@ const {
   ADD_SECONDARY_CONTACT_ORDER_SOCKET,
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   DELETE_SECONDARY_CONTACT_ORDER_SOCKET,
+  ADD_NEW_DELIVERY_PRICE_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -48,6 +49,20 @@ class OrdersController {
       myEmitter.emit(ADD_NEW_ORDER_SOCKET, newOrder);
 
       return res.status(200).json(newOrder);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async addDeliveryPrice(req, res) {
+    const { order_id, delivery } = req.body;
+
+    try {
+      await OrdersService.addDeliveryPrice({ order_id, delivery });
+
+      myEmitter.emit(ADD_NEW_DELIVERY_PRICE_SOCKET, { order_id, delivery });
+
+      return res.status(200).json({ order_id, delivery });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

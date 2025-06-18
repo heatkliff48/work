@@ -56,6 +56,7 @@ import {
   NEW_ALDABARAN_SOCKET,
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   REMOVE_SECONDARY_CONTACT_ORDER_SOCKET,
+  NEW_DELIVERY_PRICE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -97,6 +98,13 @@ export const addNewOrderSocket = (newOrder) => {
   return {
     type: NEW_ORDER_SOCKET,
     payload: newOrder,
+  };
+};
+
+export const addNewDeliveryPriceSocket = (price) => {
+  return {
+    type: NEW_DELIVERY_PRICE_SOCKET,
+    payload: price,
   };
 };
 
