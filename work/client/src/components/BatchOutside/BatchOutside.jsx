@@ -1,20 +1,19 @@
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
-import BatchOutsideModal from './BatchOutsideModal';
+// import { useProductsContext } from '#components/contexts/ProductContext.js';
+// import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+// import BatchOutsideModal from './BatchOutsideModal';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const BatchOutside = () => {
-  const [modalShow, setModalShow] = useState(false);
+  // const [modalShow, setModalShow] = useState(false);
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-  const { setCurrentOrderedProducts, setCurrentBatchId, setCurrentBatch } =
-    useWarehouseContext();
-  const { latestProducts } = useProductsContext();
+  // const { setCurrentOrderedProducts, setCurrentBatchId, setCurrentBatch } = useWarehouseContext();
+  // const { latestProducts } = useProductsContext();
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -23,9 +22,7 @@ const BatchOutside = () => {
 
   const [batchOutsideDataList, setBatchOutsideDataList] = useState([]);
 
-  const list_of_ordered_production = useSelector(
-    (state) => state.listOfOrderedProduction
-  );
+  // const list_of_ordered_production = useSelector((state) => state.listOfOrderedProduction );
 
   const batch_outside_table = [
     {
@@ -56,19 +53,19 @@ const BatchOutside = () => {
     }
   }, [batchOutside]);
 
-  const batchOutsideHandler = (id) => {
-    const currBatch = batchOutside.find((el) => el.id === id);
-    setCurrentBatchId(currBatch.id);
-    setCurrentBatch(currBatch);
-    const currOrderedProduction = currBatch?.id_list_of_ordered_production
-      ? list_of_ordered_production.find(
-          (el) => el.id === currBatch.id_list_of_ordered_production
-        )
-      : latestProducts.find((el) => el.article === currBatch.product_article);
+  // const batchOutsideHandler = (id) => {
+  //   const currBatch = batchOutside.find((el) => el.id === id);
+  //   setCurrentBatchId(currBatch.id);
+  //   setCurrentBatch(currBatch);
+  //   const currOrderedProduction = currBatch?.id_list_of_ordered_production
+  //     ? list_of_ordered_production.find(
+  //         (el) => el.id === currBatch.id_list_of_ordered_production
+  //       )
+  //     : latestProducts.find((el) => el.article === currBatch.product_article);
 
-    setCurrentOrderedProducts(currOrderedProduction);
-    setModalShow(true);
-  };
+  //   setCurrentOrderedProducts(currOrderedProduction);
+  //   setModalShow(true);
+  // };
 
   useEffect(() => {
     if (user && roles.length > 0) {
@@ -96,12 +93,12 @@ const BatchOutside = () => {
         tableName={'Production plan'}
         userAccess={userAccess}
         handleRowClick={(row) => {
-          batchOutsideHandler(row.original.id);
+          // batchOutsideHandler(row.original.id);
         }}
       />
-      {userAccess?.canWrite && (
+      {/* {userAccess?.canWrite && (
         <BatchOutsideModal show={modalShow} onHide={() => setModalShow(false)} />
-      )}
+      )} */}
     </Fragment>
   );
 };
