@@ -28,6 +28,15 @@ class OrdersRepository {
       return error;
     }
   }
+  static async addDeliveryPrice({ delivery, order_id }) {
+    try {
+      await Orders.update({ delivery }, { where: { id: order_id } });
+
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
 
   static async addShippingDateOrder({ order_id, shipping_date }) {
     try {

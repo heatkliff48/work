@@ -10,6 +10,7 @@ router.get('/anchor_products', OrdersController.getAnchorProductsOfOrder);
 router.get('/tool_products', OrdersController.getToolProductsOfOrder);
 router.get('/rel_mat_products', OrdersController.getRelMatProductsOfOrder);
 router.post('/add', OrdersController.addNewOrder);
+router.post('/delivery', OrdersController.addDeliveryPrice);
 router.post('/date', OrdersController.addShippingDateOrder);
 router.post('/desc', OrdersController.addDescriptionOrder);
 router.post('/sec_cnt', OrdersController.addSecondaryContact);

@@ -4,6 +4,9 @@ export const ORDERS_LIST = 'ORDERS_LIST';
 export const ADD_NEW_ORDER = 'ADD_NEW_ORDER';
 export const NEW_ORDER = 'NEW_ORDER';
 
+export const ADD_NEW_DELIVERY_PRICE = 'ADD_NEW_DELIVERY_PRICE';
+export const NEW_DELIVERY_PRICE = 'NEW_DELIVERY_PRICE';
+
 export const ADD_DATA_SHIP_ORDER = 'ADD_DATA_SHIP_ORDER';
 export const DATA_SHIP_ORDER = 'DATA_SHIP_ORDER';
 

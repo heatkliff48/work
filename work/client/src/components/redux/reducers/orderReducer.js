@@ -10,6 +10,7 @@ import {
 import {
   DATASHIP_ORDER_SOCKET,
   DESCRIPTIOM_ORDER_SOCKET,
+  NEW_DELIVERY_PRICE_SOCKET,
   NEW_ORDER_SOCKET,
   PERSON_IN_CHARGE_OF_ORDER_SOCKET,
   REMOVE_SECONDARY_CONTACT_ORDER_SOCKET,
@@ -27,6 +28,20 @@ export const ordersReducer = (orders = [], action) => {
     case NEW_ORDER_SOCKET: {
       return [...orders, payload];
     }
+
+    case NEW_DELIVERY_PRICE_SOCKET: {
+      const { order_id, delivery } = payload;
+
+      const result = orders.map((order) => {
+        if (order.id === order_id) {
+          return { ...order, delivery };
+        }
+        return order;
+      });
+
+      return result;
+    }
+
     case NEW_ORDER: {
       if (orders.find((order) => order.id === payload.id)) return orders;
 
