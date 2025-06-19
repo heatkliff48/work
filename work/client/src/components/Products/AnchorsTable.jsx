@@ -64,25 +64,27 @@ const AnchorsTable = () => {
     setModalShow(true);
   };
 
-  // useEffect(() => {
-  //   if (user && roles.length > 0) {
-  //     const access = checkUserAccess(user, roles, 'batch_outside');
-  //     setUserAccess(access);
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Products');
+      setUserAccess(access);
 
-  //     if (!access.canRead) {
-  //       navigate('/');
-  //     }
-  //   }
-  // }, [user, roles]);
+      if (!access.canRead) {
+        navigate('/');
+      }
+    }
+  }, [user, roles]);
 
   return (
     <Fragment>
-      <ShowProductsTypeJournalModal
-        table={COLUMNS_ANCHOR_PRODUCT}
-        target={3}
-        title={'fastener'}
-        productCode={productCode}
-      />{' '}
+      {userAccess?.canWrite && (
+        <ShowProductsTypeJournalModal
+          table={COLUMNS_ANCHOR_PRODUCT}
+          target={3}
+          title={'fastener'}
+          productCode={productCode}
+        />
+      )}{' '}
       <Table
         COLUMN_DATA={COLUMNS_ANCHOR_PRODUCT}
         dataOfTable={anchorDataList}

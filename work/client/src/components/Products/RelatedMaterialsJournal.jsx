@@ -14,6 +14,7 @@ const RelatedMaterialsJournal = () => {
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [relatedMaterialsJournalDataList, setRelatedMaterialsJournalDataList] =
     useState([]);
@@ -46,31 +47,31 @@ const RelatedMaterialsJournal = () => {
     setModalShow(true);
   };
 
-  // useEffect(() => {
-  //   if (user && roles.length > 0) {
-  //     const access = checkUserAccess(user, roles, 'batch_outside');
-  //     setUserAccess(access);
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Products');
+      setUserAccess(access);
 
-  //     if (!access.canRead) {
-  //       navigate('/');
-  //     }
-  //   }
-  // }, [user, roles]);
+      if (!access.canRead) {
+        navigate('/');
+      }
+    }
+  }, [user, roles]);
 
   useEffect(() => {
-    // if (userAccess?.canRead) {
     dispatch(getRelatedMaterialsJournal());
-    // }
   }, []);
 
   return (
     <Fragment>
-      <ShowProductsTypeJournalModal
-        table={COLUMNS_RELATED_MATERIALS_JOURNAL}
-        target={2}
-        title={'related material'}
-        productCode={productCode}
-      />{' '}
+      {userAccess?.canWrite && (
+        <ShowProductsTypeJournalModal
+          table={COLUMNS_RELATED_MATERIALS_JOURNAL}
+          target={2}
+          title={'related material'}
+          productCode={productCode}
+        />
+      )}{' '}
       <Table
         COLUMN_DATA={COLUMNS_RELATED_MATERIALS_JOURNAL}
         dataOfTable={relatedMaterialsJournalDataList}

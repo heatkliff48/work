@@ -969,14 +969,21 @@ const OrderCart = React.memo(() => {
                   <textarea
                     placeholder="Enter description..."
                     value={newDescription}
+                    disabled={
+                      !checkUserAccess(user, roles, 'orders_description_edit')
+                        ?.canWrite
+                    }
                     onChange={(e) => setNewDescription(e.target.value)}
                   />
-                  <button
-                    className="save-button"
-                    onClick={() => onSaveDescription(newDescription)}
-                  >
-                    Save
-                  </button>
+                  {checkUserAccess(user, roles, 'orders_description_edit')
+                    ?.canWrite && (
+                    <button
+                      className="save-button"
+                      onClick={() => onSaveDescription(newDescription)}
+                    >
+                      Save
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -1128,27 +1135,34 @@ const OrderCart = React.memo(() => {
                       }));
                     }}
                     readOnly={orderCartData?.status < 3 ? false : true}
+                    disabled={
+                      !checkUserAccess(user, roles, 'orders_save_delivery_price')
+                        ?.canWrite
+                    }
                   />
-                  <button
-                    style={{
-                      padding: '4px 10px',
-                      marginLeft: '20px',
-                    }}
-                    onClick={() => {
-                      console.log({
-                        order_id: orderCartData.id,
-                        delivery: orderCartData.delivery,
-                      });
-                      dispatch(
-                        addNewDeliveryPrice({
+                  {checkUserAccess(user, roles, 'orders_description_edit')
+                    ?.canWrite && (
+                    <button
+                      style={{
+                        padding: '4px 10px',
+                        marginLeft: '20px',
+                      }}
+                      onClick={() => {
+                        console.log({
                           order_id: orderCartData.id,
                           delivery: orderCartData.delivery,
-                        })
-                      );
-                    }}
-                  >
-                    Save
-                  </button>
+                        });
+                        dispatch(
+                          addNewDeliveryPrice({
+                            order_id: orderCartData.id,
+                            delivery: orderCartData.delivery,
+                          })
+                        );
+                      }}
+                    >
+                      Save
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="vat_result">

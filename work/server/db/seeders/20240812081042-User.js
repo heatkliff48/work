@@ -13,22 +13,6 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
-        {
-          username: 'ag@baublock.com',
-          email: 'ag@baublock.com',
-          password: '$2a$12$JHhE.UMdF3K57QxLhalcN.Ih8m5a/j35XsKI4gpb6lX7COBKll7hK',
-          role: 16,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          username: 'abb@baublock.com',
-          email: 'abb@baublock.com',
-          password: '$2a$12$xiOAWye2RQ2moUP3ref8Su0eXpPdj7hKL2rGIrpoYShttckVjm9QC',
-          role: 13,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
       ],
       {}
     );

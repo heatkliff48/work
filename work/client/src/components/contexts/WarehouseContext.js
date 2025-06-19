@@ -484,8 +484,6 @@ const WarehouseContextProvider = ({ children }) => {
       ...list_of_ordered_production,
     ];
 
-    console.log('combinedList', combinedList);
-
     // console.log(
     //   'related_materials_backorder_list',
     //   related_materials_backorder_list
@@ -515,22 +513,14 @@ const WarehouseContextProvider = ({ children }) => {
     const fullyReservedOrders = Array.from(ordersMap.entries())
       .filter(([orderArticle, items]) => {
         // Проверяем, что ВСЕ позиции заказа имеют quantity === quantity_in_warehouse
-        // console.log(
-        //   'ITEMS EVERY RESERVED',
-        //   items.every((item) => item.quantity === item.quantity_in_warehouse)
-        // );
         return items.every((item) => item.quantity === item.quantity_in_warehouse);
       })
       .map(([orderArticle]) => orderArticle); // Извлекаем только order_article
-
-    console.log('fullyReservedOrders', fullyReservedOrders);
 
     fullyReservedOrders.forEach((order_article) => {
       const currOrder = list_of_orders.find(
         (order) => order.article === order_article
       );
-
-      // console.log('currOrder', currOrder);
 
       if (currOrder?.id && !order_status.includes(currOrder?.status)) {
         dispatch(
@@ -580,10 +570,6 @@ const WarehouseContextProvider = ({ children }) => {
     productsOfOrders,
     dryMixedProductsOfOrders,
   ]);
-
-  useEffect(() => {
-    console.log('Current list_of_ordered_production:', list_of_ordered_production);
-  }, [list_of_ordered_production]);
 
   return (
     <WarehouseContext.Provider

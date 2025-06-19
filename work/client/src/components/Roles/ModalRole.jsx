@@ -21,7 +21,6 @@ function ModalRole() {
   useEffect(() => {
     if (role && pages) {
       const rolePermissions = role.PageAndRolesArray || [];
-      console.log('role', role);
       setPermissions(
         pages.map((page) => {
           const pageInfo = rolePermissions.find((p) => p.id === page.id);
@@ -64,10 +63,6 @@ function ModalRole() {
     setModalRoleCard(false);
   };
 
-  if (!role || !pages || permissions.length === 0) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <Modal
       isOpen={modalRoleCard}
@@ -75,7 +70,7 @@ function ModalRole() {
       className="role-modal"
     >
       <ModalHeader toggle={() => setModalRoleCard(false)} className="role-header">
-        {role.role_name}
+        {role?.role_name}
       </ModalHeader>
       <ModalBody>
         <div className="permissions-table">
@@ -86,7 +81,6 @@ function ModalRole() {
           </div>
           {permissions.map((perm) => (
             <div key={perm.page_id} className="table-row">
-              {/* {console.log('permissions', perm)} */}
               <div>{pages.find((page) => page.id === perm.page_id)?.page_name}</div>
               <div>
                 <input
