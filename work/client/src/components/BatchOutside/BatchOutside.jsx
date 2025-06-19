@@ -69,7 +69,7 @@ const BatchOutside = () => {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'batch_outside');
+      const access = checkUserAccess(user, roles, 'production_plan');
       setUserAccess(access);
 
       if (!access.canRead) {

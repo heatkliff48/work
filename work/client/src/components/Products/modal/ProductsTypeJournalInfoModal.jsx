@@ -19,8 +19,11 @@ import {
 import ShowProductsTypeJournalModal from './ProductsTypeJournalModal';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { useNavigate } from 'react-router-dom';
 
 function ProductsTypeJournalInfoModal(props) {
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const {
     COLUMNS_DRY_MIXED_PRODUCT,
     COLUMNS_ANCHOR_PRODUCT,
@@ -47,6 +50,7 @@ function ProductsTypeJournalInfoModal(props) {
       ? state.anchor
       : state.tool
   );
+  const user = useSelector((state) => state.user);
   const [isChecked, setIsChecked] = useState(selectedProductsType?.active_status);
   const [lastVersion, setLastVersion] = useState(1);
   const [productByVersion, setProductByVersion] = useState();
@@ -88,6 +92,7 @@ function ProductsTypeJournalInfoModal(props) {
   ]);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleStatusChange = () => {
     setIsChecked(!isChecked);
@@ -192,18 +197,18 @@ function ProductsTypeJournalInfoModal(props) {
     setLastVersion(1);
   };
 
-  // useEffect(() => {
-  //   if (user && roles.length > 0) {
-  //     const access = checkUserAccess(user, roles, 'recipe_products');
-  //     setUserAccess(access);
+  useEffect(() => {
+    if (user && roles.length > 0) {
+      const access = checkUserAccess(user, roles, 'Products');
+      setUserAccess(access);
 
-  //     console.log('access', access);
+      console.log('access', access);
 
-  //     if (!access?.canRead) {
-  //       navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
-  //     }
-  //   }
-  // }, [user, roles]);
+      if (!access?.canRead) {
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+      }
+    }
+  }, [user, roles]);
 
   return (
     <>
@@ -257,14 +262,16 @@ function ProductsTypeJournalInfoModal(props) {
                     options={productByVersion}
                     value={currentVersion}
                   />
-                  <div>
-                    <h5>Change product's availability status</h5>
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={handleStatusChange}
-                    />
-                  </div>
+                  {userAccess?.canWrite && (
+                    <div>
+                      <h5>Change product's availability status</h5>
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={handleStatusChange}
+                      />
+                    </div>
+                  )}
                   <BarcodeGenerator
                     productCode={selectedProductsType?.product_code}
                   />
@@ -274,76 +281,82 @@ function ProductsTypeJournalInfoModal(props) {
           </Container>
         </Modal.Body>
         <Modal.Footer>
-          <ShowProductsTypeJournalModal
-            table={
-              props.target == 1
-                ? COLUMNS_DRY_MIXED_PRODUCT
-                : props.target == 2
-                ? COLUMNS_RELATED_MATERIALS_JOURNAL
-                : props.target == 3
-                ? COLUMNS_ANCHOR_PRODUCT
-                : COLUMNS_TOOLS_PRODUCT
-            }
-            target={props.target}
-            title={
-              props.target == 1
-                ? 'dry mix'
-                : props.target == 2
-                ? 'related material'
-                : props.target == 3
-                ? 'fastener'
-                : 'tool'
-            }
-            productCode={selectedProductsType?.productCode}
-            disabled={repairButton}
-            repair={true}
-          />
-          <ShowProductsTypeJournalModal
-            table={
-              props.target == 1
-                ? COLUMNS_DRY_MIXED_PRODUCT
-                : props.target == 2
-                ? COLUMNS_RELATED_MATERIALS_JOURNAL
-                : props.target == 3
-                ? COLUMNS_ANCHOR_PRODUCT
-                : COLUMNS_TOOLS_PRODUCT
-            }
-            target={props.target}
-            title={
-              props.target == 1
-                ? 'dry mix'
-                : props.target == 2
-                ? 'related material'
-                : props.target == 3
-                ? 'fastener'
-                : 'tool'
-            }
-            productCode={selectedProductsType?.productCode}
-            addNewVersion={true}
-          />
-          <ShowProductsTypeJournalModal
-            table={
-              props.target == 1
-                ? COLUMNS_DRY_MIXED_PRODUCT
-                : props.target == 2
-                ? COLUMNS_RELATED_MATERIALS_JOURNAL
-                : props.target == 3
-                ? COLUMNS_ANCHOR_PRODUCT
-                : COLUMNS_TOOLS_PRODUCT
-            }
-            target={props.target}
-            title={
-              props.target == 1
-                ? 'dry mix'
-                : props.target == 2
-                ? 'related material'
-                : props.target == 3
-                ? 'fastener'
-                : 'tool'
-            }
-            productCode={selectedProductsType?.productCode}
-            duplicate={true}
-          />
+          {userAccess?.canWrite && (
+            <ShowProductsTypeJournalModal
+              table={
+                props.target == 1
+                  ? COLUMNS_DRY_MIXED_PRODUCT
+                  : props.target == 2
+                  ? COLUMNS_RELATED_MATERIALS_JOURNAL
+                  : props.target == 3
+                  ? COLUMNS_ANCHOR_PRODUCT
+                  : COLUMNS_TOOLS_PRODUCT
+              }
+              target={props.target}
+              title={
+                props.target == 1
+                  ? 'dry mix'
+                  : props.target == 2
+                  ? 'related material'
+                  : props.target == 3
+                  ? 'fastener'
+                  : 'tool'
+              }
+              productCode={selectedProductsType?.productCode}
+              disabled={repairButton}
+              repair={true}
+            />
+          )}
+          {userAccess?.canWrite && (
+            <ShowProductsTypeJournalModal
+              table={
+                props.target == 1
+                  ? COLUMNS_DRY_MIXED_PRODUCT
+                  : props.target == 2
+                  ? COLUMNS_RELATED_MATERIALS_JOURNAL
+                  : props.target == 3
+                  ? COLUMNS_ANCHOR_PRODUCT
+                  : COLUMNS_TOOLS_PRODUCT
+              }
+              target={props.target}
+              title={
+                props.target == 1
+                  ? 'dry mix'
+                  : props.target == 2
+                  ? 'related material'
+                  : props.target == 3
+                  ? 'fastener'
+                  : 'tool'
+              }
+              productCode={selectedProductsType?.productCode}
+              addNewVersion={true}
+            />
+          )}
+          {userAccess?.canWrite && (
+            <ShowProductsTypeJournalModal
+              table={
+                props.target == 1
+                  ? COLUMNS_DRY_MIXED_PRODUCT
+                  : props.target == 2
+                  ? COLUMNS_RELATED_MATERIALS_JOURNAL
+                  : props.target == 3
+                  ? COLUMNS_ANCHOR_PRODUCT
+                  : COLUMNS_TOOLS_PRODUCT
+              }
+              target={props.target}
+              title={
+                props.target == 1
+                  ? 'dry mix'
+                  : props.target == 2
+                  ? 'related material'
+                  : props.target == 3
+                  ? 'fastener'
+                  : 'tool'
+              }
+              productCode={selectedProductsType?.productCode}
+              duplicate={true}
+            />
+          )}
           <Button onClick={props.onHide}>Close</Button>
         </Modal.Footer>
       </Modal>

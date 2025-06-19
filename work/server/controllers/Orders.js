@@ -394,7 +394,6 @@ class OrdersController {
   }
 
   static async getUpdateInChargeOrder(req, res) {
-    console.log('-------------------------req.body', req.body);
     const { person_in_charge, order_id } = req.body;
 
     try {

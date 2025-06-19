@@ -7,12 +7,27 @@ module.exports = {
       'Pages',
       [
         {
+          page_name: 'Users_info' /* Admin */,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          page_name: 'Roles', // Admin
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          page_name: 'warehouse_manager',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
           page_name: 'Products',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          page_name: 'Clients',
+          page_name: 'Statistics',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -32,27 +47,43 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
-          page_name: 'Users_info' /* Admin */,
+          page_name: 'orders_change_person_in_charge',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          page_name: 'orders_description_edit',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          page_name: 'orders_save_delivery_price',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          page_name: 'orders_files',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          page_name: 'accounting',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          page_name: 'Clients',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+
         {
           page_name: 'Warehouse', // Head of sales department(write)
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          page_name: 'Warehouse_reservation',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
           page_name: 'Warehouse_modal_upload_file',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          page_name: 'Roles', // Admin
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -72,12 +103,12 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
-          page_name: 'batch_outside',
+          page_name: 'related_materials_backorder_list',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          page_name: 'batch_outside_add_to_warehouse',
+          page_name: 'production_plan',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -97,7 +128,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
-          page_name: 'orders_change_person_in_charge',
+          page_name: 'quality_management',
           createdAt: new Date(),
           updatedAt: new Date(),
         },

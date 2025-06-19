@@ -85,18 +85,25 @@ function Main() {
     <div className="main-container">
       <h1 className="main-title">Main Page</h1>
       <div className="button-container">
-        <button
-          className="nav-button"
-          onClick={() => navigate('/warehouse_manager')}
-        >
-          Warehouse Manager
-        </button>
-
+        {checkUserAccess(user, roles, 'Users_info')?.canRead && (
+          <button className="nav-button" onClick={() => navigate('/users_info')}>
+            Users Info
+          </button>
+        )}
         {checkUserAccess(user, roles, 'Roles')?.canRead && (
           <button className="nav-button" onClick={() => navigate('/roles')}>
             Roles
           </button>
         )}
+        {checkUserAccess(user, roles, 'warehouse_manager')?.canRead && (
+          <button
+            className="nav-button"
+            onClick={() => navigate('/warehouse_manager')}
+          >
+            Warehouse Manager
+          </button>
+        )}
+
         {checkUserAccess(user, roles, 'Products')?.canRead && (
           <button
             className="nav-button"
@@ -105,16 +112,17 @@ function Main() {
             Products Type Journal
           </button>
         )}
-        <button className="nav-button" onClick={() => navigate('/statistics')}>
-          Statistics
-        </button>
-
+        {checkUserAccess(user, roles, 'Statistics')?.canRead && (
+          <button className="nav-button" onClick={() => navigate('/statistics')}>
+            Statistics
+          </button>
+        )}
         {checkUserAccess(user, roles, 'Orders')?.canRead && (
           <button className="nav-button" onClick={() => navigate('/orders')}>
             Orders
           </button>
         )}
-        {checkUserAccess(user, roles, 'Orders')?.canRead && (
+        {checkUserAccess(user, roles, 'accounting')?.canRead && (
           <button className="nav-button" onClick={() => navigate('/accounting')}>
             Accounting
           </button>
@@ -130,11 +138,6 @@ function Main() {
             onClick={() => navigate('/warehouse_products_type')}
           >
             Warehouse
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'Users_info')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/users_info')}>
-            Users Info
           </button>
         )}
         {/* {checkUserAccess(user, roles, 'Production_batch_log')?.canRead && (
@@ -166,7 +169,8 @@ function Main() {
             List of ordered production OEM
           </button>
         )}
-        {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
+        {checkUserAccess(user, roles, 'related_materials_backorder_list')
+          ?.canRead && (
           <button
             className="nav-button"
             onClick={() => navigate('/related_materials_backorder_list')}
@@ -174,7 +178,7 @@ function Main() {
             Related materials backorder list
           </button>
         )}
-        {checkUserAccess(user, roles, 'batch_outside')?.canRead && (
+        {checkUserAccess(user, roles, 'production_plan')?.canRead && (
           <button className="nav-button" onClick={() => navigate('/batch_outside')}>
             Production Plan
           </button>
@@ -200,14 +204,14 @@ function Main() {
             Recipe Orders
           </button>
         )}
-        {/* {checkUserAccess(user, roles, 'quality_management')?.canRead && ( */}
-        <button
-          className="nav-button"
-          onClick={() => navigate('/quality_management')}
-        >
-          Quality Management
-        </button>
-        {/* )} */}
+        {checkUserAccess(user, roles, 'quality_management')?.canRead && (
+          <button
+            className="nav-button"
+            onClick={() => navigate('/quality_management')}
+          >
+            Quality Management
+          </button>
+        )}
       </div>
     </div>
   );

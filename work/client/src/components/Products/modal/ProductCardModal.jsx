@@ -192,13 +192,6 @@ const ProductCardModal = React.memo(() => {
     qualityManagementData,
   ]);
 
-  useEffect(()=>{
-
-    console.log('isRepaer', isRepair);
-    console.log('isEdit', isEdit);
-
-  }, [isEdit, isRepair])
-
   useEffect(() => {
     const searchArticle = productCardData.article
       ? productCardData.article.slice(0, productCardData.article.length)
@@ -312,6 +305,16 @@ const ProductCardModal = React.memo(() => {
                 >
                   Repair
                 </Button>
+                <Button
+                  color="primary"
+                  onClick={() => {
+                    setIsRepair(false);
+                    setIsEdit(false);
+                    setIsModalWindowOpen(true);
+                  }}
+                >
+                  Duplicate
+                </Button>
               </div>
             )}
             {isModalWindowOpen && (
@@ -324,16 +327,6 @@ const ProductCardModal = React.memo(() => {
                 isEdit={isEdit}
               />
             )}
-            <Button
-              color="primary"
-              onClick={() => {
-                setIsRepair(false);
-                setIsEdit(false);
-                setIsModalWindowOpen(true);
-              }}
-            >
-              Duplicate
-            </Button>
           </div>
         </ModalFooter>
       </Modal>

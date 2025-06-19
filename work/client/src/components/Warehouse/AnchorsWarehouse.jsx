@@ -35,7 +35,9 @@ function Warehouse() {
 
   return (
     <>
-      <ShowProductsTypeWarehouseModal target={3} title={'fastener'} />
+      {userAccess?.canWrite && (
+        <ShowProductsTypeWarehouseModal target={3} title={'fastener'} />
+      )}
 
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE}
