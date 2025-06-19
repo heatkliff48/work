@@ -4,6 +4,7 @@ import autoTable from 'jspdf-autotable';
 import image from './headerPDF.jpg';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
 const loadImage = () => {
   return new Promise((resolve, reject) => {
@@ -21,11 +22,22 @@ const WMOPdf = ({ orderCartData, toggle }) => {
     saveHandler,
     additionalInfoPDF,
     aldabaranNum,
+    getProductType,
   } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
+  const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
+    useProductsTypeJournalContext();
 
   const [pdfUrl, setPdfUrl] = useState(null);
   const [pdfData, setPdfData] = useState({});
+
+  const productMap = {
+    product: latestProducts,
+    dryMixed: latestDryMix,
+    anchor: latestAnchors,
+    tool: latestTools,
+    relMat: latestRelatedMaterials,
+  };
 
   const generatePDF = async () => {
     if (!orderCartData) {
@@ -145,24 +157,28 @@ const WMOPdf = ({ orderCartData, toggle }) => {
 
     const pdfProducts = wmoctProduct?.map((prod) => {
       const { article, shipped } = prod;
+      const type = getProductType(article);
       const bd_ship = wmoctProductShippedBD.find((el) => el.article == article);
-      const product = latestProducts.find((el) => el.article == article);
+      const productArr = productMap[type];
+      const product = productArr.find((el) => el.article == article);
 
-      const descripcion = `BAUBLOCK®${
-        product.tradingMark
-      } ${product.lengths.toString()}x${product.width}x${product.height}mm ${
-        product.density
-      }kg/m³`;
+      const descripcion = product?.name
+        ? `BAUBLOCK®${product?.name} `
+        : `BAUBLOCK®${product?.tradingMark} ${product?.lengths.toString()}x${
+            product?.width
+          }x${product?.height}mm ${product?.density}kg/m³`;
 
       pallet_sum += shipped - bd_ship?.shipped;
 
       const palet = shipped - bd_ship?.shipped;
 
-      const unidades = palet * product.quantityBlockOnPallet;
+      const valuue = product?.quantityBlockOnPallet ?? product?.units_per_pallet;
+
+      const unidades = palet * valuue;
 
       if (palet == 0) return {};
 
-      pallet_weight += product.weightDef;
+      pallet_weight += product?.weightDef;
       return {
         código: article,
         descripcion,

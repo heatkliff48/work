@@ -3,9 +3,25 @@ import { Fragment, useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
-  const { warehouse_data } = useWarehouseContext();
   const [wmoctmodal, setWmoctModal] = useState();
-  const { wmoctProduct, setWmoctProduct } = useWarehouseContext();
+  const {
+    wmoctProduct,
+    setWmoctProduct,
+    getProductType,
+    warehouse_data,
+    dry_mixes_warehouse_data,
+    anchors_warehouse_data,
+    tools_warehouse_data,
+    related_materials_warehouse_data,
+  } = useWarehouseContext();
+
+  const warehouseMap = {
+    product: warehouse_data,
+    dryMixed: dry_mixes_warehouse_data,
+    anchor: anchors_warehouse_data,
+    tool: tools_warehouse_data,
+    relMat: related_materials_warehouse_data,
+  };
 
   const onClickHandler = (batch) => {
     setWmoctProduct((prev) => {
@@ -29,8 +45,19 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
   };
 
   useEffect(() => {
-    const result = warehouse_data
-      .filter((el) => el.product_article == selectedProduct)
+    if (!selectedProduct) return;
+    const type = getProductType(selectedProduct);
+    const wh_arr = warehouseMap[type];
+    const result = wh_arr
+      .filter((el) => {
+        const product_article =
+          el.product_article ||
+          el.dry_mixed_article ||
+          el.anchor_article ||
+          el.tool_article ||
+          el.rel_mat_article;
+        return product_article == selectedProduct;
+      })
       .filter((warehouseItem) => {
         const isArticleInAnyWMOCTBatches = wmoctProduct.some((wmoctItem) => {
           return wmoctItem.batches.some((batchItem) => {

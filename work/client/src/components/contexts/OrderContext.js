@@ -439,7 +439,7 @@ const OrderContextProvider = ({ children }) => {
         secondaryContact,
         shipping_date: order?.shipping_date,
         person_in_charge: order?.person_in_charge,
-        delivery: order?.deliveryя,
+        delivery: order?.delivery,
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));

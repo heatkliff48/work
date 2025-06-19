@@ -8,6 +8,7 @@ import {
   updReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
 import { useProductsContext } from './ProductContext';
+import { updateDryMixesWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewAldabaran } from '#components/redux/actions/aldabaranAction.js';
@@ -121,6 +122,15 @@ const WarehouseContextProvider = ({ children }) => {
   );
   const anchors_warehouse_data = useSelector((state) => state.anchorsWarehouse);
   const tools_warehouse_data = useSelector((state) => state.toolsWarehouse);
+
+  const warehouseMap = {
+    product: warehouse_data,
+    dryMixed: dry_mixes_warehouse_data,
+    anchor: anchors_warehouse_data,
+    tool: tools_warehouse_data,
+    relMat: related_materials_warehouse_data,
+  };
+
   const list_of_reserved_products = useSelector((state) => state.reservedProducts);
   const list_of_ordered_production = useSelector(
     (state) => state.listOfOrderedProduction
@@ -239,8 +249,10 @@ const WarehouseContextProvider = ({ children }) => {
       const { orders_products_id, order_id } = el;
       orderId = order_id;
 
+      const type = getProductType(el.article);
+      const warehouse_arr = warehouseMap[type];
       el?.batches?.forEach((elem) => {
-        const wh = warehouse_data.find((el) => el.article == elem.batchId);
+        const wh = warehouse_arr.find((el) => el.article == elem.batchId);
 
         const haveReserve = list_of_reserved_products.find(
           (el) =>
@@ -259,6 +271,7 @@ const WarehouseContextProvider = ({ children }) => {
             warehouse_id: wh.id,
             total_quantity: wh.total_quantity - elem.allocated,
             ordered_quantity: wh.ordered_quantity - elem.allocated,
+            type,
           });
         }
 
@@ -269,14 +282,27 @@ const WarehouseContextProvider = ({ children }) => {
             warehouse_id: wh.id,
             total_quantity: wh.total_quantity + quantity,
             ordered_quantity: wh.ordered_quantity + quantity,
+            type,
           });
           dispatch(updReservedProducts(obj));
         }
       });
     });
 
+    console.log('wh_arr', wh_arr);
     wh_arr.forEach((el) => {
-      dispatch(updateWarehouseQuantitys(el));
+      const { warehouse_id, total_quantity, ordered_quantity, type } = el;
+      if (type == 'product') {
+        dispatch(
+          updateWarehouseQuantitys({
+            warehouse_id,
+            total_quantity,
+            ordered_quantity,
+          })
+        );
+      } else if (type == 'dryMixed') {
+        updateDryMixesWarehouse({ warehouse_id, total_quantity, ordered_quantity });
+      }
     });
 
     const allShipped = wmoctProduct.every((el) => el.qty_total === el.shipped);

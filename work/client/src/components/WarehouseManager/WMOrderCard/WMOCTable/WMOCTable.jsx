@@ -19,6 +19,10 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     setAldabaranNum,
     aldabaran,
     getProductType,
+    dry_mixes_warehouse_data,
+    anchors_warehouse_data,
+    tools_warehouse_data,
+    related_materials_warehouse_data,
   } = useWarehouseContext();
   const {
     productsOfOrders,
@@ -137,6 +141,14 @@ const WMOCTable = ({ product_list, orderCartData }) => {
 
       const productType = getProductType(article);
 
+      const warehouseMap = {
+        product: warehouse_data,
+        dryMixed: dry_mixes_warehouse_data,
+        anchor: anchors_warehouse_data,
+        tool: tools_warehouse_data,
+        relMat: related_materials_warehouse_data,
+      };
+      const wh_arr = warehouseMap[productType];
       const [arr, orderArr] = productMap[productType] || [[], []];
 
       const product_from_list_id = arr?.find((p) => p.article === article)?.id;
@@ -164,14 +176,17 @@ const WMOCTable = ({ product_list, orderCartData }) => {
       if (list_of_batches.length > 0) {
         list_of_batches.forEach((batch) => {
           const { quantity } = batch;
-          const wrh_item = warehouse_data.find((el) => el.id == batch.warehouse_id);
-          batches.push({
-            batchId: wrh_item.article,
-            remainingInBatch: wrh_item.ordered_quantity,
-            allocated: quantity,
-          });
-          shipped += quantity;
-          qty_rem -= quantity;
+
+          const wrh_item = wh_arr.find((el) => el.id == batch.warehouse_id);
+          if (wrh_item?.ordered_quantity >= quantity) {
+            batches.push({
+              batchId: wrh_item?.article,
+              remainingInBatch: wrh_item?.ordered_quantity,
+              allocated: quantity,
+            });
+            shipped += quantity;
+            qty_rem -= quantity;
+          }
         });
       }
 
