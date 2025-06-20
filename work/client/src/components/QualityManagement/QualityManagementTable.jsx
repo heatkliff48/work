@@ -260,12 +260,8 @@ const QualityManagementTable = () => {
         })
       );
 
-      // console.log('updatedReserves', updatedReserves);
-
       for (const ordered_production of updatedReserves) {
-        // console.log('ordered_production', ordered_production);
         await dispatch(updListOfOrderedProduction(ordered_production));
-        // await dispatch(getListOfOrderedProduction());
       }
       await dispatch(deleteQualityManagement(id));
       if (production_plan_id) {

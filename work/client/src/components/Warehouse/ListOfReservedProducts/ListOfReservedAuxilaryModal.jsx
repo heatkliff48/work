@@ -53,20 +53,12 @@ function ListOfReservedAuxilaryModal(props) {
       : tools_warehouse_data.find((wh) => wh.id === warehouseInfoCurIdModal);
 
   useEffect(() => {
-    console.log(
-      'related_materials_backorder_list',
-      related_materials_backorder_list
-    );
     const curr_res_prod_list = related_materials_backorder_list.filter(
       (el) => el?.product_article == curr_warehouse?.product_article
     );
 
     setCurrentListOfResProd(curr_res_prod_list);
   }, [related_materials_backorder_list, warehouseInfoCurIdModal]);
-
-  useEffect(() => {
-    console.log('currentListOfResProd', currentListOfResProd);
-  }, [currentListOfResProd]);
 
   useEffect(() => {
     if (user && roles.length > 0) {

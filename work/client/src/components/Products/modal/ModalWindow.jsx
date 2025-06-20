@@ -36,10 +36,6 @@ const ModalWindow = React.memo(
       'normOfBrack',
       'humidity',
     ];
-    useEffect(() => {
-      console.log('isRepaer', isRepair);
-      console.log('isEdit', isEdit);
-    }, [isEdit, isRepair]);
 
     const clearData = () => {
       setTrMark('');
