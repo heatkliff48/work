@@ -1148,10 +1148,6 @@ const OrderCart = React.memo(() => {
                         marginLeft: '20px',
                       }}
                       onClick={() => {
-                        console.log({
-                          order_id: orderCartData.id,
-                          delivery: orderCartData.delivery,
-                        });
                         dispatch(
                           addNewDeliveryPrice({
                             order_id: orderCartData.id,

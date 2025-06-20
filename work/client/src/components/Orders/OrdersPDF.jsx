@@ -418,7 +418,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       const total = prod.total;
 
       const pvp_neto_ud = (prod.final_price / total).toFixed(2);
-console.log('pdfRelMat', pdfRelMat);
+
       return {
         ref: pdfRelMat?.article,
         descripcion: pdfRelMat?.description,

@@ -117,12 +117,6 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
     setIsRepair(false);
   };
 
-  useEffect(() => {
-    console.log('isRepaer', isRepair);
-    console.log('isEdit', isEdit);
-    console.log('previewOperationName',previewOperationName );
-  }, [isEdit, isRepair]);
-
   return (
     <div>
       <Modal isOpen={previewProductModal} toggle={toggle} size="lg">

@@ -289,7 +289,6 @@ const WarehouseContextProvider = ({ children }) => {
       });
     });
 
-    console.log('wh_arr', wh_arr);
     wh_arr.forEach((el) => {
       const { warehouse_id, total_quantity, ordered_quantity, type } = el;
       if (type == 'product') {
@@ -484,11 +483,6 @@ const WarehouseContextProvider = ({ children }) => {
       ...list_of_ordered_production,
     ];
 
-    // console.log(
-    //   'related_materials_backorder_list',
-    //   related_materials_backorder_list
-    // );
-
     // // Группируем все позиции по order_article
     // const ordersMap = related_materials_backorder_list.reduce((acc, item) => {
     //   if (!acc.has(item.order_article)) {
@@ -506,8 +500,6 @@ const WarehouseContextProvider = ({ children }) => {
       acc.get(item.order_article).push(item);
       return acc;
     }, new Map());
-
-    // console.log('ordersMap', ordersMap);
 
     // Проверяем каждый заказ на полную резервацию
     const fullyReservedOrders = Array.from(ordersMap.entries())
