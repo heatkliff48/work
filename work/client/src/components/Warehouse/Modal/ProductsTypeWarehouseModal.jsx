@@ -99,8 +99,6 @@ function ProductsTypeWarehouseModal(props) {
       const product = latestProductsType.find((el) => el.id === row.original.id);
       const warehouse_article = getWarehouseArticle(product);
 
-      console.log('warehouse_article', warehouse_article);
-
       setWarehouseData((prev) => ({
         ...prev,
         product_article: product.article,

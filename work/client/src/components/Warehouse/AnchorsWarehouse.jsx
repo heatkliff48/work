@@ -1,21 +1,27 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Table from '../Table/Table';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import ShowProductsTypeWarehouseModal from './Modal/ProductsTypeWarehouseModal';
 import { getAnchorsWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
+import ListOfReservedAuxilaryModal from './ListOfReservedProducts/ListOfReservedAuxilaryModal';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 
 function Warehouse() {
   const { COLUMNS_WAREHOUSE, anchors_warehouse_data } = useWarehouseContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { setWarehouseInfoCurIdModal } = useModalContext();
 
   const user = useSelector((state) => state.user);
 
-  // const handleRowClick = useCallback((row) => {
-  //   setWarehouseInfoCurIdModal(row.original.id);
-  //   setWarehouseInfoModal(!warehouseInfoModal);
-  // }, []);
+  const [modalShow, setModalShow] = useState(false);
+
+  const handleRowClick = useCallback((row) => {
+    setWarehouseInfoCurIdModal(row.original.id);
+    // setWarehouseInfoModal(!warehouseInfoModal);
+    setModalShow(true);
+  }, []);
 
   const dispatch = useDispatch();
 
@@ -44,7 +50,12 @@ function Warehouse() {
         dataOfTable={anchors_warehouse_data}
         userAccess={userAccess}
         tableName={'Fasteners Warehouse'}
-        // handleRowClick={handleRowClick}
+        handleRowClick={handleRowClick}
+      />
+      <ListOfReservedAuxilaryModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        target={3}
       />
     </>
   );

@@ -5,23 +5,20 @@ import { FileProvider } from './FileContext';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useSelector } from 'react-redux';
 
-const FilesMain = () => {
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+const FilesMain = ({ type }) => {
+  const { roles, checkUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
-
-  useEffect(() => {
-    if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Warehouse_modal_upload_file');
-      setUserAccess(access);
-    }
-  }, [user, roles]);
 
   return (
     <FileProvider>
       <div>
-        {userAccess?.canWrite && <FileUpload />}
-        <FileDownload />
+        {checkUserAccess(user, roles, 'Warehouse_modal_upload_file')?.canWrite && (
+          <FileUpload type={type} />
+        )}
+        {checkUserAccess(user, roles, 'Warehouse_modal_upload_file')?.canRead && (
+          <FileDownload type={type} />
+        )}
       </div>
     </FileProvider>
   );

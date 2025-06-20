@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FileContext } from './FileContext';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 
-const FileDownload = () => {
+const FileDownload = ({ type }) => {
   const { message, setMessage, filesWarehouse } = useContext(FileContext);
   const [selectedFile, setSelectedFile] = useState('');
   const [filteredFiles, setFilteredFiles] = useState(filesWarehouse);
@@ -31,7 +31,8 @@ const FileDownload = () => {
 
   useEffect(() => {
     const filteredFiles = filesWarehouse.filter(
-      (el) => el.warehouse_id === warehouseInfoCurIdModal
+      (el) =>
+        el.warehouse_id === warehouseInfoCurIdModal && el.warehouse_type === type
     );
     setFilteredFiles(filteredFiles);
   }, [filesWarehouse]);
