@@ -22,11 +22,12 @@ filesWarehouseRouter.get('/', async (req, res) => {
 filesWarehouseRouter.post('/', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>filesOrderRouter post');
 
-  const { warehouse_id, file_name } = req.body;
+  const { warehouse_id, warehouse_type, file_name } = req.body;
 
   try {
     const filesWarehouse = await FilesWarehouse.create({
       warehouse_id,
+      warehouse_type,
       file_name,
     });
 
@@ -41,10 +42,10 @@ filesWarehouseRouter.post('/', async (req, res) => {
 filesWarehouseRouter.post('/delete', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>filesOrderRouter delete');
 
-  const { warehouse_id } = req.body;
+  const { warehouse_id, warehouse_type } = req.body;
 
   try {
-    await FilesWarehouse.destroy({ where: { id: warehouse_id } });
+    await FilesWarehouse.destroy({ where: { warehouse_id, warehouse_type } });
 
     myEmitter.emit(DELETE_FILES_WAREHOUSE_SOCKET, warehouse_id);
   } catch (err) {

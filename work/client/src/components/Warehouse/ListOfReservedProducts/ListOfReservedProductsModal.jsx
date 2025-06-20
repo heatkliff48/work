@@ -60,12 +60,12 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const deleteHandler = (el) => {
-    const { id, remaining_stock } = curr_warehouse;
+    const { id, free_quantity_remaining } = curr_warehouse;
 
     const reservedProduct = productsOfOrders.find(
       (orderedProduct) => orderedProduct.id === el.orders_products_id
     );
-    const new_remaining_stock = remaining_stock + el.quantity;
+    const new_remaining_stock = free_quantity_remaining + el.quantity;
 
     dispatch(deleteReservedProducts(el.id));
     dispatch(updateRemainingStock({ warehouse_id: id, new_remaining_stock }));
@@ -110,7 +110,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Warehouse_reservation');
+      const access = checkUserAccess(user, roles, 'Warehouse');
       setUserAccess(access);
 
       console.log('access', access);
@@ -139,7 +139,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
             <span>Product article: {curr_warehouse.product_article}</span>
             <span>
               Free products, {curr_warehouse?.type == 'OK' ? 'pallet' : 'blocks'}:{' '}
-              {curr_warehouse.remaining_stock}
+              {curr_warehouse.free_quantity_remaining}
             </span>
           </div>
           <div className="warehouseInfo">
@@ -150,7 +150,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
               style={{ marginBottom: '10px' }}
               color="primary"
               disabled={
-                curr_warehouse?.remaining_stock === 0 ||
+                curr_warehouse?.free_quantity_remaining === 0 ||
                 filteredProducts?.length === 0
               }
               onClick={() => {
@@ -160,7 +160,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
               Reserve product
             </Button>
           )}
-          <FilesMain />
+          <FilesMain type={0} />
           <Table>
             <thead>
               <tr>

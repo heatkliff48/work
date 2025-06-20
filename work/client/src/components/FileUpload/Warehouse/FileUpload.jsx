@@ -5,7 +5,7 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { addNewFilesWarehouse } from '#components/redux/actions/filesWarehouseAction.js';
 import { useDispatch } from 'react-redux';
 
-const FileUpload = () => {
+const FileUpload = ({ type }) => {
   const [file, setFile] = useState(null);
   const { setMessage, refreshFiles } = useContext(FileContext);
   const { warehouseInfoCurIdModal } = useModalContext();
@@ -25,6 +25,7 @@ const FileUpload = () => {
       dispatch(
         addNewFilesWarehouse({
           warehouse_id: warehouseInfoCurIdModal,
+          warehouse_type: type,
           file_name: file.name,
         })
       );

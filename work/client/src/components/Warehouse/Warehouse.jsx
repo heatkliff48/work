@@ -8,8 +8,7 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 
 function Warehouse() {
-  const { COLUMNS_WAREHOUSE, warehouse_data } =
-    useWarehouseContext();
+  const { COLUMNS_WAREHOUSE, warehouse_data } = useWarehouseContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const {
@@ -56,7 +55,7 @@ function Warehouse() {
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE}
         dataOfTable={warehouse_data}
-        userAccess={userAccess}
+        userAccess={userAccess?.canRead}
         onClickButton={() => {
           setWarehouseModal(!warehouseModal);
         }}
