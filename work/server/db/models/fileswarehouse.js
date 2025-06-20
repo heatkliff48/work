@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   FilesWarehouse.init(
     {
       warehouse_id: DataTypes.INTEGER,
+      warehouse_type: DataTypes.INTEGER,
       file_name: DataTypes.STRING,
     },
     {
