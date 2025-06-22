@@ -55,7 +55,7 @@ function Warehouse() {
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE}
         dataOfTable={warehouse_data}
-        userAccess={userAccess?.canRead}
+        userAccess={userAccess}
         onClickButton={() => {
           setWarehouseModal(!warehouseModal);
         }}

@@ -37,6 +37,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ReservedProducts');
+    await queryInterface.dropTable('ReservedRelatedMaterials');
   },
 };
