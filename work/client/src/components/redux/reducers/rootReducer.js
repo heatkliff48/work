@@ -42,7 +42,7 @@ import {
 import { qualityManagementReducer } from './qualityManagementReducer';
 import { recipeReducer } from './recipeReducer';
 import { relatedMaterialsBackorderListReducer } from './relatedMaterialsBackorderListReducer';
-import { reservedProductsReducer } from './reservedProductsReducer';
+import { reservedAnchorProductsReducer, reservedDryMixedProductsReducer, reservedProductsReducer, reservedRelMatProductsReducer, reservedToolProductsReducer } from './reservedProductsReducer';
 import { rolesReducer } from './rolesReducer';
 import { stockBalanceReducer } from './stockBalanceReducer';
 import { userReducer } from './userReducer';
@@ -72,6 +72,10 @@ export const rootReducer = combineReducers({
   usersMainInfo: usersMainInfoReducer,
   productionBatchLog: productionBatchLogReducer,
   reservedProducts: reservedProductsReducer,
+  reservedDryMixedProducts: reservedDryMixedProductsReducer,
+  reservedAnchorProducts: reservedAnchorProductsReducer,
+  reservedToolProducts: reservedToolProductsReducer,
+  reservedRelMatProducts: reservedRelMatProductsReducer,
   listOfOrderedProduction: listOfOrderedProductionReducer,
   listOfOrderedProductionOEM: listOfOrderedProductionOEMReducer,
   batchOutside: batchOutsideReducer,

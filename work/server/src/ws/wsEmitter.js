@@ -65,6 +65,20 @@ const {
   ADD_NEW_ALDABARAN_SOCKET,
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   DELETE_SECONDARY_CONTACT_ORDER_SOCKET,
+  GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -428,12 +442,208 @@ function registerWsEmitter(map) {
   });
 
   myEmitter.on(
+    GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
     GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
     (reserved_products_id) => {
       for (let [id, userConnect] of map) {
         userConnect.send(
           JSON.stringify({
             type: GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: reserved_products_id,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (reserved_products_id) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: reserved_products_id,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (reserved_products_id) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: reserved_products_id,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (reserved_products_id) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: reserved_products_id,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (reserved_products_id) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: reserved_products_id,
           })
         );

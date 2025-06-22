@@ -31,9 +31,13 @@ import { getAllRoles } from '#components/redux/actions/rolesAction.js';
 import { getAllStockBalance } from '#components/redux/actions/stockBalanceAction.js';
 import {
   getAllWarehouse,
+  getListOfAnchorReservedProducts,
+  getListOfDryMixedReservedProducts,
   getListOfOrderedProduction,
   getListOfOrderedProductionOEM,
+  getListOfRelMatReservedProducts,
   getListOfReservedProducts,
+  getListOfToolReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
 import { useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -70,6 +74,10 @@ function Main() {
     dispatch(getToolProductsOfOrders());
     dispatch(getRelMatProductsOfOrders());
     dispatch(getListOfReservedProducts());
+    dispatch(getListOfDryMixedReservedProducts());
+    dispatch(getListOfAnchorReservedProducts());
+    dispatch(getListOfToolReservedProducts());
+    dispatch(getListOfRelMatReservedProducts());
     dispatch(getListOfOrderedProduction());
     dispatch(getListOfOrderedProductionOEM());
     dispatch(getOrders());

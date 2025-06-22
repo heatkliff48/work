@@ -28,6 +28,46 @@ import {
   UPDATE_RESERVED_PRODUCT,
   WAREHOSE_QUANTITYS,
   UPDATE_WAREHOSE_QUANTITYS,
+  LIST_OF_DRY_MIXED_RESERVED_PRODUCTS,
+  NEW_DRY_MIXED_RESERVED_PRODUCT,
+  UPD_DRY_MIXED_RESERVED_PRODUCT,
+  DELETE_PRODUCT_FROM_DRY_MIXED_RESERVED_LIST,
+  LIST_OF_ANCHOR_RESERVED_PRODUCTS,
+  NEW_ANCHOR_RESERVED_PRODUCT,
+  UPD_ANCHOR_RESERVED_PRODUCT,
+  DELETE_PRODUCT_FROM_ANCHOR_RESERVED_LIST,
+  LIST_OF_TOOL_RESERVED_PRODUCTS,
+  NEW_TOOL_RESERVED_PRODUCT,
+  UPD_TOOL_RESERVED_PRODUCT,
+  DELETE_PRODUCT_FROM_TOOL_RESERVED_LIST,
+  LIST_OF_REL_MAT_PRODUCTS,
+  NEW_REL_MAT_RESERVED_PRODUCT,
+  UPD_REL_MAT_PRODUCT,
+  DELETE_PRODUCT_FROM_REL_MAT_LIST,
+  GET_LIST_OF_DRY_MIXED_RESERVED_PRODUCTS,
+  ADD_NEW_DRY_MIXED_RESERVED_PRODUCT,
+  UPDATE_DRY_MIXED_RESERVED_PRODUCT,
+  GET_DELETE_PRODUCT_FROM_DRY_MIXED_RESERVED_LIST,
+  GET_LIST_OF_ANCHOR_RESERVED_PRODUCTS,
+  ADD_NEW_ANCHOR_RESERVED_PRODUCT,
+  UPDATE_ANCHOR_RESERVED_PRODUCT,
+  GET_DELETE_PRODUCT_FROM_ANCHOR_RESERVED_LIST,
+  GET_LIST_OF_TOOL_RESERVED_PRODUCTS,
+  ADD_NEW_TOOL_RESERVED_PRODUCT,
+  UPDATE_TOOL_RESERVED_PRODUCT,
+  GET_DELETE_PRODUCT_FROM_TOOL_RESERVED_LIST,
+  GET_LIST_OF_REL_MAT_PRODUCTS,
+  ADD_NEW_REL_MAT_RESERVED_PRODUCT,
+  UPDATE_REL_MAT_PRODUCT,
+  GET_DELETE_PRODUCT_FROM_REL_MAT_LIST,
+  DRY_MIXED_WAREHOSE_QUANTITYS,
+  ANCHOR_WAREHOSE_QUANTITYS,
+  TOOL_WAREHOSE_QUANTITYS,
+  REL_MAT_WAREHOSE_QUANTITYS,
+  UPDATE_DRY_MIXED_WAREHOSE_QUANTITYS,
+  UPDATE_ANCHOR_WAREHOSE_QUANTITYS,
+  UPDATE_TOOL_WAREHOSE_QUANTITYS,
+  UPDATE_REL_MAT_WAREHOSE_QUANTITYS,
 } from '../types/warehouseTypes';
 
 const url = axios.create({
@@ -38,15 +78,6 @@ const url = axios.create({
 const getAllWarehouse = () => {
   return url
     .get('/warehouse')
-    .then((res) => {
-      return res.data;
-    })
-    .catch(showErrorMessage);
-};
-
-const getListOfReservedProducts = () => {
-  return url
-    .get('/warehouse/reserved/product')
     .then((res) => {
       return res.data;
     })
@@ -80,6 +111,51 @@ const updateWhQuantitys = (upd_rem_srock) => {
     .catch(showErrorMessage);
 };
 
+const updateDryMixedWhQuantitys = (upd_rem_srock) => {
+  return url
+    .post('/warehouse/upd/quantitys/drymix', upd_rem_srock)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updateAnchorWhQuantitys = (upd_rem_srock) => {
+  return url
+    .post('/warehouse/upd/quantitys/anchor', upd_rem_srock)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updateToolWhQuantitys = (upd_rem_srock) => {
+  return url
+    .post('/warehouse/upd/quantitys/tool', upd_rem_srock)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updateRelMatWhQuantitys = (upd_rem_srock) => {
+  return url
+    .post('/warehouse/upd/quantitys/relmat', upd_rem_srock)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getListOfReservedProducts = () => {
+  return url
+    .get('/warehouse/reserved/product')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
 const addNewReservedProduct = (reserved_product) => {
   return url
     .post('/warehouse/reserved/product/add', reserved_product)
@@ -101,6 +177,150 @@ const updReservedProduct = (reserved_product) => {
 const deleteReservedProduct = (id) => {
   return url
     .post('/warehouse/reserved/product/delete', { id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getListOfDryMixedReservedProducts = () => {
+  return url
+    .get('/warehouse/reserved/drymix')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewDryMixedReservedProduct = (reserved_product) => {
+  return url
+    .post('/warehouse/reserved/drymix/add', reserved_product)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updDryMixedReservedProduct = (reserved_product) => {
+  return url
+    .post('/warehouse/reserved/drymix/upd', reserved_product)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const deleteDryMixedReservedProduct = (id) => {
+  return url
+    .post('/warehouse/reserved/drymix/delete', { id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getListOfAnchorReservedProducts = () => {
+  return url
+    .get('/warehouse/reserved/anchor')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewAnchorReservedProduct = (reserved_product) => {
+  return url
+    .post('/warehouse/reserved/anchor/add', reserved_product)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updAnchorReservedProduct = (reserved_product) => {
+  return url
+    .post('/warehouse/reserved/anchor/upd', reserved_product)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const deleteAnchorReservedProduct = (id) => {
+  return url
+    .post('/warehouse/reserved/anchor/delete', { id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getListOfToolReservedProducts = () => {
+  return url
+    .get('/warehouse/reserved/tool')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewToolReservedProduct = (reserved_product) => {
+  return url
+    .post('/warehouse/reserved/tool/add', reserved_product)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updToolReservedProduct = (reserved_product) => {
+  return url
+    .post('/warehouse/reserved/tool/upd', reserved_product)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const deleteToolReservedProduct = (id) => {
+  return url
+    .post('/warehouse/reserved/tool/delete', { id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getListOfRelMatReservedProducts = () => {
+  return url
+    .get('/warehouse/reserved/relmat')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewRelMatReservedProduct = (reserved_product) => {
+  return url
+    .post('/warehouse/reserved/relmat/add', reserved_product)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updRelMatReservedProduct = (reserved_product) => {
+  return url
+    .post('/warehouse/reserved/relmat/upd', reserved_product)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const deleteRelMatReservedProduct = (id) => {
+  return url
+    .post('/warehouse/reserved/relmat/delete', { id })
     .then((res) => {
       return res.data;
     })
@@ -171,16 +391,6 @@ function* getAllWarehouseWatcher() {
   }
 }
 
-function* getListOfReservedProductsWatcher() {
-  try {
-    const { listOfReservedProducts } = yield call(getListOfReservedProducts);
-
-    yield put({ type: LIST_OF_RESERVED_PRODUCTS, payload: listOfReservedProducts });
-  } catch (err) {
-    yield put({ type: LIST_OF_RESERVED_PRODUCTS, payload: [] });
-  }
-}
-
 function* addNewWarehouseWatcher(action) {
   try {
     yield call(addNewWarehouse, action.payload);
@@ -206,6 +416,56 @@ function* updateWhQuantitysWatcher(action) {
     yield put({ type: WAREHOSE_QUANTITYS, payload: updWarehouse });
   } catch (err) {
     yield put({ type: WAREHOSE_QUANTITYS, payload: [] });
+  }
+}
+
+function* updateDryMixedWhQuantitysWatcher(action) {
+  try {
+    const { payload } = action;
+    const updWarehouse = yield call(updateDryMixedWhQuantitys, payload);
+    yield put({ type: DRY_MIXED_WAREHOSE_QUANTITYS, payload: updWarehouse });
+  } catch (err) {
+    yield put({ type: DRY_MIXED_WAREHOSE_QUANTITYS, payload: [] });
+  }
+}
+
+function* updateAnchorWhQuantitysWatcher(action) {
+  try {
+    const { payload } = action;
+    const updWarehouse = yield call(updateAnchorWhQuantitys, payload);
+    yield put({ type: ANCHOR_WAREHOSE_QUANTITYS, payload: updWarehouse });
+  } catch (err) {
+    yield put({ type: ANCHOR_WAREHOSE_QUANTITYS, payload: [] });
+  }
+}
+
+function* updateToolWhQuantitysWatcher(action) {
+  try {
+    const { payload } = action;
+    const updWarehouse = yield call(updateToolWhQuantitys, payload);
+    yield put({ type: TOOL_WAREHOSE_QUANTITYS, payload: updWarehouse });
+  } catch (err) {
+    yield put({ type: TOOL_WAREHOSE_QUANTITYS, payload: [] });
+  }
+}
+
+function* updateRelMatWhQuantitysWatcher(action) {
+  try {
+    const { payload } = action;
+    const updWarehouse = yield call(updateRelMatWhQuantitys, payload);
+    yield put({ type: REL_MAT_WAREHOSE_QUANTITYS, payload: updWarehouse });
+  } catch (err) {
+    yield put({ type: REL_MAT_WAREHOSE_QUANTITYS, payload: [] });
+  }
+}
+
+function* getListOfReservedProductsWatcher() {
+  try {
+    const { listOfReservedProducts } = yield call(getListOfReservedProducts);
+
+    yield put({ type: LIST_OF_RESERVED_PRODUCTS, payload: listOfReservedProducts });
+  } catch (err) {
+    yield put({ type: LIST_OF_RESERVED_PRODUCTS, payload: [] });
   }
 }
 
@@ -238,6 +498,203 @@ function* deleteReservedProductWatcher(action) {
     yield call(deleteReservedProduct, payload);
   } catch (err) {
     yield put({ type: DELETE_PRODUCT_FROM_RESERVED_LIST, payload: [] });
+  }
+}
+
+function* getListOfDryMixedReservedProductsWatcher() {
+  try {
+    const listOfReservedDryMixedProducts = yield call(
+      getListOfDryMixedReservedProducts
+    );
+
+    yield put({
+      type: LIST_OF_DRY_MIXED_RESERVED_PRODUCTS,
+      payload: listOfReservedDryMixedProducts,
+    });
+  } catch (err) {
+    yield put({ type: LIST_OF_DRY_MIXED_RESERVED_PRODUCTS, payload: [] });
+  }
+}
+
+function* addNewDryMixedReservedProductWatcher(action) {
+  try {
+    const { new_reserved_product } = yield call(
+      addNewDryMixedReservedProduct,
+      action.payload
+    );
+
+    yield put({
+      type: NEW_DRY_MIXED_RESERVED_PRODUCT,
+      payload: new_reserved_product,
+    });
+  } catch (err) {
+    yield put({ type: NEW_DRY_MIXED_RESERVED_PRODUCT, payload: [] });
+  }
+}
+
+function* updDryMixedReservedProductWatcher(action) {
+  try {
+    const { new_reserved_product } = yield call(
+      updDryMixedReservedProduct,
+      action.payload
+    );
+
+    yield put({
+      type: UPD_DRY_MIXED_RESERVED_PRODUCT,
+      payload: new_reserved_product,
+    });
+  } catch (err) {
+    yield put({ type: UPD_DRY_MIXED_RESERVED_PRODUCT, payload: [] });
+  }
+}
+
+function* deleteDryMixedReservedProductWatcher(action) {
+  try {
+    const { payload } = action;
+    yield call(deleteDryMixedReservedProduct, payload);
+  } catch (err) {
+    yield put({ type: DELETE_PRODUCT_FROM_DRY_MIXED_RESERVED_LIST, payload: [] });
+  }
+}
+
+function* getListOfAnchorReservedProductsWatcher() {
+  try {
+    const listOfReservedProducts = yield call(getListOfAnchorReservedProducts);
+
+    yield put({
+      type: LIST_OF_ANCHOR_RESERVED_PRODUCTS,
+      payload: listOfReservedProducts,
+    });
+  } catch (err) {
+    yield put({ type: LIST_OF_ANCHOR_RESERVED_PRODUCTS, payload: [] });
+  }
+}
+
+function* addNewAnchorReservedProductWatcher(action) {
+  try {
+    const { new_reserved_product } = yield call(
+      addNewAnchorReservedProduct,
+      action.payload
+    );
+
+    yield put({ type: NEW_ANCHOR_RESERVED_PRODUCT, payload: new_reserved_product });
+  } catch (err) {
+    yield put({ type: NEW_ANCHOR_RESERVED_PRODUCT, payload: [] });
+  }
+}
+
+function* updAnchorReservedProductWatcher(action) {
+  try {
+    const { new_reserved_product } = yield call(
+      updAnchorReservedProduct,
+      action.payload
+    );
+
+    yield put({ type: UPD_ANCHOR_RESERVED_PRODUCT, payload: new_reserved_product });
+  } catch (err) {
+    yield put({ type: UPD_ANCHOR_RESERVED_PRODUCT, payload: [] });
+  }
+}
+
+function* deleteAnchorReservedProductWatcher(action) {
+  try {
+    const { payload } = action;
+    yield call(deleteAnchorReservedProduct, payload);
+  } catch (err) {
+    yield put({ type: DELETE_PRODUCT_FROM_ANCHOR_RESERVED_LIST, payload: [] });
+  }
+}
+
+function* getListOfToolReservedProductsWatcher() {
+  try {
+    const listOfReservedProducts = yield call(getListOfToolReservedProducts);
+
+    yield put({
+      type: LIST_OF_TOOL_RESERVED_PRODUCTS,
+      payload: listOfReservedProducts,
+    });
+  } catch (err) {
+    yield put({ type: LIST_OF_TOOL_RESERVED_PRODUCTS, payload: [] });
+  }
+}
+
+function* addNewToolReservedProductWatcher(action) {
+  try {
+    const { new_reserved_product } = yield call(
+      addNewToolReservedProduct,
+      action.payload
+    );
+
+    yield put({ type: NEW_TOOL_RESERVED_PRODUCT, payload: new_reserved_product });
+  } catch (err) {
+    yield put({ type: NEW_TOOL_RESERVED_PRODUCT, payload: [] });
+  }
+}
+
+function* updToolReservedProductWatcher(action) {
+  try {
+    const { new_reserved_product } = yield call(
+      updToolReservedProduct,
+      action.payload
+    );
+
+    yield put({ type: UPD_TOOL_RESERVED_PRODUCT, payload: new_reserved_product });
+  } catch (err) {
+    yield put({ type: UPD_TOOL_RESERVED_PRODUCT, payload: [] });
+  }
+}
+
+function* deleteToolReservedProductWatcher(action) {
+  try {
+    const { payload } = action;
+    yield call(deleteToolReservedProduct, payload);
+  } catch (err) {
+    yield put({ type: DELETE_PRODUCT_FROM_TOOL_RESERVED_LIST, payload: [] });
+  }
+}
+
+function* getListOfRelMatReservedProductsWatcher() {
+  try {
+    const listOfReservedProducts = yield call(getListOfRelMatReservedProducts);
+
+    yield put({ type: LIST_OF_REL_MAT_PRODUCTS, payload: listOfReservedProducts });
+  } catch (err) {
+    yield put({ type: LIST_OF_REL_MAT_PRODUCTS, payload: [] });
+  }
+}
+
+function* addNewRelMatReservedProductWatcher(action) {
+  try {
+    const { new_reserved_product } = yield call(
+      addNewRelMatReservedProduct,
+      action.payload
+    );
+
+    yield put({ type: NEW_REL_MAT_RESERVED_PRODUCT, payload: new_reserved_product });
+  } catch (err) {
+    yield put({ type: NEW_REL_MAT_RESERVED_PRODUCT, payload: [] });
+  }
+}
+
+function* updRelMatReservedProductWatcher(action) {
+  try {
+    const { new_reserved_product } = yield call(
+      updRelMatReservedProduct,
+      action.payload
+    );
+
+    yield put({ type: UPD_REL_MAT_PRODUCT, payload: new_reserved_product });
+  } catch (err) {
+    yield put({ type: UPD_REL_MAT_PRODUCT, payload: [] });
+  }
+}
+
+function* deleteRelMatReservedProductWatcher(action) {
+  try {
+    const { payload } = action;
+    yield call(deleteRelMatReservedProduct, payload);
+  } catch (err) {
+    yield put({ type: DELETE_PRODUCT_FROM_REL_MAT_LIST, payload: [] });
   }
 }
 
@@ -327,19 +784,85 @@ function* updListOfOrderedProductionOEMWorker(action) {
 
 function* warehouseWatcher() {
   yield takeLatest(GET_ALL_WAREHOUSE, getAllWarehouseWatcher);
-  yield takeLatest(GET_LIST_OF_RESERVED_PRODUCTS, getListOfReservedProductsWatcher);
   yield takeLatest(ADD_NEW_WAREHOUSE, addNewWarehouseWatcher);
 
   yield takeLatest(UPDATE_REMAINING_STOCK, updRemainingStockWatcher);
   yield takeLatest(UPDATE_WAREHOSE_QUANTITYS, updateWhQuantitysWatcher);
+  yield takeLatest(
+    UPDATE_DRY_MIXED_WAREHOSE_QUANTITYS,
+    updateDryMixedWhQuantitysWatcher
+  );
+  yield takeLatest(UPDATE_ANCHOR_WAREHOSE_QUANTITYS, updateAnchorWhQuantitysWatcher);
+  yield takeLatest(UPDATE_TOOL_WAREHOSE_QUANTITYS, updateToolWhQuantitysWatcher);
+  yield takeLatest(
+    UPDATE_REL_MAT_WAREHOSE_QUANTITYS,
+    updateRelMatWhQuantitysWatcher
+  );
 
+  yield takeLatest(GET_LIST_OF_RESERVED_PRODUCTS, getListOfReservedProductsWatcher);
   yield takeLatest(ADD_NEW_RESERVED_PRODUCT, addNewReservedProductWatcher);
   yield takeLatest(UPDATE_RESERVED_PRODUCT, updReservedProductWatcher);
-
   yield takeLatest(
     GET_DELETE_PRODUCT_FROM_RESERVED_LIST,
     deleteReservedProductWatcher
   );
+
+  yield takeLatest(
+    GET_LIST_OF_DRY_MIXED_RESERVED_PRODUCTS,
+    getListOfDryMixedReservedProductsWatcher
+  );
+  yield takeLatest(
+    ADD_NEW_DRY_MIXED_RESERVED_PRODUCT,
+    addNewDryMixedReservedProductWatcher
+  );
+  yield takeLatest(
+    UPDATE_DRY_MIXED_RESERVED_PRODUCT,
+    updDryMixedReservedProductWatcher
+  );
+  yield takeLatest(
+    GET_DELETE_PRODUCT_FROM_DRY_MIXED_RESERVED_LIST,
+    deleteDryMixedReservedProductWatcher
+  );
+
+  yield takeLatest(
+    GET_LIST_OF_ANCHOR_RESERVED_PRODUCTS,
+    getListOfAnchorReservedProductsWatcher
+  );
+  yield takeLatest(
+    ADD_NEW_ANCHOR_RESERVED_PRODUCT,
+    addNewAnchorReservedProductWatcher
+  );
+  yield takeLatest(UPDATE_ANCHOR_RESERVED_PRODUCT, updAnchorReservedProductWatcher);
+  yield takeLatest(
+    GET_DELETE_PRODUCT_FROM_ANCHOR_RESERVED_LIST,
+    deleteAnchorReservedProductWatcher
+  );
+
+  yield takeLatest(
+    GET_LIST_OF_TOOL_RESERVED_PRODUCTS,
+    getListOfToolReservedProductsWatcher
+  );
+  yield takeLatest(ADD_NEW_TOOL_RESERVED_PRODUCT, addNewToolReservedProductWatcher);
+  yield takeLatest(UPDATE_TOOL_RESERVED_PRODUCT, updToolReservedProductWatcher);
+  yield takeLatest(
+    GET_DELETE_PRODUCT_FROM_TOOL_RESERVED_LIST,
+    deleteToolReservedProductWatcher
+  );
+
+  yield takeLatest(
+    GET_LIST_OF_REL_MAT_PRODUCTS,
+    getListOfRelMatReservedProductsWatcher
+  );
+  yield takeLatest(
+    ADD_NEW_REL_MAT_RESERVED_PRODUCT,
+    addNewRelMatReservedProductWatcher
+  );
+  yield takeLatest(UPDATE_REL_MAT_PRODUCT, updRelMatReservedProductWatcher);
+  yield takeLatest(
+    GET_DELETE_PRODUCT_FROM_REL_MAT_LIST,
+    deleteRelMatReservedProductWatcher
+  );
+
   yield takeLatest(
     GET_LIST_OF_ORDERED_PRODUCTION,
     getListOfOrderedProductionWatcher

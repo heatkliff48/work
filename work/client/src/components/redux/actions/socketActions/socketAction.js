@@ -57,6 +57,20 @@ import {
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   REMOVE_SECONDARY_CONTACT_ORDER_SOCKET,
   NEW_DELIVERY_PRICE_SOCKET,
+  NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -213,9 +227,107 @@ export const updInChargeOrderSocket = (person_in_charge) => {
   };
 };
 
+export const addNewReservedProductSocket = (new_reserved_product) => {
+  return {
+    type: NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: new_reserved_product,
+  };
+};
+
+export const updateReservedProductSocket = (new_reserved_product) => {
+  return {
+    type: UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: new_reserved_product,
+  };
+};
+
 export const deleteReservedProductSocket = (reserved_products_id) => {
   return {
     type: DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: reserved_products_id,
+  };
+};
+
+export const addNewDryMixedReservedProductSocket = (new_reserved_product) => {
+  return {
+    type: NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: new_reserved_product,
+  };
+};
+
+export const updateDryMixedReservedProductSocket = (new_reserved_product) => {
+  return {
+    type: UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: new_reserved_product,
+  };
+};
+
+export const deleteDryMixedReservedProductSocket = (reserved_products_id) => {
+  return {
+    type: DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: reserved_products_id,
+  };
+};
+
+export const addNewAnchorReservedProductSocket = (new_reserved_product) => {
+  return {
+    type: NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: new_reserved_product,
+  };
+};
+
+export const updateAnchorReservedProductSocket = (new_reserved_product) => {
+  return {
+    type: UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: new_reserved_product,
+  };
+};
+
+export const deleteAnchorReservedProductSocket = (reserved_products_id) => {
+  return {
+    type: DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: reserved_products_id,
+  };
+};
+
+export const addNewToolReservedProductSocket = (new_reserved_product) => {
+  return {
+    type: NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: new_reserved_product,
+  };
+};
+
+export const updateToolReservedProductSocket = (new_reserved_product) => {
+  return {
+    type: UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: new_reserved_product,
+  };
+};
+
+export const deleteToolReservedProductSocket = (reserved_products_id) => {
+  return {
+    type: DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: reserved_products_id,
+  };
+};
+
+export const addNewRelMatReservedProductSocket = (new_reserved_product) => {
+  return {
+    type: NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: new_reserved_product,
+  };
+};
+
+export const updateRelMatReservedProductSocket = (new_reserved_product) => {
+  return {
+    type: UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    payload: new_reserved_product,
+  };
+};
+
+export const deleteRelMatReservedProductSocket = (reserved_products_id) => {
+  return {
+    type: DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
     payload: reserved_products_id,
   };
 };

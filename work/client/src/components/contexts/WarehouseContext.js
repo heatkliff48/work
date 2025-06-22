@@ -3,12 +3,23 @@ import {
   updateOrderStatus,
 } from '#components/redux/actions/ordersAction.js';
 import {
+  addNewAnchorReservedProducts,
+  addNewDryMixedReservedProducts,
+  addNewRelMatReservedProducts,
   addNewReservedProducts,
+  addNewToolReservedProducts,
+  updAnchorReservedProducts,
+  updateAnchorWarehouseQuantitys,
+  updateDryMixedWarehouseQuantitys,
+  updateRelMatWarehouseQuantitys,
+  updateToolWarehouseQuantitys,
   updateWarehouseQuantitys,
+  updDryMixedReservedProducts,
+  updRelMatReservedProducts,
   updReservedProducts,
+  updToolReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
 import { useProductsContext } from './ProductContext';
-import { updateDryMixesWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewAldabaran } from '#components/redux/actions/aldabaranAction.js';
@@ -132,6 +143,23 @@ const WarehouseContextProvider = ({ children }) => {
   };
 
   const list_of_reserved_products = useSelector((state) => state.reservedProducts);
+
+  const list_of_dry_mix_reserved_products = useSelector(
+    (state) => state.reservedDryMixedProducts
+  );
+
+  const list_of_anchor_reserved_products = useSelector(
+    (state) => state.reservedAnchorProducts
+  );
+
+  const list_of_tool_reserved_products = useSelector(
+    (state) => state.reservedToolProducts
+  );
+
+  const list_of_rel_mat_reserved_products = useSelector(
+    (state) => state.reservedRelMatProducts
+  );
+
   const list_of_ordered_production = useSelector(
     (state) => state.listOfOrderedProduction
   );
@@ -141,6 +169,14 @@ const WarehouseContextProvider = ({ children }) => {
   const related_materials_backorder_list = useSelector(
     (state) => state.relatedMaterialsBackorderList
   );
+
+  const reservedMap = {
+    product: list_of_reserved_products,
+    dryMixed: list_of_dry_mix_reserved_products,
+    anchor: list_of_anchor_reserved_products,
+    tool: list_of_tool_reserved_products,
+    relMat: list_of_rel_mat_reserved_products,
+  };
 
   const aldabaran = useSelector((state) => state.aldabaran);
 
@@ -224,7 +260,10 @@ const WarehouseContextProvider = ({ children }) => {
 
         const lProduct = productArr?.find((lp) => lp.id === productId);
 
-        const quantity = prod.quantity_palet || prod.quantity_ud;
+        const quantity =
+          prod?.quantity_palet ||
+          prod?.quantity_palet_dry ||
+          prod?.quantity_palet_anchor;
 
         return `${lProduct?.article || '???'}: ${quantity}, `;
       });
@@ -251,15 +290,18 @@ const WarehouseContextProvider = ({ children }) => {
 
       const type = getProductType(el.article);
       const warehouse_arr = warehouseMap[type];
+      const reserved_arr = reservedMap[type];
+
       el?.batches?.forEach((elem) => {
         const wh = warehouse_arr.find((el) => el.article == elem.batchId);
 
-        const haveReserve = list_of_reserved_products.find(
+        const haveReserve = reserved_arr.find(
           (el) =>
             el.warehouse_id == wh.id && el.orders_products_id == orders_products_id
         );
 
         const obj = {
+          article: el.article,
           warehouse_id: wh.id,
           orders_products_id,
           quantity: elem.allocated,
@@ -284,23 +326,82 @@ const WarehouseContextProvider = ({ children }) => {
             ordered_quantity: wh.ordered_quantity + quantity,
             type,
           });
-          dispatch(updReservedProducts(obj));
+
+          switch (type) {
+            case 'product':
+              dispatch(updReservedProducts(obj));
+              break;
+
+            case 'relMat':
+              dispatch(updRelMatReservedProducts(obj));
+              break;
+
+            case 'tool':
+              dispatch(updToolReservedProducts(obj));
+              break;
+
+            case 'dryMixed':
+              dispatch(updDryMixedReservedProducts(obj));
+              break;
+
+            case 'anchor':
+              dispatch(updAnchorReservedProducts(obj));
+              break;
+
+            default:
+              break;
+          }
         }
       });
     });
 
     wh_arr.forEach((el) => {
       const { warehouse_id, total_quantity, ordered_quantity, type } = el;
-      if (type == 'product') {
-        dispatch(
-          updateWarehouseQuantitys({
+      switch (type) {
+        case 'product':
+          dispatch(
+            updateWarehouseQuantitys({
+              warehouse_id,
+              total_quantity,
+              ordered_quantity,
+            })
+          );
+          break;
+
+        case 'dryMixed':
+          updateDryMixedWarehouseQuantitys({
             warehouse_id,
             total_quantity,
             ordered_quantity,
-          })
-        );
-      } else if (type == 'dryMixed') {
-        updateDryMixesWarehouse({ warehouse_id, total_quantity, ordered_quantity });
+          });
+          break;
+
+        case 'anchor':
+          updateAnchorWarehouseQuantitys({
+            warehouse_id,
+            total_quantity,
+            ordered_quantity,
+          });
+          break;
+
+        case 'tool':
+          updateToolWarehouseQuantitys({
+            warehouse_id,
+            total_quantity,
+            ordered_quantity,
+          });
+          break;
+
+        case 'relmat':
+          updateRelMatWarehouseQuantitys({
+            warehouse_id,
+            total_quantity,
+            ordered_quantity,
+          });
+          break;
+
+        default:
+          break;
       }
     });
 
@@ -331,7 +432,60 @@ const WarehouseContextProvider = ({ children }) => {
       `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
     dispatch(addNewAldabaran({ num: aldabaranNum, data: dateTimeStr }));
-    dispatch(addNewReservedProducts(newReserved));
+
+    const grouped = {
+      product: [],
+      relMat: [],
+      tool: [],
+      dryMixed: [],
+      anchor: [],
+    };
+
+    newReserved.forEach((item) => {
+      const { article, warehouse_id, orders_products_id, quantity } = item;
+
+      const obj = { warehouse_id, orders_products_id, quantity };
+
+      if (article.startsWith('T.')) {
+        grouped.product.push(obj);
+      } else if (article.startsWith('X.P')) {
+        grouped.relMat.push(obj);
+      } else if (article.startsWith('X.T')) {
+        grouped.tool.push(obj);
+      } else if (article.startsWith('X.M')) {
+        grouped.dryMixed.push(obj);
+      } else if (article.startsWith('X.F')) {
+        grouped.anchor.push(obj);
+      }
+    });
+
+    Object.entries(grouped).forEach(([key, items]) => {
+      switch (key) {
+        case 'product':
+          dispatch(addNewReservedProducts(items));
+          break;
+
+        case 'relMat':
+          dispatch(addNewRelMatReservedProducts(items));
+          break;
+
+        case 'tool':
+          dispatch(addNewToolReservedProducts(items));
+          break;
+
+        case 'dryMixed':
+          dispatch(addNewDryMixedReservedProducts(items));
+          break;
+
+        case 'anchor':
+          dispatch(addNewAnchorReservedProducts(items));
+          break;
+
+        default:
+          break;
+      }
+    });
+
     setWmoctProductShippedBD([]);
     setSelectedOrder(null);
   };
@@ -576,6 +730,10 @@ const WarehouseContextProvider = ({ children }) => {
         anchors_warehouse_data,
         tools_warehouse_data,
         list_of_reserved_products,
+        list_of_dry_mix_reserved_products,
+        list_of_anchor_reserved_products,
+        list_of_tool_reserved_products,
+        list_of_rel_mat_reserved_products,
         list_of_ordered_production,
         list_of_ordered_production_oem,
         related_materials_backorder_list,
