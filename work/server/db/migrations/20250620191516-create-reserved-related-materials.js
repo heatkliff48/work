@@ -11,17 +11,9 @@ module.exports = {
       },
       warehouse_id: {
         type: Sequelize.INTEGER,
-        references: {
-          key: 'id',
-          model: 'Warehouses',
-        },
       },
       orders_products_id: {
         type: Sequelize.INTEGER,
-        references: {
-          key: 'id',
-          model: 'OrdersProducts',
-        },
       },
       quantity: {
         type: Sequelize.INTEGER,

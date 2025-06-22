@@ -342,7 +342,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       const dryMixes = dryMixesJournal.find((el) => el.id == prod.dry_mixed_id);
       const quantity = prod.quantity_ud;
 
-      const descripcion = `${dryMixes?.name} BAUBLOCK Sacos de ${dryMixes.pallet_weight}kg`;
+      const descripcion = `${dryMixes?.name} BAUBLOCK Sacos de ${dryMixes?.pallet_weight}kg`;
 
       const sacos = dryMixes.units_per_pallet;
 

@@ -10,6 +10,7 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useDispatch } from 'react-redux';
 import { getAldabaran } from '#components/redux/actions/aldabaranAction.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
 
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
@@ -35,6 +36,8 @@ function WarehouseManager() {
     relMatProductsOfOrders,
   } = useOrderContext();
 
+  const { setWmoctPdfModal } = useModalContext();
+
   const dispatch = useDispatch();
   // const navigate = useNavigate();
 
@@ -53,6 +56,7 @@ function WarehouseManager() {
 
   useEffect(() => {
     dispatch(getAldabaran());
+    setWmoctPdfModal(false);
   }, []);
 
   useEffect(() => {

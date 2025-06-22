@@ -161,7 +161,15 @@ const OrderCart = React.memo(() => {
   };
 
   const filterKeys = useMemo(
-    () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
+    () => [
+      'id',
+      'order_id',
+      'dry_mixed_id',
+      'client_id',
+      'product_id',
+      'createdAt',
+      'updatedAt',
+    ],
     []
   );
 
@@ -172,7 +180,7 @@ const OrderCart = React.memo(() => {
   const filterAndMapData = useCallback(
     (data, filterKeys) =>
       Object.entries(data || {})
-        .filter(([key]) => !filterKeys.includes(key))
+        .filter(([key]) => !filterKeys?.includes(key))
         .map(([key, value]) => {
           if (!key || key === 'warehouse_id') return null;
 

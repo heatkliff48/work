@@ -57,6 +57,20 @@ import {
   updRelMatProductOfOrderSocket,
   deleteSecondaryContactSocket,
   addNewDeliveryPriceSocket,
+  addNewReservedProductSocket,
+  updateReservedProductSocket,
+  addNewDryMixedReservedProductSocket,
+  updateDryMixedReservedProductSocket,
+  deleteDryMixedReservedProductSocket,
+  addNewAnchorReservedProductSocket,
+  updateAnchorReservedProductSocket,
+  deleteAnchorReservedProductSocket,
+  addNewToolReservedProductSocket,
+  updateToolReservedProductSocket,
+  deleteToolReservedProductSocket,
+  addNewRelMatReservedProductSocket,
+  updateRelMatReservedProductSocket,
+  deleteRelMatReservedProductSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -140,6 +154,20 @@ import {
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   DELETE_SECONDARY_CONTACT_ORDER_SOCKET,
   ADD_NEW_DELIVERY_PRICE_SOCKET,
+  NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -276,8 +304,64 @@ export const createSocketOnMessage = (dispatch) => (event) => {
       dispatch(deleteBatchOutsideSocket(payload));
       break;
 
+    case NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(addNewReservedProductSocket(payload));
+      break;
+
+    case UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(updateReservedProductSocket(payload));
+      break;
+
     case GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET:
       dispatch(deleteReservedProductSocket(payload));
+      break;
+
+    case NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(addNewDryMixedReservedProductSocket(payload));
+      break;
+
+    case UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(updateDryMixedReservedProductSocket(payload));
+      break;
+
+    case DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(deleteDryMixedReservedProductSocket(payload));
+      break;
+
+    case NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(addNewAnchorReservedProductSocket(payload));
+      break;
+
+    case UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(updateAnchorReservedProductSocket(payload));
+      break;
+
+    case DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(deleteAnchorReservedProductSocket(payload));
+      break;
+
+    case NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(addNewToolReservedProductSocket(payload));
+      break;
+
+    case UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(updateToolReservedProductSocket(payload));
+      break;
+
+    case DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(deleteToolReservedProductSocket(payload));
+      break;
+
+    case NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(addNewRelMatReservedProductSocket(payload));
+      break;
+
+    case UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(updateRelMatReservedProductSocket(payload));
+      break;
+
+    case DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET:
+      dispatch(deleteRelMatReservedProductSocket(payload));
       break;
 
     case UPDATE_REMAINING_STOCK_SOCKET:
