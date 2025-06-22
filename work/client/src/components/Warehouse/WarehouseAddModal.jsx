@@ -116,8 +116,10 @@ const WarehouseAddModal = React.memo(
     };
 
     const addProductOrder = async () => {
-      const { article, product_article, ordered_quantity, free_quantity_remaining } =
-        warehouseData;
+      const { article, product_article, total_quantity } = warehouseData;
+
+      const free_quantity_remaining = total_quantity;
+      const ordered_quantity = 0;
 
       // 1. Фильтруем резервы для текущего product_article
       const reservedProducts =
@@ -216,6 +218,11 @@ const WarehouseAddModal = React.memo(
                         />
                       </>
                     );
+                  if (
+                    el.accessor === 'free_quantity_remaining' ||
+                    el.accessor === 'ordered_quantity'
+                  )
+                    return;
                   if (el.accessor === 'warehouse_loc')
                     return (
                       <>
