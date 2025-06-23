@@ -62,7 +62,7 @@ const sessionParser = session({
   },
 });
 
-app.use(cors({ credentials: true, origin: process.env.ORIGIN }));
+app.use(cors({ credentials: true, origin: process.env.ORIGIN.split(',') }));
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.json());
@@ -79,6 +79,7 @@ app.use(
 //   await TokenService.checkAccess(req, res, next);
 // });
 app.use((req, res, next) => {
+  console.log('Запрос пришел с Origin:', req.headers.origin);
   // res.locals.token = process.env.API;
   if (req.session.user) {
     res.locals.user = req.session.user;
@@ -156,6 +157,6 @@ wss.on('connection', function (ws, request) {
   });
 });
 
-server.listen(process.env.PORT, () => {
-  console.log('Server start on port ', process.env.PORT);
+server.listen(process.env.PORT, '0.0.0.0', () => {
+  console.log(`Server start on http://ваш_локальный_IP:${process.env.PORT}`);
 });
