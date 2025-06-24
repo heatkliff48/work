@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProjectContext } from '#components/contexts/Context.js';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress.js';
 import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo.js';
-import { addNewOrder } from '#components/redux/actions/ordersAction.js';
+import { addNewOrder, getOrders } from '#components/redux/actions/ordersAction.js';
 import ShowClientsModal from '#components/Clients/ClientsInfo/ClientsInfoModal.js';
 import ShowDeliveryAddressModal from '#components/Clients/DeliveryAddress/DeliveryAddressModal';
 import ShowClientsContactInfoModal from '#components/Clients/ClientsContactInfo/ClientsContactInfoModal';
@@ -117,6 +117,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   useEffect(() => {
     if (isOrderReady) {
       dispatch(addNewOrder(newOrder));
+      dispatch(getOrders());
       getCurrentOrderInfoHandler(newOrder);
       setClientModalOrder(!clientModalOrder);
       setIsOrderReady(false);

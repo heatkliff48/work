@@ -44,7 +44,7 @@ function OrdersTable() {
 
   useEffect(() => {
     dispatch(getOrders());
-  }, [deliveryAddresses]);
+  }, [deliveryAddresses, ordersDataList]);
 
   useEffect(() => {
     setProductOfOrder({});
