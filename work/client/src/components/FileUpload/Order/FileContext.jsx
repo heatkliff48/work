@@ -1,7 +1,6 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { getFilesOrder } from '#components/redux/actions/filesOrderAction.js';
+import { useSelector } from 'react-redux';
 
 export const FileContext = createContext();
 
@@ -9,12 +8,6 @@ export const FileProvider = ({ children }) => {
   const [files, setFiles] = useState([]);
   const [message, setMessage] = useState('');
   const filesOrder = useSelector((state) => state.filesOrder);
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getFilesOrder());
-  }, []);
 
   const refreshFiles = async () => {
     try {

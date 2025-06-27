@@ -1,9 +1,7 @@
 import Table from '#components/Table/Table';
-import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { getRelatedMaterialsJournal } from '#components/redux/actions/productsTypeJournalAction.js';
 import React, { Fragment, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ShowProductsTypeJournalModal from './modal/ProductsTypeJournalModal';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
@@ -13,7 +11,6 @@ const RelatedMaterialsJournal = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [relatedMaterialsJournalDataList, setRelatedMaterialsJournalDataList] =
@@ -22,9 +19,7 @@ const RelatedMaterialsJournal = () => {
   const [productCode, setProductCode] = useState('');
   const {
     COLUMNS_RELATED_MATERIALS_JOURNAL,
-    selectedProductsType,
     setSelectedProductsType,
-    dataTable,
     setDataTable,
     latestRelatedMaterials,
   } = useProductsTypeJournalContext();
@@ -57,10 +52,6 @@ const RelatedMaterialsJournal = () => {
       }
     }
   }, [user, roles]);
-
-  useEffect(() => {
-    dispatch(getRelatedMaterialsJournal());
-  }, []);
 
   return (
     <Fragment>

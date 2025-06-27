@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useProjectContext } from '../contexts/Context';
 import ModalRole from './ModalRole';
-import { getAllRoles, updateRoleActive } from '../redux/actions/rolesAction';
+import { updateRoleActive } from '../redux/actions/rolesAction';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 
@@ -32,10 +32,6 @@ function Roles() {
   const handleSaveRoles = () => {
     dispatch(updateRoleActive({ updActiveRole: updatedRoles }));
   };
-
-  useEffect(() => {
-    dispatch(getAllRoles());
-  }, []);
 
   return (
     <>

@@ -1,9 +1,7 @@
-// import axios from 'axios';
-
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-// import { dataFetchedChange } from '#components/redux/actions/userAction.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
+import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import {
   getAllClients,
   getAllContactInfo,
@@ -31,7 +29,10 @@ import {
   getRelatedMaterialsWarehouse,
   getToolsWarehouse,
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
-import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
+import {
+  getRecipe,
+  getRecipeOrdersData,
+} from '#components/redux/actions/recipeAction.js';
 import { getRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 import { getAllRoles } from '#components/redux/actions/rolesAction.js';
 import { getAllStockBalance } from '#components/redux/actions/stockBalanceAction.js';
@@ -45,9 +46,20 @@ import {
   getListOfReservedProducts,
   getListOfToolReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
+import { getFilesWarehouse } from '#components/redux/actions/filesWarehouseAction.js';
+import { getFilesProduct } from '#components/redux/actions/filesProductAction.js';
+import { getFilesOrder } from '#components/redux/actions/filesOrderAction.js';
 import { useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { getAllProductionBatchLogs } from '#components/redux/actions/productionBatchLogAction.js';
+import { getQualityManagement } from '#components/redux/actions/qualityManagementAction.js';
+import { getPagesList } from '#components/redux/actions/pagesAction';
+import {
+  getAllUsersInfo,
+  getAllUsersMainInfo,
+} from '#components/redux/actions/usersInfoAction';
+import { getAldabaran } from '#components/redux/actions/aldabaranAction.js';
 
 function Main() {
   const navigate = useNavigate();
@@ -64,20 +76,27 @@ function Main() {
   }, [user]);
 
   useEffect(() => {
-    dispatch(getAllRoles());
-    dispatch(getAllProducts());
-    dispatch(getAllClients());
+    dispatch(getAldabaran());
     dispatch(getAllDeliveryAddresses());
+    dispatch(getAllClients());
     dispatch(getAllContactInfo());
-    dispatch(getDryMixesJournal());
-    dispatch(getRelatedMaterialsJournal());
-    dispatch(getAnchor());
-    dispatch(getTool());
+    dispatch(getAllProducts());
+    dispatch(getAllProductionBatchLogs());
+    dispatch(getAllRoles());
+    dispatch(getAllStockBalance());
+    dispatch(getAllUsersInfo());
+    dispatch(getAllUsersMainInfo());
     dispatch(getAllWarehouse());
-    dispatch(getProductsOfOrders());
-    dispatch(getDryMixedProductsOfOrders());
+    dispatch(getAnchor());
     dispatch(getAnchorProductsOfOrders());
-    dispatch(getToolProductsOfOrders());
+    dispatch(getAnchorsWarehouse());
+    dispatch(getBatchOutside());
+    dispatch(getDryMixesJournal());
+    dispatch(getDryMixedProductsOfOrders());
+    dispatch(getDryMixesWarehouse());
+    dispatch(getFilesOrder());
+    dispatch(getFilesProduct());
+    dispatch(getFilesWarehouse());
     dispatch(getRelMatProductsOfOrders());
     dispatch(getListOfReservedProducts());
     dispatch(getListOfDryMixedReservedProducts());
@@ -87,14 +106,19 @@ function Main() {
     dispatch(getListOfOrderedProduction());
     dispatch(getListOfOrderedProductionOEM());
     dispatch(getOrders());
+    dispatch(getPagesList());
+    dispatch(getProductsOfOrders());
     dispatch(getRecipeOrdersData());
-    dispatch(clearBatchState());
-    dispatch(getAllStockBalance());
+    dispatch(getRecipe());
     dispatch(getRelatedMaterialsBackorder());
-    dispatch(getDryMixesWarehouse());
-    getAnchorsWarehouse();
-    getRelatedMaterialsWarehouse();
+    dispatch(getRelatedMaterialsJournal());
+    dispatch(getRelatedMaterialsWarehouse());
+    dispatch(getTool());
+    dispatch(getToolProductsOfOrders());
     dispatch(getToolsWarehouse());
+
+    dispatch(getQualityManagement());
+    dispatch(clearBatchState());
 
     setStoredData(null);
     //dispatch(dataFetchedChange(true));

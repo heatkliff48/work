@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { getFilesWarehouse } from '#components/redux/actions/filesWarehouseAction.js';
+
 
 export const FileContext = createContext();
 
@@ -9,12 +9,6 @@ export const FileProvider = ({ children }) => {
   const [files, setFiles] = useState([]);
   const [message, setMessage] = useState('');
   const filesWarehouse = useSelector((state) => state.filesWarehouse);
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getFilesWarehouse());
-  }, []);
 
   const refreshFiles = async () => {
     try {

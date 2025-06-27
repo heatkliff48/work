@@ -15,7 +15,6 @@ function ProductionBatchLog() {
   const productionBatchLog = useSelector((state) => state.productionBatchLog);
 
   const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,10 +22,6 @@ function ProductionBatchLog() {
       setProductionBatchLogData(productionBatchLog);
     }
   }, [productionBatchLog]);
-
-  useEffect(() => {
-    dispatch(getAllProductionBatchLogs());
-  }, []);
 
   useEffect(() => {
     if (user && roles.length > 0) {

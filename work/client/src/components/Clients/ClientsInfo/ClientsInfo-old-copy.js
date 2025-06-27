@@ -1,31 +1,19 @@
 import React, { Fragment, useEffect, useState, createContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import MydModalWithGrid from './ClientFullModal.js';
 import ShowClientsModal from './ClientsInfoModal.js';
-import { getAllClients } from '#components/redux/actions/clientAction';
 import { useProjectContext } from '#components/contexts/Context.js';
-import {
-  getAllDeliveryAddresses,
-  getAllContactInfo,
-} from '#components/redux/actions/clientAction';
 
 export const ClientContext = createContext();
 
 const ClientsInfo = () => {
   const [modalShow, setModalShow] = useState(false);
-  const { currentClient, setCurrentClient } = useProjectContext();
+  const { setCurrentClient } = useProjectContext();
 
-  const dispatch = useDispatch();
   const clients = useSelector((state) => state.clients);
 
   const [searchFilter, setSearchFilter] = useState('');
   const [listOfClientsFiltered, setListOfClientsFiltered] = useState(clients);
-
-  useEffect(() => {
-    dispatch(getAllClients());
-    dispatch(getAllDeliveryAddresses());
-    dispatch(getAllContactInfo());
-  }, []);
 
   const clientHandler = (id) => {
     const client = clients.find((el) => el.id === id);

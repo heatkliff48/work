@@ -55,7 +55,6 @@ function WarehouseManager() {
   // }, [user, roles]);
 
   useEffect(() => {
-    dispatch(getAldabaran());
     setWmoctPdfModal(false);
   }, []);
 
