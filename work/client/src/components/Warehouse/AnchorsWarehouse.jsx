@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Table from '../Table/Table';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import ShowProductsTypeWarehouseModal from './Modal/ProductsTypeWarehouseModal';
-import { getAnchorsWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import ListOfReservedAuxilaryModal from './ListOfReservedProducts/ListOfReservedAuxilaryModal';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 
@@ -23,7 +22,6 @@ function Warehouse() {
     setModalShow(true);
   }, []);
 
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (user && roles.length > 0) {
@@ -34,10 +32,6 @@ function Warehouse() {
       }
     }
   }, [user, roles, checkUserAccess, userAccess, setUserAccess]);
-
-  useEffect(() => {
-    dispatch(getAnchorsWarehouse());
-  }, []);
 
   return (
     <>

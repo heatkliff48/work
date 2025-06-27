@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Table from '../Table/Table';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import ShowProductsTypeWarehouseModal from './Modal/ProductsTypeWarehouseModal';
-import { getRelatedMaterialsWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import ListOfReservedAuxilaryModal from './ListOfReservedProducts/ListOfReservedAuxilaryModal';
 
@@ -17,8 +16,6 @@ function Warehouse() {
   const user = useSelector((state) => state.user);
 
   const [modalShow, setModalShow] = useState(false);
-
-  const dispatch = useDispatch();
 
   const handleRowClick = useCallback((row) => {
     setWarehouseInfoCurIdModal(row.original.id);
@@ -35,10 +32,6 @@ function Warehouse() {
       }
     }
   }, [user, roles, checkUserAccess, userAccess, setUserAccess]);
-
-  useEffect(() => {
-    dispatch(getRelatedMaterialsWarehouse());
-  }, []);
 
   return (
     <>
