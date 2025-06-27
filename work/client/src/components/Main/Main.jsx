@@ -25,6 +25,7 @@ import {
   getRelatedMaterialsJournal,
   getTool,
 } from '#components/redux/actions/productsTypeJournalAction.js';
+import { getDryMixesWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { getRecipeOrdersData } from '#components/redux/actions/recipeAction.js';
 import { getRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 import { getAllRoles } from '#components/redux/actions/rolesAction.js';
@@ -85,6 +86,8 @@ function Main() {
     dispatch(clearBatchState());
     dispatch(getAllStockBalance());
     dispatch(getRelatedMaterialsBackorder());
+    dispatch(getDryMixesWarehouse());
+
     setStoredData(null);
     //dispatch(dataFetchedChange(true));
   }, []);

@@ -2,27 +2,16 @@ import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
-// import { useProductsContext } from '#components/contexts/ProductContext.js';
-// import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-// import BatchOutsideModal from './BatchOutsideModal';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const BatchOutside = () => {
-  // const [modalShow, setModalShow] = useState(false);
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-  // const { setCurrentOrderedProducts, setCurrentBatchId, setCurrentBatch } = useWarehouseContext();
-  // const { latestProducts } = useProductsContext();
-
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const batchOutside = useSelector((state) => state.batchOutside);
-
-  const [batchOutsideDataList, setBatchOutsideDataList] = useState([]);
-
-  // const list_of_ordered_production = useSelector((state) => state.listOfOrderedProduction );
 
   const batch_outside_table = [
     {
@@ -46,12 +35,6 @@ const BatchOutside = () => {
       Filter: TextSearchFilter,
     },
   ];
-
-  useEffect(() => {
-    if (batchOutside) {
-      setBatchOutsideDataList(batchOutside);
-    }
-  }, [batchOutside]);
 
   // const batchOutsideHandler = (id) => {
   //   const currBatch = batchOutside.find((el) => el.id === id);
@@ -89,16 +72,13 @@ const BatchOutside = () => {
       {' '}
       <Table
         COLUMN_DATA={batch_outside_table}
-        dataOfTable={batchOutsideDataList}
+        dataOfTable={batchOutside}
         tableName={'Production plan'}
         userAccess={userAccess}
         handleRowClick={(row) => {
           // batchOutsideHandler(row.original.id);
         }}
       />
-      {/* {userAccess?.canWrite && (
-        <BatchOutsideModal show={modalShow} onHide={() => setModalShow(false)} />
-      )} */}
     </Fragment>
   );
 };

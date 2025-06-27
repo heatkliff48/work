@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Table from '../Table/Table';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import ShowProductsTypeWarehouseModal from './Modal/ProductsTypeWarehouseModal';
-import { getDryMixesWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import ListOfReservedAuxilaryModal from './ListOfReservedProducts/ListOfReservedAuxilaryModal';
 
@@ -19,11 +18,8 @@ function Warehouse() {
 
   const handleRowClick = useCallback((row) => {
     setWarehouseInfoCurIdModal(row.original.id);
-    // setWarehouseInfoModal(!warehouseInfoModal);
     setModalShow(true);
   }, []);
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (user && roles.length > 0) {
@@ -34,10 +30,6 @@ function Warehouse() {
       }
     }
   }, [user, roles, checkUserAccess, userAccess, setUserAccess]);
-
-  useEffect(() => {
-    dispatch(getDryMixesWarehouse());
-  }, []);
 
   return (
     <>
