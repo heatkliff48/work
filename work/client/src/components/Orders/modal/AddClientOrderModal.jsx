@@ -2,7 +2,6 @@ import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOrderContext } from '../../contexts/OrderContext';
-import { useNavigate } from 'react-router-dom';
 import { useProjectContext } from '#components/contexts/Context.js';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress.js';
 import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo.js';
@@ -25,7 +24,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setIsOrderReady,
   } = useOrderContext();
   const { clientModalOrder, setClientModalOrder } = useModalContext();
-  const { setCurrentClient, clients_info_table, clientsDataList } =
+  const { setCurrentClient, clients_info_table } =
     useProjectContext();
 
   const dispatch = useDispatch();
@@ -98,13 +97,13 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setNewOrder((prev) => ({ ...prev, del_adr_id: addressId }));
   };
 
-  const filterListOfClientsHandler = (e) => {
-    setSearchFilter(e.target.value);
-    let filtered = list_of_clients.filter((el) =>
-      el.c_name?.toLowerCase().includes(e.target.value.toLowerCase())
-    );
-    setListOfClientsFiltered(filtered);
-  };
+  // const filterListOfClientsHandler = (e) => {
+  //   setSearchFilter(e.target.value);
+  //   let filtered = list_of_clients.filter((el) =>
+  //     el.c_name?.toLowerCase().includes(e.target.value.toLowerCase())
+  //   );
+  //   setListOfClientsFiltered(filtered);
+  // };
 
   useEffect(() => {
     if (newOrder?.contact_id && newOrder?.del_adr_id) {
@@ -183,7 +182,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
               <ShowClientsModal />
               <Table
                 COLUMN_DATA={clients_info_table}
-                dataOfTable={clientsDataList}
+                dataOfTable={listOfClientsFiltered}
                 tableName={'Clients'}
                 handleRowClick={(row) => {
                   addClientOrderHendler(row.original.id);
