@@ -5,17 +5,14 @@ import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import ShowQualityManagementAddModal from './QualityManagementAddModal';
 import {
   deleteQualityManagement,
-  getQualityManagement,
   updateQualityManagement,
 } from '#components/redux/actions/qualityManagementAction.js';
 import {
   addNewWarehouse,
   updListOfOrderedProduction,
-  getListOfOrderedProduction,
 } from '#components/redux/actions/warehouseAction.js';
 import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
@@ -23,16 +20,12 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 const QualityManagementTable = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
-  const { list_of_reserved_products, list_of_ordered_production } =
-    useWarehouseContext();
+  const { list_of_ordered_production } = useWarehouseContext();
 
-  const user = useSelector((state) => state.user);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const qualityManagementData = useSelector((state) => state.qualityManagementData);
 
   const [qualityManagementDataList, setQualityManagementDataList] = useState([]);
-  const [modalShow, setModalShow] = useState(false);
 
   const COLUMNS_QUALITY_MANAGEMENT = [
     {
@@ -77,10 +70,6 @@ const QualityManagementTable = () => {
       setQualityManagementDataList(qualityManagementData);
     }
   }, [qualityManagementData]);
-
-  useEffect(() => {
-    dispatch(getQualityManagement());
-  }, []);
 
   const qualityManagementPlusHandler = async () => {
     if (qualityManagementData) {

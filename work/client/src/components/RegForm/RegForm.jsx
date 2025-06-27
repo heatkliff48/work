@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser } from '../redux/actions/userAction';
-import { getAllRoles } from '../redux/actions/rolesAction';
 import { useProjectContext } from '../contexts/Context';
 
 function RegForm() {
@@ -26,7 +25,6 @@ function RegForm() {
     if (user) {
       navigate('/');
     }
-    dispatch(getAllRoles());
   }, [user]);
 
   useEffect(() => {

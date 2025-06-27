@@ -1,21 +1,17 @@
 import Table from '#components/Table/Table';
-import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import React, { Fragment, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ShowProductsTypeJournalModal from './modal/ProductsTypeJournalModal';
 import ProductsTypeJournalInfoModal from './modal/ProductsTypeJournalInfoModal';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
-import { getDryMixesJournal } from '#components/redux/actions/productsTypeJournalAction.js';
 
 const DryMixesJournal = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { user } = useProjectContext();
 
   const navigate = useNavigate();
-  const dryMixesJournal = useSelector((state) => state.dryMixesJournal);
 
   const [dryMixesJournalDataList, setDryMixesJournalDataList] = useState([]);
   const [modalShow, setModalShow] = useState(false);
@@ -29,12 +25,6 @@ const DryMixesJournal = () => {
     setDataTable,
     latestDryMix,
   } = useProductsTypeJournalContext();
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getDryMixesJournal());
-  }, []);
 
   useEffect(() => {
     if (latestDryMix) {

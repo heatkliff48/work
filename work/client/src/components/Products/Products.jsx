@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
 import './products.css';
-import { getAllProducts } from '../redux/actions/productsAction';
+
 import ModalWindow from './modal/ModalWindow';
 import ProductCardModal from './modal/ProductCardModal';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { GlobalFilterInput } from '#components/Table/GlobalFilterInput';
 import { matchSorter } from 'match-sorter';
@@ -50,7 +50,6 @@ function Products() {
   );
 
   const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const sortTypes = {
@@ -99,12 +98,6 @@ function Products() {
       setModalProductCard(!modalProductCard);
     }
   };
-
-  useEffect(() => {
-    if (userAccess?.canRead) {
-      dispatch(getAllProducts());
-    }
-  }, [userAccess?.canRead]);
 
   useEffect(() => {
     if (user && roles.length > 0) {

@@ -1,11 +1,7 @@
 import React, { Fragment, useEffect, useState, createContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import UsersInfoFullModal from './usersInfoFullModal.jsx';
 import ShowUsersInfoModal from './usersInfoModal.jsx';
-import {
-  getAllUsersInfo,
-  getAllUsersMainInfo,
-} from '#components/redux/actions/usersInfoAction';
 import { useProjectContext } from '#components/contexts/Context.js';
 import Table from '#components/Table/Table';
 import { useUsersContext } from '#components/contexts/UserContext.js';
@@ -23,14 +19,8 @@ const UsersInfo = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
   const usersInfo = useSelector((state) => state.usersInfo);
   const usersMainInfo = useSelector((state) => state.usersMainInfo);
-
-  useEffect(() => {
-    dispatch(getAllUsersInfo());
-    dispatch(getAllUsersMainInfo());
-  }, []);
 
   const clientHandler = (id) => {
     const user = usersInfoDataList.find((el) => el.id === id);

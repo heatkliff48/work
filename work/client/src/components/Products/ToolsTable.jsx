@@ -1,20 +1,17 @@
 import Table from '#components/Table/Table';
-import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import React, { Fragment, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ShowProductsTypeJournalModal from './modal/ProductsTypeJournalModal';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import ProductsTypeJournalInfoModal from './modal/ProductsTypeJournalInfoModal';
-import { getTool } from '#components/redux/actions/productsTypeJournalAction.js';
 
 const ToolsTable = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const tool = useSelector((state) => state.tool);
 
   const [toolDataList, setToolDataList] = useState([]);
   const [modalShow, setModalShow] = useState(false);
@@ -27,12 +24,6 @@ const ToolsTable = () => {
     setDataTable,
     latestTools,
   } = useProductsTypeJournalContext();
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getTool());
-  }, []);
 
   useEffect(() => {
     if (latestTools) {

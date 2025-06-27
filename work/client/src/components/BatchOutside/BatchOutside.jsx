@@ -1,15 +1,13 @@
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import React, { Fragment, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const BatchOutside = () => {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const batchOutside = useSelector((state) => state.batchOutside);
 
@@ -60,12 +58,6 @@ const BatchOutside = () => {
       }
     }
   }, [user, roles]);
-
-  useEffect(() => {
-    if (userAccess?.canRead) {
-      dispatch(getBatchOutside());
-    }
-  }, []);
 
   return (
     <Fragment>
