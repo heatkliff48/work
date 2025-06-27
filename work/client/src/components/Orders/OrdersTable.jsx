@@ -1,10 +1,7 @@
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import {
-  getOrders,
-  getCurrentProductsOfOrders,
-} from '#components/redux/actions/ordersAction.js';
+import { getCurrentProductsOfOrders } from '#components/redux/actions/ordersAction.js';
 import Table from '../Table/Table';
 import { useOrderContext } from '../contexts/OrderContext';
 import AddClientOrderModal from './modal/AddClientOrderModal';
@@ -24,8 +21,6 @@ function OrdersTable() {
   const { setCurrentClient } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
-  const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -41,10 +36,6 @@ function OrdersTable() {
       }
     }
   }, [user, roles]);
-
-  useEffect(() => {
-    dispatch(getOrders());
-  }, [deliveryAddresses, ordersDataList]);
 
   useEffect(() => {
     setProductOfOrder({});

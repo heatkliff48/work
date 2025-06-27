@@ -1,6 +1,6 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import Select from 'react-select';
 import Container from 'react-bootstrap/Container';
 import InputField from '#components/InputField/InputField.jsx';
@@ -33,10 +33,7 @@ function ProductsTypeWarehouseModal(props) {
     dry_mixes_warehouse_data,
     related_materials_backorder_list,
   } = useWarehouseContext();
-  const [productsTypeWarehouseInput, setProductsTypeWarehouseInput] = useState({});
   const [warehouseData, setWarehouseData] = useState([]);
-
-  const [errors, setErrors] = useState({});
 
   const latestProductsType =
     props.target == 1
