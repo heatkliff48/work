@@ -64,6 +64,7 @@ const OrderCart = React.memo(() => {
     status_list,
     list_of_orders,
     setSelectedProduct,
+    productOfOrder,
     setProductOfOrder,
     personsInChargeList,
     accountingDataList,
@@ -368,9 +369,20 @@ const OrderCart = React.memo(() => {
   };
 
   const onProductClickHandler = (sel_prod) => {
-    const product = latestProducts.find(
-      (el) => el.article === sel_prod.product_article
-    );
+    const product =
+      sel_prod.product_article.slice(2, 3) == 'N'
+        ? latestProducts.find((el) => el.article === sel_prod.product_article)
+        : sel_prod.product_article.slice(2, 3) == 'M'
+        ? latestDryMix.find((el) => el.article === sel_prod.product_article)
+        : sel_prod.product_article.slice(2, 3) == 'P'
+        ? latestRelatedMaterials.find(
+            (el) => el.article === sel_prod.product_article
+          )
+        : sel_prod.product_article.slice(2, 3) == 'F'
+        ? latestAnchors.find((el) => el.article === sel_prod.product_article)
+        : latestTools.find((el) => el.article === sel_prod.product_article);
+    console.log('product', product);
+    console.log('sel_prod', sel_prod);
     setSelectedProduct(product);
     setProductOfOrder({ ...sel_prod, product_id: product?.id });
     setProductInfoModalOrder(!productInfoModalOrder);

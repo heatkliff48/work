@@ -346,6 +346,64 @@ class OrdersController {
     }
   }
 
+  static async getUpdateDryMixedProductsInfoOfOrder(req, res) {
+    const productOfOrder = req.body;
+
+    try {
+      const upd_prod_info = await OrdersService.getUpdateDryMixedProductsInfoOfOrder(
+        {
+          productOfOrder,
+        }
+      );
+
+      return res.status(200).json(upd_prod_info);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getUpdateAnchorProductsInfoOfOrder(req, res) {
+    const productOfOrder = req.body;
+
+    try {
+      const upd_prod_info = await OrdersService.getUpdateAnchorProductsInfoOfOrder({
+        productOfOrder,
+      });
+
+      return res.status(200).json(upd_prod_info);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getUpdateToolProductsInfoOfOrder(req, res) {
+    const productOfOrder = req.body;
+
+    try {
+      const upd_prod_info = await OrdersService.getUpdateToolProductsInfoOfOrder({
+        productOfOrder,
+      });
+
+      return res.status(200).json(upd_prod_info);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getUpdateRelMatProductsInfoOfOrder(req, res) {
+    const productOfOrder = req.body;
+
+    try {
+      const upd_prod_info = await OrdersService.getUpdateRelMatProductsInfoOfOrder({
+        productOfOrder,
+      });
+
+      return res.status(200).json(upd_prod_info);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async getUpdateContactInfoOfOrder(req, res) {
     const { contact_id, order_id } = req.body;
 

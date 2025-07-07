@@ -2,12 +2,22 @@ import React, { useEffect, useMemo } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useOrderContext } from '../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
-import { getUpdateProductInfoOfOrders } from '#components/redux/actions/ordersAction.js';
+import {
+  getUpdateProductInfoOfOrders,
+  getUpdateAnchorProductsInfoOfOrder,
+  getUpdateDryMixedProductsInfoOfOrder,
+  getUpdateRelMatProductsInfoOfOrder,
+  getUpdateToolProductsInfoOfOrder,
+} from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 
 const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   const {
     COLUMNS_ORDER_PRODUCT,
+    COLUMNS_ORDER_DRY_MIXES,
+    COLUMNS_ORDER_ANCHOR,
+    COLUMNS_ORDER_TOOL,
+    COLUMNS_ORDER_RELATED_MATERIAL,
     productOfOrder,
     setProductOfOrder,
     selectedProduct,
@@ -19,6 +29,18 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   const handleProductListOrderChange = (e) => {
     setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
+  const COLUMNS_ORDER = useMemo(() => {
+    return selectedProduct.article.slice(2, 3) == 'N'
+      ? COLUMNS_ORDER_PRODUCT
+      : selectedProduct.article.slice(2, 3) == 'M'
+      ? COLUMNS_ORDER_DRY_MIXES
+      : selectedProduct.article.slice(2, 3) == 'P'
+      ? COLUMNS_ORDER_RELATED_MATERIAL
+      : selectedProduct.article.slice(2, 3) == 'F'
+      ? COLUMNS_ORDER_ANCHOR
+      : COLUMNS_ORDER_TOOL;
+  }, [selectedProduct]);
 
   const quantity_palet_value = useMemo(() => {
     if (!selectedProduct) return;
@@ -52,7 +74,8 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
     setProductOfOrder((prev) => ({
       ...prev,
-      price_m2: result,
+      price_m2:
+        selectedProduct.article.slice(2, 3) == 'N' ? result : productOfOrder?.pvp,
     }));
     return result;
   }, [
@@ -63,7 +86,24 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
-    const result = (price_m2_value * quantity_real_value * (100 - discount)) / 100;
+    const result =
+      selectedProduct.article.slice(2, 3) == 'N'
+        ? (price_m2_value * quantity_real_value * (100 - discount)) / 100
+        : selectedProduct.article.slice(2, 3) == 'M'
+        ? (productOfOrder?.pvp *
+            productOfOrder?.quantity_real_ud *
+            (100 - discount)) /
+          100
+        : selectedProduct.article.slice(2, 3) == 'P'
+        ? (productOfOrder?.pvp * productOfOrder?.quantity_ud * (100 - discount)) /
+          100
+        : selectedProduct.article.slice(2, 3) == 'F'
+        ? (productOfOrder?.pvp *
+            productOfOrder?.quantity_real_ud *
+            (100 - discount)) /
+          100
+        : (productOfOrder?.pvp * productOfOrder?.quantity_ud * (100 - discount)) /
+          100;
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -73,13 +113,25 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   }, [price_m2_value, quantity_real_value, productOfOrder?.discount]);
 
   const addProductOrder = async () => {
-    dispatch(getUpdateProductInfoOfOrders(productOfOrder));
+    console.log('productOfOrder', productOfOrder);
+    selectedProduct.article.slice(2, 3) == 'N'
+      ? dispatch(getUpdateProductInfoOfOrders(productOfOrder))
+      : selectedProduct.article.slice(2, 3) == 'M'
+      ? dispatch(getUpdateDryMixedProductsInfoOfOrder(productOfOrder))
+      : selectedProduct.article.slice(2, 3) == 'P'
+      ? dispatch(getUpdateRelMatProductsInfoOfOrder(productOfOrder))
+      : selectedProduct.article.slice(2, 3) == 'F'
+      ? dispatch(getUpdateAnchorProductsInfoOfOrder(productOfOrder))
+      : dispatch(getUpdateToolProductsInfoOfOrder(productOfOrder));
+
     setProductOfOrder({});
     setSelectedProduct({});
     toggle();
   };
 
-  useEffect(() => {}, []);
+  // useEffect(() => {
+  //   console.log('productOfOrder', productOfOrder);
+  // }, [productOfOrder]);
 
   return (
     <div>
@@ -102,9 +154,15 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
         </ModalHeader>
         <ModalBody>
           <>
-            {COLUMNS_ORDER_PRODUCT?.map((el) => {
+            {COLUMNS_ORDER?.map((el) => {
               if (el.accessor === 'product_id') return null;
-              if (el.accessor === 'product_article')
+              if (
+                el.accessor === 'product_article' ||
+                el.accessor === 'dry_mixed_article' ||
+                el.accessor === 'anchor_article' ||
+                el.accessor === 'tool_article' ||
+                el.accessor === 'rel_mat_article'
+              )
                 return (
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
@@ -113,7 +171,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                       type="text"
                       id={el.accessor}
                       name={el.accessor}
-                      value={productOfOrder[el.accessor] || ''}
+                      value={productOfOrder.product_article || ''}
                       readOnly
                     />
                   </>
@@ -161,7 +219,8 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                 return (
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
-                    <input                      type="text"
+                    <input
+                      type="text"
                       id={el.accessor}
                       name={el.accessor}
                       value={final_price_value}

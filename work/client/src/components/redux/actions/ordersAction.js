@@ -32,6 +32,10 @@ import {
   GET_DELETE_REL_MAT_OF_ORDER,
   DELETE_SECONDARY_CONTACT,
   ADD_NEW_DELIVERY_PRICE,
+  GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER,
+  GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER,
+  GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER,
+  GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -105,6 +109,34 @@ export const getUpdateProductOfOrders = (newProductsOfOrder) => {
 export const getUpdateProductInfoOfOrders = (productOfOrder) => {
   return {
     type: GET_UPDATE_PRODUCT_INFO_OF_ORDER,
+    payload: productOfOrder,
+  };
+};
+
+export const getUpdateDryMixedProductsInfoOfOrder = (productOfOrder) => {
+  return {
+    type: GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER,
+    payload: productOfOrder,
+  };
+};
+
+export const getUpdateAnchorProductsInfoOfOrder = (productOfOrder) => {
+  return {
+    type: GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER,
+    payload: productOfOrder,
+  };
+};
+
+export const getUpdateToolProductsInfoOfOrder = (productOfOrder) => {
+  return {
+    type: GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER,
+    payload: productOfOrder,
+  };
+};
+
+export const getUpdateRelMatProductsInfoOfOrder = (productOfOrder) => {
+  return {
+    type: GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
     payload: productOfOrder,
   };
 };

@@ -37,9 +37,11 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
     const product = latestDryMix.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
-    setProductOfOrder((prev) => ({ ...prev, 
+    setProductOfOrder((prev) => ({
+      ...prev,
       dry_mixed_article: row.original.article,
-      dry_mixed_id: product?.id }));
+      dry_mixed_id: product?.id,
+    }));
   }, []);
 
   const handleProductListOrderChange = (e) => {
@@ -105,9 +107,11 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
   const pvp_value = useMemo(() => {
     const result = total_value > 1 ? final_price_value / total_value : 0;
 
+    console.log('pvp_value', result.toFixed(2));
+
     setProductOfOrder((prev) => ({
       ...prev,
-      pvp_dry: result.toFixed(2),
+      pvp: result.toFixed(2),
     }));
     return result.toFixed(2);
   }, [final_price_value, total_value]);
