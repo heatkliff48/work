@@ -178,6 +178,37 @@ class OrdersService {
     return upd_prod_info;
   }
 
+  static async getUpdateDryMixedProductsInfoOfOrder({ productOfOrder }) {
+    const upd_prod_info =
+      await OrdersRepository.getUpdateDryMixedProductsInfoOfOrder(productOfOrder);
+
+    return upd_prod_info;
+  }
+
+  static async getUpdateAnchorProductsInfoOfOrder({ productOfOrder }) {
+    const upd_prod_info = await OrdersRepository.getUpdateAnchorProductsInfoOfOrder(
+      productOfOrder
+    );
+
+    return upd_prod_info;
+  }
+
+  static async getUpdateToolProductsInfoOfOrder({ productOfOrder }) {
+    const upd_prod_info = await OrdersRepository.getUpdateToolProductsInfoOfOrder(
+      productOfOrder
+    );
+
+    return upd_prod_info;
+  }
+
+  static async getUpdateRelMatProductsInfoOfOrder({ productOfOrder }) {
+    const upd_prod_info = await OrdersRepository.getUpdateRelMatProductsInfoOfOrder(
+      productOfOrder
+    );
+
+    return upd_prod_info;
+  }
+
   static async getUpdateContactInfoOfOrder({ contact_id, order_id }) {
     await OrdersRepository.getUpdateContactInfoOrder({ contact_id, order_id });
 

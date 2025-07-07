@@ -18,8 +18,14 @@ router.post('/delete/sec_cnt', OrdersController.deleteSecondaryContact);
 router.post('/current/products', OrdersController.getCurrentProductsOfOrder);
 router.post('/delete', OrdersController.getDeleteOrder);
 router.post('/delete/product', OrdersController.getDeleteProductOfOrder);
-router.post('/delete/dry_mixed_products', OrdersController.getDeleteDryMixedProductOfOrder);
-router.post('/delete/anchor_product', OrdersController.getDeleteAnchorProductOfOrder);
+router.post(
+  '/delete/dry_mixed_products',
+  OrdersController.getDeleteDryMixedProductOfOrder
+);
+router.post(
+  '/delete/anchor_product',
+  OrdersController.getDeleteAnchorProductOfOrder
+);
 router.post('/delete/tool_product', OrdersController.getDeleteToolProductOfOrder);
 router.post('/products/add', OrdersController.getUpdateProductsOfOrder);
 router.post(
@@ -28,8 +34,27 @@ router.post(
 );
 router.post('/anchor_products/add', OrdersController.getUpdateAnchorProductsOfOrder);
 router.post('/tool_products/add', OrdersController.getUpdateToolProductsOfOrder);
-router.post('/rel_mat_products/add', OrdersController.getUpdateRelMatProductsOfOrder);
+router.post(
+  '/rel_mat_products/add',
+  OrdersController.getUpdateRelMatProductsOfOrder
+);
 router.post('/product/update/info', OrdersController.getUpdateProductInfoOfOrder);
+router.post(
+  '/dry_mixed_products/update/info',
+  OrdersController.getUpdateDryMixedProductsInfoOfOrder
+);
+router.post(
+  '/anchor_products/update/info',
+  OrdersController.getUpdateAnchorProductsInfoOfOrder
+);
+router.post(
+  '/tool_products/update/info',
+  OrdersController.getUpdateToolProductsInfoOfOrder
+);
+router.post(
+  '/rel_mat_products/update/info',
+  OrdersController.getUpdateRelMatProductsInfoOfOrder
+);
 router.post('/update/contact', OrdersController.getUpdateContactInfoOfOrder);
 router.post(
   '/update/delivery_address',
