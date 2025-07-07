@@ -46,7 +46,11 @@ import RelatedMaterialsBackorderList from '#components/Warehouse/RelatedMaterial
 
 function App() {
   const dispatch = useDispatch();
-  const url = 'ws://localhost:3001';
+
+  // WS_URL_AUTO_REPLACE_START
+  const url = 'ws://192.168.0.103:3001';
+  // WS_URL_AUTO_REPLACE_END
+
   // const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   // const isCheckedAuth = useRef(false);
