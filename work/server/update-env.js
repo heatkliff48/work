@@ -48,6 +48,18 @@ const os = require('os');
     } else {
       console.warn('Файл .env фронтенда не найден');
     }
+
+    // Обновляем url в App.js фронтенда
+    const appJsPath = '../client/src/App.js';
+    if (fs.existsSync(appJsPath)) {
+      let appJs = fs.readFileSync(appJsPath, 'utf8');
+
+      // Ищем и заменяем URL WebSocket
+      appJs = appJs.replace(/const url = .*/, `const url = 'ws://${ip}:3001';`);
+
+      fs.writeFileSync(appJsPath, appJs);
+      console.log('✅ App.js фронтенда обновлен');
+    }
   } catch (err) {
     console.error('Ошибка:', err.message);
     process.exit(1);
