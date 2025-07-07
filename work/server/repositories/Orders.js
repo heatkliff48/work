@@ -31,7 +31,6 @@ class OrdersRepository {
   static async addDeliveryPrice({ delivery, order_id }) {
     try {
       await Orders.update({ delivery }, { where: { id: order_id } });
-
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
@@ -305,6 +304,11 @@ class OrdersRepository {
     try {
       const { order_id, productOfOrder } = newDryMixedProductsOfOrder;
 
+      console.log(
+        'productOfOrder ---------------------------------------------------',
+        productOfOrder
+      );
+
       const {
         dry_mixed_id,
         quantity_ud,
@@ -572,6 +576,210 @@ class OrdersRepository {
           'discount',
           'final_price',
           'warehouse_id',
+        ],
+      });
+
+      return upd_prod_info;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getUpdateDryMixedProductsInfoOfOrder(productOfOrder) {
+    try {
+      const {
+        order_id,
+        dry_mixed_id,
+        quantity_ud,
+        quantity_palet_dry,
+        quantity_real_ud,
+        total,
+        discount,
+        pvp,
+        final_price,
+        id,
+      } = productOfOrder;
+
+      await OrderDryMixedProducts.update(
+        {
+          order_id,
+          dry_mixed_id,
+          quantity_ud,
+          quantity_palet_dry,
+          quantity_real_ud,
+          total,
+          discount,
+          pvp,
+          final_price,
+          id,
+        },
+        { where: { id } }
+      );
+
+      const upd_prod_info = await OrderDryMixedProducts.findOne({
+        where: { id },
+        attributes: [
+          'order_id',
+          'dry_mixed_id',
+          'quantity_ud',
+          'quantity_palet_dry',
+          'quantity_real_ud',
+          'total',
+          'discount',
+          'pvp',
+          'final_price',
+          'id',
+        ],
+      });
+
+      return upd_prod_info;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getUpdateAnchorProductsInfoOfOrder(productOfOrder) {
+    try {
+      const {
+        order_id,
+        anchor_id,
+        quantity_ud,
+        quantity_palet_anchor,
+        quantity_real_ud,
+        total,
+        discount,
+        pvp,
+        final_price,
+        id,
+      } = productOfOrder;
+
+      await OrderAnchorProducts.update(
+        {
+          order_id,
+          anchor_id,
+          quantity_ud,
+          quantity_palet_anchor,
+          quantity_real_ud,
+          total,
+          discount,
+          pvp,
+          final_price,
+          id,
+        },
+        { where: { id } }
+      );
+
+      const upd_prod_info = await OrderAnchorProducts.findOne({
+        where: { id },
+        attributes: [
+          'order_id',
+          'anchor_id',
+          'quantity_ud',
+          'quantity_palet_anchor',
+          'quantity_real_ud',
+          'total',
+          'discount',
+          'pvp',
+          'final_price',
+          'id',
+        ],
+      });
+
+      return upd_prod_info;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getUpdateToolProductsInfoOfOrder(productOfOrder) {
+    try {
+      const {
+        order_id,
+        tool_id,
+        quantity_ud,
+        total,
+        discount,
+        pvp,
+        final_price,
+        id,
+      } = productOfOrder;
+
+      await OrderToolProducts.update(
+        {
+          order_id,
+          tool_id,
+          quantity_ud,
+          total,
+          discount,
+          pvp,
+          final_price,
+          id,
+        },
+        { where: { id } }
+      );
+
+      const upd_prod_info = await OrderToolProducts.findOne({
+        where: { id },
+        attributes: [
+          'order_id',
+          'tool_id',
+          'quantity_ud',
+          'total',
+          'discount',
+          'pvp',
+          'final_price',
+          'id',
+        ],
+      });
+
+      return upd_prod_info;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getUpdateRelMatProductsInfoOfOrder(productOfOrder) {
+    try {
+      const {
+        order_id,
+        rel_mat_id,
+        quantity_ud,
+        total,
+        discount,
+        pvp,
+        final_price,
+        id,
+      } = productOfOrder;
+
+      await OrderRelMatProducts.update(
+        {
+          order_id,
+          rel_mat_id,
+          quantity_ud,
+          total,
+          discount,
+          pvp,
+          final_price,
+          id,
+        },
+        { where: { id } }
+      );
+
+      const upd_prod_info = await OrderRelMatProducts.findOne({
+        where: { id },
+        attributes: [
+          'order_id',
+          'rel_mat_id',
+          'quantity_ud',
+          'total',
+          'discount',
+          'pvp',
+          'final_price',
+          'id',
         ],
       });
 

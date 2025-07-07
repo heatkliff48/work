@@ -6,6 +6,10 @@ import {
   TOOL_PRODUCTS_OF_ORDER,
   ANCHOR_PRODUCTS_OF_ORDER,
   REL_MAT_PRODUCTS_OF_ORDER,
+  UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER,
+  UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER,
+  UPDATE_TOOL_PRODUCT_INFO_OF_ORDER,
+  UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
 } from '../types/ordersTypes';
 import {
   DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
@@ -57,7 +61,10 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
   }
 };
 
-export const dryMixedProductsOfOrdersReducer = (state = [], action) => {
+export const dryMixedProductsOfOrdersReducer = (
+  dryMixedProductsOfOrders = [],
+  action
+) => {
   const { type, payload } = action;
 
   switch (type) {
@@ -66,20 +73,35 @@ export const dryMixedProductsOfOrdersReducer = (state = [], action) => {
     }
 
     case UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...state, payload];
+      return [...dryMixedProductsOfOrders, payload];
+    }
+
+    case UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER: {
+      const result = dryMixedProductsOfOrders.map((el) => {
+        if (el?.id === payload?.id) {
+          return { ...payload };
+        }
+
+        return el;
+      });
+
+      return result;
     }
 
     case DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET: {
-      const result = state.filter((el) => el.id !== payload);
+      const result = dryMixedProductsOfOrders.filter((el) => el.id !== payload);
       return result;
     }
 
     default:
-      return state;
+      return dryMixedProductsOfOrders;
   }
 };
 
-export const anchorProductsOfOrdersReducer = (state = [], action) => {
+export const anchorProductsOfOrdersReducer = (
+  anchorProductsOfOrders = [],
+  action
+) => {
   const { type, payload } = action;
 
   switch (type) {
@@ -88,20 +110,32 @@ export const anchorProductsOfOrdersReducer = (state = [], action) => {
     }
 
     case UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...state, payload];
+      return [...anchorProductsOfOrders, payload];
+    }
+
+    case UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER: {
+      const result = anchorProductsOfOrders.map((el) => {
+        if (el?.id === payload?.id) {
+          return { ...payload };
+        }
+
+        return el;
+      });
+
+      return result;
     }
 
     case DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET: {
-      const result = state.filter((el) => el.id !== payload);
+      const result = anchorProductsOfOrders.filter((el) => el.id !== payload);
       return result;
     }
 
     default:
-      return state;
+      return anchorProductsOfOrders;
   }
 };
 
-export const toolProductsOfOrdersReducer = (state = [], action) => {
+export const toolProductsOfOrdersReducer = (toolProductsOfOrders = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case TOOL_PRODUCTS_OF_ORDER: {
@@ -109,20 +143,35 @@ export const toolProductsOfOrdersReducer = (state = [], action) => {
     }
 
     case UPDATE_TOOL_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...state, payload];
+      return [...toolProductsOfOrders, payload];
+    }
+
+    case UPDATE_TOOL_PRODUCT_INFO_OF_ORDER: {
+      const result = toolProductsOfOrders.map((el) => {
+        if (el?.id === payload?.id) {
+          return { ...payload };
+        }
+
+        return el;
+      });
+
+      return result;
     }
 
     case DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET: {
-      const result = state.filter((el) => el.id !== payload);
+      const result = toolProductsOfOrders.filter((el) => el.id !== payload);
       return result;
     }
 
     default:
-      return state;
+      return toolProductsOfOrders;
   }
 };
 
-export const relMatProductsOfOrdersReducer = (state = [], action) => {
+export const relMatProductsOfOrdersReducer = (
+  relMatProductsOfOrders = [],
+  action
+) => {
   const { type, payload } = action;
   switch (type) {
     case REL_MAT_PRODUCTS_OF_ORDER: {
@@ -130,15 +179,27 @@ export const relMatProductsOfOrdersReducer = (state = [], action) => {
     }
 
     case UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...state, payload];
+      return [...relMatProductsOfOrders, payload];
+    }
+
+    case UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER: {
+      const result = relMatProductsOfOrders.map((el) => {
+        if (el?.id === payload?.id) {
+          return { ...payload };
+        }
+
+        return el;
+      });
+
+      return result;
     }
 
     case DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET: {
-      const result = state.filter((el) => el.id !== payload);
+      const result = relMatProductsOfOrders.filter((el) => el.id !== payload);
       return result;
     }
 
     default:
-      return state;
+      return relMatProductsOfOrders;
   }
 };
