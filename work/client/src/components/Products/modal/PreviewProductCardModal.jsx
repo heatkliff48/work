@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, version } from 'react';
 import {
   Button,
   Card,
@@ -22,14 +22,8 @@ import {
 
 const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
   const { COLUMNS, getOptionValue, selectOptions } = useProductsContext();
-  const {
-    previewProductData,
-    setPreviewOperationName,
-    isRepair,
-    setIsRepair,
-    isEdit,
-    setIsEdit,
-  } = useProjectContext();
+  const { previewProductData, setPreviewOperationName, setIsRepair, setIsEdit } =
+    useProjectContext();
   const { previewProductModal, setPreviewProductModal } = useModalContext();
 
   const dispatch = useDispatch();
@@ -98,8 +92,12 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
     const rightPalletSize = getOptionValue('palletSize', palletSize);
     const rightPalletHeight = getOptionValue('palletHeight', palletHeight);
 
+    const newVersion =
+      previewOperationName === 'add' ? 1 : previewProductData.version;
+
     const obj = {
       ...previewProductData,
+      version: newVersion,
       placeOfProduction: rightPlaceOfProduction,
       typeOfPackaging: rightTypeOfPackaging,
       palletSize: rightPalletSize,
