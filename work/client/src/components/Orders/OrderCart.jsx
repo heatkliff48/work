@@ -381,8 +381,6 @@ const OrderCart = React.memo(() => {
         : sel_prod.product_article.slice(2, 3) == 'F'
         ? latestAnchors.find((el) => el.article === sel_prod.product_article)
         : latestTools.find((el) => el.article === sel_prod.product_article);
-    console.log('product', product);
-    console.log('sel_prod', sel_prod);
     setSelectedProduct(product);
     setProductOfOrder({ ...sel_prod, product_id: product?.id });
     setProductInfoModalOrder(!productInfoModalOrder);

@@ -107,8 +107,6 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
   const pvp_value = useMemo(() => {
     const result = total_value > 1 ? final_price_value / total_value : 0;
 
-    console.log('pvp_value', result.toFixed(2));
-
     setProductOfOrder((prev) => ({
       ...prev,
       pvp: result.toFixed(2),
