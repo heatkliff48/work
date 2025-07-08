@@ -97,7 +97,7 @@ const ModalWindow = React.memo(
       };
 
       const isExistingProduct = products.some(
-        (product) => product.article === prodArticle
+        (product) => product.article === prodArticle && product.density === density
       );
 
       const existingProduct = products.find(
@@ -116,10 +116,10 @@ const ModalWindow = React.memo(
         const prevName = needRepair ? 'repair' : 'edit';
         setPreviewOperationName(prevName);
 
-        if (isExistingProduct) {
+        if (isExistingProduct && !needRepair) {
           updatedProduct.version = lastVersion + 1;
-          updatedProduct.productCode = existingProduct.productCode;
         }
+        updatedProduct.productCode = existingProduct.productCode;
 
         setPreviewProductData(updatedProduct);
       } else if (isExistingProduct) {

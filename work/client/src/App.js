@@ -48,7 +48,7 @@ function App() {
   const dispatch = useDispatch();
 
   // WS_URL_AUTO_REPLACE_START
-  const url = 'ws://192.168.0.103:3001';
+  const url = process.env.REACT_APP_URL_SOCKET;
   // WS_URL_AUTO_REPLACE_END
 
   // const navigate = useNavigate();
