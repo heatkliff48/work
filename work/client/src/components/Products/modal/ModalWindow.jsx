@@ -136,9 +136,10 @@ const ModalWindow = React.memo(
       } else if (isEdit) {
         setPreviewOperationName('edit');
 
+        console.log('updatedProduct', updatedProduct);
+
         const obj = {
           ...updatedProduct,
-          productCode: existingProduct.productCode,
           version: lastVersion + 1,
         };
 
