@@ -42,29 +42,116 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       : COLUMNS_ORDER_TOOL;
   }, [selectedProduct]);
 
+  const pieces_per_pallet = selectedProduct?.pieces_per_unit ?? 0;
+
   const quantity_palet_value = useMemo(() => {
     if (!selectedProduct) return;
     if (!productOfOrder?.quantity_m2) productOfOrder.quantity_m2 = 0;
-    const result = Math.ceil(
-      productOfOrder?.quantity_m2 / (selectedProduct?.m2 || 1)
-    );
 
-    setProductOfOrder((prev) => ({
-      ...prev,
-      quantity_palet: result,
-    }));
-    return result;
-  }, [productOfOrder.quantity_m2, selectedProduct?.m2]);
+    if (selectedProduct.article.slice(2, 3) == 'N') {
+      const result = Math.ceil(
+        productOfOrder?.quantity_m2 / (selectedProduct?.m2 || 1)
+      );
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_palet: result,
+      }));
+      return result;
+    } else if (selectedProduct.article.slice(2, 3) == 'M') {
+      const result = Math.ceil(
+        productOfOrder?.quantity_ud / (selectedProduct?.units_per_pallet || 1)
+      );
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_palet_dry: result,
+      }));
+      return result;
+    } else if (selectedProduct.article.slice(2, 3) == 'F') {
+      const result = Math.ceil(
+        productOfOrder?.quantity_ud / (pieces_per_pallet || 1)
+      );
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_palet_anchor: result,
+      }));
+      return result;
+    }
+  }, [
+    productOfOrder?.quantity_m2,
+    selectedProduct?.m2,
+    productOfOrder?.quantity_ud,
+    selectedProduct?.units_per_pallet,
+  ]);
 
   const quantity_real_value = useMemo(() => {
-    const result = Math.ceil(quantity_palet_value * (selectedProduct?.m2 || 1));
+    if (selectedProduct.article.slice(2, 3) == 'N') {
+      const result = Math.ceil(quantity_palet_value * (selectedProduct?.m2 || 1));
 
-    setProductOfOrder((prev) => ({
-      ...prev,
-      quantity_real: result,
-    }));
-    return result;
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_real: result,
+      }));
+      return result;
+    } else if (selectedProduct.article.slice(2, 3) == 'M') {
+      const result = Math.ceil(
+        quantity_palet_value * (selectedProduct?.units_per_pallet || 1)
+      );
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_real_ud: result,
+      }));
+      return result;
+    } else if (selectedProduct.article.slice(2, 3) == 'F') {
+      const result = Math.ceil(quantity_palet_value * (pieces_per_pallet || 1));
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_real_ud: result,
+      }));
+      return result;
+    }
   }, [quantity_palet_value, selectedProduct?.m2]);
+
+  const total_value = useMemo(() => {
+    if (selectedProduct.article.slice(2, 3) == 'F') {
+      const result = quantity_palet_value * pieces_per_pallet;
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        total: result.toFixed(2),
+      }));
+      return result.toFixed(2);
+    } else if (
+      selectedProduct.article.slice(2, 3) == 'T' ||
+      selectedProduct.article.slice(2, 3) == 'P'
+    ) {
+      const result = productOfOrder.quantity_ud;
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        total: result,
+      }));
+      return result;
+    } else {
+      const result = quantity_palet_value * selectedProduct?.units_per_pallet;
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        total: result.toFixed(2),
+      }));
+      return result.toFixed(2);
+    }
+  }, [
+    quantity_palet_value,
+    selectedProduct?.units_per_pallet,
+    productOfOrder?.quantity_palet_anchor,
+    productOfOrder?.quantity_ud,
+    selectedProduct?.piece_weight,
+  ]);
 
   const price_m2_value = useMemo(() => {
     const result = (
@@ -90,19 +177,23 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       selectedProduct.article.slice(2, 3) == 'N'
         ? (price_m2_value * quantity_real_value * (100 - discount)) / 100
         : selectedProduct.article.slice(2, 3) == 'M'
-        ? (productOfOrder?.pvp *
-            productOfOrder?.quantity_real_ud *
-            (100 - discount)) /
+        ? (selectedProduct?.price_per_unit *
+            quantity_real_value *
+            Math.abs(100 - discount)) /
           100
         : selectedProduct.article.slice(2, 3) == 'P'
-        ? (productOfOrder?.pvp * productOfOrder?.quantity_ud * (100 - discount)) /
+        ? (selectedProduct?.price_per_unit *
+            productOfOrder?.quantity_ud *
+            Math.abs(100 - discount)) /
           100
         : selectedProduct.article.slice(2, 3) == 'F'
-        ? (productOfOrder?.pvp *
-            productOfOrder?.quantity_real_ud *
-            (100 - discount)) /
+        ? (selectedProduct?.price_per_unit *
+            quantity_real_value *
+            Math.abs(100 - discount)) /
           100
-        : (productOfOrder?.pvp * productOfOrder?.quantity_ud * (100 - discount)) /
+        : (selectedProduct?.price_per_unit *
+            productOfOrder?.quantity_ud *
+            Math.abs(100 - discount)) /
           100;
 
     setProductOfOrder((prev) => ({
@@ -110,7 +201,23 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       final_price: result,
     }));
     return result;
-  }, [price_m2_value, quantity_real_value, productOfOrder?.discount]);
+  }, [
+    price_m2_value,
+    quantity_real_value,
+    productOfOrder?.discount,
+    selectedProduct?.price_per_unit,
+    productOfOrder?.quantity_ud,
+  ]);
+
+  const pvp_value = useMemo(() => {
+    const result = total_value > 1 ? final_price_value / total_value : 0;
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      pvp: result.toFixed(2),
+    }));
+    return result.toFixed(2);
+  }, [final_price_value, total_value]);
 
   const addProductOrder = async () => {
     console.log('productOfOrder', productOfOrder);
@@ -176,7 +283,11 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                     />
                   </>
                 );
-              if (el.accessor === 'quantity_palet')
+              if (
+                el.accessor === 'quantity_palet' ||
+                el.accessor === 'quantity_palet_dry' ||
+                el.accessor === 'quantity_palet_ud'
+              )
                 return (
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
@@ -189,7 +300,10 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                     />
                   </>
                 );
-              if (el.accessor === 'quantity_real')
+              if (
+                el.accessor === 'quantity_real' ||
+                el.accessor === 'quantity_real_ud'
+              )
                 return (
                   <>
                     <ModalBody>{el.Header}:</ModalBody>
@@ -211,6 +325,32 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                       id={el.accessor}
                       name={el.accessor}
                       value={price_m2_value}
+                      readOnly
+                    />
+                  </>
+                );
+              if (el.accessor === 'total')
+                return (
+                  <>
+                    <ModalBody>{el.Header}:</ModalBody>
+                    <input
+                      type="text"
+                      id={el.accessor}
+                      name={el.accessor}
+                      value={total_value}
+                      readOnly
+                    />
+                  </>
+                );
+              if (el.accessor === 'pvp')
+                return (
+                  <>
+                    <ModalBody>{el.Header}:</ModalBody>
+                    <input
+                      type="text"
+                      id={el.accessor}
+                      name={el.accessor}
+                      value={pvp_value}
                       readOnly
                     />
                   </>
