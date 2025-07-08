@@ -16,8 +16,6 @@ const BlocksJournalTableOrder = ({
   const { productModalOrder, setProductModalOrder } = useModalContext();
   const { userAccess } = useUsersContext();
 
-  console.log('productListOrder - Blocks', productListOrder);
-
   return (
     <>
       {productModalOrder && (

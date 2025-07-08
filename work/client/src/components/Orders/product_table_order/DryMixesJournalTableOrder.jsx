@@ -16,8 +16,6 @@ const DryMixesJournalTableOrder = ({
     useModalContext();
   const { userAccess } = useUsersContext();
 
-  console.log('productListOrder - Dry Mix', productListOrder);
-
   return (
     <>
       {dryMixedProductModalOrder && (
