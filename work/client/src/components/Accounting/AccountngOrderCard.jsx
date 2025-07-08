@@ -6,6 +6,8 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { updAccountingDataList } from '#components/redux/actions/ordersAction.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 const AccountngOrderCard = React.memo(() => {
   const {
@@ -25,6 +27,7 @@ const AccountngOrderCard = React.memo(() => {
   const { latestProducts } = useProductsContext();
   const { latestDryMix, latestRelatedMaterials, latestAnchors, latestTools } =
     useProductsTypeJournalContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const productListOrder = useSelector((state) => state.productsOfOrders);
   const dispatch = useDispatch();
 
@@ -391,6 +394,7 @@ const AccountngOrderCard = React.memo(() => {
               </div>
             </div>
           </div>
+          <FilesMain userAccess={userAccess} />
           <div className="status-table">
             {accountingStatusList.map((item) => (
               <div key={item.accessor} className="status-row">

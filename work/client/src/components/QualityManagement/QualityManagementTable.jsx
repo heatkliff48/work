@@ -14,7 +14,10 @@ import {
   addNewWarehouse,
   updListOfOrderedProduction,
 } from '#components/redux/actions/warehouseAction.js';
-import { deleteBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+import {
+  deleteBatchOutside,
+  updateBatchOutside,
+} from '#components/redux/actions/batchOutsideAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 const QualityManagementTable = () => {
@@ -24,6 +27,7 @@ const QualityManagementTable = () => {
 
   const dispatch = useDispatch();
   const qualityManagementData = useSelector((state) => state.qualityManagementData);
+  const batchOutside = useSelector((state) => state.batchOutside);
 
   const [qualityManagementDataList, setQualityManagementDataList] = useState([]);
 
@@ -168,9 +172,13 @@ const QualityManagementTable = () => {
         batch_id,
         product_article,
         reserved_quantity_allocated,
+        reserved_quantity_remaining,
+        total_quantity_plan,
         free_quantity_fact,
         production_plan_id,
       } = qualityManagementData[0];
+
+      console.log('qualityManagementData[0]', qualityManagementData[0]);
 
       // 1. Фильтруем резервы для текущего product_article
       const reservedProducts =
@@ -254,7 +262,20 @@ const QualityManagementTable = () => {
       }
       await dispatch(deleteQualityManagement(id));
       if (production_plan_id) {
-        await dispatch(deleteBatchOutside(production_plan_id));
+        if (
+          reserved_quantity_remaining <= 0 ||
+          total_quantity_plan - reserved_quantity_allocated < 63
+        ) {
+          await dispatch(deleteBatchOutside(production_plan_id));
+        } else {
+          const batch = batchOutside.find((el) => el.id === production_plan_id);
+          await dispatch(
+            updateBatchOutside({
+              ...batch,
+              quantity_pallets: total_quantity_plan - reserved_quantity_allocated,
+            })
+          );
+        }
       }
     }
   };
