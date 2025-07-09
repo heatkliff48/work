@@ -27,6 +27,10 @@ router.post(
   OrdersController.getDeleteAnchorProductOfOrder
 );
 router.post('/delete/tool_product', OrdersController.getDeleteToolProductOfOrder);
+router.post(
+  '/delete/rel_mat_product',
+  OrdersController.getDeleteRelMatProductOfOrder
+);
 router.post('/products/add', OrdersController.getUpdateProductsOfOrder);
 router.post(
   '/dry_mixed_products/add',
