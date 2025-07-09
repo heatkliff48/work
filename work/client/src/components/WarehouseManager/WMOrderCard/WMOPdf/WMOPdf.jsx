@@ -172,9 +172,15 @@ const WMOPdf = ({ orderCartData, toggle }) => {
 
       const palet = shipped - bd_ship?.shipped;
 
-      const valuue = product?.quantityBlockOnPallet ?? product?.units_per_pallet;
+      console.log('product', product);
 
-      const unidades = palet * valuue;
+      const valuue = product?.quantityBlockOnPallet ?? product?.units_per_pallet ?? 1;
+
+      console.log('valuue', valuue);
+
+      console.log('palet', palet);
+
+      const unidades = Number(palet) * Number(valuue);
 
       if (palet == 0) return {};
 
