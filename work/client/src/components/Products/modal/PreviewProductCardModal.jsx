@@ -103,7 +103,7 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
       palletSize: rightPalletSize,
       palletHeight: rightPalletHeight,
     };
-
+    console.log('object', obj);
     if (['add', 'edit'].includes(previewOperationName)) {
       dispatch(addNewProduct(obj));
     } else {
