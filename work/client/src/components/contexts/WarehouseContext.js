@@ -262,6 +262,7 @@ const WarehouseContextProvider = ({ children }) => {
 
         const quantity =
           prod?.quantity_palet ||
+          prod?.quantity_ud ||
           prod?.quantity_palet_dry ||
           prod?.quantity_palet_anchor;
 

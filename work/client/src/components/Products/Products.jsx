@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
 import './products.css';
@@ -24,11 +24,16 @@ function Products() {
     setModalProductCard,
     previewProductModal,
   } = useModalContext();
-  const { TABLE_COLUMNS, COLUMNS, latestProducts } = useProductsContext();
+  const { TABLE_COLUMNS, COLUMNS, latestProducts, products } = useProductsContext();
   const { setProductCardData, previewOperationName } = useProjectContext();
 
+  const [data, setData] = useState([]);
   const columns = useMemo(() => TABLE_COLUMNS, []);
-  const data = useMemo(() => latestProducts ?? [], [latestProducts]);
+  // const data = useMemo(() => latestProducts ?? [], [latestProducts, products]);
+
+  useEffect(() => {
+    setData(latestProducts);
+  }, [latestProducts, products]);
 
   const defaultColumn = useMemo(
     () => ({

@@ -3,7 +3,7 @@ import {
   REP_PRODUCT_SOCKET,
   UPD_PRODUCT_SOCKET,
 } from '../types/socketTypes/socket';
-import { ALL_PRODUCTS} from '../types/productsTypes';
+import { ALL_PRODUCTS } from '../types/productsTypes';
 
 export const productsReducer = (products = [], action) => {
   const { type, payload } = action;
@@ -27,10 +27,15 @@ export const productsReducer = (products = [], action) => {
     }
 
     case REP_PRODUCT_SOCKET: {
+      console.log('payload', payload);
+      console.log('products', products);
       const updateProducts = products.map((el) => {
-        if (el.id === payload.id) return payload;
+        if (el.id == payload.id)
+          return payload;
         return el;
       });
+
+      console.log('REP_PRODUCT_SOCKET', updateProducts);
 
       return updateProducts;
     }
