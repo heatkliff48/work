@@ -433,6 +433,7 @@ export const ProductsContextProvider = ({ children }) => {
         TABLE_COLUMNS,
         COLUMNS,
         latestProducts,
+        products,
         selectOptions,
         getOptionValue,
       }}

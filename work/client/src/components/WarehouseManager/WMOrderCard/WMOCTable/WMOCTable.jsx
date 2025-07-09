@@ -27,7 +27,6 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     anchors_warehouse_data,
     tools_warehouse_data,
     related_materials_warehouse_data,
-    related_materials_backorder_list,
   } = useWarehouseContext();
 
   const {
@@ -77,9 +76,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
               const { allocated, remainingInBatch } = el;
 
               const canPlus =
-                remainingInBatch > 0 &&
-                qty_rem > 0 &&
-                allocated < wmoctItem.qty_total;
+                remainingInBatch > 0 && qty_rem > 0 && allocated < remainingInBatch;
               const result = canPlus ? allocated + 1 : allocated;
 
               shipped = canPlus ? shipped + 1 : shipped;

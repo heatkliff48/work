@@ -97,8 +97,8 @@ const ModalWindow = React.memo(
       };
 
       const isExistingProduct = products.some(
-        (product) => product.article === prodArticle && product.density === density
-      );
+        (product) => product.article === prodArticle && product.density == density
+      ); // добавить проверку выс шир длин
 
       const existingProduct = products.find(
         (product) => product.article === prodArticle
@@ -110,19 +110,9 @@ const ModalWindow = React.memo(
 
       const needRepair = products.some(
         (product) => product.article === prodArticle && product.density != density
-      );
+      ); // добавить проверку выс шир длин
 
-      if (isRepair) {
-        const prevName = needRepair ? 'repair' : 'edit';
-        setPreviewOperationName(prevName);
-
-        if (isExistingProduct && !needRepair) {
-          updatedProduct.version = lastVersion + 1;
-        }
-        updatedProduct.productCode = existingProduct.productCode;
-
-        setPreviewProductData(updatedProduct);
-      } else if (isExistingProduct) {
+      if (isExistingProduct) {
         setPreviewOperationName('edit');
 
         const obj = {
@@ -133,6 +123,16 @@ const ModalWindow = React.memo(
         };
 
         setPreviewProductData(obj);
+      } else if (isRepair) {
+        const prevName = needRepair ? 'repair' : 'edit';
+        setPreviewOperationName(prevName);
+
+        if (isExistingProduct && !needRepair) {
+          updatedProduct.version = lastVersion + 1;
+        }
+        updatedProduct.productCode = existingProduct.productCode;
+
+        setPreviewProductData(updatedProduct);
       } else if (isEdit) {
         setPreviewOperationName('edit');
 
