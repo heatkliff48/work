@@ -170,6 +170,14 @@ class OrdersService {
     return;
   }
 
+  static async getDeleteRelMatProductOfOrder({ product_id }) {
+    await OrdersRepository.getDeleteRelMatProductOfOrder({
+      product_id,
+    });
+
+    return;
+  }
+
   static async getUpdateProductInfoOfOrder({ productOfOrder }) {
     const upd_prod_info = await OrdersRepository.getUpdateProductInfoOfOrder(
       productOfOrder

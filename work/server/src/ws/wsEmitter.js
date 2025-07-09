@@ -79,6 +79,7 @@ const {
   GET_NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   GET_UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   GET_DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -331,6 +332,17 @@ function registerWsEmitter(map) {
     }
   });
 
+  myEmitter.on(GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET, (product_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+          payload: product_id,
+        })
+      );
+    }
+  });
+
   myEmitter.on(ADD_NEW_WAREHOUSE_SOCKET, (new_warehouse) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
@@ -441,19 +453,16 @@ function registerWsEmitter(map) {
     }
   });
 
-  myEmitter.on(
-    GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-    (new_reserved_product) => {
-      for (let [id, userConnect] of map) {
-        userConnect.send(
-          JSON.stringify({
-            type: GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-            payload: new_reserved_product,
-          })
-        );
-      }
+  myEmitter.on(GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET, (new_reserved_product) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+          payload: new_reserved_product,
+        })
+      );
     }
-  );
+  });
 
   myEmitter.on(
     GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,

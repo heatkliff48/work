@@ -369,21 +369,23 @@ const OrderCart = React.memo(() => {
   };
 
   const onProductClickHandler = (sel_prod) => {
-    const product =
-      sel_prod.product_article.slice(2, 3) == 'N'
-        ? latestProducts.find((el) => el.article === sel_prod.product_article)
-        : sel_prod.product_article.slice(2, 3) == 'M'
-        ? latestDryMix.find((el) => el.article === sel_prod.product_article)
-        : sel_prod.product_article.slice(2, 3) == 'P'
-        ? latestRelatedMaterials.find(
-            (el) => el.article === sel_prod.product_article
-          )
-        : sel_prod.product_article.slice(2, 3) == 'F'
-        ? latestAnchors.find((el) => el.article === sel_prod.product_article)
-        : latestTools.find((el) => el.article === sel_prod.product_article);
-    setSelectedProduct(product);
-    setProductOfOrder({ ...sel_prod, product_id: product?.id });
-    setProductInfoModalOrder(!productInfoModalOrder);
+    if (orderCartData?.status < 3) {
+      const product =
+        sel_prod.product_article.slice(2, 3) == 'N'
+          ? latestProducts.find((el) => el.article === sel_prod.product_article)
+          : sel_prod.product_article.slice(2, 3) == 'M'
+          ? latestDryMix.find((el) => el.article === sel_prod.product_article)
+          : sel_prod.product_article.slice(2, 3) == 'P'
+          ? latestRelatedMaterials.find(
+              (el) => el.article === sel_prod.product_article
+            )
+          : sel_prod.product_article.slice(2, 3) == 'F'
+          ? latestAnchors.find((el) => el.article === sel_prod.product_article)
+          : latestTools.find((el) => el.article === sel_prod.product_article);
+      setSelectedProduct(product);
+      setProductOfOrder({ ...sel_prod, product_id: product?.id });
+      setProductInfoModalOrder(!productInfoModalOrder);
+    }
   };
 
   const statusChangeHandler = (status) => {
@@ -760,7 +762,7 @@ const OrderCart = React.memo(() => {
       dispatch(getDeleteAnchorProductOfOrder(product?.id));
     } else if (product?.product_article.charAt(2) === 'T') {
       dispatch(getDeleteToolProductOfOrder(product?.id));
-    } else if (product?.product_article.charAt(2) === 'X') {
+    } else if (product?.product_article.charAt(2) === 'P') {
       dispatch(getDeleteRelMatProductOfOrder(product?.id));
     }
   };
@@ -775,17 +777,17 @@ const OrderCart = React.memo(() => {
     ];
 
     // Считаем финальную цену для всех продуктов
-    const final_price_product =
-      allProducts.reduce(
-        (acc, el) =>
-          acc +
-          (el?.final_price ||
-            el?.final_price_dry ||
-            el?.final_price_anchor ||
-            el?.final_price_tool ||
-            el?.final_price_rel_mat),
-        0
-      ) || 0;
+    const final_price_product = allProducts.reduce(
+      (acc, el) =>
+        acc +
+        (el?.final_price ||
+          el?.final_price_dry ||
+          el?.final_price_anchor ||
+          el?.final_price_tool ||
+          el?.final_price_rel_mat ||
+          0),
+      0
+    );
 
     if (!final_price_product || !vatValue.vat_procent) {
       setVatValue((prev) => ({

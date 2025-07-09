@@ -533,6 +533,17 @@ class OrdersRepository {
     }
   }
 
+  static async getDeleteRelMatProductOfOrder({ product_id }) {
+    try {
+      await OrderRelMatProducts.destroy({ where: { id: product_id } });
+
+      return;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
   static async getUpdateProductInfoOfOrder(productOfOrder) {
     try {
       const {
