@@ -215,7 +215,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
           break;
       }
 
-      if (list_of_batches.length > 0) {
+      if (list_of_batches?.length > 0) {
         list_of_batches.forEach((batch) => {
           const { quantity } = batch;
 
