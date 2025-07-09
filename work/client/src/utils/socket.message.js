@@ -71,6 +71,7 @@ import {
   addNewRelMatReservedProductSocket,
   updateRelMatReservedProductSocket,
   deleteRelMatReservedProductSocket,
+  deleteRelMatProductOfOrderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -168,6 +169,7 @@ import {
   NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -238,6 +240,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET:
       dispatch(deleteToolProductOfOrderSocket(payload));
+      break;
+
+    case GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET:
+      dispatch(deleteRelMatProductOfOrderSocket(payload));
       break;
 
     case ADD_DATASHIP_ORDER_SOCKET:

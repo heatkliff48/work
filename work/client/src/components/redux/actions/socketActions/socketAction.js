@@ -71,6 +71,7 @@ import {
   NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -181,6 +182,13 @@ export const deleteAnchorProductOfOrderSocket = (product_id) => {
 export const deleteToolProductOfOrderSocket = (product_id) => {
   return {
     type: DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+    payload: product_id,
+  };
+};
+
+export const deleteRelMatProductOfOrderSocket = (product_id) => {
+  return {
+    type: DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
     payload: product_id,
   };
 };

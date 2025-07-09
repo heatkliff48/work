@@ -19,6 +19,7 @@ const {
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   DELETE_SECONDARY_CONTACT_ORDER_SOCKET,
   ADD_NEW_DELIVERY_PRICE_SOCKET,
+  GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -326,6 +327,21 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET, product_id);
+      return res.status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async getDeleteRelMatProductOfOrder(req, res) {
+    const product_id = req.body.rel_mat_id;
+
+    try {
+      await OrdersService.getDeleteRelMatProductOfOrder({
+        product_id,
+      });
+
+      myEmitter.emit(GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET, product_id);
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
