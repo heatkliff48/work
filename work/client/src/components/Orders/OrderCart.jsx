@@ -767,7 +767,7 @@ const OrderCart = React.memo(() => {
     }
   };
 
-  useEffect(() => {
+  const final_price_product = useMemo(() => {
     const allProducts = [
       ...productLists['products'],
       ...productLists['dryMixes'],
@@ -776,8 +776,7 @@ const OrderCart = React.memo(() => {
       ...productLists['related_materials'],
     ];
 
-    // Считаем финальную цену для всех продуктов
-    const final_price_product = allProducts.reduce(
+    return allProducts.reduce(
       (acc, el) =>
         acc +
         (el?.final_price ||
@@ -788,17 +787,21 @@ const OrderCart = React.memo(() => {
           0),
       0
     );
+  }, [
+    productLists.products,
+    productLists.dryMixes,
+    productLists.anchors,
+    productLists.tools,
+    productLists.related_materials,
+  ]);
 
+  useEffect(() => {
     if (!final_price_product || !vatValue.vat_procent) {
-      setVatValue((prev) => ({
-        ...prev,
-        vat_result: 0,
-      }));
+      setVatValue((prev) => ({ ...prev, vat_result: 0 }));
     } else {
       const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
         2
       );
-
       const vat_result = Number(
         final_price_product + Number(vat_euro) + Number(orderCartData.delivery)
       ).toFixed(2);
@@ -806,11 +809,11 @@ const OrderCart = React.memo(() => {
       setVatValue((prev) => ({
         ...prev,
         vat_euro_origin: final_price_product,
-        vat_result: vat_result,
+        vat_result,
         vat_euro,
       }));
     }
-  }, [productLists, vatValue.vat_procent, orderCartData.delivery]);
+  }, [final_price_product, vatValue.vat_procent, orderCartData.delivery]);
 
   useEffect(() => {
     const storedData = localStorage.getItem('orderCartData')
