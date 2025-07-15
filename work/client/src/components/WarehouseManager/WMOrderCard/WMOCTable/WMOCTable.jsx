@@ -69,14 +69,14 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     setWmoctProduct((prev) =>
       prev.map((wmoctItem) => {
         if (wmoctItem.article == batch.article) {
-          let { shipped, qty_rem } = wmoctItem;
+          let { shipped, qty_rem, qty_total } = wmoctItem;
 
           const newBatches = wmoctItem.batches.map((el, i) => {
             if (i == batchIndex) {
               const { allocated, remainingInBatch } = el;
 
               const canPlus =
-                remainingInBatch > 0 && qty_rem > 0 && allocated < remainingInBatch;
+                remainingInBatch > 0 && qty_rem > 0 && allocated < qty_total;
               const result = canPlus ? allocated + 1 : allocated;
 
               shipped = canPlus ? shipped + 1 : shipped;
@@ -102,12 +102,12 @@ const WMOCTable = ({ product_list, orderCartData }) => {
         if (wmoctItem.article == batch.article) {
           let { shipped, qty_rem } = wmoctItem;
           const newBatches = wmoctItem.batches.map((el, i) => {
-            const { allocated } = el;
+            const { allocated, minAllocated } = el;
 
             if (i == batchIndex) {
-              const canMinus = allocated != 0;
+              const canMinus = allocated != 0 && allocated > minAllocated;
 
-              const result = canMinus ? allocated - 1 : 0;
+              const result = canMinus ? allocated - 1 : minAllocated;
               shipped = canMinus ? shipped - 1 : shipped;
               qty_rem = canMinus ? qty_rem + 1 : qty_rem;
 
@@ -225,6 +225,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
             batchId: wrh_item?.article,
             remainingInBatch: wrh_item?.ordered_quantity,
             allocated: quantity,
+            minAllocated: quantity,
           });
           shipped += quantity;
           qty_rem -= quantity;
