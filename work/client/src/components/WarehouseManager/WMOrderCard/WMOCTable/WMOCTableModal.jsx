@@ -70,6 +70,7 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
       .filter((el) => el.ordered_quantity > 0)
       .map((el) => ({
         batch_article: el.article,
+        free_quantity_remaining:  el.free_quantity_remaining,
         quantity: el.ordered_quantity,
       }));
     setWmoctModal(result);
@@ -96,7 +97,8 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
               <thead className="bg-gray-100">
                 <tr>
                   <th className="border px-2">Batch article</th>
-                  <th className="border px-2">Qty remaining in batch, pallets</th>
+                  <th className="border px-2">Free quantity remaining</th>
+                  <th className="border px-2">Ordered quantity</th>
                 </tr>
               </thead>
 
@@ -110,6 +112,9 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
                     >
                       <td className="border p-1" rowSpan={product?.length || 1}>
                         {product.batch_article}
+                      </td>
+                      <td className="border p-1" rowSpan={product?.length || 1}>
+                        {product.free_quantity_remaining}
                       </td>
                       <td className="border p-1" rowSpan={product?.length || 1}>
                         {product.quantity}
