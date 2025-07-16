@@ -209,12 +209,26 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         });
       }
 
-      doc.setFont(undefined, `normal`);
-      doc.text(
-        `Delivery price: ${pdfData.delivery}`,
-        140,
-        doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50
-      );
+      const deliveryY = doc.lastAutoTable
+        ? doc.lastAutoTable.finalY + 10
+        : yPosition + 50;
+      const deliveryText = `Delivery price: ${pdfData.delivery}`;
+
+      // Настройки текста
+      doc.setFontSize(6);
+      doc.setFont(undefined, 'normal');
+
+      // Размер текста (чтобы точно подобрать ширину прямоугольника)
+      const textWidth = doc.getTextWidth(deliveryText);
+      const padding = 2; // небольшой отступ внутри "фона"
+
+      // Рисуем прямоугольник-фон
+      doc.setFillColor(255, 0, 0); // красный
+      doc.rect(176 - padding, deliveryY - 4.5, textWidth + 2 * padding, 6, 'F');
+
+      // Рисуем текст
+      doc.setTextColor(255, 255, 255); // белый
+      doc.text(deliveryText, 176, deliveryY);
 
       const startY = doc.lastAutoTable
         ? doc.lastAutoTable.finalY + 20
