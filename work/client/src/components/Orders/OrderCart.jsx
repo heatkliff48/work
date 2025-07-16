@@ -64,7 +64,6 @@ const OrderCart = React.memo(() => {
     status_list,
     list_of_orders,
     setSelectedProduct,
-    productOfOrder,
     setProductOfOrder,
     personsInChargeList,
     accountingDataList,
@@ -97,7 +96,6 @@ const OrderCart = React.memo(() => {
     ordered_production_oem_status,
     filteredWarehouseByProduct,
     setFilteredWarehouseByProduct,
-    relatedMaterialsJournal,
   } = useWarehouseContext();
 
   const dispatch = useDispatch();
@@ -128,7 +126,7 @@ const OrderCart = React.memo(() => {
     vat_euro: 0,
     vat_result: 0,
   });
-  const [delivery, setDelivery] = useState(0);
+
   const [currentOrderedProduct, setCurrentOrderedProduct] = useState({});
 
   const [productLists, setProductLists] = useState({
