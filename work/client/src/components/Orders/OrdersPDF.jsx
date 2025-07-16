@@ -209,8 +209,15 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         });
       }
 
+      doc.setFont(undefined, `normal`);
+      doc.text(
+        `Delivery price: ${pdfData.delivery}`,
+        140,
+        doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50
+      );
+
       const startY = doc.lastAutoTable
-        ? doc.lastAutoTable.finalY + 10
+        ? doc.lastAutoTable.finalY + 20
         : yPosition + 50;
 
       autoTable(doc, {
@@ -245,7 +252,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
   useEffect(() => {
     console.log('🔄 Данные заказа обновлены:', orderData);
-    const { deliveryAddress, contactInfo, owner, article } = orderData;
+    const { deliveryAddress, contactInfo, owner, article, delivery } = orderData;
+    console.log('orderData', orderData);
+    console.log('delivery', delivery);
 
     const today = new Date();
     const nextMonthDate = new Date(today);
@@ -447,6 +456,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       tax: vatValue.vat_procent || 0,
       finalTotal: vatValue.vat_result || 0,
       terms,
+      delivery,
       footer,
     });
 
