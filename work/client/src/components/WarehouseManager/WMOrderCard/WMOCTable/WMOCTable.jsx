@@ -80,6 +80,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
                 qty_rem > 0 &&
                 allocated < qty_total &&
                 allocated <= qty_rem;
+
               const result = canPlus ? allocated + 1 : allocated;
 
               shipped = canPlus ? shipped + 1 : shipped;
