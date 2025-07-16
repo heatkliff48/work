@@ -244,13 +244,25 @@ const QualityManagementTable = () => {
             };
       });
 
+      if (reserved_quantity_allocated < 0) {
+        alert('Ошибка: reserved_quantity_allocated не может быть отрицательным.');
+        console.log('reserved_quantity_allocated', reserved_quantity_allocated);
+      }
+
+      if (summReserve < 0) {
+        alert('Ошибка: summReserve не может быть отрицательным.');
+        console.log('summReserve', summReserve);
+      }
+
+      const calculatedOrderedQuantity = reserved_quantity_allocated + summReserve;
+
       await dispatch(
         addNewWarehouse({
           product_article,
           article: batch_id,
           warehouse_loc: 'local',
           free_quantity_remaining: remainingFreeQty,
-          ordered_quantity: reserved_quantity_allocated + summReserve,
+          ordered_quantity: calculatedOrderedQuantity,
           total_quantity:
             reserved_quantity_allocated + summReserve + remainingFreeQty,
           type: 'OK',

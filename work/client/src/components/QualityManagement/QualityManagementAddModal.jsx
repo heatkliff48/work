@@ -13,7 +13,8 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 function QualityManagementAddModal(props) {
   const { latestProducts } = useProductsContext();
-  const { warehouse_data, currentOrderedProducts } = useWarehouseContext();
+  const { warehouse_data, currentOrderedProducts, list_of_ordered_production } =
+    useWarehouseContext();
 
   const [productionPlanDataList, setProductionPlanDataList] = useState([]);
   const [customBatchSelectInput, setCustomBatchSelectInput] = useState({});
@@ -149,6 +150,11 @@ function QualityManagementAddModal(props) {
   const handlerAddProductionPlanEntry = useCallback((row) => {
     const prodPlanEntry = batchOutside.filter((el) => el.id === row.original.id)[0];
 
+    const reservedProduct =
+      list_of_ordered_production?.find(
+        (item) => item.id === prodPlanEntry.id_list_of_ordered_production
+      ) || [];
+
     const product = latestProducts.find(
       (el) => el.article === prodPlanEntry?.product_article
     );
@@ -160,11 +166,11 @@ function QualityManagementAddModal(props) {
         batch_id: warehouse_article,
         product_article: prodPlanEntry.product_article,
         total_quantity_plan: prodPlanEntry.quantity_pallets,
-        reserved_quantity:
-          prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free,
+        reserved_quantity: reservedProduct.quantity,
+        // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free,
         reserved_quantity_allocated: 0,
-        reserved_quantity_remaining:
-          prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free - 0,
+        reserved_quantity_remaining: reservedProduct.quantity,
+        // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free - 0,
         free_quantity_fact: 0,
         production_plan_id: prodPlanEntry.id,
       })
