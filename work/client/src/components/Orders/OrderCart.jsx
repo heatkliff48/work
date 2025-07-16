@@ -1196,6 +1196,8 @@ const OrderCart = React.memo(() => {
                   before shipment)
                 </p>
               ) : (
+                <div>
+                <p>Shipping date</p>
                 <DatePicker
                   id="data_pcker"
                   type="text"
@@ -1203,6 +1205,7 @@ const OrderCart = React.memo(() => {
                   onChange={(date) => handleDateChange(date)}
                   dateFormat="dd.MM.yyyy"
                 />
+                </div>
               )}
             </div>
             {checkUserAccess(user, roles, 'orders_change_person_in_charge')
