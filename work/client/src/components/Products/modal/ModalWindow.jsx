@@ -99,6 +99,10 @@ const ModalWindow = React.memo(
       const isExistingProduct = products.some(
         (product) => product.article === prodArticle && product.density == density
       ); // добавить проверку выс шир длин
+      console.log('products', products);
+      console.log('prodArticle', prodArticle);
+      console.log('density', density);
+      console.log('isExistingProduct', isExistingProduct);
 
       const existingProduct = products.find(
         (product) => product.article === prodArticle
@@ -134,7 +138,11 @@ const ModalWindow = React.memo(
 
         setPreviewProductData(updatedProduct);
       } else if (isEdit) {
-        setPreviewOperationName('edit');
+        if (!isExistingProduct) {
+          setPreviewOperationName('add');
+        } else {
+          setPreviewOperationName('edit');
+        }
 
         const obj = {
           ...updatedProduct,
