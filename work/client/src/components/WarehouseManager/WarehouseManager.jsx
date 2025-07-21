@@ -104,7 +104,7 @@ function WarehouseManager() {
           // userAccess={userAccess}
           onClickButton={() => {}}
           buttonText={''}
-          tableName={'Warehouse Manager'}
+          tableName={'Order dispatch'}
           handleRowClick={(row) => {
             getCurrentOrderInfoHandler({ article: row.original.orders_article });
 
