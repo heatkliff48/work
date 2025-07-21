@@ -136,8 +136,6 @@ const ModalWindow = React.memo(
       } else if (isEdit) {
         setPreviewOperationName('edit');
 
-        console.log('updatedProduct', updatedProduct);
-
         const obj = {
           ...updatedProduct,
           version: lastVersion + 1,
@@ -188,24 +186,29 @@ const ModalWindow = React.memo(
 
     const calculatePalletDimensions = (palletSize, palletHeight) => {
       // Определение ширины и длины паллета
-      const palletWidthValue = parseInt(palletSize) === 0 ? 1000 : 800;
-      const palletLengthValue = 1200;
+      let palletLengthValue;
+      let palletWidthValue;
+
+      if (typeof palletSize === 'string' && palletSize.includes('x')) {
+        const [lengthStr, widthStr] = palletSize.split('x');
+        palletLengthValue = parseInt(lengthStr) || 1200;
+        palletWidthValue = parseInt(widthStr) || 800;
+      } else {
+        palletWidthValue = parseInt(palletSize) === 0 ? 1000 : 800;
+        palletLengthValue = 1200;
+      }
 
       // Определение высоты паллета
-      let palletHeightValue;
-      switch (palletHeight) {
-        case 0:
-          palletHeightValue = 1200;
-          break;
-        case 1:
-          palletHeightValue = 1000;
-          break;
-        case 2:
-          palletHeightValue = 1500;
-          break;
-        default:
-          palletHeightValue = 1200; // Стандартное значение
-      }
+      const palletHeightMap = {
+        0: 1200,
+        1: 1000,
+        2: 1500,
+        std: 1200,
+        marine: 1000,
+        height: 1500,
+      };
+
+      const palletHeightValue = palletHeightMap[palletHeight] ?? 1200;
 
       return {
         palletWidth: palletWidthValue,
@@ -448,7 +451,6 @@ const ModalWindow = React.memo(
         },
         {}
       );
-
       setFormInput((prev) => ({
         ...prev,
         ...extractedValues,
