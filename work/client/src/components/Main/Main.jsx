@@ -143,7 +143,7 @@ function Main() {
             className="nav-button"
             onClick={() => navigate('/warehouse_manager')}
           >
-            Warehouse Manager
+            Order dispatch
           </button>
         )}
 
