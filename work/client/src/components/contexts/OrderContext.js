@@ -359,7 +359,9 @@ const OrderContextProvider = ({ children }) => {
   }, [isOrderReady]);
 
   useEffect(() => {
-    list_of_orders.forEach((el) => {
+    if (!list_of_orders || list_of_orders.length == 0) return;
+
+    list_of_orders?.forEach((el) => {
       const haveAproved = accDataList?.find(
         (acc) => acc.orders_article == el.article
       );
