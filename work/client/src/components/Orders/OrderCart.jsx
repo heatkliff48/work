@@ -800,9 +800,7 @@ const OrderCart = React.memo(() => {
       const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
         2
       );
-      const vat_result = Number(
-        final_price_product + Number(vat_euro) + Number(orderCartData.delivery)
-      ).toFixed(2);
+      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
 
       setVatValue((prev) => ({
         ...prev,
@@ -811,7 +809,28 @@ const OrderCart = React.memo(() => {
         vat_euro,
       }));
     }
-  }, [final_price_product, vatValue.vat_procent, orderCartData.delivery]);
+  }, [final_price_product, vatValue.vat_procent]);
+
+  const deliveryFunc = async () => {
+    await dispatch(
+      addNewDeliveryPrice({
+        order_id: orderCartData.id,
+        delivery: orderCartData.delivery,
+      })
+    );
+
+    const prevDelivery = list_of_orders.find((el) => el.id == orderCartData.id);
+    console.log('prevDelivery', prevDelivery);
+    console.log('prevDelivery?.delivery', prevDelivery?.delivery);
+    const delivery = !prevDelivery?.delivery
+      ? Number(vatValue.vat_result) + orderCartData?.delivery ?? 0
+      : Number(vatValue.vat_result) +
+        (orderCartData?.delivery - prevDelivery.delivery);
+
+    setVatValue((prev) => {
+      return { ...prev, vat_result: delivery };
+    });
+  };
 
   useEffect(() => {
     const storedData = localStorage.getItem('orderCartData')
@@ -1169,12 +1188,7 @@ const OrderCart = React.memo(() => {
                         marginLeft: '20px',
                       }}
                       onClick={() => {
-                        dispatch(
-                          addNewDeliveryPrice({
-                            order_id: orderCartData.id,
-                            delivery: orderCartData.delivery,
-                          })
-                        );
+                        deliveryFunc();
                       }}
                     >
                       Save
@@ -1195,14 +1209,14 @@ const OrderCart = React.memo(() => {
                 </p>
               ) : (
                 <div>
-                <p>Shipping date</p>
-                <DatePicker
-                  id="data_pcker"
-                  type="text"
-                  selected={dataValue}
-                  onChange={(date) => handleDateChange(date)}
-                  dateFormat="dd.MM.yyyy"
-                />
+                  <p>Shipping date</p>
+                  <DatePicker
+                    id="data_pcker"
+                    type="text"
+                    selected={dataValue}
+                    onChange={(date) => handleDateChange(date)}
+                    dateFormat="dd.MM.yyyy"
+                  />
                 </div>
               )}
             </div>
