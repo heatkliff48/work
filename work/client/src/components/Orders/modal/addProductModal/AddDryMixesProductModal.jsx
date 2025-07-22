@@ -272,9 +272,9 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
             </>
           )}
         </ModalBody>
-        <ModalFooter>
+        {/* <ModalFooter>
           <button onClick={addProductOrder}>Add dry product</button>
-        </ModalFooter>
+        </ModalFooter> */}
       </Modal>
     </div>
   );
