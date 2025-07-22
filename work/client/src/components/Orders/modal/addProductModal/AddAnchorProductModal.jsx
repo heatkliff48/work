@@ -270,9 +270,9 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
             </>
           )}
         </ModalBody>
-        <ModalFooter>
+        {/* <ModalFooter>
           <button onClick={addProductOrder}>Add fastener product</button>
-        </ModalFooter>
+        </ModalFooter> */}
       </Modal>
     </div>
   );
