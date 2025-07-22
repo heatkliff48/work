@@ -30,6 +30,7 @@ export const ordersReducer = (orders = [], action) => {
     }
 
     case NEW_DELIVERY_PRICE_SOCKET: {
+      console.log('NEW_DELIVERY_PRICE_SOCKET', payload);
       const { order_id, delivery } = payload;
 
       const result = orders.map((order) => {
