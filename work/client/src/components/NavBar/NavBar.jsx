@@ -1,3 +1,4 @@
+import MainOffcanvas from '#components/Main/MainOffcanvas.jsx';
 import { clearAccountingDataList } from '#components/redux/actions/ordersAction.js';
 import { delUser } from '../redux/actions/userAction';
 import React from 'react';
@@ -11,7 +12,7 @@ function NavBar() {
 
   return (
     <nav className="nav_wrapper">
-      <div className="nav_left_wrapper"></div>
+      <div className="nav_left_wrapper">{user && <MainOffcanvas />}</div>
       <div className="nav_right_wrapper">
         {/* {user &&  (
           <div className="nav_link_wrapper">
@@ -25,18 +26,7 @@ function NavBar() {
             </div>
           </div>
         )} */}
-        {user && (
-          <div className="nav_link_wrapper">
-            <div
-              className="nav_link"
-              onClick={() => {
-                navigate('/');
-              }}
-            >
-              <p className="p_nav">Главная</p>
-            </div>
-          </div>
-        )}
+
         {!user && (
           <div className="nav_link_wrapper">
             <div
