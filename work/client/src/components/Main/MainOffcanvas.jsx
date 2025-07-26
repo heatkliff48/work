@@ -22,7 +22,7 @@ function MainOffcanvas() {
     <>
       <div className="nav_link_wrapper">
         <div className="nav_link" onClick={handleShow}>
-          <p className="p_nav">Главная</p>
+          <p className="p_nav">Home</p>
         </div>
       </div>
 
@@ -32,48 +32,71 @@ function MainOffcanvas() {
         </Offcanvas.Header>
         <Offcanvas.Body>
           <ButtonGroup vertical>
-            <DropdownButton
-              as={ButtonGroup}
-              title="Admin"
-              id="bg-vertical-dropdown-1"
-            >
-              <Dropdown.Item eventKey="1">
-                {checkUserAccess(user, roles, 'Users_info')?.canRead && (
-                  <Button
-                    className="nav-button"
-                    onClick={() => {
-                      navigate('/users_info');
-                      handleClose();
-                    }}
-                  >
-                    Users Info
-                  </Button>
-                )}
-              </Dropdown.Item>
-              <Dropdown.Item eventKey="2">
-                {checkUserAccess(user, roles, 'Roles')?.canRead && (
-                  <Button
-                    className="nav-button"
-                    onClick={() => {
-                      navigate('/roles');
-                      handleClose();
-                    }}
-                  >
-                    Roles
-                  </Button>
-                )}
-              </Dropdown.Item>
-            </DropdownButton>
-
-            {checkUserAccess(user, roles, 'Statistics')?.canRead && (
-              <Button
-                onClick={() => {
-                  navigate('/statistics');
-                  handleClose();
-                }}
+            {checkUserAccess(user, roles, 'Users_info')?.canRead && (
+              <DropdownButton
+                as={ButtonGroup}
+                title="Admin"
+                id="bg-vertical-dropdown-1"
               >
-                Statistics
-              </Button>
+                <Dropdown.Item eventKey="1">
+                  {checkUserAccess(user, roles, 'Users_info')?.canRead && (
+                    <Button
+                      className="nav-button"
+                      onClick={() => {
+                        navigate('/users_info');
+                        handleClose();
+                      }}
+                    >
+                      Users Info
+                    </Button>
+                  )}
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="2">
+                  {checkUserAccess(user, roles, 'Roles')?.canRead && (
+                    <Button
+                      className="nav-button"
+                      onClick={() => {
+                        navigate('/roles');
+                        handleClose();
+                      }}
+                    >
+                      Roles
+                    </Button>
+                  )}
+                </Dropdown.Item>
+              </DropdownButton>
+            )}
+            {checkUserAccess(user, roles, 'Products')?.canRead && (
+              <DropdownButton
+                as={ButtonGroup}
+                title="Products catalog"
+                id="bg-vertical-dropdown-1"
+              >
+                <Dropdown.Item eventKey="1">
+                  {checkUserAccess(user, roles, 'Products')?.canRead && (
+                    <Button
+                      onClick={() => {
+                        navigate('/products_type_journal');
+                        handleClose();
+                      }}
+                    >
+                      Products catalog
+                    </Button>
+                  )}
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="2">
+                  {checkUserAccess(user, roles, 'Statistics')?.canRead && (
+                    <Button
+                      onClick={() => {
+                        navigate('/statistics');
+                        handleClose();
+                      }}
+                    >
+                      Statistics
+                    </Button>
+                  )}
+                </Dropdown.Item>
+              </DropdownButton>
             )}
             {checkUserAccess(user, roles, 'Clients')?.canRead && (
               <Button
@@ -97,65 +120,78 @@ function MainOffcanvas() {
               </Button>
             )}
 
+            {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
+              <DropdownButton
+                as={ButtonGroup}
+                title="Ordered products pipeline"
+                id="bg-vertical-dropdown-1"
+              >
+                <Dropdown.Item eventKey="1">
+                  {checkUserAccess(user, roles, 'List_of_ordered_production')
+                    ?.canRead && (
+                    <Button
+                      className="nav-button"
+                      onClick={() => {
+                        navigate('/list_of_ordered_production');
+                        handleClose();
+                      }}
+                    >
+                      Oredred blocks pipeline
+                    </Button>
+                  )}
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="2">
+                  {checkUserAccess(user, roles, 'list_of_ordered_production_oem')
+                    ?.canRead && (
+                    <Button
+                      className="nav-button"
+                      onClick={() => {
+                        navigate('/list_of_ordered_production_oem');
+                        handleClose();
+                      }}
+                    >
+                      Oredred OEM blocks pipeline
+                    </Button>
+                  )}
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="3">
+                  {checkUserAccess(user, roles, 'related_materials_backorder_list')
+                    ?.canRead && (
+                    <Button
+                      className="nav-button"
+                      onClick={() => {
+                        navigate('/related_materials_backorder_list');
+                        handleClose();
+                      }}
+                    >
+                      Related materials backorder list
+                    </Button>
+                  )}
+                </Dropdown.Item>
+              </DropdownButton>
+            )}
+
             <DropdownButton
               as={ButtonGroup}
-              title="Ordered products pipeline"
-              id="bg-vertical-dropdown-1"
-            >
-              <Dropdown.Item eventKey="1">
-                {checkUserAccess(user, roles, 'List_of_ordered_production')
-                  ?.canRead && (
-                  <Button
-                    className="nav-button"
-                    onClick={() => {
-                      navigate('/list_of_ordered_production');
-                      handleClose();
-                    }}
-                  >
-                    Oredred blocks pipeline
-                  </Button>
-                )}
-              </Dropdown.Item>
-              <Dropdown.Item eventKey="2">
-                {checkUserAccess(user, roles, 'list_of_ordered_production_oem')
-                  ?.canRead && (
-                  <Button
-                    className="nav-button"
-                    onClick={() => {
-                      navigate('/list_of_ordered_production_oem');
-                      handleClose();
-                    }}
-                  >
-                    Oredred OEM blocks pipeline
-                  </Button>
-                )}
-              </Dropdown.Item>
-              <Dropdown.Item eventKey="3">
-                {checkUserAccess(user, roles, 'related_materials_backorder_list')
-                  ?.canRead && (
-                  <Button
-                    className="nav-button"
-                    onClick={() => {
-                      navigate('/related_materials_backorder_list');
-                      handleClose();
-                    }}
-                  >
-                    Related materials backorder list
-                  </Button>
-                )}
-              </Dropdown.Item>
-            </DropdownButton>
-
-            <Button>Button</Button>
-            <Button>Button</Button>
-
-            <DropdownButton
-              as={ButtonGroup}
-              title="Dropdown"
+              title="Production planner"
               id="bg-vertical-dropdown-2"
             >
-              <Dropdown.Item eventKey="1">Dropdown link</Dropdown.Item>
-              <Dropdown.Item eventKey="2">Dropdown link</Dropdown.Item>
+              <Dropdown.Item eventKey="1">
+                <Button>Autoclave calender</Button>
+              </Dropdown.Item>
+              <Dropdown.Item eventKey="2">
+                {checkUserAccess(user, roles, 'production_batch_designer')
+                  ?.canRead && (
+                  <Button
+                    onClick={() => {
+                      navigate('/production_batch_designer');
+                      handleClose();
+                    }}
+                  >
+                    Batch planner
+                  </Button>
+                )}
+              </Dropdown.Item>
             </DropdownButton>
 
             <DropdownButton
