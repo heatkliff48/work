@@ -52,15 +52,31 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
     const rightTypeOfPackaging = getOptionValue('typeOfPackaging', typeOfPackaging);
 
     const rightPalletSize = getOptionValue('palletSize', palletSize);
+    const combinationMap = {
+      '0-0-0': 'A',
+      '0-0-1': 'B',
+      '0-0-2': 'C',
+      '0-1-0': 'D',
+      '0-1-1': 'E',
+      '0-1-2': 'F',
+      '1-0-0': 'G',
+      '1-0-1': 'H',
+      '1-0-2': 'I',
+      '1-1-0': 'J',
+      '1-1-1': 'K',
+      '1-1-2': 'L',
+    };
+
+    const combinationKey = `${rightPlaceOfProduction}-${rightTypeOfPackaging}-${rightPalletSize}`;
+    const combinationLetter = combinationMap[combinationKey];
+
+    if (!combinationLetter) {
+      console.warn('Unknown combination for prodArticle:', combinationKey);
+    }
 
     const prodArticle = `T.${form
       ?.toUpperCase()
-      .slice(
-        0,
-        1
-      )}${rightPlaceOfProduction}${rightTypeOfPackaging}${rightPalletSize}D${density
-      .toString()
-      .slice(0, 2)}W${width}H${height.toString().slice(0, 2)}L${lengths
+      .slice(0, 1)}${combinationLetter}D${density.toString().slice(0, 2)}W${width
       .toString()
       .slice(0, 2)}${certificate?.substr(0, 1)}${versionNumber}`;
 

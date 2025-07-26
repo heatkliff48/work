@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       version: DataTypes.INTEGER,
       article: DataTypes.STRING,
+      description: DataTypes.STRING,
       density: DataTypes.INTEGER,
       form: DataTypes.STRING,
       certificate: DataTypes.STRING,

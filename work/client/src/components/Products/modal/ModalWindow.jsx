@@ -73,27 +73,50 @@ const ModalWindow = React.memo(
       );
 
       const rightPalletSize = getOptionValue('palletSize', palletSize);
+      const combinationMap = {
+        '0-0-0': 'A',
+        '0-0-1': 'B',
+        '0-0-2': 'C',
+        '0-1-0': 'D',
+        '0-1-1': 'E',
+        '0-1-2': 'F',
+        '1-0-0': 'G',
+        '1-0-1': 'H',
+        '1-0-2': 'I',
+        '1-1-0': 'J',
+        '1-1-1': 'K',
+        '1-1-2': 'L',
+      };
+
+      const combinationKey = `${rightPlaceOfProduction}-${rightTypeOfPackaging}-${rightPalletSize}`;
+      const combinationLetter = combinationMap[combinationKey];
+
+      if (!combinationLetter) {
+        console.warn('Unknown combination for prodArticle:', combinationKey);
+      }
 
       const prodArticle = `T.${form
         ?.toUpperCase()
-        .slice(
-          0,
-          1
-        )}${rightPlaceOfProduction}${rightTypeOfPackaging}${rightPalletSize}D${density
-        .toString()
-        .slice(0, 2)}W${width}H${height.toString().slice(0, 2)}L${lengths
+        .slice(0, 1)}${combinationLetter}D${density.toString().slice(0, 2)}W${width
         .toString()
         .slice(0, 2)}${certificate?.substr(0, 1)}`;
 
       let productCode = '0001';
       const articleId = products.length === 0 ? 1 : products.length + 1;
-      productCode = `00000${articleId}`.slice(-5);
+      productCode = `${34000 + articleId - 34}`.slice(-5);
+      console.log('articleId', articleId);
+
+      //description
+      const description = `BAUBLOCK®${trMark} ${formInput.lengths ?? '-'}x${
+        formInput.width ?? '-'
+      }x${formInput.height ?? '-'}mm ${formInput.density ?? '-'}kg/m³`;
 
       const updatedProduct = {
         ...formInput,
         article: prodArticle,
         productCode,
         activeStatus: true,
+        description,
       };
 
       const isExistingProduct = products.some(
@@ -167,8 +190,10 @@ const ModalWindow = React.memo(
         tradingMark = 'Termeco';
       } else if (formInput.density >= 360 && formInput.density < 460) {
         tradingMark = 'Utilitas';
-      } else if (formInput.density > 460) {
+      } else if (formInput.density >= 460 && formInput.density < 560) {
         tradingMark = 'Silenso';
+      } else if (formInput.density > 560) {
+        tradingMark = 'CalmEco';
       }
 
       if (formInput.form === 'U-block') {
@@ -208,15 +233,15 @@ const ModalWindow = React.memo(
 
       // Определение высоты паллета
       const palletHeightMap = {
-        0: 1200,
+        0: 1140,
         1: 1000,
         2: 1500,
-        std: 1200,
+        std: 1140,
         marine: 1000,
         height: 1500,
       };
 
-      const palletHeightValue = palletHeightMap[palletHeight] ?? 1200;
+      const palletHeightValue = palletHeightMap[palletHeight] ?? 1140;
 
       return {
         palletWidth: palletWidthValue,
@@ -252,9 +277,7 @@ const ModalWindow = React.memo(
 
         if (formInput?.lengths && formInput?.height && formInput?.width) {
           values.volumeBlock = Number(
-            ((((formInput?.lengths / 1000) * formInput?.height) / 1000) *
-              formInput?.width) /
-              1000
+            (formInput?.lengths * formInput?.height * formInput?.width) / 1000000000
           ).toFixed(3);
 
           updateFuncs.volumeBlock = (value) =>
@@ -265,17 +288,21 @@ const ModalWindow = React.memo(
         if (values.quantityBlockOnPallet && values.volumeBlock) {
           values.volumeBlockOnPallet = (
             values.quantityBlockOnPallet * values.volumeBlock
-          ).toFixed(2);
+          ).toFixed(3);
 
           updateFuncs.volumeBlockOnPallet = (value) =>
             setFormInput((prev) => ({ ...prev, volumeBlockOnPallet: value }));
         }
 
         // Вычисление m2
-        if (values.volumeBlockOnPallet && formInput?.width) {
+        if (
+          formInput?.height &&
+          formInput?.lengths &&
+          values.quantityBlockOnPallet
+        ) {
           values.m2 = (
-            values.volumeBlockOnPallet /
-            (formInput?.width / 1000)
+            (formInput?.lengths * values.quantityBlockOnPallet * formInput?.height) /
+            1000000
           ).toFixed(2);
           updateFuncs.m2 = (value) =>
             setFormInput((prev) => ({ ...prev, m2: value }));
@@ -321,7 +348,7 @@ const ModalWindow = React.memo(
 
         // Вычисление densityDryDef
         if (formInput?.density) {
-          values.densityDryDef = (formInput?.density * 1.02).toFixed(2);
+          values.densityDryDef = (formInput?.density * 1.0).toFixed(2);
           updateFuncs.densityDryDef = (value) =>
             setFormInput((prev) => ({ ...prev, densityDryDef: value }));
         }
@@ -329,7 +356,7 @@ const ModalWindow = React.memo(
         // Вычисление densityHuminityMax
         if (formInput?.humidity && values.densityDryMax) {
           values.densityHuminityMax = (
-            (1.05 + formInput?.humidity * 0.01) *
+            (1.0 + formInput?.humidity * 0.01) *
             values.densityDryMax
           ).toFixed(2);
           updateFuncs.densityHuminityMax = (value) =>
@@ -356,17 +383,17 @@ const ModalWindow = React.memo(
         if (values.densityHuminityMax && values.volumeBlockOnPallet) {
           values.weightMax = (
             values.densityHuminityMax * values.volumeBlockOnPallet +
-            23
+            20
           ).toFixed(2);
           updateFuncs.weightMax = (value) =>
             setFormInput((prev) => ({ ...prev, weightMax: value }));
         }
 
         // Вычисление weightDef
-        if (values.densityDryDef && values.volumeBlockOnPallet) {
+        if (values.densityHuminityDef && values.volumeBlockOnPallet) {
           values.weightDef = (
-            values.densityDryDef * values.volumeBlockOnPallet +
-            23
+            values.densityHuminityDef * values.volumeBlockOnPallet +
+            20
           ).toFixed(2);
           updateFuncs.weightDef = (value) =>
             setFormInput((prev) => ({ ...prev, weightDef: value }));
