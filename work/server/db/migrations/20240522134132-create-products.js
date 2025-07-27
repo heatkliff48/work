@@ -52,8 +52,14 @@ module.exports = {
       height: {
         type: Sequelize.FLOAT,
       },
+      resistenciaCompresion: {
+        type: Sequelize.FLOAT,
+      },
       tradingMark: {
         type: Sequelize.STRING,
+      },
+      pesoUnitario: {
+        type: Sequelize.FLOAT,
       },
       volumeBlockOnPallet: {
         type: Sequelize.FLOAT,

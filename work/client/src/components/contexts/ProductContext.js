@@ -241,8 +241,21 @@ export const ProductsContextProvider = ({ children }) => {
       max: 1000,
     },
     {
+      Header: 'Resistencia a la compresión, N/mm2',
+      accessor: 'resistenciaCompresion',
+      defaultValue: '2,3',
+      Filter: NumberRangeColumnFilter,
+      filter: 'between',
+      sortType: 'number',
+    },
+    {
       Header: 'Trading Mark',
       accessor: 'tradingMark',
+      sortType: 'string',
+    },
+    {
+      Header: 'Peso Unitario,kg',
+      accessor: 'pesoUnitario',
       sortType: 'string',
     },
     {

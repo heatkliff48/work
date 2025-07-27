@@ -8,20 +8,31 @@ const InputField = React.memo(
     const [inputError, setInputError] = useState("This field can't be empty");
 
     const isValid = (value) => value !== '' && value !== '-';
-
     const [valid, setValid] = useState(
       isValid(inputValue[el.accessor], el.min, el.max)
     );
 
-    const regexp = new RegExp(`^[0-9]*$`);
+    // Разрешаем числа вида 123, 123,4 или 123,45
+    const regexp = /^[0-9]*([,][0-9]{0,2})?$/;
 
     const inputChangeHandler = (e) => {
-      inputValueChange(e);
-      if (!e.target.value) {
+      const rawValue = e.target.value;
+      inputValueChange(e); // сохраняем как строку
+
+      if (!rawValue) {
         setInputError("This field can't be empty");
-      } else if (parseInt(e.target.value) < parseInt(e.target.min)) {
+        return;
+      }
+
+      const parsed = parseFloat(rawValue.replace(',', '.'));
+      const min = parseFloat(e.target.min);
+      const max = parseFloat(e.target.max);
+
+      if (isNaN(parsed)) {
+        setInputError('Неверный формат числа');
+      } else if (parsed < min) {
         setInputError(`Must be higher than ${e.target.min}`);
-      } else if (parseInt(e.target.value) > parseInt(e.target.max)) {
+      } else if (parsed > max) {
         setInputError(`Must be lower than ${e.target.max}`);
       } else {
         setInputError('');
@@ -30,7 +41,9 @@ const InputField = React.memo(
 
     return (
       <div className="item_topic">
-        <ModalBody key={el.id}>{uBlockHeader ? uBlockHeader : el.Header}:</ModalBody>
+        <ModalBody key={el.id}>
+          {uBlockHeader ? uBlockHeader : el.Header}:
+        </ModalBody>
         {inputDirty && inputError && (
           <div style={{ color: 'red' }}>{inputError}</div>
         )}
@@ -42,17 +55,23 @@ const InputField = React.memo(
           max={el.max}
           id={el.accessor}
           name={el.accessor}
-          value={inputValue[el.accessor] || ''}
+          value={
+            inputValue[el.accessor]
+              ? String(inputValue[el.accessor]).replace('.', ',')
+              : ''
+          }
           readOnly={isDisabled}
+          step="any"
           onChange={(e) => {
-            if (regexp.test(e.target.value)) inputChangeHandler(e);
+            if (regexp.test(e.target.value)) {
+              inputChangeHandler(e);
+            }
           }}
-          onBlur={(e) => {
-            setInputDirty(true);
-          }}
+          onBlur={() => setInputDirty(true)}
         />
       </div>
     );
   }
 );
+
 export default InputField;
