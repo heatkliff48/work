@@ -47,7 +47,11 @@ const ModalWindow = React.memo(
 
     const handleInputChange = useCallback((e) => {
       setStayDefault(false);
-      setFormInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+      setFormInput((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
     }, []);
 
     const updateProductHandler = () => {
@@ -55,8 +59,6 @@ const ModalWindow = React.memo(
         form,
         certificate,
         width,
-        height,
-        lengths,
         density,
         placeOfProduction,
         typeOfPackaging,
@@ -111,12 +113,16 @@ const ModalWindow = React.memo(
         formInput.width ?? '-'
       }x${formInput.height ?? '-'}mm ${formInput.density ?? '-'}kg/m³`;
 
+      let parsedRC = parseFloat(formInput.resistenciaCompresion?.replace(',', '.'));
+      if (isNaN(parsedRC)) parsedRC = null;
+
       const updatedProduct = {
         ...formInput,
         article: prodArticle,
         productCode,
         activeStatus: true,
         description,
+        resistenciaCompresion: parsedRC,
       };
 
       const isExistingProduct = products.some(
@@ -397,6 +403,16 @@ const ModalWindow = React.memo(
           ).toFixed(2);
           updateFuncs.weightDef = (value) =>
             setFormInput((prev) => ({ ...prev, weightDef: value }));
+        }
+
+        // Вычисление pesoUnitario
+        if (values.weightDef && values.quantityBlockOnPallet) {
+          values.pesoUnitario = (
+            (values.weightDef - 20) /
+            values.quantityBlockOnPallet
+          ).toFixed(2);
+          updateFuncs.pesoUnitario = (value) =>
+            setFormInput((prev) => ({ ...prev, pesoUnitario: value }));
         }
 
         return { values, updateFuncs };
