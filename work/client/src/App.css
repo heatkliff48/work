@@ -566,6 +566,7 @@ button {
   --bs-btn-hover-color: ;
   --bs-btn-hover-bg: ;
   --bs-btn-hover-border-color: ;
+  --bs-btn-active-bg: ;
 }
 
 .btn {
