@@ -14,16 +14,15 @@ function MainOffcanvas() {
   const { roles, checkUserAccess } = useUsersContext();
 
   const [show, setShow] = useState(false);
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
   return (
     <>
       <div className="nav_link_wrapper">
-        <div className="nav_link" onClick={handleShow}>
-          <p className="p_nav">Home</p>
-        </div>
+        <button className="nav_home_button" onClick={handleShow}>
+          Меню
+        </button>
       </div>
 
       <Offcanvas show={show} onHide={handleClose} backdrop={true}>
@@ -32,272 +31,252 @@ function MainOffcanvas() {
         </Offcanvas.Header>
         <Offcanvas.Body>
           <ButtonGroup vertical>
+            {/* Администрирование */}
             {checkUserAccess(user, roles, 'Users_info')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
-                title="Admin"
-                id="bg-vertical-dropdown-1"
+                title="Администрирование"
+                className="custom-menu-button"
               >
                 <Dropdown.Item eventKey="1">
-                  {checkUserAccess(user, roles, 'Users_info')?.canRead && (
-                    <Button
-                      className="nav-button"
-                      onClick={() => {
-                        navigate('/users_info');
-                        handleClose();
-                      }}
-                    >
-                      Users Info
-                    </Button>
-                  )}
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/users_info');
+                      handleClose();
+                    }}
+                  >
+                    Users Info
+                  </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="2">
-                  {checkUserAccess(user, roles, 'Roles')?.canRead && (
-                    <Button
-                      className="nav-button"
-                      onClick={() => {
-                        navigate('/roles');
-                        handleClose();
-                      }}
-                    >
-                      Roles
-                    </Button>
-                  )}
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/roles');
+                      handleClose();
+                    }}
+                  >
+                    Roles
+                  </Button>
                 </Dropdown.Item>
               </DropdownButton>
             )}
+
+            {/* Продукты */}
             {checkUserAccess(user, roles, 'Products')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
-                title="Products catalog"
-                id="bg-vertical-dropdown-1"
+                title="Каталог продукции"
+                className="custom-menu-button"
               >
                 <Dropdown.Item eventKey="1">
-                  {checkUserAccess(user, roles, 'Products')?.canRead && (
-                    <Button
-                      onClick={() => {
-                        navigate('/products_type_journal');
-                        handleClose();
-                      }}
-                    >
-                      Products catalog
-                    </Button>
-                  )}
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/products_type_journal');
+                      handleClose();
+                    }}
+                  >
+                    Products catalog
+                  </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="2">
-                  {checkUserAccess(user, roles, 'Statistics')?.canRead && (
-                    <Button
-                      onClick={() => {
-                        navigate('/statistics');
-                        handleClose();
-                      }}
-                    >
-                      Statistics
-                    </Button>
-                  )}
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/statistics');
+                      handleClose();
+                    }}
+                  >
+                    Statistics
+                  </Button>
                 </Dropdown.Item>
               </DropdownButton>
             )}
+
+            {/* Клиенты */}
             {checkUserAccess(user, roles, 'Clients')?.canRead && (
               <Button
+                className="custom-menu-button"
                 onClick={() => {
                   navigate('/clients');
                   handleClose();
                 }}
               >
-                Clients
+                Клиенты
               </Button>
             )}
+
+            {/* Заказы */}
             {checkUserAccess(user, roles, 'Orders')?.canRead && (
               <Button
+                className="custom-menu-button"
                 onClick={() => {
                   navigate('/orders');
                   handleClose();
                 }}
               >
-                Orders
+                Заказы
               </Button>
             )}
+
+            {/* Производственные блоки */}
             {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
-                title="Ordered products pipeline"
-                id="bg-vertical-dropdown-1"
+                title="Производство"
+                className="custom-menu-button"
               >
                 <Dropdown.Item eventKey="1">
-                  {checkUserAccess(user, roles, 'List_of_ordered_production')
-                    ?.canRead && (
-                    <Button
-                      className="nav-button"
-                      onClick={() => {
-                        navigate('/list_of_ordered_production');
-                        handleClose();
-                      }}
-                    >
-                      Oredred blocks pipeline
-                    </Button>
-                  )}
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/list_of_ordered_production');
+                      handleClose();
+                    }}
+                  >
+                    Ordered blocks
+                  </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="2">
-                  {checkUserAccess(user, roles, 'list_of_ordered_production_oem')
-                    ?.canRead && (
-                    <Button
-                      className="nav-button"
-                      onClick={() => {
-                        navigate('/list_of_ordered_production_oem');
-                        handleClose();
-                      }}
-                    >
-                      Oredred OEM blocks pipeline
-                    </Button>
-                  )}
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/list_of_ordered_production_oem');
+                      handleClose();
+                    }}
+                  >
+                    OEM blocks
+                  </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="3">
-                  {checkUserAccess(user, roles, 'related_materials_backorder_list')
-                    ?.canRead && (
-                    <Button
-                      className="nav-button"
-                      onClick={() => {
-                        navigate('/related_materials_backorder_list');
-                        handleClose();
-                      }}
-                    >
-                      Related materials backorder list
-                    </Button>
-                  )}
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/related_materials_backorder_list');
+                      handleClose();
+                    }}
+                  >
+                    Materials backorder
+                  </Button>
                 </Dropdown.Item>
               </DropdownButton>
             )}
+
+            {/* Планирование */}
             {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
-                title="Production planner"
-                id="bg-vertical-dropdown-2"
+                title="Планирование"
+                className="custom-menu-button"
               >
                 <Dropdown.Item eventKey="1">
-                  <Button>Autoclave calender</Button>
-                </Dropdown.Item>
-                <Dropdown.Item eventKey="2">
-                  {checkUserAccess(user, roles, 'production_batch_designer')
-                    ?.canRead && (
-                    <Button
-                      onClick={() => {
-                        navigate('/production_batch_designer');
-                        handleClose();
-                      }}
-                    >
-                      Batch planner
-                    </Button>
-                  )}
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/production_batch_designer');
+                      handleClose();
+                    }}
+                  >
+                    Batch planner
+                  </Button>
                 </Dropdown.Item>
               </DropdownButton>
             )}
-            {checkUserAccess(user, roles, 'production_plan')?.canRead && (
-              <Button
-                onClick={() => {
-                  navigate('/batch_outside');
-                  handleClose();
-                }}
-              >
-                Batch calender
-              </Button>
-            )}
 
+            {/* Технологические рецепты */}
             {checkUserAccess(user, roles, 'recipe_products')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
-                title="Production planner"
-                id="bg-vertical-dropdown-2"
+                title="Технология"
+                className="custom-menu-button"
               >
-                {checkUserAccess(user, roles, 'recipe_products')?.canRead && (
-                  <Dropdown.Item eventKey="1">
-                    <Button
-                      onClick={() => {
-                        navigate('/recipe_products');
-                        handleClose();
-                      }}
-                    >
-                      Recepies catalog
-                    </Button>
-                  </Dropdown.Item>
-                )}
-
-                {checkUserAccess(user, roles, 'raw_materials_plan')?.canRead && (
-                  <Dropdown.Item eventKey="2">
-                    <Button
-                      onClick={() => {
-                        navigate('/raw_materials_plan');
-                        handleClose();
-                      }}
-                    >
-                      Batch recepie planner
-                    </Button>
-                  </Dropdown.Item>
-                )}
-                {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
-                  <Dropdown.Item eventKey="3">
-                    <Button
-                      onClick={() => {
-                        navigate('/recipe_orders');
-                        handleClose();
-                      }}
-                    >
-                      Raw material calender
-                    </Button>
-                  </Dropdown.Item>
-                )}
+                <Dropdown.Item eventKey="1">
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/recipe_products');
+                      handleClose();
+                    }}
+                  >
+                    Recipes
+                  </Button>
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="2">
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/raw_materials_plan');
+                      handleClose();
+                    }}
+                  >
+                    Recipe planner
+                  </Button>
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="3">
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/recipe_orders');
+                      handleClose();
+                    }}
+                  >
+                    Raw material calendar
+                  </Button>
+                </Dropdown.Item>
               </DropdownButton>
             )}
-            {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
-              <Button
-                onClick={() => {
-                  navigate('/recipe_orders');
-                  handleClose();
-                }}
-              >
-                Technology calender
-              </Button>
-            )}
-            {checkUserAccess(user, roles, 'quality_management')?.canRead && (
-              <Button
-                onClick={() => {
-                  navigate('/quality_management');
-                  handleClose();
-                }}
-              >
-                Quality management
-              </Button>
-            )}
 
+            {/* Склад */}
             {checkUserAccess(user, roles, 'Warehouse')?.canRead && (
               <Button
+                className="custom-menu-button"
                 onClick={() => {
                   navigate('/warehouse_products_type');
                   handleClose();
                 }}
               >
-                Warehouse
+                Склад
               </Button>
             )}
 
+            {/* Отгрузка */}
             {checkUserAccess(user, roles, 'warehouse_manager')?.canRead && (
               <Button
+                className="custom-menu-button"
                 onClick={() => {
                   navigate('/warehouse_manager');
                   handleClose();
                 }}
               >
-                Order dispatch
+                Отгрузка
               </Button>
             )}
+
+            {/* Качество */}
+            {checkUserAccess(user, roles, 'quality_management')?.canRead && (
+              <Button
+                className="custom-menu-button"
+                onClick={() => {
+                  navigate('/quality_management');
+                  handleClose();
+                }}
+              >
+                Качество
+              </Button>
+            )}
+
+            {/* Бухгалтерия */}
             {checkUserAccess(user, roles, 'accounting')?.canRead && (
               <Button
+                className="custom-menu-button"
                 onClick={() => {
                   navigate('/accounting');
                   handleClose();
                 }}
               >
-                Accounting
+                Бухгалтерия
               </Button>
             )}
           </ButtonGroup>
