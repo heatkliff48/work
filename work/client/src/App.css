@@ -110,7 +110,6 @@
   border-radius: 8px;
   padding: 10px 20px;
   margin-bottom: 12px;
-  text-align: left;
   font-weight: 500;
   font-size: 16px;
   transition: background-color 0.2s ease;
@@ -118,6 +117,11 @@
 
 .custom-menu-button:hover {
   background-color: #6da75d;
+}
+
+.custom-menu-button:hover {
+  color: black;
+  border-color: #6da75d;
 }
 
 /* Кнопки внутри Dropdown */
@@ -543,6 +547,7 @@ label {
 
 /* Buttons styling for download and preview */
 button {
+  text-align: center;
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
@@ -551,6 +556,20 @@ button {
   font-size: 16px;
   cursor: pointer;
   /* margin-top: 20px; */
+}
+
+.btn-primary {
+  --bs-btn-bg: ;
+  --bs-btn-border-color: ;
+  --bs-btn-border: ;
+  --bs-btn-hover-color: ;
+  --bs-btn-hover-color: ;
+  --bs-btn-hover-bg: ;
+  --bs-btn-hover-border-color: ;
+}
+
+.btn {
+  --bs-btn-border-width: 0;
 }
 
 button:hover {
