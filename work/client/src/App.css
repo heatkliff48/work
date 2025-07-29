@@ -558,7 +558,7 @@ button {
   /* margin-top: 20px; */
 }
 
-.btn-primary {
+/* .btn-primary {
   --bs-btn-bg: ;
   --bs-btn-border-color: ;
   --bs-btn-border: ;
@@ -567,7 +567,7 @@ button {
   --bs-btn-hover-bg: ;
   --bs-btn-hover-border-color: ;
   --bs-btn-active-bg: ;
-}
+} */
 
 .btn {
   --bs-btn-border-width: 0;
