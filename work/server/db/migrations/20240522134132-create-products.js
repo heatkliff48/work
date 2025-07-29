@@ -52,6 +52,9 @@ module.exports = {
       height: {
         type: Sequelize.FLOAT,
       },
+      diametro: {
+        type: Sequelize.FLOAT,
+      },
       resistenciaCompresion: {
         type: Sequelize.FLOAT,
       },
@@ -112,7 +115,16 @@ module.exports = {
       volumeBlock: {
         type: Sequelize.FLOAT,
       },
+      qty_per_truck: {
+        type: Sequelize.FLOAT,
+      },
+      qty_per_contendor: {
+        type: Sequelize.FLOAT,
+      },
       productCode: {
+        type: Sequelize.STRING,
+      },
+      product_code_pall: {
         type: Sequelize.STRING,
       },
       activeStatus: {

@@ -106,7 +106,6 @@ const ModalWindow = React.memo(
       let productCode = '0001';
       const articleId = products.length === 0 ? 1 : products.length + 1;
       productCode = `${34000 + articleId - 34}`.slice(-5);
-      console.log('articleId', articleId);
 
       //description
       const description = `BAUBLOCK®${trMark} ${formInput.lengths ?? '-'}x${
@@ -128,10 +127,6 @@ const ModalWindow = React.memo(
       const isExistingProduct = products.some(
         (product) => product.article === prodArticle && product.density == density
       ); // добавить проверку выс шир длин
-      console.log('products', products);
-      console.log('prodArticle', prodArticle);
-      console.log('density', density);
-      console.log('isExistingProduct', isExistingProduct);
 
       const existingProduct = products.find(
         (product) => product.article === prodArticle
@@ -415,6 +410,20 @@ const ModalWindow = React.memo(
             setFormInput((prev) => ({ ...prev, pesoUnitario: value }));
         }
 
+        // Вычисление qty_per_truck
+        if (values.weightDef) {
+          values.qty_per_truck = Math.floor(24000 / values.weightDef).toFixed(2);
+          updateFuncs.qty_per_truck = (value) =>
+            setFormInput((prev) => ({ ...prev, qty_per_truck: value }));
+        }
+
+        // Вычисление qty_per_contendor
+        if (values.weightDef) {
+          values.qty_per_contendor = Math.floor(25000 / values.weightDef).toFixed(2);
+          updateFuncs.qty_per_contendor = (value) =>
+            setFormInput((prev) => ({ ...prev, qty_per_contendor: value }));
+        }
+
         return { values, updateFuncs };
       },
       [
@@ -622,6 +631,24 @@ const ModalWindow = React.memo(
                       readOnly
                     />
                   </div>
+                );
+              }
+              if (el.accessor === 'diametro') {
+                if (formInput?.form !== 'O-block') return null;
+
+                return (
+                  <InputField
+                    key={el.id}
+                    el={el}
+                    inputValue={formInput}
+                    inputValueChange={handleInputChange}
+                    isDisabled={
+                      formInput?.form == 'Forjado' &&
+                      (el.accessor == 'lengths' || el.accessor == 'height')
+                        ? true
+                        : false
+                    }
+                  />
                 );
               }
 

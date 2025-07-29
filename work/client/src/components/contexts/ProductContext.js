@@ -241,6 +241,14 @@ export const ProductsContextProvider = ({ children }) => {
       max: 1000,
     },
     {
+      Header: 'Diametro',
+      accessor: 'diametro',
+      defaultValue: 250,
+      Filter: NumberRangeColumnFilter,
+      filter: 'between',
+      sortType: 'number',
+    },
+    {
       Header: 'Resistencia a la compresión, N/mm2',
       accessor: 'resistenciaCompresion',
       defaultValue: '2,3',
