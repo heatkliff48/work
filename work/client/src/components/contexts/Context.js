@@ -345,6 +345,39 @@ const ProjectContextProvider = ({ children }) => {
     { id: 20, label: 'Accountant' },
   ];
 
+  const pageTitles = {
+    '/': 'Main Page',
+    '/sign-in': 'Sign In',
+    '/roles': 'Roles',
+    '/products': 'Products',
+    '/products/edit': 'Редактирование',
+    '/clients': 'Clients',
+    '/users_info': 'Users Info',
+    '/warehouse_manager': 'Order dispatch',
+    '/products_type_journal': 'Products Type Journal',
+    '/statistics': 'Statistics',
+    '/orders': 'Clients',
+    '/accounting': 'Accounting',
+    '/warehouse_products_type': 'Warehouse',
+    '/production_batch_designer': 'Production Batch Designer',
+    '/list_of_ordered_production': 'List of ordered production',
+    '/list_of_ordered_production_oem': 'List of ordered production OEM',
+    '/related_materials_backorder_list': 'Related materials backorder list',
+    '/batch_outside': 'Production Plan',
+    '/recipe_products': 'Recipe Products',
+    '/raw_materials_plan': 'Raw Materials Plan',
+    '/recipe_orders': 'Recipe Orders',
+    '/quality_management': 'Quality Management',
+  };
+
+  function getPageTitleByPath(pathname = window.location.pathname) {
+    return pageTitles[pathname] || 'Страница';
+  }
+
+  const getRoleName = (roleId) => {
+    return roleTable.find((el) => el.id == roleId)?.label ?? 'null';
+  };
+
   useEffect(() => {
     //сделать диспатч чек юзер на нахождение юзера в бд
     if (isCheckedAuth && !user) {
@@ -369,6 +402,7 @@ const ProjectContextProvider = ({ children }) => {
         roleId,
         setRoleId,
         roleTable,
+        getRoleName,
         clients_info_table,
         clients_legal_address_table,
         clients_delivery_addresses_table,
@@ -399,6 +433,7 @@ const ProjectContextProvider = ({ children }) => {
         setPreviewProductData,
         previewOperationName,
         setPreviewOperationName,
+        getPageTitleByPath,
       }}
     >
       {children}
