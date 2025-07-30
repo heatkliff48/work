@@ -105,7 +105,7 @@ const ModalWindow = React.memo(
 
       let productCode = '0001';
       const articleId = products.length === 0 ? 1 : products.length + 1;
-      productCode = `${34000 + articleId - 34}`.slice(-5);
+      productCode = `${34000 + articleId}`.slice(-5);
 
       //description
       const description = `BAUBLOCK®${trMark} ${formInput.lengths ?? '-'}x${

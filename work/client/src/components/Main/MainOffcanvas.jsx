@@ -21,7 +21,7 @@ function MainOffcanvas() {
     <>
       <div className="nav_link_wrapper">
         <button className="nav_home_button" onClick={handleShow}>
-          Меню
+          Home
         </button>
       </div>
 
@@ -35,7 +35,7 @@ function MainOffcanvas() {
             {checkUserAccess(user, roles, 'Users_info')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
-                title="Администрирование"
+                title="Admin"
                 className="custom-menu-button"
               >
                 <Dropdown.Item eventKey="1">
@@ -67,7 +67,7 @@ function MainOffcanvas() {
             {checkUserAccess(user, roles, 'Products')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
-                title="Каталог продукции"
+                title="Products catalog"
                 className="custom-menu-button"
               >
                 <Dropdown.Item eventKey="1">
@@ -104,7 +104,7 @@ function MainOffcanvas() {
                   handleClose();
                 }}
               >
-                Клиенты
+                Clients
               </Button>
             )}
 
@@ -117,7 +117,7 @@ function MainOffcanvas() {
                   handleClose();
                 }}
               >
-                Заказы
+                Orders
               </Button>
             )}
 
@@ -125,7 +125,7 @@ function MainOffcanvas() {
             {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
-                title="Производство"
+                title="Ordered products pipeline"
                 className="custom-menu-button"
               >
                 <Dropdown.Item eventKey="1">
@@ -136,7 +136,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Ordered blocks
+                    Oredred blocks pipeline
                   </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="2">
@@ -147,7 +147,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    OEM blocks
+                    Oredred OEM blocks pipeline
                   </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="3">
@@ -158,7 +158,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Materials backorder
+                    Related materials backorder list
                   </Button>
                 </Dropdown.Item>
               </DropdownButton>
@@ -168,10 +168,15 @@ function MainOffcanvas() {
             {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
-                title="Планирование"
+                title="Production planner"
                 className="custom-menu-button"
               >
                 <Dropdown.Item eventKey="1">
+                  <Button className="custom-submenu-button">
+                    Autoclave calender
+                  </Button>
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="2">
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
@@ -184,12 +189,24 @@ function MainOffcanvas() {
                 </Dropdown.Item>
               </DropdownButton>
             )}
+            {checkUserAccess(user, roles, 'production_plan')?.canRead && (
+              <Button
+                className="custom-menu-button"
+                onClick={() => {
+                  navigate('/batch_outside');
+
+                  handleClose();
+                }}
+              >
+                Batch calender
+              </Button>
+            )}
 
             {/* Технологические рецепты */}
             {checkUserAccess(user, roles, 'recipe_products')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
-                title="Технология"
+                title="Technology planner"
                 className="custom-menu-button"
               >
                 <Dropdown.Item eventKey="1">
@@ -200,7 +217,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Recipes
+                    Recepies catalog
                   </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="2">
@@ -211,7 +228,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Recipe planner
+                    Batch recepie planner
                   </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="3">
@@ -222,10 +239,34 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Raw material calendar
+                    Raw material calender
                   </Button>
                 </Dropdown.Item>
               </DropdownButton>
+            )}
+            {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
+              <Button
+                className="custom-menu-button"
+                onClick={() => {
+                  navigate('/recipe_orders');
+
+                  handleClose();
+                }}
+              >
+                Technology calender
+              </Button>
+            )}
+            {/* Качество */}
+            {checkUserAccess(user, roles, 'quality_management')?.canRead && (
+              <Button
+                className="custom-menu-button"
+                onClick={() => {
+                  navigate('/quality_management');
+                  handleClose();
+                }}
+              >
+                Quality management
+              </Button>
             )}
 
             {/* Склад */}
@@ -237,7 +278,7 @@ function MainOffcanvas() {
                   handleClose();
                 }}
               >
-                Склад
+                Warehouse
               </Button>
             )}
 
@@ -250,20 +291,7 @@ function MainOffcanvas() {
                   handleClose();
                 }}
               >
-                Отгрузка
-              </Button>
-            )}
-
-            {/* Качество */}
-            {checkUserAccess(user, roles, 'quality_management')?.canRead && (
-              <Button
-                className="custom-menu-button"
-                onClick={() => {
-                  navigate('/quality_management');
-                  handleClose();
-                }}
-              >
-                Качество
+                Order dispatch
               </Button>
             )}
 
@@ -276,7 +304,7 @@ function MainOffcanvas() {
                   handleClose();
                 }}
               >
-                Бухгалтерия
+                Accounting
               </Button>
             )}
           </ButtonGroup>
