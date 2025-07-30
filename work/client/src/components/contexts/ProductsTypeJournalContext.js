@@ -19,11 +19,30 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       accessor: 'article',
       Filter: TextSearchFilter,
     },
-
+    {
+      Header: 'Width, mm',
+      accessor: 'width',
+    },
+    {
+      Header: 'Lengths, mm',
+      accessor: 'lengths',
+    },
+    {
+      Header: 'Height, mm',
+      accessor: 'height',
+    },
     {
       Header: 'Units of measurement',
       accessor: 'units_of_measurement',
       Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Altura x Palet',
+      accessor: 'altura_x_palet',
+    },
+    {
+      Header: 'Unit x Base',
+      accessor: 'unit_x_base',
     },
     {
       Header: 'Units per pallet',
@@ -45,7 +64,6 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       accessor: 'type_of_mix',
       Filter: TextSearchFilter,
     },
-
     {
       Header: 'Place of production',
       accessor: 'place_of_production',
@@ -65,6 +83,14 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       Header: 'Price per kilogram',
       accessor: 'price_per_kilogram',
       Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Quantity per truck',
+      accessor: 'qty_per_truck',
+    },
+    {
+      Header: 'Quantity per contendor',
+      accessor: 'qty_per_contendor',
     },
     {
       Header: 'Description',
@@ -217,10 +243,26 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       accessor: 'article',
       Filter: TextSearchFilter,
     },
-
+    {
+      Header: 'Width, mm',
+      accessor: 'width',
+    },
+    {
+      Header: 'Lengths, mm',
+      accessor: 'lengths',
+    },
+    {
+      Header: 'Height, mm',
+      accessor: 'height',
+    },
     {
       Header: 'Units of measurement',
       accessor: 'units_of_measurement',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Units per pallet',
+      accessor: 'units_per_pallet',
       Filter: TextSearchFilter,
     },
     {
@@ -228,7 +270,11 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       accessor: 'piece_weight',
       Filter: TextSearchFilter,
     },
-
+    {
+      Header: 'Pallet weight',
+      accessor: 'pallet_weight',
+      Filter: TextSearchFilter,
+    },
     {
       Header: 'Place of production',
       accessor: 'place_of_production',
@@ -243,6 +289,14 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       Header: 'Price per unit',
       accessor: 'price_per_unit',
       Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Quantity per truck',
+      accessor: 'qty_per_truck',
+    },
+    {
+      Header: 'Quantity per contendor',
+      accessor: 'qty_per_contendor',
     },
     {
       Header: 'Description',
@@ -266,6 +320,8 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
     { value: 'pieces', label: 'Pieces' },
     { value: 'kilograms', label: 'Kilograms' },
     { value: 'bags', label: 'Bags' },
+    { value: 'boxes', label: 'Boxes' },
+    { value: 'pallets', label: 'Pallets' },
   ];
   const typeOfMixOptions = [
     { value: 0, label: 'Dry mix' },

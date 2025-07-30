@@ -60,9 +60,8 @@ function ProductsTypeJournalModal(props) {
     'place_of_production',
     'price_per_unit',
     'piece_weight',
+     'pallet_weight'
   ];
-
-  const dispatch = useDispatch();
 
   const handleProductsTypeJournalInputChange = useCallback((e) => {
     setProductsTypeJournalInput((prev) => ({
@@ -76,10 +75,12 @@ function ProductsTypeJournalModal(props) {
   }, []);
 
   useEffect(() => {
-    const { bag_weight, units_per_pallet } = productsTypeJournalInput;
-    if (bag_weight && units_per_pallet) {
+    const { bag_weight, units_per_pallet, units_of_measurement } =
+      productsTypeJournalInput;
+    if (bag_weight && units_per_pallet && units_of_measurement) {
+      const constante = units_of_measurement == 'pallets' ? 20 : 0;
       const palletWeight =
-        parseFloat(bag_weight) * parseFloat(units_per_pallet) + 23;
+        parseFloat(bag_weight) * parseFloat(units_per_pallet) + constante;
       setProductsTypeJournalInput((prev) => ({
         ...prev,
         pallet_weight: palletWeight,
@@ -88,6 +89,25 @@ function ProductsTypeJournalModal(props) {
   }, [
     productsTypeJournalInput.bag_weight,
     productsTypeJournalInput.units_per_pallet,
+    productsTypeJournalInput.units_of_measurement,
+  ]);
+  //tools pallet_weight
+  useEffect(() => {
+    const { piece_weight, units_per_pallet, units_of_measurement } =
+      productsTypeJournalInput;
+    if (piece_weight && units_per_pallet && units_of_measurement) {
+      const constante = units_of_measurement == 'pallets' ? 20 : 0;
+      const palletWeight =
+        parseFloat(piece_weight) * parseFloat(units_per_pallet) + constante;
+      setProductsTypeJournalInput((prev) => ({
+        ...prev,
+        pallet_weight: palletWeight,
+      }));
+    }
+  }, [
+    productsTypeJournalInput.piece_weight,
+    productsTypeJournalInput.units_per_pallet,
+    productsTypeJournalInput.units_of_measurement,
   ]);
 
   useEffect(() => {
@@ -102,19 +122,40 @@ function ProductsTypeJournalModal(props) {
   }, [productsTypeJournalInput.price_per_unit, productsTypeJournalInput.bag_weight]);
 
   useEffect(() => {
-    const { boxes_on_a_pallet, box_weight } = productsTypeJournalInput;
-    if (boxes_on_a_pallet && box_weight) {
-      const palletWeight =
-        parseFloat(boxes_on_a_pallet) * parseFloat(box_weight) + 23;
+    const { unit_x_base, altura_x_palet } = productsTypeJournalInput;
+    if (unit_x_base && altura_x_palet) {
+      const value = parseFloat(unit_x_base) * parseFloat(altura_x_palet);
       setProductsTypeJournalInput((prev) => ({
         ...prev,
-        pallet_weight: palletWeight,
+        units_per_pallet: value,
       }));
     }
   }, [
-    productsTypeJournalInput.boxes_on_a_pallet,
-    productsTypeJournalInput.box_weight,
+    productsTypeJournalInput.unit_x_base,
+    productsTypeJournalInput.altura_x_palet,
   ]);
+
+  useEffect(() => {
+    const { pallet_weight } = productsTypeJournalInput;
+    if (pallet_weight) {
+      const value = Math.floor(24000 / parseFloat(pallet_weight));
+      setProductsTypeJournalInput((prev) => ({
+        ...prev,
+        qty_per_truck: value,
+      }));
+    }
+  }, [productsTypeJournalInput.pallet_weight]);
+
+  useEffect(() => {
+    const { pallet_weight } = productsTypeJournalInput;
+    if (pallet_weight) {
+      const value = Math.floor(25000 / parseFloat(pallet_weight));
+      setProductsTypeJournalInput((prev) => ({
+        ...prev,
+        qty_per_contendor: value,
+      }));
+    }
+  }, [productsTypeJournalInput.pallet_weight]);
 
   const handleProductsTypeJournalSelectChange = (selectedOption, key) => {
     setProductsTypeJournalInput((prev) => ({
@@ -310,7 +351,9 @@ function ProductsTypeJournalModal(props) {
             'box_weight',
             'pallet_weight',
           ].includes(fieldName)
-        : ['name', 'manufacturer_name', 'piece_weight'].includes(fieldName);
+        : ['name', 'manufacturer_name', 'piece_weight', 'pallet_weight'].includes(
+            fieldName
+          );
     }
     return false;
   };
@@ -349,7 +392,6 @@ function ProductsTypeJournalModal(props) {
                 onSubmitForm(e);
               }}
             >
-              <h3></h3>
               <Row>
                 {props.table.map((el) => (
                   <div className="md:flex md:items-center mb-6">

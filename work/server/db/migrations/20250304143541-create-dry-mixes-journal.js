@@ -15,11 +15,26 @@ module.exports = {
       article: {
         type: Sequelize.STRING,
       },
+      lengths: {
+        type: Sequelize.FLOAT,
+      },
+      width: {
+        type: Sequelize.FLOAT,
+      },
+      height: {
+        type: Sequelize.FLOAT,
+      },
       manufacturer_name: {
         type: Sequelize.STRING,
       },
       units_of_measurement: {
         type: Sequelize.STRING,
+      },
+      altura_x_palet: {
+        type: Sequelize.INTEGER,
+      },
+      unit_x_base: {
+        type: Sequelize.INTEGER,
       },
       units_per_pallet: {
         type: Sequelize.INTEGER,
@@ -47,6 +62,18 @@ module.exports = {
       },
       product_code: {
         type: Sequelize.STRING,
+      },
+      product_code_box: {
+        type: Sequelize.STRING,
+      },
+      product_code_pall: {
+        type: Sequelize.STRING,
+      },
+      qty_per_truck: {
+        type: Sequelize.INTEGER,
+      },
+      qty_per_contendor: {
+        type: Sequelize.INTEGER,
       },
       active_status: {
         type: Sequelize.BOOLEAN,
