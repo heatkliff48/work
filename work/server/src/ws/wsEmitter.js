@@ -81,6 +81,7 @@ const {
   GET_DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   ADD_NEW_DELIVERY_PRICE_SOCKET,
+  UPDATE_PRODUCT_CODE_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -1052,6 +1053,17 @@ function registerWsEmitter(map) {
       }
     }
   );
+
+  myEmitter.on(UPDATE_PRODUCT_CODE_SOCKET, (tool) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_PRODUCT_CODE_SOCKET,
+          payload: tool,
+        })
+      );
+    }
+  });
 
   // myEmitter.on(CHECK_CARD_SOCKET, (gameusers, street, dohod, isFree, money) => {
   //   for (let [id, userConnect] of map) {

@@ -1,13 +1,14 @@
 import {
   FULL_ANCHOR,
   FULL_DRY_MIXES_JOURNAL,
+  FULL_PRODUCT_CODE,
   FULL_RELATED_MATERIALS_JOURNAL,
   FULL_TOOL,
-  UPDATE_DRY_MIXES_JOURNAL,
 } from '../types/productsTypeJournalTypes';
 import {
   NEED_UPDATE_ANCHOR_SOCKET,
   NEED_UPDATE_DRY_MIXES_JOURNAL_SOCKET,
+  NEED_UPDATE_PRODUCT_CODE_SOCKET,
   NEED_UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
   NEED_UPDATE_TOOL_SOCKET,
   NEW_ANCHOR_SOCKET,
@@ -100,5 +101,24 @@ export const toolReducer = (tool = [], action) => {
     }
     default:
       return tool;
+  }
+};
+
+export const productCodeReducer = (productCode = [], action) => {
+  const { type, payload } = action;
+
+  switch (type) {
+    case FULL_PRODUCT_CODE: {
+      return payload;
+    }
+    case NEED_UPDATE_PRODUCT_CODE_SOCKET: {
+      const result = productCode.map((el) => {
+        if (el.id === payload[1].id) return payload[1];
+        return el;
+      });
+      return result;
+    }
+    default:
+      return productCode;
   }
 };

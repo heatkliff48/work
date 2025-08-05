@@ -72,6 +72,7 @@ import {
   UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+  NEED_UPDATE_PRODUCT_CODE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -586,5 +587,12 @@ export const addNewAldabaranSocket = (currentAldabaran) => {
   return {
     type: NEW_ALDABARAN_SOCKET,
     payload: currentAldabaran,
+  };
+};
+
+export const updateProductCodeSocket = (productCode) => {
+  return {
+    type: NEED_UPDATE_PRODUCT_CODE_SOCKET,
+    payload: productCode,
   };
 };

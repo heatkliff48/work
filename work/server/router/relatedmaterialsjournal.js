@@ -32,6 +32,8 @@ relatedMaterialsJournalRouter.post('/', async (req, res) => {
     place_of_production,
     price_per_unit,
     product_code,
+    product_code_box,
+    product_code_pall,
     active_status,
     version,
   } = req.body;
@@ -46,6 +48,8 @@ relatedMaterialsJournalRouter.post('/', async (req, res) => {
       place_of_production,
       price_per_unit,
       product_code,
+      product_code_box,
+      product_code_pall,
       active_status,
       version,
     });
@@ -72,6 +76,8 @@ relatedMaterialsJournalRouter.post('/update', async (req, res) => {
     place_of_production,
     price_per_unit,
     product_code,
+    product_code_box,
+    product_code_pall,
     active_status,
     version,
   } = req.body;
@@ -87,6 +93,8 @@ relatedMaterialsJournalRouter.post('/update', async (req, res) => {
         place_of_production,
         price_per_unit,
         product_code,
+        product_code_box,
+        product_code_pall,
         active_status,
         version,
       },
