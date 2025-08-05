@@ -25,6 +25,8 @@ module.exports = (sequelize, DataTypes) => {
       place_of_production: DataTypes.STRING,
       price_per_unit: DataTypes.FLOAT,
       product_code: DataTypes.STRING,
+      product_code_box: DataTypes.STRING,
+      product_code_pall: DataTypes.STRING,
       active_status: DataTypes.BOOLEAN,
       version: DataTypes.INTEGER,
     },

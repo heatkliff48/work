@@ -5,10 +5,12 @@ import {
   ADD_NEW_TOOL,
   GET_FULL_ANCHOR,
   GET_FULL_DRY_MIXES_JOURNAL,
+  GET_FULL_PRODUCT_CODE,
   GET_FULL_RELATED_MATERIALS_JOURNAL,
   GET_FULL_TOOL,
   UPDATE_NEW_ANCHOR,
   UPDATE_NEW_DRY_MIXES_JOURNAL,
+  UPDATE_NEW_PRODUCT_CODE,
   UPDATE_NEW_RELATED_MATERIALS_JOURNAL,
   UPDATE_NEW_TOOL,
 } from '../types/productsTypeJournalTypes';
@@ -90,5 +92,18 @@ export const updateTool = (tool) => {
   return {
     type: UPDATE_NEW_TOOL,
     payload: tool,
+  };
+};
+
+export const getProductCode = () => {
+  return {
+    type: GET_FULL_PRODUCT_CODE,
+  };
+};
+
+export const updateProductCode = (productCode) => {
+  return {
+    type: UPDATE_NEW_PRODUCT_CODE,
+    payload: productCode,
   };
 };

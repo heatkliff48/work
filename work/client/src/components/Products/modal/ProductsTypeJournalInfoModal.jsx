@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import './styles.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import BarcodeGenerator from './BarcodeGenerator';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 import {
   updateAnchor,
   updateDryMixesJournal,
@@ -58,6 +60,7 @@ function ProductsTypeJournalInfoModal(props) {
     selectedProductsType?.version
   );
   const [repairButton, setRepairButton] = useState(true);
+  const [selectedBarcodeValue, setSelectedBarcodeValue] = useState(1);
   // const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   // const user = useSelector((state) => state.user);
@@ -195,6 +198,11 @@ function ProductsTypeJournalInfoModal(props) {
   const handleCloseModal = () => {
     props.onHide();
     setLastVersion(1);
+    setSelectedBarcodeValue(1);
+  };
+
+  const handleChange = (value) => {
+    setSelectedBarcodeValue(value);
   };
 
   useEffect(() => {
@@ -272,8 +280,31 @@ function ProductsTypeJournalInfoModal(props) {
                       />
                     </div>
                   )}
+                  <ToggleButtonGroup
+                    type="radio"
+                    name="options"
+                    value={selectedBarcodeValue}
+                    onChange={handleChange}
+                  >
+                    <ToggleButton id="tbg-radio-1" value={1}>
+                      Block barcode
+                    </ToggleButton>
+                    <ToggleButton id="tbg-radio-2" value={2}>
+                      Box barcode
+                    </ToggleButton>
+                    <ToggleButton id="tbg-radio-3" value={3}>
+                      Pallet barcode
+                    </ToggleButton>
+                  </ToggleButtonGroup>
                   <BarcodeGenerator
-                    productCode={selectedProductsType?.product_code}
+                    productCode={
+                      selectedBarcodeValue == 1
+                        ? selectedProductsType?.product_code
+                        : selectedBarcodeValue == 2
+                        ? selectedProductsType?.product_code_box.slice(0, -1)
+                        : selectedProductsType?.product_code_pall.slice(0, -1)
+                    }
+                    chosenBarcodeType={selectedBarcodeValue}
                   />
                 </Col>
               </Row>

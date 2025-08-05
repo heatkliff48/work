@@ -30,6 +30,7 @@ import { productsReducer } from './productsReducer';
 import {
   anchorReducer,
   dryMixesJournalReducer,
+  productCodeReducer,
   relatedMaterialsJournalReducer,
   toolReducer,
 } from './productsTypeJournalReducer';
@@ -42,7 +43,13 @@ import {
 import { qualityManagementReducer } from './qualityManagementReducer';
 import { recipeReducer } from './recipeReducer';
 import { relatedMaterialsBackorderListReducer } from './relatedMaterialsBackorderListReducer';
-import { reservedAnchorProductsReducer, reservedDryMixedProductsReducer, reservedProductsReducer, reservedRelMatProductsReducer, reservedToolProductsReducer } from './reservedProductsReducer';
+import {
+  reservedAnchorProductsReducer,
+  reservedDryMixedProductsReducer,
+  reservedProductsReducer,
+  reservedRelMatProductsReducer,
+  reservedToolProductsReducer,
+} from './reservedProductsReducer';
 import { rolesReducer } from './rolesReducer';
 import { stockBalanceReducer } from './stockBalanceReducer';
 import { userReducer } from './userReducer';
@@ -98,4 +105,5 @@ export const rootReducer = combineReducers({
   qualityManagementData: qualityManagementReducer,
   relatedMaterialsBackorderList: relatedMaterialsBackorderListReducer,
   aldabaran: aldabaranReducer,
+  productCode: productCodeReducer,
 });

@@ -45,6 +45,12 @@ module.exports = {
       product_code: {
         type: Sequelize.STRING,
       },
+      product_code_box: {
+        type: Sequelize.STRING,
+      },
+      product_code_pall: {
+        type: Sequelize.STRING,
+      },
       active_status: {
         type: Sequelize.BOOLEAN,
       },

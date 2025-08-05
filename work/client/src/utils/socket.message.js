@@ -72,6 +72,7 @@ import {
   updateRelMatReservedProductSocket,
   deleteRelMatReservedProductSocket,
   deleteRelMatProductOfOrderSocket,
+  updateProductCodeSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -170,6 +171,7 @@ import {
   UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+  UPDATE_PRODUCT_CODE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -504,6 +506,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_ALDABARAN_SOCKET:
       dispatch(addNewAldabaranSocket(payload));
+      break;
+
+    case UPDATE_PRODUCT_CODE_SOCKET:
+      dispatch(updateProductCodeSocket(payload));
       break;
 
     default:

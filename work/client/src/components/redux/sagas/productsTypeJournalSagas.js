@@ -8,10 +8,12 @@ import {
   ADD_NEW_TOOL,
   FULL_ANCHOR,
   FULL_DRY_MIXES_JOURNAL,
+  FULL_PRODUCT_CODE,
   FULL_RELATED_MATERIALS_JOURNAL,
   FULL_TOOL,
   GET_FULL_ANCHOR,
   GET_FULL_DRY_MIXES_JOURNAL,
+  GET_FULL_PRODUCT_CODE,
   GET_FULL_RELATED_MATERIALS_JOURNAL,
   GET_FULL_TOOL,
   NEW_ANCHOR,
@@ -22,8 +24,10 @@ import {
   UPDATE_DRY_MIXES_JOURNAL,
   UPDATE_NEW_ANCHOR,
   UPDATE_NEW_DRY_MIXES_JOURNAL,
+  UPDATE_NEW_PRODUCT_CODE,
   UPDATE_NEW_RELATED_MATERIALS_JOURNAL,
   UPDATE_NEW_TOOL,
+  UPDATE_PRODUCT_CODE,
   UPDATE_RELATED_MATERIALS_JOURNAL,
   UPDATE_TOOL,
 } from '../types/productsTypeJournalTypes';
@@ -135,6 +139,24 @@ const addNewTool = (tool) => {
 const updateTool = (tool) => {
   return url
     .post('/tool/update', tool)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getProductCode = () => {
+  return url
+    .get('/productCode')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updateProductCode = (productCode) => {
+  return url
+    .post('/productCode/update', productCode)
     .then((res) => {
       return res.data;
     })
@@ -276,6 +298,26 @@ function* updateNewToolWorker(action) {
   }
 }
 
+function* getProductCodeWorker() {
+  try {
+    const { productCode } = yield call(getProductCode);
+
+    yield put({ type: FULL_PRODUCT_CODE, payload: productCode });
+  } catch (err) {
+    yield put({ type: FULL_PRODUCT_CODE, payload: [] });
+  }
+}
+
+function* updateNewProductCodeWorker(action) {
+  try {
+    const { productCode } = yield call(updateProductCode, action.payload);
+
+    yield put({ type: UPDATE_PRODUCT_CODE, payload: productCode });
+  } catch (err) {
+    yield put({ type: UPDATE_PRODUCT_CODE, payload: [] });
+  }
+}
+
 // watchers
 
 function* productsTypeJournalWatcher() {
@@ -300,6 +342,8 @@ function* productsTypeJournalWatcher() {
   yield takeLatest(GET_FULL_TOOL, getToolWorker);
   yield takeLatest(ADD_NEW_TOOL, addNewToolWorker);
   yield takeLatest(UPDATE_NEW_TOOL, updateNewToolWorker);
+  yield takeLatest(GET_FULL_PRODUCT_CODE, getProductCodeWorker);
+  yield takeLatest(UPDATE_NEW_PRODUCT_CODE, updateNewProductCodeWorker);
 }
 
 export default productsTypeJournalWatcher;
