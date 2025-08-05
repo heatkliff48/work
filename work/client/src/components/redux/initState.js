@@ -44,6 +44,7 @@ const initState = {
   qualityManagementData: [],
   relatedMaterialsBackorderList: [],
   aldabaran: [],
+  productCode: [],
 };
 
 export default initState;

@@ -28,6 +28,7 @@ const ModalWindow = React.memo(
     const [articleId, setArticleId] = useState(-1);
     const [defaultValues, setDefaultValues] = useState({});
     const products = useSelector((state) => state.products);
+    const product_code = useSelector((state) => state.productCode);
 
     const editableAccessors = [
       'palletHeight',
@@ -53,6 +54,30 @@ const ModalWindow = React.memo(
         [e.target.name]: e.target.value,
       }));
     }, []);
+
+    const calculateEAN13Checksum = (barcode) => {
+      let sum = 0;
+
+      for (let i = 0; i < 12; i++) {
+        const digit = parseInt(barcode[i], 10);
+        sum += i % 2 === 0 ? digit : digit * 3; // Нечетные позиции умножаем на 1, четные на 3
+      }
+
+      const checksum = (10 - (sum % 10)) % 10; // Вычисляем контрольную сумму
+      return checksum;
+    };
+
+    const calculateEAN14Checksum = (barcode) => {
+      let sum = 0;
+
+      for (let i = 0; i < 13; i++) {
+        const digit = parseInt(barcode[i], 10);
+        sum += i % 2 === 0 ? digit * 3 : digit;
+      }
+
+      const checksum = (10 - (sum % 10)) % 10;
+      return checksum;
+    };
 
     const updateProductHandler = () => {
       const {
@@ -103,22 +128,59 @@ const ModalWindow = React.memo(
         .toString()
         .slice(0, 2)}${certificate?.substr(0, 1)}`;
 
-      let productCode = '0001';
-      const articleId = products.length === 0 ? 1 : products.length + 1;
-      productCode = `${34000 + articleId}`.slice(-5);
+      const productCode = calculateEAN13Checksum(
+        '84' +
+          '36626' +
+          '34' +
+          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+            -3
+          )
+      );
+      // const articleId = products.length === 0 ? 1 : products.length + 1;
+      const fullPorductCode =
+        '84' +
+        '36626' +
+        '34' +
+        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+          -3
+        ) +
+        productCode;
+
+      const palletProductCode = calculateEAN14Checksum(
+        '2' +
+          '84' +
+          '36626' +
+          '34' +
+          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+            -3
+          )
+      );
+
+      const fullPalletProductCode =
+        '2' +
+        '84' +
+        '36626' +
+        '34' +
+        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+          -3
+        ) +
+        palletProductCode;
 
       //description
       const description = `BAUBLOCK®${trMark} ${formInput.lengths ?? '-'}x${
         formInput.width ?? '-'
       }x${formInput.height ?? '-'}mm ${formInput.density ?? '-'}kg/m³`;
 
-      let parsedRC = parseFloat(formInput.resistenciaCompresion?.replace(',', '.'));
+      let parsedRC = parseFloat(
+        formInput.resistenciaCompresion.toString()?.replace(',', '.')
+      );
       if (isNaN(parsedRC)) parsedRC = null;
 
       const updatedProduct = {
         ...formInput,
         article: prodArticle,
-        productCode,
+        productCode: fullPorductCode,
+        product_code_pall: fullPalletProductCode,
         activeStatus: true,
         description,
         resistenciaCompresion: parsedRC,
@@ -147,6 +209,7 @@ const ModalWindow = React.memo(
           ...updatedProduct,
           id: existingProduct.id,
           productCode: existingProduct.productCode,
+          product_code_pall: existingProduct.product_code_pall,
           version: lastVersion + 1,
         };
 

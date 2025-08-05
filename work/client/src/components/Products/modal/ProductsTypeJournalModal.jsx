@@ -6,7 +6,7 @@ import Select from 'react-select';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import './styles.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import ProductsTypeJournalInfoPreviewModal from './ProductsTypeJournalInfoPreviewModal';
@@ -31,6 +31,7 @@ function ProductsTypeJournalModal(props) {
   const [previewModalShow, setPreviewModalShow] = useState(false);
 
   const [productsTypeJournalInput, setProductsTypeJournalInput] = useState({});
+  const product_code = useSelector((state) => state.productCode);
 
   const requiredFieldsDryMix = [
     'name',
@@ -60,7 +61,7 @@ function ProductsTypeJournalModal(props) {
     'place_of_production',
     'price_per_unit',
     'piece_weight',
-     'pallet_weight'
+    'pallet_weight',
   ];
 
   const handleProductsTypeJournalInputChange = useCallback((e) => {
@@ -73,6 +74,30 @@ function ProductsTypeJournalModal(props) {
       setErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
     }
   }, []);
+
+  const calculateEAN13Checksum = (barcode) => {
+    let sum = 0;
+
+    for (let i = 0; i < 12; i++) {
+      const digit = parseInt(barcode[i], 10);
+      sum += i % 2 === 0 ? digit : digit * 3; // Нечетные позиции умножаем на 1, четные на 3
+    }
+
+    const checksum = (10 - (sum % 10)) % 10; // Вычисляем контрольную сумму
+    return checksum;
+  };
+
+  const calculateEAN14Checksum = (barcode) => {
+    let sum = 0;
+
+    for (let i = 0; i < 13; i++) {
+      const digit = parseInt(barcode[i], 10);
+      sum += i % 2 === 0 ? digit * 3 : digit;
+    }
+
+    const checksum = (10 - (sum % 10)) % 10;
+    return checksum;
+  };
 
   useEffect(() => {
     const { bag_weight, units_per_pallet, units_of_measurement } =
@@ -227,6 +252,65 @@ function ProductsTypeJournalModal(props) {
           : props.target == 3
           ? `2`
           : `3`) + `0000${articleId}`.slice(-4);
+
+      const productCode = calculateEAN13Checksum(
+        '84' +
+          '36626' +
+          '34' +
+          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+            -3
+          )
+      );
+      // const articleId = products.length === 0 ? 1 : products.length + 1;
+      const fullPorductCode =
+        '84' +
+        '36626' +
+        '34' +
+        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+          -3
+        ) +
+        productCode;
+
+      const boxProductCode = calculateEAN14Checksum(
+        '1' +
+          '84' +
+          '36626' +
+          '34' +
+          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+            -3
+          )
+      );
+
+      const fullBoxProductCode =
+        '1' +
+        '84' +
+        '36626' +
+        '34' +
+        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+          -3
+        ) +
+        boxProductCode;
+
+      const palletProductCode = calculateEAN14Checksum(
+        '2' +
+          '84' +
+          '36626' +
+          '34' +
+          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+            -3
+          )
+      );
+
+      const fullPalletProductCode =
+        '2' +
+        '84' +
+        '36626' +
+        '34' +
+        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+          -3
+        ) +
+        palletProductCode;
+
       setProductsTypeJournalInput({
         ...selectedProductsType,
         article: `X.${
@@ -238,10 +322,98 @@ function ProductsTypeJournalModal(props) {
             ? `F`
             : `T`
         }${code}`,
-        product_code: code,
+        product_code: fullPorductCode,
+        product_code_box: fullBoxProductCode,
+        product_code_pall: fullPalletProductCode,
         version: 1,
       });
     } else {
+      const productCode = calculateEAN13Checksum(
+        '84' +
+          '36626' +
+          '34' +
+          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+            -3
+          )
+      );
+      // const articleId = products.length === 0 ? 1 : products.length + 1;
+      const fullPorductCode =
+        '84' +
+        '36626' +
+        '34' +
+        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+          -3
+        ) +
+        productCode;
+
+      const boxProductCode = calculateEAN14Checksum(
+        '1' +
+          '84' +
+          '36626' +
+          '34' +
+          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+            -3
+          )
+      );
+
+      const fullBoxProductCode =
+        '1' +
+        '84' +
+        '36626' +
+        '34' +
+        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+          -3
+        ) +
+        boxProductCode;
+
+      const palletProductCode = calculateEAN14Checksum(
+        '2' +
+          '84' +
+          '36626' +
+          '34' +
+          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+            -3
+          )
+      );
+
+      const fullPalletProductCode =
+        '2' +
+        '84' +
+        '36626' +
+        '34' +
+        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+          -3
+        ) +
+        palletProductCode;
+
+      let code = '0001';
+      const articleId =
+        props.target == 1
+          ? latestDryMix.length === 0
+            ? 1
+            : latestDryMix.length + 1
+          : props.target == 2
+          ? latestRelatedMaterials.length === 0
+            ? 1
+            : latestRelatedMaterials.length + 1
+          : props.target == 3
+          ? latestAnchors.length === 0
+            ? 1
+            : latestAnchors.length + 1
+          : latestTools.length === 0
+          ? 1
+          : latestTools.length + 1;
+
+      // dryMixesJournal.length === 0 ? 1 : dryMixesJournal.length + 1;
+      code =
+        (props.target == 1
+          ? `1`
+          : props.target == 2
+          ? `4`
+          : props.target == 3
+          ? `2`
+          : `3`) + `0000${articleId}`.slice(-4);
+
       setProductsTypeJournalInput((prev) => ({
         ...prev,
         article: `X.${
@@ -252,12 +424,14 @@ function ProductsTypeJournalModal(props) {
             : props.target == 3
             ? `F`
             : `T`
-        }${props?.productCode}`,
+        }${code}`,
         units_of_measurement: unitsOfMeasurementOptions[0].value,
         ...(props.target == 1 && { type_of_mix: typeOfMixOptions[0].value }), // Добавляем только если условие true
         place_of_production:
           defaultCountry?.value || placeOfProductionOptions[0].value,
-        product_code: props?.productCode,
+        product_code: fullPorductCode,
+        product_code_box: fullBoxProductCode,
+        product_code_pall: fullPalletProductCode,
         active_status: true,
         version: 1,
       }));

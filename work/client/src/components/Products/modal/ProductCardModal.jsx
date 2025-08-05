@@ -22,6 +22,8 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useStatisticContext } from '#components/contexts/StatisticContext.js';
 import ModalWindow from './ModalWindow';
 import BarcodeGenerator from './BarcodeGenerator';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 
 const ProductCardModal = React.memo(() => {
   const { userAccess } = useUsersContext();
@@ -55,6 +57,7 @@ const ProductCardModal = React.memo(() => {
   const [repairButton, setRepairButton] = useState(true);
   const [productByVersion, setProductByVersion] = useState();
   const products = useSelector((state) => state.products);
+  const [selectedBarcodeValue, setSelectedBarcodeValue] = useState(1);
 
   const memoizedArticle = (prod) => {
     const {
@@ -229,6 +232,10 @@ const ProductCardModal = React.memo(() => {
     setProductByVersion(prodArrVers);
   }, [productCardData, products]);
 
+  const handleChange = (value) => {
+    setSelectedBarcodeValue(value);
+  };
+
   return (
     <div>
       <Modal isOpen={modalProductCard} toggle={toggle} size="lg">
@@ -297,7 +304,29 @@ const ProductCardModal = React.memo(() => {
                 );
               else
                 return (
-                  <BarcodeGenerator productCode={productCardData?.productCode} />
+                  <>
+                    <ToggleButtonGroup
+                      type="radio"
+                      name="options"
+                      value={selectedBarcodeValue}
+                      onChange={handleChange}
+                    >
+                      <ToggleButton id="tbg-radio-1" value={1}>
+                        Block barcode
+                      </ToggleButton>
+                      <ToggleButton id="tbg-radio-2" value={2}>
+                        Pallet barcode
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                    <BarcodeGenerator
+                      productCode={
+                        selectedBarcodeValue == 1
+                          ? productCardData?.productCode
+                          : productCardData?.product_code_pall.slice(0, -1)
+                      }
+                      chosenBarcodeType={selectedBarcodeValue}
+                    />
+                  </>
                 );
             })}
           </div>

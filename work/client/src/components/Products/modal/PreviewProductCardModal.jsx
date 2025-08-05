@@ -1,4 +1,4 @@
-import React, { useEffect, version } from 'react';
+import React, { useEffect, useState, version } from 'react';
 import {
   Button,
   Card,
@@ -10,6 +10,8 @@ import {
   ModalFooter,
   ModalHeader,
 } from 'reactstrap';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
@@ -19,12 +21,15 @@ import {
   addNewProduct,
   repProduct,
 } from '#components/redux/actions/productsAction.js';
+import { updateProductCode } from '#components/redux/actions/productsTypeJournalAction.js';
 
 const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
   const { COLUMNS, getOptionValue, selectOptions } = useProductsContext();
   const { previewProductData, setPreviewOperationName, setIsRepair, setIsEdit } =
     useProjectContext();
   const { previewProductModal, setPreviewProductModal } = useModalContext();
+
+  const [selectedBarcodeValue, setSelectedBarcodeValue] = useState(1);
 
   const dispatch = useDispatch();
 
@@ -125,10 +130,20 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
     } else {
       dispatch(repProduct(obj));
     }
+    dispatch(
+      updateProductCode({
+        id: 1,
+        product_code: obj.productCode.slice(0, -1).slice(-3),
+      })
+    );
     setPreviewProductModal(!previewProductModal);
     setPreviewOperationName('');
     setIsEdit(false);
     setIsRepair(false);
+  };
+
+  const handleChange = (value) => {
+    setSelectedBarcodeValue(value);
   };
 
   return (
@@ -203,7 +218,29 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
                 );
               else
                 return (
-                  <BarcodeGenerator productCode={previewProductData?.productCode} />
+                  <>
+                    <ToggleButtonGroup
+                      type="radio"
+                      name="options-preview"
+                      value={selectedBarcodeValue}
+                      onChange={handleChange}
+                    >
+                      <ToggleButton id="tbg-radio-preview-1" value={1}>
+                        Block barcode
+                      </ToggleButton>
+                      <ToggleButton id="tbg-radio-preview-2" value={2}>
+                        Pallet barcode
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                    <BarcodeGenerator
+                      productCode={
+                        selectedBarcodeValue == 1
+                          ? previewProductData?.productCode
+                          : previewProductData?.product_code_pall.slice(0, -1)
+                      }
+                      chosenBarcodeType={selectedBarcodeValue}
+                    />
+                  </>
                 );
             })}
           </div>

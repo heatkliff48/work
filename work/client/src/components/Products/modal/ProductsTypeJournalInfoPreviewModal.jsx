@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import './styles.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import BarcodeGenerator from './BarcodeGenerator';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 import {
   addNewAnchor,
   addNewDryMixesJournal,
@@ -20,6 +22,7 @@ import {
   updateRelatedMaterialsJournal,
   updateTool,
 } from '#components/redux/actions/productsTypeJournalAction.js';
+import { updateProductCode } from '#components/redux/actions/productsTypeJournalAction.js';
 
 function ProductsTypeJournalInfoPreviewModal(props) {
   const {
@@ -56,6 +59,7 @@ function ProductsTypeJournalInfoPreviewModal(props) {
   const [currentVersion, setCurrentVersion] = useState(
     productsTypeJournalPreviewInput?.version
   );
+  const [selectedBarcodePreviewValue, setSelectedBarcodePreviewValue] = useState(1);
   // const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   // const user = useSelector((state) => state.user);
@@ -117,6 +121,8 @@ function ProductsTypeJournalInfoPreviewModal(props) {
             article: existingProduct.article,
             version: existingProduct.version + 1,
             product_code: existingProduct.product_code,
+            product_code_box: existingProduct.product_code_box,
+            product_code_pall: existingProduct.product_code_pall,
           });
           dispatch(
             addNewDryMixesJournal({
@@ -124,6 +130,8 @@ function ProductsTypeJournalInfoPreviewModal(props) {
               article: existingProduct.article,
               version: existingProduct.version + 1,
               product_code: existingProduct.product_code,
+              product_code_box: existingProduct.product_code_box,
+              product_code_pall: existingProduct.product_code_pall,
             })
           );
         } else {
@@ -133,6 +141,14 @@ function ProductsTypeJournalInfoPreviewModal(props) {
           dispatch(
             addNewDryMixesJournal({
               ...productsTypeJournalPreviewInput,
+            })
+          );
+          dispatch(
+            updateProductCode({
+              id: 1,
+              product_code: productsTypeJournalPreviewInput.product_code
+                .slice(0, -1)
+                .slice(-3),
             })
           );
         }
@@ -175,6 +191,8 @@ function ProductsTypeJournalInfoPreviewModal(props) {
             article: existingProduct.article,
             version: existingProduct.version + 1,
             product_code: existingProduct.product_code,
+            product_code_box: existingProduct.product_code_box,
+            product_code_pall: existingProduct.product_code_pall,
           });
           dispatch(
             addNewRelatedMaterialsJournal({
@@ -182,6 +200,8 @@ function ProductsTypeJournalInfoPreviewModal(props) {
               article: existingProduct.article,
               version: existingProduct.version + 1,
               product_code: existingProduct.product_code,
+              product_code_box: existingProduct.product_code_box,
+              product_code_pall: existingProduct.product_code_pall,
             })
           );
         } else {
@@ -191,6 +211,14 @@ function ProductsTypeJournalInfoPreviewModal(props) {
           dispatch(
             addNewRelatedMaterialsJournal({
               ...productsTypeJournalPreviewInput,
+            })
+          );
+          dispatch(
+            updateProductCode({
+              id: 1,
+              product_code: productsTypeJournalPreviewInput.product_code
+                .slice(0, -1)
+                .slice(-3),
             })
           );
         }
@@ -229,6 +257,8 @@ function ProductsTypeJournalInfoPreviewModal(props) {
             article: existingProduct.article,
             version: existingProduct.version + 1,
             product_code: existingProduct.product_code,
+            product_code_box: existingProduct.product_code_box,
+            product_code_pall: existingProduct.product_code_pall,
           });
           dispatch(
             addNewAnchor({
@@ -236,6 +266,8 @@ function ProductsTypeJournalInfoPreviewModal(props) {
               article: existingProduct.article,
               version: existingProduct.version + 1,
               product_code: existingProduct.product_code,
+              product_code_box: existingProduct.product_code_box,
+              product_code_pall: existingProduct.product_code_pall,
             })
           );
         } else {
@@ -245,6 +277,14 @@ function ProductsTypeJournalInfoPreviewModal(props) {
           dispatch(
             addNewAnchor({
               ...productsTypeJournalPreviewInput,
+            })
+          );
+          dispatch(
+            updateProductCode({
+              id: 1,
+              product_code: productsTypeJournalPreviewInput.product_code
+                .slice(0, -1)
+                .slice(-3),
             })
           );
         }
@@ -283,6 +323,8 @@ function ProductsTypeJournalInfoPreviewModal(props) {
             article: existingProduct.article,
             version: existingProduct.version + 1,
             product_code: existingProduct.product_code,
+            product_code_box: existingProduct.product_code_box,
+            product_code_pall: existingProduct.product_code_pall,
           });
           dispatch(
             addNewTool({
@@ -290,6 +332,8 @@ function ProductsTypeJournalInfoPreviewModal(props) {
               article: existingProduct.article,
               version: existingProduct.version + 1,
               product_code: existingProduct.product_code,
+              product_code_box: existingProduct.product_code_box,
+              product_code_pall: existingProduct.product_code_pall,
             })
           );
         } else {
@@ -301,9 +345,18 @@ function ProductsTypeJournalInfoPreviewModal(props) {
               ...productsTypeJournalPreviewInput,
             })
           );
+          dispatch(
+            updateProductCode({
+              id: 1,
+              product_code: productsTypeJournalPreviewInput.product_code
+                .slice(0, -1)
+                .slice(-3),
+            })
+          );
         }
       }
     }
+
     props.onHide();
   };
 
@@ -318,6 +371,10 @@ function ProductsTypeJournalInfoPreviewModal(props) {
         : COLUMNS_TOOLS_PRODUCT
     );
   }, []);
+
+  const handleChange = (value) => {
+    setSelectedBarcodePreviewValue(value);
+  };
 
   const handleCloseModal = () => {
     props.onHide();
@@ -398,8 +455,37 @@ function ProductsTypeJournalInfoPreviewModal(props) {
                       Current version: {productsTypeJournalPreviewInput?.version}
                     </h5>
                   </div>
+                  <ToggleButtonGroup
+                    type="radio"
+                    name="options-preview"
+                    value={selectedBarcodePreviewValue}
+                    onChange={handleChange}
+                  >
+                    <ToggleButton id="tbg-radio-preview-1" value={1}>
+                      Block barcode
+                    </ToggleButton>
+                    <ToggleButton id="tbg-radio-preview-2" value={2}>
+                      Box barcode
+                    </ToggleButton>
+                    <ToggleButton id="tbg-radio-preview-3" value={3}>
+                      Pallet barcode
+                    </ToggleButton>
+                  </ToggleButtonGroup>
                   <BarcodeGenerator
-                    productCode={productsTypeJournalPreviewInput?.product_code}
+                    productCode={
+                      selectedBarcodePreviewValue == 1
+                        ? productsTypeJournalPreviewInput?.product_code
+                        : selectedBarcodePreviewValue == 2
+                        ? productsTypeJournalPreviewInput?.product_code_box.slice(
+                            0,
+                            -1
+                          )
+                        : productsTypeJournalPreviewInput?.product_code_pall.slice(
+                            0,
+                            -1
+                          )
+                    }
+                    chosenBarcodeType={selectedBarcodePreviewValue}
                   />
                 </Col>
               </Row>

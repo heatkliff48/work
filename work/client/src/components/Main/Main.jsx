@@ -20,6 +20,7 @@ import { getAllProducts } from '#components/redux/actions/productsAction.js';
 import {
   getAnchor,
   getDryMixesJournal,
+  getProductCode,
   getRelatedMaterialsJournal,
   getTool,
 } from '#components/redux/actions/productsTypeJournalAction.js';
@@ -116,6 +117,7 @@ function Main() {
     dispatch(getTool());
     dispatch(getToolProductsOfOrders());
     dispatch(getToolsWarehouse());
+    dispatch(getProductCode());
 
     dispatch(getQualityManagement());
     dispatch(clearBatchState());
