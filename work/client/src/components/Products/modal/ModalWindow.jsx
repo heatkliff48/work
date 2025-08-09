@@ -147,7 +147,7 @@ const ModalWindow = React.memo(
         productCode;
 
       const palletProductCode = calculateEAN14Checksum(
-        '2' +
+        '1' +
           '84' +
           '36626' +
           '34' +
@@ -157,7 +157,7 @@ const ModalWindow = React.memo(
       );
 
       const fullPalletProductCode =
-        '2' +
+        '1' +
         '84' +
         '36626' +
         '34' +
