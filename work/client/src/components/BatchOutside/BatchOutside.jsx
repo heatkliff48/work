@@ -18,12 +18,12 @@ const BatchOutside = () => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'quantity_pallets',
+      Header: 'Quantity: pallets',
       accessor: 'quantity_pallets',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'quantity_free',
+      Header: 'Quantity: free',
       accessor: 'quantity_free',
       Filter: TextSearchFilter,
     },
