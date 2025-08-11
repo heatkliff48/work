@@ -194,23 +194,23 @@ function Main() {
             className="nav-button"
             onClick={() => navigate('/production_batch_designer')}
           >
-            Production Batch Designer
+            Batch planner
           </button>
         )}
-        {/* {checkUserAccess(user, roles, 'autoclave_calenare')?.canRead && ( */}
+        {/* {checkUserAccess(user, roles, 'autoclave_calendar')?.canRead && ( */}
         <button
           className="nav-button"
-          onClick={() => navigate('/autoclave_calenare')}
+          onClick={() => navigate('/autoclave_calendar')}
         >
           Autoclave Calendare
         </button>
-         {/* )} */}
+        {/* )} */}
         {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
           <button
             className="nav-button"
             onClick={() => navigate('/list_of_ordered_production')}
           >
-            List of ordered production
+            Ordered blocks pipeline
           </button>
         )}
         {checkUserAccess(user, roles, 'list_of_ordered_production_oem')?.canRead && (

@@ -35,7 +35,7 @@ function ListOfOrderedProduction() {
         // userAccess={userAccess}
         onClickButton={() => {}}
         buttonText={''}
-        tableName={'List of ordered production'}
+        tableName={'Ordered blocks pipeline'}
         handleRowClick={(row) => {
           // productHandler(row.original);
         }}
