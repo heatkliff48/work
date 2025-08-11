@@ -218,7 +218,7 @@ function Main() {
             className="nav-button"
             onClick={() => navigate('/list_of_ordered_production_oem')}
           >
-            List of ordered production OEM
+            Ordered OEM blocks pipeline
           </button>
         )}
         {checkUserAccess(user, roles, 'related_materials_backorder_list')
@@ -232,7 +232,7 @@ function Main() {
         )}
         {checkUserAccess(user, roles, 'production_plan')?.canRead && (
           <button className="nav-button" onClick={() => navigate('/batch_outside')}>
-            Production Plan
+            Batch calendar
           </button>
         )}
         {checkUserAccess(user, roles, 'recipe_products')?.canRead && (
@@ -253,7 +253,7 @@ function Main() {
         )}
         {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
           <button className="nav-button" onClick={() => navigate('/recipe_orders')}>
-            Recipe Orders
+            Raw material calendar
           </button>
         )}
         {checkUserAccess(user, roles, 'quality_management')?.canRead && (

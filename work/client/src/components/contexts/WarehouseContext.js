@@ -31,12 +31,12 @@ const WarehouseContextProvider = ({ children }) => {
 
   const COLUMNS_WAREHOUSE = [
     {
-      Header: 'Article of warehouse',
+      Header: 'Warehouse ID',
       accessor: 'article',
       sortType: 'string',
     },
     {
-      Header: 'Article of product',
+      Header: 'Product ID',
       accessor: 'product_article',
       sortType: 'string',
     },

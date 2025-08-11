@@ -13,7 +13,7 @@ function ListOfOrderedProductionOEM() {
         // userAccess={userAccess}
         onClickButton={() => {}}
         buttonText={''}
-        tableName={'List of ordered production OEM'}
+        tableName={'Ordered OEM blocks pipeline'}
         handleRowClick={(row) => {
           console.log('row.original', row.original);
         }}
