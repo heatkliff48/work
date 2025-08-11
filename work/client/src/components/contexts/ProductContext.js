@@ -25,6 +25,13 @@ export const ProductsContextProvider = ({ children }) => {
       disableSortBy: true,
     },
     {
+      Header: 'Description',
+      accessor: 'description',
+      Filter: TextSearchFilter,
+      disableSortBy: true,
+    },
+
+    {
       Header: 'Density, kg/m³',
       accessor: 'density',
       defaultValue: 500,

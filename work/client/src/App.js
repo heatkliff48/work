@@ -98,10 +98,7 @@ function App() {
             path="/production_batch_designer"
             element={<ProductionBatchDesigner />}
           />
-          <Route
-            path="/autoclave_calenare"
-            element={<AutoclaveCalendare />}
-          />
+          <Route path="/autoclave_calendar" element={<AutoclaveCalendare />} />
           <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
 
           <Route path="/quality_management" element={<QualityManagementTable />} />

@@ -89,7 +89,7 @@ function AddListOfOrderedModal(props) {
               COLUMN_DATA={COLUMNS_LIST_OF_ORDERED_PRODUCTION}
               dataOfTable={list_of_ordered_production}
               userAccess={userAccess}
-              tableName={'List of ordered production'}
+              tableName={'Ordered blocks pipeline'}
               handleRowClick={(row) => {
                 handlerAddProductToBatchLog(row);
               }}

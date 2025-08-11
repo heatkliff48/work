@@ -60,7 +60,7 @@ function ProductionBatchDesigner() {
       { Header: 'Плотность, кг/м³', accessor: 'density' },
       { Header: 'Ширина, мм', accessor: 'width' },
       { Header: 'Количество, паллет', accessor: 'quantity' },
-      { Header: 'Продукт + Брак, паллет', accessor: 'product_with_brack' },
+      { Header: 'Продукт + Брак, массивов', accessor: 'product_with_brack' },
       { Header: 'Кол-во, м³', accessor: 'quantity_m3' },
       { Header: 'Свободная продукция, массив', accessor: 'free_product_cakes' },
       { Header: 'Свободная продукция, паллет', accessor: 'free_product_package' },
