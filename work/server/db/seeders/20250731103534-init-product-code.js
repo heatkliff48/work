@@ -7,7 +7,7 @@ module.exports = {
       'ProductCodes',
       [
         {
-          product_code: '088',
+          product_code: '109',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
