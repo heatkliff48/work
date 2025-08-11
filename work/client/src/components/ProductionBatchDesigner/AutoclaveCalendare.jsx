@@ -16,6 +16,7 @@ import {
 import { ru } from 'date-fns/locale';
 import { useDispatch } from 'react-redux';
 import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 export default function ProductionPlannerCalendar({
   initialMonth,
@@ -27,6 +28,8 @@ export default function ProductionPlannerCalendar({
   weekStartsOn = 1,
 }) {
   const dispatch = useDispatch();
+  const { autoclave_calendar } = useWarehouseContext();
+
   const [currentMonth, setCurrentMonth] = useState(
     initialMonth ? startOfMonth(initialMonth) : startOfMonth(new Date())
   );
@@ -60,19 +63,48 @@ export default function ProductionPlannerCalendar({
 
   const weekDayHeaders = useMemo(() => {
     const base = startOfWeek(new Date(), { weekStartsOn });
-    return Array.from({ length: 7 }, (_, i) =>
-      format(addDays(base, i), 'EEEEE', { locale: ru })
-    );
+    return Array.from({ length: 7 }, (_, i) => ({
+      key: i, // уникальный ключ
+      label: format(addDays(base, i), 'EEEEE', { locale: ru }), // видимую букву оставляем
+    }));
   }, [weekStartsOn]);
+
+  useEffect(() => {
+    console.log('autoclave_calendar', autoclave_calendar);
+    if (!autoclave_calendar || !Array.isArray(autoclave_calendar)) return;
+    const seeded = Object.create(null);
+    for (const r of autoclave_calendar) {
+      const iso = String(r.date).slice(0, 10); // 'YYYY-MM-DD'
+      seeded[iso] = {
+        quantity: Number(r.quantity) || 0,
+        quantity_of_complited: Number(r.quantity_of_complited ?? 0) || 0,
+      };
+    }
+    if (!onChange) setInternalMap(seeded);
+    onChange?.(seeded);
+  }, [autoclave_calendar]);
 
   function toISO(d) {
     return format(d, 'yyyy-MM-dd');
   }
 
+  function clamp(n, lo, hi) {
+    const x = Number(n);
+    if (!Number.isFinite(x)) return lo;
+    return Math.max(lo, Math.min(hi, x));
+  }
+
+  // сеттеры значений
   function setQty(iso, qty) {
-    const clamped = Math.max(min, Math.min(max, Number(qty) || 0));
-    const next = { ...map, [iso]: clamped };
-    if (!Number.isFinite(clamped)) return;
+    const prev = map[iso] ?? { quantity: 0, quantity_of_complited: 0 };
+    const nextQty = clamp(qty, min, max);
+    // не даём "выполнено" быть больше плана
+    const nextDone = clamp(prev.quantity_of_complited, min, nextQty);
+
+    const next = {
+      ...map,
+      [iso]: { quantity: nextQty, quantity_of_complited: nextDone },
+    };
     if (!onChange) setInternalMap(next);
     onChange?.(next);
   }
@@ -80,12 +112,12 @@ export default function ProductionPlannerCalendar({
   const today = new Date();
 
   const saveHandler = () => {
-    const arr = Object.entries(map).map(([date, quantity]) => ({
+    const arr = Object.entries(map).map(([date, obj]) => ({
       date,
-      quantity,
+      quantity: Number(obj?.quantity) || 0,
       quantity_of_complited: 0,
     }));
-
+    console.log('arr', arr);
     dispatch(addNewAutoclaveCalendar(arr));
   };
 
@@ -108,18 +140,21 @@ export default function ProductionPlannerCalendar({
       </div>
 
       <div style={styles.grid}>
-        {weekDayHeaders.map((wd) => (
-          <div key={wd} style={{ ...styles.cell, ...styles.headerCell }}>
-            {wd}
+        {weekDayHeaders.map(({ key, label }) => (
+          <div key={key} style={{ ...styles.cell, ...styles.headerCell }}>
+            {label}
           </div>
         ))}
 
         {days.map((day) => {
           const iso = toISO(day);
-          const qty = map[iso] ?? 0;
           const inMonth = isSameMonth(day, currentMonth);
           const isOpen = openDayISO === iso;
           const isPast = isBefore(day, today) && !isToday(day);
+
+          const obj = map[iso] ?? { quantity: 0, quantity_of_complited: 0 };
+          const qty = obj.quantity;
+          const done = obj.quantity_of_complited;
 
           return (
             <div key={iso} style={{ ...styles.cell, opacity: inMonth ? 1 : 0.5 }}>
@@ -132,11 +167,21 @@ export default function ProductionPlannerCalendar({
                   ...(isPast ? styles.pastDay : null),
                 }}
                 disabled={isPast}
+                title={iso}
               >
                 <div style={styles.dayNumber}>
                   {format(day, 'd', { locale: ru })}
                 </div>
-                {qty > 0 && <div style={styles.badge}>{qty}</div>}
+                {qty > 0 && (
+                  <div style={styles.badgePlan} title="План">
+                    {qty}
+                  </div>
+                )}
+                {done >= 0 && (
+                  <div style={styles.badgeDone} title="Выполнено">
+                    {done}
+                  </div>
+                )}
               </button>
 
               {isOpen && (
@@ -179,11 +224,13 @@ export default function ProductionPlannerCalendar({
           );
         })}
       </div>
-      <div style={styles.hint}>
-        <diiv>
-          <button onClick={saveHandler}>Save</button>
-        </diiv>
-        Кликните по дате, чтобы установить план на день.
+      <div style={styles.footer}>
+        <button style={styles.saveBtn} onClick={saveHandler}>
+          Save
+        </button>
+        <div style={styles.hint}>
+          Кликните по дате, чтобы установить план/выполнение.
+        </div>
       </div>
     </div>
   );
@@ -228,13 +275,40 @@ const styles = {
   today: { outline: '2px solid #93c5fd' },
   active: { boxShadow: 'inset 0 0 0 2px #2563eb' },
   pastDay: { cursor: 'not-allowed', color: '#94a3b8' },
-  dayNumber: { fontWeight: 700, fontSize: 16, color: '#1e293b' },
+  dayNumber: {
+    position: 'absolute',
+    fontWeight: 700,
+    fontSize: 16,
+    color: '#1e293b',
+    top: '10px',
+  },
   badge: {
     width: '10%',
     fontSize: 12,
     padding: '2px 6px',
     borderRadius: 999,
     background: '#000000ff',
+  },
+  badgePlan: {
+    position: 'absolute',
+    bottom: 23,
+    right: '10px',
+    fontSize: '20px',
+    padding: '0px 5px',
+    borderRadius: '1000px',
+    background: 'rgba(9, 255, 0, 1)',
+    color: 'rgba(0, 0, 0, 1)',
+  },
+  badgeDone: {
+    position: 'absolute',
+    bottom: 23,
+    right: 40,
+    fontSize: '20px',
+    padding: '0px 5px',
+    borderRadius: 1000,
+    border: '1px solid #94a3b8',
+    background: '#ff0000ff',
+    color: '#ffffffff',
   },
   popover: {
     position: 'absolute',
@@ -276,6 +350,16 @@ const styles = {
     borderRadius: 8,
     padding: '6px 12px',
     fontWeight: 600,
+    cursor: 'pointer',
+  },
+  footer: { marginTop: 12, display: 'flex', gap: 12, alignItems: 'center' },
+  saveBtn: {
+    border: 0,
+    background: '#0ea5e9',
+    color: '#fff',
+    borderRadius: 10,
+    padding: '10px 16px',
+    fontWeight: 700,
     cursor: 'pointer',
   },
   hint: { marginTop: 8, fontSize: 12, color: '#64748b' },

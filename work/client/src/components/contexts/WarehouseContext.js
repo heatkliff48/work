@@ -732,6 +732,7 @@ const WarehouseContextProvider = ({ children }) => {
         anchors_warehouse_data,
         tools_warehouse_data,
         list_of_reserved_products,
+        autoclave_calendar,
         list_of_dry_mix_reserved_products,
         list_of_anchor_reserved_products,
         list_of_tool_reserved_products,

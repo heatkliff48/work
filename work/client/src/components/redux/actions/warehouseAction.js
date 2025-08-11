@@ -234,7 +234,6 @@ export const getAutoclaveCalendar = () => {
 };
 
 export const addNewAutoclaveCalendar = (autoclave_calendar_data) => {
-  console.log('autoclave_calendar_data', autoclave_calendar_data);
   return {
     type: ADD_NEW_AUTOCLAVE_CALENDAR,
     payload: autoclave_calendar_data,

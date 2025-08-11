@@ -32,20 +32,17 @@ export const listOfOrderedProductionReducer = (
 
 export const autoclaveCalendarReducer = (autoclave_calendar = [], action) => {
   const { type, payload } = action;
+
+  const value = Array.isArray(payload) ? payload : [];
+
   switch (type) {
     case AUTOCLAVE_CALENDAR: {
-      return payload;
+      return value;
     }
 
     case NEW_AUTOCLAVE_CALENDAR: {
-      return [...autoclave_calendar, ...payload];
+      return value;
     }
-
-    // case DELETE_PRODUCT_FROM_RESERVED_LIST: {
-    //   const newReservedProducts = listOfOrderedProduction.filter((el) => el.id !== payload);
-
-    //   return newReservedProducts;
-    // }
 
     default:
       return autoclave_calendar;

@@ -17,6 +17,7 @@ const {
   OrderAnchorProducts,
   OrderToolProducts,
   OrderRelMatProducts,
+  sequelize,
 } = require('../db/models');
 
 class WarehouseRepository {
@@ -46,49 +47,45 @@ class WarehouseRepository {
 
   static async addNewAutoclaveCalendarData(map) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>AddNewAutoclaveCalendarData');
-
+    const t = await sequelize.transaction();
     try {
       const autoclaveCalendares = await AutoclaveCalendares.findAll({
         raw: true,
+        transaction: t,
       });
-
-      // Делаем карту для быстрого поиска по дате
       const calendarMap = new Map(autoclaveCalendares.map((r) => [r.date, r]));
 
-      map.map(async (item) => {
-        const date = item.date;
+      // ВАЖНО: не forEach, а for...of
+      for (const item of map) {
+        const date = String(item.date).slice(0, 10);
         const quantity = Number(item.quantity) || 0;
         const quantity_of_complited = Number(item.quantity_of_complited ?? 0) || 0;
 
         if (calendarMap.has(date)) {
-          // Обновляем запись
+          const data = calendarMap.get(date);
           await AutoclaveCalendares.update(
-            {
-              quantity,
-              quantity_of_complited,
-            },
-            { where: { date } }
+            { quantity, quantity_of_complited },
+            { where: { id: data.id }, transaction: t }
           );
         } else {
-          // Создаём новую запись
-          await AutoclaveCalendares.create({
-            date,
-            quantity,
-            quantity_of_complited,
-          });
+          await AutoclaveCalendares.create(
+            { date, quantity, quantity_of_complited },
+            { transaction: t }
+          );
         }
-      });
+      }
 
+      await t.commit(); // фиксация
+
+      // только теперь читаем заново
       const updAutoclaveCalendares = await AutoclaveCalendares.findAll({
         raw: true,
       });
-
-      console.log('?????????????????????', updAutoclaveCalendares);
-
       return updAutoclaveCalendares ?? [];
     } catch (error) {
+      await t.rollback();
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
-      return error;
+      throw error;
     }
   }
 

@@ -732,6 +732,9 @@ function* getAutoclaveCalendarWatcher() {
 
 function* addNewAutoclaveCalendarWatcher(action) {
   try {
+    const rows = Array.isArray(action.payload) ? action.payload : [];
+    if (rows.length === 0) throw new Error('No data to save');
+
     const new_autoclave_calendar = yield call(
       addNewAutoclaveCalendar,
       action.payload

@@ -47,7 +47,7 @@ class WarehouseController {
     try {
       const autoclaveCalendares = await WarehouseService.getAutoclaveCalendar();
 
-      return res.status(200).json({ autoclaveCalendares });
+      return res.status(200).json(autoclaveCalendares);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
