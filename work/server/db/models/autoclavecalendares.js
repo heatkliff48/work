@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   AutoclaveCalendares.init({
     date: DataTypes.STRING,
-    quantity: DataTypes.INTEGER
+    quantity: DataTypes.INTEGER,
+    quantity_of_complited: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'AutoclaveCalendares',

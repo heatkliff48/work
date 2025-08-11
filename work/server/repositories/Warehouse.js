@@ -17,6 +17,7 @@ const {
   OrderAnchorProducts,
   OrderToolProducts,
   OrderRelMatProducts,
+  sequelize,
 } = require('../db/models');
 
 class WarehouseRepository {
@@ -32,8 +33,8 @@ class WarehouseRepository {
     }
   }
 
-  static async getAutoclaveCalendares() {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAutoclaveCalendares');
+  static async getAutoclaveCalendar() {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAutoclaveCalendar');
 
     try {
       const autoclaveCalendares = await AutoclaveCalendares.findAll();
@@ -41,6 +42,50 @@ class WarehouseRepository {
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
+    }
+  }
+
+  static async addNewAutoclaveCalendarData(map) {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>AddNewAutoclaveCalendarData');
+    const t = await sequelize.transaction();
+    try {
+      const autoclaveCalendares = await AutoclaveCalendares.findAll({
+        raw: true,
+        transaction: t,
+      });
+      const calendarMap = new Map(autoclaveCalendares.map((r) => [r.date, r]));
+
+      // ВАЖНО: не forEach, а for...of
+      for (const item of map) {
+        const date = String(item.date).slice(0, 10);
+        const quantity = Number(item.quantity) || 0;
+        const quantity_of_complited = Number(item.quantity_of_complited ?? 0) || 0;
+
+        if (calendarMap.has(date)) {
+          const data = calendarMap.get(date);
+          await AutoclaveCalendares.update(
+            { quantity, quantity_of_complited },
+            { where: { id: data.id }, transaction: t }
+          );
+        } else {
+          await AutoclaveCalendares.create(
+            { date, quantity, quantity_of_complited },
+            { transaction: t }
+          );
+        }
+      }
+
+      await t.commit(); // фиксация
+
+      // только теперь читаем заново
+      const updAutoclaveCalendares = await AutoclaveCalendares.findAll({
+        raw: true,
+      });
+      return updAutoclaveCalendares ?? [];
+    } catch (error) {
+      await t.rollback();
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      throw error;
     }
   }
 

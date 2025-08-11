@@ -1,5 +1,7 @@
 import {
+  AUTOCLAVE_CALENDAR,
   LIST_OF_ORDERED_PRODUCTION,
+  NEW_AUTOCLAVE_CALENDAR,
   NEW_ORDERED_PRODUCTION,
 } from '../types/warehouseTypes';
 
@@ -25,5 +27,24 @@ export const listOfOrderedProductionReducer = (
 
     default:
       return listOfOrderedProduction;
+  }
+};
+
+export const autoclaveCalendarReducer = (autoclave_calendar = [], action) => {
+  const { type, payload } = action;
+
+  const value = Array.isArray(payload) ? payload : [];
+
+  switch (type) {
+    case AUTOCLAVE_CALENDAR: {
+      return value;
+    }
+
+    case NEW_AUTOCLAVE_CALENDAR: {
+      return value;
+    }
+
+    default:
+      return autoclave_calendar;
   }
 };

@@ -15,7 +15,10 @@ import { filesProductReducer } from './filesProductReducer';
 import { filesWarehouseReducer } from './filesWarehouseReducer';
 import { jwtReducer } from './jwtReducer';
 import { listOfOrderedProductionOEMReducer } from './listOfOrderedProductionOEMReducer';
-import { listOfOrderedProductionReducer } from './listOfOrderedProductionReducer';
+import {
+  autoclaveCalendarReducer,
+  listOfOrderedProductionReducer,
+} from './listOfOrderedProductionReducer';
 import { ordersReducer } from './orderReducer';
 import { pagesReducer } from './pagesReducer';
 import { productionBatchLogReducer } from './productionBatchLogReducer';
@@ -106,4 +109,5 @@ export const rootReducer = combineReducers({
   relatedMaterialsBackorderList: relatedMaterialsBackorderListReducer,
   aldabaran: aldabaranReducer,
   productCode: productCodeReducer,
+  autoclave_calendar: autoclaveCalendarReducer,
 });

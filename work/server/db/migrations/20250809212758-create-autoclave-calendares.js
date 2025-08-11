@@ -15,6 +15,9 @@ module.exports = {
       quantity: {
         type: Sequelize.INTEGER
       },
+      quantity_of_complited: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
