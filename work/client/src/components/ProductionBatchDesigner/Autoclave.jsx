@@ -317,6 +317,7 @@ function Autoclave({ acData, batchFromBD }) {
         lastItem.product.product_article === current.product.product_article &&
         lastItem.product.id_list_of_ordered_production !== null &&
         current.product.id_list_of_ordered_production !== null
+        // && lastItem.product.date === current.product.date // ----- date check
       ) {
         // Keep the positionInBatch from the first entry
         lastItem.product.cakes_in_batch += current.product.cakes_in_batch; // Sum cakes_in_batch
@@ -355,6 +356,7 @@ function Autoclave({ acData, batchFromBD }) {
             position.product.id_list_of_ordered_production !== null
               ? position.product.id
               : null,
+          date: '', // ----- position.product.date передача даты, если она будет
         })
       );
     });

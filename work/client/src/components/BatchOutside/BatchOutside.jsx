@@ -13,17 +13,17 @@ const BatchOutside = () => {
 
   const batch_outside_table = [
     {
-      Header: 'Product article',
+      Header: 'Product ID',
       accessor: 'product_article',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'quantity_pallets',
+      Header: 'Quantity: pallets',
       accessor: 'quantity_pallets',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'quantity_free',
+      Header: 'Quantity: free',
       accessor: 'quantity_free',
       Filter: TextSearchFilter,
     },
@@ -31,6 +31,10 @@ const BatchOutside = () => {
       Header: 'Position in autoclave',
       accessor: 'position_in_autoclave',
       Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Date',
+      accessor: 'date',
     },
   ];
 
@@ -65,7 +69,7 @@ const BatchOutside = () => {
       <Table
         COLUMN_DATA={batch_outside_table}
         dataOfTable={batchOutside}
-        tableName={'Production plan'}
+        tableName={'Batch calendar'}
         userAccess={userAccess}
         handleRowClick={(row) => {
           // batchOutsideHandler(row.original.id);

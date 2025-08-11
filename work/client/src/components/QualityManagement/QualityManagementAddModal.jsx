@@ -257,7 +257,7 @@ function QualityManagementAddModal(props) {
       dialogClassName="modal-auto-size"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Production plan</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">Batch calendar</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {customBatchSelect ? (
@@ -317,7 +317,7 @@ function QualityManagementAddModal(props) {
               // userAccess={userAccess}
               onClickButton={() => {}}
               buttonText={''}
-              tableName={'Production plan'}
+              tableName={'Batch calendar'}
               handleRowClick={(row) => {
                 handlerAddProductionPlanEntry(row);
               }}

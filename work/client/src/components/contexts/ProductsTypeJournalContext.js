@@ -15,7 +15,7 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Article',
+      Header: 'Product ID',
       accessor: 'article',
       Filter: TextSearchFilter,
     },
@@ -117,7 +117,7 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Article',
+      Header: 'Product ID',
       accessor: 'article',
       Filter: TextSearchFilter,
     },
@@ -188,7 +188,7 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Article',
+      Header: 'Product ID',
       accessor: 'article',
       Filter: TextSearchFilter,
     },
@@ -239,7 +239,7 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Article',
+      Header: 'Product ID',
       accessor: 'article',
       Filter: TextSearchFilter,
     },

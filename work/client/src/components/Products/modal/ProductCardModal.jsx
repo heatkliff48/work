@@ -243,7 +243,7 @@ const ProductCardModal = React.memo(() => {
         <ModalHeader>
           <div className="product_card_header">
             <div>
-              <div>Article</div>
+              <div>Product ID</div>
               <div className="product_article">
                 {memoizedArticle(productCardData)}
               </div>

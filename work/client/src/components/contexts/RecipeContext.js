@@ -6,7 +6,7 @@ const RecipeContext = createContext();
 const RecipeContextProvider = ({ children }) => {
   const recipe_info = [
     {
-      Header: 'Article',
+      Header: 'Recipe ID',
       accessor: 'article',
     },
     {
