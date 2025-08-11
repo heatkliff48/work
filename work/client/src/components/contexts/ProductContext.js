@@ -30,6 +30,7 @@ export const ProductsContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
       disableSortBy: true,
     },
+
     {
       Header: 'Density, kg/m³',
       accessor: 'density',
