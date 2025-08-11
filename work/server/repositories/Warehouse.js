@@ -1,4 +1,5 @@
 const {
+  AutoclaveCalendares,
   Warehouses,
   DryMixesWarehouses,
   RelatedMaterialsWarehouses,
@@ -25,6 +26,18 @@ class WarehouseRepository {
     try {
       const warehouse = await Warehouses.findAll();
       return warehouse ?? [];
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async getAutoclaveCalendares() {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAutoclaveCalendares');
+
+    try {
+      const autoclaveCalendares = await AutoclaveCalendares.findAll();
+      return autoclaveCalendares ?? [];
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;

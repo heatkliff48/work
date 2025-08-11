@@ -172,7 +172,13 @@ function MainOffcanvas() {
                 className="custom-menu-button"
               >
                 <Dropdown.Item eventKey="1">
-                  <Button className="custom-submenu-button">
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/autoclave_calenare');
+                      handleClose();
+                    }}
+                  >
                     Autoclave calender
                   </Button>
                 </Dropdown.Item>

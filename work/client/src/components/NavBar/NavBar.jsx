@@ -105,7 +105,7 @@ function NavBar() {
         {user && (
           <div className="nav_user_info">
             <div className="nav_username">
-              {user?.username.toUpperCase() ?? 'User Name'}
+              {user?.username?.toUpperCase() ?? 'User Name'}
             </div>
             <div className="nav_userrole">
               {getRoleName(user?.role) ?? 'user role/department'}

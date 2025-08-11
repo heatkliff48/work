@@ -43,6 +43,16 @@ class WarehouseController {
     }
   }
 
+  static async getAutoclaveCalendares(req, res) {
+    try {
+      const autoclaveCalendares = await WarehouseService.getAutoclaveCalendares();
+
+      return res.status(200).json({ autoclaveCalendares });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async getListOfReservedProductsOEM(req, res) {
     try {
       const orderedProductionOEM =
@@ -426,10 +436,11 @@ class WarehouseController {
     const reserved_product = req.body;
 
     try {
-      const new_reserved_product =
-        await WarehouseService.addNewReservedToolProducts({
+      const new_reserved_product = await WarehouseService.addNewReservedToolProducts(
+        {
           reserved_product,
-        });
+        }
+      );
 
       myEmitter.emit(
         GET_NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
