@@ -180,6 +180,17 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
+                      navigate('/autoclave_calenare');
+                      handleClose();
+                    }}
+                  >
+                    Autoclave calender
+                  </Button>
+                </Dropdown.Item>
+                <Dropdown.Item eventKey="2">
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
                       navigate('/production_batch_designer');
                       handleClose();
                     }}

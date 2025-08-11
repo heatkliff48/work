@@ -148,7 +148,6 @@ function Main() {
             Order dispatch
           </button>
         )}
-
         {checkUserAccess(user, roles, 'Products')?.canRead && (
           <button
             className="nav-button"
@@ -198,6 +197,14 @@ function Main() {
             Production Batch Designer
           </button>
         )}
+        {/* {checkUserAccess(user, roles, 'autoclave_calenare')?.canRead && ( */}
+        <button
+          className="nav-button"
+          onClick={() => navigate('/autoclave_calenare')}
+        >
+          Autoclave Calendare
+        </button>
+         {/* )} */}
         {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
           <button
             className="nav-button"

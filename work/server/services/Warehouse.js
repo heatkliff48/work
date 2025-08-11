@@ -13,6 +13,12 @@ class WarehouseService {
     return orderedProduction;
   }
 
+  static async getAutoclaveCalendares() {
+    const autoclaveCalendares = await WarehouseRepository.getAutoclaveCalendares();
+
+    return autoclaveCalendares;
+  }
+
   static async getListOfReservedProductsOEM() {
     const orderedProductionOEM =
       await WarehouseRepository.getListOfReservedProductsOEM();
