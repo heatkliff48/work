@@ -13,13 +13,13 @@ export const ProductsContextProvider = ({ children }) => {
   const products = useSelector((state) => state.products);
 
   const TABLE_COLUMNS = [
+    // {
+    //   Header: 'Id',
+    //   accessor: 'id',
+    //   sortType: 'number',
+    // },
     {
-      Header: 'Id',
-      accessor: 'id',
-      sortType: 'number',
-    },
-    {
-      Header: 'Article',
+      Header: 'Product ID',
       accessor: 'article',
       Filter: TextSearchFilter,
       disableSortBy: true,
@@ -154,7 +154,7 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'number',
     },
     {
-      Header: 'Article',
+      Header: 'Product ID',
       accessor: 'article',
       Filter: TextSearchFilter,
       disableSortBy: true,

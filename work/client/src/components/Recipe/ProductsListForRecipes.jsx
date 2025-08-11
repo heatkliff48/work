@@ -62,7 +62,7 @@ const ProductsListForRecipes = () => {
         userAccess={userAccess}
         onClickButton={() => {}}
         buttonText={''}
-        tableName={'Table of recipes'}
+        tableName={'Recipe catalog'}
         handleRowClick={(row) => {
           handlerRecipeInfo(row);
         }}

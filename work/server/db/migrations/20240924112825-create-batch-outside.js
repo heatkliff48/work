@@ -24,6 +24,9 @@ module.exports = {
       id_list_of_ordered_production: {
         type: Sequelize.INTEGER,
       },
+      date: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

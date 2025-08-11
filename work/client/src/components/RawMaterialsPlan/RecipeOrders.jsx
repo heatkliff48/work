@@ -33,7 +33,9 @@ function RecipeOrders() {
   ];
 
   const handlerRecipeInfo = (row) => {
-    const recipe = list_of_recipes?.find((el) => el.article === row.original.recipe_article);
+    const recipe = list_of_recipes?.find(
+      (el) => el.article === row.original.recipe_article
+    );
 
     if (!recipe) {
       console.error('Recipe not found');
@@ -47,7 +49,6 @@ function RecipeOrders() {
   useEffect(() => {
     const updatedData = recipeOrders
       .map((el) => {
-
         const batch = batchOutside.find((batch) => batch.id === el.id_batch);
         const recipe = list_of_recipes.find((recipe) => recipe.id === el.id_recipe);
 
@@ -77,7 +78,7 @@ function RecipeOrders() {
       <Table
         COLUMN_DATA={COLUMNS_RECIPE_ORDERS}
         dataOfTable={recipeDataList}
-        tableName={'Recipe Orders'}
+        tableName={'Raw material calendar'}
         handleRowClick={(row) => handlerRecipeInfo(row)}
       />
     </>

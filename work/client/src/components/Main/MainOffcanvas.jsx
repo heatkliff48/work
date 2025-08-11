@@ -179,7 +179,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Autoclave calender
+                    Autoclave calendar
                   </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="2">
@@ -204,7 +204,7 @@ function MainOffcanvas() {
                   handleClose();
                 }}
               >
-                Batch calender
+                Batch calendar
               </Button>
             )}
 
@@ -223,7 +223,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Recepies catalog
+                    Recipes catalog
                   </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="2">
@@ -234,7 +234,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Batch recepie planner
+                    Batch recipe planner
                   </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="3">
@@ -245,7 +245,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Raw material calender
+                    Raw material calendar
                   </Button>
                 </Dropdown.Item>
               </DropdownButton>
@@ -259,7 +259,7 @@ function MainOffcanvas() {
                   handleClose();
                 }}
               >
-                Technology calender
+                Technology calendar
               </Button>
             )}
             {/* Качество */}
