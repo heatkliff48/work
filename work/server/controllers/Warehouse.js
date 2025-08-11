@@ -43,11 +43,24 @@ class WarehouseController {
     }
   }
 
-  static async getAutoclaveCalendares(req, res) {
+  static async getAutoclaveCalendar(req, res) {
     try {
-      const autoclaveCalendares = await WarehouseService.getAutoclaveCalendares();
+      const autoclaveCalendares = await WarehouseService.getAutoclaveCalendar();
 
       return res.status(200).json({ autoclaveCalendares });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async addNewAutoclaveCalendarData(req, res) {
+    const autoclave_calendar_data = req.body;
+
+    try {
+      const updAutoclaveCalendares =
+        await WarehouseService.addNewAutoclaveCalendarData(autoclave_calendar_data);
+
+      return res.status(200).json(updAutoclaveCalendares);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

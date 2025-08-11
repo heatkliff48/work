@@ -32,12 +32,60 @@ class WarehouseRepository {
     }
   }
 
-  static async getAutoclaveCalendares() {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAutoclaveCalendares');
+  static async getAutoclaveCalendar() {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAutoclaveCalendar');
 
     try {
       const autoclaveCalendares = await AutoclaveCalendares.findAll();
       return autoclaveCalendares ?? [];
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async addNewAutoclaveCalendarData(map) {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>AddNewAutoclaveCalendarData');
+
+    try {
+      const autoclaveCalendares = await AutoclaveCalendares.findAll({
+        raw: true,
+      });
+
+      // Делаем карту для быстрого поиска по дате
+      const calendarMap = new Map(autoclaveCalendares.map((r) => [r.date, r]));
+
+      map.map(async (item) => {
+        const date = item.date;
+        const quantity = Number(item.quantity) || 0;
+        const quantity_of_complited = Number(item.quantity_of_complited ?? 0) || 0;
+
+        if (calendarMap.has(date)) {
+          // Обновляем запись
+          await AutoclaveCalendares.update(
+            {
+              quantity,
+              quantity_of_complited,
+            },
+            { where: { date } }
+          );
+        } else {
+          // Создаём новую запись
+          await AutoclaveCalendares.create({
+            date,
+            quantity,
+            quantity_of_complited,
+          });
+        }
+      });
+
+      const updAutoclaveCalendares = await AutoclaveCalendares.findAll({
+        raw: true,
+      });
+
+      console.log('?????????????????????', updAutoclaveCalendares);
+
+      return updAutoclaveCalendares ?? [];
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;

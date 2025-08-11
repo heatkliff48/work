@@ -68,6 +68,10 @@ import {
   UPDATE_ANCHOR_WAREHOSE_QUANTITYS,
   UPDATE_TOOL_WAREHOSE_QUANTITYS,
   UPDATE_REL_MAT_WAREHOSE_QUANTITYS,
+  GET_AUTOCLAVE_CALENDAR,
+  ADD_NEW_AUTOCLAVE_CALENDAR,
+  AUTOCLAVE_CALENDAR,
+  NEW_AUTOCLAVE_CALENDAR,
 } from '../types/warehouseTypes';
 
 const url = axios.create({
@@ -321,6 +325,24 @@ const updRelMatReservedProduct = (reserved_product) => {
 const deleteRelMatReservedProduct = (id) => {
   return url
     .post('/warehouse/reserved/relmat/delete', { id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getAutoclaveCalendar = () => {
+  return url
+    .get('/warehouse/autoclave_calendares')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewAutoclaveCalendar = (autoclave_calendar_data) => {
+  return url
+    .post('/warehouse/autoclave_calendares/add', autoclave_calendar_data)
     .then((res) => {
       return res.data;
     })
@@ -698,6 +720,29 @@ function* deleteRelMatReservedProductWatcher(action) {
   }
 }
 
+function* getAutoclaveCalendarWatcher() {
+  try {
+    const autoclave_calendar = yield call(getAutoclaveCalendar);
+
+    yield put({ type: AUTOCLAVE_CALENDAR, payload: autoclave_calendar });
+  } catch (err) {
+    yield put({ type: AUTOCLAVE_CALENDAR, payload: [] });
+  }
+}
+
+function* addNewAutoclaveCalendarWatcher(action) {
+  try {
+    const new_autoclave_calendar = yield call(
+      addNewAutoclaveCalendar,
+      action.payload
+    );
+
+    yield put({ type: NEW_AUTOCLAVE_CALENDAR, payload: new_autoclave_calendar });
+  } catch (err) {
+    yield put({ type: NEW_AUTOCLAVE_CALENDAR, payload: [] });
+  }
+}
+
 function* getListOfOrderedProductionWatcher() {
   try {
     const { orderedProduction } = yield call(getListOfOrderedProduction);
@@ -862,6 +907,9 @@ function* warehouseWatcher() {
     GET_DELETE_PRODUCT_FROM_REL_MAT_LIST,
     deleteRelMatReservedProductWatcher
   );
+
+  yield takeLatest(GET_AUTOCLAVE_CALENDAR, getAutoclaveCalendarWatcher);
+  yield takeLatest(ADD_NEW_AUTOCLAVE_CALENDAR, addNewAutoclaveCalendarWatcher);
 
   yield takeLatest(
     GET_LIST_OF_ORDERED_PRODUCTION,

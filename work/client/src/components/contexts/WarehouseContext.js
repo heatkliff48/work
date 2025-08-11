@@ -127,6 +127,7 @@ const WarehouseContextProvider = ({ children }) => {
   const order_status = [7, 8, 9, 10];
 
   const warehouse_data = useSelector((state) => state.warehouse);
+  const autoclave_calendar = useSelector((state) => state.autoclave_calendar);
   const dry_mixes_warehouse_data = useSelector((state) => state.dryMixesWarehouse);
   const related_materials_warehouse_data = useSelector(
     (state) => state.relatedMaterialsWarehouse

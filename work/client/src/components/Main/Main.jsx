@@ -39,6 +39,7 @@ import { getAllRoles } from '#components/redux/actions/rolesAction.js';
 import { getAllStockBalance } from '#components/redux/actions/stockBalanceAction.js';
 import {
   getAllWarehouse,
+  getAutoclaveCalendar,
   getListOfAnchorReservedProducts,
   getListOfDryMixedReservedProducts,
   getListOfOrderedProduction,
@@ -78,6 +79,7 @@ function Main() {
 
   useEffect(() => {
     dispatch(getAldabaran());
+    dispatch(getAutoclaveCalendar());
     dispatch(getAllDeliveryAddresses());
     dispatch(getAllClients());
     dispatch(getAllContactInfo());

@@ -14,6 +14,8 @@ import {
   subMonths,
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useDispatch } from 'react-redux';
+import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
 
 export default function ProductionPlannerCalendar({
   initialMonth,
@@ -24,6 +26,7 @@ export default function ProductionPlannerCalendar({
   presets = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   weekStartsOn = 1,
 }) {
+  const dispatch = useDispatch();
   const [currentMonth, setCurrentMonth] = useState(
     initialMonth ? startOfMonth(initialMonth) : startOfMonth(new Date())
   );
@@ -75,6 +78,16 @@ export default function ProductionPlannerCalendar({
   }
 
   const today = new Date();
+
+  const saveHandler = () => {
+    const arr = Object.entries(map).map(([date, quantity]) => ({
+      date,
+      quantity,
+      quantity_of_complited: 0,
+    }));
+
+    dispatch(addNewAutoclaveCalendar(arr));
+  };
 
   return (
     <div style={styles.wrapper}>
@@ -166,7 +179,12 @@ export default function ProductionPlannerCalendar({
           );
         })}
       </div>
-      <div style={styles.hint}>Кликните по дате, чтобы установить план на день.</div>
+      <div style={styles.hint}>
+        <diiv>
+          <button onClick={saveHandler}>Save</button>
+        </diiv>
+        Кликните по дате, чтобы установить план на день.
+      </div>
     </div>
   );
 }

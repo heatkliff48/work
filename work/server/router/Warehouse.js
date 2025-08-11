@@ -16,7 +16,8 @@ router.get(
   WarehouseController.getListOfReservedRelatedMaterialsProducts
 );
 router.get('/ordered_production', WarehouseController.getListOfOrderedProduction);
-router.get('/autoclave_calendares', WarehouseController.getAutoclaveCalendares);
+router.get('/autoclave_calendares', WarehouseController.getAutoclaveCalendar);
+router.post('/autoclave_calendares/add', WarehouseController.addNewAutoclaveCalendarData);
 router.get(
   '/ordered_production_oem',
   WarehouseController.getListOfReservedProductsOEM

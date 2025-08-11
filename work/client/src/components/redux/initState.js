@@ -45,6 +45,7 @@ const initState = {
   relatedMaterialsBackorderList: [],
   aldabaran: [],
   productCode: [],
+  autoclave_calendar: [],
 };
 
 export default initState;

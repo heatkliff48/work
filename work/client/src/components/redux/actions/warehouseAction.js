@@ -33,6 +33,8 @@ import {
   UPDATE_ANCHOR_WAREHOSE_QUANTITYS,
   UPDATE_TOOL_WAREHOSE_QUANTITYS,
   UPDATE_REL_MAT_WAREHOSE_QUANTITYS,
+  GET_AUTOCLAVE_CALENDAR,
+  ADD_NEW_AUTOCLAVE_CALENDAR,
 } from '../types/warehouseTypes';
 
 export const getAllWarehouse = () => {
@@ -222,6 +224,20 @@ export const deleteRelMatReservedProducts = (id) => {
   return {
     type: GET_DELETE_PRODUCT_FROM_REL_MAT_LIST,
     payload: id,
+  };
+};
+
+export const getAutoclaveCalendar = () => {
+  return {
+    type: GET_AUTOCLAVE_CALENDAR,
+  };
+};
+
+export const addNewAutoclaveCalendar = (autoclave_calendar_data) => {
+  console.log('autoclave_calendar_data', autoclave_calendar_data);
+  return {
+    type: ADD_NEW_AUTOCLAVE_CALENDAR,
+    payload: autoclave_calendar_data,
   };
 };
 
