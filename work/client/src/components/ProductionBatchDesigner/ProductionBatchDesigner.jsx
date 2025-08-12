@@ -33,6 +33,7 @@ function ProductionBatchDesigner() {
   const [acData, setAcData] = useState([]);
   const [batchFromBD, setBatchFromBD] = useState([]);
   const [autoclaveCount, setAutoclaveCount] = useState(0);
+  const [autoclaveCalendarData, setAutoclaveCalendarData] = useState(0);
 
   useEffect(() => {
     if (!Array.isArray(autoclave_calendar)) return;
@@ -52,8 +53,8 @@ function ProductionBatchDesigner() {
 
     if (nearest && nearest.value > 0) {
       setAutoclaveCount(nearest.value);
+      setAutoclaveCalendarData(nearest);
     } else {
-      // если подходящей даты нет — оставим дефолт 10 (или можно 0, на ваше усмотрение)
       setAutoclaveCount(10);
     }
   }, [autoclave_calendar]);
@@ -319,12 +320,6 @@ function ProductionBatchDesigner() {
       filledAutoclave.push(updatedAutoclaveData.slice(i, i + 21));
     }
 
-    // while (filledAutoclave.length < autoclaveCount) {
-    //   filledAutoclave.push(
-    //     Array.from({ length: 21 }, () => ({ id: null, density: '', width: '' }))
-    //   );
-    // }
-
     setAcData(filledAutoclave);
   }, [latestProducts, listOfOrderedCakes, emptyAutoclave]);
 
@@ -535,7 +530,11 @@ function ProductionBatchDesigner() {
 
       {/* Компонент Autoclave */}
       <div style={{ marginLeft: '20px' }}>
-        <Autoclave acData={acData} batchFromBD={batchFromBD} />
+        <Autoclave
+          acData={acData}
+          batchFromBD={batchFromBD}
+          autoclaveCalendarData={autoclaveCalendarData}
+        />
       </div>
     </div>
   );

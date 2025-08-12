@@ -55,7 +55,6 @@ class WarehouseRepository {
       });
       const calendarMap = new Map(autoclaveCalendares.map((r) => [r.date, r]));
 
-      // ВАЖНО: не forEach, а for...of
       for (const item of map) {
         const date = String(item.date).slice(0, 10);
         const quantity = Number(item.quantity) || 0;
@@ -75,12 +74,12 @@ class WarehouseRepository {
         }
       }
 
-      await t.commit(); // фиксация
+      await t.commit();
 
-      // только теперь читаем заново
       const updAutoclaveCalendares = await AutoclaveCalendares.findAll({
         raw: true,
       });
+
       return updAutoclaveCalendares ?? [];
     } catch (error) {
       await t.rollback();

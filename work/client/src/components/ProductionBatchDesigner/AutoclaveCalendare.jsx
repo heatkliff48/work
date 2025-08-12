@@ -70,7 +70,6 @@ export default function ProductionPlannerCalendar({
   }, [weekStartsOn]);
 
   useEffect(() => {
-    console.log('autoclave_calendar', autoclave_calendar);
     if (!autoclave_calendar || !Array.isArray(autoclave_calendar)) return;
     const seeded = Object.create(null);
     for (const r of autoclave_calendar) {
@@ -117,7 +116,6 @@ export default function ProductionPlannerCalendar({
       quantity: Number(obj?.quantity) || 0,
       quantity_of_complited: 0,
     }));
-    console.log('arr', arr);
     dispatch(addNewAutoclaveCalendar(arr));
   };
 
