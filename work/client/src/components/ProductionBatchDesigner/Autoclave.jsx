@@ -292,6 +292,15 @@ function Autoclave({ acData, batchFromBD }) {
   };
 
   const onSaveHandler = async () => {
+    const isFull = autoclave.every(
+      (row) => row.every((cell) => cell.id !== null) // все ячейки заняты
+    );
+
+    if (!isFull) {
+      alert('Please fill the autoclave completely');
+      return; // прерываем сохранение
+    }
+
     let positionInBatch = 1;
     let batchPositions = [];
 

@@ -16,7 +16,7 @@ function ProductionBatchDesigner() {
   const dispatch = useDispatch();
 
   const { latestProducts } = useProductsContext();
-  const { listOfOrderedCakes } = useWarehouseContext();
+  const { listOfOrderedCakes, autoclave_calendar } = useWarehouseContext();
   const {
     autoclave,
     setAutoclave,
@@ -32,17 +32,42 @@ function ProductionBatchDesigner() {
   const [currId, setCurrId] = useState(null);
   const [acData, setAcData] = useState([]);
   const [batchFromBD, setBatchFromBD] = useState([]);
+  const [autoclaveCount, setAutoclaveCount] = useState(0);
+
+  useEffect(() => {
+    if (!Array.isArray(autoclave_calendar)) return;
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    // Поддержим возможную опечатку "quantity" (как в вашем примере) и корректное "quantity"
+    const nearest = autoclave_calendar
+      .map((x) => ({
+        ...x,
+        qty: Number(x.quantity ?? 0),
+        done: Number(x.quantity_of_complited ?? 0),
+      }))
+      .map((x) => ({ ...x, value: x.qty - x.done }))
+      .filter((x) => x.value > 0 && typeof x.date === 'string' && x.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date))[0];
+
+    if (nearest && nearest.value > 0) {
+      setAutoclaveCount(nearest.value);
+    } else {
+      // если подходящей даты нет — оставим дефолт 10 (или можно 0, на ваше усмотрение)
+      setAutoclaveCount(10);
+    }
+  }, [autoclave_calendar]);
 
   let countRef = useRef(0);
   const MAX_QUANTITY = 10405;
   const emptyAutoclave = useMemo(
     () =>
-      Array.from({ length: 210 }, () => ({
+      Array.from({ length: autoclaveCount * 21 }, () => ({
         id_lst_of_ordered_production: null,
         status: 0,
         quallty_check: 0,
       })),
-    []
+    [autoclaveCount]
   );
 
   const addEmptyAutoclaveRow = (autoclave) => {
@@ -293,6 +318,12 @@ function ProductionBatchDesigner() {
     for (let i = 0; i < updatedAutoclaveData.length; i += 21) {
       filledAutoclave.push(updatedAutoclaveData.slice(i, i + 21));
     }
+
+    // while (filledAutoclave.length < autoclaveCount) {
+    //   filledAutoclave.push(
+    //     Array.from({ length: 21 }, () => ({ id: null, density: '', width: '' }))
+    //   );
+    // }
 
     setAcData(filledAutoclave);
   }, [latestProducts, listOfOrderedCakes, emptyAutoclave]);
