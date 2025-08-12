@@ -48,13 +48,7 @@ batchOutsideRouter.post('/', async (req, res) => {
     });
 
     myEmitter.emit(ADD_NEW_BATCH_OUTSIDE_SOCKET, batchOutside);
-    return res.json(batchOutside).status(200); //.json({ client });
-    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-    // .json({
-    //   client,
-    //   accessToken,
-    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    // })
+    return res.json(batchOutside).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
