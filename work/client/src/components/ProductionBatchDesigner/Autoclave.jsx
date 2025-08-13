@@ -373,14 +373,15 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
       return;
     }
 
-    const { quantity, date } = autoclaveCalendarData;
-    const quantity_of_complited = filledCount / CELLS_PER_AUTOCLAVE;
+    const { quantity, date, quantity_of_complited } = autoclaveCalendarData;
+    const new_quantity_of_complited =
+      quantity_of_complited + filledCount / CELLS_PER_AUTOCLAVE;
 
     const newDataCalendar = [
       {
         quantity,
         date,
-        quantity_of_complited,
+        quantity_of_complited: new_quantity_of_complited,
       },
     ];
 
