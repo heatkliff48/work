@@ -55,7 +55,7 @@ function ProductionBatchDesigner() {
       setAutoclaveCount(nearest.value);
       setAutoclaveCalendarData(nearest);
     } else {
-      setAutoclaveCount(10);
+      setAutoclaveCount(0);
     }
   }, [autoclave_calendar]);
 
@@ -64,7 +64,7 @@ function ProductionBatchDesigner() {
   const emptyAutoclave = useMemo(
     () =>
       Array.from({ length: autoclaveCount * 21 }, () => ({
-        id_lst_of_ordered_production: null,
+        id_list_of_ordered_production: null,
         status: 0,
         quallty_check: 0,
       })),
@@ -163,17 +163,17 @@ function ProductionBatchDesigner() {
       ).toFixed(2);
       const free_product_package = Math.floor(free_product_cakes * 3);
 
-      const haveBatch = batchDesigner.length > 0;
       const total_cakes = Math.ceil(product_with_brack);
 
-      const cakes_in_batch = haveBatch
-        ? batchDesigner.find((el) => el.id === id).cakes_in_batch
-        : emptyAutoclave?.filter((unit) => unit.id_list_of_ordered_product === id)
-            .length;
+      // ищем запись в batchDesigner ровно один раз
+      const existing = batchDesigner.find((el) => el.id === id);
 
-      const cakes_residue = haveBatch
-        ? batchDesigner.find((el) => el.id === id).cakes_residue
-        : Math.max(total_cakes - cakes_in_batch, 0);
+      // если записи нет — считаем, что размещено 0
+      const cakes_in_batch = existing?.cakes_in_batch ?? 0;
+
+      // если есть готовое значение — берём его, иначе считаем от total_cakes
+      const cakes_residue =
+        existing?.cakes_residue ?? Math.max(total_cakes - cakes_in_batch, 0);
 
       const updatedProdBatch = {
         ...prodBatchData,
@@ -234,7 +234,7 @@ function ProductionBatchDesigner() {
 
     const transformedAutoclave = tAutoclave.map((unit) => {
       const batch = prodBatchDesigner.find((prod) => {
-        return prod.id === unit.id_list_of_ordered_product;
+        return prod.id === unit.id_list_of_ordered_production;
       });
 
       if (!batch)
