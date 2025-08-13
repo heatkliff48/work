@@ -20,7 +20,6 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 export default function ProductionPlannerCalendar({
   initialMonth,
-  value,
   onChange,
   min = 0,
   max = 9999,
@@ -33,13 +32,13 @@ export default function ProductionPlannerCalendar({
   const [currentMonth, setCurrentMonth] = useState(
     initialMonth ? startOfMonth(initialMonth) : startOfMonth(new Date())
   );
-
   const [internalMap, setInternalMap] = useState(() => Object.create(null));
-  const map = value ?? internalMap;
-
   const [openDayISO, setOpenDayISO] = useState(null);
 
+  const map = internalMap;
+
   const popoverRef = useRef(null);
+
   useEffect(() => {
     function handleClickOutside(e) {
       if (popoverRef.current && !popoverRef.current.contains(e.target)) {
@@ -111,11 +110,16 @@ export default function ProductionPlannerCalendar({
   const today = new Date();
 
   const saveHandler = () => {
-    const arr = Object.entries(map).map(([date, obj]) => ({
-      date,
-      quantity: Number(obj?.quantity) || 0,
-      quantity_of_complited: 0,
-    }));
+    const arr = Object.entries(map).map(([date, obj]) => {
+      const existing = autoclave_calendar.find((item) => item.date === date);
+
+      return {
+        date,
+        quantity: Number(obj?.quantity) || 0,
+        quantity_of_complited: existing?.quantity_of_complited ?? 0,
+      };
+    });
+
     dispatch(addNewAutoclaveCalendar(arr));
   };
 

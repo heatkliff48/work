@@ -101,15 +101,21 @@ function ProductionBatchDesigner() {
     const { article, density, width } = prod_data;
 
     const maxId =
-      batchDesigner.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
+      (batchDesigner.reduce((max, item) => (item.id > max ? item.id : max), 0) ||
+        0) + 1;
 
     setAutoclave((prevAutoclave) => {
-      let flatAutoclave = prevAutoclave.flat();
-      const lastIndex = flatAutoclave.filter((el) => el.id).length;
+      const flat = prevAutoclave.flat();
 
-      const newElement = { id: maxId, density, width };
-      flatAutoclave.splice(lastIndex, 0, newElement);
-      const count = flatAutoclave.filter((el) => el.id === maxId).length;
+      const emptyIndex = flat.findIndex((cell) => !cell || cell.id === null);
+      if (emptyIndex === -1) {
+        alert('No free slots available in autoclaves');
+        return prevAutoclave;
+      }
+
+      flat[emptyIndex] = { id: maxId, density, width };
+
+      const countForThisId = flat.filter((c) => c && c.id === maxId).length;
 
       dispatch(
         addBatchState({
@@ -122,22 +128,19 @@ function ProductionBatchDesigner() {
         })
       );
 
-      setQuantityPallets((prev) => {
-        return {
-          ...prev,
-          [maxId]: count * 3,
-        };
-      });
-
+      setQuantityPallets((prev) => ({ ...prev, [maxId]: countForThisId * 3 }));
       setBatchOrderIDs((prev) => (prev.includes(maxId) ? prev : [...prev, maxId]));
 
-      const newAutoclave = [];
-      while (flatAutoclave.length) {
-        newAutoclave.push(flatAutoclave.splice(0, 21));
+      const rows = [];
+      const rowCount = prevAutoclave.length;
+      const CELLS_PER_AUTOCLAVE = 21;
+      for (let r = 0; r < rowCount; r++) {
+        const from = r * CELLS_PER_AUTOCLAVE;
+        rows.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
       }
-
-      return newAutoclave;
+      return rows;
     });
+
     setBatchFromBD((prev) => [
       ...prev,
       {
