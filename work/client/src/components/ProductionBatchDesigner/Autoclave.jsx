@@ -385,6 +385,7 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
         quantity,
         date,
         quantity_of_complited: new_quantity_of_complited,
+        quantity_of_complited: new_quantity_of_complited,
       },
     ];
 
@@ -648,6 +649,7 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
     additionalProduct = null,
     id_list_of_ordered_production = null
   ) => {
+
     const baseProduct = additionalProduct
       ? {
           ...product,
@@ -662,6 +664,7 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
             Number(additionalProduct.free_product_package),
         }
       : product;
+
 
     // Точное соответствие оригинальной логике
     if (
