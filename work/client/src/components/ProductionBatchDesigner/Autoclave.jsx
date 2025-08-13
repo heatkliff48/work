@@ -3,7 +3,10 @@ import {
   unlockButton,
   updateBatchState,
 } from '#components/redux/actions/batchDesignerAction.js';
-import { addNewBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+import {
+  addNewBatchOutside,
+  updateBatchOutside,
+} from '#components/redux/actions/batchOutsideAction.js';
 import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,6 +29,7 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
   const [initialRowCount, setInitialRowCount] = useState(0);
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
+  const existingBatchOutside = useSelector((state) => state.batchOutside) || [];
 
   const getClassForAutoclave = (num) => {
     switch (num) {
@@ -373,21 +377,23 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
       return;
     }
 
-    const { quantity, date } = autoclaveCalendarData;
-    const quantity_of_complited = filledCount / CELLS_PER_AUTOCLAVE;
+    const { quantity, date, quantity_of_complited } = autoclaveCalendarData;
+    const new_quantity_of_complited =
+      quantity_of_complited + filledCount / CELLS_PER_AUTOCLAVE;
 
     const newDataCalendar = [
       {
         quantity,
         date,
-        quantity_of_complited,
+        quantity_of_complited: new_quantity_of_complited,
       },
     ];
 
     dispatch(addNewAutoclaveCalendar(newDataCalendar));
 
+    // Формируем новые позиции для batchOutside
     let positionInBatch = 1;
-    let batchPositions = [];
+    const batchPositions = [];
 
     batchOrderIDs?.forEach((id) => {
       const product = batchDesigner.find((p) => p.id === id);
@@ -400,53 +406,221 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
       }
     });
 
-    const mergedBatchPositions = batchPositions.reduce((acc, current) => {
+    // 5. Объединяем новые записи между собой (если артикул и дата совпадают)
+    const mergedNewPositions = batchPositions.reduce((acc, current) => {
       const lastItem = acc[acc.length - 1];
+      const currentProduct = current.product;
+
       if (
         lastItem &&
-        lastItem.product.product_article === current.product.product_article &&
+        lastItem.product.product_article === currentProduct.product_article &&
         lastItem.product.id_list_of_ordered_production !== null &&
-        current.product.id_list_of_ordered_production !== null
+        currentProduct.id_list_of_ordered_production !== null
       ) {
-        lastItem.product.cakes_in_batch += current.product.cakes_in_batch;
-        lastItem.product.free_product_package +=
-          current.product.free_product_package;
-        lastItem.product.total_cakes += current.product.total_cakes;
+        // Объединяем с предыдущей записью
+        lastItem.product.cakes_in_batch += currentProduct.cakes_in_batch;
+        lastItem.product.free_product_package += currentProduct.free_product_package;
+        lastItem.product.total_cakes += currentProduct.total_cakes;
       } else {
+        // Добавляем новую запись
         acc.push({
-          product: { ...current.product },
+          product: { ...currentProduct },
           positionInBatch: current.positionInBatch,
         });
       }
       return acc;
     }, []);
 
-    mergedBatchPositions.forEach((position) => {
-      dispatch(
-        addNewBatchOutside({
-          product_article: position.product.product_article,
-          quantity_pallets: position.product.cakes_in_batch * 3,
-          quantity_free:
-            position.product.id_list_of_ordered_production !== null &&
-            position.product.cakes_in_batch &&
-            position.product.total_cakes &&
-            position.product.free_product_package >= 0
-              ? (position.product.cakes_in_batch - position.product.total_cakes) *
-                  3 +
-                position.product.free_product_package
-              : position.product.id_list_of_ordered_production == null
-              ? position.product.cakes_in_batch * 3
-              : null,
-          position_in_autoclave: position.positionInBatch,
-          id_list_of_ordered_production:
-            position.product.id_list_of_ordered_production !== null
-              ? position.product.id
-              : null,
-          date: '',
-        })
+    // 6. Для каждой объединённой новой записи:
+    mergedNewPositions.forEach((newPosition) => {
+      const { product, positionInBatch } = newPosition;
+
+      // Ищем совпадение в существующих записях (по артикулу и дате)
+      const existingRecord = existingBatchOutside.find(
+        (record) =>
+          record.product_article === product.product_article && record.date === date
       );
+
+      if (existingRecord) {
+        // ОБНОВЛЯЕМ существующую запись
+        const updatedRecord = {
+          ...existingRecord,
+          quantity_pallets:
+            existingRecord.quantity_pallets + product.cakes_in_batch * 3,
+          quantity_free:
+            newPosition.product.id_list_of_ordered_production !== null &&
+            newPosition.product.cakes_in_batch &&
+            newPosition.product.total_cakes &&
+            newPosition.product.free_product_package >= 0
+              ? (newPosition.product.cakes_in_batch -
+                  newPosition.product.total_cakes) *
+                  3 +
+                newPosition.product.free_product_package +
+                existingRecord.quantity_free
+              : newPosition.product.id_list_of_ordered_production == null
+              ? newPosition.product.cakes_in_batch * 3 + existingRecord.quantity_free
+              : null,
+          newPosition_in_autoclave: newPosition.newPositionInBatch,
+          id_list_of_ordered_production:
+            newPosition.product.id_list_of_ordered_production !== null
+              ? newPosition.product.id
+              : null,
+          // calculateQuantityFree(
+          //   existingRecord,
+          //   product,
+          //   existingRecord.id_list_of_ordered_production
+          // ),
+        };
+        dispatch(updateBatchOutside(updatedRecord));
+      } else {
+        // ДОБАВЛЯЕМ новую запись
+        dispatch(
+          addNewBatchOutside({
+            product_article: product.product_article,
+            quantity_pallets: product.cakes_in_batch * 3,
+            quantity_free:
+              newPosition.product.id_list_of_ordered_production !== null &&
+              newPosition.product.cakes_in_batch &&
+              newPosition.product.total_cakes &&
+              newPosition.product.free_product_package >= 0
+                ? (newPosition.product.cakes_in_batch -
+                    newPosition.product.total_cakes) *
+                    3 +
+                  newPosition.product.free_product_package
+                : newPosition.product.id_list_of_ordered_production == null
+                ? newPosition.product.cakes_in_batch * 3
+                : null,
+            newPosition_in_autoclave: newPosition.newPositionInBatch,
+            id_list_of_ordered_production:
+              newPosition.product.id_list_of_ordered_production !== null
+                ? newPosition.product.id
+                : null,
+            // calculateQuantityFree(
+            //   product,
+            //   product.id_list_of_ordered_production
+            // ),
+            position_in_autoclave: positionInBatch,
+            id_list_of_ordered_production:
+              product.id_list_of_ordered_production !== null ? product.id : null,
+            date: date,
+          })
+        );
+      }
     });
+
     setBatchOrderIDs([]);
+
+    // let positionInBatch = 1;
+    // let batchPositions = [];
+
+    // batchOrderIDs?.forEach((id) => {
+    //   const product = batchDesigner.find((p) => p.id === id);
+    //   if (product) {
+    //     batchPositions.push({
+    //       product,
+    //       positionInBatch,
+    //     });
+    //     positionInBatch += product.cakes_in_batch;
+    //   }
+    // });
+
+    // const mergedBatchPositions = batchPositions.reduce((acc, current) => {
+    //   const lastItem = acc[acc.length - 1];
+    //   if (
+    //     lastItem &&
+    //     lastItem.product.product_article === current.product.product_article &&
+    //     lastItem.product.id_list_of_ordered_production !== null &&
+    //     current.product.id_list_of_ordered_production !== null
+    //   ) {
+    //     lastItem.product.cakes_in_batch += current.product.cakes_in_batch;
+    //     lastItem.product.free_product_package +=
+    //       current.product.free_product_package;
+    //     lastItem.product.total_cakes += current.product.total_cakes;
+    //   } else {
+    //     acc.push({
+    //       product: { ...current.product },
+    //       positionInBatch: current.positionInBatch,
+    //     });
+    //   }
+    //   return acc;
+    // }, []);
+
+    // mergedBatchPositions.forEach((position) => {
+    //   dispatch(
+    //     addNewBatchOutside({
+    //       product_article: position.product.product_article,
+    //       quantity_pallets: position.product.cakes_in_batch * 3,
+    // quantity_free:
+    //   position.product.id_list_of_ordered_production !== null &&
+    //   position.product.cakes_in_batch &&
+    //   position.product.total_cakes &&
+    //   position.product.free_product_package >= 0
+    //     ? (position.product.cakes_in_batch - position.product.total_cakes) *
+    //         3 +
+    //       position.product.free_product_package
+    //     : position.product.id_list_of_ordered_production == null
+    //     ? position.product.cakes_in_batch * 3
+    //     : null,
+    //       position_in_autoclave: position.positionInBatch,
+    //       id_list_of_ordered_production:
+    //         position.product.id_list_of_ordered_production !== null
+    //           ? position.product.id
+    //           : null,
+    //       date: '',
+    //     })
+    //   );
+    // });
+    // setBatchOrderIDs([]);
+  };
+
+  const calculateQuantityFree = (
+    product,
+    additionalProduct = null,
+    id_list_of_ordered_production = null
+  ) => {
+    // Объединяем продукты, если передан additionalProduct
+    console.log('product ------- ', product);
+    console.log('additionalProduct ------- ', additionalProduct);
+    console.log(
+      'id_list_of_ordered_production ------- ',
+      id_list_of_ordered_production
+    );
+
+    const baseProduct = additionalProduct
+      ? {
+          ...product,
+          id_list_of_ordered_production: id_list_of_ordered_production,
+          cakes_in_batch:
+            Number(product.cakes_in_batch) +
+            Number(additionalProduct.cakes_in_batch),
+          total_cakes:
+            Number(product.total_cakes) + Number(additionalProduct.total_cakes),
+          free_product_package:
+            Number(product.free_product_package) +
+            Number(additionalProduct.free_product_package),
+        }
+      : product;
+
+    console.log('baseProduct ------- ', baseProduct);
+
+    // Точное соответствие оригинальной логике
+    if (
+      baseProduct.id_list_of_ordered_production !== null &&
+      baseProduct.cakes_in_batch &&
+      baseProduct.total_cakes &&
+      baseProduct.free_product_package >= 0
+    ) {
+      return (
+        (baseProduct.cakes_in_batch - baseProduct.total_cakes) * 3 +
+        baseProduct.free_product_package
+      );
+    }
+
+    if (baseProduct.id_list_of_ordered_production == null) {
+      return baseProduct.cakes_in_batch * 3;
+    }
+
+    return null;
   };
 
   useEffect(() => {
