@@ -460,8 +460,7 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
         const updatedRecord = {
           ...existingRecord,
           quantity_pallets:
-            existingRecord.quantity_pallets +
-            product.cakes_in_batch * Math.floor(m3InArray / volumeBlockOnPallet),
+            existingRecord.quantity_pallets + product.cakes_in_batch * 3, // исправить -----------------------
           quantity_free:
             newPosition.product.id_list_of_ordered_production !== null &&
             newPosition.product.cakes_in_batch &&
@@ -469,16 +468,13 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
             newPosition.product.free_product_package >= 0
               ? Math.max(
                   0,
-                  newPosition.product.cakes_in_batch *
-                    Math.floor(m3InArray / volumeBlockOnPallet) -
-                    quantity_total?.quantity
-                )
+                  newPosition.product.cakes_in_batch * 3 -
+                    newPosition.product.quantity
+                ) // исправить -----------------------
               : newPosition.product.id_list_of_ordered_production == null
-              ? newPosition.product.cakes_in_batch *
-                  Math.floor(m3InArray / volumeBlockOnPallet) +
-                existingRecord.quantity_free
+              ? newPosition.product.cakes_in_batch * 3 + existingRecord.quantity_free
               : 0,
-          position_in_autoclave: newPosition.positionInBatch,
+          newPosition_in_autoclave: newPosition.newPositionInBatch,
           id_list_of_ordered_production:
             newPosition.product.id_list_of_ordered_production !== null
               ? newPosition.product.id
@@ -492,88 +488,38 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
         dispatch(updateBatchOutside(updatedRecord));
       } else {
         // ДОБАВЛЯЕМ новую запись
-
-        const quantity_total =
-          newPosition.product.id_list_of_ordered_production !== null
-            ? list_of_ordered_production?.find(
-                (order) => order.id == newPosition.product.id
-              )
-            : 0;
-
-        const m3InArray = latestProducts?.find(
-          (p) => p.article == product.product_article
-        )?.m3InArray;
-        const volumeBlockOnPallet = latestProducts?.find(
-          (p) => p.article == product.product_article
-        )?.volumeBlockOnPallet;
-
-        const newBatchOutside = {
-          product_article: product.product_article,
-          quantity_pallets:
-            product.cakes_in_batch * Math.floor(m3InArray / volumeBlockOnPallet),
-          quantity_free:
-            newPosition.product.id_list_of_ordered_production !== null &&
-            newPosition.product.cakes_in_batch &&
-            newPosition.product.total_cakes &&
-            newPosition.product.free_product_package >= 0
-              ? Math.max(
-                  0,
-                  newPosition.product.cakes_in_batch *
-                    Math.floor(m3InArray / volumeBlockOnPallet) -
-                    quantity_total?.quantity
-                )
-              : newPosition.product.id_list_of_ordered_production == null
-              ? newPosition.product.cakes_in_batch *
-                  Math.floor(m3InArray / volumeBlockOnPallet) +
-                existingRecord.quantity_free
-              : 0,
-          position_in_autoclave: newPosition.positionInBatch,
-          id_list_of_ordered_production:
-            newPosition.product.id_list_of_ordered_production !== null
-              ? newPosition.product.id
-              : null,
-          // calculateQuantityFree(
-          //   product,
-          //   product.id_list_of_ordered_production
-          // ),
-          position_in_autoclave: positionInBatch,
-          date: date,
-        };
         dispatch(
-          addNewBatchOutside(
-            newBatchOutside
-            //   {
-            //   product_article: product.product_article,
-            //   quantity_pallets: product.cakes_in_batch * 3,
-            //   quantity_free:
-            //     newPosition.product.id_list_of_ordered_production !== null &&
-            //     newPosition.product.cakes_in_batch &&
-            //     newPosition.product.total_cakes &&
-            //     newPosition.product.free_product_package >= 0
-            //       ? Math.max(
-            //           0,
-            //           newPosition.product.cakes_in_batch * 3 -
-            //             newPosition.product.quantity
-            //         ) // исправить -----------------------
-            //       : newPosition.product.id_list_of_ordered_production == null
-            //       ? newPosition.product.cakes_in_batch * 3 +
-            //         existingRecord.quantity_free
-            //       : 0,
-            //   newPosition_in_autoclave: newPosition.newPositionInBatch,
-            //   id_list_of_ordered_production:
-            //     newPosition.product.id_list_of_ordered_production !== null
-            //       ? newPosition.product.id
-            //       : null,
-            //   // calculateQuantityFree(
-            //   //   product,
-            //   //   product.id_list_of_ordered_production
-            //   // ),
-            //   position_in_autoclave: positionInBatch,
-            //   // id_list_of_ordered_production:
-            //   //   product.id_list_of_ordered_production !== null ? product.id : null,
-            //   date: date,
-            // }
-          )
+          addNewBatchOutside({
+            product_article: product.product_article,
+            quantity_pallets: product.cakes_in_batch * 3,
+            quantity_free:
+              newPosition.product.id_list_of_ordered_production !== null &&
+              newPosition.product.cakes_in_batch &&
+              newPosition.product.total_cakes &&
+              newPosition.product.free_product_package >= 0
+                ? Math.max(
+                    0,
+                    newPosition.product.cakes_in_batch * 3 -
+                      newPosition.product.quantity
+                  ) // исправить -----------------------
+                : newPosition.product.id_list_of_ordered_production == null
+                ? newPosition.product.cakes_in_batch * 3 +
+                  existingRecord.quantity_free
+                : 0,
+            newPosition_in_autoclave: newPosition.newPositionInBatch,
+            id_list_of_ordered_production:
+              newPosition.product.id_list_of_ordered_production !== null
+                ? newPosition.product.id
+                : null,
+            // calculateQuantityFree(
+            //   product,
+            //   product.id_list_of_ordered_production
+            // ),
+            position_in_autoclave: positionInBatch,
+            id_list_of_ordered_production:
+              product.id_list_of_ordered_production !== null ? product.id : null,
+            date: date,
+          })
         );
       }
     });
