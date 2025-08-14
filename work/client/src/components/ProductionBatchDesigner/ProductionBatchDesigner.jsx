@@ -35,6 +35,18 @@ function ProductionBatchDesigner() {
   const [autoclaveCount, setAutoclaveCount] = useState(0);
   const [autoclaveCalendarData, setAutoclaveCalendarData] = useState(0);
 
+  const formatISO = (s) => {
+    if (!s) return '—';
+    // s в формате 'YYYY-MM-DD'
+    const [y, m, d] = s.split('-').map(Number);
+    const dt = new Date(y, (m || 1) - 1, d || 1);
+    return dt.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
   useEffect(() => {
     if (!Array.isArray(autoclave_calendar)) return;
 
@@ -70,15 +82,6 @@ function ProductionBatchDesigner() {
       })),
     [autoclaveCount]
   );
-
-  const addEmptyAutoclaveRow = (autoclave) => {
-    const newRow = Array.from({ length: 21 }, () => ({
-      id: null,
-      density: '',
-      width: '',
-    }));
-    return [...autoclave, newRow];
-  };
 
   const headers = useMemo(
     () => [
@@ -327,40 +330,54 @@ function ProductionBatchDesigner() {
   }, [latestProducts, listOfOrderedCakes, emptyAutoclave]);
 
   useEffect(() => {
-    if (currId !== null) {
-      setAutoclave((prevAutoclave) => {
-        let updatedAutoclave = prevAutoclave.map((row) => [...row]);
-        let flat = updatedAutoclave.flat();
-        const row = productionBatchDesigner.find((r) => r.id === currId);
+    if (currId === null) return;
 
-        if (!row) return prevAutoclave;
+    setAutoclave((prevAutoclave) => {
+      // копируем матрицу без изменения размеров
+      const updatedAutoclave = prevAutoclave.map((row) => [...row]);
+      const flat = updatedAutoclave.flat();
 
-        const { id, density, width, cakes_residue } = row;
+      const row = productionBatchDesigner.find((r) => r.id === currId);
+      if (!row) {
+        countRef.current = 0;
+        return prevAutoclave;
+      }
 
-        let freeSpaces = flat.filter((cell) => !cell.id).length;
-        let required = cakes_residue;
+      const { id, density, width, cakes_residue } = row;
 
-        while (freeSpaces < required) {
-          updatedAutoclave = addEmptyAutoclaveRow(updatedAutoclave);
-          flat = updatedAutoclave.flat();
-          freeSpaces = flat.filter((cell) => !cell.id).length;
-        }
+      // считаем доступную вместимость (пустые ячейки) ВНУТРИ УЖЕ СОЗДАННЫХ автоклавов
+      const freeSpaces = flat.filter((cell) => !cell?.id).length;
+      if (freeSpaces === 0) {
+        alert('No free slots available in autoclaves'); // нет места вообще
+        countRef.current = 0;
+        return prevAutoclave;
+      }
 
-        let placed = 0;
-        for (let i = 0; i < updatedAutoclave.length && placed < required; i++) {
-          for (let j = 0; j < updatedAutoclave[i].length && placed < required; j++) {
-            if (!updatedAutoclave[i][j].id) {
-              updatedAutoclave[i][j] = { id, density, width };
-              placed++;
-            }
+      // сколько нужно положить
+      const required = Number(cakes_residue) || 0;
+      // кладём ровно столько, сколько помещается
+      const toPlace = Math.min(required, freeSpaces);
+
+      // если не всё поместилось — предупредим
+      if (toPlace < required) {
+        alert(`Not enough autoclave capacity: placed ${toPlace} of ${required}.`);
+      }
+
+      // размещаем «слева направо, сверху вниз», не создавая новых рядов
+      let placed = 0;
+      for (let i = 0; i < updatedAutoclave.length && placed < toPlace; i++) {
+        for (let j = 0; j < updatedAutoclave[i].length && placed < toPlace; j++) {
+          if (!updatedAutoclave[i][j]?.id) {
+            updatedAutoclave[i][j] = { id, density, width };
+            placed++;
           }
         }
+      }
 
-        countRef.current = placed;
-        return updatedAutoclave;
-      });
-    }
-  }, [currId]);
+      countRef.current = placed; // столько реально положили (второй эффект это использует)
+      return updatedAutoclave;
+    });
+  }, [currId, productionBatchDesigner, setAutoclave]);
 
   useEffect(() => {
     if (autoclave.length !== 0) {
@@ -511,14 +528,36 @@ function ProductionBatchDesigner() {
         />
       )}
       <div>
-        <button
+        {/* <button
           onClick={() => {
             setProductBatchModal(!productBatchModal);
           }}
           className="table_button"
         >
           Add product
-        </button>
+        </button> */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            marginBottom: 8,
+            justifyContent: 'space-between',
+          }}
+        >
+          <button
+            onClick={() => {
+              setProductBatchModal(!productBatchModal);
+            }}
+            className="table_button"
+          >
+            Add product
+          </button>
+
+          <div style={{ fontWeight: 800, fontSize: '35px' }}>
+            &nbsp;{formatISO(autoclaveCalendarData?.date)}
+          </div>
+        </div>
         <table>
           <thead>
             <tr>
