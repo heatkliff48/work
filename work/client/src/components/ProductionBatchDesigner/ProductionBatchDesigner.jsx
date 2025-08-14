@@ -516,6 +516,10 @@ function ProductionBatchDesigner() {
     });
   }, [productionBatchDesigner]);
 
+  useEffect(() => {
+    console.log('productionBatchDesigner', productionBatchDesigner);
+  }, [productionBatchDesigner]);
+
   return (
     <div style={{ display: 'flex' }}>
       {/* Таблица */}

@@ -446,20 +446,20 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
         const updatedRecord = {
           ...existingRecord,
           quantity_pallets:
-            existingRecord.quantity_pallets + product.cakes_in_batch * 3,
+            existingRecord.quantity_pallets + product.cakes_in_batch * 3, // исправить -----------------------
           quantity_free:
             newPosition.product.id_list_of_ordered_production !== null &&
             newPosition.product.cakes_in_batch &&
             newPosition.product.total_cakes &&
             newPosition.product.free_product_package >= 0
-              ? (newPosition.product.cakes_in_batch -
-                  newPosition.product.total_cakes) *
-                  3 +
-                newPosition.product.free_product_package +
-                existingRecord.quantity_free
+              ? Math.max(
+                  0,
+                  newPosition.product.cakes_in_batch * 3 -
+                    newPosition.product.quantity
+                ) // исправить -----------------------
               : newPosition.product.id_list_of_ordered_production == null
               ? newPosition.product.cakes_in_batch * 3 + existingRecord.quantity_free
-              : null,
+              : 0,
           newPosition_in_autoclave: newPosition.newPositionInBatch,
           id_list_of_ordered_production:
             newPosition.product.id_list_of_ordered_production !== null
@@ -483,13 +483,15 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
               newPosition.product.cakes_in_batch &&
               newPosition.product.total_cakes &&
               newPosition.product.free_product_package >= 0
-                ? (newPosition.product.cakes_in_batch -
-                    newPosition.product.total_cakes) *
-                    3 +
-                  newPosition.product.free_product_package
+                ? Math.max(
+                    0,
+                    newPosition.product.cakes_in_batch * 3 -
+                      newPosition.product.quantity
+                  ) // исправить -----------------------
                 : newPosition.product.id_list_of_ordered_production == null
-                ? newPosition.product.cakes_in_batch * 3
-                : null,
+                ? newPosition.product.cakes_in_batch * 3 +
+                  existingRecord.quantity_free
+                : 0,
             newPosition_in_autoclave: newPosition.newPositionInBatch,
             id_list_of_ordered_production:
               newPosition.product.id_list_of_ordered_production !== null
