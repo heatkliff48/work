@@ -303,6 +303,7 @@ function ProductionBatchDesigner() {
             width,
             density,
             quantity: rightQuantity,
+            density,
             product_with_brack: ((quantity_m3 + normOfBrack) / m3InArray).toFixed(2),
             quantity_m3,
             article,
