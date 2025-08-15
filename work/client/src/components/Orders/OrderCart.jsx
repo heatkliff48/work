@@ -73,6 +73,7 @@ const OrderCart = React.memo(() => {
     toolProductsOfOrders,
     relMatProductsOfOrders,
   } = useOrderContext();
+
   const {
     productInfoModalOrder,
     setProductInfoModalOrder,
@@ -820,8 +821,6 @@ const OrderCart = React.memo(() => {
     );
 
     const prevDelivery = list_of_orders.find((el) => el.id == orderCartData.id);
-    console.log('prevDelivery', prevDelivery);
-    console.log('prevDelivery?.delivery', prevDelivery?.delivery);
     const delivery = !prevDelivery?.delivery
       ? Number(vatValue.vat_result) + orderCartData?.delivery ?? 0
       : Number(vatValue.vat_result) +
@@ -1202,23 +1201,25 @@ const OrderCart = React.memo(() => {
               </div>
             </div>
             <div className="shipping_date">
-              {haveShipDate ? (
-                <p>
-                  Shipping date: {haveShipDate} ({handleDayBeforShipping()} days
-                  before shipment)
-                </p>
-              ) : (
-                <div>
-                  <p>Shipping date</p>
-                  <DatePicker
-                    id="data_pcker"
-                    type="text"
-                    selected={dataValue}
-                    onChange={(date) => handleDateChange(date)}
-                    dateFormat="dd.MM.yyyy"
-                  />
-                </div>
-              )}
+              {orderCartData.status >= 4 ? (
+                haveShipDate ? (
+                  <p>
+                    Shipping date: {haveShipDate} ({handleDayBeforShipping()} days
+                    before shipment)
+                  </p>
+                ) : (
+                  <div>
+                    <p>Shipping date</p>
+                    <DatePicker
+                      id="data_pcker"
+                      type="text"
+                      selected={dataValue}
+                      onChange={(date) => handleDateChange(date)}
+                      dateFormat="dd.MM.yyyy"
+                    />
+                  </div>
+                )
+              ) : null}
             </div>
             {checkUserAccess(user, roles, 'orders_change_person_in_charge')
               ?.canWrite && (

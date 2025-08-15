@@ -267,8 +267,6 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
   useEffect(() => {
     console.log('🔄 Данные заказа обновлены:', orderData);
     const { deliveryAddress, contactInfo, owner, article, delivery } = orderData;
-    console.log('orderData', orderData);
-    console.log('delivery', delivery);
 
     const today = new Date();
     const nextMonthDate = new Date(today);
