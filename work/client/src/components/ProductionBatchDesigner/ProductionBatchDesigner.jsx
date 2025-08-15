@@ -284,8 +284,14 @@ function ProductionBatchDesigner() {
       const group = groupedByArticle[densityKey];
       group.forEach(({ id, quantity, product_article, quantity_in_warehouse }) => {
         const product = latestProducts.find((el) => el.article == product_article);
-        const { volumeBlockOnPallet, normOfBrack, width, article, m3InArray } =
-          product;
+        const {
+          volumeBlockOnPallet,
+          normOfBrack,
+          width,
+          article,
+          m3InArray,
+          density,
+        } = product;
 
         if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
           const rightQuantity = quantity - quantity_in_warehouse;
@@ -295,6 +301,7 @@ function ProductionBatchDesigner() {
             id,
             product_article,
             width,
+            density,
             quantity: rightQuantity,
             product_with_brack: ((quantity_m3 + normOfBrack) / m3InArray).toFixed(2),
             quantity_m3,
@@ -502,10 +509,6 @@ function ProductionBatchDesigner() {
 
       return rows;
     });
-  }, [productionBatchDesigner]);
-
-  useEffect(() => {
-    console.log('productionBatchDesigner', productionBatchDesigner);
   }, [productionBatchDesigner]);
 
   return (
