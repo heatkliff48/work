@@ -385,7 +385,6 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
         quantity,
         date,
         quantity_of_complited: new_quantity_of_complited,
-        quantity_of_complited: new_quantity_of_complited,
       },
     ];
 
