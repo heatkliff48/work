@@ -126,6 +126,7 @@ const OrderCart = React.memo(() => {
     vat_procent: 21,
     vat_euro: 0,
     vat_result: 0,
+    vat_result_del: 0,
   });
 
   const [currentOrderedProduct, setCurrentOrderedProduct] = useState({});
@@ -802,18 +803,22 @@ const OrderCart = React.memo(() => {
         2
       );
       const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
+      const vat_result_del = orderCartData?.delivery
+        ? vat_result + orderCartData?.delivery
+        : 0;
 
       setVatValue((prev) => ({
         ...prev,
         vat_euro_origin: final_price_product,
         vat_result,
         vat_euro,
+        vat_result_del,
       }));
     }
   }, [final_price_product, vatValue.vat_procent]);
 
   const deliveryFunc = async () => {
-    await dispatch(
+    dispatch(
       addNewDeliveryPrice({
         order_id: orderCartData.id,
         delivery: orderCartData.delivery,
@@ -827,7 +832,7 @@ const OrderCart = React.memo(() => {
         (orderCartData?.delivery - prevDelivery.delivery);
 
     setVatValue((prev) => {
-      return { ...prev, vat_result: delivery };
+      return { ...prev, vat_result_del: delivery };
     });
   };
 
@@ -1161,7 +1166,7 @@ const OrderCart = React.memo(() => {
               </div>
               <div className="vat_procent">
                 <div>
-                  <p>Delivery</p>
+                  <p>Delivery price</p>
                   <input
                     type="text"
                     id="delivery"
@@ -1199,6 +1204,12 @@ const OrderCart = React.memo(() => {
                 <p>Result</p>
                 <p>{vatValue.vat_result}</p>
               </div>
+              {vatValue.vat_result_del > 0 ? (
+                <div className="vat_result_del">
+                  <p>Result with delivery priice</p>
+                  <p>{vatValue.vat_result_del}</p>
+                </div>
+              ) : null}
             </div>
             <div className="shipping_date">
               {orderCartData.status >= 4 ? (
