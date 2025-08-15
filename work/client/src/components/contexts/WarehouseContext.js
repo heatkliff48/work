@@ -505,11 +505,11 @@ const WarehouseContextProvider = ({ children }) => {
       })
       .map((el) => {
         const product = latestProducts.find(
-          (el) => el.article == el.product_article
+          (prod) => prod.article === el.product_article
         );
         // Рассчитать количество тортов
         const quantity_cakes = Math.ceil(
-          product.m3InArray / product.volumeBlockOnPallet
+          product?.m3InArray / product?.volumeBlockOnPallet
         );
 
         // Рассчитать количество в партии
