@@ -280,10 +280,7 @@ function ProductionBatchDesigner() {
     const prodBatch = [];
     let updatedTotalQuantity = totalQuantity;
 
-    console.log('groupedByArticle', groupedByArticle);
     Object.keys(groupedByArticle).forEach((densityKey) => {
-      console.log('densityKey', densityKey);
-      console.log('groupedByArticle[densityKey]', groupedByArticle[densityKey]);
       const group = groupedByArticle[densityKey];
       group.forEach(({ id, quantity, product_article, quantity_in_warehouse }) => {
         const product = latestProducts.find((el) => el.article == product_article);
