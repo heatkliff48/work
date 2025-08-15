@@ -504,78 +504,13 @@ const WarehouseContextProvider = ({ children }) => {
         return ![7, 8, 9, 10].includes(orderStatus);
       })
       .map((el) => {
+        const product = latestProducts.find(
+          (el) => el.article == el.product_article
+        );
         // Рассчитать количество тортов
-        const quantity_cakes = Math.ceil(el.quantity / 3);
-
-        // // Найти ID заказа
-        // const orderId = list_of_orders.find(
-        //   (order) => order.article === el.order_article
-        // )?.id;
-
-        // // Найти ID продукта
-        // const productId = latestProducts.find(
-        //   (product) => product.article === el.product_article
-        // )?.id;
-
-        // // Фильтровать продукты заказа
-        // const arrOfOrderProduct = productsOfOrders.filter(
-        //   (elem) => elem.order_id === orderId && elem.product_id === productId
-        // );
-
-        // const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
-        //   // Filter to get all matching reserved products
-        //   const reservedProducts = list_of_reserved_products?.filter(
-        //     (res_prod) => res_prod?.orders_products_id === elem.id
-        //   );
-
-        //   // Sum up the 'quantity' of all matching reserved products
-        //   const totalReservedQuantity = reservedProducts.reduce(
-        //     (resSum, res_prod) => resSum + res_prod.quantity,
-        //     0
-        //   );
-
-        //   return sum + totalReservedQuantity;
-        // }, 0);
-
-        // const quantity_in_warehouse = arrOfOrderProduct.reduce((sum, elem) => {
-        //   let remainingToAllocate = elem.quantity_palet || 0; // Сколько нужно зарезервировать для этого товара
-
-        //   const matchingWarehouseProducts =
-        //     warehouse_data?.filter(
-        //       (warehouseItem) => warehouseItem.product_article === el.product_article
-        //     ) || []; // Если warehouse_data undefined, используем пустой массив
-
-        //   // Проходим по складу и "забираем" остатки
-        //   for (const warehouseItem of matchingWarehouseProducts) {
-        //     if (
-        //       remainingToAllocate > 0 &&
-        //       warehouseItem.free_quantity_remaining > 0
-        //     ) {
-        //       const taken = Math.min(
-        //         warehouseItem.free_quantity_remaining,
-        //         remainingToAllocate
-        //       );
-
-        //       // Обновляем данные склада
-        //       dispatch(
-        //         updateRemainingStock({
-        //           warehouse_id: warehouseItem?.id,
-        //           free_quantity_remaining:
-        //             warehouseItem.free_quantity_remaining - taken,
-        //           ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-        //         })
-        //       );
-
-        //       warehouseItem.free_quantity_remaining -= taken;
-        //       warehouseItem.ordered_quantity =
-        //         (warehouseItem.ordered_quantity || 0) + taken;
-
-        //       remainingToAllocate -= taken;
-        //     }
-        //   }
-
-        //   return sum + (elem.quantity_palet - remainingToAllocate); // Сколько реально зарезервировали
-        // }, 0);
+        const quantity_cakes = Math.ceil(
+          product.m3InArray / product.volumeBlockOnPallet
+        );
 
         // Рассчитать количество в партии
         const quantity_in_batch =
