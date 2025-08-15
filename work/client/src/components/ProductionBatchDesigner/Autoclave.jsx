@@ -502,8 +502,8 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
             //   product.id_list_of_ordered_production
             // ),
             position_in_autoclave: positionInBatch,
-            id_list_of_ordered_production:
-              product.id_list_of_ordered_production !== null ? product.id : null,
+            // id_list_of_ordered_production:
+            //   product.id_list_of_ordered_production !== null ? product.id : null,
             date: date,
           })
         );
@@ -580,13 +580,6 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
     additionalProduct = null,
     id_list_of_ordered_production = null
   ) => {
-    // Объединяем продукты, если передан additionalProduct
-    console.log('product ------- ', product);
-    console.log('additionalProduct ------- ', additionalProduct);
-    console.log(
-      'id_list_of_ordered_production ------- ',
-      id_list_of_ordered_production
-    );
 
     const baseProduct = additionalProduct
       ? {
@@ -602,8 +595,6 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
             Number(additionalProduct.free_product_package),
         }
       : product;
-
-    console.log('baseProduct ------- ', baseProduct);
 
     // Точное соответствие оригинальной логике
     if (
