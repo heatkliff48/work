@@ -302,6 +302,7 @@ function ProductionBatchDesigner() {
             density,
             product_article,
             width,
+            density,
             quantity: rightQuantity,
             product_with_brack: ((quantity_m3 + normOfBrack) / m3InArray).toFixed(2),
             quantity_m3,
@@ -509,10 +510,6 @@ function ProductionBatchDesigner() {
 
       return rows;
     });
-  }, [productionBatchDesigner]);
-
-  useEffect(() => {
-    console.log('productionBatchDesigner', productionBatchDesigner);
   }, [productionBatchDesigner]);
 
   return (
