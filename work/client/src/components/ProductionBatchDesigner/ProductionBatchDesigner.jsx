@@ -86,7 +86,7 @@ function ProductionBatchDesigner() {
   const headers = useMemo(
     () => [
       { Header: 'ID', accessor: 'id' },
-      { Header: 'Плотность, кг/м³', accessor: 'density' },
+      { Header: 'Product Article', accessor: 'product_article' },
       { Header: 'Ширина, мм', accessor: 'width' },
       { Header: 'Количество, паллет', accessor: 'quantity' },
       { Header: 'Продукт + Брак, массивов', accessor: 'product_with_brack' },
@@ -268,34 +268,27 @@ function ProductionBatchDesigner() {
         el.quantity !== el.quantity_in_warehouse &&
         el.quantity > el.quantity_in_batch * 3 + el.quantity_in_warehouse
     );
-    const groupedByDensity = rightListOfOrdered.reduce((acc, curr) => {
-      const product = latestProducts.find((p) => p.article === curr.product_article);
-      if (!product) return acc;
-      const { density } = product;
 
-      if (!acc[density]) {
-        acc[density] = [];
+    const groupedByArticle = rightListOfOrdered.reduce((acc, curr) => {
+      if (!acc[curr.product_article]) {
+        acc[curr.product_article] = [];
       }
-
-      acc[density].push({ ...curr, product });
-
+      acc[curr.product_article].push({ ...curr });
       return acc;
     }, {});
 
     const prodBatch = [];
     let updatedTotalQuantity = totalQuantity;
 
-    Object.keys(groupedByDensity).forEach((densityKey) => {
-      const group = groupedByDensity[densityKey];
-      group.forEach(({ id, quantity, product, quantity_in_warehouse }) => {
-        const {
-          volumeBlockOnPallet,
-          normOfBrack,
-          width,
-          density,
-          article,
-          m3InArray,
-        } = product;
+    console.log('groupedByArticle', groupedByArticle);
+    Object.keys(groupedByArticle).forEach((densityKey) => {
+      console.log('densityKey', densityKey);
+      console.log('groupedByArticle[densityKey]', groupedByArticle[densityKey]);
+      const group = groupedByArticle[densityKey];
+      group.forEach(({ id, quantity, product_article, quantity_in_warehouse }) => {
+        const product = latestProducts.find((el) => el.article == product_article);
+        const { volumeBlockOnPallet, normOfBrack, width, article, m3InArray } =
+          product;
 
         if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
           const rightQuantity = quantity - quantity_in_warehouse;
@@ -303,7 +296,7 @@ function ProductionBatchDesigner() {
 
           const batch = addCakesData({
             id,
-            density,
+            product_article,
             width,
             quantity: rightQuantity,
             product_with_brack: ((quantity_m3 + normOfBrack) / m3InArray).toFixed(2),
@@ -470,15 +463,16 @@ function ProductionBatchDesigner() {
   }, [currId]);
 
   const renderGroupedRows = useCallback(() => {
-    let currentDensity = null;
+    let currentArticle = null;
+
     return productionBatchDesigner.flatMap((row, index) => {
       const rows = [];
 
-      if (currentDensity !== row.density) {
-        currentDensity = row.density;
+      if (currentArticle !== row.product_article) {
+        currentArticle = row.product_article;
         rows.push(
-          <tr key={`group-${currentDensity}`} className="group-row">
-            <td colSpan="14">Плотность: {currentDensity}</td>
+          <tr key={`group-${currentArticle}`} className="group-row">
+            <td colSpan="14">Product: {currentArticle}</td>
           </tr>
         );
       }
@@ -501,13 +495,10 @@ function ProductionBatchDesigner() {
         </tr>
       );
 
-      if (
-        index === productionBatchDesigner.length - 1 ||
-        productionBatchDesigner[index + 1].density !== currentDensity
-      ) {
+      if (productionBatchDesigner[index + 1]?.product_article !== currentArticle) {
         rows.push(
-          <tr key={`calc-${currentDensity}`} className="calculation-row">
-            <td colSpan="14">Здесь будут расчеты для плотности: {currentDensity}</td>
+          <tr key={`calc-${currentArticle}`} className="calculation-row">
+            <td colSpan="14">Здесь будут расчеты для артикула: {currentArticle}</td>
           </tr>
         );
       }
@@ -532,14 +523,6 @@ function ProductionBatchDesigner() {
         />
       )}
       <div>
-        {/* <button
-          onClick={() => {
-            setProductBatchModal(!productBatchModal);
-          }}
-          className="table_button"
-        >
-          Add product
-        </button> */}
         <div
           style={{
             display: 'flex',
