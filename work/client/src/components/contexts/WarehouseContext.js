@@ -509,8 +509,8 @@ const WarehouseContextProvider = ({ children }) => {
         );
 
         // Рассчитать количество тортов
-        const quantity_cakes = Math.floor(
-          el.quantity / (product?.m3InArray / product?.volumeBlockOnPallet)
+        const quantity_cakes = Math.ceil(
+          el.quantity / Math.floor(product?.m3InArray / product?.volumeBlockOnPallet)
         );
 
         // Рассчитать количество в партии

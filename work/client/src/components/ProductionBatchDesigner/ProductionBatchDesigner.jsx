@@ -304,7 +304,10 @@ function ProductionBatchDesigner() {
             density,
             quantity: rightQuantity,
             density,
-            product_with_brack: ((quantity_m3 + normOfBrack) / m3InArray).toFixed(2),
+            product_with_brack: (
+              quantity / Math.floor(m3InArray / volumeBlockOnPallet) +
+              normOfBrack
+            ).toFixed(2),
             quantity_m3,
             article,
           });
@@ -314,7 +317,49 @@ function ProductionBatchDesigner() {
       });
     });
 
-    setProductonBatchDesigner(prodBatch);
+    // 🔹 объединяем одинаковые артикулы и суммируем поля
+    const merged = Object.values(
+      prodBatch.reduce((acc, item) => {
+        const key = item.product_article;
+        if (!acc[key]) {
+          acc[key] = { ...item };
+        } else {
+          acc[key].quantity =
+            (Number(acc[key].quantity) || 0) + (Number(item.quantity) || 0);
+          acc[key].product_with_brack =
+            (Number(acc[key].product_with_brack) || 0) +
+            (Number(item.product_with_brack) || 0);
+          acc[key].quantity_m3 = (
+            (Number(acc[key].quantity_m3) || 0) + (Number(item.quantity_m3) || 0)
+          ).toFixed(2);
+          acc[key].free_product_cakes =
+            (Number(acc[key].free_product_cakes) || 0) +
+            (Number(item.free_product_cakes) || 0);
+          acc[key].free_product_package =
+            (Number(acc[key].free_product_package) || 0) +
+            (Number(item.free_product_package) || 0);
+          acc[key].total_cakes =
+            (Number(acc[key].total_cakes) || 0) + (Number(item.total_cakes) || 0);
+          acc[key].cakes_in_batch =
+            (Number(acc[key].cakes_in_batch) || 0) +
+            (Number(item.cakes_in_batch) || 0);
+          acc[key].cakes_residue =
+            (Number(acc[key].cakes_residue) || 0) +
+            (Number(item.cakes_residue) || 0);
+        }
+        return acc;
+      }, {})
+    );
+
+    // 🔹 перенумеровываем id с 1, 2, 3...
+    const reindexed = merged.map((item, index) => ({
+      ...item,
+      id: index + 1,
+    }));
+
+    setProductonBatchDesigner(reindexed);
+
+    // setProductonBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
 
     const updatedAutoclaveData = transformAutoclaveData(emptyAutoclave, prodBatch);
