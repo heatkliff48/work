@@ -302,7 +302,6 @@ function ProductionBatchDesigner() {
             density,
             product_article,
             width,
-            density,
             quantity: rightQuantity,
             product_with_brack: (
               quantity / Math.floor(m3InArray / volumeBlockOnPallet) +
