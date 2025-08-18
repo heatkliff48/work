@@ -267,14 +267,11 @@ function Autoclave({ acData, autoclaveCalendarData }) {
         return prev;
       }
 
-      // помечаем пустым
       flat[lastIndex] = { ...EMPTY_CELL };
 
-      // сжимаем именно этот ряд, чтобы не было дыр
       const rowIndex = Math.floor(lastIndex / CELLS_PER_AUTOCLAVE);
       compactRowInPlace(flat, rowIndex);
 
-      // пересчёт
       const count = flat.filter((el) => el.id === selectedId).length;
       // Берём план (total) из batchDesigner, а не из локального snapshot
       const total = getTotalById(productId);
@@ -306,7 +303,6 @@ function Autoclave({ acData, autoclaveCalendarData }) {
         prevIDs.includes(productId) ? prevIDs : [...prevIDs, productId]
       );
 
-      // собрать обратно фиксированным размером
       const rows = [];
       const rowCount = prev.length;
       for (let r = 0; r < rowCount; r++) {
