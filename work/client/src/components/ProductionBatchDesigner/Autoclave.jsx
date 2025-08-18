@@ -453,10 +453,18 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
               )
             : 0;
 
+        const m3InArray = latestProducts?.find(
+          (p) => p.article == product.product_article
+        )?.m3InArray;
+        const volumeBlockOnPallet = latestProducts?.find(
+          (p) => p.article == product.product_article
+        )?.volumeBlockOnPallet;
+
         const updatedRecord = {
           ...existingRecord,
           quantity_pallets:
-            existingRecord.quantity_pallets + product.cakes_in_batch * 3, // исправить -----------------------
+            existingRecord.quantity_pallets +
+            product.cakes_in_batch * Math.floor(m3InArray / volumeBlockOnPallet),
           quantity_free:
             newPosition.product.id_list_of_ordered_production !== null &&
             newPosition.product.cakes_in_batch &&
@@ -464,10 +472,14 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
             newPosition.product.free_product_package >= 0
               ? Math.max(
                   0,
-                  newPosition.product.cakes_in_batch * 3 - quantity_total?.quantity
-                ) // исправить -----------------------
+                  newPosition.product.cakes_in_batch *
+                    Math.floor(m3InArray / volumeBlockOnPallet) -
+                    quantity_total?.quantity
+                )
               : newPosition.product.id_list_of_ordered_production == null
-              ? newPosition.product.cakes_in_batch * 3 + existingRecord.quantity_free
+              ? newPosition.product.cakes_in_batch *
+                  Math.floor(m3InArray / volumeBlockOnPallet) +
+                existingRecord.quantity_free
               : 0,
           position_in_autoclave: newPosition.positionInBatch,
           id_list_of_ordered_production:
@@ -491,9 +503,17 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
               )
             : 0;
 
+        const m3InArray = latestProducts?.find(
+          (p) => p.article == product.product_article
+        )?.m3InArray;
+        const volumeBlockOnPallet = latestProducts?.find(
+          (p) => p.article == product.product_article
+        )?.volumeBlockOnPallet;
+
         const newBatchOutside = {
           product_article: product.product_article,
-          quantity_pallets: product.cakes_in_batch * 3,
+          quantity_pallets:
+            product.cakes_in_batch * Math.floor(m3InArray / volumeBlockOnPallet),
           quantity_free:
             newPosition.product.id_list_of_ordered_production !== null &&
             newPosition.product.cakes_in_batch &&
@@ -501,10 +521,14 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
             newPosition.product.free_product_package >= 0
               ? Math.max(
                   0,
-                  newPosition.product.cakes_in_batch * 3 - quantity_total?.quantity
-                ) // исправить -----------------------
+                  newPosition.product.cakes_in_batch *
+                    Math.floor(m3InArray / volumeBlockOnPallet) -
+                    quantity_total?.quantity
+                )
               : newPosition.product.id_list_of_ordered_production == null
-              ? newPosition.product.cakes_in_batch * 3 + existingRecord.quantity_free
+              ? newPosition.product.cakes_in_batch *
+                  Math.floor(m3InArray / volumeBlockOnPallet) +
+                existingRecord.quantity_free
               : 0,
           position_in_autoclave: newPosition.positionInBatch,
           id_list_of_ordered_production:
