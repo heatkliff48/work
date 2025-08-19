@@ -35,9 +35,6 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
   const list_of_ordered_production = useSelector(
     (state) => state.listOfOrderedProduction
   );
-  const list_of_ordered_production = useSelector(
-    (state) => state.listOfOrderedProduction
-  );
 
   const getClassForAutoclave = (num) => {
     switch (num) {
