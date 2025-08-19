@@ -30,6 +30,10 @@ function RecipeOrders() {
       Header: 'Production volume',
       accessor: 'production_volume',
     },
+    {
+      Header: 'Date',
+      accessor: 'date',
+    },
   ];
 
   const handlerRecipeInfo = (row) => {
@@ -59,6 +63,7 @@ function RecipeOrders() {
           recipe_article: recipe?.article || 'Unknown Recipe',
           batch_article: batch?.product_article || 'Unknown Batch',
           production_volume: el.production_volume || 0,
+          date: batch?.date || 'Unknown Date',
         };
       })
       .filter((el) => el.id);
