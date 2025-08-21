@@ -104,8 +104,10 @@
 
 /* Кнопки меню */
 .custom-menu-button {
+  display: block; /* чтобы занимала всю строку */
+  width: 100%;
   background-color: #82af6f;
-  color: white;
+  color: white !important;
   border: none;
   border-radius: 8px;
   padding: 10px 20px;
@@ -122,6 +124,27 @@
 .custom-menu-button:hover {
   color: black;
   border-color: #6da75d;
+}
+
+.custom-dropdown-item {
+  padding: 8px 16px !important;
+  margin: 4px 10px !important;
+  border: 1px solid #82af6f !important;
+  border-radius: 6px !important;
+  color: #333 !important;
+  background-color: white !important;
+}
+
+.custom-dropdown-item:hover {
+  background-color: #f8f9fa !important;
+  color: #333 !important;
+}
+
+.btn-group-vertical > .btn,
+.btn-group-vertical > .custom-menu-button,
+.btn-group-vertical > .custom-submenu-button {
+  border-radius: 8px !important; /* или ваш радиус */
+  margin-bottom: 12px; /* чтобы кнопки не сливались */
 }
 
 /* Кнопки внутри Dropdown */
