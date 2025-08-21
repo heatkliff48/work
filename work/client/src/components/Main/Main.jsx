@@ -198,6 +198,14 @@ function Main() {
             Batch planner
           </button>
         )}
+        {checkUserAccess(user, roles, 'production_batch_designer_new')?.canRead && (
+          <button
+            className="nav-button"
+            onClick={() => navigate('/production_batch_designer_new')}
+          >
+            Batch planner New
+          </button>
+        )}
         {/* {checkUserAccess(user, roles, 'autoclave_calendar')?.canRead && ( */}
         <button
           className="nav-button"

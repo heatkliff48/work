@@ -12,7 +12,7 @@ import Autoclave from './Autoclave';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-function ProductionBatchDesigner() {
+function ProductionBatchDesignerNew() {
   const dispatch = useDispatch();
 
   const { latestProducts } = useProductsContext();
@@ -30,6 +30,7 @@ function ProductionBatchDesigner() {
   const batchDesigner = useSelector((state) => state.batchDesigner);
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [currId, setCurrId] = useState(null);
+  const [currArticle, setCurrArticle] = useState(null);
   const [acData, setAcData] = useState([]);
   const [batchFromBD, setBatchFromBD] = useState([]);
   const [autoclaveCount, setAutoclaveCount] = useState(0);
@@ -156,8 +157,35 @@ function ProductionBatchDesigner() {
     ]);
   };
 
+  // const handleAddOnAutoclave = (row) => {
+  //   setCurrId(row.id);
+  // };
+
   const handleAddOnAutoclave = (row) => {
-    setCurrId(row.id);
+    setCurrId(row.id); // как было
+    setCurrArticle(row.product_article); // НОВОЕ
+  };
+
+  const distributeToSources = (sources, amount, onEachUpdate) => {
+    let remaining = amount;
+    const out = sources.map((s) => ({ ...s }));
+
+    for (const s of out) {
+      if (remaining <= 0) break;
+      const residue =
+        s.cakes_residue ??
+        Math.max((s.total_cakes || 0) - (s.cakes_in_batch || 0), 0);
+      const take = Math.min(residue, remaining);
+      if (take <= 0) continue;
+
+      s.cakes_in_batch = (s.cakes_in_batch || 0) + take;
+      s.cakes_residue = Math.max(residue - take, 0);
+      remaining -= take;
+
+      onEachUpdate?.(s, take); // можно диспатчить прямо здесь
+    }
+
+    return { sources: out, placed: amount - remaining, leftover: remaining };
   };
 
   const addCakesData = useCallback(
@@ -268,11 +296,11 @@ function ProductionBatchDesigner() {
         el.quantity !== el.quantity_in_warehouse &&
         el.quantity > el.quantity_in_batch * 3 + el.quantity_in_warehouse
     );
+
     const groupedByArticle = rightListOfOrdered.reduce((acc, curr) => {
       if (!acc[curr.product_article]) {
         acc[curr.product_article] = [];
       }
-
       acc[curr.product_article].push({ ...curr });
       return acc;
     }, {});
@@ -286,11 +314,11 @@ function ProductionBatchDesigner() {
         const product = latestProducts.find((el) => el.article == product_article);
         const {
           volumeBlockOnPallet,
+          density,
           normOfBrack,
           width,
           article,
           m3InArray,
-          density,
         } = product;
 
         if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
@@ -299,11 +327,14 @@ function ProductionBatchDesigner() {
 
           const batch = addCakesData({
             id,
-            density,
             product_article,
             width,
+            density,
             quantity: rightQuantity,
-            product_with_brack: ((quantity_m3 + normOfBrack) / m3InArray).toFixed(2),
+            product_with_brack: (
+              quantity / Math.floor(m3InArray / volumeBlockOnPallet) +
+              normOfBrack
+            ).toFixed(2),
             quantity_m3,
             article,
           });
@@ -313,7 +344,61 @@ function ProductionBatchDesigner() {
       });
     });
 
-    setProductonBatchDesigner(prodBatch);
+    // 🔹 объединяем одинаковые артикулы и суммируем поля + запоминаем исходные заказы
+    const mergedMap = prodBatch.reduce((acc, item) => {
+      const key = item.product_article;
+      if (!acc[key]) {
+        acc[key] = {
+          ...item,
+          sources: [
+            {
+              id: item.id,
+              total_cakes: Number(item.total_cakes) || 0,
+              cakes_in_batch: Number(item.cakes_in_batch) || 0,
+              cakes_residue: Number(item.cakes_residue) || 0,
+            },
+          ],
+        };
+      } else {
+        acc[key].quantity =
+          (Number(acc[key].quantity) || 0) + (Number(item.quantity) || 0);
+        acc[key].product_with_brack =
+          (Number(acc[key].product_with_brack) || 0) +
+          (Number(item.product_with_brack) || 0);
+        acc[key].quantity_m3 = (
+          (Number(acc[key].quantity_m3) || 0) + (Number(item.quantity_m3) || 0)
+        ).toFixed(2);
+        acc[key].free_product_cakes =
+          (Number(acc[key].free_product_cakes) || 0) +
+          (Number(item.free_product_cakes) || 0);
+        acc[key].free_product_package =
+          (Number(acc[key].free_product_package) || 0) +
+          (Number(item.free_product_package) || 0);
+        acc[key].total_cakes =
+          (Number(acc[key].total_cakes) || 0) + (Number(item.total_cakes) || 0);
+        acc[key].cakes_in_batch =
+          (Number(acc[key].cakes_in_batch) || 0) +
+          (Number(item.cakes_in_batch) || 0);
+        acc[key].cakes_residue =
+          (Number(acc[key].cakes_residue) || 0) + (Number(item.cakes_residue) || 0);
+
+        acc[key].sources.push({
+          id: item.id,
+          total_cakes: Number(item.total_cakes) || 0,
+          cakes_in_batch: Number(item.cakes_in_batch) || 0,
+          cakes_residue: Number(item.cakes_residue) || 0,
+        });
+      }
+      return acc;
+    }, {});
+
+    const merged = Object.values(mergedMap);
+
+    // можно оставить перенумерацию для UI
+    const reindexed = merged.map((item, index) => ({ ...item, id: index + 1 }));
+    setProductonBatchDesigner(reindexed);
+
+    // setProductonBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
 
     const updatedAutoclaveData = transformAutoclaveData(emptyAutoclave, prodBatch);
@@ -326,141 +411,256 @@ function ProductionBatchDesigner() {
     setAcData(filledAutoclave);
   }, [latestProducts, listOfOrderedCakes, emptyAutoclave]);
 
+  // useEffect(() => {
+  //   if (currId === null) return;
+
+  //   setAutoclave((prevAutoclave) => {
+  //     // копируем матрицу без изменения размеров
+  //     const updatedAutoclave = prevAutoclave.map((row) => [...row]);
+  //     const flat = updatedAutoclave.flat();
+
+  //     const row = productionBatchDesigner.find((r) => r.id === currId);
+  //     if (!row) {
+  //       countRef.current = 0;
+  //       return prevAutoclave;
+  //     }
+
+  //     const { id, density, width, cakes_residue } = row;
+
+  //     // считаем доступную вместимость (пустые ячейки) ВНУТРИ УЖЕ СОЗДАННЫХ автоклавов
+  //     const freeSpaces = flat.filter((cell) => !cell?.id).length;
+  //     if (freeSpaces === 0) {
+  //       alert('No free slots available in autoclaves'); // нет места вообще
+  //       countRef.current = 0;
+  //       return prevAutoclave;
+  //     }
+
+  //     // сколько нужно положить
+  //     const required = Number(cakes_residue) || 0;
+  //     // кладём ровно столько, сколько помещается
+  //     const toPlace = Math.min(required, freeSpaces);
+
+  //     // если не всё поместилось — предупредим
+  //     if (toPlace < required) {
+  //       alert(`Not enough autoclave capacity: placed ${toPlace} of ${required}.`);
+  //     }
+
+  //     // размещаем «слева направо, сверху вниз», не создавая новых рядов
+  //     let placed = 0;
+  //     for (let i = 0; i < updatedAutoclave.length && placed < toPlace; i++) {
+  //       for (let j = 0; j < updatedAutoclave[i].length && placed < toPlace; j++) {
+  //         if (!updatedAutoclave[i][j]?.id) {
+  //           updatedAutoclave[i][j] = { id, density, width };
+  //           placed++;
+  //         }
+  //       }
+  //     }
+
+  //     countRef.current = placed; // столько реально положили (второй эффект это использует)
+  //     return updatedAutoclave;
+  //   });
+  // }, [currId]);
+
   useEffect(() => {
     if (currId === null) return;
 
     setAutoclave((prevAutoclave) => {
-      // копируем матрицу без изменения размеров
-      const updatedAutoclave = prevAutoclave.map((row) => [...row]);
-      const flat = updatedAutoclave.flat();
-
-      const row = productionBatchDesigner.find((r) => r.id === currId);
-      if (!row) {
+      // плоский список свободных слотов (индексы) внутри текущей матрицы автоклава
+      const rows = prevAutoclave.map((r) => [...r]);
+      const flat = rows.flat();
+      const freeIdx = [];
+      for (let i = 0; i < flat.length; i++) {
+        if (!flat[i]?.id) freeIdx.push(i);
+      }
+      if (freeIdx.length === 0) {
+        alert('No free slots available in autoclaves');
         countRef.current = 0;
         return prevAutoclave;
       }
 
-      const { id, density, width, cakes_residue } = row;
-
-      // считаем доступную вместимость (пустые ячейки) ВНУТРИ УЖЕ СОЗДАННЫХ автоклавов
-      const freeSpaces = flat.filter((cell) => !cell?.id).length;
-      if (freeSpaces === 0) {
-        alert('No free slots available in autoclaves'); // нет места вообще
+      // агрегированная строка + источники
+      const groupRow = productionBatchDesigner.find((r) => r.id === currId);
+      if (!groupRow) {
         countRef.current = 0;
         return prevAutoclave;
       }
+      const { density, width, cakes_residue, sources = [] } = groupRow;
 
-      // сколько нужно положить
-      const required = Number(cakes_residue) || 0;
-      // кладём ровно столько, сколько помещается
-      const toPlace = Math.min(required, freeSpaces);
-
-      // если не всё поместилось — предупредим
-      if (toPlace < required) {
-        alert(`Not enough autoclave capacity: placed ${toPlace} of ${required}.`);
-      }
-
-      // размещаем «слева направо, сверху вниз», не создавая новых рядов
+      let remaining = Math.min(Number(cakes_residue) || 0, freeIdx.length);
       let placed = 0;
-      for (let i = 0; i < updatedAutoclave.length && placed < toPlace; i++) {
-        for (let j = 0; j < updatedAutoclave[i].length && placed < toPlace; j++) {
-          if (!updatedAutoclave[i][j]?.id) {
-            updatedAutoclave[i][j] = { id, density, width };
-            placed++;
-          }
+      let cursor = 0; // указывает на следующий свободный индекс в freeIdx
+
+      // раскладываем по источникам: каждому кладём min(residue, remaining)
+      for (const s of sources) {
+        if (remaining <= 0) break;
+        const sResidue = Math.max(
+          (Number(s.total_cakes) || 0) - (Number(s.cakes_in_batch) || 0),
+          Number(s.cakes_residue) || 0
+        );
+        const take = Math.min(sResidue, remaining);
+        for (let k = 0; k < take; k++) {
+          const idx = freeIdx[cursor++];
+          flat[idx] = { id: s.id, density, width }; // КЛАДЁМ РЕАЛЬНЫЙ id ИЗ ИСТОЧНИКА
         }
+        placed += take;
+        remaining -= take;
       }
 
-      countRef.current = placed; // столько реально положили (второй эффект это использует)
-      return updatedAutoclave;
+      // собираем обратно тем же размером (по 21 в ряд)
+      const CELLS_PER_AUTOCLAVE = 21;
+      const out = [];
+      for (let i = 0; i < rows.length; i++) {
+        const from = i * CELLS_PER_AUTOCLAVE;
+        out.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
+      }
+      countRef.current = placed;
+      return out;
     });
-  }, [currId, productionBatchDesigner, setAutoclave]);
+  }, [currId]);
 
   useEffect(() => {
-    if (autoclave.length !== 0) {
-      setProductonBatchDesigner((prev) => {
-        return prev.map((batchItem) => {
-          const { cakes_in_batch, free_product_package, id } = batchItem;
-          for (let i = 0; i < batchDesigner.length; i++) {
-            if (batchDesigner[i].id === id) {
-              const free = (batchDesigner[i].cakes_in_batch - cakes_in_batch) * 3;
+    if (autoclave.length === 0) return;
 
-              const new_free_product_package =
-                free > 0 ? free_product_package + free : free_product_package;
-              return {
-                ...batchItem,
-                free_product_package: new_free_product_package,
-                cakes_in_batch: batchDesigner[i].cakes_in_batch,
-                cakes_residue: batchDesigner[i].cakes_residue,
-              };
-            }
-          }
-          return batchItem;
-        });
-      });
-      return;
-    }
+    setProductonBatchDesigner((prev) =>
+      prev.map((item) => {
+        const sameArticle = batchDesigner.filter(
+          (b) => b.product_article === item.product_article
+        );
+        if (sameArticle.length === 0) return item;
+
+        const sumInBatch = sameArticle.reduce(
+          (acc, b) => acc + (Number(b.cakes_in_batch) || 0),
+          0
+        );
+        const sumResidue = sameArticle.reduce(
+          (acc, b) => acc + (Number(b.cakes_residue) || 0),
+          0
+        );
+
+        const deltaCakes = sumInBatch - (Number(item.cakes_in_batch) || 0);
+        const new_free_product_package =
+          deltaCakes > 0
+            ? (Number(item.free_product_package) || 0) + deltaCakes * 3
+            : item.free_product_package;
+
+        return {
+          ...item,
+          free_product_package: new_free_product_package,
+          cakes_in_batch: sumInBatch,
+          cakes_residue: sumResidue,
+        };
+      })
+    );
   }, [batchDesigner]);
 
+  // useEffect(() => {
+  //   const currentCount =
+  //     countRef.current === 0
+  //       ? batchDesigner.find((el) => el.product_article === currId)?.cakes_residue ??
+  //         0
+  //       : countRef.current;
+
+  //   setProductonBatchDesigner((prevBatch) => {
+  //     let hasChanges = false;
+
+  //     const updatedBatch = prevBatch.map((batchItem) => {
+  //       if (batchItem.product_article === currId) {
+  //         const { cakes_residue, cakes_in_batch, id } = batchItem;
+
+  //         const new_cakes_in_batch = cakes_in_batch + currentCount;
+  //         const new_cakes_residue = Math.max(cakes_residue - currentCount, 0);
+
+  //         if (
+  //           cakes_residue !== new_cakes_residue ||
+  //           cakes_in_batch !== new_cakes_in_batch
+  //         ) {
+  //           hasChanges = true;
+  //         }
+
+  //         dispatch(
+  //           updateBatchState({
+  //             id,
+  //             cakes_in_batch: new_cakes_in_batch,
+  //             cakes_residue: new_cakes_residue,
+  //           })
+  //         );
+
+  //         dispatch(
+  //           unlockButton({
+  //             id,
+  //             isButtonLocked: new_cakes_residue === 0,
+  //           })
+  //         );
+
+  //         setQuantityPallets((prev) => ({
+  //           ...prev,
+  //           [id]: new_cakes_in_batch * 3,
+  //         }));
+
+  //         setBatchOrderIDs((prev) => (prev.includes(id) ? prev : [...prev, id]));
+
+  //         return {
+  //           ...batchItem,
+  //           cakes_in_batch: new_cakes_in_batch,
+  //           cakes_residue: new_cakes_residue,
+  //         };
+  //       }
+  //       return batchItem;
+  //     });
+
+  //     return hasChanges ? updatedBatch : prevBatch;
+  //   });
+
+  //   countRef.current = 0;
+  //   setCurrId(null);
+  // }, [currId]);
+
   useEffect(() => {
+    if (currId === null) return;
+
     const currentCount =
       countRef.current === 0
         ? batchDesigner.find((el) => el.id === currId)?.cakes_residue ?? 0
         : countRef.current;
 
-    setProductonBatchDesigner((prevBatch) => {
-      let hasChanges = false;
+    // найдём строку-агрегат по currId
+    const groupRow = productionBatchDesigner.find((r) => r.id === currId);
+    const sources = groupRow?.sources || [];
 
-      const updatedBatch = prevBatch.map((batchItem) => {
-        if (batchItem.id === currId) {
-          // const currBatchFromBD = batchFromBD.find((el) => el.id === currId);
-          const { cakes_residue, cakes_in_batch } = batchItem;
+    // распределяем по исходным заказам
+    const { sources: newSources, placed } = distributeToSources(
+      sources,
+      currentCount,
+      (s /* updated source */) => {
+        // обновляем стор по КАЖДОМУ исходному заказу
+        dispatch(
+          updateBatchState({
+            id: s.id,
+            cakes_in_batch: s.cakes_in_batch,
+            cakes_residue: s.cakes_residue,
+          })
+        );
+        dispatch(unlockButton({ id: s.id, isButtonLocked: s.cakes_residue === 0 }));
+        setQuantityPallets((prev) => ({
+          ...prev,
+          [s.id]: (s.cakes_in_batch || 0) * 3,
+        }));
+        setBatchOrderIDs((prev) => (prev.includes(s.id) ? prev : [...prev, s.id]));
+      }
+    );
 
-          const new_cakes_in_batch = cakes_in_batch + currentCount;
-          const new_cakes_residue = Math.max(cakes_residue - currentCount, 0);
-
-          if (
-            cakes_residue !== new_cakes_residue ||
-            cakes_in_batch !== new_cakes_in_batch
-          ) {
-            hasChanges = true;
-          }
-
-          dispatch(
-            updateBatchState({
-              id: currId,
-              cakes_in_batch: new_cakes_in_batch,
-              cakes_residue: new_cakes_residue,
-            })
-          );
-
-          dispatch(
-            unlockButton({
-              id: currId,
-              isButtonLocked: new_cakes_residue === 0,
-            })
-          );
-
-          setQuantityPallets((prev) => ({
-            ...prev,
-            [currId]: new_cakes_in_batch * 3,
-          }));
-
-          setBatchOrderIDs((prev) =>
-            prev.includes(currId) ? prev : [...prev, currId]
-          );
-
-          return {
-            ...batchItem,
-            cakes_in_batch: new_cakes_in_batch,
-            cakes_residue: new_cakes_residue,
-          };
-        }
-        return batchItem;
-      });
-
-      return hasChanges ? updatedBatch : prevBatch;
-    });
+    // моментально обновим агрегированную строку в таблице (для отзывчивости UI)
+    setProductonBatchDesigner((prev) =>
+      prev.map((item) => {
+        if (item.id !== currId) return item;
+        return {
+          ...item,
+          cakes_in_batch: (item.cakes_in_batch || 0) + placed,
+          cakes_residue: Math.max((item.cakes_residue || 0) - placed, 0),
+          sources: newSources,
+        };
+      })
+    );
 
     countRef.current = 0;
     setCurrId(null);
@@ -487,11 +687,17 @@ function ProductionBatchDesigner() {
             return <td key={accessor}>{row[accessor]}</td>;
           })}
           <td>
-            <button
+            {/* <button
               onClick={() => handleAddOnAutoclave(row)}
               disabled={
                 batchDesigner?.find((el) => el.id === row.id)?.isButtonLocked
               }
+            >
+              Разместить
+            </button> */}
+            <button
+              onClick={() => handleAddOnAutoclave(row)}
+              disabled={row.cakes_residue === 0} // было: поиск по batchDesigner по id
             >
               Разместить
             </button>
@@ -569,4 +775,4 @@ function ProductionBatchDesigner() {
   );
 }
 
-export default ProductionBatchDesigner;
+export default ProductionBatchDesignerNew;
