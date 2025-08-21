@@ -366,235 +366,239 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
     });
   };
 
-  const onSaveHandler = async () => {
-    const filledCount = Array.isArray(autoclave)
-      ? autoclave.flat().filter((cell) => cell.id !== null).length
-      : 0;
+  // const onSaveHandler = async () => {
+  //   const filledCount = Array.isArray(autoclave)
+  //     ? autoclave.flat().filter((cell) => cell.id !== null).length
+  //     : 0;
 
-    if (filledCount === 0 || filledCount % CELLS_PER_AUTOCLAVE !== 0) {
-      alert('Please fill the autoclave completely');
-      return;
-    }
+  //   if (filledCount === 0 || filledCount % CELLS_PER_AUTOCLAVE !== 0) {
+  //     alert('Please fill the autoclave completely');
+  //     return;
+  //   }
 
-    const { quantity, date, quantity_of_complited } = autoclaveCalendarData;
-    const new_quantity_of_complited =
-      quantity_of_complited + filledCount / CELLS_PER_AUTOCLAVE;
+  //   const { quantity, date, quantity_of_complited } = autoclaveCalendarData;
+  //   const new_quantity_of_complited =
+  //     quantity_of_complited + filledCount / CELLS_PER_AUTOCLAVE;
 
-    const newDataCalendar = [
-      {
-        quantity,
-        date,
-        quantity_of_complited: new_quantity_of_complited,
-      },
-    ];
+  //   const newDataCalendar = [
+  //     {
+  //       quantity,
+  //       date,
+  //       quantity_of_complited: new_quantity_of_complited,
+  //     },
+  //   ];
 
-    dispatch(addNewAutoclaveCalendar(newDataCalendar));
+  //   dispatch(addNewAutoclaveCalendar(newDataCalendar));
 
-    // Формируем новые позиции для batchOutside
-    let positionInBatch = 1;
-    const batchPositions = [];
+  //   // Формируем новые позиции для batchOutside
+  //   let positionInBatch = 1;
+  //   const batchPositions = [];
 
-    batchOrderIDs?.forEach((id) => {
-      const product = batchDesigner.find((p) => p.id === id);
-      if (product) {
-        batchPositions.push({
-          product,
-          positionInBatch,
-        });
-        positionInBatch += product.cakes_in_batch;
-      }
-    });
+  //   batchOrderIDs?.forEach((id) => {
+  //     const product = batchDesigner.find((p) => p.id === id);
+  //     if (product) {
+  //       batchPositions.push({
+  //         product,
+  //         positionInBatch,
+  //       });
+  //       positionInBatch += product.cakes_in_batch;
+  //     }
+  //   });
 
-    // 5. Объединяем новые записи между собой (если артикул и дата совпадают)
-    const mergedNewPositions = batchPositions.reduce((acc, current) => {
-      const lastItem = acc[acc.length - 1];
-      const currentProduct = current.product;
+  //   // 5. Объединяем новые записи между собой (если артикул и дата совпадают)
+  //   const mergedNewPositions = batchPositions.reduce((acc, current) => {
+  //     const lastItem = acc[acc.length - 1];
+  //     const currentProduct = current.product;
 
-      if (
-        lastItem &&
-        lastItem.product.product_article === currentProduct.product_article &&
-        lastItem.product.id_list_of_ordered_production !== null &&
-        currentProduct.id_list_of_ordered_production !== null
-      ) {
-        // Объединяем с предыдущей записью
-        lastItem.product.cakes_in_batch += currentProduct.cakes_in_batch;
-        lastItem.product.free_product_package += currentProduct.free_product_package;
-        lastItem.product.total_cakes += currentProduct.total_cakes;
-      } else {
-        // Добавляем новую запись
-        acc.push({
-          product: { ...currentProduct },
-          positionInBatch: current.positionInBatch,
-        });
-      }
-      return acc;
-    }, []);
+  //     if (
+  //       lastItem &&
+  //       lastItem.product.product_article === currentProduct.product_article &&
+  //       lastItem.product.id_list_of_ordered_production !== null &&
+  //       currentProduct.id_list_of_ordered_production !== null
+  //     ) {
+  //       // Объединяем с предыдущей записью
+  //       lastItem.product.cakes_in_batch += currentProduct.cakes_in_batch;
+  //       lastItem.product.free_product_package += currentProduct.free_product_package;
+  //       lastItem.product.total_cakes += currentProduct.total_cakes;
+  //     } else {
+  //       // Добавляем новую запись
+  //       acc.push({
+  //         product: { ...currentProduct },
+  //         positionInBatch: current.positionInBatch,
+  //       });
+  //     }
+  //     return acc;
+  //   }, []);
 
-    // 6. Для каждой объединённой новой записи:
-    mergedNewPositions.forEach((newPosition) => {
-      const { product } = newPosition;
+  //   // 6. Для каждой объединённой новой записи:
+  //   mergedNewPositions.forEach((newPosition) => {
+  //     const { product } = newPosition;
 
-      // Ищем совпадение в существующих записях (по артикулу и дате)
-      const existingRecord = existingBatchOutside.find(
-        (record) =>
-          record.product_article === product.product_article && record.date === date
-      );
+  //     // Ищем совпадение в существующих записях (по артикулу и дате)
+  //     const existingRecord = existingBatchOutside.find(
+  //       (record) =>
+  //         record.product_article === product.product_article && record.date === date
+  //     );
 
-      if (existingRecord) {
-        // ОБНОВЛЯЕМ существующую запись
+  //     if (existingRecord) {
+  //       // ОБНОВЛЯЕМ существующую запись
 
-        const quantity_total =
-          newPosition.product.id_list_of_ordered_production !== null
-            ? list_of_ordered_production?.find(
-                (order) => order.id == newPosition.product.id
-              )
-            : 0;
+  //       const quantity_total =
+  //         newPosition.product.id_list_of_ordered_production !== null
+  //           ? list_of_ordered_production?.find(
+  //               (order) => order.id == newPosition.product.id
+  //             )
+  //           : 0;
 
-        const m3InArray = latestProducts?.find(
-          (p) => p.article == product.product_article
-        )?.m3InArray;
-        const volumeBlockOnPallet = latestProducts?.find(
-          (p) => p.article == product.product_article
-        )?.volumeBlockOnPallet;
+  //       const m3InArray = latestProducts?.find(
+  //         (p) => p.article == product.product_article
+  //       )?.m3InArray;
+  //       const volumeBlockOnPallet = latestProducts?.find(
+  //         (p) => p.article == product.product_article
+  //       )?.volumeBlockOnPallet;
 
-        const updatedRecord = {
-          ...existingRecord,
-          quantity_pallets:
-            existingRecord.quantity_pallets +
-            product.cakes_in_batch * Math.floor(m3InArray / volumeBlockOnPallet),
-          quantity_free:
-            newPosition.product.id_list_of_ordered_production !== null &&
-            newPosition.product.cakes_in_batch &&
-            newPosition.product.total_cakes &&
-            newPosition.product.free_product_package >= 0
-              ? Math.max(
-                  0,
-                  newPosition.product.cakes_in_batch *
-                    Math.floor(m3InArray / volumeBlockOnPallet) -
-                    quantity_total?.quantity
-                )
-              : newPosition.product.id_list_of_ordered_production == null
-              ? newPosition.product.cakes_in_batch *
-                  Math.floor(m3InArray / volumeBlockOnPallet) +
-                existingRecord.quantity_free
-              : 0,
-          position_in_autoclave: newPosition.positionInBatch,
-          id_list_of_ordered_production:
-            newPosition.product.id_list_of_ordered_production !== null
-              ? newPosition.product.id
-              : null,
-        };
-        dispatch(updateBatchOutside(updatedRecord));
-      } else {
-        const quantity_total =
-          newPosition.product.id_list_of_ordered_production !== null
-            ? list_of_ordered_production?.find(
-                (order) => order.id == newPosition.product.id
-              )
-            : 0;
+  //       const updatedRecord = {
+  //         ...existingRecord,
+  //         quantity_pallets:
+  //           existingRecord.quantity_pallets +
+  //           product.cakes_in_batch * Math.floor(m3InArray / volumeBlockOnPallet),
+  //         quantity_free:
+  //           newPosition.product.id_list_of_ordered_production !== null &&
+  //           newPosition.product.cakes_in_batch &&
+  //           newPosition.product.total_cakes &&
+  //           newPosition.product.free_product_package >= 0
+  //             ? Math.max(
+  //                 0,
+  //                 newPosition.product.cakes_in_batch *
+  //                   Math.floor(m3InArray / volumeBlockOnPallet) -
+  //                   quantity_total?.quantity
+  //               )
+  //             : newPosition.product.id_list_of_ordered_production == null
+  //             ? newPosition.product.cakes_in_batch *
+  //                 Math.floor(m3InArray / volumeBlockOnPallet) +
+  //               existingRecord.quantity_free
+  //             : 0,
+  //         position_in_autoclave: newPosition.positionInBatch,
+  //         id_list_of_ordered_production:
+  //           newPosition.product.id_list_of_ordered_production !== null
+  //             ? newPosition.product.id
+  //             : null,
+  //       };
+  //       dispatch(updateBatchOutside(updatedRecord));
+  //     } else {
+  //       const quantity_total =
+  //         newPosition.product.id_list_of_ordered_production !== null
+  //           ? list_of_ordered_production?.find(
+  //               (order) => order.id == newPosition.product.id
+  //             )
+  //           : 0;
 
-        const m3InArray = latestProducts?.find(
-          (p) => p.article == product.product_article
-        )?.m3InArray;
-        const volumeBlockOnPallet = latestProducts?.find(
-          (p) => p.article == product.product_article
-        )?.volumeBlockOnPallet;
+  //       const m3InArray = latestProducts?.find(
+  //         (p) => p.article == product.product_article
+  //       )?.m3InArray;
+  //       const volumeBlockOnPallet = latestProducts?.find(
+  //         (p) => p.article == product.product_article
+  //       )?.volumeBlockOnPallet;
 
-        const newBatchOutside = {
-          product_article: product.product_article,
-          quantity_pallets:
-            product.cakes_in_batch * Math.floor(m3InArray / volumeBlockOnPallet),
-          quantity_free:
-            newPosition.product.id_list_of_ordered_production !== null &&
-            newPosition.product.cakes_in_batch &&
-            newPosition.product.total_cakes &&
-            newPosition.product.free_product_package >= 0
-              ? Math.max(
-                  0,
-                  newPosition.product.cakes_in_batch *
-                    Math.floor(m3InArray / volumeBlockOnPallet) -
-                    quantity_total?.quantity
-                )
-              : newPosition.product.id_list_of_ordered_production == null
-              ? newPosition.product.cakes_in_batch *
-                  Math.floor(m3InArray / volumeBlockOnPallet) +
-                existingRecord.quantity_free
-              : 0,
-          position_in_autoclave: newPosition.positionInBatch,
-          id_list_of_ordered_production:
-            newPosition.product.id_list_of_ordered_production !== null
-              ? newPosition.product.id
-              : null,
-          date: date,
-        };
-        dispatch(addNewBatchOutside(newBatchOutside));
-      }
-    });
+  //       const newBatchOutside = {
+  //         product_article: product.product_article,
+  //         quantity_pallets:
+  //           product.cakes_in_batch * Math.floor(m3InArray / volumeBlockOnPallet),
+  //         quantity_free:
+  //           newPosition.product.id_list_of_ordered_production !== null &&
+  //           newPosition.product.cakes_in_batch &&
+  //           newPosition.product.total_cakes &&
+  //           newPosition.product.free_product_package >= 0
+  //             ? Math.max(
+  //                 0,
+  //                 newPosition.product.cakes_in_batch *
+  //                   Math.floor(m3InArray / volumeBlockOnPallet) -
+  //                   quantity_total?.quantity
+  //               )
+  //             : newPosition.product.id_list_of_ordered_production == null
+  //             ? newPosition.product.cakes_in_batch *
+  //                 Math.floor(m3InArray / volumeBlockOnPallet) +
+  //               existingRecord.quantity_free
+  //             : 0,
+  //         position_in_autoclave: newPosition.positionInBatch,
+  //         id_list_of_ordered_production:
+  //           newPosition.product.id_list_of_ordered_production !== null
+  //             ? newPosition.product.id
+  //             : null,
+  //         date: date,
+  //       };
+  //       dispatch(addNewBatchOutside(newBatchOutside));
+  //     }
+  //   });
 
-    setBatchOrderIDs([]);
+  //   setBatchOrderIDs([]);
 
-    // let positionInBatch = 1;
-    // let batchPositions = [];
+  //   // let positionInBatch = 1;
+  //   // let batchPositions = [];
 
-    // batchOrderIDs?.forEach((id) => {
-    //   const product = batchDesigner.find((p) => p.id === id);
-    //   if (product) {
-    //     batchPositions.push({
-    //       product,
-    //       positionInBatch,
-    //     });
-    //     positionInBatch += product.cakes_in_batch;
-    //   }
-    // });
+  //   // batchOrderIDs?.forEach((id) => {
+  //   //   const product = batchDesigner.find((p) => p.id === id);
+  //   //   if (product) {
+  //   //     batchPositions.push({
+  //   //       product,
+  //   //       positionInBatch,
+  //   //     });
+  //   //     positionInBatch += product.cakes_in_batch;
+  //   //   }
+  //   // });
 
-    // const mergedBatchPositions = batchPositions.reduce((acc, current) => {
-    //   const lastItem = acc[acc.length - 1];
-    //   if (
-    //     lastItem &&
-    //     lastItem.product.product_article === current.product.product_article &&
-    //     lastItem.product.id_list_of_ordered_production !== null &&
-    //     current.product.id_list_of_ordered_production !== null
-    //   ) {
-    //     lastItem.product.cakes_in_batch += current.product.cakes_in_batch;
-    //     lastItem.product.free_product_package +=
-    //       current.product.free_product_package;
-    //     lastItem.product.total_cakes += current.product.total_cakes;
-    //   } else {
-    //     acc.push({
-    //       product: { ...current.product },
-    //       positionInBatch: current.positionInBatch,
-    //     });
-    //   }
-    //   return acc;
-    // }, []);
+  //   // const mergedBatchPositions = batchPositions.reduce((acc, current) => {
+  //   //   const lastItem = acc[acc.length - 1];
+  //   //   if (
+  //   //     lastItem &&
+  //   //     lastItem.product.product_article === current.product.product_article &&
+  //   //     lastItem.product.id_list_of_ordered_production !== null &&
+  //   //     current.product.id_list_of_ordered_production !== null
+  //   //   ) {
+  //   //     lastItem.product.cakes_in_batch += current.product.cakes_in_batch;
+  //   //     lastItem.product.free_product_package +=
+  //   //       current.product.free_product_package;
+  //   //     lastItem.product.total_cakes += current.product.total_cakes;
+  //   //   } else {
+  //   //     acc.push({
+  //   //       product: { ...current.product },
+  //   //       positionInBatch: current.positionInBatch,
+  //   //     });
+  //   //   }
+  //   //   return acc;
+  //   // }, []);
 
-    // mergedBatchPositions.forEach((position) => {
-    //   dispatch(
-    //     addNewBatchOutside({
-    //       product_article: position.product.product_article,
-    //       quantity_pallets: position.product.cakes_in_batch * 3,
-    // quantity_free:
-    //   position.product.id_list_of_ordered_production !== null &&
-    //   position.product.cakes_in_batch &&
-    //   position.product.total_cakes &&
-    //   position.product.free_product_package >= 0
-    //     ? (position.product.cakes_in_batch - position.product.total_cakes) *
-    //         3 +
-    //       position.product.free_product_package
-    //     : position.product.id_list_of_ordered_production == null
-    //     ? position.product.cakes_in_batch * 3
-    //     : null,
-    //       position_in_autoclave: position.positionInBatch,
-    //       id_list_of_ordered_production:
-    //         position.product.id_list_of_ordered_production !== null
-    //           ? position.product.id
-    //           : null,
-    //       date: '',
-    //     })
-    //   );
-    // });
-    // setBatchOrderIDs([]);
-  };
+  //   // mergedBatchPositions.forEach((position) => {
+  //   //   dispatch(
+  //   //     addNewBatchOutside({
+  //   //       product_article: position.product.product_article,
+  //   //       quantity_pallets: position.product.cakes_in_batch * 3,
+  //   // quantity_free:
+  //   //   position.product.id_list_of_ordered_production !== null &&
+  //   //   position.product.cakes_in_batch &&
+  //   //   position.product.total_cakes &&
+  //   //   position.product.free_product_package >= 0
+  //   //     ? (position.product.cakes_in_batch - position.product.total_cakes) *
+  //   //         3 +
+  //   //       position.product.free_product_package
+  //   //     : position.product.id_list_of_ordered_production == null
+  //   //     ? position.product.cakes_in_batch * 3
+  //   //     : null,
+  //   //       position_in_autoclave: position.positionInBatch,
+  //   //       id_list_of_ordered_production:
+  //   //         position.product.id_list_of_ordered_production !== null
+  //   //           ? position.product.id
+  //   //           : null,
+  //   //       date: '',
+  //   //     })
+  //   //   );
+  //   // });
+  //   // setBatchOrderIDs([]);
+  // };
+
+  const onSaveHandler = ()=>{
+    console.log('batchDesigner', batchDesigner);
+  }
 
   useEffect(() => {
     setAutoclave(acData);

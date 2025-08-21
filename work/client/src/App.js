@@ -44,6 +44,7 @@ import WarehouseManager from '#components/WarehouseManager/WarehouseManager.jsx'
 import ProductsTypeWarehouse from '#components/Warehouse/ProductsTypeWarehouse.jsx';
 import RelatedMaterialsBackorderList from '#components/Warehouse/RelatedMaterialsBackorderList/RelatedMaterialsBackorderList.jsx';
 import AutoclaveCalendare from '#components/ProductionBatchDesigner/AutoclaveCalendare.jsx';
+import ProductionBatchDesignerNew from '#components/ProductionBatchDesigner/ProductionBatchDesignerNew.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -97,6 +98,10 @@ function App() {
           <Route
             path="/production_batch_designer"
             element={<ProductionBatchDesigner />}
+          />
+          <Route
+            path="/production_batch_designer_new"
+            element={<ProductionBatchDesignerNew />}
           />
           <Route path="/autoclave_calendar" element={<AutoclaveCalendare />} />
           <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
