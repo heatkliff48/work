@@ -239,6 +239,26 @@ function RawMaterialsPlan() {
                         value: product.current_recipe?.id,
                         label: product.current_recipe?.article,
                       }}
+                      styles={{
+                        singleValue: (provided) => ({
+                          ...provided,
+                          color: 'black', // цвет текста выбранного значения
+                        }),
+                        option: (provided, state) => ({
+                          ...provided,
+                          color: state.isSelected ? 'white' : 'black', // выбранная белая, остальные чёрные
+                          backgroundColor: state.isSelected
+                            ? '#2684FF'
+                            : state.isFocused
+                            ? '#e6f0ff' // подсветка при наведении
+                            : 'white',
+                        }),
+                        control: (provided) => ({
+                          ...provided,
+                          backgroundColor: 'white',
+                          color: 'black',
+                        }),
+                      }}
                     />
                   ) : (
                     <> No recipes</>

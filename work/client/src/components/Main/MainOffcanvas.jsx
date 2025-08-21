@@ -1,5 +1,5 @@
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -16,6 +16,20 @@ function MainOffcanvas() {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  const CustomDropdownToggle = React.forwardRef(({ children, onClick }, ref) => (
+    <Button
+      ref={ref}
+      className="custom-menu-button d-flex justify-content-between align-items-center"
+      onClick={(e) => {
+        e.preventDefault();
+        onClick(e);
+      }}
+    >
+      {children}
+      <span className="ms-2">▼</span> {/* Добавляем стрелку вручную */}
+    </Button>
+  ));
 
   return (
     <>
@@ -36,7 +50,8 @@ function MainOffcanvas() {
               <DropdownButton
                 as={ButtonGroup}
                 title="Admin"
-                className="custom-menu-button"
+                bsPrefix="custom-menu-button"
+                variant="custom"
               >
                 <Dropdown.Item eventKey="1">
                   <Button
@@ -64,36 +79,35 @@ function MainOffcanvas() {
             )}
 
             {/* Продукты */}
-            {checkUserAccess(user, roles, 'Products')?.canRead && (
-              <DropdownButton
-                as={ButtonGroup}
-                title="Products catalog"
-                className="custom-menu-button"
-              >
-                <Dropdown.Item eventKey="1">
-                  <Button
-                    className="custom-submenu-button"
-                    onClick={() => {
-                      navigate('/products_type_journal');
-                      handleClose();
-                    }}
-                  >
-                    Products catalog
-                  </Button>
-                </Dropdown.Item>
-                <Dropdown.Item eventKey="2">
-                  <Button
-                    className="custom-submenu-button"
-                    onClick={() => {
-                      navigate('/statistics');
-                      handleClose();
-                    }}
-                  >
-                    Statistics
-                  </Button>
-                </Dropdown.Item>
-              </DropdownButton>
-            )}
+            <DropdownButton
+              as={ButtonGroup}
+              title="Products catalog"
+              bsPrefix="custom-menu-button"
+              variant="custom"
+            >
+              <Dropdown.Item eventKey="1">
+                <Button
+                  className="custom-submenu-button"
+                  onClick={() => {
+                    navigate('/products_type_journal');
+                    handleClose();
+                  }}
+                >
+                  Products catalog
+                </Button>
+              </Dropdown.Item>
+              <Dropdown.Item eventKey="2">
+                <Button
+                  className="custom-submenu-button"
+                  onClick={() => {
+                    navigate('/statistics');
+                    handleClose();
+                  }}
+                >
+                  Statistics
+                </Button>
+              </Dropdown.Item>
+            </DropdownButton>
 
             {/* Клиенты */}
             {checkUserAccess(user, roles, 'Clients')?.canRead && (
@@ -126,7 +140,8 @@ function MainOffcanvas() {
               <DropdownButton
                 as={ButtonGroup}
                 title="Ordered products pipeline"
-                className="custom-menu-button"
+                bsPrefix="custom-menu-button"
+                variant="custom"
               >
                 <Dropdown.Item eventKey="1">
                   <Button
@@ -169,7 +184,8 @@ function MainOffcanvas() {
               <DropdownButton
                 as={ButtonGroup}
                 title="Production planner"
-                className="custom-menu-button"
+                bsPrefix="custom-menu-button"
+                variant="custom"
               >
                 <Dropdown.Item eventKey="1">
                   <Button
@@ -213,7 +229,8 @@ function MainOffcanvas() {
               <DropdownButton
                 as={ButtonGroup}
                 title="Technology planner"
-                className="custom-menu-button"
+                bsPrefix="custom-menu-button"
+                variant="custom"
               >
                 <Dropdown.Item eventKey="1">
                   <Button
