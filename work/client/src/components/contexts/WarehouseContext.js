@@ -492,6 +492,51 @@ const WarehouseContextProvider = ({ children }) => {
     setSelectedOrder(null);
   };
 
+  const distributeToSources = (sources, amount, onEachUpdate) => {
+    let remaining = amount;
+    const out = sources.map((s) => ({ ...s }));
+
+    for (const s of out) {
+      if (remaining <= 0) break;
+      const residue =
+        s.cakes_residue ??
+        Math.max((s.total_cakes || 0) - (s.cakes_in_batch || 0), 0);
+      const take = Math.min(residue, remaining);
+      if (take <= 0) continue;
+
+      s.cakes_in_batch = (s.cakes_in_batch || 0) + take;
+      s.cakes_residue = Math.max(residue - take, 0);
+      remaining -= take;
+
+      onEachUpdate?.(s, take);
+    }
+
+    return { sources: out, placed: amount - remaining, leftover: remaining };
+  };
+
+  // Обратная операция: "забрать" n массивов, начиная с приоритетного source
+  const collectFromSources = (sources, amount, onEachUpdate) => {
+    let remaining = amount;
+    const out = sources.map((s) => ({ ...s }));
+
+    for (const s of out) {
+      if (remaining <= 0) break;
+      const canGive = Math.min(s.cakes_in_batch || 0, remaining);
+      if (canGive <= 0) continue;
+
+      s.cakes_in_batch = (s.cakes_in_batch || 0) - canGive;
+      const residue =
+        s.cakes_residue ??
+        Math.max((s.total_cakes || 0) - (s.cakes_in_batch || 0), 0);
+      s.cakes_residue = (residue || 0) + canGive;
+      remaining -= canGive;
+
+      onEachUpdate?.(s, -canGive);
+    }
+
+    return { sources: out, taken: amount - remaining, leftover: remaining };
+  };
+
   useEffect(() => {
     const data = list_of_ordered_production
       ?.filter((el) => {
@@ -697,6 +742,8 @@ const WarehouseContextProvider = ({ children }) => {
         wmoctProductShippedBD,
         setWmoctProductShippedBD,
         saveHandler,
+        distributeToSources,
+        collectFromSources,
         selectedOrder,
         setSelectedOrder,
         additionalInfoPDF,
