@@ -24,8 +24,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setIsOrderReady,
   } = useOrderContext();
   const { clientModalOrder, setClientModalOrder } = useModalContext();
-  const { setCurrentClient, clients_info_table } =
-    useProjectContext();
+  const { setCurrentClient, clients_info_table } = useProjectContext();
 
   const dispatch = useDispatch();
   const list_of_clients = useSelector((state) => state.clients);
@@ -71,6 +70,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const addClientOrderHendler = async (id) => {
+    console.log(list_of_clients);
     const article = getOrderArticle();
     const client = list_of_clients.find((el) => el.id === id);
 
