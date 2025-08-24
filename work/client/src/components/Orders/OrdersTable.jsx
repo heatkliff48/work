@@ -8,6 +8,7 @@ import AddClientOrderModal from './modal/AddClientOrderModal';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import RandomAhhOrder from './RandomAhhOrder';
 
 function OrdersTable() {
   const {
@@ -51,6 +52,7 @@ function OrdersTable() {
           toggle={() => setClientModalOrder(!clientModalOrder)}
         />
       )}
+      <RandomAhhOrder />
       <Table
         COLUMN_DATA={COLUMNS_ORDERS}
         dataOfTable={ordersDataList}
