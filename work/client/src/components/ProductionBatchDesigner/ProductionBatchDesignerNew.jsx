@@ -34,7 +34,6 @@ function ProductionBatchDesignerNew() {
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [currId, setCurrId] = useState(null);
   const [acData, setAcData] = useState([]);
-  const [batchFromBD, setBatchFromBD] = useState([]);
   const [autoclaveCount, setAutoclaveCount] = useState(0);
   const [autoclaveCalendarData, setAutoclaveCalendarData] = useState(0);
 
@@ -147,17 +146,6 @@ function ProductionBatchDesignerNew() {
       }
       return rows;
     });
-
-    setBatchFromBD((prev) => [
-      ...prev,
-      {
-        id: maxId,
-        id_list_of_ordered_production: null,
-        product_article: article,
-        cakes_in_batch: 1,
-        cakes_residue: 0,
-      },
-    ]);
   };
 
   const handleAddOnAutoclave = (row) => {
@@ -206,22 +194,6 @@ function ProductionBatchDesignerNew() {
         cakes_in_batch,
         cakes_residue,
       };
-
-      setBatchFromBD((prev) => {
-        const existingIndex = prev.findIndex((item) => item.id === id);
-
-        if (existingIndex !== -1) {
-          const updated = [...prev];
-          updated[existingIndex] = {
-            id,
-            cakes_in_batch: 0,
-            cakes_residue: total_cakes,
-          };
-          return updated;
-        }
-
-        return [...prev, { id, cakes_in_batch: 0, cakes_residue: total_cakes }];
-      });
 
       const existingBatch = batchDesigner?.find((el) => el?.id === id);
 
@@ -804,7 +776,6 @@ function ProductionBatchDesignerNew() {
       <div style={{ marginLeft: '20px' }}>
         <Autoclave
           acData={acData}
-          batchFromBD={batchFromBD}
           autoclaveCalendarData={autoclaveCalendarData}
         />
       </div>
