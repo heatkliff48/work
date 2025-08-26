@@ -587,7 +587,7 @@ const WarehouseContextProvider = ({ children }) => {
 
     // Сортировка внутри каждой группы по shipping_date (возрастание)
     for (const list of byArticle.values()) {
-      list.sort((a, b) => getTime(a.shipping_date) - getTime(b.shipping_date));
+      list.sort((a, b) => getTime(b.shipping_date) - getTime(a.shipping_date));
     }
 
     // Считаем произведённое по каждому product_article из batchOutside.
@@ -597,7 +597,17 @@ const WarehouseContextProvider = ({ children }) => {
     const producedByArticle = new Map();
 
     for (const batch of batchOutside) {
-      const producedUnits = (Number(batch.quantity_pallets) || 0) / 3;
+      const m3InArray = latestProducts?.find(
+        (p) => p.article == batch.product_article
+      )?.m3InArray;
+
+      const volumeBlockOnPallet = latestProducts?.find(
+        (p) => p.article == batch.product_article
+      )?.volumeBlockOnPallet;
+
+      const producedUnits =
+        (Number(batch.quantity_pallets) || 0) /
+        Math.floor(m3InArray / volumeBlockOnPallet);
 
       // пытаемся взять напрямую по product_article
       let art = batch.product_article;
@@ -630,7 +640,7 @@ const WarehouseContextProvider = ({ children }) => {
           continue;
         }
 
-        const need = Number(order.quantity) || 0;
+        const need = Number(order.quantity_cakes) || 0;
         const alloc = Math.min(need, remaining);
 
         order.quantity_in_batch = alloc;
