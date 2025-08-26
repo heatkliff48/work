@@ -179,19 +179,21 @@ function ProductionBatchDesignerNew() {
 
       const total_cakes = Math.ceil(product_with_brack);
 
-      // ищем запись в batchDesigner ровно один раз
-      const haveBatch = batchDesigner.find((el) => el.id == id);
-      const existing = haveBatch
-        ? haveBatch
-        : batchOutside.find((el) => el.id == id);
+      const haveBatch = batchDesigner.find((el) => String(el.id) === String(id));
+      // pallets-per-array (как и при сохранении)
+      const palletsPerArray = Math.max(
+        1,
+        Math.floor(m3InArray / volumeBlockOnPallet) || 1
+      );
+      // Считаем ВСЕ паллеты по этому заказу из batchOutside (любые даты)
+      const palletsFromOutside = (batchOutside || [])
+        .filter((r) => String(r.id_list_of_ordered_production) === String(id))
+        .reduce((sum, r) => sum + (Number(r.quantity_pallets) || 0), 0);
+      const arraysFromOutside = Math.floor(palletsFromOutside / palletsPerArray);
 
-      // если записи нет — считаем, что размещено 0
       const cakes_in_batch = haveBatch
-        ? haveBatch?.cakes_in_batch ?? 0
-        : existing
-        ? existing?.quantity_pallets / Math.floor(m3InArray / volumeBlockOnPallet) ??
-          0
-        : 0;
+        ? Number(haveBatch.cakes_in_batch) || 0
+        : arraysFromOutside;
 
       // если есть готовое значение — берём его, иначе считаем от total_cakes
       const cakes_residue = Math.max(total_cakes - cakes_in_batch, 0);
