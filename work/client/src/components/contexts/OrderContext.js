@@ -300,6 +300,7 @@ const OrderContextProvider = ({ children }) => {
   const [ordersDataList, setOrdersDataList] = useState([]);
   const [personsInChargeList, setPersonsInChargeList] = useState([]);
   const [productionBatchDesigner, setProductonBatchDesigner] = useState([]);
+  const [randomOrderCheck, setRandomOrderCheck] = useState(false);
 
   const list_of_orders = useSelector((state) => state.orders);
   const accountingDataList = useSelector((state) => state.accountingDataList);
@@ -549,6 +550,8 @@ const OrderContextProvider = ({ children }) => {
         setAccDataList,
         getAccountingStatus,
         deliveryAddresses,
+        randomOrderCheck,
+        setRandomOrderCheck,
       }}
     >
       {children}
