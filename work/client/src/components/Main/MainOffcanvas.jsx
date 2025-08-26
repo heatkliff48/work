@@ -151,7 +151,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Oredred blocks pipeline
+                    Ordered blocks pipeline
                   </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="2">
@@ -162,7 +162,7 @@ function MainOffcanvas() {
                       handleClose();
                     }}
                   >
-                    Oredred OEM blocks pipeline
+                    Ordered OEM blocks pipeline
                   </Button>
                 </Dropdown.Item>
                 <Dropdown.Item eventKey="3">
