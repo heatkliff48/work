@@ -280,65 +280,6 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
   //   });
   // };
 
-  // const deleteArrayById = () => {
-  //   if (!selectedId) return;
-  //   const found = batchDesigner?.find((el) => el?.id === selectedId);
-  //   if (!found) return;
-  //   const productId = found.id;
-
-  //   setAutoclave((prev) => {
-  //     const flat = prev.flat();
-  //     const lastIndex = flat.map((el) => el.id).lastIndexOf(selectedId);
-  //     if (lastIndex === -1) {
-  //       alert('Не найдено элементов с таким id');
-  //       return prev;
-  //     }
-
-  //     flat[lastIndex] = { ...EMPTY_CELL };
-
-  //     const rowIndex = Math.floor(lastIndex / CELLS_PER_AUTOCLAVE);
-  //     compactRowInPlace(flat, rowIndex);
-
-  //     // const count = flat.filter((el) => el.id === selectedId).length;
-  //     // const fromBD = batchFromBD?.find((el) => el.id === selectedId);
-  //     // const cakes_residue = fromBD?.cakes_residue ?? 0;
-
-  //     // if (cakes_residue <= count) {
-  //     //   dispatch(
-  //     //     updateBatchState({
-  //     //       id: productId,
-  //     //       cakes_in_batch: count,
-  //     //       cakes_residue: 0,
-  //     //     })
-  //     //   );
-  //     //   dispatch(unlockButton({ id: productId, isButtonLocked: true }));
-  //     // } else {
-  //     //   dispatch(
-  //     //     updateBatchState({
-  //     //       id: productId,
-  //     //       cakes_in_batch: count,
-  //     //       cakes_residue: cakes_residue - count,
-  //     //     })
-  //     //   );
-  //     //   dispatch(unlockButton({ id: productId, isButtonLocked: false }));
-  //     // }
-
-  //     // setQuantityPallets((prevQ) => ({ ...prevQ, [productId]: count * 3 }));
-  //     // setBatchOrderIDs((prevIDs) =>
-  //     //   prevIDs.includes(productId) ? prevIDs : [...prevIDs, productId]
-  //     // );
-  //     applyDelta(productId, -1);
-
-  //     const rows = [];
-  //     const rowCount = prev.length;
-  //     for (let r = 0; r < rowCount; r++) {
-  //       const from = r * CELLS_PER_AUTOCLAVE;
-  //       rows.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
-  //     }
-  //     return rows;
-  //   });
-  // };
-
   const addArrayAfterId = () => {
     if (!selectedId) return;
 
@@ -655,39 +596,57 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
   // };
 
   const deleteBatchById = () => {
-    if (!selectedId) return;
-    const found = batchDesigner?.find((el) => el.id === selectedId);
-    if (!found) return;
-    const productId = found.id;
+  if (!selectedId) return;
 
-    setAutoclave((prev) => {
-      const flat = prev.flat();
+  const found = batchDesigner?.find((el) => el.id === selectedId);
+  if (!found) return;
 
-      // зануляем все вхождения выбранной партии
-      for (let i = 0; i < flat.length; i++) {
-        if (flat[i]?.article === found.product_article) flat[i] = { ...EMPTY_CELL };
+  // будем убирать всю партию по артикулу
+  const targetArticle = found.product_article;
+
+  setAutoclave((prev) => {
+    const flat = prev.flat();
+    const capacity = prev.length * CELLS_PER_AUTOCLAVE;
+
+    // 1) Считаем, сколько ячеек какого id удалили
+    const removedById = new Map();
+    const kept = [];
+
+    for (let i = 0; i < flat.length; i++) {
+      const cell = flat[i];
+      if (cell?.article === targetArticle) {
+        // копим статистику по конкретным заказам внутри этой партии
+        if (cell?.id != null) {
+          removedById.set(cell.id, (removedById.get(cell.id) || 0) + 1);
+        }
+        // просто пропускаем — тем самым мы "сдвигаем всё влево" глобально
+      } else {
+        kept.push(cell);
       }
+    }
 
-      // сжимаем все ряды, чтобы пустые ушли в хвост каждого ряда
-      compactAllRowsInPlace(flat, prev.length);
+    // 2) Добиваем пустыми до исходной ёмкости
+    while (kept.length < capacity) kept.push({ ...EMPTY_CELL });
 
-      const fromBD = batchFromBD?.find((el) => el.id === selectedId) || {};
-      const { cakes_in_batch, cakes_residue } = fromBD;
+    // 3) Обновляем счётчики по всем затронутым id (-removed)
+    for (const [id, removed] of removedById.entries()) {
+      bumpOne(id, -removed);
+    }
 
-      dispatch(updateBatchState({ id: productId, cakes_in_batch, cakes_residue }));
-      setQuantityPallets((prevQ) => ({ ...prevQ, [productId]: 0 }));
-      setBatchOrderIDs((prevIDs) => prevIDs.filter((x) => x !== productId));
-      dispatch(unlockButton({ id: productId, isButtonLocked: false }));
+    // 4) Чистим выбранный id из списка сохранённых позиций
+    setBatchOrderIDs((prevIDs) => prevIDs.filter((x) => !removedById.has(x)));
 
-      // собрать обратно без изменения размеров
-      const rows = [];
-      for (let r = 0; r < prev.length; r++) {
-        const from = r * CELLS_PER_AUTOCLAVE;
-        rows.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
-      }
-      return rows;
-    });
-  };
+    // 5) Сбрасываем выделение и собираем ряды из глобально скомпактированного флата
+    setSelectedId(null);
+
+    const rows = [];
+    for (let r = 0; r < prev.length; r++) {
+      const from = r * CELLS_PER_AUTOCLAVE;
+      rows.push(kept.slice(from, from + CELLS_PER_AUTOCLAVE));
+    }
+    return rows;
+  });
+};
 
   // const fillingAutoclave = () => {
   //   if (!selectedId) return;
