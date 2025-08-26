@@ -705,6 +705,10 @@ function Autoclave({ acData, autoclaveCalendarData }) {
     // setBatchOrderIDs([]);
   };
 
+  // const onSaveHandler = () => {
+  //   console.log('batch', batchDesigner);
+  // };
+
   useEffect(() => {
     setAutoclave(acData);
     setInitialRowCount(Array.isArray(acData) ? acData.length : 0);

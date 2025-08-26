@@ -357,13 +357,20 @@ function ProductionBatchDesignerNew() {
 
     const merged = Object.values(mergedMap);
 
-    // можно оставить перенумерацию для UI
     const reindexed = merged.map((item, index) => ({ ...item, id: index + 1 }));
-    setProductonBatchDesigner(reindexed);
+
+    const visible = reindexed.filter((x) => (Number(x.cakes_residue) || 0) > 0);
+    setProductonBatchDesigner(visible);
 
     setTotalQuantity(updatedTotalQuantity);
 
-    const updatedAutoclaveData = transformAutoclaveData(emptyAutoclave, prodBatch);
+    const batchForAutoclave = prodBatch.filter(
+      (x) => (Number(x.cakes_residue) || 0) > 0
+    );
+    const updatedAutoclaveData = transformAutoclaveData(
+      emptyAutoclave,
+      batchForAutoclave
+    );
 
     const filledAutoclave = [];
     for (let i = 0; i < updatedAutoclaveData.length; i += 21) {
@@ -774,10 +781,7 @@ function ProductionBatchDesignerNew() {
 
       {/* Компонент Autoclave */}
       <div style={{ marginLeft: '20px' }}>
-        <Autoclave
-          acData={acData}
-          autoclaveCalendarData={autoclaveCalendarData}
-        />
+        <Autoclave acData={acData} autoclaveCalendarData={autoclaveCalendarData} />
       </div>
     </div>
   );

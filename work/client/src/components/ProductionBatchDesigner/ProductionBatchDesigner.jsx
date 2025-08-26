@@ -302,9 +302,7 @@ function ProductionBatchDesigner() {
             density,
             product_article,
             width,
-            density,
             quantity: rightQuantity,
-            density,
             product_with_brack: (
               quantity / Math.floor(m3InArray / volumeBlockOnPallet) +
               normOfBrack
@@ -352,13 +350,9 @@ function ProductionBatchDesigner() {
       }, {})
     );
 
-    // 🔹 перенумеровываем id с 1, 2, 3...
-    const reindexed = merged.map((item, index) => ({
-      ...item,
-      id: index + 1,
-    }));
-
-    setProductonBatchDesigner(reindexed);
+    const reindexed = merged.map((item, index) => ({ ...item, id: index + 1 }));
+    const visible = reindexed.filter((x) => (Number(x.cakes_residue) || 0) > 0);
+    setProductonBatchDesigner(visible);
 
     // setProductonBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
