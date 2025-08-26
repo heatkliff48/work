@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 const CELLS_PER_AUTOCLAVE = 21;
 const EMPTY_CELL = { id: null, density: '', width: '' };
 
-function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
+function Autoclave({ acData, autoclaveCalendarData }) {
   const dispatch = useDispatch();
   const {
     setAutoclave,
@@ -276,8 +276,9 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
 
       // пересчёт
       const count = flat.filter((el) => el.id === selectedId).length;
-      const fromBD = batchFromBD?.find((el) => el.id === selectedId);
-      const cakes_residue = fromBD?.cakes_residue ?? 0;
+      // Берём план (total) из batchDesigner, а не из локального snapshot
+      const total = getTotalById(productId);
+      const cakes_residue = Math.max(total - count, 0);
 
       if (cakes_residue <= count) {
         dispatch(
@@ -318,57 +319,57 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
   };
 
   const deleteBatchById = () => {
-  if (!selectedId) return;
+    if (!selectedId) return;
 
-  const found = batchDesigner?.find((el) => el.id === selectedId);
-  if (!found) return;
+    const found = batchDesigner?.find((el) => el.id === selectedId);
+    if (!found) return;
 
-  // будем убирать всю партию по артикулу
-  const targetArticle = found.product_article;
+    // будем убирать всю партию по артикулу
+    const targetArticle = found.product_article;
 
-  setAutoclave((prev) => {
-    const flat = prev.flat();
-    const capacity = prev.length * CELLS_PER_AUTOCLAVE;
+    setAutoclave((prev) => {
+      const flat = prev.flat();
+      const capacity = prev.length * CELLS_PER_AUTOCLAVE;
 
-    // 1) Считаем, сколько ячеек какого id удалили
-    const removedById = new Map();
-    const kept = [];
+      // 1) Считаем, сколько ячеек какого id удалили
+      const removedById = new Map();
+      const kept = [];
 
-    for (let i = 0; i < flat.length; i++) {
-      const cell = flat[i];
-      if (cell?.article === targetArticle) {
-        // копим статистику по конкретным заказам внутри этой партии
-        if (cell?.id != null) {
-          removedById.set(cell.id, (removedById.get(cell.id) || 0) + 1);
+      for (let i = 0; i < flat.length; i++) {
+        const cell = flat[i];
+        if (cell?.article === targetArticle) {
+          // копим статистику по конкретным заказам внутри этой партии
+          if (cell?.id != null) {
+            removedById.set(cell.id, (removedById.get(cell.id) || 0) + 1);
+          }
+          // просто пропускаем — тем самым мы "сдвигаем всё влево" глобально
+        } else {
+          kept.push(cell);
         }
-        // просто пропускаем — тем самым мы "сдвигаем всё влево" глобально
-      } else {
-        kept.push(cell);
       }
-    }
 
-    // 2) Добиваем пустыми до исходной ёмкости
-    while (kept.length < capacity) kept.push({ ...EMPTY_CELL });
+      // 2) Добиваем пустыми до исходной ёмкости
+      while (kept.length < capacity) kept.push({ ...EMPTY_CELL });
 
-    // 3) Обновляем счётчики по всем затронутым id (-removed)
-    for (const [id, removed] of removedById.entries()) {
-      bumpOne(id, -removed);
-    }
+      // 3) Обновляем счётчики по всем затронутым id (-removed)
+      for (const [id, removed] of removedById.entries()) {
+        bumpOne(id, -removed);
+      }
 
-    // 4) Чистим выбранный id из списка сохранённых позиций
-    setBatchOrderIDs((prevIDs) => prevIDs.filter((x) => !removedById.has(x)));
+      // 4) Чистим выбранный id из списка сохранённых позиций
+      setBatchOrderIDs((prevIDs) => prevIDs.filter((x) => !removedById.has(x)));
 
-    // 5) Сбрасываем выделение и собираем ряды из глобально скомпактированного флата
-    setSelectedId(null);
+      // 5) Сбрасываем выделение и собираем ряды из глобально скомпактированного флата
+      setSelectedId(null);
 
-    const rows = [];
-    for (let r = 0; r < prev.length; r++) {
-      const from = r * CELLS_PER_AUTOCLAVE;
-      rows.push(kept.slice(from, from + CELLS_PER_AUTOCLAVE));
-    }
-    return rows;
-  });
-};
+      const rows = [];
+      for (let r = 0; r < prev.length; r++) {
+        const from = r * CELLS_PER_AUTOCLAVE;
+        rows.push(kept.slice(from, from + CELLS_PER_AUTOCLAVE));
+      }
+      return rows;
+    });
+  };
 
   const fillingAutoclave = () => {
     if (!selectedId) return;
