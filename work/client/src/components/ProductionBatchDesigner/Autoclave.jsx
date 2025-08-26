@@ -1,6 +1,5 @@
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import {
   unlockButton,
   updateBatchState,
@@ -29,6 +28,7 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
   const { latestProducts } = useProductsContext();
 
   const [selectedId, setSelectedId] = useState(null);
+  const [selectedArticle, setSelectedArticle] = useState(null);
   const [idColorMap, setIdColorMap] = useState({});
   const [initialRowCount, setInitialRowCount] = useState(0);
 
@@ -66,6 +66,46 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
     }
   };
 
+  // ——— helpers для "прилегания" к группе ———
+  const articleHandler = (id) => {
+    const product_article = batchDesigner.find((el) => el.id == id)?.product_article;
+    setSelectedArticle(product_article);
+  };
+  // ——— helpers для "прилегания" к группе ———
+  const getColBounds = (idx) => {
+    const start = idx - (idx % CELLS_PER_AUTOCLAVE);
+    return { start, end: start + CELLS_PER_AUTOCLAVE };
+  };
+
+  const findTailIndex = (flat, id) => {
+    for (let i = flat.length - 1; i >= 0; i--) {
+      if (flat[i]?.id === id) return i;
+    }
+    return -1;
+  };
+
+  // Пытаемся вставить ЯЧЕЙКУ сразу ПОСЛЕ хвоста группы в ТОМ ЖЕ автоклаве (колонке).
+  // Если после хвоста в колонке есть пустота — двигаем хвост вправо и вставляем.
+  const insertAdjacentToTail = (flat, tailIdx, payload) => {
+    if (tailIdx < 0) return false;
+    const { start, end } = getColBounds(tailIdx);
+
+    // ищем первую пустую ПОСЛЕ хвоста внутри этой колонки
+    let empty = -1;
+    for (let i = tailIdx + 1; i < end; i++) {
+      if (!flat[i] || flat[i].id == null) {
+        empty = i;
+        break;
+      }
+    }
+    if (empty === -1) return false;
+
+    // сдвиг внутри колонки только от хвоста до найденной пустоты
+    for (let i = empty; i > tailIdx + 1; i--) flat[i] = flat[i - 1];
+    flat[tailIdx + 1] = payload;
+    return true;
+  };
+
   // пытаемся достать дату отгрузки из нескольких возможных полей
   const shipTs = (id) => {
     const o = (list_of_ordered_production || []).find(
@@ -89,19 +129,6 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
     return Number(r) || 0;
   };
 
-  // Исходные значения "как было при загрузке" (для полного отката)
-  const getOriginalById = (id) => {
-    const x = (batchFromBD || []).find((el) => el.id === id);
-    const orig_in = Number(x?.cakes_in_batch ?? 0);
-    const orig_total = Number(x?.total_cakes ?? 0);
-    const // если в исходнике не было residue — восстановим формулой total - in
-      orig_res =
-        x?.cakes_residue != null
-          ? Number(x.cakes_residue)
-          : Math.max(orig_total - orig_in, 0);
-    return { inBatch: orig_in, residue: orig_res };
-  };
-
   // Сколько по плану (цель)
   const getTotalById = (id) => {
     const p = (batchDesigner || []).find((el) => el.id === id);
@@ -110,26 +137,6 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
   const getInBatchById = (id) => {
     const v = (batchDesigner || []).find((el) => el.id === id)?.cakes_in_batch;
     return Number(v) || 0;
-  };
-
-  // Обновить несколько id за один проход (избегаем "по 1" в одном тике)
-  const applyDeltaBatch = (deltaById /* { [id]: +N / -N } */) => {
-    Object.entries(deltaById).forEach(([rawId, delta]) => {
-      const id = Number(rawId);
-      if (!id || !delta) return;
-
-      const total = getTotalById(id);
-      const curr = getInBatchById(id);
-      const nextIn = Math.max(0, curr + delta); // можно > total (переразмещение)
-      const nextRes = Math.max(total - nextIn, 0); // residue растёт только ниже цели
-
-      dispatch(
-        updateBatchState({ id, cakes_in_batch: nextIn, cakes_residue: nextRes })
-      );
-      dispatch(unlockButton({ id, isButtonLocked: nextRes === 0 }));
-      setQuantityPallets((prev) => ({ ...prev, [id]: nextIn * 3 }));
-      setBatchOrderIDs((prev) => (prev.includes(id) ? prev : [...prev, id]));
-    });
   };
 
   // ДОБАВЛЕНИЕ: если есть неразмещённые — берём самую ближайшую дату среди тех, у кого residue > 0;
@@ -147,16 +154,6 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
     }
     // все размещены — добавляем в самый поздний заказ
     return ascByDate[ascByDate.length - 1];
-  };
-
-  // УДАЛЕНИЕ: всегда целимся в «последний по дате» из группы, у которого реально стоит хоть один массив в автоклаве
-  const pickSourceIdForRemove = (preferId, flatCells) => {
-    const ids = getGroupIds(preferId);
-    const descByDate = [...ids].sort((a, b) => shipTs(a) - shipTs(b)).reverse();
-    for (const id of descByDate) {
-      if (flatCells?.some((c) => c?.id === id)) return id;
-    }
-    return descByDate[0] ?? null;
   };
 
   // атомарное изменение одного заказа с учётом цели (total_cakes)
@@ -197,23 +194,23 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
     return out;
   };
 
-  // const isEmpty = (c) => !c || c.id === null;
+  const isEmpty = (c) => !c || c.id === null;
 
   // // сжать один ряд: непустые влево, пустые вправо
-  // const compactRowInPlace = (flat, rowIndex) => {
-  //   const start = rowIndex * CELLS_PER_AUTOCLAVE;
-  //   const end = start + CELLS_PER_AUTOCLAVE;
-  //   const row = flat.slice(start, end);
-  //   const used = row.filter((c) => !isEmpty(c));
-  //   const pad = Array(CELLS_PER_AUTOCLAVE - used.length).fill({ ...EMPTY_CELL });
-  //   const compacted = used.concat(pad);
-  //   for (let i = 0; i < CELLS_PER_AUTOCLAVE; i++) flat[start + i] = compacted[i];
-  // };
+  const compactRowInPlace = (flat, rowIndex) => {
+    const start = rowIndex * CELLS_PER_AUTOCLAVE;
+    const end = start + CELLS_PER_AUTOCLAVE;
+    const row = flat.slice(start, end);
+    const used = row.filter((c) => !isEmpty(c));
+    const pad = Array(CELLS_PER_AUTOCLAVE - used.length).fill({ ...EMPTY_CELL });
+    const compacted = used.concat(pad);
+    for (let i = 0; i < CELLS_PER_AUTOCLAVE; i++) flat[start + i] = compacted[i];
+  };
 
   // // сжать все ряды
-  // const compactAllRowsInPlace = (flat, rowsCount) => {
-  //   for (let r = 0; r < rowsCount; r++) compactRowInPlace(flat, r);
-  // };
+  const compactAllRowsInPlace = (flat, rowsCount) => {
+    for (let r = 0; r < rowsCount; r++) compactRowInPlace(flat, r);
+  };
 
   // ---------- actions (без изменения длины массива) ----------
   // const addArrayAfterId = () => {
@@ -342,271 +339,515 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
   //   });
   // };
 
-  // const deleteBatchById = () => {
-  //   if (!selectedId) return;
-  //   const found = batchDesigner?.find((el) => el.id === selectedId);
-  //   if (!found) return;
-  //   const productId = found.id;
-
-  //   setAutoclave((prev) => {
-  //     const flat = prev.flat();
-
-  //     const toRemove = flat.filter((c) => c?.id === selectedId).length;
-
-  //     // зануляем все вхождения выбранной партии
-  //     for (let i = 0; i < flat.length; i++) {
-  //       if (flat[i]?.id === selectedId) flat[i] = { ...EMPTY_CELL };
-  //     }
-
-  //     // сжимаем все ряды, чтобы пустые ушли в хвост каждого ряда
-  //     compactAllRowsInPlace(flat, prev.length);
-
-  //     // const fromBD = batchFromBD?.find((el) => el.id === selectedId) || {};
-  //     // const { cakes_in_batch, cakes_residue } = fromBD;
-
-  //     // dispatch(updateBatchState({ id: productId, cakes_in_batch, cakes_residue }));
-  //     // setQuantityPallets((prevQ) => ({ ...prevQ, [productId]: 0 }));
-  //     // setBatchOrderIDs((prevIDs) => prevIDs.filter((x) => x !== productId));
-  //     // dispatch(unlockButton({ id: productId, isButtonLocked: false }));
-
-  //     applyDelta(productId, -toRemove);
-
-  //     // собрать обратно без изменения размеров
-  //     const rows = [];
-  //     for (let r = 0; r < prev.length; r++) {
-  //       const from = r * CELLS_PER_AUTOCLAVE;
-  //       rows.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
-  //     }
-  //     return rows;
-  //   });
-  // };
-
-  // const fillingAutoclave = () => {
-  //   if (!selectedId) return;
-  //   const found = batchDesigner?.find((el) => el?.id === selectedId);
-  //   if (!found) return;
-  //   const productId = found.id;
-
-  //   setAutoclave((prev) => {
-  //     const flat = prev.flat();
-
-  //     let lastIndex = flat.map((el) => el.id).lastIndexOf(selectedId);
-  //     if (lastIndex === -1) {
-  //       alert('Не найдено элементов с таким id');
-  //       return prev;
-  //     }
-
-  //     const rowStart = lastIndex - (lastIndex % CELLS_PER_AUTOCLAVE);
-  //     const rowEnd = rowStart + CELLS_PER_AUTOCLAVE;
-  //     const source = { ...flat[lastIndex] };
-
-  //     let added = 0;
-  //     // идём по позициям справа от хвоста в пределах текущего ряда
-  //     for (let pos = lastIndex + 1; pos < rowEnd; pos++) {
-  //       // если пусто — просто ставим
-  //       if (!flat[pos] || flat[pos].id === null) {
-  //         flat[pos] = { ...source };
-  //         lastIndex = pos;
-  //         added++;
-  //         continue;
-  //       }
-
-  //       // иначе ищем ближайшую пустую дальше в этом ряду
-  //       let empty = -1;
-  //       for (let j = pos; j < rowEnd; j++) {
-  //         if (!flat[j] || flat[j].id === null) {
-  //           empty = j;
-  //           break;
-  //         }
-  //       }
-
-  //       if (empty === -1) {
-  //         // в ряду больше нет места
-  //         break;
-  //       }
-
-  //       // сдвигаем хвост на 1 вправо: [pos .. empty-1] -> [pos+1 .. empty]
-  //       for (let k = empty; k > pos; k--) {
-  //         flat[k] = flat[k - 1];
-  //       }
-  //       // вставляем копию рядом с группой
-  //       flat[pos] = { ...source };
-  //       lastIndex = pos; // хвост группы сместился
-  //       added++;
-  //     }
-
-  //     // const count = flat.filter((el) => el.id === productId).length;
-
-  //     // dispatch(
-  //     //   updateBatchState({
-  //     //     id: selectedId,
-  //     //     cakes_in_batch: count,
-  //     //     cakes_residue: 0,
-  //     //   })
-  //     // );
-
-  //     // setQuantityPallets((prevQ) => ({ ...prevQ, [productId]: count * 3 }));
-  //     // setBatchOrderIDs((prevIDs) =>
-  //     //   prevIDs.includes(productId) ? prevIDs : [...prevIDs, productId]
-  //     // );
-  //     if (added > 0) applyDelta(productId, +added);
-
-  //     // собираем обратно фиксированным размером
-  //     const rows = [];
-  //     const rowCount = prev.length;
-  //     for (let r = 0; r < rowCount; r++) {
-  //       const from = r * CELLS_PER_AUTOCLAVE;
-  //       rows.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
-  //     }
-  //     return rows;
-  //   });
-  // };
-
   const addArrayAfterId = () => {
     if (!selectedId) return;
 
+    // 1) выбираем заказ, в пользу которого добавляем (по твоей логике по дате)
+    const idToUse = pickSourceIdForAdd(
+      selectedId,
+      productionBatchDesigner,
+      batchDesigner
+    );
+    if (!idToUse) return;
+
+    // 2) параметры плит (берём у группы; у всех sources они одинаковые)
     const group = getGroupBySourceId(selectedId);
     const density = group?.density || '';
     const width = group?.width || '';
 
-    const idToUse = pickSourceIdForAdd(selectedId);
-
     setAutoclave((prev) => {
-      const flat = flatAutoclave(prev);
-      const firstFree = flat.findIndex((c) => !c?.id);
+      const flat = prev.flat();
+      const payload = { id: idToUse, density, width };
 
-      if (firstFree !== -1) {
-        const next = flat.slice();
-        next[firstFree] = { id: idToUse, density, width };
-        bumpOne(idToUse, +1);
-        return rowsFromFlat(next);
+      // 3) сначала пробуем "прилечь" к СВОЕЙ группе (idToUse)
+      let inserted = false;
+      let tail = findTailIndex(flat, idToUse);
+      if (tail !== -1) {
+        inserted = insertAdjacentToTail(flat, tail, payload);
       }
 
-      // мест нет — всё равно считаем это валидным добавлением (обновляем счётчики)
+      // 4) если своей группы ещё нет — прилегаем к ВЫДЕЛЕННОЙ (визуальной) группе
+      if (!inserted) {
+        const selTail = findTailIndex(flat, selectedId);
+        if (selTail !== -1) inserted = insertAdjacentToTail(flat, selTail, payload);
+      }
+
+      // 5) если и это не удалось (в колонках нет места после хвостов) —
+      // ставим в первую глобальную пустую (и считчики всё равно увеличиваем)
+      if (!inserted) {
+        const firstEmpty = flat.findIndex((c) => !c || c.id == null);
+        if (firstEmpty !== -1) {
+          flat[firstEmpty] = payload;
+          inserted = true;
+        }
+      }
+
+      // 6) счётчики обновляем ВСЕГДА (можно класть сверх плана)
       bumpOne(idToUse, +1);
-      return prev;
+      setSelectedId(idToUse);
+
+      return inserted ? rowsFromFlat(flat) : prev;
     });
   };
+
+  // const deleteArrayById = () => {
+  //   if (!selectedId) return;
+
+  //   setAutoclave((prev) => {
+  //     const flat = prev.flat();
+  //     console.log('flat', flat);
+
+  //     // 1) вся группа исходных id по выделенному элементу
+  //     const groupIds = new Set(getGroupIds(selectedId));
+  //     if (!groupIds.size) return prev;
+  //     console.log('groupIds', groupIds);
+
+  //     // 2) глобальный "хвост" группы: самый правый индекс в любой колонке
+  //     let tailIdx = -1;
+  //     for (let i = flat.length - 1; i >= 0; i--) {
+  //       const cid = flat[i]?.id;
+  //       if (cid != null && groupIds.has(cid)) {
+  //         tailIdx = i;
+  //         break;
+  //       }
+  //     }
+  //     if (tailIdx === -1) return prev;
+
+  //     console.log('tailIdx', tailIdx);
+  //     const idToDec = flat[tailIdx].id; // конкретный заказ, который убираем
+  //     console.log('idToDec', idToDec);
+
+  //     // 3) удаляем и компактируем ТОЛЬКО эту колонку (автоклав)
+  //     flat[tailIdx] = { ...EMPTY_CELL };
+  //     const row = Math.floor(tailIdx / CELLS_PER_AUTOCLAVE);
+  //     console.log('row', row);
+  //     const start = row * CELLS_PER_AUTOCLAVE;
+  //     console.log('start', start);
+  //     const end = start + CELLS_PER_AUTOCLAVE;
+  //     console.log('end', end);
+
+  //     const used = flat.slice(start, end).filter((c) => c && c.id != null);
+  //     console.log('used', used);
+  //     while (used.length < CELLS_PER_AUTOCLAVE) used.push({ ...EMPTY_CELL });
+  //     for (let i = 0; i < CELLS_PER_AUTOCLAVE; i++) flat[start + i] = used[i];
+
+  //     // 4) счётчики: минус один у того самого id
+  //     bumpOne(idToDec, -1);
+
+  //     // 5) перевыбор — на новый хвост группы (чтобы можно было жать подряд)
+  //     let newTail = null;
+  //     for (let i = flat.length - 1; i >= 0; i--) {
+  //       const cid = flat[i]?.id;
+  //       if (cid != null && groupIds.has(cid)) {
+  //         newTail = cid;
+  //         break;
+  //       }
+  //     }
+  //     setSelectedId(newTail);
+
+  //     return rowsFromFlat(flat);
+  //   });
+  // };
+
+  // const deleteArrayById = () => {
+  //   if (!selectedId) return;
+
+  //   const { id, product_article } = batchDesigner?.find(
+  //     (el) => el?.id === selectedId
+  //   );
+
+  //   setAutoclave((prevAutoclave) => {
+  //     let flatAutoclave = prevAutoclave.flat();
+
+  //     const firstIndex = flatAutoclave.findIndex((el) => el.id === selectedId);
+
+  //     if (firstIndex === -1) {
+  //       alert('Не найдено элементов с таким id');
+  //       return prevAutoclave;
+  //     }
+
+  //     flatAutoclave.splice(firstIndex, 1);
+  //     const count = flatAutoclave.filter((el) => el.id === selectedId).length;
+
+  //     const newAutoclave = [];
+  //     while (flatAutoclave.length) {
+  //       newAutoclave.push(flatAutoclave.splice(0, 21));
+  //     }
+  //     const { cakes_residue } = productionBatchDesigner.find(
+  //       (el) => el.article === product_article
+  //     );
+
+  //     if (cakes_residue <= count) {
+  //       dispatch(
+  //         updateBatchState({
+  //           id,
+  //           cakes_in_batch: count,
+  //           cakes_residue: 0,
+  //         })
+  //       );
+  //       dispatch(
+  //         unlockButton({
+  //           id,
+  //           isButtonLocked: true,
+  //         })
+  //       );
+  //       setQuantityPallets((prev) => {
+  //         return {
+  //           ...prev,
+  //           [id]: count * 3,
+  //         };
+  //       });
+  //       setBatchOrderIDs((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  //     } else {
+  //       dispatch(
+  //         updateBatchState({
+  //           id,
+  //           cakes_in_batch: count,
+  //           cakes_residue: cakes_residue - count,
+  //         })
+  //       );
+
+  //       dispatch(
+  //         unlockButton({
+  //           id,
+  //           isButtonLocked: false,
+  //         })
+  //       );
+
+  //       setQuantityPallets((prev) => {
+  //         return {
+  //           ...prev,
+  //           [id]: count * 3,
+  //         };
+  //       });
+  //       setBatchOrderIDs((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  //     }
+
+  //     return newAutoclave;
+  //   });
+  // };
 
   const deleteArrayById = () => {
     if (!selectedId) return;
+    const found = batchDesigner?.find((el) => el?.id === selectedId);
+    if (!found) return;
+    const productId = found.id;
 
     setAutoclave((prev) => {
-      const flat = flatAutoclave(prev);
-      const idToUse = pickSourceIdForRemove(selectedId, flat);
-      if (!idToUse) return prev;
+      const flat = prev.flat();
 
-      // ищем «последний по дате» id в разметке, проходя с конца
-      let idx = -1;
-      for (let i = flat.length - 1; i >= 0; i--) {
-        if (flat[i]?.id === idToUse) {
-          idx = i;
-          break;
-        }
+      // удаляем ПОСЛЕДНЕЕ вхождение
+      const lastIndex = flat
+        .map((el) => el.article)
+        .lastIndexOf(found.product_article);
+      if (lastIndex === -1) {
+        alert('Не найдено элементов с таким id');
+        return prev;
       }
-      if (idx === -1) return prev;
 
-      const copy = flat.slice();
-      copy[idx] = { ...EMPTY_CELL };
+      // помечаем пустым
+      flat[lastIndex] = { ...EMPTY_CELL };
 
-      // компактируем только тот ряд, где удаляли
-      const row = Math.floor(idx / CELLS_PER_AUTOCLAVE);
-      const start = row * CELLS_PER_AUTOCLAVE;
-      const chunk = copy
-        .slice(start, start + CELLS_PER_AUTOCLAVE)
-        .filter((c) => c?.id);
-      while (chunk.length < CELLS_PER_AUTOCLAVE) chunk.push({ ...EMPTY_CELL });
-      for (let i = 0; i < CELLS_PER_AUTOCLAVE; i++) copy[start + i] = chunk[i];
+      // сжимаем именно этот ряд, чтобы не было дыр
+      const rowIndex = Math.floor(lastIndex / CELLS_PER_AUTOCLAVE);
+      compactRowInPlace(flat, rowIndex);
 
-      bumpOne(idToUse, -1);
+      // пересчёт
+      const count = flat.filter((el) => el.id === selectedId).length;
+      const fromBD = batchFromBD?.find((el) => el.id === selectedId);
+      const cakes_residue = fromBD?.cakes_residue ?? 0;
 
-      // чтобы «Удалить массив» можно было жать подряд
-      const nextId = pickSourceIdForRemove(selectedId, copy);
-      setSelectedId(nextId);
+      if (cakes_residue <= count) {
+        dispatch(
+          updateBatchState({
+            id: productId,
+            cakes_in_batch: count,
+            cakes_residue: 0,
+          })
+        );
 
-      return rowsFromFlat(copy);
+        dispatch(unlockButton({ id: productId, isButtonLocked: true }));
+      } else {
+        dispatch(
+          updateBatchState({
+            id: productId,
+            cakes_in_batch: count,
+            cakes_residue: cakes_residue - count,
+          })
+        );
+        dispatch(unlockButton({ id: productId, isButtonLocked: false }));
+      }
+
+      setQuantityPallets((prevQ) => ({ ...prevQ, [productId]: count * 3 }));
+      setBatchOrderIDs((prevIDs) =>
+        prevIDs.includes(productId) ? prevIDs : [...prevIDs, productId]
+      );
+
+      // собрать обратно фиксированным размером
+      const rows = [];
+      const rowCount = prev.length;
+      for (let r = 0; r < rowCount; r++) {
+        const from = r * CELLS_PER_AUTOCLAVE;
+        rows.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
+      }
+
+      return rows;
     });
   };
+
+  // const deleteBatchById = () => {
+  //   if (!selectedId) return;
+
+  //   setAutoclave((prev) => {
+  //     const flat = flatAutoclave(prev);
+  //     const ids = getGroupIds(selectedId);
+  //     if (!ids.length) return prev;
+
+  //     const removedById = new Map();
+
+  //     const copy = flat.slice();
+  //     for (let i = 0; i < copy.length; i++) {
+  //       const cid = copy[i]?.id;
+  //       if (cid != null && ids.includes(cid)) {
+  //         removedById.set(cid, (removedById.get(cid) || 0) + 1);
+  //         copy[i] = { ...EMPTY_CELL };
+  //       }
+  //     }
+
+  //     // Компактим каждую "колонку" автоклава
+  //     const cols = Math.ceil(copy.length / CELLS_PER_AUTOCLAVE);
+  //     for (let c = 0; c < cols; c++) {
+  //       const from = c * CELLS_PER_AUTOCLAVE;
+  //       const chunk = copy
+  //         .slice(from, from + CELLS_PER_AUTOCLAVE)
+  //         .filter((x) => x?.id);
+  //       while (chunk.length < CELLS_PER_AUTOCLAVE) chunk.push({ ...EMPTY_CELL });
+  //       for (let i = 0; i < CELLS_PER_AUTOCLAVE; i++) copy[from + i] = chunk[i];
+  //     }
+
+  //     ids.forEach((id) => {
+  //       const removed = removedById.get(id) || 0;
+  //       if (removed === 0) return;
+
+  //       const total = getTotalById(id);
+  //       const currIn = getInBatchById(id);
+  //       const currRes = getResidueById(id);
+
+  //       const nextIn = Math.max(0, currIn - removed);
+
+  //       let candidateResidue = currRes + removed;
+
+  //       const maxResAllowed = Math.max(total - nextIn, 0);
+
+  //       const nextRes = Math.max(Math.min(candidateResidue, maxResAllowed), 0);
+
+  //       dispatch(
+  //         updateBatchState({ id, cakes_in_batch: nextIn, cakes_residue: nextRes })
+  //       );
+  //       dispatch(unlockButton({ id, isButtonLocked: nextRes === 0 }));
+  //       setQuantityPallets((prev) => ({ ...prev, [id]: nextIn * 3 }));
+  //       setBatchOrderIDs((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  //     });
+
+  //     setSelectedId(null);
+  //     return rowsFromFlat(copy);
+  //   });
+  // };
 
   const deleteBatchById = () => {
     if (!selectedId) return;
+    const found = batchDesigner?.find((el) => el.id === selectedId);
+    if (!found) return;
+    const productId = found.id;
 
     setAutoclave((prev) => {
-      const flat = flatAutoclave(prev);
-      const ids = getGroupIds(selectedId);
-      if (!ids.length) return prev;
+      const flat = prev.flat();
 
-      // очистить все ячейки группы
-      const copy = flat.slice();
-      for (let i = 0; i < copy.length; i++) {
-        if (ids.includes(copy[i]?.id)) copy[i] = { ...EMPTY_CELL };
+      // зануляем все вхождения выбранной партии
+      for (let i = 0; i < flat.length; i++) {
+        if (flat[i]?.article === found.product_article) flat[i] = { ...EMPTY_CELL };
       }
 
-      // компактнуть каждую колонку
-      const cols = Math.ceil(copy.length / CELLS_PER_AUTOCLAVE);
-      for (let c = 0; c < cols; c++) {
-        const from = c * CELLS_PER_AUTOCLAVE;
-        const chunk = copy
-          .slice(from, from + CELLS_PER_AUTOCLAVE)
-          .filter((x) => x?.id);
-        while (chunk.length < CELLS_PER_AUTOCLAVE) chunk.push({ ...EMPTY_CELL });
-        for (let i = 0; i < CELLS_PER_AUTOCLAVE; i++) copy[from + i] = chunk[i];
-      }
+      // сжимаем все ряды, чтобы пустые ушли в хвост каждого ряда
+      compactAllRowsInPlace(flat, prev.length);
 
-      // откатить Redux к исходным значениям по каждому исходному заказу
-      for (const id of ids) {
-        const { inBatch, residue } = getOriginalById(id);
-        dispatch(
-          updateBatchState({ id, cakes_in_batch: inBatch, cakes_residue: residue })
-        );
-        dispatch(unlockButton({ id, isButtonLocked: residue === 0 }));
-        setQuantityPallets((prev) => ({ ...prev, [id]: inBatch * 3 }));
-        setBatchOrderIDs((prev) => (prev.includes(id) ? prev : [...prev, id]));
-      }
+      const fromBD = batchFromBD?.find((el) => el.id === selectedId) || {};
+      const { cakes_in_batch, cakes_residue } = fromBD;
 
-      setSelectedId(null);
-      return rowsFromFlat(copy);
+      dispatch(updateBatchState({ id: productId, cakes_in_batch, cakes_residue }));
+      setQuantityPallets((prevQ) => ({ ...prevQ, [productId]: 0 }));
+      setBatchOrderIDs((prevIDs) => prevIDs.filter((x) => x !== productId));
+      dispatch(unlockButton({ id: productId, isButtonLocked: false }));
+
+      // собрать обратно без изменения размеров
+      const rows = [];
+      for (let r = 0; r < prev.length; r++) {
+        const from = r * CELLS_PER_AUTOCLAVE;
+        rows.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
+      }
+      return rows;
     });
   };
 
+  // const fillingAutoclave = () => {
+  //   if (!selectedId) return;
+
+  //   // id, в пользу которого заполняем (по твоему правилу: ближайшая дата, иначе самая поздняя)
+  //   const idToUse = pickSourceIdForAdd(selectedId);
+  //   if (!idToUse) return;
+
+  //   // параметры плит берем у группы (они одинаковые для sources в продукте)
+  //   const group = getGroupBySourceId(selectedId);
+  //   const density = group?.density || '';
+  //   const width = group?.width || '';
+
+  //   setAutoclave((prev) => {
+  //     const flat = prev.flat();
+
+  //     // определяем КОНКРЕТНЫЙ автоклав (колонку) по любой ячейке выбранного id
+  //     const anyIdx = flat.map((c) => c?.id).lastIndexOf(selectedId);
+  //     if (anyIdx === -1) return prev;
+
+  //     const { start, end } = getColBounds(anyIdx);
+
+  //     // считаем пустые в ЭТОЙ колонке
+  //     // (сколько сможем реально поставить)
+  //     let empties = 0;
+  //     for (let i = start; i < end; i++)
+  //       if (!flat[i] || flat[i].id == null) empties++;
+
+  //     if (!empties) return prev;
+
+  //     let placed = 0;
+
+  //     // пробуем по одному вставлять СРАЗУ ПОСЛЕ ХВОСТА idToUse в этой же колонке,
+  //     // сдвигая ячейки внутри колонки вправо (прилегание к своей группе).
+  //     while (placed < empties) {
+  //       // хвост нашей группы в текущей колонке
+  //       let tail = findTailIndexInBounds(flat, idToUse, start, end);
+
+  //       // если своей группы еще нет в этой колонке — привяжемся к хвосту выделенной группы
+  //       if (tail === -1) {
+  //         const selTail = findTailIndexInBounds(flat, selectedId, start, end);
+  //         if (selTail !== -1) {
+  //           const ok = insertAdjacentToTail(flat, selTail, {
+  //             id: idToUse,
+  //             density,
+  //             width,
+  //           });
+  //           if (!ok) break; // нет пустоты справа от хвоста в колонке
+  //           placed++;
+  //           continue;
+  //         }
+  //         // если в колонке нет ни выбранного id, ни нашей группы — ставим в первую пустую
+  //         let firstEmpty = -1;
+  //         for (let i = start; i < end; i++) {
+  //           if (!flat[i] || flat[i].id == null) {
+  //             firstEmpty = i;
+  //             break;
+  //           }
+  //         }
+  //         if (firstEmpty === -1) break;
+  //         flat[firstEmpty] = { id: idToUse, density, width };
+  //         placed++;
+  //         continue;
+  //       }
+
+  //       // нормальный случай: прилегаем к хвосту своей группы
+  //       const ok = insertAdjacentToTail(flat, tail, { id: idToUse, density, width });
+  //       if (!ok) break; // в колонке нет пустоты справа от хвоста
+  //       placed++;
+  //       // tail сдвинулся на +1; следующая итерация опять вставит сразу за новым хвостом
+  //     }
+
+  //     // одним батчем обновляем счетчики на число реально вставленных
+  //     if (placed > 0) {
+  //       applyDeltaBatch({ [idToUse]: placed });
+  //       setSelectedId(idToUse);
+  //       return rowsFromFlat(flat);
+  //     }
+
+  //     return prev;
+  //   });
+  // };
+
   const fillingAutoclave = () => {
     if (!selectedId) return;
-
-    const group = getGroupBySourceId(selectedId);
-    const density = group?.density || '';
-    const width = group?.width || '';
+    const found = batchDesigner?.find((el) => el?.id === selectedId);
+    if (!found) return;
+    const productId = found.id;
 
     setAutoclave((prev) => {
-      const flat = flatAutoclave(prev);
+      const flat = prev.flat();
 
-      // найдём любую ячейку выбранного id, чтобы определить текущий автоклав (ряд из 21)
-      const anyIdx = flat.map((c) => c?.id).lastIndexOf(selectedId);
-      if (anyIdx === -1) return prev;
-
-      const rowStart = anyIdx - (anyIdx % CELLS_PER_AUTOCLAVE);
-      const rowEnd = rowStart + CELLS_PER_AUTOCLAVE;
-
-      // все пустые позиции в ЭТОМ автоклаве
-      const emptyPos = [];
-      for (let i = rowStart; i < rowEnd; i++) {
-        if (!flat[i] || flat[i].id === null) emptyPos.push(i);
+      let lastIndex = flat
+        .map((el) => el.article)
+        .lastIndexOf(found.product_article);
+      if (lastIndex === -1) {
+        alert('Не найдено элементов с таким id');
+        return prev;
       }
-      if (emptyPos.length === 0) return prev;
 
-      // кого пополняем: если есть неразмещённые — ближайшая дата, иначе — самая поздняя
-      const idToUse =
-        typeof pickSourceIdForAdd === 'function'
-          ? pickSourceIdForAdd(selectedId)
-          : selectedId;
+      const rowStart = lastIndex - (lastIndex % CELLS_PER_AUTOCLAVE);
+      const rowEnd = rowStart + CELLS_PER_AUTOCLAVE;
+      const source = { ...flat[lastIndex] };
 
-      // рисуем в матрице сразу все ячейки…
-      const next = flat.slice();
-      for (const pos of emptyPos) next[pos] = { id: idToUse, density, width };
+      // идём по позициям справа от хвоста в пределах текущего ряда
+      for (let pos = lastIndex + 1; pos < rowEnd; pos++) {
+        // если пусто — просто ставим
+        if (!flat[pos] || flat[pos].id === null) {
+          flat[pos] = { ...source };
+          lastIndex = pos;
+          continue;
+        }
 
-      // …и одним батчем обновляем счётчики (+кол-во пустых мест)
-      applyDeltaBatch({ [idToUse]: emptyPos.length });
+        // иначе ищем ближайшую пустую дальше в этом ряду
+        let empty = -1;
+        for (let j = pos; j < rowEnd; j++) {
+          if (!flat[j] || flat[j].id === null) {
+            empty = j;
+            break;
+          }
+        }
 
-      return rowsFromFlat(next);
+        if (empty === -1) {
+          // в ряду больше нет места
+          break;
+        }
+
+        // сдвигаем хвост на 1 вправо: [pos .. empty-1] -> [pos+1 .. empty]
+        for (let k = empty; k > pos; k--) {
+          flat[k] = flat[k - 1];
+        }
+        // вставляем копию рядом с группой
+        flat[pos] = { ...source };
+        lastIndex = pos; // хвост группы сместился
+      }
+
+      const count = flat.filter((el) => el.article === found.product_article).length;
+
+      dispatch(
+        updateBatchState({
+          id: selectedId,
+          cakes_in_batch: count,
+          cakes_residue: 0,
+        })
+      );
+
+      setQuantityPallets((prevQ) => ({ ...prevQ, [productId]: count * 3 }));
+      setBatchOrderIDs((prevIDs) =>
+        prevIDs.includes(productId) ? prevIDs : [...prevIDs, productId]
+      );
+
+      // собираем обратно фиксированным размером
+      const rows = [];
+      const rowCount = prev.length;
+      for (let r = 0; r < rowCount; r++) {
+        const from = r * CELLS_PER_AUTOCLAVE;
+        rows.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
+      }
+
+      return rows;
     });
   };
 
@@ -777,10 +1018,10 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
           quantity_pallets:
             product.cakes_in_batch * Math.floor(m3InArray / volumeBlockOnPallet),
           quantity_free:
-            newPosition.product.id_list_of_ordered_production !== null &&
-            newPosition.product.cakes_in_batch &&
-            newPosition.product.total_cakes &&
-            newPosition.product.free_product_package >= 0
+            newPosition?.product?.id_list_of_ordered_production !== null &&
+            newPosition?.product?.cakes_in_batch &&
+            newPosition?.product?.total_cakes &&
+            newPosition?.product?.free_product_package >= 0
               ? Math.max(
                   0,
                   newPosition.product.cakes_in_batch *
@@ -889,7 +1130,10 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
                 className={`autoclave-cell ${getClassForAutoclave(
                   assignColorToId(el?.id)
                 )}`}
-                onClick={() => setSelectedId(el?.id)}
+                onClick={() => {
+                  setSelectedId(el?.id);
+                  articleHandler(el?.id);
+                }}
               >
                 {el.id !== null ? `${el.density}x${el.width}` : ''}
               </div>
@@ -899,7 +1143,7 @@ function Autoclave({ acData, batchFromBD, autoclaveCalendarData }) {
       </div>
 
       <div className="autoclave-buttons-container">
-        {selectedId && <div>Выбран массив с id: {selectedId}</div>}
+        {selectedArticle && <div>Выбран массив с article: {selectedArticle}</div>}
         <button onClick={deleteBatchById}>Удалить партию</button>
         <button onClick={deleteArrayById}>Удалить Массив</button>
         <button onClick={addArrayAfterId}>Добавить массив</button>

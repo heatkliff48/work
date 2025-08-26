@@ -29,6 +29,8 @@ function ProductionBatchDesignerNew() {
   const { productBatchModal, setProductBatchModal } = useModalContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
+  const batchOutside = useSelector((state) => state.batchOutside);
+
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [currId, setCurrId] = useState(null);
   const [acData, setAcData] = useState([]);
@@ -165,6 +167,10 @@ function ProductionBatchDesignerNew() {
   const addCakesData = useCallback(
     (prodBatchData) => {
       const { id, product_with_brack, article } = prodBatchData;
+      const m3InArray = latestProducts?.find((p) => p.article == article)?.m3InArray;
+      const volumeBlockOnPallet = latestProducts?.find(
+        (p) => p.article == article
+      )?.volumeBlockOnPallet;
 
       const free_product_cakes = (
         Math.ceil(product_with_brack) - product_with_brack
@@ -174,14 +180,21 @@ function ProductionBatchDesignerNew() {
       const total_cakes = Math.ceil(product_with_brack);
 
       // ищем запись в batchDesigner ровно один раз
-      const existing = batchDesigner.find((el) => el.id === id);
+      const haveBatch = batchDesigner.find((el) => el.id == id);
+      const existing = haveBatch
+        ? haveBatch
+        : batchOutside.find((el) => el.id == id);
 
       // если записи нет — считаем, что размещено 0
-      const cakes_in_batch = existing?.cakes_in_batch ?? 0;
+      const cakes_in_batch = haveBatch
+        ? haveBatch?.cakes_in_batch ?? 0
+        : existing
+        ? existing?.quantity_pallets / Math.floor(m3InArray / volumeBlockOnPallet) ??
+          0
+        : 0;
 
       // если есть готовое значение — берём его, иначе считаем от total_cakes
-      const cakes_residue =
-        existing?.cakes_residue ?? Math.max(total_cakes - cakes_in_batch, 0);
+      const cakes_residue = Math.max(total_cakes - cakes_in_batch, 0);
 
       const updatedProdBatch = {
         ...prodBatchData,
@@ -248,12 +261,14 @@ function ProductionBatchDesignerNew() {
       if (!batch)
         return {
           id: null,
+          article: '',
           density: '',
           width: '',
         };
 
       return {
         id: batch.id,
+        article: batch.article,
         density: batch.density,
         width: batch.width,
       };
@@ -372,7 +387,6 @@ function ProductionBatchDesignerNew() {
     const reindexed = merged.map((item, index) => ({ ...item, id: index + 1 }));
     setProductonBatchDesigner(reindexed);
 
-    // setProductonBatchDesigner(prodBatch);
     setTotalQuantity(updatedTotalQuantity);
 
     const updatedAutoclaveData = transformAutoclaveData(emptyAutoclave, prodBatch);
@@ -386,7 +400,7 @@ function ProductionBatchDesignerNew() {
   }, [latestProducts, listOfOrderedCakes, emptyAutoclave]);
 
   useEffect(() => {
-    if (autoclave.length === 0) return;
+    if (autoclave?.length === 0) return;
 
     setProductonBatchDesigner((prev) =>
       prev.map((item) => {
@@ -420,18 +434,129 @@ function ProductionBatchDesignerNew() {
     );
   }, [batchDesigner]);
 
+  // useEffect(() => {
+  //   if (currId === null) return;
+
+  //   const groupRow = productionBatchDesigner.find((r) => r.id === currId);
+  //   if (!groupRow) {
+  //     setCurrId(null);
+  //     return;
+  //   }
+
+  //   const { density, width, cakes_residue, product_article } = groupRow;
+
+  //   // Синхронные источники прямо из Redux по этому артикулу
+  //   const sources = batchDesigner
+  //     .filter((b) => b.product_article === product_article)
+  //     .map((b) => ({
+  //       id: b.id,
+  //       total_cakes: Number(b.total_cakes) || 0,
+  //       cakes_in_batch: Number(b.cakes_in_batch) || 0,
+  //       cakes_residue: Number(b.cakes_residue) || 0,
+  //     }));
+
+  //   setAutoclave((prevAutoclave) => {
+  //     const rows = prevAutoclave.map((r) => [...r]);
+  //     const flat = rows.flat();
+
+  //     // свободные ячейки
+  //     const freeIdx = [];
+  //     for (let i = 0; i < flat.length; i++) {
+  //       if (!flat[i]?.id) freeIdx.push(i);
+  //     }
+  //     if (freeIdx.length === 0) {
+  //       alert('No free slots available in autoclaves');
+  //       return prevAutoclave;
+  //     }
+
+  //     // сколько реально можем положить
+  //     let remaining = Math.min(Number(cakes_residue) || 0, freeIdx.length);
+  //     let placed = 0;
+  //     let cursor = 0;
+
+  //     // раскладываем именно по REAL id из sources
+  //     for (const s of sources) {
+  //       if (remaining <= 0) break;
+  //       const sResidue = Math.max(
+  //         (Number(s.total_cakes) || 0) - (Number(s.cakes_in_batch) || 0),
+  //         Number(s.cakes_residue) || 0
+  //       );
+  //       const take = Math.min(sResidue, remaining);
+  //       for (let k = 0; k < take; k++) {
+  //         const idx = freeIdx[cursor++];
+  //         flat[idx] = { id: s.id, density, width, article: product_article };
+  //       }
+  //       placed += take;
+  //       remaining -= take;
+  //     }
+
+  //     // собираем матрицу обратно (по 21)
+  //     const CELLS_PER_AUTOCLAVE = 21;
+  //     const out = [];
+  //     for (let i = 0; i < rows.length; i++) {
+  //       const from = i * CELLS_PER_AUTOCLAVE;
+  //       out.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
+  //     }
+
+  //     // >>> ВАЖНО: сообщаем "сколько положили" во второй этап
+  //     if (placed > 0) {
+  //       setPendingPlacement({ groupId: currId, placed, sources });
+  //     } else {
+  //       // ничего не положили — сразу сбросим выбор
+  //       setCurrId(null);
+  //     }
+
+  //     return out;
+  //   });
+  // }, [currId]);
+
   useEffect(() => {
-    if (currId === null) return;
+    if (currId == null) return;
 
     const groupRow = productionBatchDesigner.find((r) => r.id === currId);
-    if (!groupRow) {
-      setCurrId(null);
-      return;
-    }
+    if (!groupRow) return;
 
     const { density, width, cakes_residue, product_article } = groupRow;
+    const CELLS_PER_AUTOCLAVE = 21;
+    const EMPTY_CELL = () => ({});
+    const isEmpty = (c) => !c || !c.id;
 
-    // Синхронные источники прямо из Redux по этому артикулу
+    const getColBounds = (idx) => {
+      const start = idx - (idx % CELLS_PER_AUTOCLAVE);
+      return { start, end: start + CELLS_PER_AUTOCLAVE - 1 };
+    };
+
+    // Пытаемся "открыть окно" размером size, начиная с start,
+    // сдвигая всё ПРАВО от start внутри границ [bStart..bEnd].
+    // Возвращает { ok, next } — next используется ТОЛЬКО если ok === true.
+    const tryOpenWindowRight = (arr, start, size, bStart, bEnd) => {
+      const a = arr.slice(); // чистая копия
+      let insertPos = start;
+
+      for (let step = 0; step < size; step++) {
+        // ищем ПУСТУЮ ячейку справа внутри границ
+        let emptyAt = -1;
+        for (let i = bEnd; i >= insertPos; i--) {
+          if (isEmpty(a[i])) {
+            emptyAt = i;
+            break;
+          }
+        }
+        if (emptyAt === -1) {
+          return { ok: false };
+        }
+        // сдвигаем блок [insertPos..emptyAt-1] на 1 вправо
+        for (let j = emptyAt; j > insertPos; j--) {
+          a[j] = a[j - 1];
+        }
+        a[insertPos] = EMPTY_CELL();
+        insertPos += 1; // двигаем позицию для следующего шага окна
+      }
+
+      return { ok: true, next: a };
+    };
+
+    // Кладём подряд, распределяя по источникам этого артикула
     const sources = batchDesigner
       .filter((b) => b.product_article === product_article)
       .map((b) => ({
@@ -441,57 +566,102 @@ function ProductionBatchDesignerNew() {
         cakes_residue: Number(b.cakes_residue) || 0,
       }));
 
-    setAutoclave((prevAutoclave) => {
-      const rows = prevAutoclave.map((r) => [...r]);
+    setAutoclave((prev) => {
+      const rows = prev.map((r) => [...r]);
       const flat = rows.flat();
 
-      // свободные ячейки
-      const freeIdx = [];
-      for (let i = 0; i < flat.length; i++) {
-        if (!flat[i]?.id) freeIdx.push(i);
-      }
-      if (freeIdx.length === 0) {
-        alert('No free slots available in autoclaves');
-        return prevAutoclave;
-      }
+      // Сколько реально можем положить
+      const freeTotal = flat.reduce((acc, c) => acc + (isEmpty(c) ? 1 : 0), 0);
+      let remaining = Math.min(Number(cakes_residue) || 0, freeTotal);
+      if (remaining <= 0) return prev;
 
-      // сколько реально можем положить
-      let remaining = Math.min(Number(cakes_residue) || 0, freeIdx.length);
-      let placed = 0;
-      let cursor = 0;
-
-      // раскладываем именно по REAL id из sources
-      for (const s of sources) {
-        if (remaining <= 0) break;
-        const sResidue = Math.max(
-          (Number(s.total_cakes) || 0) - (Number(s.cakes_in_batch) || 0),
-          Number(s.cakes_residue) || 0
-        );
-        const take = Math.min(sResidue, remaining);
-        for (let k = 0; k < take; k++) {
-          const idx = freeIdx[cursor++];
-          flat[idx] = { id: s.id, density, width };
+      // Ищем последний индекс нашего артикула
+      let lastSameIdx = -1;
+      for (let i = flat.length - 1; i >= 0; i--) {
+        if (flat[i]?.article === product_article) {
+          lastSameIdx = i;
+          break;
         }
-        placed += take;
-        remaining -= take;
       }
 
-      // собираем матрицу обратно (по 21)
-      const CELLS_PER_AUTOCLAVE = 21;
+      // Хелпер вставки подряд в flat начиная с idx (без сдвигов, предполагая свободные)
+      const placeSequentially = (startIdx, count) => {
+        let idx = startIdx;
+        let left = count;
+        for (const s of sources) {
+          if (left <= 0) break;
+          const residue =
+            Math.max(s.total_cakes - s.cakes_in_batch, s.cakes_residue) || 0;
+          const take = Math.min(residue, left);
+          for (let k = 0; k < take; k++) {
+            flat[idx++] = { id: s.id, density, width, article: product_article };
+          }
+          left -= take;
+        }
+        return count - left; // фактически поставлено
+      };
+
+      let placed = 0;
+
+      if (lastSameIdx >= 0) {
+        // Вставляем СРАЗУ ПОСЛЕ последнего такого артикула и сдвигаем всё вправо,
+        // строго внутри этого же автоклава.
+        const insertAt = lastSameIdx + 1;
+        const { start: bStart, end: bEnd } = getColBounds(insertAt);
+
+        // Максимум сколько вообще влезет внутрь этого автоклава
+        const freeHere = (() => {
+          let n = 0;
+          for (let i = insertAt; i <= bEnd; i++) if (isEmpty(flat[i])) n++;
+          // Плюс то, что сможем «вытолкать» вправо за счёт других пустых
+          // внутри тех же границ — tryOpenWindowRight это посчитает сам.
+          return n + 0;
+        })();
+
+        // Пробуем открыть окно от remaining вниз до 1,
+        // применяем ТОЛЬКО успешный вариант.
+        let best = null;
+        for (
+          let want = Math.min(remaining, bEnd - insertAt + 1);
+          want >= 1;
+          want--
+        ) {
+          const trial = tryOpenWindowRight(flat, insertAt, want, bStart, bEnd);
+          if (trial.ok) {
+            best = { want, next: trial.next };
+            break;
+          }
+        }
+
+        if (best) {
+          // применяем результат чистого сдвига
+          for (let i = 0; i < flat.length; i++) flat[i] = best.next[i];
+          // размещаем в открытое окно
+          placed += placeSequentially(insertAt, Math.min(best.want, remaining));
+          remaining -= placed;
+        }
+        // если не удалось открыть даже окно на 1 — ничего не трогаем (и не перезаписываем!)
+      } else {
+        // Такого артикула нет — кладём в первые свободные слоты (без сдвига)
+        for (let i = 0; i < flat.length && remaining > 0; i++) {
+          if (isEmpty(flat[i])) {
+            placed += placeSequentially(i, 1);
+            remaining -= 1;
+          }
+        }
+      }
+
+      if (placed === 0) return prev;
+
+      // Собираем обратно по 21
       const out = [];
       for (let i = 0; i < rows.length; i++) {
         const from = i * CELLS_PER_AUTOCLAVE;
         out.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
       }
 
-      // >>> ВАЖНО: сообщаем "сколько положили" во второй этап
-      if (placed > 0) {
-        setPendingPlacement({ groupId: currId, placed, sources });
-      } else {
-        // ничего не положили — сразу сбросим выбор
-        setCurrId(null);
-      }
-
+      // Сообщаем системе учёта, что реально положили
+      setPendingPlacement({ groupId: currId, placed, sources });
       return out;
     });
   }, [currId]);
@@ -562,9 +732,7 @@ function ProductionBatchDesignerNew() {
           <td>
             <button
               onClick={() => handleAddOnAutoclave(row)}
-              disabled={
-                batchDesigner?.find((el) => el.id === row.id)?.isButtonLocked
-              }
+              disabled={row.cakes_residue === 0}
             >
               Разместить
             </button>
