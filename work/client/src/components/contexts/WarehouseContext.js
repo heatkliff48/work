@@ -537,15 +537,19 @@ const WarehouseContextProvider = ({ children }) => {
     return { sources: out, taken: amount - remaining, leftover: remaining };
   };
 
+  const getTime = (d) => {
+    const t = d ? new Date(d).getTime() : NaN;
+    return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
+  };
+
   useEffect(() => {
-    const data = list_of_ordered_production
-      ?.filter((el) => {
-        // Определение статуса заказа
-        const orderStatus = list_of_orders?.find(
+    // Построение базового списка заказов без quantity_in_batch (пока)
+    const baseOrders = list_of_ordered_production
+      .filter((el) => {
+        const orderStatus = list_of_orders.find(
           (order) => order.article === el.order_article
         )?.status;
 
-        // Исключение заказов с указанными статусами
         return ![7, 8, 9, 10].includes(orderStatus);
       })
       .map((el) => {
@@ -553,23 +557,91 @@ const WarehouseContextProvider = ({ children }) => {
           (prod) => prod.article === el.product_article
         );
 
-        // Рассчитать количество тортов
-        const quantity_cakes = Math.ceil(
-          el.quantity / Math.floor(product?.m3InArray / product?.volumeBlockOnPallet)
+        const arraysPerPalletRaw = Math.floor(
+          (product?.m3InArray ?? 0) / (product?.volumeBlockOnPallet ?? 1)
         );
+        const arraysPerPallet = arraysPerPalletRaw > 0 ? arraysPerPalletRaw : 1;
 
-        // Рассчитать количество в партии
-        const quantity_in_batch =
-          batchOutside.find((batch) => batch.id_list_of_ordered_production === el.id)
-            ?.quantity_pallets / 3 || 0;
+        const quantity_cakes = Math.ceil(
+          (Number(el.quantity) || 0) / arraysPerPallet
+        );
 
         return {
           ...el,
           quantity_cakes,
-          quantity_in_batch,
-          // quantity_in_warehouse,
+          quantity_in_batch: 0,
         };
-      })
+      });
+
+    const byArticle = new Map();
+    const idSetByArticle = new Map();
+
+    for (const item of baseOrders) {
+      if (!byArticle.has(item.product_article)) {
+        byArticle.set(item.product_article, []);
+        idSetByArticle.set(item.product_article, new Set());
+      }
+      byArticle.get(item.product_article).push(item);
+      idSetByArticle.get(item.product_article).add(item.id);
+    }
+
+    // Сортировка внутри каждой группы по shipping_date (возрастание)
+    for (const list of byArticle.values()) {
+      list.sort((a, b) => getTime(a.shipping_date) - getTime(b.shipping_date));
+    }
+
+    // Считаем произведённое по каждому product_article из batchOutside.
+    // Поддерживаем два сценария:
+    // 1) новые записи с полем batch.product_article,
+    // 2) старые записи, привязанные к id_list_of_ordered_production.
+    const producedByArticle = new Map();
+
+    for (const batch of batchOutside) {
+      const producedUnits = (Number(batch.quantity_pallets) || 0) / 3;
+
+      // пытаемся взять напрямую по product_article
+      let art = batch.product_article;
+
+      // если нет product_article — маппим по принадлежности id к группе
+      if (!art) {
+        for (const [pa, idSet] of idSetByArticle.entries()) {
+          if (
+            batch.id_list_of_ordered_production &&
+            idSet.has(batch.id_list_of_ordered_production)
+          ) {
+            art = pa;
+            break;
+          }
+        }
+      }
+
+      if (!art) continue;
+
+      producedByArticle.set(art, (producedByArticle.get(art) || 0) + producedUnits);
+    }
+
+    // Распределение произведённого: идём по заказам (после сортировки) и "раздаём"
+    for (const [article, orders] of byArticle.entries()) {
+      let remaining = producedByArticle.get(article) || 0;
+
+      for (const order of orders) {
+        if (remaining <= 0) {
+          order.quantity_in_batch = 0;
+          continue;
+        }
+
+        const need = Number(order.quantity) || 0;
+        const alloc = Math.min(need, remaining);
+
+        order.quantity_in_batch = alloc;
+        remaining -= alloc;
+      }
+    }
+
+    // Финальный массив data
+    const data = Array.from(byArticle.values())
+      .flat()
+      // если тебе всё ещё нужно уникализировать по (product_article, order_article)
       .reduce((uniqueItems, item) => {
         if (
           !uniqueItems.some(
@@ -582,6 +654,51 @@ const WarehouseContextProvider = ({ children }) => {
         }
         return uniqueItems;
       }, []);
+
+    // const data = list_of_ordered_production
+    //   ?.filter((el) => {
+    //     // Определение статуса заказа
+    //     const orderStatus = list_of_orders?.find(
+    //       (order) => order.article === el.order_article
+    //     )?.status;
+
+    //     // Исключение заказов с указанными статусами
+    //     return ![7, 8, 9, 10].includes(orderStatus);
+    //   })
+    //   .map((el) => {
+    //     const product = latestProducts.find(
+    //       (prod) => prod.article === el.product_article
+    //     );
+
+    //     // Рассчитать количество тортов
+    //     const quantity_cakes = Math.ceil(
+    //       el.quantity / Math.floor(product?.m3InArray / product?.volumeBlockOnPallet)
+    //     );
+
+    //     // Рассчитать количество в партии
+    //     const quantity_in_batch =
+    //       batchOutside.find((batch) => batch.id_list_of_ordered_production === el.id)
+    //         ?.quantity_pallets / 3 || 0;
+
+    //     return {
+    //       ...el,
+    //       quantity_cakes,
+    //       quantity_in_batch,
+    //       // quantity_in_warehouse,
+    //     };
+    //   })
+    //   .reduce((uniqueItems, item) => {
+    //     if (
+    //       !uniqueItems.some(
+    //         (el) =>
+    //           el.product_article === item.product_article &&
+    //           el.order_article === item.order_article
+    //       )
+    //     ) {
+    //       uniqueItems.push(item);
+    //     }
+    //     return uniqueItems;
+    //   }, []);
 
     setListOfOrderedCakes(data);
 

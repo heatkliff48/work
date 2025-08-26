@@ -27,6 +27,7 @@ const initState = {
   listOfOrderedProduction: [],
   listOfOrderedProductionOEM: [],
   batchDesigner: [],
+  batchOutside: [],
   recipeOrders: [],
   filesWarehouse: [],
   filesOrder: [],
