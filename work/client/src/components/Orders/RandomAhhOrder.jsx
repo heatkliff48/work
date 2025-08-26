@@ -8,6 +8,7 @@ import {
   getCurrentProductsOfOrders,
   getOrders,
 } from '#components/redux/actions/ordersAction.js';
+import { useNavigate } from 'react-router-dom';
 
 function RandomAhhOrder(props) {
   const {
@@ -19,6 +20,8 @@ function RandomAhhOrder(props) {
     setIsOrderReady,
     getCurrentOrderInfoHandler,
     ordersDataList,
+    randomOrderCheck,
+    setRandomOrderCheck,
   } = useOrderContext();
   const { setCurrentClient } = useProjectContext();
   const list_of_clients = useSelector((state) => state.clients);
@@ -26,6 +29,7 @@ function RandomAhhOrder(props) {
   const contactInfo = useSelector((state) => state.contactInfo);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const makeRandomOrder = () => {
     const article = getOrderArticle();
@@ -98,13 +102,25 @@ function RandomAhhOrder(props) {
 
   useEffect(() => {
     if (isOrderReady) {
-      console.log('ordersDataList', ordersDataList); // я хз как здесь новый список заказов получить
+      // console.log('ordersDataList', ordersDataList); // я хз как здесь новый список заказов получить
       // dispatch(getOrders());
-      getCurrentOrderInfoHandler(newOrder);
+      // console.log('newOrder', newOrder);
+      // getCurrentOrderInfoHandler(newOrder);
+      // console.log(
+      //   'ordersDataList[ordersDataList.length - 1]',
+      //   ordersDataList[ordersDataList.length - 1]
+      // );
+      getCurrentOrderInfoHandler(ordersDataList[ordersDataList.length - 1]);
+      dispatch(
+        getCurrentProductsOfOrders(ordersDataList[ordersDataList.length - 1].id)
+      );
+      // console.log('randomOrderCheck', randomOrderCheck);
+      setRandomOrderCheck(true);
+      navigate('/order_card');
       setIsOrderReady(false);
       setNewOrder({});
     }
-  }, [isOrderReady, ordersDataList]);
+  }, [ordersDataList]);
 
   return (
     <>

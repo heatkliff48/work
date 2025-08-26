@@ -72,6 +72,8 @@ const OrderCart = React.memo(() => {
     anchorProductsOfOrders,
     toolProductsOfOrders,
     relMatProductsOfOrders,
+    randomOrderCheck,
+    setRandomOrderCheck,
   } = useOrderContext();
 
   const {
@@ -80,6 +82,8 @@ const OrderCart = React.memo(() => {
     warehouseInfoModal,
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
+    productModalOrder,
+    setProductModalOrder,
   } = useModalContext();
   const { displayNames, user } = useProjectContext();
 
@@ -959,6 +963,24 @@ const OrderCart = React.memo(() => {
       }
     }
   }, [list_of_orders, orderCartData?.id]);
+
+  useEffect(() => {
+    if (!randomOrderCheck) return;
+    setProductModalOrder(true);
+    const today = new Date();
+    const randomDays = Math.floor(Math.random() * 365) + 1; // от 1 до 365 дней вперед
+    const randomDate = new Date(today);
+    randomDate.setDate(today.getDate() + randomDays);
+
+    handleDateChange(randomDate);
+
+    dispatch(
+      updateOrderStatus({
+        order_id: orderCartData?.id,
+        status: 6,
+      })
+    );
+  }, [randomOrderCheck]);
 
   return (
     <>

@@ -17,6 +17,8 @@ function OrdersTable() {
     setProductOfOrder,
     setNewOrder,
     ordersDataList,
+    randomOrderCheck,
+    setRandomOrderCheck,
   } = useOrderContext();
   const { clientModalOrder, setClientModalOrder } = useModalContext();
   const { setCurrentClient } = useProjectContext();
@@ -42,6 +44,7 @@ function OrdersTable() {
     setProductOfOrder({});
     setNewOrder({});
     setCurrentClient({});
+    setRandomOrderCheck(false);
   }, [clientModalOrder]);
 
   return (
@@ -63,6 +66,7 @@ function OrdersTable() {
         buttonText={'Add new order'}
         tableName={'Orders'}
         handleRowClick={(row) => {
+          console.log('row.original', row.original);
           getCurrentOrderInfoHandler(row.original);
           dispatch(getCurrentProductsOfOrders(row.original.id));
           navigate('/order_card');
