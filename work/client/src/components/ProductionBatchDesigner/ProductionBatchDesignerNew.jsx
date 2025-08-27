@@ -154,7 +154,14 @@ function ProductionBatchDesignerNew() {
 
   const addCakesData = useCallback(
     (prodBatchData) => {
-      const { id, product_with_brack, article } = prodBatchData;
+      const {
+        id,
+        product_with_brack,
+        article,
+        quantity_cakes,
+        quantity_in_batch,
+        quantity_in_warehouse,
+      } = prodBatchData;
       const m3InArray = latestProducts?.find((p) => p.article == article)?.m3InArray;
       const volumeBlockOnPallet = latestProducts?.find(
         (p) => p.article == article
@@ -167,24 +174,23 @@ function ProductionBatchDesignerNew() {
 
       const total_cakes = Math.ceil(product_with_brack);
 
-      const haveBatch = batchDesigner.find((el) => String(el.id) === String(id));
       // pallets-per-array (как и при сохранении)
       const palletsPerArray = Math.max(
         1,
         Math.floor(m3InArray / volumeBlockOnPallet) || 1
       );
-      // Считаем ВСЕ паллеты по этому заказу из batchOutside (любые даты)
-      const palletsFromOutside = (batchOutside || [])
-        .filter((r) => String(r.id_list_of_ordered_production) === String(id))
-        .reduce((sum, r) => sum + (Number(r.quantity_pallets) || 0), 0);
-      const arraysFromOutside = Math.floor(palletsFromOutside / palletsPerArray);
 
-      const cakes_in_batch = haveBatch
-        ? Number(haveBatch.cakes_in_batch) || 0
-        : arraysFromOutside;
+      const cakes_in_batch =
+        quantity_in_batch == 0
+          ? quantity_in_batch
+          : Math.max(
+              quantity_cakes -
+                (quantity_in_warehouse + quantity_in_batch * palletsPerArray),
+              0
+            );
 
       // если есть готовое значение — берём его, иначе считаем от total_cakes
-      const cakes_residue = Math.max(total_cakes - cakes_in_batch, 0);
+      const cakes_residue = Math.max(quantity_cakes - quantity_in_batch, 0);
 
       const updatedProdBatch = {
         ...prodBatchData,
@@ -254,11 +260,19 @@ function ProductionBatchDesignerNew() {
   useEffect(() => {
     if (!latestProducts || !listOfOrderedCakes) return;
 
-    const rightListOfOrdered = listOfOrderedCakes.filter(
-      (el) =>
+    const rightListOfOrdered = listOfOrderedCakes.filter((el) => {
+      const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
+        (prod) => prod.article == el.product_article
+      );
+      return (
         el.quantity !== el.quantity_in_warehouse &&
-        el.quantity > el.quantity_in_batch * 3 + el.quantity_in_warehouse
-    );
+        el.quantity >
+          el.quantity_in_batch * Math.floor(m3InArray / volumeBlockOnPallet) +
+            el.quantity_in_warehouse
+      );
+    });
+    console.log('listOfOrderedCakes', listOfOrderedCakes);
+    console.log('rightListOfOrdered', rightListOfOrdered);
 
     const groupedByArticle = rightListOfOrdered.reduce((acc, curr) => {
       if (!acc[curr.product_article]) {
@@ -273,39 +287,53 @@ function ProductionBatchDesignerNew() {
 
     Object.keys(groupedByArticle).forEach((densityKey) => {
       const group = groupedByArticle[densityKey];
-      group.forEach(({ id, quantity, product_article, quantity_in_warehouse }) => {
-        const product = latestProducts.find((el) => el.article == product_article);
-        const {
-          volumeBlockOnPallet,
-          density,
-          normOfBrack,
-          width,
-          article,
-          m3InArray,
-        } = product;
-
-        if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
-          const rightQuantity = quantity - quantity_in_warehouse;
-          const quantity_m3 = (rightQuantity * volumeBlockOnPallet).toFixed(2);
-
-          const batch = addCakesData({
-            id,
-            product_article,
-            width,
+      group.forEach(
+        ({
+          id,
+          quantity,
+          product_article,
+          quantity_in_warehouse,
+          quantity_cakes,
+          quantity_in_batch,
+        }) => {
+          const product = latestProducts.find((el) => el.article == product_article);
+          const {
+            volumeBlockOnPallet,
             density,
-            quantity: rightQuantity,
-            product_with_brack: (
-              quantity / Math.floor(m3InArray / volumeBlockOnPallet) +
-              normOfBrack
-            ).toFixed(2),
-            quantity_m3,
+            normOfBrack,
+            width,
             article,
-          });
-          prodBatch.push(batch);
-          updatedTotalQuantity += rightQuantity;
+            m3InArray,
+          } = product;
+
+          if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
+            const rightQuantity = quantity - quantity_in_warehouse;
+            const quantity_m3 = (rightQuantity * volumeBlockOnPallet).toFixed(2);
+
+            const batch = addCakesData({
+              id,
+              product_article,
+              width,
+              density,
+              quantity: rightQuantity,
+              product_with_brack: (
+                quantity / Math.floor(m3InArray / volumeBlockOnPallet) +
+                normOfBrack
+              ).toFixed(2),
+              quantity_m3,
+              article,
+              quantity_cakes,
+              quantity_in_batch,
+              quantity_in_warehouse,
+            });
+            prodBatch.push(batch);
+            updatedTotalQuantity += rightQuantity;
+          }
         }
-      });
+      );
     });
+
+    console.log('prodBatch', prodBatch);
 
     // 🔹 объединяем одинаковые артикулы и суммируем поля + запоминаем исходные заказы
     const mergedMap = prodBatch.reduce((acc, item) => {
