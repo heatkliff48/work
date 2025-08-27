@@ -587,7 +587,7 @@ const WarehouseContextProvider = ({ children }) => {
 
     // Сортировка внутри каждой группы по shipping_date (возрастание)
     for (const list of byArticle.values()) {
-      list.sort((a, b) => getTime(b.shipping_date) - getTime(a.shipping_date));
+      list.sort((a, b) => getTime(a.shipping_date) - getTime(b.shipping_date));
     }
 
     // Считаем произведённое по каждому product_article из batchOutside.
