@@ -17,6 +17,7 @@ import {
   DELETE_PRODUCT_OF_ORDER_SOCKET,
   DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+  NEW_RANDOM_PRODUCTS_OF_ORDER_SOCKET,
   UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET,
@@ -36,7 +37,19 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
     }
 
     case UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...productsOfOrders, payload];
+      if (Array.isArray(payload)) {
+        return [...productsOfOrders, ...payload];
+      } else {
+        return [...productsOfOrders, payload];
+      }
+    }
+
+    case NEW_RANDOM_PRODUCTS_OF_ORDER_SOCKET: {
+      if (Array.isArray(payload)) {
+        return [...productsOfOrders, ...payload];
+      } else {
+        return [...productsOfOrders, payload];
+      }
     }
 
     case UPDATE_PRODUCT_INFO_OF_ORDER: {

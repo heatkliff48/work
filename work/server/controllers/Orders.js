@@ -192,9 +192,19 @@ class OrdersController {
     const { newProductsOfOrder } = req.body;
 
     try {
-      const product_of_order = await OrdersService.getUpdateProductsOfOrder(
-        newProductsOfOrder
-      );
+      let product_of_order;
+
+      if (Array.isArray(newProductsOfOrder)) {
+        product_of_order = await Promise.all(
+          newProductsOfOrder.map((product) =>
+            OrdersService.getUpdateProductsOfOrder(product.newProductsOfOrder)
+          )
+        );
+      } else {
+        product_of_order = await OrdersService.getUpdateProductsOfOrder(
+          newProductsOfOrder
+        );
+      }
 
       myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
 

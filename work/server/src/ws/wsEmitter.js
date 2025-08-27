@@ -82,6 +82,7 @@ const {
   GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   ADD_NEW_DELIVERY_PRICE_SOCKET,
   UPDATE_PRODUCT_CODE_SOCKET,
+  ADD_RANDOM_PRODUCTS_OF_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -1060,6 +1061,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_PRODUCT_CODE_SOCKET,
           payload: tool,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_RANDOM_PRODUCTS_OF_ORDER_SOCKET, (randomProducts) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_RANDOM_PRODUCTS_OF_ORDER_SOCKET,
+          payload: randomProducts,
         })
       );
     }

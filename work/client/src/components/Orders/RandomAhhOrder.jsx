@@ -5,6 +5,7 @@ import { useProjectContext } from '#components/contexts/Context.js';
 import { useEffect } from 'react';
 import {
   addNewOrder,
+  addOrderRandomProducts,
   getCurrentProductsOfOrders,
   getOrders,
 } from '#components/redux/actions/ordersAction.js';
@@ -51,6 +52,8 @@ function RandomAhhOrder(props) {
       status: status_list[0].accessor,
       person_in_charge: 0,
     });
+
+    setRandomOrderCheck(true);
   };
 
   const getRandomClientData = (clients) => {
@@ -89,38 +92,33 @@ function RandomAhhOrder(props) {
     return orderArticle;
   };
 
-  const randomizeNewOrderCart = (async) => {};
-
   useEffect(() => {
-    if (newOrder?.contact_id && newOrder?.del_adr_id) {
+    if (newOrder?.contact_id && newOrder?.del_adr_id && randomOrderCheck) {
       setIsOrderReady(true);
       dispatch(addNewOrder(newOrder));
     } else {
       setIsOrderReady(false);
     }
-  }, [newOrder?.contact_id, newOrder?.del_adr_id]);
+  }, [newOrder?.contact_id, newOrder?.del_adr_id, randomOrderCheck]);
 
   useEffect(() => {
-    if (isOrderReady) {
-      // console.log('ordersDataList', ordersDataList); // я хз как здесь новый список заказов получить
-      // dispatch(getOrders());
-      // console.log('newOrder', newOrder);
-      // getCurrentOrderInfoHandler(newOrder);
-      // console.log(
-      //   'ordersDataList[ordersDataList.length - 1]',
-      //   ordersDataList[ordersDataList.length - 1]
-      // );
+    if (isOrderReady && randomOrderCheck) {
       getCurrentOrderInfoHandler(ordersDataList[ordersDataList.length - 1]);
       dispatch(
         getCurrentProductsOfOrders(ordersDataList[ordersDataList.length - 1].id)
       );
-      // console.log('randomOrderCheck', randomOrderCheck);
-      setRandomOrderCheck(true);
-      navigate('/order_card');
+      dispatch(
+        addOrderRandomProducts({
+          order_id: ordersDataList[ordersDataList.length - 1].id,
+          order_article: ordersDataList[ordersDataList.length - 1].article,
+        })
+      );
+      // navigate('/order_card');
+      setRandomOrderCheck(false);
       setIsOrderReady(false);
       setNewOrder({});
     }
-  }, [ordersDataList]);
+  }, [ordersDataList, randomOrderCheck]);
 
   return (
     <>
