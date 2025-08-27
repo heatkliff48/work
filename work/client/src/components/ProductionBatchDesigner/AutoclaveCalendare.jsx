@@ -14,7 +14,7 @@ import {
   subMonths,
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
@@ -23,7 +23,7 @@ export default function ProductionPlannerCalendar({
   onChange,
   min = 0,
   max = 9999,
-  presets = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  presets = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   weekStartsOn = 1,
 }) {
   const dispatch = useDispatch();
@@ -34,6 +34,9 @@ export default function ProductionPlannerCalendar({
   );
   const [internalMap, setInternalMap] = useState(() => Object.create(null));
   const [openDayISO, setOpenDayISO] = useState(null);
+  const [beforeNext, setBeforeNext] = useState([]);
+
+  const batchOutside = useSelector((state) => state.batchOutside);
 
   const map = internalMap;
 
@@ -123,6 +126,52 @@ export default function ProductionPlannerCalendar({
     dispatch(addNewAutoclaveCalendar(arr));
   };
 
+  const nextHandler = (planQtyNum, doneNum, dayISO) => {
+    const arr = Object.entries(map)
+      .map(([date, obj]) => {
+        const existing = autoclave_calendar.find((i) => i.date === date);
+        return {
+          date,
+          quantity: Number(obj?.quantity) || 0,
+          quantity_of_complited: Number(
+            existing?.quantity_of_complited ?? obj?.quantity_of_complited ?? 0
+          ),
+        };
+      })
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    const tailFromDay = arr.filter((r) => r.date >= dayISO);
+
+    const fits = (rec) =>
+      rec.quantity_of_complited === 0 ||
+      rec.quantity - rec.quantity_of_complited >= doneNum;
+
+    const searchTail = arr.filter((r) => r.date > dayISO);
+    const next = searchTail.find(fits);
+
+    const before = next ? tailFromDay.filter((r) => r.date < next.date) : [];
+
+    const violating = before.find(
+      (d) => d.quantity < planQtyNum && d.quantity_of_complited < doneNum
+    );
+    if (violating) {
+      window.alert(`Нельзя продолжить: look at ${violating.date} `);
+      return;
+    }
+
+    setBeforeNext(before);
+
+    const beforeDates = new Set(before.map((r) => r.date));
+    const rightBatchOutside = (batchOutside ?? []).filter((item) =>
+      beforeDates.has(item?.date)
+    );
+
+    for (let i = 0; i < before.length; i++) {
+
+      
+    }
+  };
+
   return (
     <div style={styles.wrapper}>
       <div style={styles.header}>
@@ -161,18 +210,31 @@ export default function ProductionPlannerCalendar({
           return (
             <div key={iso} style={{ ...styles.cell, opacity: inMonth ? 1 : 0.5 }}>
               <button
-                onClick={() => setOpenDayISO(isOpen ? null : iso)}
+                onClick={(e) => {
+                  if (isPast) return;
+                  setOpenDayISO(isOpen ? null : iso);
+                }}
                 style={{
                   ...styles.dayBtn,
                   ...(isToday(day) ? styles.today : null),
                   ...(isOpen ? styles.active : null),
                   ...(isPast ? styles.pastDay : null),
                 }}
-                disabled={isPast}
                 title={iso}
               >
                 <div style={styles.dayNumber}>
                   {format(day, 'd', { locale: ru })}
+                  {qty > 0 && done > 0 && (
+                    <div
+                      style={styles.btnNext}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        nextHandler(qty, done, iso);
+                      }}
+                    >
+                      next
+                    </div>
+                  )}
                 </div>
                 {qty > 0 && (
                   <div style={styles.badgePlan} title="План">
@@ -290,6 +352,16 @@ const styles = {
     padding: '2px 6px',
     borderRadius: 999,
     background: '#000000ff',
+  },
+  btnNext: {
+    position: 'absolute',
+    bottom: 23,
+    right: '10px',
+    fontSize: '18px',
+    padding: '0px 5px',
+    borderRadius: '1000px',
+    background: 'rgba(0, 68, 255, 1)',
+    color: 'rgba(255, 255, 255, 1)',
   },
   badgePlan: {
     position: 'absolute',
