@@ -185,19 +185,19 @@ function ProductionBatchDesignerNew() {
           ? quantity_in_batch
           : Math.max(
               quantity_cakes -
-                (quantity_in_warehouse + quantity_in_batch * palletsPerArray),
+                (quantity_in_warehouse / palletsPerArray + quantity_in_batch),
               0
             );
 
       // если есть готовое значение — берём его, иначе считаем от total_cakes
-      const cakes_residue = Math.max(quantity_cakes - quantity_in_batch, 0);
+      const cakes_residue = Math.max(total_cakes - cakes_in_batch, 0);
 
       const updatedProdBatch = {
         ...prodBatchData,
         free_product_cakes,
         free_product_package,
         total_cakes,
-        cakes_in_batch,
+        cakes_in_batch:0,
         cakes_residue,
       };
 
@@ -316,6 +316,8 @@ function ProductionBatchDesignerNew() {
               quantity -
               (quantity_in_warehouse + quantity_in_batch * palletsPerArray);
             const quantity_m3 = (rightQuantity * volumeBlockOnPallet).toFixed(2);
+            console.log('palletsPerArray', palletsPerArray);
+            console.log('rightQuantity', rightQuantity);
 
             const batch = addCakesData({
               id,
@@ -570,7 +572,7 @@ function ProductionBatchDesignerNew() {
 
       return { ok: true, next: a };
     };
-
+    console.log('batchDesigner', batchDesigner);
     // Кладём подряд, распределяя по источникам этого артикула
     const sources = batchDesigner
       .filter((b) => b.product_article === product_article)
