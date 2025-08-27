@@ -47,6 +47,7 @@ const anchorsWarehouseRouter = require('./router/anchorswarehouse.js');
 const toolsWarehouseRouter = require('./router/toolswarehouse.js');
 const relatedMaterialsBackorderListRouter = require('./router/relatedmaterialsbackorderlist.js');
 const productCodeRouter = require('./router/productCode.js');
+const orderRandomProductsRouter = require('./router/orderRandom.js');
 
 const app = express();
 const map = new Map();
@@ -128,6 +129,7 @@ app.use('/toolsWarehouse', toolsWarehouseRouter);
 app.use('/qualityManagement', qualityManagementRouter);
 app.use('/relatedMaterialsBackorderList', relatedMaterialsBackorderListRouter);
 app.use('/productCode', productCodeRouter);
+app.use('/orderRandom', orderRandomProductsRouter);
 
 // Обработка WebSocket соединений
 server.on('upgrade', function (req, socket, head) {

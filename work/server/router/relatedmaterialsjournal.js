@@ -1,14 +1,10 @@
 const relatedMaterialsJournalRouter = require('express').Router();
 const { RelatedMaterialsJournal } = require('../db/models/index.js');
-const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
 const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
   UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
 } = require('../src/constants/event.js');
-const { ErrorUtils } = require('../utils/Errors.js');
 
 relatedMaterialsJournalRouter.get('/', async (req, res) => {
   try {

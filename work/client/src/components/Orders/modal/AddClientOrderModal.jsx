@@ -70,7 +70,6 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const addClientOrderHendler = async (id) => {
-    console.log(list_of_clients);
     const article = getOrderArticle();
     const client = list_of_clients.find((el) => el.id === id);
 
@@ -108,6 +107,12 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   useEffect(() => {
     if (newOrder?.contact_id && newOrder?.del_adr_id) {
       setIsOrderReady(true);
+      dispatch(addNewOrder(newOrder));
+      dispatch(getOrders());
+      getCurrentOrderInfoHandler(newOrder);
+      setClientModalOrder(!clientModalOrder);
+      setIsOrderReady(false);
+      toggle();
     } else {
       setIsOrderReady(false);
     }
@@ -115,11 +120,11 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
 
   useEffect(() => {
     if (isOrderReady) {
-      dispatch(addNewOrder(newOrder));
-      dispatch(getOrders());
-      getCurrentOrderInfoHandler(newOrder);
-      setClientModalOrder(!clientModalOrder);
-      setIsOrderReady(false);
+      //   dispatch(addNewOrder(newOrder));
+      //   dispatch(getOrders());
+      //   getCurrentOrderInfoHandler(newOrder);
+      //   setClientModalOrder(!clientModalOrder);
+      //   setIsOrderReady(false);
     }
   }, [isOrderReady]);
 

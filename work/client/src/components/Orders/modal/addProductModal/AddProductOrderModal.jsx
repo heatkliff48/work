@@ -3,7 +3,10 @@ import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useOrderContext } from '../../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
-import { getUpdateProductOfOrders } from '#components/redux/actions/ordersAction.js';
+import {
+  addOrderRandomProducts,
+  getUpdateProductOfOrders,
+} from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import '#components/Styles/modals.css';
@@ -21,6 +24,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     setRandomOrderCheck,
     orderCartData,
     setNewOrder,
+    setRandomFillComplete,
   } = useOrderContext();
   const { COLUMNS, latestProducts } = useProductsContext();
 
@@ -130,180 +134,76 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
   }, []);
 
-  const simulateRandomProductAddition = async () => {
-    // Генерируем случайное количество итераций
-    const randomIterations = Math.floor(Math.random() * 4) + 2;
+  // const simulateRandomProductAddition = async () => {
+  //   const randomIterations = Math.floor(Math.random() * 4) + 2;
+  //   const actions = [];
 
-    for (let i = 0; i < randomIterations; i++) {
-      // console.log(`Итерация ${i + 1}/${randomIterations}`);
+  //   for (let i = 0; i < randomIterations; i++) {
+  //     const activeProducts = latestProducts.filter(
+  //       (product) => product.activeStatus === true
+  //     );
 
-      // 1. Выбираем случайный продукт из таблицы
-      const activeProducts = latestProducts.filter(
-        (product) => product.activeStatus === true
-      );
+  //     if (activeProducts.length === 0) {
+  //       break;
+  //     }
 
-      if (activeProducts.length === 0) {
-        // console.log('Нет активных продуктов');
-        break;
-      }
+  //     const randomIndex = Math.floor(Math.random() * 10); // вроде менять тут
+  //     const randomProduct = activeProducts[randomIndex];
+  //     setSelectedProduct(randomProduct);
 
-      const randomIndex = Math.floor(Math.random() * 10); // вроде менять тут
-      const randomProduct = activeProducts[randomIndex];
-      setSelectedProduct(randomProduct);
+  //     const randomQuantity = Math.floor(Math.random() * 1000) + 1;
 
-      // console.log('Выбран случайный продукт:', randomProduct.article);
+  //     const randomQuantityPallets = Math.floor(Math.random() * 150) + 1;
 
-      // 2. Симулируем клик на продукт (вызов handlerAddProductOrder)
-      // Создаем mock row object для совместимости с handlerAddProductOrder
-      // const mockRow = {
-      //   original: randomProduct,
-      // };
+  //     const randomQuantityReal = Math.floor(Math.random() * 1000) + 1;
 
-      // handlerAddProductOrder(mockRow);
+  //     if (haveOrderClient) {
+  //       actions.push({
+  //         newProductsOfOrder: {
+  //           order_id: haveOrderClient.id,
+  //           productOfOrder: {
+  //             product_id: randomProduct.id,
+  //             quantity_m2: randomQuantity,
+  //             quantity_palet: randomQuantityPallets,
+  //             quantity_real: randomQuantityReal,
+  //             price_m2: 0,
+  //             discount: 0,
+  //             final_price: 0,
+  //           },
+  //         },
+  //       });
 
-      // // 3. Ждем немного для обновления состояния
-      // await new Promise((resolve) => setTimeout(resolve, 100));
+  //       setProductOfOrder({});
+  //       setSelectedProduct({});
+  //     }
+  //   }
 
-      // 4. Генерируем случайное quantity_m2
-      const randomQuantity = Math.floor(Math.random() * 1000) + 1;
-      // console.log('Случайное quantity_m2:', randomQuantity);
+  //   if (actions.length > 0) {
+  //     dispatch(
+  //       getUpdateProductOfOrders({
+  //         newProductsOfOrder: actions,
+  //       })
+  //     );
+  //   }
 
-      const randomQuantityPallets = Math.floor(Math.random() * 150) + 1;
-      // console.log('Случайное quantity_pallets:', randomQuantityPallets);
-
-      const randomQuantityReal = Math.floor(Math.random() * 1000) + 1;
-      // console.log('Случайное quantity_real:', randomQuantityReal);
-
-      if (haveOrderClient) {
-        // console.log('Данные для отправки:', {
-        // order_id: haveOrderClient.id,
-        // productOfOrder: {
-        //   quantity_m2: randomQuantity,
-        //   quantity_palet: randomQuantityPallets,
-        //   quantity_real: randomQuantityReal,
-        // },
-        // });
-
-        try {
-          dispatch(
-            getUpdateProductOfOrders({
-              newProductsOfOrder: {
-                order_id: haveOrderClient.id,
-                productOfOrder: {
-                  product_id: randomProduct.id,
-                  quantity_m2: randomQuantity,
-                  quantity_palet: randomQuantityPallets,
-                  quantity_real: randomQuantityReal,
-                  price_m2: 0,
-                  discount: 0,
-                  final_price: 0,
-                },
-              },
-            })
-          );
-          setProductOfOrder({});
-          setSelectedProduct({});
-
-          // console.log(`Продукт ${i + 1} успешно добавлен`);
-        } catch (error) {
-          // console.error('Ошибка при добавлении продукта:', error);
-        }
-      } else {
-        // console.log('Нет выбранного заказа или продукта');
-      }
-
-      // 5. Симулируем ввод значения в InputField
-      // setProductOfOrder((prev) => {
-      //   const updated = { ...prev, quantity_m2: randomQuantity };
-      //   // otpravka
-      //   if (haveOrderClient) {
-      //     console.log('Данные для отправки:', {
-      //       order_id: haveOrderClient.id,
-      //       productOfOrder,
-      //     });
-
-      //     // 8. Симулируем нажатие кнопки "Add product"
-      //     try {
-      //       dispatch(
-      //         getUpdateProductOfOrders({
-      //           newProductsOfOrder: {
-      //             order_id: haveOrderClient.id,
-      //             productOfOrder: updated, // вот так!
-      //           },
-      //         })
-      //       );
-
-      //       console.log(`Продукт ${i + 1} успешно добавлен`);
-      //     } catch (error) {
-      //       console.error('Ошибка при добавлении продукта:', error);
-      //     }
-      //   } else {
-      //     console.log('Нет выбранного заказа или продукта');
-      //   }
-
-      //   return updated;
-      // });
-
-      // 6. Ждем вычисления производных значений
-      // await new Promise((resolve) => setTimeout(resolve, 200));
-
-      // 7. Проверяем, что все значения вычислены
-      // if (haveOrderClient) {
-      //   console.log('Данные для отправки:', {
-      //     order_id: haveOrderClient.id,
-      //     productOfOrder,
-      //   });
-
-      //   // 8. Симулируем нажатие кнопки "Add product"
-      //   try {
-      //     await dispatch(
-      //       getUpdateProductOfOrders({
-      //         newProductsOfOrder: {
-      //           order_id: haveOrderClient.id,
-      //           productOfOrder: { ...productOfOrder },
-      //         },
-      //       })
-      //     );
-
-      //     console.log(`Продукт ${i + 1} успешно добавлен`);
-      //   } catch (error) {
-      //     console.error('Ошибка при добавлении продукта:', error);
-      //   }
-      // } else {
-      //   console.log('Нет выбранного заказа или продукта');
-      // }
-
-      // 9. Небольшая пауза между итерациями
-      // await new Promise((resolve) => setTimeout(resolve, 300));
-    }
-
-    // Завершаем процесс
-    setRandomOrderCheck(false);
-    toggle();
-    // console.log('Все итерации завершены');
-  };
+  //   toggle();
+  // };
 
   // useEffect(() => {
-  //   console.log('randomOrderCheck', randomOrderCheck);
-  //   if (!randomOrderCheck) return;
+  //   if (!randomOrderCheck || inProgress) return;
+  //   setInProgress(true);
+  //   setRandomFillComplete(false);
 
-  //   simulateRandomProductAddition();
-  // }, [randomOrderCheck]);
+  //   const run = async () => {
+  //     try {
+  //       // await simulateRandomProductAddition();
+  //     } finally {
+  //       setInProgress(false);
+  //     }
+  //   };
 
-  useEffect(() => {
-    if (!randomOrderCheck || inProgress) return; // блокировка
-    setInProgress(true);
-
-    const run = async () => {
-      try {
-        await simulateRandomProductAddition();
-      } finally {
-        setInProgress(false);
-      }
-    };
-
-    run();
-  }, [randomOrderCheck, inProgress]);
+  //   run();
+  // }, [randomOrderCheck, inProgress]);
 
   return (
     <div>

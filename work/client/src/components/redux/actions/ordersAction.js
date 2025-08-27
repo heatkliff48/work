@@ -36,6 +36,7 @@ import {
   GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER,
   GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER,
   GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
+  ADD_RANDOM_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -287,5 +288,12 @@ export const deleteAccountingData = (article) => {
   return {
     type: DELETE_ACCOUTING_DATA_LIST,
     payload: article,
+  };
+};
+
+export const addOrderRandomProducts = ({ order_id, order_article }) => {
+  return {
+    type: ADD_RANDOM_PRODUCTS_OF_ORDER,
+    payload: { order_id, order_article },
   };
 };
