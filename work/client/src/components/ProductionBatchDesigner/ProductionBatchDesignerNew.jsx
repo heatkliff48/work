@@ -307,7 +307,14 @@ function ProductionBatchDesignerNew() {
           } = product;
 
           if (updatedTotalQuantity + quantity <= MAX_QUANTITY) {
-            const rightQuantity = quantity - quantity_in_warehouse;
+            const palletsPerArray = Math.max(
+              1,
+              Math.floor(m3InArray / volumeBlockOnPallet) || 1
+            );
+
+            const rightQuantity =
+              quantity -
+              (quantity_in_warehouse + quantity_in_batch * palletsPerArray);
             const quantity_m3 = (rightQuantity * volumeBlockOnPallet).toFixed(2);
 
             const batch = addCakesData({
@@ -316,10 +323,9 @@ function ProductionBatchDesignerNew() {
               width,
               density,
               quantity: rightQuantity,
-              product_with_brack: (
-                quantity / Math.floor(m3InArray / volumeBlockOnPallet) +
-                normOfBrack
-              ).toFixed(2),
+              product_with_brack: (quantity / palletsPerArray + normOfBrack).toFixed(
+                2
+              ),
               quantity_m3,
               article,
               quantity_cakes,
