@@ -492,6 +492,8 @@ export default function ProductionPlannerCalendar({
           const obj = map[iso] ?? { quantity: 0, quantity_of_complited: 0 };
           const qty = obj.quantity;
           const done = obj.quantity_of_complited;
+          const todayISO = format(new Date(), 'yyyy-MM-dd'); // date-fns уже используешь
+          const isPastBtn = iso < todayISO;
 
           return (
             <div key={iso} style={{ ...styles.cell, opacity: inMonth ? 1 : 0.5 }}>
@@ -510,7 +512,7 @@ export default function ProductionPlannerCalendar({
               >
                 <div style={styles.dayNumber}>
                   {format(day, 'd', { locale: ru })}
-                  {qty > 0 && done > 0 && (
+                  {qty > 0 && done > 0 && isPastBtn && (
                     <div
                       style={styles.btnNext}
                       onClick={(e) => {
