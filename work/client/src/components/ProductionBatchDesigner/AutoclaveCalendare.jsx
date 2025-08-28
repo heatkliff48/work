@@ -17,6 +17,8 @@ import { ru } from 'date-fns/locale';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import next3 from './next3.png';
+import { updateBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 
 export default function ProductionPlannerCalendar({
   initialMonth,
@@ -29,18 +31,16 @@ export default function ProductionPlannerCalendar({
   const dispatch = useDispatch();
   const { autoclave_calendar } = useWarehouseContext();
 
+  const [openDayISO, setOpenDayISO] = useState(null);
+  const [internalMap, setInternalMap] = useState(() => Object.create(null));
   const [currentMonth, setCurrentMonth] = useState(
     initialMonth ? startOfMonth(initialMonth) : startOfMonth(new Date())
   );
-  const [internalMap, setInternalMap] = useState(() => Object.create(null));
-  const [openDayISO, setOpenDayISO] = useState(null);
-  const [beforeNext, setBeforeNext] = useState([]);
 
   const batchOutside = useSelector((state) => state.batchOutside);
+  const popoverRef = useRef(null);
 
   const map = internalMap;
-
-  const popoverRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -95,7 +95,6 @@ export default function ProductionPlannerCalendar({
     return Math.max(lo, Math.min(hi, x));
   }
 
-  // сеттеры значений
   function setQty(iso, qty) {
     const prev = map[iso] ?? { quantity: 0, quantity_of_complited: 0 };
     const nextQty = clamp(qty, min, max);
@@ -126,7 +125,264 @@ export default function ProductionPlannerCalendar({
     dispatch(addNewAutoclaveCalendar(arr));
   };
 
+  function findQocVsNextQuantityViolation(corridor) {
+    if (!corridor || corridor.length < 2) return null;
+
+    let maxRequired = 0; // максимум quantity впереди
+    for (let i = 0; i < corridor.length - 1; i++) {
+      const nextQty = Number(corridor[i + 1]?.quantity) || 0;
+      if (nextQty > maxRequired) maxRequired = nextQty;
+
+      const qoc = Number(corridor[i]?.quantity_of_complited) || 0;
+      if (qoc > maxRequired) {
+        return {
+          at: corridor[i].date,
+          actual: qoc,
+          needAtLeast: maxRequired,
+          becauseOfDate: corridor[i + 1].date,
+        };
+      }
+    }
+    return null;
+  }
+
+  // function redistributeCascade(before) {
+  //   if (!before || before.length === 0) return before;
+
+  //   const work = before.map((d) => ({
+  //     date: d.date,
+  //     quantity: Number(d.quantity) || 0,
+  //     qoc: Number(d.quantity_of_complited) || 0, // выполнено
+  //   }));
+
+  //   // получатель i: справа -> налево
+  //   for (let i = work.length - 1; i >= 0; i--) {
+  //     let capacity = Math.max(0, work[i].quantity - work[i].qoc);
+  //     if (capacity <= 0) continue;
+
+  //     // доноры j: все предыдущие дни (тоже справа -> налево для жадного отбора)
+  //     for (let j = i - 1; j >= 0 && capacity > 0; j--) {
+  //       const avail = work[j].qoc;
+  //       if (avail <= 0) continue;
+
+  //       const take = Math.min(capacity, avail);
+  //       work[j].qoc -= take;
+  //       work[i].qoc += take;
+  //       capacity -= take;
+  //     }
+  //   }
+
+  //   return work.map((w) => ({
+  //     date: w.date,
+  //     quantity: w.quantity,
+  //     quantity_of_complited: w.qoc,
+  //   }));
+  // }
+
+  function applyToMap(entries) {
+    const patch = {};
+    for (const r of entries) {
+      patch[r.date] = (prev) => {
+        const base = prev ?? { quantity: 0, quantity_of_complited: 0 };
+        return {
+          ...base,
+          // план оставляем как был в карте (если хочешь — ставь r.quantity)
+          quantity: base.quantity,
+          quantity_of_complited: Number(r.quantity_of_complited) || 0,
+        };
+      };
+    }
+
+    if (typeof onChange === 'function') {
+      const nextMap = { ...map };
+      for (const [date, updater] of Object.entries(patch)) {
+        nextMap[date] = updater(nextMap[date]);
+      }
+      onChange(nextMap);
+    } else {
+      setInternalMap((prev) => {
+        const next = { ...prev };
+        for (const [date, updater] of Object.entries(patch)) {
+          next[date] = updater(next[date]);
+        }
+        return next;
+      });
+    }
+  }
+
+  function shiftForwardOneStepWithPlan(corridor) {
+    if (!corridor || corridor.length < 2) {
+      return { redistributed: corridor ?? [], transfers: [] };
+    }
+
+    // Снимок "до"
+    const work = corridor.map((d) => ({
+      date: d.date,
+      qty: Number(d.quantity) || 0,
+      oldQoc: Number(d.quantity_of_complited) || 0,
+    }));
+
+    const n = work.length;
+    const finalQoc = Array(n).fill(0);
+    const transfers = [];
+
+    // 1) Для каждого i переносим его старый qoc к i+1 (ограничиваем планом приемника)
+    for (let i = 0; i < n - 1; i++) {
+      const moved = Math.min(work[i].oldQoc, work[i + 1].qty);
+      // фиксируем соседний шаг i -> i+1
+      if (moved > 0) {
+        transfers.push({ from: work[i].date, to: work[i + 1].date, amount: moved });
+      }
+      // левый день теряет отданное (остаток у него пока не ставим — см. шаг 2)
+      // приемник i+1 получит РОВНО moved (без сложения со своим старым)
+      finalQoc[i + 1] = moved;
+    }
+
+    // 2) Левый край: у самого левого остаётся только то, что не смог отдать вправо
+    const movedFromLeft = Math.min(work[0].oldQoc, work[1].qty);
+    finalQoc[0] = work[0].oldQoc - movedFromLeft;
+
+    // 3) Промежуточные дни: держат только вход с предыдущего (уже установлен в шаге 1)
+    //    т.е. никакого сложения со своим старым qoc не делаем.
+
+    // 4) Собираем результат
+    const redistributed = work.map((w, idx) => ({
+      date: w.date,
+      quantity: w.qty,
+      quantity_of_complited: finalQoc[idx],
+    }));
+
+    return { redistributed, transfers };
+  }
+
+  function replanRightBatchOutside(items, transfers, opts = {}) {
+    const unitField = opts.unitField ?? null;
+
+    if (
+      !Array.isArray(items) ||
+      !Array.isArray(transfers) ||
+      transfers.length === 0
+    ) {
+      return items ?? [];
+    }
+
+    // 1) Копия и нормализация дат
+    const out = (items ?? []).map((x) => ({
+      ...x,
+      date: String(x.date).slice(0, 10),
+    }));
+    // Сортируем батчи по дате (возрастание), чтобы индексация была стабильной
+    out.sort((a, b) => a.date.localeCompare(b.date));
+
+    // 2) Индексация по дате: Map<ISO, number[]>
+    const byDate = new Map();
+    for (let i = 0; i < out.length; i++) {
+      const iso = out[i].date;
+      if (!byDate.has(iso)) byDate.set(iso, []);
+      byDate.get(iso).push(i);
+    }
+    const ensureBucket = (iso) => {
+      if (!byDate.has(iso)) byDate.set(iso, []);
+      return byDate.get(iso);
+    };
+
+    // 3) Сортируем transfers: сначала правые цели
+    //    — по to (desc), при равенстве — по from (desc), затем по amount (desc) для стабильности
+    const ordered = [...transfers].sort((a, b) => {
+      const t = String(b.to).localeCompare(String(a.to));
+      if (t !== 0) return t;
+      const f = String(b.from).localeCompare(String(a.from));
+      if (f !== 0) return f;
+      return (Number(b.amount) || 0) - (Number(a.amount) || 0);
+    });
+
+    // малые хелперы выборки/перемещения
+    const takeOneIndexFrom = (iso) => {
+      const bucket = byDate.get(iso);
+      if (!bucket || bucket.length === 0) return null;
+      // берём с конца — дешевле модифицировать массив
+      return bucket.pop();
+    };
+    const moveIndexTo = (idx, isoTo) => {
+      out[idx] = { ...out[idx], date: isoTo };
+      ensureBucket(isoTo).push(idx);
+    };
+
+    // 4) Проигрываем план переносов по шагам
+    for (const { from, to, amount } of ordered) {
+      let need = Math.max(0, Math.floor(Number(amount) || 0));
+      if (need === 0) continue;
+
+      if (!unitField) {
+        // режим: 1 запись = 1 единица
+        while (need > 0) {
+          const idx = takeOneIndexFrom(from);
+          if (idx == null) {
+            console.warn(
+              '[replanRightBatchOutside] нет записей на',
+              from,
+              '→',
+              to,
+              'осталось',
+              need
+            );
+            break;
+          }
+          moveIndexTo(idx, to);
+          need -= 1;
+        }
+      } else {
+        // режим: перенос по числовому полю (запись может дробиться)
+        while (need > 0) {
+          const bucket = byDate.get(from);
+          if (!bucket || bucket.length === 0) {
+            console.warn(
+              '[replanRightBatchOutside] нет записей на',
+              from,
+              '→',
+              to,
+              'осталось',
+              need
+            );
+            break;
+          }
+          const idx = bucket[bucket.length - 1]; // смотрим на последнюю
+          const rec = out[idx];
+          const units = Math.max(0, Number(rec[unitField]) || 0);
+          if (units <= 0) {
+            bucket.pop(); // пустая — убираем
+            continue;
+          }
+
+          const take = Math.min(need, units);
+          if (take === units) {
+            // переносим запись целиком
+            bucket.pop();
+            moveIndexTo(idx, to);
+          } else {
+            // дробим запись: часть остаётся, часть — переносим как новую
+            out[idx] = { ...rec, [unitField]: units - take, date: from }; // остаток
+            const moved = { ...rec, [unitField]: take, date: to };
+            const newIdx = out.length;
+            out.push(moved);
+            ensureBucket(to).push(newIdx);
+          }
+
+          need -= take;
+        }
+      }
+
+      // синхронизируем корзину донора (если опустела, оставим пустой массив)
+      if (!byDate.has(from)) byDate.set(from, []);
+    }
+
+    // 5) В финале придержим хронологию (не обязательно, но удобно для логов/UI)
+    out.sort((a, b) => a.date.localeCompare(b.date));
+    return out;
+  }
+
   const nextHandler = (planQtyNum, doneNum, dayISO) => {
+    // 1) Собираем и сортируем календарь
     const arr = Object.entries(map)
       .map(([date, obj]) => {
         const existing = autoclave_calendar.find((i) => i.date === date);
@@ -140,36 +396,66 @@ export default function ProductionPlannerCalendar({
       })
       .sort((a, b) => a.date.localeCompare(b.date));
 
-    const tailFromDay = arr.filter((r) => r.date >= dayISO);
-
+    // 3) Поиск ближайшего подходящего «next» (как было)
     const fits = (rec) =>
       rec.quantity_of_complited === 0 ||
       rec.quantity - rec.quantity_of_complited >= doneNum;
 
     const searchTail = arr.filter((r) => r.date > dayISO);
-    const next = searchTail.find(fits);
 
-    const before = next ? tailFromDay.filter((r) => r.date < next.date) : [];
+    // берём самый дальний подходящий, а не первый
+    const farthestFit = (() => {
+      const candidates = searchTail.filter(fits);
+      return candidates.length ? candidates[candidates.length - 1] : null;
+    })();
 
+    // если ни один день не подошёл по fits — берём самый правый из хвоста
+    const next =
+      farthestFit ?? (searchTail.length ? searchTail[searchTail.length - 1] : null);
+
+    // база от выбранного дня
+    const tailFromDay = arr.filter((r) => r.date >= dayISO);
+
+    // коридор включает next ДОЛЖЕННО (<=), чтобы сдвиг дошёл до самого правого дня
+    const before = next
+      ? tailFromDay.filter((r) => r.date <= next.date)
+      : tailFromDay;
+
+    const corridorForCheck = before; // before уже включает next
+    const qvErr = findQocVsNextQuantityViolation(corridorForCheck);
+    if (qvErr) {
+      window.alert(
+        `Не получится перенести партию: на ${qvErr.at} выполнено ${qvErr.actual}, ` +
+          `а впереди требуется минимум ${qvErr.needAtLeast} (из-за плана на ${qvErr.becauseOfDate}).`
+      );
+      return;
+    }
+
+    // 5) Старая проверка план/выполнено в коридоре
     const violating = before.find(
       (d) => d.quantity < planQtyNum && d.quantity_of_complited < doneNum
     );
     if (violating) {
-      window.alert(`Нельзя продолжить: look at ${violating.date} `);
+      window.alert(`Нельзя продолжить: ${violating.date}`);
       return;
     }
 
-    setBeforeNext(before);
-
+    // 6) (опционально) правки rightBatchOutside по датам коридора
     const beforeDates = new Set(before.map((r) => r.date));
     const rightBatchOutside = (batchOutside ?? []).filter((item) =>
       beforeDates.has(item?.date)
     );
 
-    for (let i = 0; i < before.length; i++) {
+    // 7) Перераспределяем и применяем (как у нас уже сделано)
+    const { redistributed, transfers } = shiftForwardOneStepWithPlan(before);
+    const movedRightA = replanRightBatchOutside(rightBatchOutside, transfers);
 
-      
-    }
+    applyToMap(redistributed);
+
+    movedRightA.forEach((el) => {
+      dispatch(updateBatchOutside(el));
+    });
+    dispatch(addNewAutoclaveCalendar(redistributed));
   };
 
   return (
@@ -232,7 +518,11 @@ export default function ProductionPlannerCalendar({
                         nextHandler(qty, done, iso);
                       }}
                     >
-                      next
+                      <img
+                        src={next3}
+                        alt="next3"
+                        style={{ width: '30px', height: '30px' }}
+                      />
                     </div>
                   )}
                 </div>
@@ -355,12 +645,11 @@ const styles = {
   },
   btnNext: {
     position: 'absolute',
-    bottom: 23,
-    right: '10px',
+    right: '-10px',
     fontSize: '18px',
     padding: '0px 5px',
     borderRadius: '1000px',
-    background: 'rgba(0, 68, 255, 1)',
+    background: 'rgba(0, 68, 255, 0)',
     color: 'rgba(255, 255, 255, 1)',
   },
   badgePlan: {
@@ -370,8 +659,8 @@ const styles = {
     fontSize: '20px',
     padding: '0px 5px',
     borderRadius: '1000px',
-    background: 'rgba(9, 255, 0, 1)',
-    color: 'rgba(0, 0, 0, 1)',
+    background: '#ff0000ff',
+    color: 'rgba(255, 255, 255, 1)',
   },
   badgeDone: {
     position: 'absolute',
@@ -381,8 +670,8 @@ const styles = {
     padding: '0px 5px',
     borderRadius: 1000,
     border: '1px solid #94a3b8',
-    background: '#ff0000ff',
-    color: '#ffffffff',
+    background: 'rgba(9, 255, 0, 1)',
+    color: '#000000ff',
   },
   popover: {
     position: 'absolute',
