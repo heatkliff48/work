@@ -202,7 +202,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/production_batch_designer');
+                      navigate('/production_batch_designer_new');
                       handleClose();
                     }}
                   >

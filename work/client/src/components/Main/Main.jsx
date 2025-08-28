@@ -190,15 +190,15 @@ function Main() {
           Production Batch Log 
         </button>
       )} */}
-        {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
+        {/* {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
           <button
             className="nav-button"
             onClick={() => navigate('/production_batch_designer')}
           >
             Batch planner
           </button>
-        )}
-        {checkUserAccess(user, roles, 'production_batch_designer_new')?.canRead && (
+        )} */}
+        {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
           <button
             className="nav-button"
             onClick={() => navigate('/production_batch_designer_new')}
