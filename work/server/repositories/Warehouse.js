@@ -59,16 +59,32 @@ class WarehouseRepository {
         const date = String(item.date).slice(0, 10);
         const quantity = Number(item.quantity) || 0;
         const quantity_of_complited = Number(item.quantity_of_complited ?? 0) || 0;
+        const quantity_of_produced = Number(item.quantity_of_produced ?? 0) || 0;
+        const residual_arrays = Number(item.residual_arrays ?? 0) || 0;
+        const total_arrays = Number(item.total_arrays ?? 0) || 0;
 
         if (calendarMap.has(date)) {
           const data = calendarMap.get(date);
           await AutoclaveCalendares.update(
-            { quantity, quantity_of_complited },
+            {
+              quantity,
+              quantity_of_complited,
+              total_arrays,
+              residual_arrays,
+              quantity_of_produced,
+            },
             { where: { id: data.id }, transaction: t }
           );
         } else {
           await AutoclaveCalendares.create(
-            { date, quantity, quantity_of_complited },
+            {
+              date,
+              quantity,
+              quantity_of_complited,
+              total_arrays,
+              residual_arrays,
+              quantity_of_produced,
+            },
             { transaction: t }
           );
         }
