@@ -272,37 +272,38 @@ const QualityManagementTable = () => {
       for (const ordered_production of updatedReserves) {
         await dispatch(updListOfOrderedProduction(ordered_production));
       }
+
+      const { date, quantity_pallets } = batchOutside.find(
+        (el) => el.id === production_plan_id
+      );
+      const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
+        (el) => el.article == product_article
+      );
+      const accd = autoclave_calendar.find((el) => (el.date = date));
+
+      const total_arrays =
+        accd?.total_arrays ??
+        0 + quantity_pallets / Math.floor(m3InArray / volumeBlockOnPallet);
+
+      const quantity_of_produced = Math.floor(total_arrays / 21);
+
+      const residual_arrays = total_arrays - quantity_of_produced * 21;
+
+      const result = {
+        ...accd,
+        total_arrays,
+        residual_arrays,
+        quantity_of_produced,
+      };
+
+      await dispatch(addNewAutoclaveCalendar(result));
+
       await dispatch(deleteQualityManagement(id));
       if (production_plan_id) {
         if (
           reserved_quantity_remaining <= 0 ||
           total_quantity_plan - reserved_quantity_allocated < 63
         ) {
-          const { date, quantity_pallets } = batchOutside.find(
-            (el) => el.id === production_plan_id
-          );
-          const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
-            (el) => el.article == product_article
-          );
-          const accd = autoclave_calendar.find((el) => (el.date = date));
-
-          const total_arrays =
-            accd?.total_arrays ??
-            0 + quantity_pallets / Math.floor(m3InArray / volumeBlockOnPallet);
-
-          const quantity_of_produced = Math.floor(total_arrays / 21);
-
-          const residual_arrays = total_arrays - quantity_of_produced * 21;
-
-          const result = {
-            ...accd,
-            total_arrays,
-            residual_arrays,
-            quantity_of_produced,
-          };
-
-          dispatch(addNewAutoclaveCalendar(result));
-
           await dispatch(deleteBatchOutside(production_plan_id));
         } else {
           const batch = batchOutside.find((el) => el.id === production_plan_id);
