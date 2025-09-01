@@ -11,6 +11,7 @@ import {
   updateQualityManagement,
 } from '#components/redux/actions/qualityManagementAction.js';
 import {
+  addNewAutoclaveCalendar,
   addNewWarehouse,
   updListOfOrderedProduction,
 } from '#components/redux/actions/warehouseAction.js';
@@ -19,11 +20,13 @@ import {
   updateBatchOutside,
 } from '#components/redux/actions/batchOutsideAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 
 const QualityManagementTable = () => {
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { userAccess } = useUsersContext();
 
-  const { list_of_ordered_production } = useWarehouseContext();
+  const { list_of_ordered_production, autoclave_calendar } = useWarehouseContext();
+  const { latestProducts } = useProductsContext();
 
   const dispatch = useDispatch();
   const qualityManagementData = useSelector((state) => state.qualityManagementData);
@@ -162,6 +165,7 @@ const QualityManagementTable = () => {
       }
     }
   };
+
   const finishBatchHandler = async () => {
     const isConfirmed = window.confirm(
       `Are you sure?\nPress 'OK' to confirm or 'Cancel' to exit.`
@@ -177,8 +181,6 @@ const QualityManagementTable = () => {
         free_quantity_fact,
         production_plan_id,
       } = qualityManagementData[0];
-
-      console.log('qualityManagementData[0]', qualityManagementData[0]);
 
       // 1. Фильтруем резервы для текущего product_article
       const reservedProducts =
@@ -246,12 +248,10 @@ const QualityManagementTable = () => {
 
       if (reserved_quantity_allocated < 0) {
         alert('Ошибка: reserved_quantity_allocated не может быть отрицательным.');
-        console.log('reserved_quantity_allocated', reserved_quantity_allocated);
       }
 
       if (summReserve < 0) {
         alert('Ошибка: summReserve не может быть отрицательным.');
-        console.log('summReserve', summReserve);
       }
 
       const calculatedOrderedQuantity = reserved_quantity_allocated + summReserve;
@@ -278,6 +278,31 @@ const QualityManagementTable = () => {
           reserved_quantity_remaining <= 0 ||
           total_quantity_plan - reserved_quantity_allocated < 63
         ) {
+          const { date, quantity_pallets } = batchOutside.find(
+            (el) => el.id === production_plan_id
+          );
+          const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
+            (el) => el.article == product_article
+          );
+          const accd = autoclave_calendar.find((el) => (el.date = date));
+
+          const total_arrays =
+            accd?.total_arrays ??
+            0 + quantity_pallets / Math.floor(m3InArray / volumeBlockOnPallet);
+
+          const quantity_of_produced = Math.floor(total_arrays / 21);
+
+          const residual_arrays = total_arrays - quantity_of_produced * 21;
+
+          const result = {
+            ...accd,
+            total_arrays,
+            residual_arrays,
+            quantity_of_produced,
+          };
+
+          dispatch(addNewAutoclaveCalendar(result));
+
           await dispatch(deleteBatchOutside(production_plan_id));
         } else {
           const batch = batchOutside.find((el) => el.id === production_plan_id);

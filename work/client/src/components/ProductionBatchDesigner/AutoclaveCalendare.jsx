@@ -118,6 +118,9 @@ export default function ProductionPlannerCalendar({
       return {
         date,
         quantity: Number(obj?.quantity) || 0,
+        total_arrays: existing?.total_arrays ?? 0,
+        residual_arrays: existing?.residual_arrays ?? 0,
+        quantity_of_produced: existing?.quantity_of_produced ?? 0,
         quantity_of_complited: existing?.quantity_of_complited ?? 0,
       };
     });
@@ -145,39 +148,6 @@ export default function ProductionPlannerCalendar({
     }
     return null;
   }
-
-  // function redistributeCascade(before) {
-  //   if (!before || before.length === 0) return before;
-
-  //   const work = before.map((d) => ({
-  //     date: d.date,
-  //     quantity: Number(d.quantity) || 0,
-  //     qoc: Number(d.quantity_of_complited) || 0, // выполнено
-  //   }));
-
-  //   // получатель i: справа -> налево
-  //   for (let i = work.length - 1; i >= 0; i--) {
-  //     let capacity = Math.max(0, work[i].quantity - work[i].qoc);
-  //     if (capacity <= 0) continue;
-
-  //     // доноры j: все предыдущие дни (тоже справа -> налево для жадного отбора)
-  //     for (let j = i - 1; j >= 0 && capacity > 0; j--) {
-  //       const avail = work[j].qoc;
-  //       if (avail <= 0) continue;
-
-  //       const take = Math.min(capacity, avail);
-  //       work[j].qoc -= take;
-  //       work[i].qoc += take;
-  //       capacity -= take;
-  //     }
-  //   }
-
-  //   return work.map((w) => ({
-  //     date: w.date,
-  //     quantity: w.quantity,
-  //     quantity_of_complited: w.qoc,
-  //   }));
-  // }
 
   function applyToMap(entries) {
     const patch = {};
@@ -492,6 +462,8 @@ export default function ProductionPlannerCalendar({
           const obj = map[iso] ?? { quantity: 0, quantity_of_complited: 0 };
           const qty = obj.quantity;
           const done = obj.quantity_of_complited;
+          const qop = obj.quantity_of_produced;
+
           const todayISO = format(new Date(), 'yyyy-MM-dd'); // date-fns уже используешь
           const isPastBtn = iso < todayISO;
 
@@ -528,15 +500,25 @@ export default function ProductionPlannerCalendar({
                     </div>
                   )}
                 </div>
-                {qty > 0 && (
-                  <div style={styles.badgePlan} title="План">
-                    {qty}
-                  </div>
-                )}
-                {done >= 0 && (
-                  <div style={styles.badgeDone} title="Выполнено">
-                    {done}
-                  </div>
+                {qop === done ? (
+                  <>
+                    <div style={styles.badgeDone} title="Произведено">
+                      {qop}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {qty > 0 && (
+                      <div style={styles.badgePlan} title="План">
+                        {qty}
+                      </div>
+                    )}
+                    {done >= 0 && (
+                      <div style={styles.badgeDone} title="Выполнено">
+                        {done}
+                      </div>
+                    )}
+                  </>
                 )}
               </button>
 
