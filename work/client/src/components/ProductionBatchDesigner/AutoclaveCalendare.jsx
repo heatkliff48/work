@@ -110,6 +110,7 @@ export default function ProductionPlannerCalendar({
   }
 
   const today = new Date();
+  console.log('autoclave_calendar', autoclave_calendar);
 
   const saveHandler = () => {
     const arr = Object.entries(map).map(([date, obj]) => {
@@ -460,9 +461,12 @@ export default function ProductionPlannerCalendar({
           const isPast = isBefore(day, today) && !isToday(day);
 
           const obj = map[iso] ?? { quantity: 0, quantity_of_complited: 0 };
+
+          const autoclaveData = autoclave_calendar.find((el) => el.date == iso);
+
           const qty = obj.quantity;
           const done = obj.quantity_of_complited;
-          const qop = obj.quantity_of_produced;
+          const qop = autoclaveData ? autoclaveData?.quantity_of_produced : 0;
 
           const todayISO = format(new Date(), 'yyyy-MM-dd'); // date-fns уже используешь
           const isPastBtn = iso < todayISO;
