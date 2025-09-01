@@ -289,12 +289,14 @@ const QualityManagementTable = () => {
 
       const residual_arrays = total_arrays - quantity_of_produced * 21;
 
-      const result = {
-        ...accd,
-        total_arrays,
-        residual_arrays,
-        quantity_of_produced,
-      };
+      const result = [
+        {
+          ...accd,
+          total_arrays,
+          residual_arrays,
+          quantity_of_produced,
+        },
+      ];
 
       await dispatch(addNewAutoclaveCalendar(result));
 

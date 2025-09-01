@@ -63,10 +63,6 @@ class WarehouseRepository {
         const residual_arrays = item?.residual_arrays;
         const total_arrays = item?.total_arrays;
 
-        console.log('quantity_of_produced', quantity_of_produced);
-        console.log('residual_arrays', residual_arrays);
-        console.log('total_arrays', total_arrays);
-
         if (calendarMap.has(date)) {
           const data = calendarMap.get(date);
           await AutoclaveCalendares.update(
