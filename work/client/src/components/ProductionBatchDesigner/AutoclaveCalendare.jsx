@@ -504,7 +504,15 @@ export default function ProductionPlannerCalendar({
                     </div>
                   )}
                 </div>
-                {qop === done ? (
+                {qty == 0 ? (
+                  <>
+                    {qty >= 0 && (
+                      <div style={styles.badgePlan} title="План">
+                        {qty}
+                      </div>
+                    )}
+                  </>
+                ) : qop === done && qop > 0 && done > 0 ? (
                   <>
                     <div style={styles.badgeDone} title="Произведено">
                       {qop}
@@ -512,7 +520,7 @@ export default function ProductionPlannerCalendar({
                   </>
                 ) : (
                   <>
-                    {qty > 0 && (
+                    {qty >= 0 && (
                       <div style={styles.badgePlan} title="План">
                         {qty}
                       </div>

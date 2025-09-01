@@ -282,7 +282,8 @@ const QualityManagementTable = () => {
       const accd = autoclave_calendar.find((el) => (el.date = date));
 
       const total_arrays =
-        accd?.total_arrays + quantity_pallets / Math.floor(m3InArray / volumeBlockOnPallet);
+        accd?.total_arrays +
+        quantity_pallets / Math.floor(m3InArray / volumeBlockOnPallet);
 
       const quantity_of_produced = Math.floor(total_arrays / 21);
 
@@ -294,7 +295,7 @@ const QualityManagementTable = () => {
         residual_arrays,
         quantity_of_produced,
       };
-      console.log('result', result);
+
       await dispatch(addNewAutoclaveCalendar(result));
 
       await dispatch(deleteQualityManagement(id));

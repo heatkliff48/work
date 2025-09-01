@@ -57,11 +57,15 @@ class WarehouseRepository {
 
       for (const item of map) {
         const date = String(item.date).slice(0, 10);
-        const quantity = Number(item.quantity) || 0;
-        const quantity_of_complited = Number(item.quantity_of_complited ?? 0) || 0;
-        const quantity_of_produced = Number(item.quantity_of_produced ?? 0) || 0;
-        const residual_arrays = Number(item.residual_arrays ?? 0) || 0;
-        const total_arrays = Number(item.total_arrays ?? 0) || 0;
+        const quantity = item?.quantity;
+        const quantity_of_complited = item?.quantity_of_complited;
+        const quantity_of_produced = item?.quantity_of_produced;
+        const residual_arrays = item?.residual_arrays;
+        const total_arrays = item?.total_arrays;
+
+        console.log('quantity_of_produced', quantity_of_produced);
+        console.log('residual_arrays', residual_arrays);
+        console.log('total_arrays', total_arrays);
 
         if (calendarMap.has(date)) {
           const data = calendarMap.get(date);
