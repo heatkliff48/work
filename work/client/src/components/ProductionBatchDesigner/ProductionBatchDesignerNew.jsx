@@ -271,8 +271,6 @@ function ProductionBatchDesignerNew() {
             el.quantity_in_warehouse
       );
     });
-    console.log('listOfOrderedCakes', listOfOrderedCakes);
-    console.log('rightListOfOrdered', rightListOfOrdered);
 
     const groupedByArticle = rightListOfOrdered.reduce((acc, curr) => {
       if (!acc[curr.product_article]) {
@@ -339,7 +337,6 @@ function ProductionBatchDesignerNew() {
       );
     });
 
-    console.log('prodBatch', prodBatch);
 
     // 🔹 объединяем одинаковые артикулы и суммируем поля + запоминаем исходные заказы
     const mergedMap = prodBatch.reduce((acc, item) => {

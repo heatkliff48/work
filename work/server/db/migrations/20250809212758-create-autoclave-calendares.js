@@ -15,6 +15,15 @@ module.exports = {
       quantity: {
         type: Sequelize.INTEGER
       },
+      total_arrays: {
+        type: Sequelize.INTEGER
+      },
+      residual_arrays: {
+        type: Sequelize.INTEGER
+      },
+      quantity_of_produced: {
+        type: Sequelize.INTEGER
+      },
       quantity_of_complited: {
         type: Sequelize.INTEGER
       },

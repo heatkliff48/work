@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class AutoclaveCalendares extends Model {
     /**
@@ -13,13 +11,19 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  AutoclaveCalendares.init({
-    date: DataTypes.STRING,
-    quantity: DataTypes.INTEGER,
-    quantity_of_complited: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'AutoclaveCalendares',
-  });
+  AutoclaveCalendares.init(
+    {
+      date: DataTypes.STRING,
+      quantity: DataTypes.INTEGER,
+      total_arrays: DataTypes.INTEGER,
+      residual_arrays: DataTypes.INTEGER,
+      quantity_of_produced: DataTypes.INTEGER,
+      quantity_of_complited: DataTypes.INTEGER,
+    },
+    {
+      sequelize,
+      modelName: 'AutoclaveCalendares',
+    }
+  );
   return AutoclaveCalendares;
 };
