@@ -49,7 +49,17 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   }, []);
 
   const handleProductListOrderChange = (e) => {
-    setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name } = e.target;
+    let value = e.target.value;
+
+    if (typeof value === 'string') {
+      const repVale = value.replace(',', '.');
+      // const parsed = parseFloat(repVale);
+      // console.log('parsed', parsed);
+      value = isNaN(repVale) ? value : repVale;
+    }
+
+    setProductOfOrder((prev) => ({ ...prev, [name]: value }));
   };
 
   const quantity_palet_value = useMemo(() => {
@@ -63,7 +73,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
     setProductOfOrder((prev) => ({
       ...prev,
-      quantity_palet: result,
+      quantity_palet: result.toFixed(2),
     }));
     return result;
   }, [productOfOrder.quantity_m2, selectedProduct?.m2]);
@@ -106,13 +116,35 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     return result.toFixed(2);
   }, [price_m2_value, quantity_real_value, productOfOrder?.discount]);
 
+  function formatDecimal(str) {
+    str = str.toString();
+
+    const parts = str.split('.');
+
+    let intPart = parts[0];
+    let decPart = parts[1] || '';
+
+    if (decPart.length === 0) {
+      decPart = '00';
+    } else if (decPart.length === 1) {
+      decPart = decPart + '0';
+    } else if (decPart.length > 2) {
+      decPart = decPart.slice(0, 2);
+    }
+
+    return `${intPart},${decPart}`;
+  }
+
   const addProductOrder = async () => {
+    const { quantity_m2 } = productOfOrder;
+    const newqm2 = formatDecimal(quantity_m2);
+
     if (haveOrderClient) {
       dispatch(
         getUpdateProductOfOrders({
           newProductsOfOrder: {
             order_id: haveOrderClient.id,
-            productOfOrder,
+            productOfOrder: { ...productOfOrder, quantity_m2: Number(newqm2) },
           },
         })
       );
@@ -175,15 +207,6 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       // console.log('Случайное quantity_real:', randomQuantityReal);
 
       if (haveOrderClient) {
-        // console.log('Данные для отправки:', {
-        // order_id: haveOrderClient.id,
-        // productOfOrder: {
-        //   quantity_m2: randomQuantity,
-        //   quantity_palet: randomQuantityPallets,
-        //   quantity_real: randomQuantityReal,
-        // },
-        // });
-
         try {
           dispatch(
             getUpdateProductOfOrders({
