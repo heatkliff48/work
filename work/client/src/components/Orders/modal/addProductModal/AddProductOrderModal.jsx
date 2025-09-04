@@ -15,12 +15,10 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder,
     setSelectedProduct,
     list_of_orders,
-    newOrder,
     selectedProduct,
     randomOrderCheck,
     setRandomOrderCheck,
     orderCartData,
-    setNewOrder,
   } = useOrderContext();
   const { COLUMNS, latestProducts } = useProductsContext();
 
@@ -132,7 +130,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       decPart = decPart.slice(0, 2);
     }
 
-    return `${intPart},${decPart}`;
+    return `${intPart}.${decPart}`;
   }
 
   const addProductOrder = async () => {
@@ -144,7 +142,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
         getUpdateProductOfOrders({
           newProductsOfOrder: {
             order_id: haveOrderClient.id,
-            productOfOrder: { ...productOfOrder, quantity_m2: Number(newqm2) },
+            productOfOrder: { ...productOfOrder, quantity_m2: parseFloat(newqm2) },
           },
         })
       );

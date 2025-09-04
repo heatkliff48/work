@@ -27,16 +27,16 @@ module.exports = {
         type: Sequelize.FLOAT,
       },
       quantity_palet: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.FLOAT,
       },
       quantity_real: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.FLOAT,
       },
       price_m2: {
         type: Sequelize.FLOAT,
       },
       discount: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.FLOAT,
       },
       final_price: {
         type: Sequelize.FLOAT,
