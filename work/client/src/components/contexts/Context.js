@@ -8,6 +8,7 @@ const ProjectContext = createContext();
 const ProjectContextProvider = ({ children }) => {
   const displayNames = {
     product_article: 'Order number',
+    project_name: 'Project name',
     quantity_m2: 'Quantity, m2',
     quantity_ud: 'Quantity, Ud',
     quantity_palet: 'Quantity of pallets',
