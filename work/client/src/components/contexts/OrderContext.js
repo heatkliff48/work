@@ -79,6 +79,11 @@ const OrderContextProvider = ({ children }) => {
       sortType: 'number',
     },
     {
+      Header: 'Price, EURO per m3',
+      accessor: 'price_m3',
+      sortType: 'number',
+    },
+    {
       Header: 'Discount, %',
       accessor: 'discount',
       defaultValue: 0,

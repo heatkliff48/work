@@ -24,7 +24,8 @@ const InputField = React.memo(
         return;
       }
 
-      const parsed = parseFloat(rawValue.replace(',', '.'));
+      const repVale = rawValue.replace(',', '.');
+      const parsed = parseFloat(repVale);
       const min = parseFloat(e.target.min);
       const max = parseFloat(e.target.max);
 
@@ -41,9 +42,7 @@ const InputField = React.memo(
 
     return (
       <div className="item_topic">
-        <ModalBody key={el.id}>
-          {uBlockHeader ? uBlockHeader : el.Header}:
-        </ModalBody>
+        <ModalBody key={el.id}>{uBlockHeader ? uBlockHeader : el.Header}:</ModalBody>
         {inputDirty && inputError && (
           <div style={{ color: 'red' }}>{inputError}</div>
         )}

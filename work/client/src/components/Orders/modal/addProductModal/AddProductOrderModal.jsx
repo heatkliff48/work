@@ -18,7 +18,6 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder,
     setSelectedProduct,
     list_of_orders,
-    newOrder,
     selectedProduct,
     randomOrderCheck,
     setRandomOrderCheck,
@@ -29,6 +28,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const { COLUMNS, latestProducts } = useProductsContext();
 
   const [inProgress, setInProgress] = useState(false);
+  const [haveChangePriceM3, setHaveChangePriceM3] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -52,8 +52,68 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
   }, []);
 
+  const handlePriceM3Change = (e) => {
+    const { name, value } = e.target;
+    setHaveChangePriceM3(true);
+    setProductOfOrder((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePriceM3Blur = (e) => {
+    const { value } = e.target;
+    const parsed = parseDecimal(value);
+    if (!Number.isNaN(parsed)) {
+      setProductOfOrder((prev) => ({ ...prev, price_m3: formatFixed(parsed, ',') }));
+    }
+  };
+
+  function parseDecimal(str) {
+    if (str === undefined || str === null) return NaN;
+    const num = parseFloat(String(str).replace(',', '.'));
+    return Number.isNaN(num) ? NaN : num;
+  }
+
+  // Число -> строка с 2 знаками; sep="," чтобы в инпуте было по-европейски
+  function formatFixed(num, sep = ',') {
+    const fixed = Number(num || 0).toFixed(2);
+    return sep === ',' ? fixed.replace('.', ',') : fixed;
+  }
+
+  function formatDecimal(str) {
+    str = str.toString();
+
+    const parts = str.split('.');
+
+    let intPart = parts[0];
+    let decPart = parts[1] || '';
+
+    if (decPart.length === 0) {
+      decPart = '00';
+    } else if (decPart.length === 1) {
+      decPart = decPart + '0';
+    } else if (decPart.length > 2) {
+      decPart = decPart.slice(0, 2);
+    }
+
+    return `${intPart}.${decPart}`;
+  }
+
+  const handleDiscountChange = (e) => {
+    const { value } = e.target;
+
+    setHaveChangePriceM3(false);
+    setProductOfOrder((prev) => ({ ...prev, discount: value }));
+  };
+
   const handleProductListOrderChange = (e) => {
-    setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name } = e.target;
+    let value = e.target.value;
+
+    if (typeof value === 'string') {
+      const repVale = value.replace(',', '.');
+      value = isNaN(repVale) ? value : repVale;
+    }
+
+    setProductOfOrder((prev) => ({ ...prev, [name]: value }));
   };
 
   const quantity_palet_value = useMemo(() => {
@@ -67,7 +127,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
     setProductOfOrder((prev) => ({
       ...prev,
-      quantity_palet: result,
+      quantity_palet: result.toFixed(2),
     }));
     return result;
   }, [productOfOrder.quantity_m2, selectedProduct?.m2]);
@@ -98,10 +158,38 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     selectedProduct?.volumeBlockOnPallet,
   ]);
 
+  const price_m3_value = useMemo(() => {
+    // если пользователь менял поле — берём его ввод
+    if (haveChangePriceM3) {
+      const n = parseDecimal(productOfOrder?.price_m3);
+      return Number.isNaN(n) ? 0 : n;
+    }
+    // иначе — базовая цена продукта
+    return Number(selectedProduct?.price || 0);
+  }, [haveChangePriceM3, productOfOrder?.price_m3, selectedProduct?.price]);
+
+  const discount_value = useMemo(() => {
+    const basePrice = Number(selectedProduct?.price || 0);
+    let result = 0;
+
+    if (haveChangePriceM3 && basePrice > 0) {
+      const priceM3 = price_m3_value; // уже число
+      result = (priceM3 / basePrice) * 100;
+    } else {
+      result = productOfOrder?.discount;
+    }
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      discount: result,
+    }));
+
+    return result;
+  }, [haveChangePriceM3, price_m3_value, productOfOrder?.discount]);
+
   const final_price_value = useMemo(() => {
-    const discount = productOfOrder?.discount ?? 0;
     const result =
-      (price_m2_value * quantity_real_value * Math.abs(100 - discount)) / 100;
+      (price_m2_value * quantity_real_value * Math.abs(100 - discount_value)) / 100;
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -111,15 +199,26 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   }, [price_m2_value, quantity_real_value, productOfOrder?.discount]);
 
   const addProductOrder = async () => {
+    const { quantity_m2, discount, price_m3 } = productOfOrder;
+    const newqm2 = formatDecimal(quantity_m2);
+    const formatedNum = price_m3.replace(',', '.');
+    const newpricem3 = formatDecimal(formatedNum);
+    const newdiscount = formatDecimal(discount);
+
     if (haveOrderClient) {
       dispatch(
         getUpdateProductOfOrders({
-          newProductsOfOrder: {
-            order_id: haveOrderClient.id,
-            productOfOrder,
+        newProductsOfOrder: {
+          order_id: haveOrderClient.id,
+          productOfOrder: {
+            ...productOfOrder,
+            quantity_m2: parseFloat(newqm2),
+            price_m3: parseFloat(newpricem3),
+            discount: parseFloat(newdiscount),
           },
-        })
-      );
+        },
+      })
+    );
       setProductOfOrder({});
       setSelectedProduct({});
     }
@@ -133,6 +232,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       discount,
     }));
   }, []);
+
 
   // const simulateRandomProductAddition = async () => {
   //   const randomIterations = Math.floor(Math.random() * 4) + 2;
@@ -188,7 +288,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
   //   toggle();
   // };
-
+  
   // useEffect(() => {
   //   if (!randomOrderCheck || inProgress) return;
   //   setInProgress(true);
@@ -311,6 +411,29 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                       inputValue={productOfOrder}
                       inputValueChange={handleProductListOrderChange}
                       uBlockHeader="Quantity, linear metre"
+                    />
+                  );
+                if (el.accessor === 'price_m3')
+                  return (
+                    <InputField
+                      key={el.id}
+                      el={el}
+                      inputValue={productOfOrder}
+                      inputValueChange={handlePriceM3Change}
+                      onBlur={handlePriceM3Blur}
+                    />
+                  );
+
+                if (el.accessor === 'discount')
+                  return (
+                    <InputField
+                      key={el.id}
+                      el={el}
+                      inputValue={{
+                        ...productOfOrder,
+                        discount: productOfOrder.discount?.toFixed(2),
+                      }}
+                      inputValueChange={handleDiscountChange}
                     />
                   );
                 return (

@@ -8,12 +8,14 @@ const ProjectContext = createContext();
 const ProjectContextProvider = ({ children }) => {
   const displayNames = {
     product_article: 'Order number',
+    project_name: 'Project name',
     quantity_m2: 'Quantity, m2',
     quantity_ud: 'Quantity, Ud',
     quantity_palet: 'Quantity of pallets',
     quantity_real: 'Real quantity, m2',
     quantity_real_ud: 'Real quantity, Ud',
     price_m2: 'Price, EURO per m2',
+    price_m3: 'Price, EURO per m3',
     discount: 'Discount, %',
     final_price: 'Final price, EURO',
     total: 'Total, kg',

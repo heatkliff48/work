@@ -73,7 +73,7 @@ const OrderCart = React.memo(() => {
     toolProductsOfOrders,
     relMatProductsOfOrders,
     randomOrderCheck,
-
+    deliveryAddresses,
     randomFillComplete,
     setRandomFillComplete,
   } = useOrderContext();
@@ -84,7 +84,6 @@ const OrderCart = React.memo(() => {
     warehouseInfoModal,
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
-    productModalOrder,
     setProductModalOrder,
   } = useModalContext();
   const { displayNames, user } = useProjectContext();
@@ -273,10 +272,14 @@ const OrderCart = React.memo(() => {
         .map((orderProduct) => {
           const id = getCorrectProductId(arrayName);
 
+          const { project_name } = deliveryAddresses.find(
+            (el) => el.client_id == orderCartData.owner.id
+          );
+
           const product = productsTable.find((p) => p.id === orderProduct?.[id]);
 
           return product
-            ? { product_article: product.article, ...orderProduct }
+            ? { product_article: product.article, project_name, ...orderProduct }
             : { ...orderProduct, product_article: 'Unknown' };
         });
 
