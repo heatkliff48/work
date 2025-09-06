@@ -35,6 +35,9 @@ module.exports = {
       price_m2: {
         type: Sequelize.FLOAT,
       },
+      price_m3: {
+        type: Sequelize.FLOAT,
+      },
       discount: {
         type: Sequelize.FLOAT,
       },
