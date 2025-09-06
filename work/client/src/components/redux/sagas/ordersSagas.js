@@ -69,6 +69,8 @@ import {
   UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER,
   UPDATE_TOOL_PRODUCT_INFO_OF_ORDER,
   UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
+  ADD_RANDOM_PRODUCTS_OF_ORDER,
+  RANDOM_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
 const url = axios.create({
@@ -367,6 +369,15 @@ const updateStatusOfOrder = (orderStatus) => {
 const updateInChargeOfOrder = (orderInCharge) => {
   return url
     .post('/orders/update/in_charge', orderInCharge)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addOrderRandomProducts = ({ order_id, order_article }) => {
+  return url
+    .post('/orderRandom/add_random', { order_id, order_article })
     .then((res) => {
       return res.data;
     })
@@ -772,6 +783,16 @@ function* updateInChargeOfOrderWorker(action) {
   }
 }
 
+function* addOrderRandomProductsWorker(action) {
+  try {
+    const { payload } = action;
+    const status = yield call(addOrderRandomProducts, payload);
+    yield put({ type: RANDOM_PRODUCTS_OF_ORDER, payload: status });
+  } catch (err) {
+    yield put({ type: RANDOM_PRODUCTS_OF_ORDER, payload: [] });
+  }
+}
+
 function* ordersWatcher() {
   yield takeLatest(GET_ORDERS_LIST, getOrdersListWatcher);
   yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
@@ -842,6 +863,7 @@ function* ordersWatcher() {
   yield takeLatest(UPDATE_DELIVERY_OF_ORDER, updateDeliveryOfOrderWorker);
   yield takeLatest(UPDATE_STATUS_OF_ORDER, updateStatusOfOrderWorker);
   yield takeLatest(UPDATE_PERSON_IN_CHARGE_OF_ORDER, updateInChargeOfOrderWorker);
+  yield takeLatest(ADD_RANDOM_PRODUCTS_OF_ORDER, addOrderRandomProductsWorker);
 }
 
 export default ordersWatcher;

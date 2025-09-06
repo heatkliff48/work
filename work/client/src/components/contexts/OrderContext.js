@@ -306,6 +306,7 @@ const OrderContextProvider = ({ children }) => {
   const [personsInChargeList, setPersonsInChargeList] = useState([]);
   const [productionBatchDesigner, setProductonBatchDesigner] = useState([]);
   const [randomOrderCheck, setRandomOrderCheck] = useState(false);
+  const [randomFillComplete, setRandomFillComplete] = useState(false);
 
   const list_of_orders = useSelector((state) => state.orders);
   const accountingDataList = useSelector((state) => state.accountingDataList);
@@ -500,7 +501,11 @@ const OrderContextProvider = ({ children }) => {
         };
       });
 
-      setOrdersDataList(newArray);
+      const uniqueArray = newArray.filter(
+        (obj, index, self) => index === self.findIndex((el) => el.id === obj.id)
+      );
+
+      setOrdersDataList(uniqueArray);
     }
   }, [list_of_orders, clients, deliveryAddresses]);
 
@@ -557,6 +562,8 @@ const OrderContextProvider = ({ children }) => {
         deliveryAddresses,
         randomOrderCheck,
         setRandomOrderCheck,
+        randomFillComplete,
+        setRandomFillComplete,
       }}
     >
       {children}

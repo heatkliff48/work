@@ -1,5 +1,8 @@
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { getListOfOrderedProduction } from '#components/redux/actions/warehouseAction.js';
 import Table from '#components/Table/Table.jsx';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 // import { useState } from 'react';
 // import ListOfOrderedProductionReserveModal from './ListOfOrderedProductionReserveModal';
 
@@ -11,6 +14,8 @@ function ListOfOrderedProduction() {
     // filteredWarehouseByProduct,
     // setFilteredWarehouseByProduct,
   } = useWarehouseContext();
+
+  const dispatch = useDispatch();
 
   // const [modalShow, setModalShow] = useState(false);
   // const [currentOrderedProduct, setCurrentOrderedProduct] = useState({});
@@ -26,6 +31,9 @@ function ListOfOrderedProduction() {
   //   setFilteredWarehouseByProduct(filteredWarehouse);
   //   setModalShow(true);
   // };
+  useEffect(() => {
+    dispatch(getListOfOrderedProduction());
+  }, []);
 
   return (
     <>

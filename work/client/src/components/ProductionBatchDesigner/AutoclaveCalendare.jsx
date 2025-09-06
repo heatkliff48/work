@@ -135,7 +135,7 @@ export default function ProductionPlannerCalendar({
     let maxRequired = 0; // максимум quantity впереди
     for (let i = 0; i < corridor.length - 1; i++) {
       const nextQty = Number(corridor[i + 1]?.quantity) || 0;
-      if (nextQty > maxRequired) maxRequired = nextQty;
+      if (nextQty >= maxRequired) maxRequired = nextQty;
 
       const qoc = Number(corridor[i]?.quantity_of_complited) || 0;
       if (qoc > maxRequired) {
@@ -404,7 +404,7 @@ export default function ProductionPlannerCalendar({
 
     // 5) Старая проверка план/выполнено в коридоре
     const violating = before.find(
-      (d) => d.quantity < planQtyNum && d.quantity_of_complited < doneNum
+      (d) => d.quantity > planQtyNum && d.quantity_of_complited < doneNum
     );
     if (violating) {
       window.alert(`Нельзя продолжить: ${violating.date}`);

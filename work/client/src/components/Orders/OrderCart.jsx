@@ -32,7 +32,7 @@ import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
 import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
 import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
 import DatePicker from 'react-datepicker';
-import { useDispatch, useSelector } from 'react-redux';
+import { batch, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Button } from 'reactstrap';
@@ -74,6 +74,8 @@ const OrderCart = React.memo(() => {
     relMatProductsOfOrders,
     randomOrderCheck,
     deliveryAddresses,
+    randomFillComplete,
+    setRandomFillComplete,
   } = useOrderContext();
 
   const {
@@ -395,16 +397,18 @@ const OrderCart = React.memo(() => {
     }
   };
 
-  const statusChangeHandler = (status) => {
-    if (
-      status.accessor < orderCartData?.status ||
-      status.accessor > orderCartData?.status + 1
-    ) {
-      return alert('This status cannot be set');
-    }
+  const statusChangeHandler = (status, bypass = false) => {
+    if (!bypass) {
+      if (
+        status.accessor < orderCartData?.status ||
+        status.accessor > orderCartData?.status + 1
+      ) {
+        return alert('This status cannot be set');
+      }
 
-    if (!aproveAccounting) {
-      return alert("Please await accounting's verification");
+      if (!aproveAccounting) {
+        return alert("Please await accounting's verification");
+      }
     }
 
     const order_id = orderCartData?.id;
@@ -413,9 +417,29 @@ const OrderCart = React.memo(() => {
         ? orderCartData?.shipping_date
         : formatDataValue;
 
-    if (status.accessor > status_list[3].accessor && !hasShippingDate) {
+    if (!bypass && status.accessor > status_list[3].accessor && !hasShippingDate) {
       alert('Пожалуйста, выберите дату отправки');
       return;
+    } else if (bypass) {
+      const today = new Date();
+      const randomDays = Math.floor(Math.random() * 365) + 1; // от 1 до 365 дней вперед
+      const randomDate = new Date(today);
+      randomDate.setDate(today.getDate() + randomDays);
+
+      const formattedDate = randomDate
+        .toLocaleDateString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        })
+        .replace(/\//g, '.');
+
+      dispatch(
+        addDataShipOrder({
+          order_id,
+          shipping_date: formattedDate,
+        })
+      );
     } else if (status.accessor === status_list[4].accessor) {
       dispatch(
         addDataShipOrder({
@@ -426,7 +450,6 @@ const OrderCart = React.memo(() => {
     }
 
     // blocks
-
     updatedProductListOrder?.forEach((product) => {
       const loc = latestProducts.find(
         (el) => el.article == product.product_article
@@ -435,7 +458,6 @@ const OrderCart = React.memo(() => {
       const haveProductReserve = list_of_reserved_products.find(
         (el) => el.orders_products_id == product.id
       );
-
       if (
         status.accessor === status_list[5].accessor &&
         loc === 'Spain' &&
@@ -448,7 +470,6 @@ const OrderCart = React.memo(() => {
         );
 
         let remainingToAllocate = reservedProduct.quantity_palet || 0; // Сколько нужно зарезервировать для этого товара
-
         const matchingWarehouseProducts =
           warehouse_data?.filter(
             (warehouseItem) =>
@@ -475,7 +496,6 @@ const OrderCart = React.memo(() => {
             remainingToAllocate -= taken;
           }
         }
-
         const quantity_in_warehouse =
           reservedProduct.quantity_palet - remainingToAllocate; // Сколько реально зарезервировали
 
@@ -967,23 +987,58 @@ const OrderCart = React.memo(() => {
     }
   }, [list_of_orders, orderCartData?.id]);
 
-  useEffect(() => {
-    if (!randomOrderCheck) return;
-    setProductModalOrder(true);
+  const randomDateChange = async () => {
     const today = new Date();
     const randomDays = Math.floor(Math.random() * 365) + 1; // от 1 до 365 дней вперед
     const randomDate = new Date(today);
     randomDate.setDate(today.getDate() + randomDays);
 
+    const formattedDate = randomDate
+      .toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+      .replace(/\//g, '.');
+
     handleDateChange(randomDate);
 
-    dispatch(
+    await dispatch(
+      addDataShipOrder({
+        order_id: orderCartData?.id,
+        shipping_date: formattedDate,
+      })
+    );
+
+    await dispatch(
       updateOrderStatus({
         order_id: orderCartData?.id,
         status: 6,
       })
     );
-  }, [randomOrderCheck]);
+  };
+
+  // useEffect(() => {
+  //   if (!randomOrderCheck) return;
+  //   setProductModalOrder(true);
+  //   // randomDateChange();
+  // }, [randomOrderCheck, updatedProductListOrder]);
+
+  // useEffect(() => {
+  // console.log('randomFillComplete', randomFillComplete);
+  // if (!randomFillComplete || updatedProductListOrder.length < 1) return;
+  // const status = {
+  //   Header: 'Order allowed for production',
+  //   accessor: 6,
+  // };
+
+  // statusChangeHandler(status, true);
+  // console.log('STATUS CHANGE ----------------------------');
+
+  // pipelineFillForRandom();
+
+  //   setRandomFillComplete(false);
+  // }, [randomFillComplete, updatedProductListOrder]);
 
   return (
     <>
