@@ -147,7 +147,6 @@ const ModalWindow = React.memo(
         productCode;
 
       const palletProductCode = calculateEAN14Checksum(
-
         '1' +
           '84' +
           '36626' +
@@ -168,9 +167,26 @@ const ModalWindow = React.memo(
         palletProductCode;
 
       //description
-      const description = `BAUBLOCK®${trMark} ${formInput.lengths ?? '-'}x${
-        formInput.width ?? '-'
-      }x${formInput.height ?? '-'}mm ${formInput.density ?? '-'}kg/m³`;
+      let description;
+
+      if (formInput.form === 'O-block') {
+        // Если выбран O-block
+        description = `BAUBLOCK® ${trMark} ${formInput.width ?? '-'} (Ø${
+          formInput.diametro ?? '-'
+        }) Medidas ${formInput.lengths ?? '-'}x${formInput.width ?? '-'}x${
+          formInput.height ?? '-'
+        } mm Densidad ${formInput.density ?? '-'} kg/m3`;
+      } else {
+        // Для всех остальных блоков
+        description = `BAUBLOCK® ${trMark} ${formInput.width ?? '-'} Medidas ${
+          formInput.lengths ?? '-'
+        }x${formInput.width ?? '-'}x${formInput.height ?? '-'} mm Densidad ${
+          formInput.density ?? '-'
+        }kg/m3`;
+      }
+      // const description = `BAUBLOCK®${trMark} ${formInput.lengths ?? '-'}x${
+      //   formInput.width ?? '-'
+      // }x${formInput.height ?? '-'}mm ${formInput.density ?? '-'}kg/m³`;
 
       let parsedRC = parseFloat(
         formInput.resistenciaCompresion.toString()?.replace(',', '.')
@@ -252,13 +268,13 @@ const ModalWindow = React.memo(
       if (formInput.density < 200) {
         tradingMark = 'SA-TEC';
       } else if (formInput.density >= 200 && formInput.density < 360) {
-        tradingMark = 'Termeco';
+        tradingMark = 'TERMECO';
       } else if (formInput.density >= 360 && formInput.density < 460) {
-        tradingMark = 'Utilitas';
+        tradingMark = 'UTILITAS';
       } else if (formInput.density >= 460 && formInput.density < 560) {
-        tradingMark = 'Silenso';
+        tradingMark = 'SILENSO';
       } else if (formInput.density > 560) {
-        tradingMark = 'CalmEco';
+        tradingMark = 'CALMECO';
       }
 
       if (formInput.form === 'U-block') {
@@ -266,7 +282,7 @@ const ModalWindow = React.memo(
       } else if (formInput.form === 'Lintel') {
         tradingMark = 'L-TEC';
       } else if (formInput.form === 'Forjado') {
-        tradingMark = 'Forja-TEC';
+        tradingMark = 'FORJA-TEC';
       }
 
       setTrMark(tradingMark);
@@ -298,10 +314,10 @@ const ModalWindow = React.memo(
 
       // Определение высоты паллета
       const palletHeightMap = {
-        0: 1140,
+        0: 1150,
         1: 1000,
         2: 1500,
-        std: 1140,
+        std: 1150,
         marine: 1000,
         height: 1500,
       };
@@ -378,25 +394,39 @@ const ModalWindow = React.memo(
           values.m = (values.m2 / (formInput?.height / 1000)).toFixed(2);
           updateFuncs.m = (value) => setFormInput((prev) => ({ ...prev, m: value }));
         }
-
         // Вычисление widthInArray
         if (formInput?.width) {
-          values.widthInArray = Math.floor(1500 / formInput?.width).toFixed(2);
+          let divisor = 1500; // значение по умолчанию
+
+          // Условия для специальных случаев width
+          if (formInput.width == 50) {
+            divisor = 600;
+          } else if (formInput.width == 75) {
+            divisor = 975;
+          } else if (formInput.width == 85) {
+            divisor = 1190;
+          } else if (formInput.width == 200) {
+            divisor = 1400;
+          } else if (formInput.width == 350) {
+            divisor = 1400;
+          }
+
+          values.widthInArray = Math.floor(divisor / formInput?.width).toFixed(2);
           updateFuncs.widthInArray = (value) =>
             setFormInput((prev) => ({ ...prev, widthInArray: value }));
         }
 
         // Вычисление m3InArray
         if (values.volumeBlock && values.widthInArray) {
-          // values.m3InArray = (
-          //             1 *
-          // Math.floor(6000 / formInput?.height) *
-          // values.widthInArray *
-          // values.volumeBlock
-          // ).toFixed(2);
-          values.m3InArray = (values.volumeBlockOnPallet * 3).toFixed(2);
-          updateFuncs.m3InArray = (value) =>
-            setFormInput((prev) => ({ ...prev, m3InArray: value }));
+          values.m3InArray = (
+            1 *
+            Math.floor(6000 / formInput?.height) *
+            values.widthInArray *
+            values.volumeBlock
+          ).toFixed(2);
+          // values.m3InArray = (values.volumeBlockOnPallet * 3).toFixed(2);
+          // updateFuncs.m3InArray = (value) =>
+          //   setFormInput((prev) => ({ ...prev, m3InArray: value }));
         }
 
         if (formInput?.density) {
@@ -545,7 +575,10 @@ const ModalWindow = React.memo(
     useEffect(() => {
       if (!stayDefault) return;
       if (formData) {
-        setFormInput(formData);
+        setFormInput({
+          ...formData,
+          diametro: formData.form === 'O-block' ? formData.diametro : null,
+        });
       } else {
         setDefaultValues(memoizedDefaultValues);
         const extractedValues = Object.entries(memoizedNewHaveMath).reduce(
@@ -559,6 +592,10 @@ const ModalWindow = React.memo(
           ...prev,
           ...memoizedDefaultValues,
           ...extractedValues,
+          diametro:
+            memoizedDefaultValues.form === 'O-block'
+              ? memoizedDefaultValues.diametro
+              : null,
         }));
       }
     }, []);
@@ -668,8 +705,11 @@ const ModalWindow = React.memo(
                         setFormInput((prev) => ({
                           ...prev,
                           [el.accessor]: option.value,
+                          diametro:
+                            option.value === 'O-block' ? prev.diametro : null,
                         }));
-                        if (el.accessor == 'form' && option.value == 'Forjado') {
+
+                        if (el.accessor == 'form' && option.value == 'FORJADO') {
                           setFormInput((prev) => ({
                             ...prev,
                             lengths: 600,
