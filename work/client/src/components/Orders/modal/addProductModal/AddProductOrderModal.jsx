@@ -49,7 +49,10 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       ...prev,
       product_article: row.original.article,
       product_id: product?.id,
+      price_m3: formatFixed(product?.price || 0, ','),
+      discount: 0,
     }));
+    setHaveChangePriceM3(false);
   }, []);
 
   const handlePriceM3Change = (e) => {
@@ -99,9 +102,16 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
   const handleDiscountChange = (e) => {
     const { value } = e.target;
+    setHaveChangePriceM3(false); // Сбрасываем флаг изменения цены
 
-    setHaveChangePriceM3(false);
-    setProductOfOrder((prev) => ({ ...prev, discount: value }));
+    const discount = Number(value || 0);
+    const newPriceM3 = base_price_m3 * (1 - discount / 100);
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      discount: discount,
+      price_m3: formatFixed(newPriceM3, ','),
+    }));
   };
 
   const handleProductListOrderChange = (e) => {
@@ -158,34 +168,46 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     selectedProduct?.volumeBlockOnPallet,
   ]);
 
-  const price_m3_value = useMemo(() => {
-    // если пользователь менял поле — берём его ввод
-    if (haveChangePriceM3) {
-      const n = parseDecimal(productOfOrder?.price_m3);
-      return Number.isNaN(n) ? 0 : n;
-    }
-    // иначе — базовая цена продукта
+  // Базовая цена продукта (не меняется)
+  const base_price_m3 = useMemo(() => {
     return Number(selectedProduct?.price || 0);
-  }, [haveChangePriceM3, productOfOrder?.price_m3, selectedProduct?.price]);
+  }, [selectedProduct?.price]);
 
-  const discount_value = useMemo(() => {
-    const basePrice = Number(selectedProduct?.price || 0);
-    let result = 0;
-
-    if (haveChangePriceM3 && basePrice > 0) {
-      const priceM3 = price_m3_value; // уже число
-      result = (priceM3 / basePrice) * 100;
+  // Цена m3 - может быть изменена пользователем или рассчитана из скидки
+  const price_m3_value = useMemo(() => {
+    if (haveChangePriceM3) {
+      // Если пользователь менял цену напрямую
+      const n = parseDecimal(productOfOrder?.price_m3);
+      return Number.isNaN(n) ? base_price_m3 : n;
     } else {
-      result = productOfOrder?.discount;
+      // Рассчитываем из скидки
+      const discount = Number(productOfOrder?.discount || 0);
+      return base_price_m3 * (1 - discount / 100);
     }
+  }, [
+    haveChangePriceM3,
+    productOfOrder?.price_m3,
+    productOfOrder?.discount,
+    base_price_m3,
+  ]);
 
-    setProductOfOrder((prev) => ({
-      ...prev,
-      discount: result,
-    }));
+  // Скидка - рассчитывается из цены или устанавливается пользователем
+  const discount_value = useMemo(() => {
+    if (haveChangePriceM3 && base_price_m3 > 0) {
+      // Если цена была изменена - рассчитываем скидку
+      const result = ((base_price_m3 - price_m3_value) / base_price_m3) * 100;
 
-    return result;
-  }, [haveChangePriceM3, price_m3_value, productOfOrder?.discount]);
+      setProductOfOrder((prev) => ({
+        ...prev,
+        discount: Math.max(0, result), // Скидка не может быть отрицательной
+      }));
+
+      return Math.max(0, result);
+    } else {
+      // Возвращаем скидку, установленную пользователем
+      return Number(productOfOrder?.discount || 0);
+    }
+  }, [haveChangePriceM3, price_m3_value, base_price_m3, productOfOrder?.discount]);
 
   const final_price_value = useMemo(() => {
     const result =
@@ -208,17 +230,17 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     if (haveOrderClient) {
       dispatch(
         getUpdateProductOfOrders({
-        newProductsOfOrder: {
-          order_id: haveOrderClient.id,
-          productOfOrder: {
-            ...productOfOrder,
-            quantity_m2: parseFloat(newqm2),
-            price_m3: parseFloat(newpricem3),
-            discount: parseFloat(newdiscount),
+          newProductsOfOrder: {
+            order_id: haveOrderClient.id,
+            productOfOrder: {
+              ...productOfOrder,
+              quantity_m2: parseFloat(newqm2),
+              price_m3: parseFloat(newpricem3),
+              discount: parseFloat(newdiscount),
+            },
           },
-        },
-      })
-    );
+        })
+      );
       setProductOfOrder({});
       setSelectedProduct({});
     }
@@ -232,7 +254,6 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       discount,
     }));
   }, []);
-
 
   // const simulateRandomProductAddition = async () => {
   //   const randomIterations = Math.floor(Math.random() * 4) + 2;
@@ -288,7 +309,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
   //   toggle();
   // };
-  
+
   // useEffect(() => {
   //   if (!randomOrderCheck || inProgress) return;
   //   setInProgress(true);
