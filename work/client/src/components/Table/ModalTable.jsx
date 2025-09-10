@@ -1,12 +1,7 @@
 import React from 'react';
 import { Modal, ModalHeader, ModalBody } from 'reactstrap';
 
-const ModalTable = ({
-  isOpen,
-  toggle,
-  data = [],
-  onClickRow = null,
-}) => {
+const ModalTable = ({ isOpen, toggle, data = [], onClickRow = null }) => {
   const filteredData = data?.filter((item) => item?.article.startsWith('T'));
 
   const isProductData = filteredData.length > 0;
@@ -16,8 +11,13 @@ const ModalTable = ({
         article: item.article,
         density: item?.density,
         width: item?.width,
+        m3InArray: item?.m3InArray,
+        volumeBlockOnPallet: item?.volumeBlockOnPallet,
+        normOfBrack: item?.normOfBrack,
       }))
     : data;
+
+  const hiddenKeys = ['m3InArray', 'volumeBlockOnPallet', 'normOfBrack'];
 
   return (
     <Modal
@@ -33,31 +33,37 @@ const ModalTable = ({
             <table className="w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-100">
-                  {Object.keys(right_data[0]).map((key) => (
-                    <th
-                      key={key}
-                      className="border border-gray-300 px-4 py-2 text-left"
-                    >
-                      {key}
-                    </th>
-                  ))}
+                  {Object.keys(right_data[0]).map((key) => {
+                    if (hiddenKeys.includes(key)) return null;
+                    return (
+                      <th
+                        key={key}
+                        className="border border-gray-300 px-4 py-2 text-left"
+                      >
+                        {key}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
                 {right_data.map((row, index) => (
                   <tr key={index} className="odd:bg-white even:bg-gray-50">
-                    {Object.values(row).map((value, i) => (
-                      <td
-                        key={i}
-                        className="border border-gray-300 px-4 py-2"
-                        onClick={() => {
-                          onClickRow(row);
-                          toggle();
-                        }}
-                      >
-                        {value}
-                      </td>
-                    ))}
+                    {Object.entries(row).map(([key, value]) => {
+                      if (hiddenKeys.includes(key)) return null;
+                      return (
+                        <td
+                          key={key}
+                          className="border border-gray-300 px-4 py-2"
+                          onClick={() => {
+                            onClickRow(row);
+                            toggle();
+                          }}
+                        >
+                          {value}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>
