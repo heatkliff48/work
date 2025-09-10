@@ -585,7 +585,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
               : newPosition.product.id_list_of_ordered_production == null
               ? newPosition.product.cakes_in_batch *
                   Math.floor(m3InArray / volumeBlockOnPallet) +
-                existingRecord.quantity_free
+                existingRecord?.quantity_free
               : 0,
           position_in_autoclave: newPosition.positionInBatch,
           id_list_of_ordered_production:
@@ -627,7 +627,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
               : newPosition.product.id_list_of_ordered_production == null
               ? newPosition.product.cakes_in_batch *
                   Math.floor(m3InArray / volumeBlockOnPallet) +
-                existingRecord.quantity_free
+                existingRecord?.quantity_free
               : 0,
           position_in_autoclave: newPosition.positionInBatch,
           id_list_of_ordered_production:

@@ -104,8 +104,10 @@ function ProductionBatchDesignerNew() {
   );
 
   const addProductHandler = (prod_data) => {
-    const { article, density, width } = prod_data;
-
+    const { article, density, width, m3InArray, volumeBlockOnPallet, normOfBrack } =
+      prod_data;
+    console.log('prod_data', prod_data);
+    console.log('batchDesigner', batchDesigner);
     const maxId =
       (batchDesigner.reduce((max, item) => (item.id > max ? item.id : max), 0) ||
         0) + 1;
@@ -119,9 +121,22 @@ function ProductionBatchDesignerNew() {
         return prevAutoclave;
       }
 
-      flat[emptyIndex] = { id: maxId, density, width };
+      flat[emptyIndex] = { id: maxId, density, width, article };
 
       const countForThisId = flat.filter((c) => c && c.id === maxId).length;
+
+      const palletsPerArray = Math.max(
+        1,
+        Math.floor(m3InArray / volumeBlockOnPallet) || 1
+      );
+
+      const product_with_brack = (1 / palletsPerArray + normOfBrack).toFixed(2);
+      const free_product_cakes = (
+        Math.ceil(product_with_brack) - product_with_brack
+      ).toFixed(2);
+      const free_product_package = Math.floor(free_product_cakes * 3);
+
+      const total_cakes = Math.ceil(product_with_brack);
 
       dispatch(
         addBatchState({
@@ -130,7 +145,9 @@ function ProductionBatchDesignerNew() {
           product_article: article,
           cakes_in_batch: 1,
           cakes_residue: 0,
-          total_cakes: 1,
+          total_cakes,
+          free_product_package,
+          free_product_cakes,
         })
       );
 
@@ -197,7 +214,7 @@ function ProductionBatchDesignerNew() {
         free_product_cakes,
         free_product_package,
         total_cakes,
-        cakes_in_batch:0,
+        cakes_in_batch: 0,
         cakes_residue,
       };
 
@@ -314,8 +331,6 @@ function ProductionBatchDesignerNew() {
               quantity -
               (quantity_in_warehouse + quantity_in_batch * palletsPerArray);
             const quantity_m3 = (rightQuantity * volumeBlockOnPallet).toFixed(2);
-            console.log('palletsPerArray', palletsPerArray);
-            console.log('rightQuantity', rightQuantity);
 
             const batch = addCakesData({
               id,
@@ -338,7 +353,6 @@ function ProductionBatchDesignerNew() {
         }
       );
     });
-
 
     // 🔹 объединяем одинаковые артикулы и суммируем поля + запоминаем исходные заказы
     const mergedMap = prodBatch.reduce((acc, item) => {
@@ -540,9 +554,6 @@ function ProductionBatchDesignerNew() {
       return { start, end: start + CELLS_PER_AUTOCLAVE - 1 };
     };
 
-    // Пытаемся "открыть окно" размером size, начиная с start,
-    // сдвигая всё ПРАВО от start внутри границ [bStart..bEnd].
-    // Возвращает { ok, next } — next используется ТОЛЬКО если ok === true.
     const tryOpenWindowRight = (arr, start, size, bStart, bEnd) => {
       const a = arr.slice(); // чистая копия
       let insertPos = start;
@@ -569,7 +580,6 @@ function ProductionBatchDesignerNew() {
 
       return { ok: true, next: a };
     };
-    console.log('batchDesigner', batchDesigner);
     // Кладём подряд, распределяя по источникам этого артикула
     const sources = batchDesigner
       .filter((b) => b.product_article === product_article)
@@ -622,15 +632,6 @@ function ProductionBatchDesignerNew() {
         // строго внутри этого же автоклава.
         const insertAt = lastSameIdx + 1;
         const { start: bStart, end: bEnd } = getColBounds(insertAt);
-
-        // Максимум сколько вообще влезет внутрь этого автоклава
-        const freeHere = (() => {
-          let n = 0;
-          for (let i = insertAt; i <= bEnd; i++) if (isEmpty(flat[i])) n++;
-          // Плюс то, что сможем «вытолкать» вправо за счёт других пустых
-          // внутри тех же границ — tryOpenWindowRight это посчитает сам.
-          return n + 0;
-        })();
 
         // Пробуем открыть окно от remaining вниз до 1,
         // применяем ТОЛЬКО успешный вариант.
