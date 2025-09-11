@@ -80,12 +80,19 @@ function Products() {
       defaultColumn,
       filterTypes,
       sortTypes,
+      initialState: {
+        sortBy: [
+          {
+            id: 'article',
+            desc: false,
+          },
+        ],
+      },
     },
     useGlobalFilter,
     useFilters,
     useSortBy
   );
-
   const {
     getTableProps,
     getTableBodyProps,
