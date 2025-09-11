@@ -60,26 +60,40 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     relMat: [latestRelatedMaterials, relMatProductsOfOrders],
   };
 
+  //ради коммента
+  useEffect(() => {
+    console.log('wmoctProduct state:', wmoctProduct);
+  }, [wmoctProduct]);
+
   const handlePlusBatch = (product) => {
     setSelectedProduct(product.article);
     setWmoctModal(true);
   };
 
   const handlePlus = (batch, batchIndex) => {
+    console.log('handlePlus called with:', { batch, batchIndex });
     setWmoctProduct((prev) =>
       prev.map((wmoctItem) => {
-        if (wmoctItem.article == batch.article) {
+        if (wmoctItem.article === batch.article) {
           let { shipped, qty_rem, qty_total } = wmoctItem;
 
           const newBatches = wmoctItem.batches.map((el, i) => {
-            if (i == batchIndex) {
+            if (i === batchIndex) {
               const { allocated, remainingInBatch } = el;
 
+              // Исправленная логика проверки
               const canPlus =
-                remainingInBatch > 0 &&
-                qty_rem > 0 &&
-                allocated < qty_total &&
-                allocated <= qty_rem;
+                remainingInBatch > 0 && // есть остаток в партии
+                qty_rem > 0 && // есть неотгруженное количество
+                shipped < qty_total; // общее отгруженное меньше общего заказанного
+
+              console.log('Plus check:', {
+                remainingInBatch,
+                qty_rem,
+                shipped,
+                qty_total,
+                canPlus,
+              });
 
               const result = canPlus ? allocated + 1 : allocated;
 
@@ -103,13 +117,15 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   const handleMinus = (batch, batchIndex) => {
     setWmoctProduct((prev) =>
       prev.map((wmoctItem) => {
-        if (wmoctItem.article == batch.article) {
+        if (wmoctItem.article === batch.article) {
+          // Изменено с == на ===
           let { shipped, qty_rem } = wmoctItem;
 
           const newBatches = wmoctItem.batches.map((el, i) => {
             const { allocated, minAllocated } = el;
 
-            if (i == batchIndex) {
+            if (i === batchIndex) {
+              // Изменено с == на ===
               let minimunAllocated = !minAllocated ? 0 : minAllocated;
               const canMinus = allocated != 0 && allocated > minimunAllocated;
 
@@ -134,13 +150,31 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   };
 
   const isDisablePlus = (article) => {
-    return wmoctProduct.some(
-      (el) => el.article == article && el.qty_total == el.shipped
-    );
+    const result = wmoctProduct.some((el) => {
+      if (el.article !== article) return false;
+      const shouldDisable = el.qty_total === el.shipped || el.qty_rem === 0;
+      console.log(`isDisablePlus for ${article}:`, {
+        qty_total: el.qty_total,
+        shipped: el.shipped,
+        qty_rem: el.qty_rem,
+        shouldDisable,
+      });
+      return shouldDisable;
+    });
+    return result;
   };
 
   const isDisableMinus = (article, batch) => {
-    return wmoctProduct.some((el) => el.article == article && batch.allocated == 0);
+    const result = wmoctProduct.some((el) => {
+      const shouldDisable = el.article === article && batch.allocated === 0;
+      console.log(`isDisableMinus for ${article}:`, {
+        article: el.article,
+        allocated: batch.allocated,
+        shouldDisable,
+      });
+      return shouldDisable;
+    });
+    return result;
   };
 
   useEffect(() => {
