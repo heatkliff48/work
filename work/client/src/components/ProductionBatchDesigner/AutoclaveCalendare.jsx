@@ -110,7 +110,6 @@ export default function ProductionPlannerCalendar({
   }
 
   const today = new Date();
-  console.log('autoclave_calendar', autoclave_calendar);
 
   const saveHandler = () => {
     const arr = Object.entries(map).map(([date, obj]) => {
