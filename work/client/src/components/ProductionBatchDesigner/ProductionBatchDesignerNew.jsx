@@ -175,9 +175,6 @@ function ProductionBatchDesignerNew() {
         id,
         product_with_brack,
         article,
-        quantity_cakes,
-        quantity_in_batch,
-        quantity_in_warehouse,
         palletsPerArray,
       } = prodBatchData;
 
@@ -188,16 +185,14 @@ function ProductionBatchDesignerNew() {
 
       const total_cakes = Math.ceil(product_with_brack);
 
-      // pallets-per-array (как и при сохранении)
-
-      const cakes_in_batch =
-        quantity_in_batch == 0
-          ? quantity_in_batch
-          : Math.max(
-              quantity_cakes -
-                (quantity_in_warehouse / palletsPerArray + quantity_in_batch),
-              0
-            );
+      const cakes_in_batch = 0;
+      // quantity_in_batch == 0
+      //   ? quantity_in_batch
+      //   : Math.max(
+      //       quantity_cakes -
+      //         (quantity_in_warehouse / palletsPerArray + quantity_in_batch),
+      //       0
+      //     );
 
       // если есть готовое значение — берём его, иначе считаем от total_cakes
       const cakes_residue = Math.max(total_cakes - cakes_in_batch, 0);
@@ -207,7 +202,7 @@ function ProductionBatchDesignerNew() {
         free_product_cakes,
         free_product_package,
         total_cakes,
-        cakes_in_batch: 0,
+        cakes_in_batch,
         cakes_residue,
       };
 
