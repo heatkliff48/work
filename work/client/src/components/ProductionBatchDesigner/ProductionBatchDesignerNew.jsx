@@ -134,7 +134,7 @@ function ProductionBatchDesignerNew() {
       const free_product_cakes = (
         Math.ceil(product_with_brack) - product_with_brack
       ).toFixed(2);
-      const free_product_package = Math.floor(free_product_cakes * 3);
+      const free_product_package = Math.floor(free_product_cakes * palletsPerArray);
 
       const total_cakes = Math.ceil(product_with_brack);
 
@@ -178,24 +178,17 @@ function ProductionBatchDesignerNew() {
         quantity_cakes,
         quantity_in_batch,
         quantity_in_warehouse,
+        palletsPerArray,
       } = prodBatchData;
-      const m3InArray = latestProducts?.find((p) => p.article == article)?.m3InArray;
-      const volumeBlockOnPallet = latestProducts?.find(
-        (p) => p.article == article
-      )?.volumeBlockOnPallet;
 
       const free_product_cakes = (
         Math.ceil(product_with_brack) - product_with_brack
       ).toFixed(2);
-      const free_product_package = Math.floor(free_product_cakes * 3);
+      const free_product_package = Math.floor(free_product_cakes * palletsPerArray);
 
       const total_cakes = Math.ceil(product_with_brack);
 
       // pallets-per-array (как и при сохранении)
-      const palletsPerArray = Math.max(
-        1,
-        Math.floor(m3InArray / volumeBlockOnPallet) || 1
-      );
 
       const cakes_in_batch =
         quantity_in_batch == 0
@@ -338,14 +331,16 @@ function ProductionBatchDesignerNew() {
               width,
               density,
               quantity: rightQuantity,
-              product_with_brack: (quantity / palletsPerArray + normOfBrack).toFixed(
-                2
-              ),
+              product_with_brack: (
+                rightQuantity / palletsPerArray +
+                normOfBrack
+              ).toFixed(2),
               quantity_m3,
               article,
               quantity_cakes,
               quantity_in_batch,
               quantity_in_warehouse,
+              palletsPerArray,
             });
             prodBatch.push(batch);
             updatedTotalQuantity += rightQuantity;
@@ -447,9 +442,17 @@ function ProductionBatchDesignerNew() {
         );
 
         const deltaCakes = sumInBatch - (Number(item.cakes_in_batch) || 0);
+        const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
+          (el) => el.article == item.product_article
+        );
+        const palletsPerArray = Math.max(
+          1,
+          Math.floor(m3InArray / volumeBlockOnPallet) || 1
+        );
+
         const new_free_product_package =
           deltaCakes > 0
-            ? (Number(item.free_product_package) || 0) + deltaCakes * 3
+            ? (Number(item.free_product_package) || 0) + deltaCakes * palletsPerArray
             : item.free_product_package;
 
         return {
