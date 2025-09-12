@@ -188,7 +188,7 @@ const QualityManagementTable = () => {
           (item) => item.product_article === product_article
         ) || [];
 
-      // 2. Сколько осталось "свободного" количества и сколько всего свободной продукции было зарезервированно сразу
+      // 2. Сколько осталось "свободного" количества
       let remainingFreeQty = free_quantity_fact;
       let summReserve = 0;
 
@@ -198,17 +198,20 @@ const QualityManagementTable = () => {
           return reservedItem; // Не трогаем резервы других товаров
         }
 
-        // Если новый товар уже "исчерпан" и кол-во паллет совпадает с кол-вом зарезервированных, ничего не меняем, если исчерпан и кол-во паллет больше кол-ва зарезервированных, то прибавляем к существующему резерву новый и смотрим, чтобы он не выходил за предел кол-ва паллет общего.
+        // Если новый товар уже "исчерпан" и кол-во паллет совпадает с кол-вом зарезервированных
         if (remainingFreeQty <= 0) {
           if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
             return reservedItem;
           } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
+            // ИСПРАВЛЕНИЕ: Добавляем к существующему количеству, а не заменяем
+            const newQuantityInWarehouse = Math.min(
+              reservedItem.quantity_in_warehouse + reserved_quantity_allocated,
+              reservedItem.quantity
+            );
+
             return {
               ...reservedItem,
-              quantity_in_warehouse: Math.min(
-                reservedItem.quantity_in_warehouse + reserved_quantity_allocated,
-                reservedItem.quantity
-              ),
+              quantity_in_warehouse: newQuantityInWarehouse,
             };
           }
         }
@@ -230,32 +233,37 @@ const QualityManagementTable = () => {
         remainingFreeQty -= deducted;
         summReserve += deducted;
 
-        // Возвращаем обновленный резерв
+        // ИСПРАВЛЕНИЕ: Правильное суммирование количества на складе
+        const baseQuantityInWarehouse = reservedItem.quantity_in_warehouse;
 
         return production_plan_id
           ? {
               ...reservedItem,
+              // Добавляем к существующему количеству: базовое + зарезервированное + новое из свободного
               quantity_in_warehouse:
-                reservedItem.quantity_in_warehouse +
-                reserved_quantity_allocated +
-                deducted,
+                baseQuantityInWarehouse + reserved_quantity_allocated + deducted,
             }
           : {
               ...reservedItem,
-              quantity_in_warehouse: reservedItem.quantity_in_warehouse + deducted,
+              // Добавляем к существующему количеству только новое из свободного
+              quantity_in_warehouse: baseQuantityInWarehouse + deducted,
             };
       });
 
+      // Проверки на корректность
       if (reserved_quantity_allocated < 0) {
         alert('Ошибка: reserved_quantity_allocated не может быть отрицательным.');
+        return;
       }
 
       if (summReserve < 0) {
         alert('Ошибка: summReserve не может быть отрицательным.');
+        return;
       }
 
       const calculatedOrderedQuantity = reserved_quantity_allocated + summReserve;
 
+      // Добавляем на склад
       await dispatch(
         addNewWarehouse({
           product_article,
@@ -263,30 +271,37 @@ const QualityManagementTable = () => {
           warehouse_loc: 'local',
           free_quantity_remaining: remainingFreeQty,
           ordered_quantity: calculatedOrderedQuantity,
-          total_quantity:
-            reserved_quantity_allocated + summReserve + remainingFreeQty,
+          total_quantity: calculatedOrderedQuantity + remainingFreeQty,
           type: 'OK',
         })
       );
 
+      // Обновляем все затронутые позиции в list_of_ordered_production
       for (const ordered_production of updatedReserves) {
         await dispatch(updListOfOrderedProduction(ordered_production));
       }
 
+      // Остальная логика с autoclave_calendar...
       const { date, quantity_pallets } = batchOutside.find(
         (el) => el.id === production_plan_id
       );
       const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
         (el) => el.article == product_article
       );
-      const accd = autoclave_calendar.find((el) => (el.date = date));
+
+      // ИСПРАВЛЕНО: используем === вместо =
+      const accd = autoclave_calendar.find((el) => el.date === date);
+
+      if (!accd) {
+        console.error('Autoclave calendar entry not found for date:', date);
+        return;
+      }
 
       const total_arrays =
-        accd?.total_arrays +
+        (accd?.total_arrays || 0) +
         quantity_pallets / Math.floor(m3InArray / volumeBlockOnPallet);
 
       const quantity_of_produced = Math.floor(total_arrays / 21);
-
       const residual_arrays = total_arrays - quantity_of_produced * 21;
 
       const result = [
@@ -299,8 +314,8 @@ const QualityManagementTable = () => {
       ];
 
       await dispatch(addNewAutoclaveCalendar(result));
-
       await dispatch(deleteQualityManagement(id));
+
       if (production_plan_id) {
         if (
           reserved_quantity_remaining <= 0 ||
