@@ -223,7 +223,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const addProductOrder = async () => {
     const { quantity_m2, discount, price_m3 } = productOfOrder;
     const newqm2 = formatDecimal(quantity_m2);
-    const formatedNum = price_m3.replace(',', '.');
+    const formatedNum = price_m3?.replace(',', '.');
     const newpricem3 = formatDecimal(formatedNum);
     const newdiscount = formatDecimal(discount);
 
