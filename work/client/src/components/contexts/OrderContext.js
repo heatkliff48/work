@@ -23,7 +23,7 @@ const OrderContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Delivery address',
+      Header: 'Project name', // 'Delivery address',
       accessor: 'del_adr_id',
       sortType: 'string',
     },
