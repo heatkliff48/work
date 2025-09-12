@@ -89,18 +89,29 @@ const WMOCTable = ({ product_list, orderCartData }) => {
 
               console.log('Plus check:', {
                 remainingInBatch,
+                allocated,
                 qty_rem,
                 shipped,
                 qty_total,
                 canPlus,
+                canTakeFromBatch: allocated < remainingInBatch,
               });
 
               const result = canPlus ? allocated + 1 : allocated;
 
+              // Обновляем remainingInBatch только если добавляем
+              const newRemainingInBatch = canPlus
+                ? remainingInBatch - 1
+                : remainingInBatch;
+
               shipped = canPlus ? shipped + 1 : shipped;
               qty_rem = canPlus ? qty_rem - 1 : qty_rem;
 
-              return { ...el, allocated: result };
+              return {
+                ...el,
+                allocated: result,
+                remainingInBatch: newRemainingInBatch,
+              };
             }
 
             return el;
