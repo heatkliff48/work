@@ -29,7 +29,6 @@ function ProductionBatchDesignerNew() {
   const { productBatchModal, setProductBatchModal } = useModalContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner);
-  const batchOutside = useSelector((state) => state.batchOutside);
 
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [currId, setCurrId] = useState(null);
@@ -175,7 +174,7 @@ function ProductionBatchDesignerNew() {
         id,
         product_with_brack,
         article,
-        palletsPerArray,
+        palletsPerArray, 
       } = prodBatchData;
 
       const free_product_cakes = (
