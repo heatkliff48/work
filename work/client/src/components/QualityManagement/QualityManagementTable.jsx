@@ -219,9 +219,12 @@ const QualityManagementTable = () => {
         // Сколько можно зарезервировать из нового товара для этого резерва
         const deducted = production_plan_id
           ? Math.min(
-              reservedItem.quantity -
-                reservedItem.quantity_in_warehouse -
-                reserved_quantity_allocated, // Сколько нужно для этого резерва
+              Math.max(
+                0,
+                reservedItem.quantity -
+                  reservedItem.quantity_in_warehouse -
+                  reserved_quantity_allocated
+              ), // Сколько нужно для этого резерва
               remainingFreeQty // Сколько доступно в новом товаре
             )
           : Math.min(
