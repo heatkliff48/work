@@ -542,6 +542,27 @@ const WarehouseContextProvider = ({ children }) => {
     return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
   };
 
+  // Надёжный парсер дат
+  const toTime = (d) => {
+    if (d == null) return Number.MAX_SAFE_INTEGER; // пустое => в конец
+    if (typeof d === 'number') return d; // уже ms
+    if (d instanceof Date) return d.getTime(); // Date -> ms
+    if (typeof d === 'string') {
+      // 1) пробуем стандартный парсер (ISO и пр.)
+      const t = Date.parse(d);
+      if (!Number.isNaN(t)) return t;
+
+      // 2) формат DD.MM.YYYY
+      const m = d.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+      if (m) {
+        const [, dd, mm, yyyy] = m;
+        return new Date(+yyyy, +mm - 1, +dd).getTime(); // локальная дата
+        // если нужен UTC: Date.UTC(+yyyy, +mm - 1, +dd)
+      }
+    }
+    return Number.MAX_SAFE_INTEGER; // всё непонятное — в конец
+  };
+
   useEffect(() => {
     // Построение базового списка заказов без quantity_in_batch (пока)
     const baseOrders = list_of_ordered_production
@@ -570,6 +591,7 @@ const WarehouseContextProvider = ({ children }) => {
           ...el,
           quantity_cakes,
           quantity_in_batch: 0,
+          shipping_ts: toTime(el.shipping_date),
         };
       });
 
@@ -587,13 +609,9 @@ const WarehouseContextProvider = ({ children }) => {
 
     // Сортировка внутри каждой группы по shipping_date (возрастание)
     for (const list of byArticle.values()) {
-      list.sort((a, b) => getTime(a.shipping_date) - getTime(b.shipping_date));
+      list.sort((a, b) => a.shipping_ts - b.shipping_ts || a.id - b.id); // стабильный тай-брейк по id
     }
 
-    // Считаем произведённое по каждому product_article из batchOutside.
-    // Поддерживаем два сценария:
-    // 1) новые записи с полем batch.product_article,
-    // 2) старые записи, привязанные к id_list_of_ordered_production.
     const producedByArticle = new Map();
 
     for (const batch of batchOutside) {
