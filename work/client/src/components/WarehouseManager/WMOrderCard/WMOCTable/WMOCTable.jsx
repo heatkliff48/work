@@ -129,25 +129,42 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     setWmoctProduct((prev) =>
       prev.map((wmoctItem) => {
         if (wmoctItem.article === batch.article) {
-          // Изменено с == на ===
           let { shipped, qty_rem } = wmoctItem;
 
           const newBatches = wmoctItem.batches.map((el, i) => {
-            const { allocated, minAllocated } = el;
-
             if (i === batchIndex) {
-              // Изменено с == на ===
+              const { allocated, minAllocated, remainingInBatch } = el;
+
               let minimunAllocated = !minAllocated ? 0 : minAllocated;
-              const canMinus = allocated != 0 && allocated > minimunAllocated;
+              const canMinus = allocated !== 0 && allocated > minimunAllocated;
 
-              const result = canMinus ? allocated - 1 : minimunAllocated;
-              shipped = canMinus ? shipped - 1 : shipped;
-              qty_rem = canMinus ? qty_rem + 1 : qty_rem;
+              console.log('Minus check:', {
+                allocated,
+                minAllocated: minimunAllocated,
+                remainingInBatch,
+                canMinus,
+              });
 
-              return { ...el, allocated: result };
+              if (canMinus) {
+                const newAllocated = allocated - 1;
+                const newRemainingInBatch = remainingInBatch + 1; // Увеличиваем остаток в партии
+
+                shipped = shipped - 1;
+                qty_rem = qty_rem + 1;
+
+                return {
+                  ...el,
+                  allocated: newAllocated,
+                  remainingInBatch: newRemainingInBatch, // Добавляем обновление remainingInBatch
+                };
+              } else {
+                // Если не можем уменьшить, возвращаем без изменений
+                return el;
+              }
             }
             return el;
           });
+
           return { ...wmoctItem, shipped, qty_rem, batches: newBatches };
         }
 
