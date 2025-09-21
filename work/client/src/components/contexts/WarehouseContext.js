@@ -184,16 +184,17 @@ const WarehouseContextProvider = ({ children }) => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [aldabaranNum, setAldabaranNum] = useState(null);
 
+  const [currentBatchId, setCurrentBatchId] = useState(0);
+  const [qualityManagerChange, setQualityManagerChange] = useState(false);
+  const [currentBatch, setCurrentBatch] = useState();
+  const [wmoctProduct, setWmoctProduct] = useState();
   const [filteredProducts, setFilteredProducts] = useState();
   const [additionalInfoPDF, setAdditionalInfoPDF] = useState({});
   const [currentOrderedProducts, setCurrentOrderedProducts] = useState({});
-  const [currentBatchId, setCurrentBatchId] = useState(0);
-  const [currentBatch, setCurrentBatch] = useState();
   const [listOfOrderedCakes, setListOfOrderedCakes] = useState([]);
-  const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
-  const [wmoctProduct, setWmoctProduct] = useState();
   const [wmoctProductShippedBD, setWmoctProductShippedBD] = useState([]);
   const [listOfOrderedAuxilary, setListOfOrderedAuxilary] = useState([]);
+  const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
 
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_orders = useSelector((state) => state.orders);
@@ -843,6 +844,7 @@ const WarehouseContextProvider = ({ children }) => {
     list_of_orders,
     productsOfOrders,
     dryMixedProductsOfOrders,
+    qualityManagerChange,
   ]);
 
   return (
@@ -897,6 +899,8 @@ const WarehouseContextProvider = ({ children }) => {
         setAldabaranNum,
         aldabaran,
         getProductType,
+        qualityManagerChange,
+        setQualityManagerChange,
       }}
     >
       {children}
