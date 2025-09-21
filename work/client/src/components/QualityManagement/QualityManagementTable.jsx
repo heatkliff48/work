@@ -25,7 +25,12 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
 
-  const { list_of_ordered_production, autoclave_calendar } = useWarehouseContext();
+  const {
+    list_of_ordered_production,
+    autoclave_calendar,
+    setQualityManagerChange,
+    qualityManagerChange,
+  } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
 
   const dispatch = useDispatch();
@@ -335,6 +340,7 @@ const QualityManagementTable = () => {
           );
         }
       }
+      setQualityManagerChange(!qualityManagerChange);
     }
   };
 
