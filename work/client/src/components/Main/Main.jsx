@@ -50,9 +50,6 @@ import {
 import { getFilesWarehouse } from '#components/redux/actions/filesWarehouseAction.js';
 import { getFilesProduct } from '#components/redux/actions/filesProductAction.js';
 import { getFilesOrder } from '#components/redux/actions/filesOrderAction.js';
-import { useContext, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { getAllProductionBatchLogs } from '#components/redux/actions/productionBatchLogAction.js';
 import { getQualityManagement } from '#components/redux/actions/qualityManagementAction.js';
 import { getPagesList } from '#components/redux/actions/pagesAction';
@@ -61,6 +58,9 @@ import {
   getAllUsersMainInfo,
 } from '#components/redux/actions/usersInfoAction';
 import { getAldabaran } from '#components/redux/actions/aldabaranAction.js';
+import { useContext, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function Main() {
   const navigate = useNavigate();
