@@ -74,6 +74,11 @@ import {
   deleteRelMatProductOfOrderSocket,
   updateProductCodeSocket,
   addOrderRandomProductsSocket,
+  updateProductInfoOfOrderSocket,
+  updateDryMixedProductInfoOfOrderSocket,
+  updateAnchorProductInfoOfOrderSocket,
+  updateToolProductInfoOfOrderSocket,
+  updateRelMatProductInfoOfOrderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -174,6 +179,11 @@ import {
   GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_PRODUCT_CODE_SOCKET,
   ADD_RANDOM_PRODUCTS_OF_ORDER_SOCKET,
+  GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -248,6 +258,26 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET:
       dispatch(deleteRelMatProductOfOrderSocket(payload));
+      break;
+
+    case GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET:
+      dispatch(updateProductInfoOfOrderSocket(payload));
+      break;
+
+    case GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET:
+      dispatch(updateDryMixedProductInfoOfOrderSocket(payload));
+      break;
+
+    case GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET:
+      dispatch(updateAnchorProductInfoOfOrderSocket(payload));
+      break;
+
+    case GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET:
+      dispatch(updateToolProductInfoOfOrderSocket(payload));
+      break;
+
+    case GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET:
+      dispatch(updateRelMatProductInfoOfOrderSocket(payload));
       break;
 
     case ADD_DATASHIP_ORDER_SOCKET:

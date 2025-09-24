@@ -20,6 +20,11 @@ const {
   DELETE_SECONDARY_CONTACT_ORDER_SOCKET,
   ADD_NEW_DELIVERY_PRICE_SOCKET,
   GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+  GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -366,6 +371,8 @@ class OrdersController {
         productOfOrder,
       });
 
+      myEmitter.emit(GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET, upd_prod_info);
+
       return res.status(200).json(upd_prod_info);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -382,6 +389,11 @@ class OrdersController {
         }
       );
 
+      myEmitter.emit(
+        GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
+        upd_prod_info
+      );
+
       return res.status(200).json(upd_prod_info);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -395,6 +407,8 @@ class OrdersController {
       const upd_prod_info = await OrdersService.getUpdateAnchorProductsInfoOfOrder({
         productOfOrder,
       });
+
+      myEmitter.emit(GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET, upd_prod_info);
 
       return res.status(200).json(upd_prod_info);
     } catch (err) {
@@ -410,6 +424,8 @@ class OrdersController {
         productOfOrder,
       });
 
+      myEmitter.emit(GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET, upd_prod_info);
+
       return res.status(200).json(upd_prod_info);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -423,6 +439,8 @@ class OrdersController {
       const upd_prod_info = await OrdersService.getUpdateRelMatProductsInfoOfOrder({
         productOfOrder,
       });
+
+      myEmitter.emit(GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET, upd_prod_info);
 
       return res.status(200).json(upd_prod_info);
     } catch (err) {

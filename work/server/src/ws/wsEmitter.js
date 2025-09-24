@@ -83,6 +83,11 @@ const {
   ADD_NEW_DELIVERY_PRICE_SOCKET,
   UPDATE_PRODUCT_CODE_SOCKET,
   ADD_RANDOM_PRODUCTS_OF_ORDER_SOCKET,
+  GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -352,6 +357,64 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
           payload: product_id,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET, (upd_prod_info) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET,
+          payload: upd_prod_info,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(
+    GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
+    (upd_prod_info) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
+            payload: upd_prod_info,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET, (upd_prod_info) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
+          payload: upd_prod_info,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET, (upd_prod_info) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
+          payload: upd_prod_info,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET, (upd_prod_info) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+          payload: upd_prod_info,
         })
       );
     }
