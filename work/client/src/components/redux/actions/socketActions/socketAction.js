@@ -74,6 +74,11 @@ import {
   DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   NEED_UPDATE_PRODUCT_CODE_SOCKET,
   NEW_RANDOM_PRODUCTS_OF_ORDER_SOCKET,
+  UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET,
+  UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
+  UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
+  UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
+  UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -192,6 +197,41 @@ export const deleteRelMatProductOfOrderSocket = (product_id) => {
   return {
     type: DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
     payload: product_id,
+  };
+};
+
+export const updateProductInfoOfOrderSocket = (upd_prod_info) => {
+  return {
+    type: UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET,
+    payload: upd_prod_info,
+  };
+};
+
+export const updateDryMixedProductInfoOfOrderSocket = (upd_prod_info) => {
+  return {
+    type: UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
+    payload: upd_prod_info,
+  };
+};
+
+export const updateAnchorProductInfoOfOrderSocket = (upd_prod_info) => {
+  return {
+    type: UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
+    payload: upd_prod_info,
+  };
+};
+
+export const updateToolProductInfoOfOrderSocket = (upd_prod_info) => {
+  return {
+    type: UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
+    payload: upd_prod_info,
+  };
+};
+
+export const updateRelMatProductInfoOfOrderSocket = (upd_prod_info) => {
+  return {
+    type: UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+    payload: upd_prod_info,
   };
 };
 

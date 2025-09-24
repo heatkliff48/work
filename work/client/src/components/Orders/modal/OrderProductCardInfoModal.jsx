@@ -220,7 +220,6 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   }, [final_price_value, total_value]);
 
   const addProductOrder = async () => {
-    console.log('productOfOrder', productOfOrder);
     selectedProduct.article.slice(2, 3) == 'N'
       ? dispatch(getUpdateProductInfoOfOrders(productOfOrder))
       : selectedProduct.article.slice(2, 3) == 'M'

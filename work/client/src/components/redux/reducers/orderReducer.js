@@ -5,7 +5,6 @@ import {
   NEW_DELIVERY_OF_ORDER,
   STATUS_OF_ORDER,
   NEW_ORDER,
-  REMOVE_SECONDARY_CONTACT,
 } from '../types/ordersTypes';
 import {
   DATASHIP_ORDER_SOCKET,

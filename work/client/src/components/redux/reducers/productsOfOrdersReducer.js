@@ -18,10 +18,15 @@ import {
   DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
   DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   NEW_RANDOM_PRODUCTS_OF_ORDER_SOCKET,
+  UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
   UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+  UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+  UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET,
   UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+  UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET,
+  UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
   UPDATE_TOOL_PRODUCT_OF_ORDER_REDUCER_SOCKET,
 } from '../types/socketTypes/socket';
 
@@ -53,6 +58,18 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
     }
 
     case UPDATE_PRODUCT_INFO_OF_ORDER: {
+      const result = productsOfOrders.map((el) => {
+        if (el?.id === payload?.id) {
+          return { ...payload };
+        }
+
+        return el;
+      });
+
+      return result;
+    }
+
+    case UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET: {
       const result = productsOfOrders.map((el) => {
         if (el?.id === payload?.id) {
           return { ...payload };
@@ -101,6 +118,18 @@ export const dryMixedProductsOfOrdersReducer = (
       return result;
     }
 
+    case UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET: {
+      const result = dryMixedProductsOfOrders.map((el) => {
+        if (el?.id === payload?.id) {
+          return { ...payload };
+        }
+
+        return el;
+      });
+
+      return result;
+    }
+
     case DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET: {
       const result = dryMixedProductsOfOrders.filter((el) => el.id !== payload);
       return result;
@@ -127,6 +156,18 @@ export const anchorProductsOfOrdersReducer = (
     }
 
     case UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER: {
+      const result = anchorProductsOfOrders.map((el) => {
+        if (el?.id === payload?.id) {
+          return { ...payload };
+        }
+
+        return el;
+      });
+
+      return result;
+    }
+
+    case UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET: {
       const result = anchorProductsOfOrders.map((el) => {
         if (el?.id === payload?.id) {
           return { ...payload };
@@ -171,6 +212,18 @@ export const toolProductsOfOrdersReducer = (toolProductsOfOrders = [], action) =
       return result;
     }
 
+    case UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET: {
+      const result = toolProductsOfOrders.map((el) => {
+        if (el?.id === payload?.id) {
+          return { ...payload };
+        }
+
+        return el;
+      });
+
+      return result;
+    }
+
     case DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET: {
       const result = toolProductsOfOrders.filter((el) => el.id !== payload);
       return result;
@@ -196,6 +249,18 @@ export const relMatProductsOfOrdersReducer = (
     }
 
     case UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER: {
+      const result = relMatProductsOfOrders.map((el) => {
+        if (el?.id === payload?.id) {
+          return { ...payload };
+        }
+
+        return el;
+      });
+
+      return result;
+    }
+
+    case UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET: {
       const result = relMatProductsOfOrders.map((el) => {
         if (el?.id === payload?.id) {
           return { ...payload };
