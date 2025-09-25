@@ -13,8 +13,7 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 function QualityManagementAddModal(props) {
   const { latestProducts } = useProductsContext();
-  const { warehouse_data, currentOrderedProducts, list_of_ordered_production } =
-    useWarehouseContext();
+  const { warehouse_data, list_of_ordered_production } = useWarehouseContext();
 
   const [productionPlanDataList, setProductionPlanDataList] = useState([]);
   const [customBatchSelectInput, setCustomBatchSelectInput] = useState({});

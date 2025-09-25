@@ -72,6 +72,7 @@ import {
   ADD_NEW_AUTOCLAVE_CALENDAR,
   AUTOCLAVE_CALENDAR,
   NEW_AUTOCLAVE_CALENDAR,
+  UPDATE_LIST_OF_ORDERED_PRODUCTION,
 } from '../types/warehouseTypes';
 
 const url = axios.create({
@@ -771,17 +772,14 @@ function* addNewListOfOrderedProductionWatcher(action) {
 
 function* updListOfOrderedProductionWorker(action) {
   try {
-    const { ordered_production } = yield call(
-      updListOfOrderedProduction,
-      action.payload
-    );
+    yield call(updListOfOrderedProduction, action.payload);
 
     yield put({
-      type: NEW_ORDERED_PRODUCTION,
-      payload: ordered_production,
+      type: UPDATE_LIST_OF_ORDERED_PRODUCTION,
+      payload: action.payload,
     });
   } catch (err) {
-    yield put({ type: NEW_ORDERED_PRODUCTION, payload: [] });
+    yield put({ type: UPDATE_LIST_OF_ORDERED_PRODUCTION, payload: [] });
   }
 }
 

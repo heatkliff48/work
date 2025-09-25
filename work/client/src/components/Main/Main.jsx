@@ -1,4 +1,3 @@
-import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
 import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
@@ -58,9 +57,10 @@ import {
   getAllUsersMainInfo,
 } from '#components/redux/actions/usersInfoAction';
 import { getAldabaran } from '#components/redux/actions/aldabaranAction.js';
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
 
 function Main() {
   const navigate = useNavigate();
