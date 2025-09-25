@@ -76,10 +76,10 @@ function NavBar() {
   const { getPageTitleByPath, getRoleName } = useProjectContext();
 
   const handleLogout = () => {
-    window.localStorage.clear();
     dispatch(clearAccountingDataList());
     dispatch(delUser());
     navigate('/sign-in');
+    window.localStorage.clear();
   };
 
   const { pathname } = useLocation();

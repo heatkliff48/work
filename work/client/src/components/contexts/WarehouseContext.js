@@ -538,11 +538,6 @@ const WarehouseContextProvider = ({ children }) => {
     return { sources: out, taken: amount - remaining, leftover: remaining };
   };
 
-  const getTime = (d) => {
-    const t = d ? new Date(d).getTime() : NaN;
-    return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
-  };
-
   // Надёжный парсер дат
   const toTime = (d) => {
     if (d == null) return Number.MAX_SAFE_INTEGER; // пустое => в конец
@@ -565,6 +560,8 @@ const WarehouseContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    if (!Array.isArray(latestProducts) || latestProducts.length === 0) return;
+    if (!Array.isArray(list_of_orders) || list_of_orders.length === 0) return;
     // Построение базового списка заказов без quantity_in_batch (пока)
     const baseOrders = list_of_ordered_production
       .filter((el) => {
@@ -766,15 +763,6 @@ const WarehouseContextProvider = ({ children }) => {
       ...list_of_ordered_production,
     ];
 
-    // // Группируем все позиции по order_article
-    // const ordersMap = related_materials_backorder_list.reduce((acc, item) => {
-    //   if (!acc.has(item.order_article)) {
-    //     acc.set(item.order_article, []);
-    //   }
-    //   acc.get(item.order_article).push(item);
-    //   return acc;
-    // }, new Map());
-
     // Группируем все позиции по order_article
     const ordersMap = combinedList.reduce((acc, item) => {
       if (!acc.has(item.order_article)) {
@@ -784,13 +772,14 @@ const WarehouseContextProvider = ({ children }) => {
       return acc;
     }, new Map());
 
-    // Проверяем каждый заказ на полную резервацию
     const fullyReservedOrders = Array.from(ordersMap.entries())
-      .filter(([orderArticle, items]) => {
-        // Проверяем, что ВСЕ позиции заказа имеют quantity === quantity_in_warehouse
-        return items.every((item) => item.quantity === item.quantity_in_warehouse);
-      })
-      .map(([orderArticle]) => orderArticle); // Извлекаем только order_article
+      .filter(([orderArticle, items]) =>
+        items.every(
+          (item) => Number(item.quantity) === Number(item.quantity_in_warehouse)
+        )
+      )
+      .map(([orderArticle]) => orderArticle);
+
 
     fullyReservedOrders.forEach((order_article) => {
       const currOrder = list_of_orders.find(
@@ -837,13 +826,15 @@ const WarehouseContextProvider = ({ children }) => {
       }
     });
   }, [
-    list_of_ordered_production,
-    list_of_reserved_products,
-    related_materials_backorder_list,
-    batchOutside,
+    latestProducts,
     list_of_orders,
+    list_of_reserved_products,
+    list_of_ordered_production,
+    list_of_ordered_production_oem,
+    batchOutside,
     productsOfOrders,
     dryMixedProductsOfOrders,
+    related_materials_backorder_list,
     qualityManagerChange,
   ]);
 

@@ -25,12 +25,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
 
-  const {
-    list_of_ordered_production,
-    autoclave_calendar,
-    setQualityManagerChange,
-    qualityManagerChange,
-  } = useWarehouseContext();
+  const { list_of_ordered_production, autoclave_calendar } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
 
   const dispatch = useDispatch();
@@ -213,7 +208,7 @@ const QualityManagementTable = () => {
               reservedItem.quantity_in_warehouse + reserved_quantity_allocated,
               reservedItem.quantity
             );
-
+            console.log('objenewQuantityInWarehousect', newQuantityInWarehouse);
             return {
               ...reservedItem,
               quantity_in_warehouse: newQuantityInWarehouse,
@@ -337,7 +332,6 @@ const QualityManagementTable = () => {
           );
         }
       }
-      setQualityManagerChange(!qualityManagerChange);
     }
   };
 
