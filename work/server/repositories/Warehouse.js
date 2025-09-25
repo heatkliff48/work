@@ -57,9 +57,9 @@ class WarehouseRepository {
 
       for (const item of map) {
         const date = String(item.date).slice(0, 10);
-        const quantity = item?.quantity;
-        const quantity_of_complited = item?.quantity_of_complited;
-        const quantity_of_produced = item?.quantity_of_produced;
+        const scheduled_autoclaves = item?.scheduled_autoclaves;
+        const produced_autoclave = item?.produced_autoclave;
+        const filled_autoclaves = item?.filled_autoclaves;
         const residual_arrays = item?.residual_arrays;
         const total_arrays = item?.total_arrays;
 
@@ -67,11 +67,11 @@ class WarehouseRepository {
           const data = calendarMap.get(date);
           await AutoclaveCalendares.update(
             {
-              quantity,
-              quantity_of_complited,
+              scheduled_autoclaves,
+              produced_autoclave,
               total_arrays,
               residual_arrays,
-              quantity_of_produced,
+              filled_autoclaves,
             },
             { where: { id: data.id }, transaction: t }
           );
@@ -79,11 +79,11 @@ class WarehouseRepository {
           await AutoclaveCalendares.create(
             {
               date,
-              quantity,
-              quantity_of_complited,
+              scheduled_autoclaves,
+              produced_autoclave,
               total_arrays,
               residual_arrays,
-              quantity_of_produced,
+              filled_autoclaves,
             },
             { transaction: t }
           );

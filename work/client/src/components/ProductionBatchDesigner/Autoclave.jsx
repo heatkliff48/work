@@ -485,15 +485,15 @@ function Autoclave({ acData, autoclaveCalendarData }) {
       return;
     }
 
-    const { quantity, date, quantity_of_complited } = autoclaveCalendarData;
-    const new_quantity_of_complited =
-      quantity_of_complited + filledCount / CELLS_PER_AUTOCLAVE;
+    const { quantity, date, produced_autoclave } = autoclaveCalendarData;
+    const new_produced_autoclave =
+      produced_autoclave + filledCount / CELLS_PER_AUTOCLAVE;
 
     const newDataCalendar = [
       {
         quantity,
         date,
-        quantity_of_complited: new_quantity_of_complited,
+        produced_autoclave: new_produced_autoclave,
       },
     ];
 

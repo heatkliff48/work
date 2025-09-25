@@ -56,8 +56,8 @@ function ProductionBatchDesigner() {
     const nearest = autoclave_calendar
       .map((x) => ({
         ...x,
-        qty: Number(x.quantity ?? 0),
-        done: Number(x.quantity_of_complited ?? 0),
+        qty: Number(x.scheduled_autoclaves ?? 0),
+        done: Number(x.produced_autoclave ?? 0),
       }))
       .map((x) => ({ ...x, value: x.qty - x.done }))
       .filter((x) => x.value > 0 && typeof x.date === 'string' && x.date >= today)

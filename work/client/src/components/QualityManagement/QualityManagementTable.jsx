@@ -304,15 +304,15 @@ const QualityManagementTable = () => {
         (accd?.total_arrays || 0) +
         quantity_pallets / Math.floor(m3InArray / volumeBlockOnPallet);
 
-      const quantity_of_produced = Math.floor(total_arrays / 21);
-      const residual_arrays = total_arrays - quantity_of_produced * 21;
+      const filled_autoclaves = Math.floor(total_arrays / 21);
+      const residual_arrays = total_arrays - filled_autoclaves * 21;
 
       const result = [
         {
           ...accd,
           total_arrays,
           residual_arrays,
-          quantity_of_produced,
+          filled_autoclaves,
         },
       ];
 

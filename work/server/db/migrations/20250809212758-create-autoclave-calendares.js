@@ -7,37 +7,37 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       date: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
-      quantity: {
-        type: Sequelize.INTEGER
+      scheduled_autoclaves: {
+        type: Sequelize.INTEGER,
       },
       total_arrays: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       residual_arrays: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
-      quantity_of_produced: {
-        type: Sequelize.INTEGER
+      filled_autoclaves: {
+        type: Sequelize.INTEGER,
       },
-      quantity_of_complited: {
-        type: Sequelize.INTEGER
+      produced_autoclave: {
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('AutoclaveCalendares');
-  }
+  },
 };

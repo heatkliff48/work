@@ -77,8 +77,8 @@ export default function ProductionPlannerCalendar({
     for (const r of autoclave_calendar) {
       const iso = String(r.date).slice(0, 10); // 'YYYY-MM-DD'
       seeded[iso] = {
-        quantity: Number(r.quantity) || 0,
-        quantity_of_complited: Number(r.quantity_of_complited ?? 0) || 0,
+        scheduled_autoclaves: Number(r.scheduled_autoclaves) || 0,
+        produced_autoclave: Number(r.produced_autoclave ?? 0) || 0,
       };
     }
     if (!onChange) setInternalMap(seeded);
@@ -96,14 +96,14 @@ export default function ProductionPlannerCalendar({
   }
 
   function setQty(iso, qty) {
-    const prev = map[iso] ?? { quantity: 0, quantity_of_complited: 0 };
+    const prev = map[iso] ?? { scheduled_autoclaves: 0, produced_autoclave: 0 };
     const nextQty = clamp(qty, min, max);
     // не даём "выполнено" быть больше плана
-    const nextDone = clamp(prev.quantity_of_complited, min, nextQty);
+    const nextDone = clamp(prev.produced_autoclave, min, nextQty);
 
     const next = {
       ...map,
-      [iso]: { quantity: nextQty, quantity_of_complited: nextDone },
+      [iso]: { scheduled_autoclaves: nextQty, produced_autoclave: nextDone },
     };
     if (!onChange) setInternalMap(next);
     onChange?.(next);
@@ -117,11 +117,11 @@ export default function ProductionPlannerCalendar({
 
       return {
         date,
-        quantity: Number(obj?.quantity) || 0,
+        scheduled_autoclaves: Number(obj?.scheduled_autoclaves) || 0,
         total_arrays: existing?.total_arrays ?? 0,
         residual_arrays: existing?.residual_arrays ?? 0,
-        quantity_of_produced: existing?.quantity_of_produced ?? 0,
-        quantity_of_complited: existing?.quantity_of_complited ?? 0,
+        filled_autoclaves: existing?.filled_autoclaves ?? 0,
+        produced_autoclave: existing?.produced_autoclave ?? 0,
       };
     });
 
@@ -131,12 +131,12 @@ export default function ProductionPlannerCalendar({
   function findQocVsNextQuantityViolation(corridor) {
     if (!corridor || corridor.length < 2) return null;
 
-    let maxRequired = 0; // максимум quantity впереди
+    let maxRequired = 0; // максимум scheduled_autoclaves впереди
     for (let i = 0; i < corridor.length - 1; i++) {
-      const nextQty = Number(corridor[i + 1]?.quantity) || 0;
+      const nextQty = Number(corridor[i + 1]?.scheduled_autoclaves) || 0;
       if (nextQty >= maxRequired) maxRequired = nextQty;
 
-      const qoc = Number(corridor[i]?.quantity_of_complited) || 0;
+      const qoc = Number(corridor[i]?.produced_autoclave) || 0;
       if (qoc > maxRequired) {
         return {
           at: corridor[i].date,
@@ -153,12 +153,12 @@ export default function ProductionPlannerCalendar({
     const patch = {};
     for (const r of entries) {
       patch[r.date] = (prev) => {
-        const base = prev ?? { quantity: 0, quantity_of_complited: 0 };
+        const base = prev ?? { scheduled_autoclaves: 0, produced_autoclave: 0 };
         return {
           ...base,
-          // план оставляем как был в карте (если хочешь — ставь r.quantity)
-          quantity: base.quantity,
-          quantity_of_complited: Number(r.quantity_of_complited) || 0,
+          // план оставляем как был в карте (если хочешь — ставь r.scheduled_autoclaves)
+          scheduled_autoclaves: base.scheduled_autoclaves,
+          produced_autoclave: Number(r.produced_autoclave) || 0,
         };
       };
     }
@@ -188,8 +188,8 @@ export default function ProductionPlannerCalendar({
     // Снимок "до"
     const work = corridor.map((d) => ({
       date: d.date,
-      qty: Number(d.quantity) || 0,
-      oldQoc: Number(d.quantity_of_complited) || 0,
+      qty: Number(d.scheduled_autoclaves) || 0,
+      oldQoc: Number(d.produced_autoclave) || 0,
     }));
 
     const n = work.length;
@@ -218,8 +218,8 @@ export default function ProductionPlannerCalendar({
     // 4) Собираем результат
     const redistributed = work.map((w, idx) => ({
       date: w.date,
-      quantity: w.qty,
-      quantity_of_complited: finalQoc[idx],
+      scheduled_autoclaves: w.qty,
+      produced_autoclave: finalQoc[idx],
     }));
 
     return { redistributed, transfers };
@@ -358,9 +358,9 @@ export default function ProductionPlannerCalendar({
         const existing = autoclave_calendar.find((i) => i.date === date);
         return {
           date,
-          quantity: Number(obj?.quantity) || 0,
-          quantity_of_complited: Number(
-            existing?.quantity_of_complited ?? obj?.quantity_of_complited ?? 0
+          scheduled_autoclaves: Number(obj?.scheduled_autoclaves) || 0,
+          produced_autoclave: Number(
+            existing?.produced_autoclave ?? obj?.produced_autoclave ?? 0
           ),
         };
       })
@@ -368,8 +368,8 @@ export default function ProductionPlannerCalendar({
 
     // 3) Поиск ближайшего подходящего «next» (как было)
     const fits = (rec) =>
-      rec.quantity_of_complited === 0 ||
-      rec.quantity - rec.quantity_of_complited >= doneNum;
+      rec.produced_autoclave === 0 ||
+      rec.scheduled_autoclaves - rec.produced_autoclave >= doneNum;
 
     const searchTail = arr.filter((r) => r.date > dayISO);
 
@@ -403,7 +403,7 @@ export default function ProductionPlannerCalendar({
 
     // 5) Старая проверка план/выполнено в коридоре
     const violating = before.find(
-      (d) => d.quantity > planQtyNum && d.quantity_of_complited < doneNum
+      (d) => d.scheduled_autoclaves > planQtyNum && d.produced_autoclave < doneNum
     );
     if (violating) {
       window.alert(`Нельзя продолжить: ${violating.date}`);
@@ -459,13 +459,13 @@ export default function ProductionPlannerCalendar({
           const isOpen = openDayISO === iso;
           const isPast = isBefore(day, today) && !isToday(day);
 
-          const obj = map[iso] ?? { quantity: 0, quantity_of_complited: 0 };
+          const obj = map[iso] ?? { scheduled_autoclaves: 0, produced_autoclave: 0 };
 
           const autoclaveData = autoclave_calendar.find((el) => el.date == iso);
 
-          const qty = obj.quantity;
-          const done = obj.quantity_of_complited;
-          const qop = autoclaveData ? autoclaveData?.quantity_of_produced : 0;
+          const qty = obj.scheduled_autoclaves;
+          const done = obj.produced_autoclave;
+          const fill_ac = autoclaveData ? autoclaveData?.filled_autoclaves : 0;
 
           const todayISO = format(new Date(), 'yyyy-MM-dd'); // date-fns уже используешь
           const isPastBtn = iso < todayISO;
@@ -487,7 +487,9 @@ export default function ProductionPlannerCalendar({
               >
                 <div style={styles.dayNumber}>
                   {format(day, 'd', { locale: ru })}
-                  {qty > 0 && done > 0 && isPastBtn && (
+                  {
+                  // qty > 0 && done > 0 && 
+                  isPastBtn && fill_ac !== done && (
                     <div
                       style={styles.btnNext}
                       onClick={(e) => {
@@ -511,10 +513,10 @@ export default function ProductionPlannerCalendar({
                       </div>
                     )}
                   </>
-                ) : qop === done && qop > 0 && done > 0 ? (
+                ) : fill_ac === done && fill_ac > 0 && done > 0 ? (
                   <>
                     <div style={styles.badgeDone} title="Произведено">
-                      {qop}
+                      {fill_ac}
                     </div>
                   </>
                 ) : (

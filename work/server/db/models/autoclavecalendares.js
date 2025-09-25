@@ -14,11 +14,11 @@ module.exports = (sequelize, DataTypes) => {
   AutoclaveCalendares.init(
     {
       date: DataTypes.STRING,
-      quantity: DataTypes.INTEGER,
+      scheduled_autoclaves: DataTypes.INTEGER,
       total_arrays: DataTypes.INTEGER,
       residual_arrays: DataTypes.INTEGER,
-      quantity_of_produced: DataTypes.INTEGER,
-      quantity_of_complited: DataTypes.INTEGER,
+      filled_autoclaves: DataTypes.INTEGER,
+      produced_autoclave: DataTypes.INTEGER,
     },
     {
       sequelize,
