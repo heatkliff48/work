@@ -57,7 +57,8 @@ import { rolesReducer } from './rolesReducer';
 import { stockBalanceReducer } from './stockBalanceReducer';
 import { userReducer } from './userReducer';
 import { usersInfoReducer, usersMainInfoReducer } from './usersInfoReducer';
-import { warehouseReducer } from './warehouseReducer';
+import { warehouseSandReducer } from './warehouseRawMaterialsReducer';
+import { warehouseReducer, rawMaterialsWarehouseReducer } from './warehouseReducer';
 import { combineReducers } from 'redux';
 
 export const rootReducer = combineReducers({
@@ -110,4 +111,6 @@ export const rootReducer = combineReducers({
   aldabaran: aldabaranReducer,
   productCode: productCodeReducer,
   autoclave_calendar: autoclaveCalendarReducer,
+  rawMaterialsWarehouse: rawMaterialsWarehouseReducer,
+  warehouseSand: warehouseSandReducer,
 });

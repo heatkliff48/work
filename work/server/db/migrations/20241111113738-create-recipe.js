@@ -27,10 +27,10 @@ module.exports = {
       sand: {
         type: Sequelize.FLOAT,
       },
-      lime_lhoist: {
+      sand_slurry: {
         type: Sequelize.FLOAT,
       },
-      lime_barcelona: {
+      lime: {
         type: Sequelize.FLOAT,
       },
       cement: {
@@ -39,29 +39,26 @@ module.exports = {
       gypsum: {
         type: Sequelize.FLOAT,
       },
-      alu_1: {
+      gypsum_stone: {
         type: Sequelize.FLOAT,
       },
-      alu_2: {
+      alu: {
         type: Sequelize.FLOAT,
       },
       return_slurry_solids: {
         type: Sequelize.FLOAT,
       },
-      return_slurry_water: {
+      water_solid: {
         type: Sequelize.FLOAT,
       },
-      water: {
-        type: Sequelize.FLOAT,
-      },
-      water_cold: {
-        type: Sequelize.FLOAT,
-      },
-      water_hot: {
+      water_mixer: {
         type: Sequelize.FLOAT,
       },
       condensate: {
         type: Sequelize.FLOAT,
+      },
+      grinding_balls: {
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,

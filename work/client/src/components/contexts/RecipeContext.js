@@ -14,13 +14,17 @@ const RecipeContextProvider = ({ children }) => {
       accessor: 'sand',
     },
     {
-      Header: 'Lime Lhoist',
-      accessor: 'lime_lhoist',
+      Header: 'Sand slurry',
+      accessor: 'sand_slurry',
     },
     {
-      Header: 'Lime Barcelona',
-      accessor: 'lime_barcelona',
+      Header: 'Lime',
+      accessor: 'lime',
     },
+    // {
+    //   Header: 'Lime Barcelona',
+    //   accessor: 'lime_barcelona',
+    // },
     {
       Header: 'Cement',
       accessor: 'cement',
@@ -30,36 +34,48 @@ const RecipeContextProvider = ({ children }) => {
       accessor: 'gypsum',
     },
     {
-      Header: 'Alu 1',
-      accessor: 'alu_1',
+      Header: 'Gypsum stone',
+      accessor: 'gypsum_stone',
     },
     {
-      Header: 'Alu 2',
-      accessor: 'alu_2',
+      Header: 'Aluminium',
+      accessor: 'alu',
     },
+    // {
+    //   Header: 'Alu 2',
+    //   accessor: 'alu_2',
+    // },
     {
       Header: 'Return slurry - solids',
       accessor: 'return_slurry_solids',
     },
+    // {
+    //   Header: 'Return slurry - water',
+    //   accessor: 'return_slurry_water',
+    // },
     {
-      Header: 'Return slurry - water',
-      accessor: 'return_slurry_water',
+      Header: 'Water solids',
+      accessor: 'water_solid',
     },
     {
-      Header: 'Water',
-      accessor: 'water',
+      Header: 'Water from mixer',
+      accessor: 'water_mixer',
     },
-    {
-      Header: 'Water cold',
-      accessor: 'water_cold',
-    },
-    {
-      Header: 'Water hot',
-      accessor: 'water_hot',
-    },
+    // {
+    //   Header: 'Water cold',
+    //   accessor: 'water_cold',
+    // },
+    // {
+    //   Header: 'Water hot',
+    //   accessor: 'water_hot',
+    // },
     {
       Header: 'Condensate',
       accessor: 'condensate',
+    },
+    {
+      Header: 'Grinding balls',
+      accessor: 'grinding_balls',
     },
   ];
 

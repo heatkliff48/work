@@ -79,6 +79,10 @@ import {
   updateAnchorProductInfoOfOrderSocket,
   updateToolProductInfoOfOrderSocket,
   updateRelMatProductInfoOfOrderSocket,
+  updateRawMaterialsWarehouseSocket,
+  addNewWarehouseSandSocket,
+  updateWarehouseSandSocket,
+  deleteWarehouseSandSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -184,6 +188,10 @@ import {
   GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
   GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
   GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+  UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+  ADD_NEW_WAREHOUSE_SAND_SOCKET,
+  UPDATE_WAREHOUSE_SAND_SOCKET,
+  DELETE_WAREHOUSE_SAND_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -516,6 +524,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
       dispatch(updateToolsWarehouseSocket(payload));
       break;
 
+    case UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET:
+      dispatch(updateRawMaterialsWarehouseSocket(payload));
+      break;
+
     case ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET:
       dispatch(addNewQualityManagementSocket(payload));
       break;
@@ -546,6 +558,18 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_RANDOM_PRODUCTS_OF_ORDER_SOCKET:
       dispatch(addOrderRandomProductsSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_SAND_SOCKET:
+      dispatch(addNewWarehouseSandSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_SAND_SOCKET:
+      dispatch(updateWarehouseSandSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_SAND_SOCKET:
+      dispatch(deleteWarehouseSandSocket(payload));
       break;
 
     default:

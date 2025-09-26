@@ -371,6 +371,7 @@ const ProjectContextProvider = ({ children }) => {
     '/warehouse_related_materials': 'Related Materials Warehouse',
     '/warehouse_anchors': 'Fasteners Warehouse',
     '/warehouse_tools': 'Tools Warehouse',
+    '/warehouse_raw_materials': 'Raw Materials Warehouse',
     '/production_batch_designer': 'Batch planner',
     '/production_batch_designer_new': 'Batch planner',
     '/list_of_ordered_production': 'Ordered blocks pipeline',

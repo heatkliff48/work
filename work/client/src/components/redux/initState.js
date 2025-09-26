@@ -47,6 +47,8 @@ const initState = {
   aldabaran: [],
   productCode: [],
   autoclave_calendar: [],
+  rawMaterialsWarehouse: [],
+  warehouseSand: [],
 };
 
 export default initState;

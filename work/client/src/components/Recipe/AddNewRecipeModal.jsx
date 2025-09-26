@@ -171,7 +171,15 @@ function AddNewRecipeModal({ show, onHide }) {
                 <h3></h3>
                 <Row>
                   {recipe_info.map((el) => {
-                    if (el.accessor === 'id' || el.accessor === 'article')
+                    if (
+                      el.accessor === 'id' ||
+                      el.accessor === 'article' ||
+                      (selectedProduct?.density <= 100 &&
+                        (el.accessor === 'sand_slurry' ||
+                          el.accessor === 'gypsum_stone')) ||
+                      (selectedProduct?.density > 100 &&
+                        (el.accessor === 'sand' || el.accessor === 'gypsum'))
+                    )
                       return null;
                     else {
                       return (
