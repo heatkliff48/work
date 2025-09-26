@@ -17,7 +17,7 @@ recipeRouter.get('/', async (req, res) => {
     return res.status(200).json({ recipe });
   } catch (err) {
     console.error(err.message);
-    return res.json({err})
+    return res.json({ err });
   }
 });
 
@@ -31,18 +31,17 @@ recipeRouter.post('/', async (req, res) => {
     form_volume_m3,
     dry_total,
     sand,
-    lime_lhoist,
-    lime_barcelona,
+    sand_slurry,
+    lime,
     cement,
     gypsum,
-    alu_1,
-    alu_2,
+    gypsum_stone,
+    alu,
     return_slurry_solids,
-    return_slurry_water,
-    water,
-    water_cold,
-    water_hot,
+    water_solid,
+    water_mixer,
     condensate,
+    grinding_balls,
   } = req.body;
 
   try {
@@ -53,24 +52,23 @@ recipeRouter.post('/', async (req, res) => {
       form_volume_m3,
       dry_total,
       sand,
-      lime_lhoist,
-      lime_barcelona,
+      sand_slurry,
+      lime,
       cement,
       gypsum,
-      alu_1,
-      alu_2,
+      gypsum_stone,
+      alu,
       return_slurry_solids,
-      return_slurry_water,
-      water,
-      water_cold,
-      water_hot,
+      water_solid,
+      water_mixer,
       condensate,
+      grinding_balls,
     });
 
     myEmitter.emit(ADD_NEW_RECIPE_SOCKET, recipe);
-    return res.status(200)
+    return res.status(200);
   } catch (err) {
-    console.error('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',err.message);
+    console.error('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', err.message);
     return res.status(500).json(err);
   }
 });

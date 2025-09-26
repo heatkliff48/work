@@ -73,6 +73,10 @@ import {
   AUTOCLAVE_CALENDAR,
   NEW_AUTOCLAVE_CALENDAR,
   UPDATE_LIST_OF_ORDERED_PRODUCTION,
+  RAW_MATERIALS_WAREHOUSE,
+  UPDATE_RAW_MATERIALS_WAREHOUSE,
+  GET_RAW_MATERIALS_WAREHOUSE,
+  UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
 } from '../types/warehouseTypes';
 
 const url = axios.create({
@@ -398,6 +402,24 @@ const addNewListOfOrderedProductionOEM = (ordered_production_oem) => {
 const updListOfOrderedProductionOEM = (ordered_production_oem) => {
   return url
     .post('/warehouse/ordered_production_oem/update', ordered_production_oem)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const getRawMaterialsWarehouse = () => {
+  return url
+    .get('/rawMaterialsWarehouse')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
+  return url
+    .post('/rawMaterialsWarehouse/update', rawMaterialsWarehouse)
     .then((res) => {
       return res.data;
     })
@@ -828,6 +850,35 @@ function* updListOfOrderedProductionOEMWorker(action) {
   }
 }
 
+function* getRawMaterialsWarehouseWorker() {
+  try {
+    const { rawMaterialsWarehouse } = yield call(getRawMaterialsWarehouse);
+
+    yield put({
+      type: RAW_MATERIALS_WAREHOUSE,
+      payload: rawMaterialsWarehouse,
+    });
+  } catch (err) {
+    yield put({ type: RAW_MATERIALS_WAREHOUSE, payload: [] });
+  }
+}
+
+function* updateNewRawMaterialsWarehouseWorker(action) {
+  try {
+    const { rawMaterialsWarehouse } = yield call(
+      updateRawMaterialsWarehouse,
+      action.payload
+    );
+
+    yield put({
+      type: UPDATE_RAW_MATERIALS_WAREHOUSE,
+      payload: rawMaterialsWarehouse,
+    });
+  } catch (err) {
+    yield put({ type: UPDATE_RAW_MATERIALS_WAREHOUSE, payload: [] });
+  }
+}
+
 function* warehouseWatcher() {
   yield takeLatest(GET_ALL_WAREHOUSE, getAllWarehouseWatcher);
   yield takeLatest(ADD_NEW_WAREHOUSE, addNewWarehouseWatcher);
@@ -929,6 +980,11 @@ function* warehouseWatcher() {
   yield takeLatest(
     UPDATE_ORDERED_PRODUCTION_OEM,
     updListOfOrderedProductionOEMWorker
+  );
+  yield takeLatest(GET_RAW_MATERIALS_WAREHOUSE, getRawMaterialsWarehouseWorker);
+  yield takeLatest(
+    UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
+    updateNewRawMaterialsWarehouseWorker
   );
 }
 

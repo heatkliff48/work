@@ -23,7 +23,6 @@ relatedMaterialsWarehouseRouter.get('/', async (req, res) => {
 });
 
 relatedMaterialsWarehouseRouter.post('/', async (req, res) => {
-  console.log('POST WAREHOUSE ----------------------', req.body);
   const {
     article,
     product_article,

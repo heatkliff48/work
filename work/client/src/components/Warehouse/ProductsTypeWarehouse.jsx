@@ -37,6 +37,15 @@ function ProductsTypeWarehouse() {
           Tools
         </button>
       </div>
+      <h1 className="main-title">Raw Materials Warehouse</h1>
+      <div className="button-container">
+        <button
+          className="nav-button"
+          onClick={() => navigate('/warehouse_raw_materials')}
+        >
+          Raw Materials
+        </button>
+      </div>
     </div>
   );
 }

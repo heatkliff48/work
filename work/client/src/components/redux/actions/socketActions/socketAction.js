@@ -79,6 +79,10 @@ import {
   UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
   UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
   UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+  NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+  NEW_WAREHOUSE_SAND_SOCKET,
+  NEED_UPDATE_WAREHOUSE_SAND_SOCKET,
+  NEED_DELETE_WAREHOUSE_SAND_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -585,6 +589,13 @@ export const updateToolsWarehouseSocket = (toolsWarehouse) => {
   };
 };
 
+export const updateRawMaterialsWarehouseSocket = (rawMaterialsWarehouse) => {
+  return {
+    type: NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+    payload: rawMaterialsWarehouse,
+  };
+};
+
 export const addNewQualityManagementSocket = (qualityManagementData) => {
   return {
     type: NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
@@ -642,5 +653,26 @@ export const addOrderRandomProductsSocket = (randomProducts) => {
   return {
     type: NEW_RANDOM_PRODUCTS_OF_ORDER_SOCKET,
     payload: randomProducts,
+  };
+};
+
+export const addNewWarehouseSandSocket = (warehouseSand) => {
+  return {
+    type: NEW_WAREHOUSE_SAND_SOCKET,
+    payload: warehouseSand,
+  };
+};
+
+export const updateWarehouseSandSocket = (warehouseSand) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_SAND_SOCKET,
+    payload: warehouseSand,
+  };
+};
+
+export const deleteWarehouseSandSocket = (sand_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_SAND_SOCKET,
+    payload: sand_warehouse_id,
   };
 };

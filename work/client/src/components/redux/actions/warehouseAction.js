@@ -35,6 +35,8 @@ import {
   UPDATE_REL_MAT_WAREHOSE_QUANTITYS,
   GET_AUTOCLAVE_CALENDAR,
   ADD_NEW_AUTOCLAVE_CALENDAR,
+  GET_RAW_MATERIALS_WAREHOUSE,
+  UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
 } from '../types/warehouseTypes';
 
 export const getAllWarehouse = () => {
@@ -277,5 +279,18 @@ export const updListOfOrderedProductionOEM = (ordered_production_oem) => {
   return {
     type: UPDATE_ORDERED_PRODUCTION_OEM,
     payload: ordered_production_oem,
+  };
+};
+
+export const getRawMaterialsWarehouse = () => {
+  return {
+    type: GET_RAW_MATERIALS_WAREHOUSE,
+  };
+};
+
+export const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
+  return {
+    type: UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
+    payload: rawMaterialsWarehouse,
   };
 };

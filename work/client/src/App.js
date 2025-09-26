@@ -17,6 +17,7 @@ import DryMixesWarehouse from '#components/Warehouse/DryMixesWarehouse.jsx';
 import RelatedMaterialsWarehouse from '#components/Warehouse/RelatedMaterialsWarehouse.jsx';
 import AnchorsWarehouse from '#components/Warehouse/AnchorsWarehouse.jsx';
 import ToolsWarehouse from '#components/Warehouse/ToolsWarehouse.jsx';
+import RawMaterialsWarehouse from '#components/Warehouse/RawMaterialsWarehouse.jsx';
 import MainContextProvider from '#components/contexts/MainContex.js';
 import WebSocketClient from '#utils/WebSockeetClient.js';
 import { createSocketOnMessage } from '#utils/socket.message.js';
@@ -131,6 +132,10 @@ function App() {
           />
           <Route path="/warehouse_anchors" element={<AnchorsWarehouse />} />
           <Route path="/warehouse_tools" element={<ToolsWarehouse />} />
+          <Route
+            path="/warehouse_raw_materials"
+            element={<RawMaterialsWarehouse />}
+          />
           <Route
             path="/warehouse_products_type"
             element={<ProductsTypeWarehouse />}

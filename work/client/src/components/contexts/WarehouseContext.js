@@ -67,6 +67,24 @@ const WarehouseContextProvider = ({ children }) => {
     },
   ];
 
+  const COLUMNS_RAW_MATERIALS_WAREHOUSE = [
+    {
+      Header: 'Material type',
+      accessor: 'material_type',
+      sortType: 'string',
+    },
+    {
+      Header: 'Remaining quantity',
+      accessor: 'remaining_quantity',
+      sortType: 'number',
+    },
+    {
+      Header: 'Last updated',
+      accessor: 'last_updated',
+      sortType: 'string',
+    },
+  ];
+
   const COLUMNS_LIST_OF_ORDERED_PRODUCTION = [
     { Header: 'Date of shipping', accessor: 'shipping_date', sortType: 'string' },
     { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
@@ -169,6 +187,10 @@ const WarehouseContextProvider = ({ children }) => {
   );
   const related_materials_backorder_list = useSelector(
     (state) => state.relatedMaterialsBackorderList
+  );
+
+  const raw_materials_warehouse = useSelector(
+    (state) => state.rawMaterialsWarehouse
   );
 
   const reservedMap = {
@@ -780,7 +802,6 @@ const WarehouseContextProvider = ({ children }) => {
       )
       .map(([orderArticle]) => orderArticle);
 
-
     fullyReservedOrders.forEach((order_article) => {
       const currOrder = list_of_orders.find(
         (order) => order.article === order_article
@@ -842,6 +863,7 @@ const WarehouseContextProvider = ({ children }) => {
     <WarehouseContext.Provider
       value={{
         COLUMNS_WAREHOUSE,
+        COLUMNS_RAW_MATERIALS_WAREHOUSE,
         COLUMNS_LIST_OF_ORDERED_PRODUCTION,
         COLUMNS_LIST_OF_ORDERED_PRODUCTION_OEM,
         COLUMNS_RELATED_MATERIALS_BACKORDER_LIST,
@@ -860,6 +882,7 @@ const WarehouseContextProvider = ({ children }) => {
         list_of_ordered_production_oem,
         related_materials_backorder_list,
         ordered_production_oem_status,
+        raw_materials_warehouse,
         filteredProducts,
         getProductsByOrder,
         setFilteredProducts,

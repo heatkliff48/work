@@ -17,6 +17,7 @@ import rolesWatcher from './rolesSagas';
 import stockBalanceWatcher from './stockBalanceSagas';
 import userWatcher from './userSagas';
 import usersInfoWatcher from './usersInfoSagas';
+import warehouseRawMaterialsWatcher from './warehouseRawMaterialsSagas';
 import warehouseWatcher from './warehouseSagas';
 import { all } from 'redux-saga/effects';
 
@@ -42,5 +43,6 @@ export default function* rootSaga() {
     qualityManagementWatcher(),
     relatedMaterialsBackorderListWatcher(),
     aldabaranWatcher(),
+    warehouseRawMaterialsWatcher(),
   ]);
 }
