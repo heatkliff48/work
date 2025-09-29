@@ -57,7 +57,17 @@ import { rolesReducer } from './rolesReducer';
 import { stockBalanceReducer } from './stockBalanceReducer';
 import { userReducer } from './userReducer';
 import { usersInfoReducer, usersMainInfoReducer } from './usersInfoReducer';
-import { warehouseSandReducer } from './warehouseRawMaterialsReducer';
+import {
+  warehouseAACReducer,
+  warehouseAluminum1Reducer,
+  warehouseAluminum2Reducer,
+  warehouseCementReducer,
+  warehouseGrindingBallsReducer,
+  warehouseGypsumReducer,
+  warehouseGypsumStoneReducer,
+  warehouseLimeReducer,
+  warehouseSandReducer,
+} from './warehouseRawMaterialsReducer';
 import { warehouseReducer, rawMaterialsWarehouseReducer } from './warehouseReducer';
 import { combineReducers } from 'redux';
 
@@ -113,4 +123,12 @@ export const rootReducer = combineReducers({
   autoclave_calendar: autoclaveCalendarReducer,
   rawMaterialsWarehouse: rawMaterialsWarehouseReducer,
   warehouseSand: warehouseSandReducer,
+  warehouseLime: warehouseLimeReducer,
+  warehouseCement: warehouseCementReducer,
+  warehouseGypsum: warehouseGypsumReducer,
+  warehouseGypsumStone: warehouseGypsumStoneReducer,
+  warehouseAluminum1: warehouseAluminum1Reducer,
+  warehouseAluminum2: warehouseAluminum2Reducer,
+  warehouseGrindingBalls: warehouseGrindingBallsReducer,
+  warehouseAAC: warehouseAACReducer,
 });

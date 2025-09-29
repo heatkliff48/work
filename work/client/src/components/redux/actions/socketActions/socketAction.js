@@ -83,6 +83,30 @@ import {
   NEW_WAREHOUSE_SAND_SOCKET,
   NEED_UPDATE_WAREHOUSE_SAND_SOCKET,
   NEED_DELETE_WAREHOUSE_SAND_SOCKET,
+  NEW_WAREHOUSE_LIME_SOCKET,
+  NEED_UPDATE_WAREHOUSE_LIME_SOCKET,
+  NEED_DELETE_WAREHOUSE_LIME_SOCKET,
+  NEW_WAREHOUSE_CEMENT_SOCKET,
+  NEED_UPDATE_WAREHOUSE_CEMENT_SOCKET,
+  NEED_DELETE_WAREHOUSE_CEMENT_SOCKET,
+  NEW_WAREHOUSE_GYPSUM_SOCKET,
+  NEED_UPDATE_WAREHOUSE_GYPSUM_SOCKET,
+  NEED_DELETE_WAREHOUSE_GYPSUM_SOCKET,
+  NEW_WAREHOUSE_GYPSUM_STONE_SOCKET,
+  NEED_UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+  NEED_DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+  NEW_WAREHOUSE_ALUMINUM1_SOCKET,
+  NEED_UPDATE_WAREHOUSE_ALUMINUM1_SOCKET,
+  NEED_DELETE_WAREHOUSE_ALUMINUM1_SOCKET,
+  NEW_WAREHOUSE_ALUMINUM2_SOCKET,
+  NEED_UPDATE_WAREHOUSE_ALUMINUM2_SOCKET,
+  NEED_DELETE_WAREHOUSE_ALUMINUM2_SOCKET,
+  NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
+  NEED_UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+  NEED_DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+  NEW_WAREHOUSE_AAC_SOCKET,
+  NEED_UPDATE_WAREHOUSE_AAC_SOCKET,
+  NEED_DELETE_WAREHOUSE_AAC_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -674,5 +698,173 @@ export const deleteWarehouseSandSocket = (sand_warehouse_id) => {
   return {
     type: NEED_DELETE_WAREHOUSE_SAND_SOCKET,
     payload: sand_warehouse_id,
+  };
+};
+
+export const addNewWarehouseLimeSocket = (warehouseLime) => {
+  return {
+    type: NEW_WAREHOUSE_LIME_SOCKET,
+    payload: warehouseLime,
+  };
+};
+
+export const updateWarehouseLimeSocket = (warehouseLime) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_LIME_SOCKET,
+    payload: warehouseLime,
+  };
+};
+
+export const deleteWarehouseLimeSocket = (lime_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_LIME_SOCKET,
+    payload: lime_warehouse_id,
+  };
+};
+
+export const addNewWarehouseCementSocket = (warehouseCement) => {
+  return {
+    type: NEW_WAREHOUSE_CEMENT_SOCKET,
+    payload: warehouseCement,
+  };
+};
+
+export const updateWarehouseCementSocket = (warehouseCement) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_CEMENT_SOCKET,
+    payload: warehouseCement,
+  };
+};
+
+export const deleteWarehouseCementSocket = (cement_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_CEMENT_SOCKET,
+    payload: cement_warehouse_id,
+  };
+};
+
+export const addNewWarehouseGypsumSocket = (warehouseGypsum) => {
+  return {
+    type: NEW_WAREHOUSE_GYPSUM_SOCKET,
+    payload: warehouseGypsum,
+  };
+};
+
+export const updateWarehouseGypsumSocket = (warehouseGypsum) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_GYPSUM_SOCKET,
+    payload: warehouseGypsum,
+  };
+};
+
+export const deleteWarehouseGypsumSocket = (gypsum_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_GYPSUM_SOCKET,
+    payload: gypsum_warehouse_id,
+  };
+};
+
+export const addNewWarehouseGypsumStoneSocket = (warehouseGypsumStone) => {
+  return {
+    type: NEW_WAREHOUSE_GYPSUM_STONE_SOCKET,
+    payload: warehouseGypsumStone,
+  };
+};
+
+export const updateWarehouseGypsumStoneSocket = (warehouseGypsumStone) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+    payload: warehouseGypsumStone,
+  };
+};
+
+export const deleteWarehouseGypsumStoneSocket = (gypsum_stone_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+    payload: gypsum_stone_warehouse_id,
+  };
+};
+
+export const addNewWarehouseAluminum1Socket = (warehouseAluminum1) => {
+  return {
+    type: NEW_WAREHOUSE_ALUMINUM1_SOCKET,
+    payload: warehouseAluminum1,
+  };
+};
+
+export const updateWarehouseAluminum1Socket = (warehouseAluminum1) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_ALUMINUM1_SOCKET,
+    payload: warehouseAluminum1,
+  };
+};
+
+export const deleteWarehouseAluminum1Socket = (aluminum1_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_ALUMINUM1_SOCKET,
+    payload: aluminum1_warehouse_id,
+  };
+};
+
+export const addNewWarehouseAluminum2Socket = (warehouseAluminum2) => {
+  return {
+    type: NEW_WAREHOUSE_ALUMINUM2_SOCKET,
+    payload: warehouseAluminum2,
+  };
+};
+
+export const updateWarehouseAluminum2Socket = (warehouseAluminum2) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_ALUMINUM2_SOCKET,
+    payload: warehouseAluminum2,
+  };
+};
+
+export const deleteWarehouseAluminum2Socket = (aluminum2_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_ALUMINUM2_SOCKET,
+    payload: aluminum2_warehouse_id,
+  };
+};
+
+export const addNewWarehouseGrindingBallsSocket = (warehouseGrindingBalls) => {
+  return {
+    type: NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
+    payload: warehouseGrindingBalls,
+  };
+};
+
+export const updateWarehouseGrindingBallsSocket = (warehouseGrindingBalls) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+    payload: warehouseGrindingBalls,
+  };
+};
+
+export const deleteWarehouseGrindingBallsSocket = (grinding_balls_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+    payload: grinding_balls_warehouse_id,
+  };
+};
+
+export const addNewWarehouseAACSocket = (warehouseAAC) => {
+  return {
+    type: NEW_WAREHOUSE_AAC_SOCKET,
+    payload: warehouseAAC,
+  };
+};
+
+export const updateWarehouseAACSocket = (warehouseAAC) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_AAC_SOCKET,
+    payload: warehouseAAC,
+  };
+};
+
+export const deleteWarehouseAACSocket = (aac_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_AAC_SOCKET,
+    payload: aac_warehouse_id,
   };
 };

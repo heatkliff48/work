@@ -8,6 +8,7 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import ListOfReservedAuxilaryModal from './ListOfReservedProducts/ListOfReservedAuxilaryModal';
 import { getRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
 import RawMaterialsWarehouseInfo from './RawMaterialsWarehouseInfo';
+import { getWarehouseSand } from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
 function Warehouse() {
   const { COLUMNS_RAW_MATERIALS_WAREHOUSE, raw_materials_warehouse } =
@@ -40,6 +41,7 @@ function Warehouse() {
 
   useEffect(() => {
     dispatch(getRawMaterialsWarehouse());
+    dispatch(getWarehouseSand());
   }, []);
 
   return (

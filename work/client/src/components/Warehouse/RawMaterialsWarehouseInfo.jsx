@@ -12,12 +12,40 @@ import RawMaterialsWarehouseAdd from './RawMaterialsWarehouseAdd';
 function RawMaterialsWarehouseInfo(props) {
   const [addModalShow, setAddModalShow] = useState(false);
 
-  const raw_material_warehouse = useSelector((state) => state.warehouseSand);
   const user = useSelector((state) => state.user);
 
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const navigate = useNavigate();
+
+  const useRawMaterialSelector = (materialType) => {
+    return useSelector((state) => {
+      switch (materialType) {
+        case 'Sand':
+          return state.warehouseSand;
+        case 'Lime':
+          return state.warehouseLime;
+        case 'Cement':
+          return state.warehouseCement;
+        case 'Gypsum':
+          return state.warehouseGypsum;
+        case 'Gypsum stone':
+          return state.warehouseGypsumStone;
+        case 'Aluminum 1':
+          return state.warehouseAluminum1;
+        case 'Aluminum 2':
+          return state.warehouseAluminum2;
+        case 'Grinding Balls':
+          return state.warehouseGrindingBalls;
+        case 'AAC':
+          return state.warehouseAAC;
+        default:
+          return state.warehouseSand;
+      }
+    });
+  };
+
+  const raw_material_warehouse = useRawMaterialSelector(props?.material_type);
 
   const raw_material_table = [
     {
@@ -87,4 +115,5 @@ function RawMaterialsWarehouseInfo(props) {
     </>
   );
 }
+
 export default RawMaterialsWarehouseInfo;

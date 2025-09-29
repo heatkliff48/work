@@ -47,7 +47,7 @@ export const rawMaterialsWarehouseReducer = (rawMaterialsWarehouse = [], action)
 
     case NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET: {
       const result = rawMaterialsWarehouse.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
+        if (el.id === payload.id) return payload;
         return el;
       });
       return result;
