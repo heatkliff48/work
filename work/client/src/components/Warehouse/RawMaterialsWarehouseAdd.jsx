@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useNavigate } from 'react-router-dom';
 import { Container } from 'reactstrap';
-import { addNewWarehouseSand } from '#components/redux/actions/warehouseRawMaterialsAction.js';
+import * as warehouseActions from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
 function RawMaterialsWarehouseAdd(props) {
   const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState({});
@@ -51,15 +51,35 @@ function RawMaterialsWarehouseAdd(props) {
       setUserAccess(access);
 
       if (!access?.canRead) {
-        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+        navigate('/');
       }
     }
   }, [user, roles]);
 
+  // Функция для получения правильного action
+  const getAddAction = useCallback((materialType) => {
+    const actionMap = {
+      Sand: warehouseActions.addNewWarehouseSand,
+      Lime: warehouseActions.addNewWarehouseLime,
+      Cement: warehouseActions.addNewWarehouseCement,
+      Gypsum: warehouseActions.addNewWarehouseGypsum,
+      'Gypsum stone': warehouseActions.addNewWarehouseGypsumStone,
+      'Aluminum 1': warehouseActions.addNewWarehouseAluminum1,
+      'Aluminum 2': warehouseActions.addNewWarehouseAluminum2,
+      'Grinding Balls': warehouseActions.addNewWarehouseGrindingBalls,
+      AAC: warehouseActions.addNewWarehouseAAC,
+    };
+
+    return actionMap[materialType] || warehouseActions.addNewWarehouseSand;
+  }, []);
+
   const onSubmitForm = async (e) => {
     e.preventDefault();
+
+    const addAction = getAddAction(props?.material_type);
+
     dispatch(
-      addNewWarehouseSand({
+      addAction({
         supplier: rawMaterialWarehouseInput?.supplier,
         quantity: rawMaterialWarehouseInput?.quantity,
       })
@@ -82,20 +102,18 @@ function RawMaterialsWarehouseAdd(props) {
           <form
             id="addClientModel"
             className="w-full max-w-sm"
-            onSubmit={(e) => {
-              onSubmitForm(e);
-            }}
+            onSubmit={onSubmitForm}
           >
             <h3>Add {props?.material_type}</h3>
             <Row>
               {raw_material_table.map((el) =>
                 el.accessor === 'date' ? null : (
-                  <Col key={el.id}>
+                  <Col key={el.accessor}>
                     <div className="md:flex md:items-center mb-6">
                       <div className="md:w-1/3">
                         <label
                           className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
-                          for="version"
+                          htmlFor={el.accessor}
                         >
                           {el.Header}
                         </label>
@@ -107,7 +125,7 @@ function RawMaterialsWarehouseAdd(props) {
                           name={el.accessor}
                           type="text"
                           value={rawMaterialWarehouseInput[el.accessor] || ''}
-                          onChange={(e) => handleRawMaterialWarehouseInputChange(e)}
+                          onChange={handleRawMaterialWarehouseInputChange}
                         />
                       </div>
                     </div>
@@ -127,4 +145,5 @@ function RawMaterialsWarehouseAdd(props) {
     </Modal>
   );
 }
+
 export default RawMaterialsWarehouseAdd;
