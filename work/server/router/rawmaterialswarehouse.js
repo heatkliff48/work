@@ -151,22 +151,28 @@ rawMaterialsWarehouseRouter.post('/sand', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/sand/update', async (req, res) => {
-  const { supplier, quantity, date } = req.body;
+  const { supplier, ...updateFields } = req.body;
 
   try {
-    const warehouseSand = await WarehouseSand.update(
-      {
-        quantity,
-        date,
-      },
-      {
-        where: {
-          supplier,
-        },
-        returning: true,
-        plain: true,
-      }
+    if (!supplier) {
+      return res.status(400).json({ message: 'Supplier is required' });
+    }
+
+    const updateData = Object.fromEntries(
+      Object.entries(updateFields).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
+    }
+
+    const warehouseSand = await WarehouseSand.update(updateData, {
+      where: { supplier },
+      returning: true,
+      plain: true,
+    });
 
     myEmitter.emit(UPDATE_WAREHOUSE_SAND_SOCKET, warehouseSand);
     return res.json(warehouseSand).status(200);
@@ -254,22 +260,28 @@ rawMaterialsWarehouseRouter.post('/lime', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/lime/update', async (req, res) => {
-  const { supplier, quantity, date } = req.body;
+  const { supplier, ...updateFields } = req.body;
 
   try {
-    const warehouseLime = await WarehouseLime.update(
-      {
-        quantity,
-        date,
-      },
-      {
-        where: {
-          supplier,
-        },
-        returning: true,
-        plain: true,
-      }
+    if (!supplier) {
+      return res.status(400).json({ message: 'Supplier is required' });
+    }
+
+    const updateData = Object.fromEntries(
+      Object.entries(updateFields).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
+    }
+
+    const warehouseLime = await WarehouseLime.update(updateData, {
+      where: { supplier },
+      returning: true,
+      plain: true,
+    });
 
     myEmitter.emit(UPDATE_WAREHOUSE_LIME_SOCKET, warehouseLime);
     return res.json(warehouseLime).status(200);
@@ -357,22 +369,28 @@ rawMaterialsWarehouseRouter.post('/cement', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/cement/update', async (req, res) => {
-  const { supplier, quantity, date } = req.body;
+  const { supplier, ...updateFields } = req.body;
 
   try {
-    const warehouseCement = await WarehouseCement.update(
-      {
-        quantity,
-        date,
-      },
-      {
-        where: {
-          supplier,
-        },
-        returning: true,
-        plain: true,
-      }
+    if (!supplier) {
+      return res.status(400).json({ message: 'Supplier is required' });
+    }
+
+    const updateData = Object.fromEntries(
+      Object.entries(updateFields).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
+    }
+
+    const warehouseCement = await WarehouseCement.update(updateData, {
+      where: { supplier },
+      returning: true,
+      plain: true,
+    });
 
     myEmitter.emit(UPDATE_WAREHOUSE_CEMENT_SOCKET, warehouseCement);
     return res.json(warehouseCement).status(200);
@@ -460,22 +478,28 @@ rawMaterialsWarehouseRouter.post('/gypsum', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/gypsum/update', async (req, res) => {
-  const { supplier, quantity, date } = req.body;
+  const { supplier, ...updateFields } = req.body;
 
   try {
-    const warehouseGypsum = await WarehouseGypsum.update(
-      {
-        quantity,
-        date,
-      },
-      {
-        where: {
-          supplier,
-        },
-        returning: true,
-        plain: true,
-      }
+    if (!supplier) {
+      return res.status(400).json({ message: 'Supplier is required' });
+    }
+
+    const updateData = Object.fromEntries(
+      Object.entries(updateFields).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
+    }
+
+    const warehouseGypsum = await WarehouseGypsum.update(updateData, {
+      where: { supplier },
+      returning: true,
+      plain: true,
+    });
 
     myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_SOCKET, warehouseGypsum);
     return res.json(warehouseGypsum).status(200);
@@ -563,22 +587,28 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/gypsum-stone/update', async (req, res) => {
-  const { supplier, quantity, date } = req.body;
+  const { supplier, ...updateFields } = req.body;
 
   try {
-    const warehouseGypsumStone = await WarehouseGypsumStone.update(
-      {
-        quantity,
-        date,
-      },
-      {
-        where: {
-          supplier,
-        },
-        returning: true,
-        plain: true,
-      }
+    if (!supplier) {
+      return res.status(400).json({ message: 'Supplier is required' });
+    }
+
+    const updateData = Object.fromEntries(
+      Object.entries(updateFields).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
+    }
+
+    const warehouseGypsumStone = await WarehouseGypsumStone.update(updateData, {
+      where: { supplier },
+      returning: true,
+      plain: true,
+    });
 
     myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET, warehouseGypsumStone);
     return res.json(warehouseGypsumStone).status(200);
@@ -666,22 +696,28 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/aluminum1/update', async (req, res) => {
-  const { supplier, quantity, date } = req.body;
+  const { supplier, ...updateFields } = req.body;
 
   try {
-    const warehouseAluminum1 = await WarehouseAluminum1.update(
-      {
-        quantity,
-        date,
-      },
-      {
-        where: {
-          supplier,
-        },
-        returning: true,
-        plain: true,
-      }
+    if (!supplier) {
+      return res.status(400).json({ message: 'Supplier is required' });
+    }
+
+    const updateData = Object.fromEntries(
+      Object.entries(updateFields).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
+    }
+
+    const warehouseAluminum1 = await WarehouseAluminum1.update(updateData, {
+      where: { supplier },
+      returning: true,
+      plain: true,
+    });
 
     myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM1_SOCKET, warehouseAluminum1);
     return res.json(warehouseAluminum1).status(200);
@@ -769,22 +805,28 @@ rawMaterialsWarehouseRouter.post('/aluminum2', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/aluminum2/update', async (req, res) => {
-  const { supplier, quantity, date } = req.body;
+  const { supplier, ...updateFields } = req.body;
 
   try {
-    const warehouseAluminum2 = await WarehouseAluminum2.update(
-      {
-        quantity,
-        date,
-      },
-      {
-        where: {
-          supplier,
-        },
-        returning: true,
-        plain: true,
-      }
+    if (!supplier) {
+      return res.status(400).json({ message: 'Supplier is required' });
+    }
+
+    const updateData = Object.fromEntries(
+      Object.entries(updateFields).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
+    }
+
+    const warehouseAluminum2 = await WarehouseAluminum2.update(updateData, {
+      where: { supplier },
+      returning: true,
+      plain: true,
+    });
 
     myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM2_SOCKET, warehouseAluminum2);
     return res.json(warehouseAluminum2).status(200);
@@ -872,22 +914,28 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/grinding-balls/update', async (req, res) => {
-  const { supplier, quantity, date } = req.body;
+  const { supplier, ...updateFields } = req.body;
 
   try {
-    const warehouseGrindingBalls = await WarehouseGrindingBalls.update(
-      {
-        quantity,
-        date,
-      },
-      {
-        where: {
-          supplier,
-        },
-        returning: true,
-        plain: true,
-      }
+    if (!supplier) {
+      return res.status(400).json({ message: 'Supplier is required' });
+    }
+
+    const updateData = Object.fromEntries(
+      Object.entries(updateFields).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
+    }
+
+    const warehouseGrindingBalls = await WarehouseGrindingBalls.update(updateData, {
+      where: { supplier },
+      returning: true,
+      plain: true,
+    });
 
     myEmitter.emit(UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET, warehouseGrindingBalls);
     return res.json(warehouseGrindingBalls).status(200);
@@ -980,22 +1028,28 @@ rawMaterialsWarehouseRouter.post('/aac', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/aac/update', async (req, res) => {
-  const { supplier, quantity, date } = req.body;
+  const { supplier, ...updateFields } = req.body;
 
   try {
-    const warehouseAAC = await WarehouseAAC.update(
-      {
-        quantity,
-        date,
-      },
-      {
-        where: {
-          supplier,
-        },
-        returning: true,
-        plain: true,
-      }
+    if (!supplier) {
+      return res.status(400).json({ message: 'Supplier is required' });
+    }
+
+    const updateData = Object.fromEntries(
+      Object.entries(updateFields).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
+    }
+
+    const warehouseAAC = await WarehouseAAC.update(updateData, {
+      where: { supplier },
+      returning: true,
+      plain: true,
+    });
 
     myEmitter.emit(UPDATE_WAREHOUSE_AAC_SOCKET, warehouseAAC);
     return res.json(warehouseAAC).status(200);

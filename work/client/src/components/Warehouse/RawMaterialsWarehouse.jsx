@@ -8,7 +8,17 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import ListOfReservedAuxilaryModal from './ListOfReservedProducts/ListOfReservedAuxilaryModal';
 import { getRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
 import RawMaterialsWarehouseInfo from './RawMaterialsWarehouseInfo';
-import { getWarehouseSand } from '#components/redux/actions/warehouseRawMaterialsAction.js';
+import {
+  getWarehouseAAC,
+  getWarehouseAluminum1,
+  getWarehouseAluminum2,
+  getWarehouseCement,
+  getWarehouseGrindingBalls,
+  getWarehouseGypsum,
+  getWarehouseGypsumStone,
+  getWarehouseLime,
+  getWarehouseSand,
+} from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
 function Warehouse() {
   const { COLUMNS_RAW_MATERIALS_WAREHOUSE, raw_materials_warehouse } =
@@ -42,6 +52,14 @@ function Warehouse() {
   useEffect(() => {
     dispatch(getRawMaterialsWarehouse());
     dispatch(getWarehouseSand());
+    dispatch(getWarehouseLime());
+    dispatch(getWarehouseCement());
+    dispatch(getWarehouseGypsum());
+    dispatch(getWarehouseGypsumStone());
+    dispatch(getWarehouseAluminum1());
+    dispatch(getWarehouseAluminum2());
+    dispatch(getWarehouseGrindingBalls());
+    dispatch(getWarehouseAAC());
   }, []);
 
   return (

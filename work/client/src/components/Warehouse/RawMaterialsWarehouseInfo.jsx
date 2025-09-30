@@ -8,9 +8,13 @@ import { useEffect } from 'react';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useNavigate } from 'react-router-dom';
 import RawMaterialsWarehouseAdd from './RawMaterialsWarehouseAdd';
+import RawMaterialsWarehouseSupplierInfoAdd from './RawMaterialsWarehouseSupplierInfoAdd';
+import '#components/Styles/modals.css';
 
 function RawMaterialsWarehouseInfo(props) {
   const [addModalShow, setAddModalShow] = useState(false);
+  const [updateModalShow, setUpdateModalShow] = useState(false);
+  const [supplierInfo, setSupplierInfo] = useState(false);
 
   const user = useSelector((state) => state.user);
 
@@ -63,10 +67,16 @@ function RawMaterialsWarehouseInfo(props) {
       accessor: 'date',
       Filter: TextSearchFilter,
     },
+    {
+      Header: 'Quality',
+      accessor: 'quality',
+      Filter: TextSearchFilter,
+    },
   ];
 
   const handleRowClick = useCallback((row) => {
-    console.log('row.original', row.original);
+    setSupplierInfo(row.original);
+    setUpdateModalShow(!updateModalShow);
   }, []);
 
   useEffect(() => {
@@ -87,13 +97,17 @@ function RawMaterialsWarehouseInfo(props) {
         show={props.show}
         onHide={props.onHide}
         aria-labelledby="contained-modal-title-vcenter"
+        size="xl" // Используем максимальный размер
+        dialogClassName="modal-table-width" // Кастомный класс для ширины
       >
         <Modal.Header closeButton>
           {/* <Modal.Title id="contained-modal-title-vcenter">
-            {props?.material_type}
-          </Modal.Title> */}
+          {props?.material_type}
+        </Modal.Title> */}
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="p-0">
+          {' '}
+          {/* Убираем padding для полной ширины таблицы */}
           <Table
             COLUMN_DATA={raw_material_table}
             dataOfTable={raw_material_warehouse}
@@ -110,6 +124,12 @@ function RawMaterialsWarehouseInfo(props) {
       <RawMaterialsWarehouseAdd
         show={addModalShow}
         onHide={() => setAddModalShow(false)}
+        material_type={props?.material_type}
+      />
+      <RawMaterialsWarehouseSupplierInfoAdd
+        show={updateModalShow}
+        onHide={() => setUpdateModalShow(false)}
+        supplierInfo={supplierInfo}
         material_type={props?.material_type}
       />
     </>
