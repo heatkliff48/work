@@ -10,72 +10,56 @@ const RecipeContextProvider = ({ children }) => {
       accessor: 'article',
     },
     {
-      Header: 'Sand',
-      accessor: 'sand',
-    },
-    {
-      Header: 'Sand slurry',
-      accessor: 'sand_slurry',
+      Header: 'Cake height',
+      accessor: 'cake_height',
     },
     {
       Header: 'Lime',
       accessor: 'lime',
     },
-    // {
-    //   Header: 'Lime Barcelona',
-    //   accessor: 'lime_barcelona',
-    // },
     {
       Header: 'Cement',
       accessor: 'cement',
     },
     {
-      Header: 'Gypsum',
-      accessor: 'gypsum',
+      Header: 'Sand (dry)',
+      accessor: 'sand_dry',
     },
     {
-      Header: 'Gypsum stone',
-      accessor: 'gypsum_stone',
+      Header: 'Sand slurry (dry)',
+      accessor: 'sand_slurry_dry',
+    },    
+    {
+      Header: 'Gypsum (dry)',
+      accessor: 'gypsum_dry',
     },
     {
-      Header: 'Aluminium',
-      accessor: 'alu',
+      Header: 'Return (dry)',
+      accessor: 'return_dry',
     },
-    // {
-    //   Header: 'Alu 2',
-    //   accessor: 'alu_2',
-    // },
     {
-      Header: 'Return slurry - solids',
-      accessor: 'return_slurry_solids',
+      Header: 'Aluminium paste',
+      accessor: 'aluminum_paste',
     },
-    // {
-    //   Header: 'Return slurry - water',
-    //   accessor: 'return_slurry_water',
-    // },
     {
       Header: 'Water solids',
-      accessor: 'water_solid',
+      accessor: 'water_solids',
     },
     {
-      Header: 'Water from mixer',
-      accessor: 'water_mixer',
-    },
-    // {
-    //   Header: 'Water cold',
-    //   accessor: 'water_cold',
-    // },
-    // {
-    //   Header: 'Water hot',
-    //   accessor: 'water_hot',
-    // },
-    {
-      Header: 'Condensate',
-      accessor: 'condensate',
+      Header: 'Solids',
+      accessor: 'solids',
     },
     {
-      Header: 'Grinding balls',
-      accessor: 'grinding_balls',
+      Header: 'Volume',
+      accessor: 'volume',
+    },
+    {
+      Header: 'Density',
+      accessor: 'density',
+    },
+    {
+      Header: 'Produced amount of return (dry)',
+      accessor: 'produced_return_dry',
     },
   ];
 
