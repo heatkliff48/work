@@ -40,7 +40,24 @@ function AddNewRecipeModal({ show, onHide }) {
     'return_slurry_solids',
   ];
 
-  const formVolume = 6.78;
+  const solidsNormalRequerideFields = [
+    'lime',
+    'cement',
+    'sand_slurry_dry',
+    'return_dry',
+    'aluminum_paste',
+  ];
+
+  const solidsOddRequerideFields = [
+    'lime',
+    'cement',
+    'sand_dry',
+    'gypsum_dry',
+    'return_dry',
+    'aluminum_paste',
+  ];
+
+  const formVolume = selectedProduct?.m3InArray ?? 6.78; // 6.78
 
   const haveProduct = useMemo(
     () => productOfRecipe?.density ?? false,
@@ -64,6 +81,28 @@ function AddNewRecipeModal({ show, onHide }) {
       setDryTotal((prev) => prev + Number(e.target.value));
     }
   }, []);
+
+  const solids = useMemo(() => {
+    const allFilled = selectedProduct?.density > 100 ? solidsNormalRequerideFields.every(field => recipeInput[field] !== '' && recipeInput[field] != null) : solidsOddRequerideFields.every(field => recipeInput[field] !== '' && recipeInput[field] != null)
+    
+    if (!allFilled) {
+      return null;
+    }
+    
+    return (parseFloat(recipeInput.lime) || 0) + 
+           (parseFloat(recipeInput.cement) || 0) + 
+           (parseFloat(recipeInput.sand_slurry_dry) || 0) + 
+           (parseFloat(recipeInput.return_dry) || 0) +
+           (parseFloat(recipeInput.aluminum_paste) || 0);
+  }, [recipeInput]);
+
+  const producedReturnDry = useMemo(() => {
+    if (!recipeInput.cake_height) {
+      return null;
+    }
+    
+    return (((parseFloat(recipeInput.cake_height)) * 1.5 * 0.6 - selectedProduct?.m3InArray) * selectedProduct?.density).toFixed(3);
+  }, [recipeInput?.cake_height]);
 
   useEffect(() => {
     let filtered = latestProducts.filter((el) =>
@@ -117,8 +156,9 @@ function AddNewRecipeModal({ show, onHide }) {
         article,
         density: selectedProduct?.density,
         certificate: selectedProduct?.certificate,
-        form_volume_m3: formVolume,
-        dry_total: dryTotal,
+        volume: formVolume,
+        solids,
+        produced_return_dry: producedReturnDry,
       })
     );
 
@@ -174,11 +214,14 @@ function AddNewRecipeModal({ show, onHide }) {
                     if (
                       el.accessor === 'id' ||
                       el.accessor === 'article' ||
+                      el.accessor === 'solids' ||
+                      el.accessor === 'volume' ||
+                      el.accessor === 'density' ||
+                      el.accessor === 'produced_return_dry' ||
                       (selectedProduct?.density <= 100 &&
-                        (el.accessor === 'sand_slurry' ||
-                          el.accessor === 'gypsum_stone')) ||
+                        (el.accessor === 'sand_slurry_dry')) ||
                       (selectedProduct?.density > 100 &&
-                        (el.accessor === 'sand' || el.accessor === 'gypsum'))
+                        (el.accessor === 'sand_dry' || el.accessor === 'gypsum_dry'))
                     )
                       return null;
                     else {
@@ -215,9 +258,10 @@ function AddNewRecipeModal({ show, onHide }) {
                     }
                   })}
                 </Row>
+                <h3>Solids: {solids !== null ? solids : 'Fill in all fields'}</h3>
+                <h3>Volume: {formVolume}</h3>
                 <h3>Density: {selectedProduct?.density}</h3>
-                <h3>Form volume, m3: {formVolume}</h3>
-                <h3>Dry total: {dryTotal}</h3>
+                <h3>Produced amount of return (dry): {producedReturnDry}</h3>
               </form>
             </Container>
           ) : (
