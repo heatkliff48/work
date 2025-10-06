@@ -161,19 +161,10 @@ class WarehouseRepository {
   static async addNewListOfOrderedProduction(ordered_production) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewListOfOrderedProduction');
     try {
-      await ListOfOrderedProductions.create(ordered_production);
+      const new_ordered_production = await ListOfOrderedProductions.create(
+        ordered_production
+      );
 
-      const new_ordered_production = await ListOfOrderedProductions.findAll({
-        attributes: [
-          'id',
-          'product_article',
-          'order_article',
-          'quantity',
-          'shipping_date',
-          'quantity_in_warehouse',
-        ],
-        order: [['shipping_date', 'ASC']],
-      });
       return new_ordered_production;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
@@ -204,19 +195,10 @@ class WarehouseRepository {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewListOfOrderedProductionOEM');
 
     try {
-      await ListOfOrderedProductionOEMs.create(ordered_production_oem);
+      const new_ordered_production_oem = await ListOfOrderedProductionOEMs.create(
+        ordered_production_oem
+      );
 
-      const new_ordered_production_oem = await ListOfOrderedProductionOEMs.findAll({
-        attributes: [
-          'id',
-          'shipping_date',
-          'product_article',
-          'order_article',
-          'quantity',
-          'status',
-        ],
-        order: [['shipping_date', 'ASC']],
-      });
       return new_ordered_production_oem;
     } catch (err) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>err', err);
@@ -247,8 +229,8 @@ class WarehouseRepository {
         { free_quantity_remaining, ordered_quantity },
         { where: { id: warehouse_id } }
       );
-      const updWarehouse = await Warehouses.findAll();
-      return updWarehouse;
+
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -265,8 +247,8 @@ class WarehouseRepository {
         { total_quantity, ordered_quantity },
         { where: { id: warehouse_id } }
       );
-      const updWarehouse = await Warehouses.findAll();
-      return updWarehouse;
+
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -286,8 +268,7 @@ class WarehouseRepository {
         { where: { id: warehouse_id } }
       );
 
-      const updWarehouse = await DryMixesWarehouses.findAll();
-      return updWarehouse;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -306,8 +287,7 @@ class WarehouseRepository {
         { where: { id: warehouse_id } }
       );
 
-      const updWarehouse = await AnchorsWarehouses.findAll();
-      return updWarehouse;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -326,8 +306,7 @@ class WarehouseRepository {
         { where: { id: warehouse_id } }
       );
 
-      const updWarehouse = await ToolsWarehouses.findAll();
-      return updWarehouse;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -346,8 +325,7 @@ class WarehouseRepository {
         { where: { id: warehouse_id } }
       );
 
-      const updWarehouse = await RelatedMaterialsWarehouses.findAll();
-      return updWarehouse;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -372,20 +350,15 @@ class WarehouseRepository {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedProducts');
 
     try {
-      for (let i = 0; i < reserved_product.length; i++) {
-        await ReservedProducts.create(reserved_product[i]);
+      if (Array.isArray(reserved_product)) {
+        for (let i = 0; i < reserved_product.length; i++) {
+          await ReservedProducts.create(reserved_product[i]);
+        }
+      } else {
+        await ReservedProducts.create(reserved_product);
       }
-      const new_reserved_product = await ReservedProducts.findAll({
-        attributes: ['id', 'warehouse_id', 'orders_products_id', 'quantity'],
-      });
-      await OrdersProducts.update(
-        {
-          warehouse_id: reserved_product.warehouse_id,
-        },
-        { where: { id: reserved_product.orders_products_id } }
-      );
 
-      return new_reserved_product;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;

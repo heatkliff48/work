@@ -79,6 +79,19 @@ import {
   updateAnchorProductInfoOfOrderSocket,
   updateToolProductInfoOfOrderSocket,
   updateRelMatProductInfoOfOrderSocket,
+  updateContactOfOrderSocket,
+  updateAdressOfOrderSocket,
+  deleteOrderSocket,
+  updateAutoclaveCalendarSocket,
+  addNewListOfOrderedProductionSocket,
+  updateListOfOrderedProductionSocket,
+  addNewListOfOrderedProductionOEMSocket,
+  updateListOfOrderedProductionOEMSocket,
+  updateWarehouseQuantitysSocket,
+  updateDryMixesQuantitysSocket,
+  updateAnchorQuantitysSocket,
+  updateToolQuantitysSocket,
+  updateRelMatQuantitysSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -184,6 +197,19 @@ import {
   GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
   GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
   GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_CONTACT_OF_ORDER_SOCKET,
+  GET_UPDATE_ADRESS_OF_ORDER_SOCKET,
+  GET_DELETE_ORDER_SOCKET,
+  GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
+  ADD_NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+  GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+  ADD_NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+  GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+  UPDATE_WAREHOUSE_QUANTITYS_SOCKET,
+  UPDATE_DRY_MIXES_QUANTITYS_SOCKET,
+  UPDATE_ANCHOR_QUANTITYS_SOCKET,
+  UPDATE_TOOL_QUANTITYS_SOCKET,
+  UPDATE_REL_MAT_QUANTITYS_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -214,6 +240,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_ORDER_SOCKET:
       dispatch(addNewOrderSocket(payload));
+      break;
+
+    case GET_DELETE_ORDER_SOCKET:
+      dispatch(deleteOrderSocket(payload));
       break;
 
     case ADD_NEW_DELIVERY_PRICE_SOCKET:
@@ -278,6 +308,14 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET:
       dispatch(updateRelMatProductInfoOfOrderSocket(payload));
+      break;
+
+    case GET_UPDATE_CONTACT_OF_ORDER_SOCKET:
+      dispatch(updateContactOfOrderSocket(payload));
+      break;
+
+    case GET_UPDATE_ADRESS_OF_ORDER_SOCKET:
+      dispatch(updateAdressOfOrderSocket(payload));
       break;
 
     case ADD_DATASHIP_ORDER_SOCKET:
@@ -406,6 +444,26 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_REMAINING_STOCK_SOCKET:
       dispatch(updateRemainingStockSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_QUANTITYS_SOCKET:
+      dispatch(updateWarehouseQuantitysSocket(payload));
+      break;
+
+    case UPDATE_DRY_MIXES_QUANTITYS_SOCKET:
+      dispatch(updateDryMixesQuantitysSocket(payload));
+      break;
+
+    case UPDATE_ANCHOR_QUANTITYS_SOCKET:
+      dispatch(updateAnchorQuantitysSocket(payload));
+      break;
+
+    case UPDATE_TOOL_QUANTITYS_SOCKET:
+      dispatch(updateToolQuantitysSocket(payload));
+      break;
+
+    case UPDATE_REL_MAT_QUANTITYS_SOCKET:
+      dispatch(updateRelMatQuantitysSocket(payload));
       break;
 
     case ADD_NEW_RECIPE_SOCKET:
@@ -546,6 +604,26 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_RANDOM_PRODUCTS_OF_ORDER_SOCKET:
       dispatch(addOrderRandomProductsSocket(payload));
+      break;
+
+    case GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET:
+      dispatch(updateAutoclaveCalendarSocket(payload));
+      break;
+
+    case ADD_NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET:
+      dispatch(addNewListOfOrderedProductionSocket(payload));
+      break;
+
+    case GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET:
+      dispatch(updateListOfOrderedProductionSocket(payload));
+      break;
+
+    case ADD_NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET:
+      dispatch(addNewListOfOrderedProductionOEMSocket(payload));
+      break;
+
+    case GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET:
+      dispatch(updateListOfOrderedProductionOEMSocket(payload));
       break;
 
     default:

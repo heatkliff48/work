@@ -446,6 +446,7 @@ function* updateDryMixedWhQuantitysWatcher(action) {
   try {
     const { payload } = action;
     const updWarehouse = yield call(updateDryMixedWhQuantitys, payload);
+
     yield put({ type: DRY_MIXED_WAREHOSE_QUANTITYS, payload: updWarehouse });
   } catch (err) {
     yield put({ type: DRY_MIXED_WAREHOSE_QUANTITYS, payload: [] });
@@ -456,6 +457,7 @@ function* updateAnchorWhQuantitysWatcher(action) {
   try {
     const { payload } = action;
     const updWarehouse = yield call(updateAnchorWhQuantitys, payload);
+
     yield put({ type: ANCHOR_WAREHOSE_QUANTITYS, payload: updWarehouse });
   } catch (err) {
     yield put({ type: ANCHOR_WAREHOSE_QUANTITYS, payload: [] });
@@ -466,6 +468,7 @@ function* updateToolWhQuantitysWatcher(action) {
   try {
     const { payload } = action;
     const updWarehouse = yield call(updateToolWhQuantitys, payload);
+
     yield put({ type: TOOL_WAREHOSE_QUANTITYS, payload: updWarehouse });
   } catch (err) {
     yield put({ type: TOOL_WAREHOSE_QUANTITYS, payload: [] });
@@ -476,6 +479,7 @@ function* updateRelMatWhQuantitysWatcher(action) {
   try {
     const { payload } = action;
     const updWarehouse = yield call(updateRelMatWhQuantitys, payload);
+
     yield put({ type: REL_MAT_WAREHOSE_QUANTITYS, payload: updWarehouse });
   } catch (err) {
     yield put({ type: REL_MAT_WAREHOSE_QUANTITYS, payload: [] });
@@ -494,10 +498,7 @@ function* getListOfReservedProductsWatcher() {
 
 function* addNewReservedProductWatcher(action) {
   try {
-    const { new_reserved_product } = yield call(
-      addNewReservedProduct,
-      action.payload
-    );
+    const new_reserved_product = yield call(addNewReservedProduct, action.payload);
 
     yield put({ type: NEW_RESERVED_PRODUCT, payload: new_reserved_product });
   } catch (err) {
@@ -759,7 +760,7 @@ function* getListOfOrderedProductionWatcher() {
 
 function* addNewListOfOrderedProductionWatcher(action) {
   try {
-    const { new_ordered_production } = yield call(
+    const new_ordered_production = yield call(
       addNewListOfOrderedProduction,
       action.payload
     );
@@ -798,7 +799,7 @@ function* getListOfOrderedProductionOEMWatcher() {
 
 function* addNewListOfOrderedProductionOEMWatcher(action) {
   try {
-    const { new_ordered_production_OEM } = yield call(
+    const new_ordered_production_OEM = yield call(
       addNewListOfOrderedProductionOEM,
       action.payload
     );
@@ -814,7 +815,7 @@ function* addNewListOfOrderedProductionOEMWatcher(action) {
 
 function* updListOfOrderedProductionOEMWorker(action) {
   try {
-    const { upd_ordered_production_oem } = yield call(
+    const upd_ordered_production_oem = yield call(
       updListOfOrderedProductionOEM,
       action.payload
     );

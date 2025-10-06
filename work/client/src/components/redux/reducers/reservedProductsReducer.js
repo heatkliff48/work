@@ -48,12 +48,12 @@ export const reservedProductsReducer = (reservedProducts = [], action) => {
       return payload;
     }
 
-    case UPD_RESERVED_PRODUCT: {
-      return payload;
-    }
-
+    case UPD_RESERVED_PRODUCT:
     case UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
-      return payload;
+      if (Array.isArray(payload)) {
+        return [...reservedProducts, ...payload];
+      }
+      return [...reservedProducts, payload];
     }
 
     case DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
