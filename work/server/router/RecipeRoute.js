@@ -17,7 +17,7 @@ recipeRouter.get('/', async (req, res) => {
     return res.status(200).json({ recipe });
   } catch (err) {
     console.error(err.message);
-    return res.json({err})
+    return res.json({ err });
   }
 });
 
@@ -26,51 +26,45 @@ recipeRouter.post('/', async (req, res) => {
 
   const {
     article,
-    density,
-    certificate,
-    form_volume_m3,
-    dry_total,
-    sand,
-    lime_lhoist,
-    lime_barcelona,
-    cement,
-    gypsum,
-    alu_1,
-    alu_2,
-    return_slurry_solids,
-    return_slurry_water,
-    water,
-    water_cold,
-    water_hot,
-    condensate,
+      certificate,
+      cake_height,
+      lime,
+      cement,
+      sand_dry,
+      sand_slurry_dry,
+      gypsum_dry,
+      return_dry,
+      aluminum_paste,
+      water_solids,
+      solids,
+      volume,
+      density,
+      produced_return_dry,
   } = req.body;
 
   try {
     const recipe = await Recipe.create({
       article,
-      density,
       certificate,
-      form_volume_m3,
-      dry_total,
-      sand,
-      lime_lhoist,
-      lime_barcelona,
+      cake_height,
+      lime,
       cement,
-      gypsum,
-      alu_1,
-      alu_2,
-      return_slurry_solids,
-      return_slurry_water,
-      water,
-      water_cold,
-      water_hot,
-      condensate,
+      sand_dry,
+      sand_slurry_dry,
+      gypsum_dry,
+      return_dry,
+      aluminum_paste,
+      water_solids,
+      solids,
+      volume,
+      density,
+      produced_return_dry,
     });
 
     myEmitter.emit(ADD_NEW_RECIPE_SOCKET, recipe);
-    return res.status(200)
+    return res.status(200);
   } catch (err) {
-    console.error('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',err.message);
+    console.error('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', err.message);
     return res.status(500).json(err);
   }
 });

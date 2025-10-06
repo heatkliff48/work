@@ -12,56 +12,56 @@ const RecipeContextProvider = ({ children }) => {
       accessor: 'article',
     },
     {
-      Header: 'Sand',
-      accessor: 'sand',
+      Header: 'Cake height',
+      accessor: 'cake_height',
     },
     {
-      Header: 'Lime Lhoist',
-      accessor: 'lime_lhoist',
-    },
-    {
-      Header: 'Lime Barcelona',
-      accessor: 'lime_barcelona',
+      Header: 'Lime',
+      accessor: 'lime',
     },
     {
       Header: 'Cement',
       accessor: 'cement',
     },
     {
-      Header: 'Gypsum',
-      accessor: 'gypsum',
+      Header: 'Sand (dry)',
+      accessor: 'sand_dry',
     },
     {
-      Header: 'Alu 1',
-      accessor: 'alu_1',
+      Header: 'Sand slurry (dry)',
+      accessor: 'sand_slurry_dry',
+    },    
+    {
+      Header: 'Gypsum (dry)',
+      accessor: 'gypsum_dry',
     },
     {
-      Header: 'Alu 2',
-      accessor: 'alu_2',
+      Header: 'Return (dry)',
+      accessor: 'return_dry',
     },
     {
-      Header: 'Return slurry - solids',
-      accessor: 'return_slurry_solids',
+      Header: 'Aluminium paste',
+      accessor: 'aluminum_paste',
     },
     {
-      Header: 'Return slurry - water',
-      accessor: 'return_slurry_water',
+      Header: 'Water solids',
+      accessor: 'water_solids',
     },
     {
-      Header: 'Water',
-      accessor: 'water',
+      Header: 'Solids',
+      accessor: 'solids',
     },
     {
-      Header: 'Water cold',
-      accessor: 'water_cold',
+      Header: 'Volume',
+      accessor: 'volume',
     },
     {
-      Header: 'Water hot',
-      accessor: 'water_hot',
+      Header: 'Density',
+      accessor: 'density',
     },
     {
-      Header: 'Condensate',
-      accessor: 'condensate',
+      Header: 'Produced amount of return (dry)',
+      accessor: 'produced_return_dry',
     },
   ];
 

@@ -154,6 +154,22 @@ function QualityManagementAddModal(props) {
         (item) => item.id === prodPlanEntry.id_list_of_ordered_production
       ) || [];
 
+    // reserved_quantity:сумма всех reservedProduct.quantity - reservedProduct.quantity_in_warehouse по item.article в list_of_ordered_production
+    // если это больше total_quantity_plan, то туда записывается total_quantity_plan
+
+    const filteredListOfOrderedProduction = list_of_ordered_production?.filter(
+      (item) => item.product_article === prodPlanEntry?.product_article
+    );
+
+    const totalDifference = filteredListOfOrderedProduction.reduce((sum, item) => {
+      return sum + (item?.quantity - item?.quantity_in_warehouse);
+    }, 0);
+
+    const reserved_quantity =
+      totalDifference > prodPlanEntry.quantity_pallets
+        ? prodPlanEntry.quantity_pallets
+        : totalDifference;
+
     const product = latestProducts.find(
       (el) => el.article === prodPlanEntry?.product_article
     );
@@ -165,10 +181,10 @@ function QualityManagementAddModal(props) {
         batch_id: warehouse_article,
         product_article: prodPlanEntry.product_article,
         total_quantity_plan: prodPlanEntry.quantity_pallets,
-        reserved_quantity: reservedProduct.quantity,
+        reserved_quantity, // reservedProduct.quantity,
         // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free,
         reserved_quantity_allocated: 0,
-        reserved_quantity_remaining: reservedProduct.quantity,
+        reserved_quantity_remaining: reserved_quantity, // reservedProduct.quantity,
         // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free - 0,
         free_quantity_fact: 0,
         production_plan_id: prodPlanEntry.id,

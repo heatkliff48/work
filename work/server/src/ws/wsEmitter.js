@@ -102,6 +102,34 @@ const {
   UPDATE_TOOL_QUANTITYS_SOCKET,
   UPDATE_REL_MAT_QUANTITYS_SOCKET,
   ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
+  UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+  ADD_NEW_WAREHOUSE_SAND_SOCKET,
+  UPDATE_WAREHOUSE_SAND_SOCKET,
+  DELETE_WAREHOUSE_SAND_SOCKET,
+  ADD_NEW_WAREHOUSE_LIME_SOCKET,
+  UPDATE_WAREHOUSE_LIME_SOCKET,
+  DELETE_WAREHOUSE_LIME_SOCKET,
+  ADD_NEW_WAREHOUSE_CEMENT_SOCKET,
+  UPDATE_WAREHOUSE_CEMENT_SOCKET,
+  DELETE_WAREHOUSE_CEMENT_SOCKET,
+  ADD_NEW_WAREHOUSE_GYPSUM_SOCKET,
+  UPDATE_WAREHOUSE_GYPSUM_SOCKET,
+  DELETE_WAREHOUSE_GYPSUM_SOCKET,
+  ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET,
+  UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+  DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+  ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET,
+  UPDATE_WAREHOUSE_ALUMINUM1_SOCKET,
+  DELETE_WAREHOUSE_ALUMINUM1_SOCKET,
+  ADD_NEW_WAREHOUSE_ALUMINUM2_SOCKET,
+  UPDATE_WAREHOUSE_ALUMINUM2_SOCKET,
+  DELETE_WAREHOUSE_ALUMINUM2_SOCKET,
+  ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
+  UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+  DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+  ADD_NEW_WAREHOUSE_AAC_SOCKET,
+  UPDATE_WAREHOUSE_AAC_SOCKET,
+  DELETE_WAREHOUSE_AAC_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -1170,6 +1198,17 @@ function registerWsEmitter(map) {
     }
   });
 
+  myEmitter.on(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, (rawMaterialsWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+          payload: rawMaterialsWarehouse,
+        })
+      );
+    }
+  });
+
   myEmitter.on(ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET, (qualityManagementData) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
@@ -1319,6 +1358,314 @@ function registerWsEmitter(map) {
       }
     }
   );
+
+  myEmitter.on(ADD_NEW_WAREHOUSE_SAND_SOCKET, (warehouseSand) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_SAND_SOCKET,
+          payload: warehouseSand,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_SAND_SOCKET, (warehouseSand) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_SAND_SOCKET,
+          payload: warehouseSand,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_WAREHOUSE_SAND_SOCKET, (sand_warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_WAREHOUSE_SAND_SOCKET,
+          payload: sand_warehouse_id,
+        })
+      );
+    }
+  });
+
+  // Lime
+  myEmitter.on(ADD_NEW_WAREHOUSE_LIME_SOCKET, (warehouseLime) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_LIME_SOCKET,
+          payload: warehouseLime,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_LIME_SOCKET, (warehouseLime) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_LIME_SOCKET,
+          payload: warehouseLime,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_WAREHOUSE_LIME_SOCKET, (lime_warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_WAREHOUSE_LIME_SOCKET,
+          payload: lime_warehouse_id,
+        })
+      );
+    }
+  });
+
+  // Cement
+  myEmitter.on(ADD_NEW_WAREHOUSE_CEMENT_SOCKET, (warehouseCement) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_CEMENT_SOCKET,
+          payload: warehouseCement,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_CEMENT_SOCKET, (warehouseCement) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_CEMENT_SOCKET,
+          payload: warehouseCement,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_WAREHOUSE_CEMENT_SOCKET, (cement_warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_WAREHOUSE_CEMENT_SOCKET,
+          payload: cement_warehouse_id,
+        })
+      );
+    }
+  });
+
+  // Gypsum
+  myEmitter.on(ADD_NEW_WAREHOUSE_GYPSUM_SOCKET, (warehouseGypsum) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_GYPSUM_SOCKET,
+          payload: warehouseGypsum,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_GYPSUM_SOCKET, (warehouseGypsum) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_GYPSUM_SOCKET,
+          payload: warehouseGypsum,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_WAREHOUSE_GYPSUM_SOCKET, (gypsum_warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_WAREHOUSE_GYPSUM_SOCKET,
+          payload: gypsum_warehouse_id,
+        })
+      );
+    }
+  });
+
+  // Gypsum stone
+  myEmitter.on(ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET, (warehouseGypsumStone) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET,
+          payload: warehouseGypsumStone,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET, (warehouseGypsumStone) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+          payload: warehouseGypsumStone,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET, (gypsum_stone_warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+          payload: gypsum_stone_warehouse_id,
+        })
+      );
+    }
+  });
+
+  // Aluminum1
+  myEmitter.on(ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET, (warehouseAluminum1) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET,
+          payload: warehouseAluminum1,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_ALUMINUM1_SOCKET, (warehouseAluminum1) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_ALUMINUM1_SOCKET,
+          payload: warehouseAluminum1,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_WAREHOUSE_ALUMINUM1_SOCKET, (aluminum1_warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_WAREHOUSE_ALUMINUM1_SOCKET,
+          payload: aluminum1_warehouse_id,
+        })
+      );
+    }
+  });
+
+  // Aluminum2
+  myEmitter.on(ADD_NEW_WAREHOUSE_ALUMINUM2_SOCKET, (warehouseAluminum2) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_ALUMINUM2_SOCKET,
+          payload: warehouseAluminum2,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_ALUMINUM2_SOCKET, (warehouseAluminum2) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_ALUMINUM2_SOCKET,
+          payload: warehouseAluminum2,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_WAREHOUSE_ALUMINUM2_SOCKET, (aluminum2_warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_WAREHOUSE_ALUMINUM2_SOCKET,
+          payload: aluminum2_warehouse_id,
+        })
+      );
+    }
+  });
+
+  // Grinding Balls
+  myEmitter.on(ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET, (warehouseGrindingBalls) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
+          payload: warehouseGrindingBalls,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET, (warehouseGrindingBalls) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+          payload: warehouseGrindingBalls,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(
+    DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+    (grinding_balls_warehouse_id) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+            payload: grinding_balls_warehouse_id,
+          })
+        );
+      }
+    }
+  );
+
+  // AAC
+  myEmitter.on(ADD_NEW_WAREHOUSE_AAC_SOCKET, (warehouseAAC) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_AAC_SOCKET,
+          payload: warehouseAAC,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_AAC_SOCKET, (warehouseAAC) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_AAC_SOCKET,
+          payload: warehouseAAC,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_WAREHOUSE_AAC_SOCKET, (aac_warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_WAREHOUSE_AAC_SOCKET,
+          payload: aac_warehouse_id,
+        })
+      );
+    }
+  });
 
   // myEmitter.on(CHECK_CARD_SOCKET, (gameusers, street, dohod, isFree, money) => {
   //   for (let [id, userConnect] of map) {

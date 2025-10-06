@@ -48,6 +48,16 @@ const initState = {
   productCode: [],
   autoclave_calendar: [],
   rawMatConsumption: [],
+  rawMaterialsWarehouse: [],
+  warehouseSand: [],
+  warehouseLime: [],
+  warehouseCement: [],
+  warehouseGypsum: [],
+  warehouseGypsumStone: [],
+  warehouseAluminum1: [],
+  warehouseAluminum2: [],
+  warehouseGrindingBalls: [],
+  warehouseAAC: [],
 };
 
 export default initState;

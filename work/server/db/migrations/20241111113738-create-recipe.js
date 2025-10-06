@@ -12,55 +12,47 @@ module.exports = {
       article: {
         type: Sequelize.STRING,
       },
-      density: {
-        type: Sequelize.FLOAT,
-      },
+      
       certificate: {
         type: Sequelize.STRING,
       },
-      form_volume_m3: {
+      cake_height: {
         type: Sequelize.FLOAT,
       },
-      dry_total: {
-        type: Sequelize.FLOAT,
-      },
-      sand: {
-        type: Sequelize.FLOAT,
-      },
-      lime_lhoist: {
-        type: Sequelize.FLOAT,
-      },
-      lime_barcelona: {
+      lime: {
         type: Sequelize.FLOAT,
       },
       cement: {
         type: Sequelize.FLOAT,
       },
-      gypsum: {
+      sand_dry: {
         type: Sequelize.FLOAT,
       },
-      alu_1: {
+      sand_slurry_dry: {
         type: Sequelize.FLOAT,
       },
-      alu_2: {
+      gypsum_dry: {
         type: Sequelize.FLOAT,
       },
-      return_slurry_solids: {
+      return_dry: {
         type: Sequelize.FLOAT,
       },
-      return_slurry_water: {
+      aluminum_paste: {
         type: Sequelize.FLOAT,
       },
-      water: {
+      water_solids: {
         type: Sequelize.FLOAT,
       },
-      water_cold: {
+      solids: {
         type: Sequelize.FLOAT,
       },
-      water_hot: {
+      volume: {
         type: Sequelize.FLOAT,
       },
-      condensate: {
+      density: {
+        type: Sequelize.FLOAT,
+      },
+      produced_return_dry: {
         type: Sequelize.FLOAT,
       },
       createdAt: {

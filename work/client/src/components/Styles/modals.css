@@ -13,3 +13,9 @@
   max-height: 100vh;
   height: 100vh;
 }
+
+.modal-table-width {
+  margin: auto;
+  max-width: 95vw;
+  width: fit-content;
+}

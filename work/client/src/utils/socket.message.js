@@ -93,6 +93,34 @@ import {
   updateToolQuantitysSocket,
   updateRelMatQuantitysSocket,
   addNewRawMatConsumptionSocket,
+  updateRawMaterialsWarehouseSocket,
+  addNewWarehouseSandSocket,
+  updateWarehouseSandSocket,
+  deleteWarehouseSandSocket,
+  addNewWarehouseLimeSocket,
+  updateWarehouseLimeSocket,
+  deleteWarehouseLimeSocket,
+  addNewWarehouseCementSocket,
+  updateWarehouseCementSocket,
+  deleteWarehouseCementSocket,
+  addNewWarehouseGypsumSocket,
+  updateWarehouseGypsumSocket,
+  deleteWarehouseGypsumSocket,
+  addNewWarehouseGypsumStoneSocket,
+  updateWarehouseGypsumStoneSocket,
+  deleteWarehouseGypsumStoneSocket,
+  addNewWarehouseAluminum1Socket,
+  updateWarehouseAluminum1Socket,
+  deleteWarehouseAluminum1Socket,
+  addNewWarehouseAluminum2Socket,
+  updateWarehouseAluminum2Socket,
+  deleteWarehouseAluminum2Socket,
+  addNewWarehouseGrindingBallsSocket,
+  updateWarehouseGrindingBallsSocket,
+  deleteWarehouseGrindingBallsSocket,
+  addNewWarehouseAACSocket,
+  updateWarehouseAACSocket,
+  deleteWarehouseAACSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -212,6 +240,34 @@ import {
   UPDATE_TOOL_QUANTITYS_SOCKET,
   UPDATE_REL_MAT_QUANTITYS_SOCKET,
   ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
+  UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+  ADD_NEW_WAREHOUSE_SAND_SOCKET,
+  UPDATE_WAREHOUSE_SAND_SOCKET,
+  DELETE_WAREHOUSE_SAND_SOCKET,
+  ADD_NEW_WAREHOUSE_LIME_SOCKET,
+  UPDATE_WAREHOUSE_LIME_SOCKET,
+  DELETE_WAREHOUSE_LIME_SOCKET,
+  ADD_NEW_WAREHOUSE_CEMENT_SOCKET,
+  UPDATE_WAREHOUSE_CEMENT_SOCKET,
+  DELETE_WAREHOUSE_CEMENT_SOCKET,
+  ADD_NEW_WAREHOUSE_GYPSUM_SOCKET,
+  UPDATE_WAREHOUSE_GYPSUM_SOCKET,
+  DELETE_WAREHOUSE_GYPSUM_SOCKET,
+  ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET,
+  UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+  DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+  ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET,
+  UPDATE_WAREHOUSE_ALUMINUM1_SOCKET,
+  DELETE_WAREHOUSE_ALUMINUM1_SOCKET,
+  ADD_NEW_WAREHOUSE_ALUMINUM2_SOCKET,
+  UPDATE_WAREHOUSE_ALUMINUM2_SOCKET,
+  DELETE_WAREHOUSE_ALUMINUM2_SOCKET,
+  ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
+  UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+  DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+  ADD_NEW_WAREHOUSE_AAC_SOCKET,
+  UPDATE_WAREHOUSE_AAC_SOCKET,
+  DELETE_WAREHOUSE_AAC_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -580,6 +636,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
       dispatch(updateToolsWarehouseSocket(payload));
       break;
 
+    case UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET:
+      dispatch(updateRawMaterialsWarehouseSocket(payload));
+      break;
+
     case ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET:
       dispatch(addNewQualityManagementSocket(payload));
       break;
@@ -630,6 +690,112 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET:
       dispatch(updateListOfOrderedProductionOEMSocket(payload));
+    case ADD_NEW_WAREHOUSE_SAND_SOCKET:
+      dispatch(addNewWarehouseSandSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_SAND_SOCKET:
+      dispatch(updateWarehouseSandSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_SAND_SOCKET:
+      dispatch(deleteWarehouseSandSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_LIME_SOCKET:
+      dispatch(addNewWarehouseLimeSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_LIME_SOCKET:
+      dispatch(updateWarehouseLimeSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_LIME_SOCKET:
+      dispatch(deleteWarehouseLimeSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_CEMENT_SOCKET:
+      dispatch(addNewWarehouseCementSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_CEMENT_SOCKET:
+      dispatch(updateWarehouseCementSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_CEMENT_SOCKET:
+      dispatch(deleteWarehouseCementSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_GYPSUM_SOCKET:
+      dispatch(addNewWarehouseGypsumSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_GYPSUM_SOCKET:
+      dispatch(updateWarehouseGypsumSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_GYPSUM_SOCKET:
+      dispatch(deleteWarehouseGypsumSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET:
+      dispatch(addNewWarehouseGypsumStoneSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET:
+      dispatch(updateWarehouseGypsumStoneSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET:
+      dispatch(deleteWarehouseGypsumStoneSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET:
+      dispatch(addNewWarehouseAluminum1Socket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_ALUMINUM1_SOCKET:
+      dispatch(updateWarehouseAluminum1Socket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_ALUMINUM1_SOCKET:
+      dispatch(deleteWarehouseAluminum1Socket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_ALUMINUM2_SOCKET:
+      dispatch(addNewWarehouseAluminum2Socket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_ALUMINUM2_SOCKET:
+      dispatch(updateWarehouseAluminum2Socket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_ALUMINUM2_SOCKET:
+      dispatch(deleteWarehouseAluminum2Socket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET:
+      dispatch(addNewWarehouseGrindingBallsSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET:
+      dispatch(updateWarehouseGrindingBallsSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET:
+      dispatch(deleteWarehouseGrindingBallsSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_AAC_SOCKET:
+      dispatch(addNewWarehouseAACSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_AAC_SOCKET:
+      dispatch(updateWarehouseAACSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_AAC_SOCKET:
+      dispatch(deleteWarehouseAACSocket(payload));
       break;
 
     default:
