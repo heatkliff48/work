@@ -45,6 +45,7 @@ import ProductsTypeWarehouse from '#components/Warehouse/ProductsTypeWarehouse.j
 import RelatedMaterialsBackorderList from '#components/Warehouse/RelatedMaterialsBackorderList/RelatedMaterialsBackorderList.jsx';
 import AutoclaveCalendare from '#components/ProductionBatchDesigner/AutoclaveCalendare.jsx';
 import ProductionBatchDesignerNew from '#components/ProductionBatchDesigner/ProductionBatchDesignerNew.jsx';
+import RawMaterialsConsumption from '#components/RawMaterialsConsumption/RawMaterialsConsumption.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -65,6 +66,7 @@ function App() {
 
     // if (isCheckedAuth && !user) navigate('/sign-in');
   }, [user]);
+
   return (
     <MainContextProvider>
       <div className="wrapper">
@@ -111,6 +113,7 @@ function App() {
           <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
           <Route path="/recipe_products" element={<ProductsListForRecipes />} />
           <Route path="/recipe_orders" element={<RecipeOrders />} />
+          <Route path="/raw_material_consumption" element={<RawMaterialsConsumption />} />
           <Route
             path="/related_materials_journal"
             element={<RelatedMaterialsJournal />}

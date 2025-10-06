@@ -24,7 +24,7 @@ export const listOfOrderedProductionReducer = (
     case NEW_ORDERED_PRODUCTION:
     case NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET:
       {
-        return [...listOfOrderedProduction, ...payload];
+        return [...listOfOrderedProduction, payload];
       }
 
     case UPDATE_LIST_OF_ORDERED_PRODUCTION:

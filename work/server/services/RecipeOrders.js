@@ -20,6 +20,19 @@ class RecipeOrdersServices {
 
     return;
   }
+
+  //--------------------------RAW MAT CONSUMPTION--------------------------
+
+  static async getAllRawMatConsumptionOrdersData() {
+    const allRawMatConsumptions = await RecipeOrdersRepository.getAllRawMatConsumptionOrdersData();
+
+    return allRawMatConsumptions;
+  }
+
+  static async addNewRawMatConsumptionOrdersData(newRawMatConsumption) {
+    await RecipeOrdersRepository.addNewRawMatConsumptionOrdersData(newRawMatConsumption);
+    return;
+  }
 }
 
 module.exports = RecipeOrdersServices;

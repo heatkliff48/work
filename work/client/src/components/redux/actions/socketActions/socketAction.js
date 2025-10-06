@@ -92,6 +92,7 @@ import {
   ANCHOR_QUANTITYS_SOCKET,
   TOOL_QUANTITYS_SOCKET,
   REL_MAT_QUANTITYS_SOCKET,
+  NEW_RAW_MAT_CONSUMPTION_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -476,6 +477,13 @@ export const addNewRecipeSocket = (recipe) => {
   return {
     type: NEW_RECIPE_SOCKET,
     payload: recipe,
+  };
+};
+
+export const addNewRawMatConsumptionSocket = (rawMatConsumption) => {
+  return {
+    type: NEW_RAW_MAT_CONSUMPTION_SOCKET,
+    payload: rawMatConsumption,
   };
 };
 

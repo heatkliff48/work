@@ -214,7 +214,7 @@ class OrdersController {
         );
       }
 
-      myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, newProductsOfOrder);
+      myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
 
       return res.status(200);
     } catch (err) {

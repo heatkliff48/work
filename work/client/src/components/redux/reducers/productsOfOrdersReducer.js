@@ -42,14 +42,18 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
     }
 
     case UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      const { productOfOrder } = payload;
+      const productOfOrder = payload;
 
-      const result = productsOfOrders.map((el) => {
-        if (el.id == productOfOrder.id) return productOfOrder;
-        return el;
-      });
+      if (!productsOfOrders.find((el) => el.id === productOfOrder.id)) {
+        return [...productsOfOrders, productOfOrder];
+      } else {
+        const result = productsOfOrders.map((el) => {
+          if (el.id == productOfOrder.id) return productOfOrder;
+          return el;
+        });
 
-      return result;
+        return result;
+      }
     }
 
     case NEW_RANDOM_PRODUCTS_OF_ORDER_SOCKET: {

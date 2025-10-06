@@ -2,14 +2,18 @@ import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import showErrorMessage from '../../Utils/showErrorMessage';
 import {
+  ADD_NEW_RAW_MAT_CONSUMPTION,
   ADD_NEW_RECIPE,
   DELETE_MATERIAL_PLAN,
   DELETE_RECIPE,
   FULL_RECIPE,
   GET_FULL_RECIPE,
+  GET_RAW_MAT_CONSUMPTION,
   GET_RECIPE_ORDERS_DATA,
   NEED_DELETE_RECIPE,
+  NEW_RAW_MAT_CONSUMPTION,
   NEW_RECIPE,
+  RAW_MAT_CONSUMPTION,
   RECIPE_ORDERS_DATA,
   SAVE_MATERIAL_PLAN,
 } from '../types/recipeTypes';
@@ -73,6 +77,24 @@ const deleteMaterialPlan = (material_plan_id) => {
     .catch(showErrorMessage);
 };
 
+const getRawMatConsumption = () => {
+  return url
+    .get('/recipe_orders/raw_mat_consumption')
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
+const addNewRawMatConsumption = (rawMatConsumption) => {
+  return url
+    .post('/recipe_orders/raw_mat_consumption', rawMatConsumption)
+    .then((res) => {
+      return res.data;
+    })
+    .catch(showErrorMessage);
+};
+
 function* getRecipeWorker(action) {
   try {
     const { recipe } = yield call(getRecipe);
@@ -130,6 +152,26 @@ function* deleteMaterialPlanWatcher(action) {
   }
 }
 
+function* getRawMatConsumptionWorker(action) {
+  try {
+    const rawMatConsumption = yield call(getRawMatConsumption);
+
+    yield put({ type: RAW_MAT_CONSUMPTION, payload: rawMatConsumption });
+  } catch (err) {
+    yield put({ type: RAW_MAT_CONSUMPTION, payload: [] });
+  }
+}
+
+function* addNewRawMatConsumptionWorker(action) {
+  try {
+    const rawMatConsumption = yield call(addNewRawMatConsumption, action.payload);
+
+    yield put({ type: NEW_RAW_MAT_CONSUMPTION, payload: rawMatConsumption });
+  } catch (err) {
+    yield put({ type: NEW_RAW_MAT_CONSUMPTION, payload: [] });
+  }
+}
+
 // watchers
 
 function* recipeWatcher() {
@@ -140,6 +182,9 @@ function* recipeWatcher() {
   yield takeLatest(SAVE_MATERIAL_PLAN, saveMaterialPlanWatcher);
   yield takeLatest(DELETE_MATERIAL_PLAN, deleteMaterialPlanWatcher);
   yield takeLatest(GET_RECIPE_ORDERS_DATA, getRecipeOrdersDataWatcher);
+
+  yield takeLatest(GET_RAW_MAT_CONSUMPTION, getRawMatConsumptionWorker);
+  yield takeLatest(ADD_NEW_RAW_MAT_CONSUMPTION, addNewRawMatConsumptionWorker);
 }
 
 export default recipeWatcher;

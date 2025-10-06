@@ -101,6 +101,7 @@ const {
   UPDATE_ANCHOR_QUANTITYS_SOCKET,
   UPDATE_TOOL_QUANTITYS_SOCKET,
   UPDATE_REL_MAT_QUANTITYS_SOCKET,
+  ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -270,12 +271,12 @@ function registerWsEmitter(map) {
     }
   });
 
-  myEmitter.on(UPDATE_PRODUCT_OF_ORDER_SOCKET, (product_of_order) => {
+  myEmitter.on(UPDATE_PRODUCT_OF_ORDER_SOCKET, (newProductsOfOrder) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
         JSON.stringify({
           type: UPDATE_PRODUCT_OF_ORDER_SOCKET,
-          payload: product_of_order,
+          payload: newProductsOfOrder,
         })
       );
     }
@@ -844,6 +845,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_REL_MAT_QUANTITYS_SOCKET,
           payload: updRelMat,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET, (rawMatConsumption) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
+          payload: rawMatConsumption,
         })
       );
     }

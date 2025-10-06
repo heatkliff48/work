@@ -92,6 +92,7 @@ import {
   updateAnchorQuantitysSocket,
   updateToolQuantitysSocket,
   updateRelMatQuantitysSocket,
+  addNewRawMatConsumptionSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -210,6 +211,7 @@ import {
   UPDATE_ANCHOR_QUANTITYS_SOCKET,
   UPDATE_TOOL_QUANTITYS_SOCKET,
   UPDATE_REL_MAT_QUANTITYS_SOCKET,
+  ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -468,6 +470,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_RECIPE_SOCKET:
       dispatch(addNewRecipeSocket(payload));
+      break;
+
+    case ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET:
+      dispatch(addNewRawMatConsumptionSocket(payload));
       break;
 
     case DELETE_RECIPE_SOCKET:

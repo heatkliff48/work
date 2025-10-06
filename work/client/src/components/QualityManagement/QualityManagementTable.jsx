@@ -21,12 +21,15 @@ import {
 } from '#components/redux/actions/batchOutsideAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.js';
+import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
 
   const { list_of_ordered_production, autoclave_calendar } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
+  const { raw_mat_consumption, recipeOrders, list_of_recipes } = useRecipeContext();
 
   const dispatch = useDispatch();
   const qualityManagementData = useSelector((state) => state.qualityManagementData);
@@ -321,6 +324,32 @@ const QualityManagementTable = () => {
           reserved_quantity_remaining <= 0 ||
           total_quantity_plan - reserved_quantity_allocated < 63
         ) {
+          recipeOrders?.forEach((el) => {
+            const batch = batchOutside.find(
+              (batch) => batch.id === production_plan_id
+            );
+            const recipe = list_of_recipes.find(
+              (recipe) => recipe.id === el.id_recipe
+            );
+
+            const haveRMC = raw_mat_consumption.find(
+              (item) =>
+                item?.recipe_article === recipe?.article &&
+                item?.batch_article === batch?.product_article
+            );
+
+            if (!haveRMC && recipe) {
+              dispatch(
+                addNewRawMatConsumption({
+                  id: el.id,
+                  recipe_article: recipe?.article || 'Unknown Recipe',
+                  batch_article: batch?.product_article || 'Unknown Batch',
+                  production_volume: el.production_volume || 0,
+                  date: batch?.date || 'Unknown Date',
+                })
+              );
+            }
+          });
           await dispatch(deleteBatchOutside(production_plan_id));
         } else {
           const batch = batchOutside.find((el) => el.id === production_plan_id);
