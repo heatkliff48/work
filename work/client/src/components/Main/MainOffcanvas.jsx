@@ -266,6 +266,17 @@ function MainOffcanvas() {
                     Raw material calendar
                   </Button>
                 </Dropdown.Item>
+                <Dropdown.Item eventKey="4">
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/raw_material_consumption');
+                      handleClose();
+                    }}
+                  >
+                    Raw material consumption
+                  </Button>
+                </Dropdown.Item>
               </DropdownButton>
             )}
             {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (

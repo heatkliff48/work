@@ -8,6 +8,7 @@ import {
 } from '../types/ordersTypes';
 import {
   DATASHIP_ORDER_SOCKET,
+  DELETE_ORDER_SOCKET,
   DESCRIPTIOM_ORDER_SOCKET,
   NEW_DELIVERY_PRICE_SOCKET,
   NEW_ORDER_SOCKET,
@@ -15,6 +16,8 @@ import {
   REMOVE_SECONDARY_CONTACT_ORDER_SOCKET,
   SECONDARY_CONTACT_ORDER_SOCKET,
   STATUS_OF_ORDER_SOCKET,
+  UPDATE_ADRESS_OF_ORDER_SOCKET,
+  UPDATE_CONTACT_OF_ORDER_SOCKET,
 } from '../types/socketTypes/socket';
 
 export const ordersReducer = (orders = [], action) => {
@@ -24,7 +27,10 @@ export const ordersReducer = (orders = [], action) => {
       return payload;
     }
 
-    case NEW_ORDER_SOCKET: {
+    case NEW_ORDER_SOCKET:
+    case NEW_ORDER: {
+      if (orders.find((order) => order.id === payload.id)) return orders;
+
       return [...orders, payload];
     }
 
@@ -39,12 +45,6 @@ export const ordersReducer = (orders = [], action) => {
       });
 
       return result;
-    }
-
-    case NEW_ORDER: {
-      if (orders.find((order) => order.id === payload.id)) return orders;
-
-      return [...orders, payload];
     }
 
     case DATASHIP_ORDER_SOCKET: {
@@ -97,12 +97,14 @@ export const ordersReducer = (orders = [], action) => {
       return result;
     }
 
-    case DELETE_ORDER: {
+    case DELETE_ORDER:
+    case DELETE_ORDER_SOCKET: {
       const result = orders.filter((el) => el.id !== payload);
       return result;
     }
 
-    case NEW_CONTACT_OF_ORDER: {
+    case NEW_CONTACT_OF_ORDER:
+    case UPDATE_CONTACT_OF_ORDER_SOCKET: {
       const { contact_id, order_id } = payload;
       return orders.map((order) => {
         if (order.id === order_id) return { ...order, contact_id };
@@ -110,7 +112,8 @@ export const ordersReducer = (orders = [], action) => {
       });
     }
 
-    case NEW_DELIVERY_OF_ORDER: {
+    case NEW_DELIVERY_OF_ORDER:
+    case UPDATE_ADRESS_OF_ORDER_SOCKET: {
       const { address_id, order_id } = payload;
       return orders.map((order) => {
         if (order.id === order_id) return { ...order, del_adr_id: address_id };
@@ -118,13 +121,7 @@ export const ordersReducer = (orders = [], action) => {
       });
     }
 
-    case STATUS_OF_ORDER_SOCKET: {
-      const { status, order_id } = payload;
-      return orders.map((order) => {
-        if (order.id === order_id) return { ...order, status };
-        return order;
-      });
-    }
+    case STATUS_OF_ORDER_SOCKET:
     case STATUS_OF_ORDER: {
       const { status, order_id } = payload;
       return orders.map((order) => {

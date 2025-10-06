@@ -2,6 +2,7 @@ const RecipeOrdersServices = require('../services/RecipeOrders');
 const {
   SAVE_MATERIAL_PLAN_SOCKET,
   DELETE_MATERIAL_PLAN_SOCKET,
+  ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
 } = require('../src/constants/event');
 const myEmitter = require('../src/ee');
 
@@ -37,6 +38,25 @@ class RecipeOrdersController {
     myEmitter.emit(DELETE_MATERIAL_PLAN_SOCKET, material_plan_id);
 
     return res.json(material_plan_id).status(200);
+  }
+
+  //--------------------------RAW MAT CONSUMPTION--------------------------
+
+  static async getAllRawMatConsumptionOrdersData(req, res) {
+    const allRawMatConsumptions =
+      await RecipeOrdersServices.getAllRawMatConsumptionOrdersData();
+
+    return res.status(200).json(allRawMatConsumptions);
+  }
+
+  static async addNewRawMatConsumptionOrdersData(req, res) {
+    const  rawMatConsumption  = req.body;
+
+    await RecipeOrdersServices.addNewRawMatConsumptionOrdersData(rawMatConsumption);
+
+    myEmitter.emit(ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET, rawMatConsumption);
+
+    return res.status(200).json(rawMatConsumption);
   }
 }
 

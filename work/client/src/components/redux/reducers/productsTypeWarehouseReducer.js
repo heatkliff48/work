@@ -5,6 +5,8 @@ import {
   FULL_TOOLS_WAREHOUSE,
 } from '../types/productsTypeWarehouseTypes';
 import {
+  ANCHOR_QUANTITYS_SOCKET,
+  DRY_MIXES_QUANTITYS_SOCKET,
   NEED_UPDATE_ANCHORS_WAREHOUSE_SOCKET,
   NEED_UPDATE_DRY_MIXES_WAREHOUSE_SOCKET,
   NEED_UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
@@ -13,6 +15,8 @@ import {
   NEW_DRY_MIXES_WAREHOUSE_SOCKET,
   NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
   NEW_TOOLS_WAREHOUSE_SOCKET,
+  REL_MAT_QUANTITYS_SOCKET,
+  TOOL_QUANTITYS_SOCKET,
 } from '../types/socketTypes/socket';
 import {
   ANCHOR_WAREHOSE_QUANTITYS,
@@ -28,8 +32,18 @@ export const dryMixesWarehouseReducer = (dryMixesWarehouse = [], action) => {
       return payload;
     }
 
-    case DRY_MIXED_WAREHOSE_QUANTITYS: {
-      return payload;
+    case DRY_MIXED_WAREHOSE_QUANTITYS:
+    case DRY_MIXES_QUANTITYS_SOCKET: {
+      const { warehouse_id, total_quantity, ordered_quantity } = payload;
+
+      const result = dryMixesWarehouse.map((el) => {
+        if (el.id === warehouse_id) {
+          return { ...el, total_quantity, ordered_quantity };
+        }
+
+        return el;
+      });
+      return result;
     }
 
     case NEW_DRY_MIXES_WAREHOUSE_SOCKET: {
@@ -59,8 +73,18 @@ export const relatedMaterialsWarehouseReducer = (
       return payload;
     }
 
-    case REL_MAT_WAREHOSE_QUANTITYS: {
-      return payload;
+    case REL_MAT_WAREHOSE_QUANTITYS:
+    case REL_MAT_QUANTITYS_SOCKET: {
+      const { warehouse_id, total_quantity, ordered_quantity } = payload;
+
+      const result = relatedMaterialsWarehouse.map((el) => {
+        if (el.id === warehouse_id) {
+          return { ...el, total_quantity, ordered_quantity };
+        }
+
+        return el;
+      });
+      return result;
     }
 
     case NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET: {
@@ -87,8 +111,18 @@ export const anchorsWarehouseReducer = (anchorsWarehouse = [], action) => {
       return payload;
     }
 
-    case ANCHOR_WAREHOSE_QUANTITYS: {
-      return payload;
+    case ANCHOR_WAREHOSE_QUANTITYS:
+    case ANCHOR_QUANTITYS_SOCKET: {
+      const { warehouse_id, total_quantity, ordered_quantity } = payload;
+
+      const result = anchorsWarehouse.map((el) => {
+        if (el.id === warehouse_id) {
+          return { ...el, total_quantity, ordered_quantity };
+        }
+
+        return el;
+      });
+      return result;
     }
 
     case NEW_ANCHORS_WAREHOUSE_SOCKET: {
@@ -115,8 +149,18 @@ export const toolsWarehouseReducer = (toolsWarehouse = [], action) => {
       return payload;
     }
 
-    case TOOL_WAREHOSE_QUANTITYS: {
-      return payload;
+    case TOOL_WAREHOSE_QUANTITYS:
+    case TOOL_QUANTITYS_SOCKET: {
+      const { warehouse_id, total_quantity, ordered_quantity } = payload;
+
+      const result = toolsWarehouse.map((el) => {
+        if (el.id === warehouse_id) {
+          return { ...el, total_quantity, ordered_quantity };
+        }
+
+        return el;
+      });
+      return result;
     }
 
     case NEW_TOOLS_WAREHOUSE_SOCKET: {

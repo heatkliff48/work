@@ -1,5 +1,7 @@
-import { createContext, useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { clearAccountingDataList } from '#components/redux/actions/ordersAction.js';
+import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.js';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 const RecipeContext = createContext();
 
@@ -63,15 +65,44 @@ const RecipeContextProvider = ({ children }) => {
     },
   ];
 
+  const COLUMNS_RAW_MAT_CONSUMPTION = [
+    {
+      Header: 'ID',
+      accessor: 'id',
+    },
+    {
+      Header: 'Recipe',
+      accessor: 'recipe_article',
+    },
+    {
+      Header: 'Batch production',
+      accessor: 'batch_article',
+    },
+    {
+      Header: 'Production volume',
+      accessor: 'production_volume',
+    },
+    {
+      Header: 'Date',
+      accessor: 'date',
+    },
+  ];
+
+  const dispatch = useDispatch();
+
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productOfRecipe, setProductOfRecipe] = useState({});
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   const list_of_recipes = useSelector((state) => state.recipe);
+  const batchOutside = useSelector((state) => state.batchOutside);
+  const recipeOrders = useSelector((state) => state.recipeOrders);
+  const raw_mat_consumption = useSelector((state) => state.rawMatConsumption);
 
   return (
     <RecipeContext.Provider
       value={{
+        COLUMNS_RAW_MAT_CONSUMPTION,
         recipe_info,
         selectedProduct,
         setSelectedProduct,
@@ -80,6 +111,8 @@ const RecipeContextProvider = ({ children }) => {
         list_of_recipes,
         selectedRecipe,
         setSelectedRecipe,
+        raw_mat_consumption,
+        recipeOrders,
       }}
     >
       {children}

@@ -23,19 +23,21 @@ export const productsReducer = (products = [], action) => {
     }
 
     case UPD_PRODUCT_SOCKET: {
-      return [...products, payload];
-    }
-
-    case REP_PRODUCT_SOCKET: {
-      console.log('payload', payload);
-      console.log('products', products);
       const updateProducts = products.map((el) => {
         if (el.id == payload.id)
           return payload;
         return el;
       });
 
-      console.log('REP_PRODUCT_SOCKET', updateProducts);
+      return updateProducts;
+    }
+
+    case REP_PRODUCT_SOCKET: {
+      const updateProducts = products.map((el) => {
+        if (el.id == payload.id)
+          return payload;
+        return el;
+      });
 
       return updateProducts;
     }

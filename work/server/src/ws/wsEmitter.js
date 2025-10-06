@@ -88,6 +88,20 @@ const {
   GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
   GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
   GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_CONTACT_OF_ORDER_SOCKET,
+  GET_UPDATE_ADRESS_OF_ORDER_SOCKET,
+  GET_DELETE_ORDER_SOCKET,
+  GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
+  GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+  ADD_NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+  ADD_NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+  GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+  UPDATE_WAREHOUSE_QUANTITYS_SOCKET,
+  UPDATE_DRY_MIXES_QUANTITYS_SOCKET,
+  UPDATE_ANCHOR_QUANTITYS_SOCKET,
+  UPDATE_TOOL_QUANTITYS_SOCKET,
+  UPDATE_REL_MAT_QUANTITYS_SOCKET,
+  ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
   UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
   ADD_NEW_WAREHOUSE_SAND_SOCKET,
   UPDATE_WAREHOUSE_SAND_SOCKET,
@@ -197,6 +211,17 @@ function registerWsEmitter(map) {
     }
   });
 
+  myEmitter.on(GET_DELETE_ORDER_SOCKET, (order_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_DELETE_ORDER_SOCKET,
+          payload: order_id,
+        })
+      );
+    }
+  });
+
   myEmitter.on(ADD_NEW_DELIVERY_PRICE_SOCKET, (order) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
@@ -274,12 +299,12 @@ function registerWsEmitter(map) {
     }
   });
 
-  myEmitter.on(UPDATE_PRODUCT_OF_ORDER_SOCKET, (product_of_order) => {
+  myEmitter.on(UPDATE_PRODUCT_OF_ORDER_SOCKET, (newProductsOfOrder) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
         JSON.stringify({
           type: UPDATE_PRODUCT_OF_ORDER_SOCKET,
-          payload: product_of_order,
+          payload: newProductsOfOrder,
         })
       );
     }
@@ -334,6 +359,28 @@ function registerWsEmitter(map) {
       }
     }
   );
+
+  myEmitter.on(GET_UPDATE_CONTACT_OF_ORDER_SOCKET, (contact_of_order) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_UPDATE_CONTACT_OF_ORDER_SOCKET,
+          payload: contact_of_order,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(GET_UPDATE_ADRESS_OF_ORDER_SOCKET, (adress_of_order) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_UPDATE_ADRESS_OF_ORDER_SOCKET,
+          payload: adress_of_order,
+        })
+      );
+    }
+  });
 
   myEmitter.on(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, (product_id) => {
     for (let [id, userConnect] of map) {
@@ -776,6 +823,72 @@ function registerWsEmitter(map) {
     }
   });
 
+  myEmitter.on(UPDATE_WAREHOUSE_QUANTITYS_SOCKET, (updWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_QUANTITYS_SOCKET,
+          payload: updWarehouse,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_DRY_MIXES_QUANTITYS_SOCKET, (updDryMixes) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_DRY_MIXES_QUANTITYS_SOCKET,
+          payload: updDryMixes,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_ANCHOR_QUANTITYS_SOCKET, (updAnchor) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_ANCHOR_QUANTITYS_SOCKET,
+          payload: updAnchor,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_TOOL_QUANTITYS_SOCKET, (updTool) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_TOOL_QUANTITYS_SOCKET,
+          payload: updTool,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_REL_MAT_QUANTITYS_SOCKET, (updRelMat) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_REL_MAT_QUANTITYS_SOCKET,
+          payload: updRelMat,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET, (rawMatConsumption) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
+          payload: rawMatConsumption,
+        })
+      );
+    }
+  });
+
   myEmitter.on(ADD_NEW_RECIPE_SOCKET, (recipe) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
@@ -1178,6 +1291,73 @@ function registerWsEmitter(map) {
       );
     }
   });
+
+  myEmitter.on(GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET, (updAutoclaveCalendares) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
+          payload: updAutoclaveCalendares,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(
+    ADD_NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+    (new_ordered_production) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: ADD_NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+            payload: new_ordered_production,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+    (upd_ordered_production) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+            payload: upd_ordered_production,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    ADD_NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+    (new_ordered_production_oem) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: ADD_NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+            payload: new_ordered_production_oem,
+          })
+        );
+      }
+    }
+  );
+
+  myEmitter.on(
+    GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+    (upd_ordered_production_oem) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+            payload: upd_ordered_production_oem,
+          })
+        );
+      }
+    }
+  );
 
   myEmitter.on(ADD_NEW_WAREHOUSE_SAND_SOCKET, (warehouseSand) => {
     for (let [id, userConnect] of map) {

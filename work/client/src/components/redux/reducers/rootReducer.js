@@ -1,4 +1,7 @@
-import { recipeOrdersReducer } from './RecipeOrdersReducer';
+import {
+  rawMatConsumptionReducer,
+  recipeOrdersReducer,
+} from './RecipeOrdersReducer';
 import { accountingReducer } from './accoutingReducer';
 import { aldabaranReducer } from './aldabaranReducer';
 import batchDesignerReducer from './batchDesignerReducer';
@@ -121,6 +124,7 @@ export const rootReducer = combineReducers({
   aldabaran: aldabaranReducer,
   productCode: productCodeReducer,
   autoclave_calendar: autoclaveCalendarReducer,
+  rawMatConsumption: rawMatConsumptionReducer,
   rawMaterialsWarehouse: rawMaterialsWarehouseReducer,
   warehouseSand: warehouseSandReducer,
   warehouseLime: warehouseLimeReducer,

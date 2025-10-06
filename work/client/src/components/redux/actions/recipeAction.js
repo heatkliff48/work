@@ -5,6 +5,8 @@ import {
   DELETE_RECIPE,
   GET_RECIPE_ORDERS_DATA,
   DELETE_MATERIAL_PLAN,
+  GET_RAW_MAT_CONSUMPTION,
+  ADD_NEW_RAW_MAT_CONSUMPTION,
 } from '../types/recipeTypes';
 
 export const getRecipe = () => {
@@ -47,3 +49,19 @@ export const deleteMaterialPlan = (mat_plan_id) => {
     payload: mat_plan_id,
   };
 };
+
+// ------------------------------------------
+
+export const getRawMatConsumption = () => {
+  return {
+    type: GET_RAW_MAT_CONSUMPTION,
+  };
+};
+
+export const addNewRawMatConsumption = (rawMatConsumption) => {
+  return {
+    type: ADD_NEW_RAW_MAT_CONSUMPTION,
+    payload: rawMatConsumption,
+  };
+};
+

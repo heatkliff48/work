@@ -79,6 +79,20 @@ import {
   UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
   UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
   UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+  UPDATE_CONTACT_OF_ORDER_SOCKET,
+  UPDATE_ADRESS_OF_ORDER_SOCKET,
+  DELETE_ORDER_SOCKET,
+  UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
+  NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+  UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+  NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+  UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+  WAREHOUSE_QUANTITYS_SOCKET,
+  DRY_MIXES_QUANTITYS_SOCKET,
+  ANCHOR_QUANTITYS_SOCKET,
+  TOOL_QUANTITYS_SOCKET,
+  REL_MAT_QUANTITYS_SOCKET,
+  NEW_RAW_MAT_CONSUMPTION_SOCKET,
   NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
   NEW_WAREHOUSE_SAND_SOCKET,
   NEED_UPDATE_WAREHOUSE_SAND_SOCKET,
@@ -148,6 +162,13 @@ export const addNewOrderSocket = (newOrder) => {
   return {
     type: NEW_ORDER_SOCKET,
     payload: newOrder,
+  };
+};
+
+export const deleteOrderSocket = (order_id) => {
+  return {
+    type: DELETE_ORDER_SOCKET,
+    payload: order_id,
   };
 };
 
@@ -263,6 +284,20 @@ export const updateRelMatProductInfoOfOrderSocket = (upd_prod_info) => {
   };
 };
 
+export const updateContactOfOrderSocket = (date) => {
+  return {
+    type: UPDATE_CONTACT_OF_ORDER_SOCKET,
+    payload: date,
+  };
+};
+
+export const updateAdressOfOrderSocket = (date) => {
+  return {
+    type: UPDATE_ADRESS_OF_ORDER_SOCKET,
+    payload: date,
+  };
+};
+
 export const addDatashipOrderSocket = (date) => {
   return {
     type: DATASHIP_ORDER_SOCKET,
@@ -302,6 +337,13 @@ export const updInChargeOrderSocket = (person_in_charge) => {
   return {
     type: PERSON_IN_CHARGE_OF_ORDER_SOCKET,
     payload: person_in_charge,
+  };
+};
+
+export const updateAutoclaveCalendarSocket = (updAutoclaveCalendares) => {
+  return {
+    type: UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
+    payload: updAutoclaveCalendares,
   };
 };
 
@@ -417,6 +459,41 @@ export const updateRemainingStockSocket = (upd_rem_srock) => {
   };
 };
 
+export const updateWarehouseQuantitysSocket = (upd_rem_srock) => {
+  return {
+    type: WAREHOUSE_QUANTITYS_SOCKET,
+    payload: upd_rem_srock,
+  };
+};
+
+export const updateDryMixesQuantitysSocket = (upd_rem_srock) => {
+  return {
+    type: DRY_MIXES_QUANTITYS_SOCKET,
+    payload: upd_rem_srock,
+  };
+};
+
+export const updateAnchorQuantitysSocket = (upd_rem_srock) => {
+  return {
+    type: ANCHOR_QUANTITYS_SOCKET,
+    payload: upd_rem_srock,
+  };
+};
+
+export const updateToolQuantitysSocket = (upd_rem_srock) => {
+  return {
+    type: TOOL_QUANTITYS_SOCKET,
+    payload: upd_rem_srock,
+  };
+};
+
+export const updateRelMatQuantitysSocket = (upd_rem_srock) => {
+  return {
+    type: REL_MAT_QUANTITYS_SOCKET,
+    payload: upd_rem_srock,
+  };
+};
+
 export const addNewWarehouseSocket = (new_warehouse) => {
   return {
     type: NEW_WAREHOUSE_SOCKET,
@@ -428,6 +505,13 @@ export const addNewRecipeSocket = (recipe) => {
   return {
     type: NEW_RECIPE_SOCKET,
     payload: recipe,
+  };
+};
+
+export const addNewRawMatConsumptionSocket = (rawMatConsumption) => {
+  return {
+    type: NEW_RAW_MAT_CONSUMPTION_SOCKET,
+    payload: rawMatConsumption,
   };
 };
 
@@ -680,6 +764,35 @@ export const addOrderRandomProductsSocket = (randomProducts) => {
   };
 };
 
+export const addNewListOfOrderedProductionSocket = (new_ordered_production) => {
+  return {
+    type: NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+    payload: new_ordered_production,
+  };
+};
+
+export const updateListOfOrderedProductionSocket = (upd_ordered_production) => {
+  return {
+    type: UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+    payload: upd_ordered_production,
+  };
+};
+
+export const addNewListOfOrderedProductionOEMSocket = (
+  new_ordered_production_oem
+) => {
+  return {
+    type: NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+    payload: new_ordered_production_oem,
+  };
+};
+
+export const updateListOfOrderedProductionOEMSocket = (
+  upd_ordered_production_oem
+) => {
+  return {
+    type: UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+    payload: upd_ordered_production_oem,
 export const addNewWarehouseSandSocket = (warehouseSand) => {
   return {
     type: NEW_WAREHOUSE_SAND_SOCKET,

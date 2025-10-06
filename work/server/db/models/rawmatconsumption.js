@@ -1,0 +1,26 @@
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class RawMatConsumptions extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  }
+  RawMatConsumptions.init({
+    recipe_article: DataTypes.STRING,
+    batch_article: DataTypes.STRING,
+    production_volume: DataTypes.INTEGER,
+    date: DataTypes.STRING
+  }, {
+    sequelize,
+    modelName: 'RawMatConsumptions',
+  });
+  return RawMatConsumptions;
+};

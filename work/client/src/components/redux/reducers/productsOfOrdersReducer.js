@@ -42,10 +42,17 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
     }
 
     case UPDATE_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      if (Array.isArray(payload)) {
-        return [...productsOfOrders, ...payload];
+      const productOfOrder = payload;
+
+      if (!productsOfOrders.find((el) => el.id === productOfOrder.id)) {
+        return [...productsOfOrders, productOfOrder];
       } else {
-        return [...productsOfOrders, payload];
+        const result = productsOfOrders.map((el) => {
+          if (el.id == productOfOrder.id) return productOfOrder;
+          return el;
+        });
+
+        return result;
       }
     }
 
@@ -103,7 +110,14 @@ export const dryMixedProductsOfOrdersReducer = (
     }
 
     case UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...dryMixedProductsOfOrders, payload];
+      const { productOfOrder } = payload;
+
+      const result = dryMixedProductsOfOrders.map((el) => {
+        if (el.id == productOfOrder.id) return productOfOrder;
+        return el;
+      });
+
+      return result;
     }
 
     case UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER: {
@@ -152,7 +166,14 @@ export const anchorProductsOfOrdersReducer = (
     }
 
     case UPDATE_ANCHOR_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...anchorProductsOfOrders, payload];
+      const { productOfOrder } = payload;
+
+      const result = anchorProductsOfOrders.map((el) => {
+        if (el.id == productOfOrder.id) return productOfOrder;
+        return el;
+      });
+
+      return result;
     }
 
     case UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER: {
@@ -197,7 +218,14 @@ export const toolProductsOfOrdersReducer = (toolProductsOfOrders = [], action) =
     }
 
     case UPDATE_TOOL_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...toolProductsOfOrders, payload];
+      const { productOfOrder } = payload;
+
+      const result = toolProductsOfOrders.map((el) => {
+        if (el.id == productOfOrder.id) return productOfOrder;
+        return el;
+      });
+
+      return result;
     }
 
     case UPDATE_TOOL_PRODUCT_INFO_OF_ORDER: {
@@ -245,7 +273,14 @@ export const relMatProductsOfOrdersReducer = (
     }
 
     case UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET: {
-      return [...relMatProductsOfOrders, payload];
+      const { productOfOrder } = payload;
+
+      const result = relMatProductsOfOrders.map((el) => {
+        if (el.id == productOfOrder.id) return productOfOrder;
+        return el;
+      });
+
+      return result;
     }
 
     case UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER: {

@@ -1,4 +1,9 @@
 import {
+  NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+  UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
+  UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+} from '../types/socketTypes/socket';
+import {
   AUTOCLAVE_CALENDAR,
   LIST_OF_ORDERED_PRODUCTION,
   UPDATE_LIST_OF_ORDERED_PRODUCTION,
@@ -16,26 +21,24 @@ export const listOfOrderedProductionReducer = (
       return payload;
     }
 
-    case NEW_ORDERED_PRODUCTION: {
-      return [...listOfOrderedProduction, ...payload];
-    }
+    case NEW_ORDERED_PRODUCTION:
+    case NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET:
+      {
+        return [...listOfOrderedProduction, payload];
+      }
 
-    case UPDATE_LIST_OF_ORDERED_PRODUCTION: {
+    case UPDATE_LIST_OF_ORDERED_PRODUCTION:
+    case UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET: {
+      const { id, quantity_in_warehouse } = payload;
       const result = listOfOrderedProduction.map((el) => {
-        if (el.id === payload.id) {
-          return payload;
+        if (el.id === id) {
+          return { ...el, quantity_in_warehouse };
         }
 
         return el;
       });
       return result;
     }
-
-    // case DELETE_PRODUCT_FROM_RESERVED_LIST: {
-    //   const newReservedProducts = listOfOrderedProduction.filter((el) => el.id !== payload);
-
-    //   return newReservedProducts;
-    // }
 
     default:
       return listOfOrderedProduction;
@@ -53,6 +56,10 @@ export const autoclaveCalendarReducer = (autoclave_calendar = [], action) => {
     }
 
     case NEW_AUTOCLAVE_CALENDAR: {
+      return value;
+    }
+
+    case UPDATE_AUTOCLAVE_CALENDAR_SOCKET: {
       return value;
     }
 

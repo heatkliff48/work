@@ -1,4 +1,4 @@
-const { RecipeOrders } = require('../db/models');
+const { RecipeOrders, RawMatConsumptions } = require('../db/models');
 
 class RecipeOrdersRepository {
   static async getRecipeOrdersData() {
@@ -60,7 +60,6 @@ class RecipeOrdersRepository {
         error
       );
       return error;
-
     }
   }
 
@@ -72,6 +71,30 @@ class RecipeOrdersRepository {
       return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>error', error);
+      return error;
+    }
+  }
+
+  //--------------------------RAW MAT CONSUMPTION--------------------------
+
+  static async getAllRawMatConsumptionOrdersData() {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAllRawMatConsumptionOrdersData');
+    try {
+      const allRawMatConsumptions = await RawMatConsumptions.findAll();
+
+      return allRawMatConsumptions;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async addNewRawMatConsumptionOrdersData(newRawMatConsumption) {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewRawMatConsumptionOrdersData');
+    try {
+      await RawMatConsumptions.create(newRawMatConsumption);
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }

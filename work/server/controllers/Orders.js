@@ -25,6 +25,9 @@ const {
   GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
   GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
   GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+  GET_UPDATE_CONTACT_OF_ORDER_SOCKET,
+  GET_UPDATE_ADRESS_OF_ORDER_SOCKET,
+  GET_DELETE_ORDER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -211,7 +214,7 @@ class OrdersController {
         );
       }
 
-      myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, newProductsOfOrder);
+      myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
 
       return res.status(200);
     } catch (err) {
@@ -457,6 +460,8 @@ class OrdersController {
         order_id,
       });
 
+      myEmitter.emit(GET_UPDATE_CONTACT_OF_ORDER_SOCKET, { contact_id, order_id });
+
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -472,6 +477,7 @@ class OrdersController {
         order_id,
       });
 
+      myEmitter.emit(GET_UPDATE_ADRESS_OF_ORDER_SOCKET, { address_id, order_id });
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -522,6 +528,8 @@ class OrdersController {
       await OrdersService.getDeleteOrder({
         order_id,
       });
+
+      myEmitter.emit(GET_DELETE_ORDER_SOCKET, order_id);
 
       return res.status(200);
     } catch (err) {
