@@ -793,6 +793,9 @@ export const updateListOfOrderedProductionOEMSocket = (
   return {
     type: UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
     payload: upd_ordered_production_oem,
+  }
+}
+
 export const addNewWarehouseSandSocket = (warehouseSand) => {
   return {
     type: NEW_WAREHOUSE_SAND_SOCKET,
