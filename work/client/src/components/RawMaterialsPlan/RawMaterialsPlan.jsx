@@ -1,12 +1,12 @@
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useRecipeContext } from '#components/contexts/RecipeContext.js';
-import { saveMaterialPlan } from '#components/redux/actions/recipeAction.js';
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
+import { useProductsContext } from "#components/contexts/ProductContext.js";
+import { useRecipeContext } from "#components/contexts/RecipeContext.js";
+import { saveMaterialPlan } from "#components/redux/actions/recipeAction.js";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Select from "react-select";
 
 function RawMaterialsPlan() {
-  const { list_of_recipes } = useRecipeContext();
+  const { list_of_recipes, recipe_info } = useRecipeContext();
   const { latestProducts } = useProductsContext();
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_ordered_production = useSelector(
@@ -19,24 +19,33 @@ function RawMaterialsPlan() {
 
   const dispatch = useDispatch();
 
-  const rawMaterials = [
-    { name: 'Sand', title: 'sand', remaining: 0 },
-    { name: 'Lime Lhoist', title: 'lime_lhoist', remaining: 0 },
-    { name: 'Lime Barcelona', title: 'lime_barcelona', remaining: 0 },
-    { name: 'Cement', title: 'cement', remaining: 0 },
-    { name: 'Gypsum', title: 'gypsum', remaining: 0 },
-    { name: 'Alu 1', title: 'alu_1', remaining: 0 },
-    { name: 'Alu 2', title: 'alu_2', remaining: 0 },
-    { name: 'Return slurry - solids', title: 'return_slurry_solids', remaining: 0 },
-    { name: 'Return slurry - water', title: 'return_slurry_water', remaining: 0 },
-    { name: 'Water', title: 'water', remaining: 0 },
-    { name: 'Water cold', title: 'water_cold', remaining: 0 },
-    { name: 'Water hot', title: 'water_hot', remaining: 0 },
-    { name: 'Condensate', title: 'condensate', remaining: 0 },
-  ];
+  const rawMaterials = recipe_info.map((item) => ({
+    name: item.Header,
+    title: item.accessor,
+    remaining: 0,
+  }));
+
+  // const rawMaterials = [
+  //   { name: 'Sand', title: 'sand', remaining: 0 },
+  //   { name: 'Lime Lhoist', title: 'lime_lhoist', remaining: 0 },
+  //   { name: 'Lime Barcelona', title: 'lime_barcelona', remaining: 0 },
+  //   { name: 'Cement', title: 'cement', remaining: 0 },
+  //   { name: 'Gypsum', title: 'gypsum', remaining: 0 },
+  //   { name: 'Alu 1', title: 'alu_1', remaining: 0 },
+  //   { name: 'Alu 2', title: 'alu_2', remaining: 0 },
+  //   { name: 'Return slurry - solids', title: 'return_slurry_solids', remaining: 0 },
+  //   { name: 'Return slurry - water', title: 'return_slurry_water', remaining: 0 },
+  //   { name: 'Water', title: 'water', remaining: 0 },
+  //   { name: 'Water cold', title: 'water_cold', remaining: 0 },
+  //   { name: 'Water hot', title: 'water_hot', remaining: 0 },
+  //   { name: 'Condensate', title: 'condensate', remaining: 0 },
+  // ];
 
   const handleOrderShareChange = (name, value) => {
-    setManualOrderShare((prev) => ({ ...prev, [name]: parseFloat(value) || 0 }));
+    setManualOrderShare((prev) => ({
+      ...prev,
+      [name]: parseFloat(value) || 0,
+    }));
   };
 
   const calculateTotal = (material) => {
@@ -122,7 +131,12 @@ function RawMaterialsPlan() {
       .filter(Boolean);
 
     setProductsArray(result);
-  }, [batchOutside, list_of_ordered_production, list_of_recipes, latestProducts]);
+  }, [
+    batchOutside,
+    list_of_ordered_production,
+    list_of_recipes,
+    latestProducts,
+  ]);
 
   useEffect(() => {
     const updatedTotals = {};
@@ -242,21 +256,21 @@ function RawMaterialsPlan() {
                       styles={{
                         singleValue: (provided) => ({
                           ...provided,
-                          color: 'black', // цвет текста выбранного значения
+                          color: "black", // цвет текста выбранного значения
                         }),
                         option: (provided, state) => ({
                           ...provided,
-                          color: state.isSelected ? 'white' : 'black', // выбранная белая, остальные чёрные
+                          color: state.isSelected ? "white" : "black", // выбранная белая, остальные чёрные
                           backgroundColor: state.isSelected
-                            ? '#2684FF'
+                            ? "#2684FF"
                             : state.isFocused
-                            ? '#e6f0ff' // подсветка при наведении
-                            : 'white',
+                            ? "#e6f0ff" // подсветка при наведении
+                            : "white",
                         }),
                         control: (provided) => ({
                           ...provided,
-                          backgroundColor: 'white',
-                          color: 'black',
+                          backgroundColor: "white",
+                          color: "black",
                         }),
                       }}
                     />
@@ -297,7 +311,7 @@ function RawMaterialsPlan() {
               <td>
                 <input
                   type="number"
-                  value={manualOrderShare[material.name] || ''}
+                  value={manualOrderShare[material.name] || ""}
                   onChange={(e) =>
                     handleOrderShareChange(material.name, e.target.value)
                   }
