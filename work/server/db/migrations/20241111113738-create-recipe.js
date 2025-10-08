@@ -52,7 +52,13 @@ module.exports = {
       density: {
         type: Sequelize.FLOAT,
       },
+      density_recipe:{
+        type: Sequelize.FLOAT,
+      },
       produced_return_dry: {
+        type: Sequelize.FLOAT,
+      },
+      water_total: {
         type: Sequelize.FLOAT,
       },
       createdAt: {

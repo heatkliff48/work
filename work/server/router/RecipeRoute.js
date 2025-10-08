@@ -7,8 +7,6 @@ const {
 } = require('../src/constants/event.js');
 
 recipeRouter.get('/', async (req, res) => {
-  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>recipeRouter get');
-
   try {
     const recipe = await Recipe.findAll({
       order: [['id', 'ASC']],
@@ -22,9 +20,7 @@ recipeRouter.get('/', async (req, res) => {
 });
 
 recipeRouter.post('/', async (req, res) => {
-  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>recipeRouter post');
-
-  const {
+    const {
     article,
       certificate,
       cake_height,
@@ -39,7 +35,9 @@ recipeRouter.post('/', async (req, res) => {
       solids,
       volume,
       density,
+      density_recipe,
       produced_return_dry,
+      water_total
   } = req.body;
 
   try {
@@ -58,7 +56,9 @@ recipeRouter.post('/', async (req, res) => {
       solids,
       volume,
       density,
+      density_recipe,
       produced_return_dry,
+      water_total
     });
 
     myEmitter.emit(ADD_NEW_RECIPE_SOCKET, recipe);
@@ -70,9 +70,7 @@ recipeRouter.post('/', async (req, res) => {
 });
 
 recipeRouter.post('/delete', async (req, res) => {
-  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>recipeRouter delete');
-
-  const { recipe_id } = req.body;
+    const { recipe_id } = req.body;
 
   try {
     await Recipe.destroy({ where: { id: recipe_id } });

@@ -1,90 +1,94 @@
-import { clearAccountingDataList } from '#components/redux/actions/ordersAction.js';
-import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.js';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { clearAccountingDataList } from "#components/redux/actions/ordersAction.js";
+import { addNewRawMatConsumption } from "#components/redux/actions/recipeAction.js";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const RecipeContext = createContext();
 
 const RecipeContextProvider = ({ children }) => {
   const recipe_info = [
     {
-      Header: 'Recipe ID',
-      accessor: 'article',
+      Header: "Recipe ID",
+      accessor: "article",
     },
     {
-      Header: 'Cake height',
-      accessor: 'cake_height',
+      Header: "Cake height",
+      accessor: "cake_height",
     },
     {
-      Header: 'Lime',
-      accessor: 'lime',
+      Header: "Lime",
+      accessor: "lime",
     },
     {
-      Header: 'Cement',
-      accessor: 'cement',
+      Header: "Cement",
+      accessor: "cement",
     },
     {
-      Header: 'Sand (dry)',
-      accessor: 'sand_dry',
+      Header: "Sand (dry)",
+      accessor: "sand_dry",
     },
     {
-      Header: 'Sand slurry (dry)',
-      accessor: 'sand_slurry_dry',
-    },    
-    {
-      Header: 'Gypsum (dry)',
-      accessor: 'gypsum_dry',
+      Header: "Sand slurry (dry)",
+      accessor: "sand_slurry_dry",
     },
     {
-      Header: 'Return (dry)',
-      accessor: 'return_dry',
+      Header: "Gypsum (dry)",
+      accessor: "gypsum_dry",
     },
     {
-      Header: 'Aluminium paste',
-      accessor: 'aluminum_paste',
+      Header: "Return (dry)",
+      accessor: "return_dry",
     },
     {
-      Header: 'Water solids',
-      accessor: 'water_solids',
+      Header: "Aluminium paste",
+      accessor: "aluminum_paste",
     },
     {
-      Header: 'Solids',
-      accessor: 'solids',
+      Header: "Water solids",
+      accessor: "water_solids",
     },
     {
-      Header: 'Volume',
-      accessor: 'volume',
+      Header: "Solids",
+      accessor: "solids",
     },
     {
-      Header: 'Density',
-      accessor: 'density',
+      Header: "Volume",
+      accessor: "volume",
     },
     {
-      Header: 'Produced amount of return (dry)',
-      accessor: 'produced_return_dry',
+      Header: "Density",
+      accessor: "density_recipe",
+    },
+    {
+      Header: "Produced amount of return (dry)",
+      accessor: "produced_return_dry",
+    },
+    {
+      Header: "Water total",
+      accessor: "water_total",
     },
   ];
 
   const COLUMNS_RAW_MAT_CONSUMPTION = [
     {
-      Header: 'ID',
-      accessor: 'id',
+      Header: "ID",
+      accessor: "id",
     },
     {
-      Header: 'Recipe',
-      accessor: 'recipe_article',
+      Header: "Recipe",
+      accessor: "recipe_article",
     },
     {
-      Header: 'Batch production',
-      accessor: 'batch_article',
+      Header: "Batch production",
+      accessor: "batch_article",
     },
     {
-      Header: 'Production volume',
-      accessor: 'production_volume',
+      Header: "Production volume",
+      accessor: "production_volume",
     },
     {
-      Header: 'Date',
-      accessor: 'date',
+      Header: "Date",
+      accessor: "date",
     },
   ];
 
