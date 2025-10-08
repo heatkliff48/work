@@ -19,11 +19,15 @@ function RawMaterialsPlan() {
 
   const dispatch = useDispatch();
 
-  const rawMaterials = recipe_info.map((item) => ({
-    name: item.Header,
-    title: item.accessor,
-    remaining: 0,
-  }));
+  const excludedAccessors = ["article"];
+
+  const rawMaterials = recipe_info
+    .filter((item) => !excludedAccessors.includes(item.accessor))
+    .map((item) => ({
+      name: item.Header,
+      title: item.accessor,
+      remaining: 0,
+    }));
 
   // const rawMaterials = [
   //   { name: 'Sand', title: 'sand', remaining: 0 },
