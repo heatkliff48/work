@@ -19,7 +19,15 @@ function RawMaterialsPlan() {
 
   const dispatch = useDispatch();
 
-  const excludedAccessors = ["article"];
+  const excludedAccessors = [
+    "article",
+    "cake_height",
+    "solids",
+    "volume",
+    "density_recipe",
+    "produced_return_dry",
+    "water_solids",
+  ];
 
   const rawMaterials = recipe_info
     .filter((item) => !excludedAccessors.includes(item.accessor))
