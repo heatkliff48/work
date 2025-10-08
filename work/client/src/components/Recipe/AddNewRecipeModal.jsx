@@ -1,15 +1,15 @@
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useDispatch } from 'react-redux';
-import { useRecipeContext } from '#components/contexts/RecipeContext.js';
-import Table from '#components/Table/Table.jsx';
-import { addNewRecipe } from '#components/redux/actions/recipeAction.js';
-import '#components/Styles/modals.css';
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { useProductsContext } from "#components/contexts/ProductContext.js";
+import { useDispatch } from "react-redux";
+import { useRecipeContext } from "#components/contexts/RecipeContext.js";
+import Table from "#components/Table/Table.jsx";
+import { addNewRecipe } from "#components/redux/actions/recipeAction.js";
+import "#components/Styles/modals.css";
 
 function AddNewRecipeModal({ show, onHide }) {
   const [recipeInput, setRecipeInput] = useState({});
@@ -29,35 +29,33 @@ function AddNewRecipeModal({ show, onHide }) {
   const [productsDataList, setCProductsDataList] = useState(latestProducts);
   const [dryTotal, setDryTotal] = useState(0);
   const dryTotalSumm = [
-    'article',
-    'sand',
-    'lime_lhoist',
-    'lime_barcelona',
-    'cement',
-    'gypsum',
-    'alu_1',
-    'alu_2',
-    'return_slurry_solids',
+    "article",
+    "sand",
+    "lime_lhoist",
+    "lime_barcelona",
+    "cement",
+    "gypsum",
+    "alu_1",
+    "alu_2",
+    "return_slurry_solids",
   ];
 
   const solidsNormalRequerideFields = [
-    'lime',
-    'cement',
-    'sand_slurry_dry',
-    'return_dry',
-    'aluminum_paste',
+    "lime",
+    "cement",
+    "sand_slurry_dry",
+    "return_dry",
+    "aluminum_paste",
   ];
 
   const solidsOddRequerideFields = [
-    'lime',
-    'cement',
-    'sand_dry',
-    'gypsum_dry',
-    'return_dry',
-    'aluminum_paste',
+    "lime",
+    "cement",
+    "sand_dry",
+    "gypsum_dry",
+    "return_dry",
+    "aluminum_paste",
   ];
-
-  const formVolume = selectedProduct?.m3InArray ?? 6.78; // 6.78
 
   const haveProduct = useMemo(
     () => productOfRecipe?.density ?? false,
@@ -65,7 +63,9 @@ function AddNewRecipeModal({ show, onHide }) {
   );
 
   const handlerAddProductRecipe = useCallback((row) => {
-    const product = productsDataList.filter((el) => el.id === row.original.id)[0];
+    const product = productsDataList.filter(
+      (el) => el.id === row.original.id
+    )[0];
 
     setSelectedProduct(product);
     setProductOfRecipe((prev) => ({
@@ -83,30 +83,63 @@ function AddNewRecipeModal({ show, onHide }) {
   }, []);
 
   const solids = useMemo(() => {
-    const allFilled = selectedProduct?.density > 100 ? solidsNormalRequerideFields.every(field => recipeInput[field] !== '' && recipeInput[field] != null) : solidsOddRequerideFields.every(field => recipeInput[field] !== '' && recipeInput[field] != null)
-    
+    const allFilled =
+      selectedProduct?.density > 100
+        ? solidsNormalRequerideFields.every(
+            (field) => recipeInput[field] !== "" && recipeInput[field] != null
+          )
+        : solidsOddRequerideFields.every(
+            (field) => recipeInput[field] !== "" && recipeInput[field] != null
+          );
+
     if (!allFilled) {
       return null;
     }
-    
-    return (parseFloat(recipeInput.lime) || 0) + 
-           (parseFloat(recipeInput.cement) || 0) + 
-           (parseFloat(recipeInput.sand_slurry_dry) || 0) + 
-           (parseFloat(recipeInput.return_dry) || 0) +
-           (parseFloat(recipeInput.aluminum_paste) || 0);
+
+    return (
+      (parseFloat(recipeInput.lime) || 0) +
+      (parseFloat(recipeInput.cement) || 0) +
+      (parseFloat(recipeInput.sand_slurry_dry) || 0) +
+      (parseFloat(recipeInput.return_dry) || 0) +
+      (parseFloat(recipeInput.aluminum_paste) || 0)
+    );
   }, [recipeInput]);
 
-  const producedReturnDry = useMemo(() => {
+  const volume = useMemo(() => {
     if (!recipeInput.cake_height) {
       return null;
     }
-    
-    return (((parseFloat(recipeInput.cake_height)) * 1.5 * 0.6 - selectedProduct?.m3InArray) * selectedProduct?.density).toFixed(3);
+
+    return parseFloat(recipeInput.cake_height) * 6.262 * 1.58;
   }, [recipeInput?.cake_height]);
+
+  const density_recipe = useMemo(() => {
+    if (!volume || !solids) {
+      return null;
+    }
+
+    return (solids / volume) * 1.06;
+  }, [volume, solids]);
+
+  const producedReturnDry = useMemo(() => {
+    if (!volume || !solids) {
+      return null;
+    }
+
+    return (volume - selectedProduct?.m3InArray) * (solids / volume);
+  }, [volume, solids]);
+
+  const water_total = useMemo(() => {
+    if (!recipeInput.water_solids || !solids) {
+      return null;
+    }
+
+    return solids * parseFloat(recipeInput?.water_solids);
+  }, [solids, recipeInput?.water_solids]);
 
   useEffect(() => {
     let filtered = latestProducts.filter((el) =>
-      el.placeOfProduction?.includes('Spain')
+      el.placeOfProduction?.includes("Spain")
     );
     setCProductsDataList(filtered);
   }, [latestProducts]);
@@ -120,12 +153,13 @@ function AddNewRecipeModal({ show, onHide }) {
 
   const recipeArticle = () => {
     // M.+00+D+плотность(300)+скртификат(DE)+00000(i++)
-    let versionNumber = '000001';
+    let versionNumber = "000001";
     const articleId =
       list_of_recipes.length === 0
         ? 1
-        : parseInt(list_of_recipes[list_of_recipes.length - 1].article.slice(-6)) +
-          1;
+        : parseInt(
+            list_of_recipes[list_of_recipes.length - 1].article.slice(-6)
+          ) + 1;
     versionNumber = `0000000${articleId}`.slice(-6);
     const recipe_article = `M.00D${selectedProduct?.density}${selectedProduct?.certificate}${versionNumber}`; //
     return recipe_article;
@@ -142,7 +176,7 @@ function AddNewRecipeModal({ show, onHide }) {
         updatedRecipeInput[accessor] = 0; // Add missing key with value 0
       } else if (
         updatedRecipeInput[accessor] === null ||
-        updatedRecipeInput[accessor] === ''
+        updatedRecipeInput[accessor] === ""
       ) {
         updatedRecipeInput[accessor] = 0;
       }
@@ -156,9 +190,11 @@ function AddNewRecipeModal({ show, onHide }) {
         article,
         density: selectedProduct?.density,
         certificate: selectedProduct?.certificate,
-        volume: formVolume,
+        volume,
         solids,
         produced_return_dry: producedReturnDry,
+        density_recipe,
+        water_total,
       })
     );
 
@@ -212,16 +248,18 @@ function AddNewRecipeModal({ show, onHide }) {
                 <Row>
                   {recipe_info.map((el) => {
                     if (
-                      el.accessor === 'id' ||
-                      el.accessor === 'article' ||
-                      el.accessor === 'solids' ||
-                      el.accessor === 'volume' ||
-                      el.accessor === 'density' ||
-                      el.accessor === 'produced_return_dry' ||
+                      el.accessor === "id" ||
+                      el.accessor === "article" ||
+                      el.accessor === "solids" ||
+                      el.accessor === "volume" ||
+                      el.accessor === "density_recipe" ||
+                      el.accessor === "water_total" ||
+                      el.accessor === "produced_return_dry" ||
                       (selectedProduct?.density <= 100 &&
-                        (el.accessor === 'sand_slurry_dry')) ||
+                        el.accessor === "sand_slurry_dry") ||
                       (selectedProduct?.density > 100 &&
-                        (el.accessor === 'sand_dry' || el.accessor === 'gypsum_dry'))
+                        (el.accessor === "sand_dry" ||
+                          el.accessor === "gypsum_dry"))
                     )
                       return null;
                     else {
@@ -242,13 +280,13 @@ function AddNewRecipeModal({ show, onHide }) {
                                 id={el.accessor}
                                 name={el.accessor}
                                 type="text"
-                                value={recipeInput[el.accessor] || ''}
+                                value={recipeInput[el.accessor] || ""}
                                 onChange={(e) => handleRecipeInfoInputChange(e)}
                               />
                             </div>
                             <div className="md:w-2/3">
                               {/* <h4>
-                                {((selectedProduct?.density * formVolume) / 100) *
+                                {((selectedProduct?.density * volume) / 100) *
                                   recipeInput[el.accessor] || 0}
                               </h4> */}
                             </div>
@@ -258,10 +296,28 @@ function AddNewRecipeModal({ show, onHide }) {
                     }
                   })}
                 </Row>
-                <h3>Solids: {solids !== null ? solids : 'Fill in all fields'}</h3>
-                <h3>Volume: {formVolume}</h3>
-                <h3>Density: {selectedProduct?.density}</h3>
-                <h3>Produced amount of return (dry): {producedReturnDry}</h3>
+                <h3>
+                  Solids: {solids !== null ? solids : "Fill in all fields"}
+                </h3>
+                <h3>
+                  Volume: {volume !== null ? volume : "Fill in all fields"}
+                </h3>
+                <h3>
+                  Density:{" "}
+                  {density_recipe !== null
+                    ? density_recipe
+                    : "Fill in all fields"}
+                </h3>
+                <h3>
+                  Produced amount of return (dry):{" "}
+                  {producedReturnDry !== null
+                    ? producedReturnDry
+                    : "Fill in all fields"}
+                </h3>
+                <h3>
+                  Water total:{" "}
+                  {water_total !== null ? water_total : "Fill in all fields"}
+                </h3>
               </form>
             </Container>
           ) : (
@@ -271,8 +327,8 @@ function AddNewRecipeModal({ show, onHide }) {
                 dataOfTable={productsDataList}
                 // userAccess={userAccess}
                 onClickButton={() => {}}
-                buttonText={''}
-                tableName={'Products from Spain'}
+                buttonText={""}
+                tableName={"Products from Spain"}
                 handleRowClick={(row) => {
                   handlerAddProductRecipe(row);
                 }}

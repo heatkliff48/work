@@ -27,7 +27,9 @@ module.exports = (sequelize, DataTypes) => {
       solids: DataTypes.FLOAT,
       volume: DataTypes.FLOAT,
       density: DataTypes.FLOAT,
+      density_recipe: DataTypes.FLOAT,
       produced_return_dry: DataTypes.FLOAT,
+      water_total: DataTypes.FLOAT,
     },
     {
       sequelize,
