@@ -47,6 +47,7 @@ import RelatedMaterialsBackorderList from '#components/Warehouse/RelatedMaterial
 import AutoclaveCalendare from '#components/ProductionBatchDesigner/AutoclaveCalendare.jsx';
 import ProductionBatchDesignerNew from '#components/ProductionBatchDesigner/ProductionBatchDesignerNew.jsx';
 import RawMaterialsConsumption from '#components/RawMaterialsConsumption/RawMaterialsConsumption.jsx';
+import TabsBar from './components/Main/TabsBar';
 
 function App() {
   const dispatch = useDispatch();
@@ -73,6 +74,7 @@ function App() {
       <div className="wrapper">
         <SnackbarProvider />
         <NavBar />
+        <TabsBar />
         <Routes>
           <Route path="/" element={<Main />} />
           <Route path="/accounting" element={<Accounting />} />
@@ -114,7 +116,10 @@ function App() {
           <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
           <Route path="/recipe_products" element={<ProductsListForRecipes />} />
           <Route path="/recipe_orders" element={<RecipeOrders />} />
-          <Route path="/raw_material_consumption" element={<RawMaterialsConsumption />} />
+          <Route
+            path="/raw_material_consumption"
+            element={<RawMaterialsConsumption />}
+          />
           <Route
             path="/related_materials_journal"
             element={<RelatedMaterialsJournal />}
