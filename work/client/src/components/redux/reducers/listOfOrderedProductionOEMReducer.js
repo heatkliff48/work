@@ -4,7 +4,6 @@ import {
 } from '../types/socketTypes/socket';
 import {
   LIST_OF_ORDERED_PRODUCTION_OEM,
-  NEW_ORDERED_PRODUCTION_OEM,
 } from '../types/warehouseTypes';
 
 export const listOfOrderedProductionOEMReducer = (
@@ -17,7 +16,6 @@ export const listOfOrderedProductionOEMReducer = (
       return payload;
     }
 
-    case NEW_ORDERED_PRODUCTION_OEM:
     case NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET: {
       return [...listOfOrderedProductionOEM, payload];
     }

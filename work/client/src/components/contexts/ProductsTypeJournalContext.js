@@ -1,9 +1,8 @@
 import { TextSearchFilter, DropdownFilter } from '#components/Table/filters.js';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useContext, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { FaCheck, FaTimes } from 'react-icons/fa';
-import { getNames, getData } from 'country-list';
+import { getData } from 'country-list';
 
 const ProductsTypeJournalContext = createContext();
 

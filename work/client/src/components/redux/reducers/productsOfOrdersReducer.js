@@ -1,15 +1,10 @@
 import {
   CURRENT_PRODUCTS_OF_ORDER,
-  UPDATE_PRODUCT_INFO_OF_ORDER,
   PRODUCTS_OF_ORDER,
   DRY_MIXED_PRODUCTS_OF_ORDER,
   TOOL_PRODUCTS_OF_ORDER,
   ANCHOR_PRODUCTS_OF_ORDER,
   REL_MAT_PRODUCTS_OF_ORDER,
-  UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER,
-  UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER,
-  UPDATE_TOOL_PRODUCT_INFO_OF_ORDER,
-  UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
 } from '../types/ordersTypes';
 import {
   DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
@@ -64,18 +59,6 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
       }
     }
 
-    case UPDATE_PRODUCT_INFO_OF_ORDER: {
-      const result = productsOfOrders.map((el) => {
-        if (el?.id === payload?.id) {
-          return { ...payload };
-        }
-
-        return el;
-      });
-
-      return result;
-    }
-
     case UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET: {
       const result = productsOfOrders.map((el) => {
         if (el?.id === payload?.id) {
@@ -114,18 +97,6 @@ export const dryMixedProductsOfOrdersReducer = (
 
       const result = dryMixedProductsOfOrders.map((el) => {
         if (el.id == productOfOrder.id) return productOfOrder;
-        return el;
-      });
-
-      return result;
-    }
-
-    case UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER: {
-      const result = dryMixedProductsOfOrders.map((el) => {
-        if (el?.id === payload?.id) {
-          return { ...payload };
-        }
-
         return el;
       });
 
@@ -176,18 +147,6 @@ export const anchorProductsOfOrdersReducer = (
       return result;
     }
 
-    case UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER: {
-      const result = anchorProductsOfOrders.map((el) => {
-        if (el?.id === payload?.id) {
-          return { ...payload };
-        }
-
-        return el;
-      });
-
-      return result;
-    }
-
     case UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET: {
       const result = anchorProductsOfOrders.map((el) => {
         if (el?.id === payload?.id) {
@@ -222,18 +181,6 @@ export const toolProductsOfOrdersReducer = (toolProductsOfOrders = [], action) =
 
       const result = toolProductsOfOrders.map((el) => {
         if (el.id == productOfOrder.id) return productOfOrder;
-        return el;
-      });
-
-      return result;
-    }
-
-    case UPDATE_TOOL_PRODUCT_INFO_OF_ORDER: {
-      const result = toolProductsOfOrders.map((el) => {
-        if (el?.id === payload?.id) {
-          return { ...payload };
-        }
-
         return el;
       });
 
@@ -277,18 +224,6 @@ export const relMatProductsOfOrdersReducer = (
 
       const result = relMatProductsOfOrders.map((el) => {
         if (el.id == productOfOrder.id) return productOfOrder;
-        return el;
-      });
-
-      return result;
-    }
-
-    case UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER: {
-      const result = relMatProductsOfOrders.map((el) => {
-        if (el?.id === payload?.id) {
-          return { ...payload };
-        }
-
         return el;
       });
 

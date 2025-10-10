@@ -6,9 +6,7 @@ import {
 import {
   AUTOCLAVE_CALENDAR,
   LIST_OF_ORDERED_PRODUCTION,
-  UPDATE_LIST_OF_ORDERED_PRODUCTION,
   NEW_AUTOCLAVE_CALENDAR,
-  NEW_ORDERED_PRODUCTION,
 } from '../types/warehouseTypes';
 
 export const listOfOrderedProductionReducer = (
@@ -21,13 +19,11 @@ export const listOfOrderedProductionReducer = (
       return payload;
     }
 
-    case NEW_ORDERED_PRODUCTION:
     case NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET:
       {
         return [...listOfOrderedProduction, payload];
       }
 
-    case UPDATE_LIST_OF_ORDERED_PRODUCTION:
     case UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET: {
       const { id, quantity_in_warehouse } = payload;
       const result = listOfOrderedProduction.map((el) => {

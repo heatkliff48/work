@@ -24,12 +24,10 @@ import {
   NEW_ANCHOR_RESERVED_PRODUCT,
   NEW_DRY_MIXED_RESERVED_PRODUCT,
   NEW_REL_MAT_RESERVED_PRODUCT,
-  NEW_RESERVED_PRODUCT,
   NEW_TOOL_RESERVED_PRODUCT,
   UPD_ANCHOR_RESERVED_PRODUCT,
   UPD_DRY_MIXED_RESERVED_PRODUCT,
   UPD_REL_MAT_PRODUCT,
-  UPD_RESERVED_PRODUCT,
   UPD_TOOL_RESERVED_PRODUCT,
 } from '../types/warehouseTypes';
 
@@ -40,16 +38,21 @@ export const reservedProductsReducer = (reservedProducts = [], action) => {
       return payload;
     }
 
-    case NEW_RESERVED_PRODUCT: {
-      return payload;
+    case UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
+      const { orders_products_id, warehouse_id, quantity } = payload;
+      const result = reservedProducts.map((el) => {
+        if (
+          el.warehouse_id == warehouse_id &&
+          el.orders_products_id == orders_products_id
+        ) {
+          return { ...el, quantity: quantity };
+        }
+        return el;
+      });
+      return result;
     }
 
     case NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
-      return payload;
-    }
-
-    case UPD_RESERVED_PRODUCT:
-    case UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
       if (Array.isArray(payload)) {
         return [...reservedProducts, ...payload];
       }
@@ -79,20 +82,25 @@ export const reservedDryMixedProductsReducer = (
       return payload;
     }
 
-    case NEW_DRY_MIXED_RESERVED_PRODUCT: {
-      return payload;
-    }
-
-    case UPD_DRY_MIXED_RESERVED_PRODUCT: {
-      return payload;
-    }
-
     case NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
-      return payload;
+      if (Array.isArray(payload)) {
+        return [...reservedDryMixedProducts, ...payload];
+      }
+      return [...reservedDryMixedProducts, payload];
     }
 
     case UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
-      return payload;
+      const { orders_products_id, warehouse_id, quantity } = payload;
+      const result = reservedDryMixedProducts.map((el) => {
+        if (
+          el.warehouse_id == warehouse_id &&
+          el.orders_products_id == orders_products_id
+        ) {
+          return { ...el, quantity: quantity };
+        }
+        return el;
+      });
+      return result;
     }
 
     case DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
@@ -118,20 +126,25 @@ export const reservedAnchorProductsReducer = (
       return payload;
     }
 
-    case NEW_ANCHOR_RESERVED_PRODUCT: {
-      return payload;
-    }
-
-    case UPD_ANCHOR_RESERVED_PRODUCT: {
-      return payload;
-    }
-
     case NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
-      return payload;
+      if (Array.isArray(payload)) {
+        return [...reservedAnchorProducts, ...payload];
+      }
+      return [...reservedAnchorProducts, payload];
     }
 
     case UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
-      return payload;
+      const { orders_products_id, warehouse_id, quantity } = payload;
+      const result = reservedAnchorProducts.map((el) => {
+        if (
+          el.warehouse_id == warehouse_id &&
+          el.orders_products_id == orders_products_id
+        ) {
+          return { ...el, quantity: quantity };
+        }
+        return el;
+      });
+      return result;
     }
 
     case DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
@@ -154,20 +167,25 @@ export const reservedToolProductsReducer = (reservedToolProducts = [], action) =
       return payload;
     }
 
-    case NEW_TOOL_RESERVED_PRODUCT: {
-      return payload;
-    }
-
-    case UPD_TOOL_RESERVED_PRODUCT: {
-      return payload;
-    }
-
     case NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
-      return payload;
+      if (Array.isArray(payload)) {
+        return [...reservedToolProducts, ...payload];
+      }
+      return [...reservedToolProducts, payload];
     }
 
     case UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
-      return payload;
+      const { orders_products_id, warehouse_id, quantity } = payload;
+      const result = reservedToolProducts.map((el) => {
+        if (
+          el.warehouse_id == warehouse_id &&
+          el.orders_products_id == orders_products_id
+        ) {
+          return { ...el, quantity: quantity };
+        }
+        return el;
+      });
+      return result;
     }
 
     case DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
@@ -193,20 +211,25 @@ export const reservedRelMatProductsReducer = (
       return payload;
     }
 
-    case NEW_REL_MAT_RESERVED_PRODUCT: {
-      return payload;
-    }
-
-    case UPD_REL_MAT_PRODUCT: {
-      return payload;
-    }
-
     case NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
-      return payload;
+      if (Array.isArray(payload)) {
+        return [...reservedRelMatProducts, ...payload];
+      }
+      return [...reservedRelMatProducts, payload];
     }
 
     case UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET: {
-      return payload;
+      const { orders_products_id, warehouse_id, quantity } = payload;
+      const result = reservedRelMatProducts.map((el) => {
+        if (
+          el.warehouse_id == warehouse_id &&
+          el.orders_products_id == orders_products_id
+        ) {
+          return { ...el, quantity: quantity };
+        }
+        return el;
+      });
+      return result;
     }
 
     case DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET: {

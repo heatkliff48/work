@@ -9,7 +9,7 @@ import './styles.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 
 function PasswordChangeModal(props) {
-  const { currentUsersInfo, setCurrentUsersInfo } = useProjectContext();
+  const { currentUsersInfo } = useProjectContext();
   const [usersMainInfoInput, setUsersMainInfoInput] = useState(currentUsersInfo);
   const [passwordInput, setPasswordInput] = useState('');
 

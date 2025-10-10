@@ -1,15 +1,12 @@
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from 'react-bootstrap/Button';
-import { useProjectContext } from '#components/contexts/Context.js';
 import { useEffect } from 'react';
 import {
   addNewOrder,
   addOrderRandomProducts,
   getCurrentProductsOfOrders,
-  getOrders,
 } from '#components/redux/actions/ordersAction.js';
-import { useNavigate } from 'react-router-dom';
 
 function RandomAhhOrder(props) {
   const {
@@ -24,13 +21,11 @@ function RandomAhhOrder(props) {
     randomOrderCheck,
     setRandomOrderCheck,
   } = useOrderContext();
-  const { setCurrentClient } = useProjectContext();
   const list_of_clients = useSelector((state) => state.clients);
   const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
   const contactInfo = useSelector((state) => state.contactInfo);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const makeRandomOrder = () => {
     const article = getOrderArticle();

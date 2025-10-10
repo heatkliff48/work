@@ -11,12 +11,12 @@ import {
   GET_RAW_MAT_CONSUMPTION,
   GET_RECIPE_ORDERS_DATA,
   NEED_DELETE_RECIPE,
-  NEW_RAW_MAT_CONSUMPTION,
   NEW_RECIPE,
   RAW_MAT_CONSUMPTION,
   RECIPE_ORDERS_DATA,
   SAVE_MATERIAL_PLAN,
 } from '../types/recipeTypes';
+import { NEW_RAW_MAT_CONSUMPTION_SOCKET } from '../types/socketTypes/socket';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -164,11 +164,9 @@ function* getRawMatConsumptionWorker(action) {
 
 function* addNewRawMatConsumptionWorker(action) {
   try {
-    const rawMatConsumption = yield call(addNewRawMatConsumption, action.payload);
-
-    yield put({ type: NEW_RAW_MAT_CONSUMPTION, payload: rawMatConsumption });
+    yield call(addNewRawMatConsumption, action.payload);
   } catch (err) {
-    yield put({ type: NEW_RAW_MAT_CONSUMPTION, payload: [] });
+    yield put({ type: NEW_RAW_MAT_CONSUMPTION_SOCKET, payload: [] });
   }
 }
 

@@ -1,19 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { Button, Table } from 'reactstrap';
-import { useDispatch, useSelector } from 'react-redux';
+import { Table } from 'reactstrap';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
-import {
-  deleteReservedProducts,
-  updateRemainingStock,
-} from '#components/redux/actions/warehouseAction.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import FilesMain from '#components/FileUpload/Warehouse/FilesMain.jsx';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 
 function ListOfReservedAuxilaryModal(props) {
   const {
@@ -21,25 +14,17 @@ function ListOfReservedAuxilaryModal(props) {
     related_materials_warehouse_data,
     anchors_warehouse_data,
     tools_warehouse_data,
-    list_of_reserved_products,
     related_materials_backorder_list,
-    filteredProducts,
-    setFilteredProducts,
   } = useWarehouseContext();
 
-  const { warehouseInfoCurIdModal, reserveProductModal, setReserveProductModal } =
-    useModalContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { warehouseInfoCurIdModal } = useModalContext();
+  const { roles, checkUserAccess, setUserAccess } = useUsersContext();
 
   const user = useSelector((state) => state.user);
-
-  const { productsOfOrders, list_of_orders } = useOrderContext();
-  const { latestProducts } = useProductsContext();
 
   const [currentListOfResProd, setCurrentListOfResProd] = useState();
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const curr_warehouse =
     props.target == 1

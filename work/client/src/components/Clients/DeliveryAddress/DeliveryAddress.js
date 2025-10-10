@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 import Table from '#components/Table/Table';
 

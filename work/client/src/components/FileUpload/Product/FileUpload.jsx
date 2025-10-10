@@ -7,7 +7,7 @@ import { useProjectContext } from '#components/contexts/Context.js';
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
-  const { setMessage, refreshFiles } = useContext(FileContext);
+  const { setMessage } = useContext(FileContext);
   const { productCardData } = useProjectContext();
 
   const dispatch = useDispatch();

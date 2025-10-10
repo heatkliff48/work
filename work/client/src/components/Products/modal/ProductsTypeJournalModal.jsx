@@ -5,8 +5,7 @@ import 'react-international-phone/style.css';
 import Select from 'react-select';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import './styles.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import ProductsTypeJournalInfoPreviewModal from './ProductsTypeJournalInfoPreviewModal';
@@ -21,8 +20,6 @@ function ProductsTypeJournalModal(props) {
     latestAnchors,
     latestTools,
     selectedProductsType,
-    setSelectedProductsType,
-    productsTypeJournalPreviewInput,
     setProductsTypeJournalPreviewIInput,
   } = useProductsTypeJournalContext();
 

@@ -1,5 +1,4 @@
 import {
-  NEW_RAW_MAT_CONSUMPTION,
   RAW_MAT_CONSUMPTION,
   RECIPE_ORDERS_DATA,
 } from '../types/recipeTypes';

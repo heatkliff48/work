@@ -119,11 +119,9 @@ class WarehouseService {
   }
 
   static async updReservedProducts({ reserved_product }) {
-    const new_reserved_product = await WarehouseRepository.updReservedProducts(
-      reserved_product
-    );
+    await WarehouseRepository.updReservedProducts(reserved_product);
 
-    return new_reserved_product;
+    return;
   }
 
   static async deleteReservedProducts({ reserved_products_id }) {
@@ -140,17 +138,15 @@ class WarehouseService {
   }
 
   static async addNewReservedDryMixedProducts({ reserved_product }) {
-    const new_reserved_product =
-      await WarehouseRepository.addNewReservedDryMixedProducts(reserved_product);
+    await WarehouseRepository.addNewReservedDryMixedProducts(reserved_product);
 
-    return new_reserved_product;
+    return;
   }
 
   static async updReservedDryMixedProducts({ reserved_product }) {
-    const new_reserved_product =
-      await WarehouseRepository.updReservedDryMixedProducts(reserved_product);
+    await WarehouseRepository.updReservedDryMixedProducts(reserved_product);
 
-    return new_reserved_product;
+    return;
   }
 
   static async deleteReservedDryMixedProducts({ reserved_products_id }) {
@@ -167,18 +163,15 @@ class WarehouseService {
   }
 
   static async addNewReservedAnchorProducts({ reserved_product }) {
-    const new_reserved_product =
-      await WarehouseRepository.addNewReservedAnchorProducts(reserved_product);
+    await WarehouseRepository.addNewReservedAnchorProducts(reserved_product);
 
-    return new_reserved_product;
+    return;
   }
 
   static async updReservedAnchorProducts({ reserved_product }) {
-    const new_reserved_product = await WarehouseRepository.updReservedAnchorProducts(
-      reserved_product
-    );
+    await WarehouseRepository.updReservedAnchorProducts(reserved_product);
 
-    return new_reserved_product;
+    return;
   }
 
   static async deleteReservedAnchorProducts({ reserved_products_id }) {
@@ -195,18 +188,15 @@ class WarehouseService {
   }
 
   static async addNewReservedToolProducts({ reserved_product }) {
-    const new_reserved_product =
-      await WarehouseRepository.addNewReservedToolProducts(reserved_product);
+    await WarehouseRepository.addNewReservedToolProducts(reserved_product);
 
-    return new_reserved_product;
+    return;
   }
 
   static async updReservedToolProducts({ reserved_product }) {
-    const new_reserved_product = await WarehouseRepository.updReservedToolProducts(
-      reserved_product
-    );
+    await WarehouseRepository.updReservedToolProducts(reserved_product);
 
-    return new_reserved_product;
+    return;
   }
 
   static async deleteReservedToolProducts({ reserved_products_id }) {
@@ -223,18 +213,15 @@ class WarehouseService {
   }
 
   static async addNewReservedRelMatProducts({ reserved_product }) {
-    const new_reserved_product =
-      await WarehouseRepository.addNewReservedRelMatProducts(reserved_product);
+    await WarehouseRepository.addNewReservedRelMatProducts(reserved_product);
 
-    return new_reserved_product;
+    return;
   }
 
   static async updReservedRelMatProducts({ reserved_product }) {
-    const new_reserved_product = await WarehouseRepository.updReservedRelMatProducts(
-      reserved_product
-    );
+    await WarehouseRepository.updReservedRelMatProducts(reserved_product);
 
-    return new_reserved_product;
+    return;
   }
 
   static async deleteReservedRelMatProducts({ reserved_products_id }) {

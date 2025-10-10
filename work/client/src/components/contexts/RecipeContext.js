@@ -1,105 +1,100 @@
-import { clearAccountingDataList } from "#components/redux/actions/ordersAction.js";
-import { addNewRawMatConsumption } from "#components/redux/actions/recipeAction.js";
-import { createContext, useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { createContext, useContext, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const RecipeContext = createContext();
 
 const RecipeContextProvider = ({ children }) => {
   const recipe_info = [
     {
-      Header: "Recipe ID",
-      accessor: "article",
+      Header: 'Recipe ID',
+      accessor: 'article',
     },
     {
-      Header: "Cake height",
-      accessor: "cake_height",
+      Header: 'Cake height',
+      accessor: 'cake_height',
     },
     {
-      Header: "Lime",
-      accessor: "lime",
+      Header: 'Lime',
+      accessor: 'lime',
     },
     {
-      Header: "Cement",
-      accessor: "cement",
+      Header: 'Cement',
+      accessor: 'cement',
     },
     {
-      Header: "Sand (dry)",
-      accessor: "sand_dry",
+      Header: 'Sand (dry)',
+      accessor: 'sand_dry',
     },
     {
-      Header: "Sand slurry (dry)",
-      accessor: "sand_slurry_dry",
+      Header: 'Sand slurry (dry)',
+      accessor: 'sand_slurry_dry',
     },
     {
-      Header: "Gypsum (dry)",
-      accessor: "gypsum_dry",
+      Header: 'Gypsum (dry)',
+      accessor: 'gypsum_dry',
     },
     {
-      Header: "Return (dry)",
-      accessor: "return_dry",
+      Header: 'Return (dry)',
+      accessor: 'return_dry',
     },
     {
-      Header: "Aluminium paste",
-      accessor: "aluminum_paste",
+      Header: 'Aluminium paste',
+      accessor: 'aluminum_paste',
     },
     {
-      Header: "Water solids",
-      accessor: "water_solids",
+      Header: 'Water solids',
+      accessor: 'water_solids',
     },
     {
-      Header: "Solids",
-      accessor: "solids",
+      Header: 'Solids',
+      accessor: 'solids',
     },
     {
-      Header: "Volume",
-      accessor: "volume",
+      Header: 'Volume',
+      accessor: 'volume',
     },
     {
-      Header: "Density",
-      accessor: "density_recipe",
+      Header: 'Density',
+      accessor: 'density_recipe',
     },
     {
-      Header: "Produced amount of return (dry)",
-      accessor: "produced_return_dry",
+      Header: 'Produced amount of return (dry)',
+      accessor: 'produced_return_dry',
     },
     {
-      Header: "Water total",
-      accessor: "water_total",
+      Header: 'Water total',
+      accessor: 'water_total',
     },
   ];
 
   const COLUMNS_RAW_MAT_CONSUMPTION = [
     {
-      Header: "ID",
-      accessor: "id",
+      Header: 'ID',
+      accessor: 'id',
     },
     {
-      Header: "Recipe",
-      accessor: "recipe_article",
+      Header: 'Recipe',
+      accessor: 'recipe_article',
     },
     {
-      Header: "Batch production",
-      accessor: "batch_article",
+      Header: 'Batch production',
+      accessor: 'batch_article',
     },
     {
-      Header: "Production volume",
-      accessor: "production_volume",
+      Header: 'Production volume',
+      accessor: 'production_volume',
     },
     {
-      Header: "Date",
-      accessor: "date",
+      Header: 'Date',
+      accessor: 'date',
     },
   ];
-
-  const dispatch = useDispatch();
 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productOfRecipe, setProductOfRecipe] = useState({});
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   const list_of_recipes = useSelector((state) => state.recipe);
-  const batchOutside = useSelector((state) => state.batchOutside);
   const recipeOrders = useSelector((state) => state.recipeOrders);
   const raw_mat_consumption = useSelector((state) => state.rawMatConsumption);
 
