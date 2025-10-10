@@ -102,7 +102,7 @@ function AddNewRecipeModal({ show, onHide }) {
       (parseFloat(recipeInput.sand_slurry_dry) || 0) +
       (parseFloat(recipeInput.return_dry) || 0) +
       (parseFloat(recipeInput.aluminum_paste) || 0)
-    );
+    ).toFixed(3);
   }, [recipeInput]);
 
   const volume = useMemo(() => {
@@ -110,7 +110,7 @@ function AddNewRecipeModal({ show, onHide }) {
       return null;
     }
 
-    return parseFloat(recipeInput.cake_height) * 6.262 * 1.58;
+    return (parseFloat(recipeInput.cake_height) * 6.262 * 1.58).toFixed(3);
   }, [recipeInput?.cake_height]);
 
   const density_recipe = useMemo(() => {
@@ -118,7 +118,7 @@ function AddNewRecipeModal({ show, onHide }) {
       return null;
     }
 
-    return (solids / volume) * 1.06;
+    return ((solids / volume) * 1.06).toFixed(3);
   }, [volume, solids]);
 
   const producedReturnDry = useMemo(() => {
@@ -126,7 +126,9 @@ function AddNewRecipeModal({ show, onHide }) {
       return null;
     }
 
-    return (volume - selectedProduct?.m3InArray) * (solids / volume);
+    return ((volume - selectedProduct?.m3InArray) * (solids / volume)).toFixed(
+      3
+    );
   }, [volume, solids]);
 
   const water_total = useMemo(() => {
@@ -134,7 +136,7 @@ function AddNewRecipeModal({ show, onHide }) {
       return null;
     }
 
-    return solids * parseFloat(recipeInput?.water_solids);
+    return (solids * parseFloat(recipeInput?.water_solids)).toFixed(3);
   }, [solids, recipeInput?.water_solids]);
 
   useEffect(() => {
@@ -218,7 +220,7 @@ function AddNewRecipeModal({ show, onHide }) {
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
-        dialogClassName="modal-products-table"
+        dialogClassName="modal-new-recipe"
         show={show}
         onHide={onHide}
         scrollable={true}
@@ -244,27 +246,26 @@ function AddNewRecipeModal({ show, onHide }) {
                   onSubmitForm(e);
                 }}
               >
-                <h3></h3>
                 <Row>
-                  {recipe_info.map((el) => {
-                    if (
-                      el.accessor === "id" ||
-                      el.accessor === "article" ||
-                      el.accessor === "solids" ||
-                      el.accessor === "volume" ||
-                      el.accessor === "density_recipe" ||
-                      el.accessor === "water_total" ||
-                      el.accessor === "produced_return_dry" ||
-                      (selectedProduct?.density <= 100 &&
-                        el.accessor === "sand_slurry_dry") ||
-                      (selectedProduct?.density > 100 &&
-                        (el.accessor === "sand_dry" ||
-                          el.accessor === "gypsum_dry"))
-                    )
-                      return null;
-                    else {
-                      return (
-                        <Col key={el.id}>
+                  <Col>
+                    {recipe_info.map((el) => {
+                      if (
+                        el.accessor === "id" ||
+                        el.accessor === "article" ||
+                        el.accessor === "solids" ||
+                        el.accessor === "volume" ||
+                        el.accessor === "density_recipe" ||
+                        el.accessor === "water_total" ||
+                        el.accessor === "produced_return_dry" ||
+                        (selectedProduct?.density <= 100 &&
+                          el.accessor === "sand_slurry_dry") ||
+                        (selectedProduct?.density > 100 &&
+                          (el.accessor === "sand_dry" ||
+                            el.accessor === "gypsum_dry"))
+                      )
+                        return null;
+                      else {
+                        return (
                           <div className="md:flex md:items-center mb-6">
                             <div className="md:w-1/3">
                               <label
@@ -291,33 +292,37 @@ function AddNewRecipeModal({ show, onHide }) {
                               </h4> */}
                             </div>
                           </div>
-                        </Col>
-                      );
-                    }
-                  })}
+                        );
+                      }
+                    })}
+                  </Col>
+                  <Col>
+                    <h3>
+                      Solids: {solids !== null ? solids : "Fill in all fields"}
+                    </h3>
+                    <h3>
+                      Volume: {volume !== null ? volume : "Fill in all fields"}
+                    </h3>
+                    <h3>
+                      Density:{" "}
+                      {density_recipe !== null
+                        ? density_recipe
+                        : "Fill in all fields"}
+                    </h3>
+                    <h3>
+                      Produced amount of return (dry):{" "}
+                      {producedReturnDry !== null
+                        ? producedReturnDry
+                        : "Fill in all fields"}
+                    </h3>
+                    <h3>
+                      Water total:{" "}
+                      {water_total !== null
+                        ? water_total
+                        : "Fill in all fields"}
+                    </h3>
+                  </Col>
                 </Row>
-                <h3>
-                  Solids: {solids !== null ? solids : "Fill in all fields"}
-                </h3>
-                <h3>
-                  Volume: {volume !== null ? volume : "Fill in all fields"}
-                </h3>
-                <h3>
-                  Density:{" "}
-                  {density_recipe !== null
-                    ? density_recipe
-                    : "Fill in all fields"}
-                </h3>
-                <h3>
-                  Produced amount of return (dry):{" "}
-                  {producedReturnDry !== null
-                    ? producedReturnDry
-                    : "Fill in all fields"}
-                </h3>
-                <h3>
-                  Water total:{" "}
-                  {water_total !== null ? water_total : "Fill in all fields"}
-                </h3>
               </form>
             </Container>
           ) : (
