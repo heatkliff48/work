@@ -126,9 +126,11 @@ function AddNewRecipeModal({ show, onHide }) {
       return null;
     }
 
-    return ((volume - selectedProduct?.m3InArray) * (solids / volume)).toFixed(
-      3
-    );
+    return selectedProduct?.width == 85
+      ? ((volume - 5.364) * (solids / volume)).toFixed(3)
+      : selectedProduct?.width == 75
+      ? ((volume - 5.31) * (solids / volume)).toFixed(3)
+      : ((volume - 5.4) * (solids / volume)).toFixed(3);
   }, [volume, solids]);
 
   const water_total = useMemo(() => {
