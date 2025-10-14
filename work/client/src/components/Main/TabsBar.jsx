@@ -1,56 +1,60 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import '#components/Styles/tabsbar.css';
+import React, { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useUsersContext } from "#components/contexts/UserContext.js";
+import "#components/Styles/tabsbar.css";
+import { useSelector } from "react-redux";
 
-const STORAGE_KEY = 'app_tabs_v1';
+const STORAGE_KEY = "app_tabs_v1";
 
 const PATH_LABELS = {
-  '/': 'Home',
-  '/users_info': 'Users Info',
-  '/roles': 'Roles',
-  '/warehouse_manager': 'Order dispatch',
-  '/products_type_journal': 'Products Type Journal',
-  '/statistics': 'Statistics',
-  '/orders': 'Orders',
-  '/accounting': 'Accounting',
-  '/clients': 'Clients',
-  '/warehouse_products_type': 'Warehouse',
-  '/production_batch_designer_new': 'Batch planner New',
-  '/autoclave_calendar': 'Autoclave Calendar',
-  '/list_of_ordered_production': 'Ordered pipeline',
-  '/list_of_ordered_production_oem': 'Ordered OEM pipeline',
-  '/related_materials_backorder_list': 'Related mat backorder',
-  '/batch_outside': 'Batch calendar',
-  '/recipe_products': 'Recipe products',
-  '/raw_materials_plan': 'Raw Materials Plan',
-  '/recipe_orders': 'Raw material calendar',
-  '/quality_management': 'Quality Management',
+  "/": "Home",
+  "/users_info": "Users Info",
+  "/roles": "Roles",
+  "/warehouse_manager": "Order dispatch",
+  "/products_type_journal": "Products Type Journal",
+  "/statistics": "Statistics",
+  "/orders": "Orders",
+  "/accounting": "Accounting",
+  "/clients": "Clients",
+  "/warehouse_products_type": "Warehouse",
+  "/production_batch_designer_new": "Batch planner New",
+  "/autoclave_calendar": "Autoclave Calendar",
+  "/list_of_ordered_production": "Ordered pipeline",
+  "/list_of_ordered_production_oem": "Ordered OEM pipeline",
+  "/related_materials_backorder_list": "Related mat backorder",
+  "/batch_outside": "Batch calendar",
+  "/recipe_products": "Recipe products",
+  "/raw_materials_plan": "Raw Materials Plan",
+  "/recipe_orders": "Raw material calendar",
+  "/quality_management": "Quality Management",
 };
 
 function normalizeLabel(path) {
-  if (!path) return 'untitled';
+  if (!path) return "untitled";
   if (PATH_LABELS[path]) return PATH_LABELS[path];
 
   const bestPrefix = Object.keys(PATH_LABELS)
-    .filter((k) => k !== '/' && path.startsWith(k))
+    .filter((k) => k !== "/" && path.startsWith(k))
     .sort((a, b) => b.length - a.length)[0];
   if (bestPrefix) return PATH_LABELS[bestPrefix];
 
-  const seg = (path.split('/').filter(Boolean).pop() || 'Home')
-    .replace(/[_-]+/g, ' ')
+  const seg = (path.split("/").filter(Boolean).pop() || "Home")
+    .replace(/[_-]+/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
-  return seg || 'untitled';
+  return seg || "untitled";
 }
 
 function genId() {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
-  return 't_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+  if (typeof crypto !== "undefined" && crypto.randomUUID)
+    return crypto.randomUUID();
+  return "t_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
 export default function TabsBar() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const user = useSelector((state) => state.user);
 
   let roles = null;
   let checkUserAccess = () => ({ canRead: true });
@@ -83,8 +87,8 @@ export default function TabsBar() {
     return [
       {
         id: genId(),
-        path: location.pathname || '/',
-        title: normalizeLabel(location.pathname || '/'),
+        path: location.pathname || "/",
+        title: normalizeLabel(location.pathname || "/"),
       },
     ];
   };
@@ -176,7 +180,7 @@ export default function TabsBar() {
           if (neighbor.path && neighbor.path !== location.pathname)
             navigate(neighbor.path);
         } else {
-          const home = { id: genId(), path: '/', title: normalizeLabel('/') };
+          const home = { id: genId(), path: "/", title: normalizeLabel("/") };
           setActiveId(home.id);
           navigate(home.path);
           return [home];
@@ -184,7 +188,7 @@ export default function TabsBar() {
       }
       return next.length
         ? next
-        : [{ id: genId(), path: '/', title: normalizeLabel('/') }];
+        : [{ id: genId(), path: "/", title: normalizeLabel("/") }];
     });
   };
 
@@ -227,35 +231,36 @@ export default function TabsBar() {
   }, [roles, checkUserAccess]);
 
   return (
-    <div className="tabsbar-container">
-      <div className="tabsbar-left">
-        <button
-          className="tabsbar-add-current"
-          title="Duplicate current tab"
-          onClick={duplicateCurrent}
-        >
-          + Add current
-        </button>
-      </div>
-
-      <div className="tabsbar-scroll">
-        {tabs.map((t) => (
-          <div
-            key={t.id}
-            className={`tab-item ${activeId === t.id ? 'active' : ''}`}
-            onClick={() => activateTab(t.id)}
-            title={t.title}
+    user && (
+      <div className="tabsbar-container">
+        <div className="tabsbar-left">
+          <button
+            className="tabsbar-add-current"
+            title="Duplicate current tab"
+            onClick={duplicateCurrent}
           >
-            <span className="tab-title">{t.title}</span>
-            <button className="tab-close" onClick={(e) => closeTab(t.id, e)}>
-              ×
-            </button>
-          </div>
-        ))}
-      </div>
+            + Add current
+          </button>
+        </div>
 
-      {/* Если нужен "быстрый переход", он тоже теперь обновляет текущую вкладку */}
-      {/* <div className="tabsbar-right">
+        <div className="tabsbar-scroll">
+          {tabs.map((t) => (
+            <div
+              key={t.id}
+              className={`tab-item ${activeId === t.id ? "active" : ""}`}
+              onClick={() => activateTab(t.id)}
+              title={t.title}
+            >
+              <span className="tab-title">{t.title}</span>
+              <button className="tab-close" onClick={(e) => closeTab(t.id, e)}>
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Если нужен "быстрый переход", он тоже теперь обновляет текущую вкладку */}
+        {/* <div className="tabsbar-right">
         <div className="dropdown-quick">
           <label className="quick-label">Quick:</label>
           <select
@@ -283,6 +288,7 @@ export default function TabsBar() {
           </select>
         </div>
       </div> */}
-    </div>
+      </div>
+    )
   );
 }
