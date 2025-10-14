@@ -6,6 +6,7 @@ import '#components/Styles/tabsbar.css';
 const STORAGE_KEY = 'app_tabs_v1';
 
 const PATH_LABELS = {
+  '/': 'Home',
   '/users_info': 'Users Info',
   '/roles': 'Roles',
   '/warehouse_manager': 'Order dispatch',
@@ -28,14 +29,29 @@ const PATH_LABELS = {
 };
 
 function normalizeLabel(path) {
-  return PATH_LABELS[path] || path || 'untitled';
+  if (!path) return 'untitled';
+  if (PATH_LABELS[path]) return PATH_LABELS[path];
+
+  const bestPrefix = Object.keys(PATH_LABELS)
+    .filter((k) => k !== '/' && path.startsWith(k))
+    .sort((a, b) => b.length - a.length)[0];
+  if (bestPrefix) return PATH_LABELS[bestPrefix];
+
+  const seg = (path.split('/').filter(Boolean).pop() || 'Home')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return seg || 'untitled';
+}
+
+function genId() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return 't_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
 export default function TabsBar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // контекст (без условного вызова хуков)
   let roles = null;
   let checkUserAccess = () => ({ canRead: true });
   try {
@@ -44,75 +60,158 @@ export default function TabsBar() {
       roles = usersCtx.roles ?? null;
       checkUserAccess = usersCtx.checkUserAccess ?? (() => ({ canRead: true }));
     }
-  } catch (err) {
+  } catch (_) {
     roles = null;
     checkUserAccess = () => ({ canRead: true });
   }
 
-  const initial = () => {
+  const initialTabs = () => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const migrated = Array.isArray(parsed)
+          ? parsed.map((t) => ({
+              id: t.id || genId(),
+              path: t.path,
+              title: t.title || normalizeLabel(t.path),
+            }))
+          : [];
+        if (migrated.length) return migrated;
+      }
     } catch {}
-    return [{ path: '/', title: 'Home' }];
+    return [
+      {
+        id: genId(),
+        path: location.pathname || '/',
+        title: normalizeLabel(location.pathname || '/'),
+      },
+    ];
   };
 
-  const [tabs, setTabs] = useState(initial);
-  const [active, setActive] = useState(location.pathname);
+  const [tabs, setTabs] = useState(initialTabs);
 
-  // при смене location обновляем активную вкладку
-  useEffect(() => {
-    setActive(location.pathname);
-  }, [location.pathname]);
+  const findTabByPath = (path) => tabs.find((t) => t.path === path);
+  const initialActiveId = (() => {
+    const match = findTabByPath(location.pathname);
+    return match ? match.id : tabs[0]?.id;
+  })();
 
-  // сохраняем tabs в localStorage
+  const [activeId, setActiveId] = useState(initialActiveId);
+
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tabs));
+    const hasMatch = tabs.some((t) => t.path === location.pathname);
+    if (!hasMatch && tabs.length) {
+      setTabs((prev) =>
+        prev.map((t, idx) =>
+          t.id === activeId || (!activeId && idx === 0)
+            ? {
+                ...t,
+                path: location.pathname,
+                title: normalizeLabel(location.pathname),
+              }
+            : t
+        )
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tabs));
+    } catch {}
   }, [tabs]);
 
-  // --- ВАЖНО: авто-добавление текущего пути в tabs
   useEffect(() => {
-    // не добавляем пустой root если он уже есть
-    const path = location.pathname;
-    if (!path) return;
-
-    // Если у тебя динамические роуты (/orders/123), и хочешь группировать их по /orders,
-    // можно нормализовать path: const key = path.split('/').slice(0,2).join('/') || path;
-    const key = path;
-
     setTabs((prev) => {
-      if (prev.find((t) => t.path === key)) return prev;
-      return [...prev, { path: key, title: normalizeLabel(key) }];
-    });
-    // не навигируем здесь — просто добавляем запись в панель
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]); // выполняем при каждом изменении маршрута
+      if (!prev.length) {
+        const newTab = {
+          id: genId(),
+          path: location.pathname,
+          title: normalizeLabel(location.pathname),
+        };
+        setActiveId(newTab.id);
+        return [newTab];
+      }
+      const current = prev.find((t) => t.id === activeId) || prev[0];
+      if (!current) return prev;
+      if (
+        current.path === location.pathname &&
+        current.title === normalizeLabel(location.pathname)
+      )
+        return prev;
 
-  const addTab = (path, title) => {
-    if (!path) return;
-    setTabs((prev) => {
-      if (prev.find((t) => t.path === path)) return prev;
-      return [...prev, { path, title: title || normalizeLabel(path) }];
+      return prev.map((t) =>
+        t.id === current.id
+          ? {
+              ...t,
+              path: location.pathname,
+              title: normalizeLabel(location.pathname),
+            }
+          : t
+      );
     });
-    navigate(path);
+  }, [location.pathname]);
+
+  const activateTab = (id) => {
+    const t = tabs.find((x) => x.id === id);
+    if (!t) return;
+    setActiveId(id);
+    if (t.path && t.path !== location.pathname) {
+      navigate(t.path);
+    }
   };
 
-  const closeTab = (pathToClose, e) => {
+  const closeTab = (idToClose, e) => {
     e?.stopPropagation();
     setTabs((prev) => {
-      const idx = prev.findIndex((t) => t.path === pathToClose);
+      const idx = prev.findIndex((t) => t.id === idToClose);
       if (idx === -1) return prev;
       const next = [...prev.slice(0, idx), ...prev.slice(idx + 1)];
-      if (active === pathToClose) {
-        const newActive =
-          (next[idx - 1] && next[idx - 1].path) || (next[0] && next[0].path) || '/';
-        navigate(newActive);
+
+      if (activeId === idToClose) {
+        const neighbor = next[idx - 1] || next[idx] || null;
+        if (neighbor) {
+          setActiveId(neighbor.id);
+          if (neighbor.path && neighbor.path !== location.pathname)
+            navigate(neighbor.path);
+        } else {
+          const home = { id: genId(), path: '/', title: normalizeLabel('/') };
+          setActiveId(home.id);
+          navigate(home.path);
+          return [home];
+        }
       }
-      return next.length ? next : [{ path: '/', title: 'Home' }];
+      return next.length
+        ? next
+        : [{ id: genId(), path: '/', title: normalizeLabel('/') }];
     });
   };
 
-  const activateTab = (path) => navigate(path);
+  const duplicateCurrent = () => {
+    if (!tabs.length) {
+      const t = {
+        id: genId(),
+        path: location.pathname,
+        title: normalizeLabel(location.pathname),
+      };
+      setTabs([t]);
+      setActiveId(t.id);
+      return;
+    }
+    const current = tabs.find((t) => t.id === activeId) || tabs[0];
+    const clone = {
+      id: genId(),
+      path: current.path,
+      title: normalizeLabel(current.path),
+    };
+    setTabs((prev) => {
+      const idx = prev.findIndex((t) => t.id === current.id);
+      const next = [...prev.slice(0, idx + 1), clone, ...prev.slice(idx + 1)];
+      return next;
+    });
+    setActiveId(clone.id);
+  };
 
   const quickEntries = useMemo(() => {
     const items = Object.keys(PATH_LABELS).map((p) => ({
@@ -132,13 +231,8 @@ export default function TabsBar() {
       <div className="tabsbar-left">
         <button
           className="tabsbar-add-current"
-          title="Add current page to tabs"
-          onClick={() =>
-            addTab(
-              location.pathname,
-              document.title || normalizeLabel(location.pathname)
-            )
-          }
+          title="Duplicate current tab"
+          onClick={duplicateCurrent}
         >
           + Add current
         </button>
@@ -147,33 +241,39 @@ export default function TabsBar() {
       <div className="tabsbar-scroll">
         {tabs.map((t) => (
           <div
-            key={t.path}
-            className={`tab-item ${active === t.path ? 'active' : ''}`}
-            onClick={() => activateTab(t.path)}
+            key={t.id}
+            className={`tab-item ${activeId === t.id ? 'active' : ''}`}
+            onClick={() => activateTab(t.id)}
             title={t.title}
           >
             <span className="tab-title">{t.title}</span>
-            <button className="tab-close" onClick={(e) => closeTab(t.path, e)}>
+            <button className="tab-close" onClick={(e) => closeTab(t.id, e)}>
               ×
             </button>
           </div>
         ))}
       </div>
 
-      <div className="tabsbar-right">
+      {/* Если нужен "быстрый переход", он тоже теперь обновляет текущую вкладку */}
+      {/* <div className="tabsbar-right">
         <div className="dropdown-quick">
           <label className="quick-label">Quick:</label>
           <select
             onChange={(e) => {
               const p = e.target.value;
               if (!p) return;
-              addTab(p, normalizeLabel(p));
+              setTabs((prev) =>
+                prev.map((tab) =>
+                  tab.id === activeId ? { ...tab, path: p, title: normalizeLabel(p) } : tab
+                )
+              );
+              navigate(p);
               e.target.selectedIndex = 0;
             }}
             defaultValue=""
           >
             <option value="" disabled>
-              Add...
+              Go to...
             </option>
             {quickEntries.map((it) => (
               <option key={it.path} value={it.path}>
@@ -182,7 +282,7 @@ export default function TabsBar() {
             ))}
           </select>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
