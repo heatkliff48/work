@@ -46,8 +46,8 @@
 }
 
 .tab-item.active {
-  background: #e9f0ff;
-  border-color: #a8c0ff;
+  background: #f5f5f5;
+  border-color: #828080;
 }
 
 .tab-title {
