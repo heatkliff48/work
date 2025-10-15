@@ -1,25 +1,22 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_ORDERED_PRODUCTION,
   ADD_NEW_RESERVED_PRODUCT,
   ADD_NEW_WAREHOUSE,
   ALL_WAREHOUSE,
   LIST_OF_ORDERED_PRODUCTION,
-  DELETE_PRODUCT_FROM_RESERVED_LIST,
   GET_ALL_WAREHOUSE,
   GET_LIST_OF_ORDERED_PRODUCTION,
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST,
   GET_LIST_OF_RESERVED_PRODUCTS,
   LIST_OF_RESERVED_PRODUCTS,
-  NEW_ORDERED_PRODUCTION,
-  NEW_RESERVED_PRODUCT,
   NEW_WAREHOUSE,
   REMAINING_STOCK,
   UPDATE_REMAINING_STOCK,
   LIST_OF_ORDERED_PRODUCTION_OEM,
-  NEW_ORDERED_PRODUCTION_OEM,
   GET_LIST_OF_ORDERED_PRODUCTION_OEM,
   ADD_NEW_ORDERED_PRODUCTION_OEM,
   UPDATE_ORDERED_PRODUCTION_OEM,
@@ -29,21 +26,9 @@ import {
   WAREHOSE_QUANTITYS,
   UPDATE_WAREHOSE_QUANTITYS,
   LIST_OF_DRY_MIXED_RESERVED_PRODUCTS,
-  NEW_DRY_MIXED_RESERVED_PRODUCT,
-  UPD_DRY_MIXED_RESERVED_PRODUCT,
-  DELETE_PRODUCT_FROM_DRY_MIXED_RESERVED_LIST,
   LIST_OF_ANCHOR_RESERVED_PRODUCTS,
-  NEW_ANCHOR_RESERVED_PRODUCT,
-  UPD_ANCHOR_RESERVED_PRODUCT,
-  DELETE_PRODUCT_FROM_ANCHOR_RESERVED_LIST,
   LIST_OF_TOOL_RESERVED_PRODUCTS,
-  NEW_TOOL_RESERVED_PRODUCT,
-  UPD_TOOL_RESERVED_PRODUCT,
-  DELETE_PRODUCT_FROM_TOOL_RESERVED_LIST,
   LIST_OF_REL_MAT_PRODUCTS,
-  NEW_REL_MAT_RESERVED_PRODUCT,
-  UPD_REL_MAT_PRODUCT,
-  DELETE_PRODUCT_FROM_REL_MAT_LIST,
   GET_LIST_OF_DRY_MIXED_RESERVED_PRODUCTS,
   ADD_NEW_DRY_MIXED_RESERVED_PRODUCT,
   UPDATE_DRY_MIXED_RESERVED_PRODUCT,
@@ -60,10 +45,6 @@ import {
   ADD_NEW_REL_MAT_RESERVED_PRODUCT,
   UPDATE_REL_MAT_PRODUCT,
   GET_DELETE_PRODUCT_FROM_REL_MAT_LIST,
-  DRY_MIXED_WAREHOSE_QUANTITYS,
-  ANCHOR_WAREHOSE_QUANTITYS,
-  TOOL_WAREHOSE_QUANTITYS,
-  REL_MAT_WAREHOSE_QUANTITYS,
   UPDATE_DRY_MIXED_WAREHOSE_QUANTITYS,
   UPDATE_ANCHOR_WAREHOSE_QUANTITYS,
   UPDATE_TOOL_WAREHOSE_QUANTITYS,
@@ -72,12 +53,35 @@ import {
   ADD_NEW_AUTOCLAVE_CALENDAR,
   AUTOCLAVE_CALENDAR,
   NEW_AUTOCLAVE_CALENDAR,
-  UPDATE_LIST_OF_ORDERED_PRODUCTION,
   RAW_MATERIALS_WAREHOUSE,
   UPDATE_RAW_MATERIALS_WAREHOUSE,
   GET_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
 } from '../types/warehouseTypes';
+import {
+  ANCHOR_QUANTITYS_SOCKET,
+  DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DRY_MIXES_QUANTITYS_SOCKET,
+  NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+  NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+  NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  REL_MAT_QUANTITYS_SOCKET,
+  TOOL_QUANTITYS_SOCKET,
+  UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
+  UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET,
+  UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+} from '../types/socketTypes/socket';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -90,7 +94,10 @@ const getAllWarehouse = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouse = (new_warehouse) => {
@@ -99,7 +106,10 @@ const addNewWarehouse = (new_warehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRemStock = (upd_rem_srock) => {
@@ -108,7 +118,10 @@ const updateRemStock = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWhQuantitys = (upd_rem_srock) => {
@@ -117,7 +130,10 @@ const updateWhQuantitys = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateDryMixedWhQuantitys = (upd_rem_srock) => {
@@ -126,7 +142,10 @@ const updateDryMixedWhQuantitys = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateAnchorWhQuantitys = (upd_rem_srock) => {
@@ -135,7 +154,10 @@ const updateAnchorWhQuantitys = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateToolWhQuantitys = (upd_rem_srock) => {
@@ -144,7 +166,10 @@ const updateToolWhQuantitys = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRelMatWhQuantitys = (upd_rem_srock) => {
@@ -153,7 +178,10 @@ const updateRelMatWhQuantitys = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfReservedProducts = () => {
@@ -162,7 +190,10 @@ const getListOfReservedProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewReservedProduct = (reserved_product) => {
@@ -171,7 +202,10 @@ const addNewReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updReservedProduct = (reserved_product) => {
@@ -180,7 +214,10 @@ const updReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteReservedProduct = (id) => {
@@ -189,7 +226,10 @@ const deleteReservedProduct = (id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfDryMixedReservedProducts = () => {
@@ -198,7 +238,10 @@ const getListOfDryMixedReservedProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewDryMixedReservedProduct = (reserved_product) => {
@@ -207,7 +250,10 @@ const addNewDryMixedReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updDryMixedReservedProduct = (reserved_product) => {
@@ -216,7 +262,10 @@ const updDryMixedReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteDryMixedReservedProduct = (id) => {
@@ -225,7 +274,10 @@ const deleteDryMixedReservedProduct = (id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfAnchorReservedProducts = () => {
@@ -234,7 +286,10 @@ const getListOfAnchorReservedProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewAnchorReservedProduct = (reserved_product) => {
@@ -243,7 +298,10 @@ const addNewAnchorReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updAnchorReservedProduct = (reserved_product) => {
@@ -252,7 +310,10 @@ const updAnchorReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteAnchorReservedProduct = (id) => {
@@ -261,7 +322,10 @@ const deleteAnchorReservedProduct = (id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfToolReservedProducts = () => {
@@ -270,7 +334,10 @@ const getListOfToolReservedProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewToolReservedProduct = (reserved_product) => {
@@ -279,7 +346,10 @@ const addNewToolReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updToolReservedProduct = (reserved_product) => {
@@ -288,7 +358,10 @@ const updToolReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteToolReservedProduct = (id) => {
@@ -297,7 +370,10 @@ const deleteToolReservedProduct = (id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfRelMatReservedProducts = () => {
@@ -306,7 +382,10 @@ const getListOfRelMatReservedProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewRelMatReservedProduct = (reserved_product) => {
@@ -315,7 +394,10 @@ const addNewRelMatReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updRelMatReservedProduct = (reserved_product) => {
@@ -324,7 +406,10 @@ const updRelMatReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteRelMatReservedProduct = (id) => {
@@ -333,7 +418,10 @@ const deleteRelMatReservedProduct = (id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getAutoclaveCalendar = () => {
@@ -342,7 +430,10 @@ const getAutoclaveCalendar = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewAutoclaveCalendar = (autoclave_calendar_data) => {
@@ -351,7 +442,10 @@ const addNewAutoclaveCalendar = (autoclave_calendar_data) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfOrderedProduction = () => {
@@ -360,7 +454,10 @@ const getListOfOrderedProduction = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewListOfOrderedProduction = (ordered_production) => {
@@ -369,7 +466,10 @@ const addNewListOfOrderedProduction = (ordered_production) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updListOfOrderedProduction = (ordered_production) => {
@@ -378,7 +478,10 @@ const updListOfOrderedProduction = (ordered_production) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfOrderedProductionOEM = () => {
@@ -387,7 +490,10 @@ const getListOfOrderedProductionOEM = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewListOfOrderedProductionOEM = (ordered_production_oem) => {
@@ -396,7 +502,10 @@ const addNewListOfOrderedProductionOEM = (ordered_production_oem) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updListOfOrderedProductionOEM = (ordered_production_oem) => {
@@ -405,7 +514,10 @@ const updListOfOrderedProductionOEM = (ordered_production_oem) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getRawMaterialsWarehouse = () => {
@@ -414,7 +526,10 @@ const getRawMaterialsWarehouse = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
@@ -423,7 +538,10 @@ const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getAllWarehouseWatcher() {
@@ -467,44 +585,36 @@ function* updateWhQuantitysWatcher(action) {
 function* updateDryMixedWhQuantitysWatcher(action) {
   try {
     const { payload } = action;
-    const updWarehouse = yield call(updateDryMixedWhQuantitys, payload);
-
-    yield put({ type: DRY_MIXED_WAREHOSE_QUANTITYS, payload: updWarehouse });
+    yield call(updateDryMixedWhQuantitys, payload);
   } catch (err) {
-    yield put({ type: DRY_MIXED_WAREHOSE_QUANTITYS, payload: [] });
+    yield put({ type: DRY_MIXES_QUANTITYS_SOCKET, payload: [] });
   }
 }
 
 function* updateAnchorWhQuantitysWatcher(action) {
   try {
     const { payload } = action;
-    const updWarehouse = yield call(updateAnchorWhQuantitys, payload);
-
-    yield put({ type: ANCHOR_WAREHOSE_QUANTITYS, payload: updWarehouse });
+    yield call(updateAnchorWhQuantitys, payload);
   } catch (err) {
-    yield put({ type: ANCHOR_WAREHOSE_QUANTITYS, payload: [] });
+    yield put({ type: ANCHOR_QUANTITYS_SOCKET, payload: [] });
   }
 }
 
 function* updateToolWhQuantitysWatcher(action) {
   try {
     const { payload } = action;
-    const updWarehouse = yield call(updateToolWhQuantitys, payload);
-
-    yield put({ type: TOOL_WAREHOSE_QUANTITYS, payload: updWarehouse });
+    yield call(updateToolWhQuantitys, payload);
   } catch (err) {
-    yield put({ type: TOOL_WAREHOSE_QUANTITYS, payload: [] });
+    yield put({ type: TOOL_QUANTITYS_SOCKET, payload: [] });
   }
 }
 
 function* updateRelMatWhQuantitysWatcher(action) {
   try {
     const { payload } = action;
-    const updWarehouse = yield call(updateRelMatWhQuantitys, payload);
-
-    yield put({ type: REL_MAT_WAREHOSE_QUANTITYS, payload: updWarehouse });
+    yield call(updateRelMatWhQuantitys, payload);
   } catch (err) {
-    yield put({ type: REL_MAT_WAREHOSE_QUANTITYS, payload: [] });
+    yield put({ type: REL_MAT_QUANTITYS_SOCKET, payload: [] });
   }
 }
 
@@ -520,19 +630,15 @@ function* getListOfReservedProductsWatcher() {
 
 function* addNewReservedProductWatcher(action) {
   try {
-    const new_reserved_product = yield call(addNewReservedProduct, action.payload);
-
-    yield put({ type: NEW_RESERVED_PRODUCT, payload: new_reserved_product });
+    yield call(addNewReservedProduct, action.payload);
   } catch (err) {
-    yield put({ type: NEW_RESERVED_PRODUCT, payload: [] });
+    yield put({ type: NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET, payload: [] });
   }
 }
 
 function* updReservedProductWatcher(action) {
   try {
-    const { new_reserved_product } = yield call(updReservedProduct, action.payload);
-
-    yield put({ type: UPD_RESERVED_PRODUCT, payload: new_reserved_product });
+    yield call(updReservedProduct, action.payload);
   } catch (err) {
     yield put({ type: UPD_RESERVED_PRODUCT, payload: [] });
   }
@@ -543,7 +649,7 @@ function* deleteReservedProductWatcher(action) {
     const { payload } = action;
     yield call(deleteReservedProduct, payload);
   } catch (err) {
-    yield put({ type: DELETE_PRODUCT_FROM_RESERVED_LIST, payload: [] });
+    yield put({ type: DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET, payload: [] });
   }
 }
 
@@ -564,33 +670,23 @@ function* getListOfDryMixedReservedProductsWatcher() {
 
 function* addNewDryMixedReservedProductWatcher(action) {
   try {
-    const { new_reserved_product } = yield call(
-      addNewDryMixedReservedProduct,
-      action.payload
-    );
-
-    yield put({
-      type: NEW_DRY_MIXED_RESERVED_PRODUCT,
-      payload: new_reserved_product,
-    });
+    yield call(addNewDryMixedReservedProduct, action.payload);
   } catch (err) {
-    yield put({ type: NEW_DRY_MIXED_RESERVED_PRODUCT, payload: [] });
+    yield put({
+      type: NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+      payload: [],
+    });
   }
 }
 
 function* updDryMixedReservedProductWatcher(action) {
   try {
-    const { new_reserved_product } = yield call(
-      updDryMixedReservedProduct,
-      action.payload
-    );
-
-    yield put({
-      type: UPD_DRY_MIXED_RESERVED_PRODUCT,
-      payload: new_reserved_product,
-    });
+    yield call(updDryMixedReservedProduct, action.payload);
   } catch (err) {
-    yield put({ type: UPD_DRY_MIXED_RESERVED_PRODUCT, payload: [] });
+    yield put({
+      type: UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+      payload: [],
+    });
   }
 }
 
@@ -599,7 +695,10 @@ function* deleteDryMixedReservedProductWatcher(action) {
     const { payload } = action;
     yield call(deleteDryMixedReservedProduct, payload);
   } catch (err) {
-    yield put({ type: DELETE_PRODUCT_FROM_DRY_MIXED_RESERVED_LIST, payload: [] });
+    yield put({
+      type: DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+      payload: [],
+    });
   }
 }
 
@@ -618,27 +717,20 @@ function* getListOfAnchorReservedProductsWatcher() {
 
 function* addNewAnchorReservedProductWatcher(action) {
   try {
-    const { new_reserved_product } = yield call(
-      addNewAnchorReservedProduct,
-      action.payload
-    );
-
-    yield put({ type: NEW_ANCHOR_RESERVED_PRODUCT, payload: new_reserved_product });
+    yield call(addNewAnchorReservedProduct, action.payload);
   } catch (err) {
-    yield put({ type: NEW_ANCHOR_RESERVED_PRODUCT, payload: [] });
+    yield put({ type: NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET, payload: [] });
   }
 }
 
 function* updAnchorReservedProductWatcher(action) {
   try {
-    const { new_reserved_product } = yield call(
-      updAnchorReservedProduct,
-      action.payload
-    );
-
-    yield put({ type: UPD_ANCHOR_RESERVED_PRODUCT, payload: new_reserved_product });
+    yield call(updAnchorReservedProduct, action.payload);
   } catch (err) {
-    yield put({ type: UPD_ANCHOR_RESERVED_PRODUCT, payload: [] });
+    yield put({
+      type: UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+      payload: [],
+    });
   }
 }
 
@@ -647,7 +739,10 @@ function* deleteAnchorReservedProductWatcher(action) {
     const { payload } = action;
     yield call(deleteAnchorReservedProduct, payload);
   } catch (err) {
-    yield put({ type: DELETE_PRODUCT_FROM_ANCHOR_RESERVED_LIST, payload: [] });
+    yield put({
+      type: DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+      payload: [],
+    });
   }
 }
 
@@ -666,27 +761,17 @@ function* getListOfToolReservedProductsWatcher() {
 
 function* addNewToolReservedProductWatcher(action) {
   try {
-    const { new_reserved_product } = yield call(
-      addNewToolReservedProduct,
-      action.payload
-    );
-
-    yield put({ type: NEW_TOOL_RESERVED_PRODUCT, payload: new_reserved_product });
+    yield call(addNewToolReservedProduct, action.payload);
   } catch (err) {
-    yield put({ type: NEW_TOOL_RESERVED_PRODUCT, payload: [] });
+    yield put({ type: NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET, payload: [] });
   }
 }
 
 function* updToolReservedProductWatcher(action) {
   try {
-    const { new_reserved_product } = yield call(
-      updToolReservedProduct,
-      action.payload
-    );
-
-    yield put({ type: UPD_TOOL_RESERVED_PRODUCT, payload: new_reserved_product });
+    yield call(updToolReservedProduct, action.payload);
   } catch (err) {
-    yield put({ type: UPD_TOOL_RESERVED_PRODUCT, payload: [] });
+    yield put({ type: UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET, payload: [] });
   }
 }
 
@@ -695,7 +780,7 @@ function* deleteToolReservedProductWatcher(action) {
     const { payload } = action;
     yield call(deleteToolReservedProduct, payload);
   } catch (err) {
-    yield put({ type: DELETE_PRODUCT_FROM_TOOL_RESERVED_LIST, payload: [] });
+    yield put({ type: DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET, payload: [] });
   }
 }
 
@@ -711,27 +796,20 @@ function* getListOfRelMatReservedProductsWatcher() {
 
 function* addNewRelMatReservedProductWatcher(action) {
   try {
-    const { new_reserved_product } = yield call(
-      addNewRelMatReservedProduct,
-      action.payload
-    );
-
-    yield put({ type: NEW_REL_MAT_RESERVED_PRODUCT, payload: new_reserved_product });
+    yield call(addNewRelMatReservedProduct, action.payload);
   } catch (err) {
-    yield put({ type: NEW_REL_MAT_RESERVED_PRODUCT, payload: [] });
+    yield put({ type: NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET, payload: [] });
   }
 }
 
 function* updRelMatReservedProductWatcher(action) {
   try {
-    const { new_reserved_product } = yield call(
-      updRelMatReservedProduct,
-      action.payload
-    );
-
-    yield put({ type: UPD_REL_MAT_PRODUCT, payload: new_reserved_product });
+    yield call(updRelMatReservedProduct, action.payload);
   } catch (err) {
-    yield put({ type: UPD_REL_MAT_PRODUCT, payload: [] });
+    yield put({
+      type: UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+      payload: [],
+    });
   }
 }
 
@@ -740,7 +818,10 @@ function* deleteRelMatReservedProductWatcher(action) {
     const { payload } = action;
     yield call(deleteRelMatReservedProduct, payload);
   } catch (err) {
-    yield put({ type: DELETE_PRODUCT_FROM_REL_MAT_LIST, payload: [] });
+    yield put({
+      type: DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+      payload: [],
+    });
   }
 }
 
@@ -782,27 +863,17 @@ function* getListOfOrderedProductionWatcher() {
 
 function* addNewListOfOrderedProductionWatcher(action) {
   try {
-    const new_ordered_production = yield call(
-      addNewListOfOrderedProduction,
-      action.payload
-    );
-
-    yield put({ type: NEW_ORDERED_PRODUCTION, payload: new_ordered_production });
+    yield call(addNewListOfOrderedProduction, action.payload);
   } catch (err) {
-    yield put({ type: NEW_ORDERED_PRODUCTION, payload: [] });
+    yield put({ type: NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET, payload: [] });
   }
 }
 
 function* updListOfOrderedProductionWorker(action) {
   try {
     yield call(updListOfOrderedProduction, action.payload);
-
-    yield put({
-      type: UPDATE_LIST_OF_ORDERED_PRODUCTION,
-      payload: action.payload,
-    });
   } catch (err) {
-    yield put({ type: UPDATE_LIST_OF_ORDERED_PRODUCTION, payload: [] });
+    yield put({ type: UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET, payload: [] });
   }
 }
 
@@ -821,33 +892,17 @@ function* getListOfOrderedProductionOEMWatcher() {
 
 function* addNewListOfOrderedProductionOEMWatcher(action) {
   try {
-    const new_ordered_production_OEM = yield call(
-      addNewListOfOrderedProductionOEM,
-      action.payload
-    );
-
-    yield put({
-      type: NEW_ORDERED_PRODUCTION_OEM,
-      payload: new_ordered_production_OEM,
-    });
+    yield call(addNewListOfOrderedProductionOEM, action.payload);
   } catch (err) {
-    yield put({ type: NEW_ORDERED_PRODUCTION_OEM, payload: [] });
+    yield put({ type: NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET, payload: [] });
   }
 }
 
 function* updListOfOrderedProductionOEMWorker(action) {
   try {
-    const upd_ordered_production_oem = yield call(
-      updListOfOrderedProductionOEM,
-      action.payload
-    );
-
-    yield put({
-      type: NEW_ORDERED_PRODUCTION_OEM,
-      payload: upd_ordered_production_oem,
-    });
+    yield call(updListOfOrderedProductionOEM, action.payload);
   } catch (err) {
-    yield put({ type: NEW_ORDERED_PRODUCTION_OEM, payload: [] });
+    yield put({ type: UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET, payload: [] });
   }
 }
 

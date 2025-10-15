@@ -373,11 +373,8 @@ class WarehouseRepository {
         { quantity },
         { where: { warehouse_id, orders_products_id } }
       );
-      const new_reserved_product = await ReservedProducts.findAll({
-        attributes: ['id', 'warehouse_id', 'orders_products_id', 'quantity'],
-      });
 
-      return new_reserved_product;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -417,7 +414,7 @@ class WarehouseRepository {
       for (let i = 0; i < reserved_product.length; i++) {
         await ReservedDryMixes.create(reserved_product[i]);
       }
-      const new_reserved_product = await ReservedDryMixes.findAll();
+
       await OrderDryMixedProducts.update(
         {
           warehouse_id: reserved_product.warehouse_id,
@@ -425,7 +422,7 @@ class WarehouseRepository {
         { where: { id: reserved_product.orders_products_id } }
       );
 
-      return new_reserved_product;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -440,9 +437,8 @@ class WarehouseRepository {
         { quantity },
         { where: { warehouse_id, orders_products_id } }
       );
-      const new_reserved_product = await ReservedDryMixes.findAll();
 
-      return new_reserved_product;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -480,7 +476,7 @@ class WarehouseRepository {
       for (let i = 0; i < reserved_product.length; i++) {
         await ReservedAnchors.create(reserved_product[i]);
       }
-      const new_reserved_product = await ReservedAnchors.findAll();
+
       await OrderAnchorProducts.update(
         {
           warehouse_id: reserved_product.warehouse_id,
@@ -488,7 +484,7 @@ class WarehouseRepository {
         { where: { id: reserved_product.orders_products_id } }
       );
 
-      return new_reserved_product;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -503,9 +499,8 @@ class WarehouseRepository {
         { quantity },
         { where: { warehouse_id, orders_products_id } }
       );
-      const new_reserved_product = await ReservedAnchors.findAll();
 
-      return new_reserved_product;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -543,7 +538,7 @@ class WarehouseRepository {
       for (let i = 0; i < reserved_product.length; i++) {
         await ReservedTools.create(reserved_product[i]);
       }
-      const new_reserved_product = await ReservedTools.findAll();
+
       await OrderToolProducts.update(
         {
           warehouse_id: reserved_product.warehouse_id,
@@ -551,7 +546,7 @@ class WarehouseRepository {
         { where: { id: reserved_product.orders_products_id } }
       );
 
-      return new_reserved_product;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -566,9 +561,8 @@ class WarehouseRepository {
         { quantity },
         { where: { warehouse_id, orders_products_id } }
       );
-      const new_reserved_product = await ReservedTools.findAll();
 
-      return new_reserved_product;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -606,7 +600,7 @@ class WarehouseRepository {
       for (let i = 0; i < reserved_product.length; i++) {
         await ReservedRelatedMaterials.create(reserved_product[i]);
       }
-      const new_reserved_product = await ReservedRelatedMaterials.findAll();
+
       await OrderRelMatProducts.update(
         {
           warehouse_id: reserved_product.warehouse_id,
@@ -614,7 +608,7 @@ class WarehouseRepository {
         { where: { id: reserved_product.orders_products_id } }
       );
 
-      return new_reserved_product;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
@@ -629,9 +623,8 @@ class WarehouseRepository {
         { quantity },
         { where: { warehouse_id, orders_products_id } }
       );
-      const new_reserved_product = await ReservedRelatedMaterials.findAll();
 
-      return new_reserved_product;
+      return;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;

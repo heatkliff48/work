@@ -1,6 +1,7 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ALL_ROLES,
   GET_ALL_ROLES,
@@ -21,7 +22,10 @@ const getRoles = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRole = ({ updRole }) => {
@@ -30,7 +34,10 @@ const updateRole = ({ updRole }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRoleActive = ({ updActiveRole }) => {
@@ -39,7 +46,10 @@ const updateRoleActive = ({ updActiveRole }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getAllRolesWatcher() {

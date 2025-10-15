@@ -1,5 +1,5 @@
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -18,19 +18,19 @@ function MainOffcanvas() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const CustomDropdownToggle = React.forwardRef(({ children, onClick }, ref) => (
-    <Button
-      ref={ref}
-      className="custom-menu-button d-flex justify-content-between align-items-center"
-      onClick={(e) => {
-        e.preventDefault();
-        onClick(e);
-      }}
-    >
-      {children}
-      <span className="ms-2">▼</span> {/* Добавляем стрелку вручную */}
-    </Button>
-  ));
+  // const CustomDropdownToggle = React.forwardRef(({ children, onClick }, ref) => (
+  //   <Button
+  //     ref={ref}
+  //     className="custom-menu-button d-flex justify-content-between align-items-center"
+  //     onClick={(e) => {
+  //       e.preventDefault();
+  //       onClick(e);
+  //     }}
+  //   >
+  //     {children}
+  //     <span className="ms-2">▼</span> {/* Добавляем стрелку вручную */}
+  //   </Button>
+  // ));
 
   return (
     <>

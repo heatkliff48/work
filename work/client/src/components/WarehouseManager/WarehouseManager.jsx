@@ -7,8 +7,6 @@ import { useEffect, useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import WMOrderCard from './WMOrderCard/WMOrderCard';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useDispatch } from 'react-redux';
-import { getAldabaran } from '#components/redux/actions/aldabaranAction.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 
@@ -37,9 +35,6 @@ function WarehouseManager() {
   } = useOrderContext();
 
   const { setWmoctPdfModal } = useModalContext();
-
-  const dispatch = useDispatch();
-  // const navigate = useNavigate();
 
   const [warehouseMdata, setWarehouseMdata] = useState([]);
 

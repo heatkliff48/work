@@ -1,7 +1,13 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
-import { ADD_NEW_ALDABARAN, ALL_ALDABARAN, GET_ALL_ALDABARAN, NEW_ALDABARAN } from '../types/aldabaranTypes';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
+import {
+  ADD_NEW_ALDABARAN,
+  ALL_ALDABARAN,
+  GET_ALL_ALDABARAN,
+} from '../types/aldabaranTypes';
+import { NEW_ALDABARAN_SOCKET } from '../types/socketTypes/socket';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -14,7 +20,10 @@ const getAldabaran = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addAldabaran = (data) => {
@@ -23,7 +32,10 @@ const addAldabaran = (data) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getAllAldabaranWatcher() {
@@ -40,9 +52,8 @@ function* addAldabaranWatcher(action) {
   try {
     const { payload } = action;
     yield call(addAldabaran, payload);
-
   } catch (err) {
-    yield put({ type: NEW_ALDABARAN, payload: [] });
+    yield put({ type: NEW_ALDABARAN_SOCKET, payload: [] });
   }
 }
 

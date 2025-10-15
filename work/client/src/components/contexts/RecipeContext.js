@@ -67,6 +67,10 @@ const RecipeContextProvider = ({ children }) => {
       Header: "Water total",
       accessor: "water_total",
     },
+    {
+      Header: 'Water total',
+      accessor: 'water_total',
+    },
   ];
 
   const COLUMNS_RAW_MAT_CONSUMPTION = [
@@ -92,14 +96,23 @@ const RecipeContextProvider = ({ children }) => {
     },
   ];
 
-  const dispatch = useDispatch();
+  // const COLUMNS_RAW_MAT_CONSUMPTION_MODAL = [
+  //   { Header: 'Sand', accessor: 'Sand' },
+  //   { Header: 'Lime', accessor: 'Lime' },
+  //   { Header: 'Cement', accessor: 'Cement' },
+  //   { Header: 'Gypsum', accessor: 'Gypsum' },
+  //   { Header: 'Gypsum ston', accessor: 'Gypsum ston' },
+  //   { Header: 'Aluminum', accessor: 'Aluminum' },
+  //   { Header: 'Aluminum', accessor: 'Aluminum' },
+  //   { Header: 'Grinding Ball', accessor: 'Grinding Ball' },
+  //   { Header: 'AAC', accessor: 'AAC' },
+  // ];
 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productOfRecipe, setProductOfRecipe] = useState({});
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   const list_of_recipes = useSelector((state) => state.recipe);
-  const batchOutside = useSelector((state) => state.batchOutside);
   const recipeOrders = useSelector((state) => state.recipeOrders);
   const raw_mat_consumption = useSelector((state) => state.rawMatConsumption);
 

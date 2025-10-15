@@ -1,6 +1,7 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_PRODUCT,
   ALL_PRODUCTS,
@@ -23,7 +24,10 @@ const getAllProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateProducts = (product) => {
@@ -32,7 +36,10 @@ const updateProducts = (product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const repairProduct = (repProduct) => {
@@ -41,7 +48,10 @@ const repairProduct = (repProduct) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewProduct = (product) => {
@@ -50,7 +60,10 @@ const addNewProduct = (product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getAllProductsWatcher() {

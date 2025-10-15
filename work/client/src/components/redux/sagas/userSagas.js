@@ -9,7 +9,8 @@ import {
   CHECK_USER,
 } from '../types/userTypes';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 // import { deleteToken, setToken } from '../actions/jwtAction';
 
 // let accessTokenFront;
@@ -42,7 +43,10 @@ const addUser = (user) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const loginUser = (user) => {
@@ -51,7 +55,10 @@ const loginUser = (user) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const checkUser = () => {
@@ -60,11 +67,17 @@ const checkUser = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const delUser = () => {
-  return url.post('/auth/logout').catch(showErrorMessage);
+  return url.post('/auth/logout').catch((err) => {
+    showMessage(errorToText(err), 'error');
+    throw err;
+  });
 };
 
 function* addUserWatcher(action) {
@@ -72,10 +85,7 @@ function* addUserWatcher(action) {
 
   try {
     // const { user, accessToken, accessTokenExpiration } = yield call(
-    const { user } = yield call(
-      addUser,
-      action.payload
-    );
+    const { user } = yield call(addUser, action.payload);
 
     window.localStorage.setItem('user', JSON.stringify(user));
     // window.localStorage.setItem('jwt', accessToken);
@@ -91,10 +101,7 @@ function* loginUserWatcher(action) {
     // accessTokenFront = yield select((state) => state.jwt);
 
     // const { user, accessToken, accessTokenExpiration } = yield call(
-    const { user } = yield call(
-      loginUser,
-      action.payload
-    );
+    const { user } = yield call(loginUser, action.payload);
 
     window.localStorage.setItem('user', JSON.stringify(user));
     // window.localStorage.setItem('jwt', accessToken);

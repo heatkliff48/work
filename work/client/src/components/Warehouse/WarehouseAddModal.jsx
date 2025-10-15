@@ -116,7 +116,7 @@ const WarehouseAddModal = React.memo(
     };
 
     const addProductOrder = async () => {
-      const { article, product_article, total_quantity } = warehouseData;
+      const { product_article, total_quantity } = warehouseData;
 
       const free_quantity_remaining = total_quantity;
       const ordered_quantity = 0;
@@ -222,7 +222,7 @@ const WarehouseAddModal = React.memo(
                     el.accessor === 'free_quantity_remaining' ||
                     el.accessor === 'ordered_quantity'
                   )
-                    return;
+                    return null;
                   if (el.accessor === 'warehouse_loc')
                     return (
                       <>

@@ -32,7 +32,7 @@ import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
 import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
 import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
 import DatePicker from 'react-datepicker';
-import { batch, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Button } from 'reactstrap';
@@ -72,10 +72,7 @@ const OrderCart = React.memo(() => {
     anchorProductsOfOrders,
     toolProductsOfOrders,
     relMatProductsOfOrders,
-    randomOrderCheck,
     deliveryAddresses,
-    randomFillComplete,
-    setRandomFillComplete,
   } = useOrderContext();
 
   const {
@@ -84,7 +81,6 @@ const OrderCart = React.memo(() => {
     warehouseInfoModal,
     setWarehouseInfoModal,
     setWarehouseInfoCurIdModal,
-    setProductModalOrder,
   } = useModalContext();
   const { displayNames, user } = useProjectContext();
 
@@ -987,36 +983,36 @@ const OrderCart = React.memo(() => {
     }
   }, [list_of_orders, orderCartData?.id]);
 
-  const randomDateChange = async () => {
-    const today = new Date();
-    const randomDays = Math.floor(Math.random() * 365) + 1; // от 1 до 365 дней вперед
-    const randomDate = new Date(today);
-    randomDate.setDate(today.getDate() + randomDays);
+  // const randomDateChange = async () => {
+  //   const today = new Date();
+  //   const randomDays = Math.floor(Math.random() * 365) + 1; // от 1 до 365 дней вперед
+  //   const randomDate = new Date(today);
+  //   randomDate.setDate(today.getDate() + randomDays);
 
-    const formattedDate = randomDate
-      .toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      })
-      .replace(/\//g, '.');
+  //   const formattedDate = randomDate
+  //     .toLocaleDateString('ru-RU', {
+  //       day: '2-digit',
+  //       month: '2-digit',
+  //       year: 'numeric',
+  //     })
+  //     .replace(/\//g, '.');
 
-    handleDateChange(randomDate);
+  //   handleDateChange(randomDate);
 
-    await dispatch(
-      addDataShipOrder({
-        order_id: orderCartData?.id,
-        shipping_date: formattedDate,
-      })
-    );
+  //   await dispatch(
+  //     addDataShipOrder({
+  //       order_id: orderCartData?.id,
+  //       shipping_date: formattedDate,
+  //     })
+  //   );
 
-    await dispatch(
-      updateOrderStatus({
-        order_id: orderCartData?.id,
-        status: 6,
-      })
-    );
-  };
+  //   await dispatch(
+  //     updateOrderStatus({
+  //       order_id: orderCartData?.id,
+  //       status: 6,
+  //     })
+  //   );
+  // };
 
   // useEffect(() => {
   //   if (!randomOrderCheck) return;

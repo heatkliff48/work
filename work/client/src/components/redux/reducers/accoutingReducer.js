@@ -1,3 +1,4 @@
+import showMessage from '#components/Utils/showMessage.js';
 import {
   ADD_ACCOUTING_DATA_LIST,
   DELETE_ACCOUTING_DATA_LIST,
@@ -19,6 +20,12 @@ export const accountingReducer = (accountingDataList = [], action) => {
       const { orders_article, aproved } = payload;
       return accountingDataList.map((el) => {
         if (el.orders_article === orders_article) {
+          showMessage(
+            `Accounting data for order ${orders_article} has been ${
+              aproved ? 'approved' : 'unapproved'
+            }`,
+            aproved ? 'success' : 'info'
+          );
           return { ...el, aproved };
         }
         return el;

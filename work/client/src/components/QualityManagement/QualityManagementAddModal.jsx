@@ -241,7 +241,7 @@ function QualityManagementAddModal(props) {
   const onSubmitForm = async (e) => {
     e.preventDefault();
 
-    const { batch_id, product_article, total_quantity_plan, reserved_quantity } =
+    const { batch_id, product_article, total_quantity_plan } =
       customBatchSelectInput;
 
     dispatch(

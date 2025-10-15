@@ -3,9 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Table from '../Table/Table';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import ShowProductsTypeWarehouseModal from './Modal/ProductsTypeWarehouseModal';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import ListOfReservedAuxilaryModal from './ListOfReservedProducts/ListOfReservedAuxilaryModal';
 import { getRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
 import RawMaterialsWarehouseInfo from './RawMaterialsWarehouseInfo';
 import {
@@ -24,7 +21,6 @@ function Warehouse() {
   const { COLUMNS_RAW_MATERIALS_WAREHOUSE, raw_materials_warehouse } =
     useWarehouseContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-  const { setWarehouseInfoCurIdModal } = useModalContext();
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();

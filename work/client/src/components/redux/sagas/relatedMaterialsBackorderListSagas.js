@@ -1,4 +1,5 @@
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
 import {
@@ -21,7 +22,10 @@ const getRelatedMaterialsBackorder = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewRelatedMaterialsBackorder = (relatedMaterialsBackorderList) => {
@@ -30,7 +34,10 @@ const addNewRelatedMaterialsBackorder = (relatedMaterialsBackorderList) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRelatedMaterialsBackorder = (relatedMaterialsBackorderList) => {
@@ -39,7 +46,10 @@ const updateRelatedMaterialsBackorder = (relatedMaterialsBackorderList) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getRelatedMaterialsBackorderListWorker() {

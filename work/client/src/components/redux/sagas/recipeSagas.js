@@ -1,6 +1,7 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_RAW_MAT_CONSUMPTION,
   ADD_NEW_RECIPE,
@@ -11,12 +12,12 @@ import {
   GET_RAW_MAT_CONSUMPTION,
   GET_RECIPE_ORDERS_DATA,
   NEED_DELETE_RECIPE,
-  NEW_RAW_MAT_CONSUMPTION,
   NEW_RECIPE,
   RAW_MAT_CONSUMPTION,
   RECIPE_ORDERS_DATA,
   SAVE_MATERIAL_PLAN,
 } from '../types/recipeTypes';
+import { NEW_RAW_MAT_CONSUMPTION_SOCKET } from '../types/socketTypes/socket';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -29,7 +30,10 @@ const getRecipe = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewRecipe = (recipe) => {
@@ -38,7 +42,10 @@ const addNewRecipe = (recipe) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteRecipe = (recipe_id) => {
@@ -47,7 +54,10 @@ const deleteRecipe = (recipe_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getRecipeOrdersData = () => {
@@ -56,7 +66,10 @@ const getRecipeOrdersData = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const saveMaterialPlan = (material_plan) => {
@@ -65,7 +78,10 @@ const saveMaterialPlan = (material_plan) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteMaterialPlan = (material_plan_id) => {
@@ -74,7 +90,10 @@ const deleteMaterialPlan = (material_plan_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getRawMatConsumption = () => {
@@ -83,7 +102,10 @@ const getRawMatConsumption = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewRawMatConsumption = (rawMatConsumption) => {
@@ -92,7 +114,10 @@ const addNewRawMatConsumption = (rawMatConsumption) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getRecipeWorker(action) {
@@ -164,11 +189,9 @@ function* getRawMatConsumptionWorker(action) {
 
 function* addNewRawMatConsumptionWorker(action) {
   try {
-    const rawMatConsumption = yield call(addNewRawMatConsumption, action.payload);
-
-    yield put({ type: NEW_RAW_MAT_CONSUMPTION, payload: rawMatConsumption });
+    yield call(addNewRawMatConsumption, action.payload);
   } catch (err) {
-    yield put({ type: NEW_RAW_MAT_CONSUMPTION, payload: [] });
+    yield put({ type: NEW_RAW_MAT_CONSUMPTION_SOCKET, payload: [] });
   }
 }
 

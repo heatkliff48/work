@@ -1,6 +1,7 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_FILES_ORDER,
   DELETE_FILES_ORDER,
@@ -21,7 +22,10 @@ const getFilesOrder = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewFilesOrder = (filesOrder) => {
@@ -30,7 +34,10 @@ const addNewFilesOrder = (filesOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteFilesOrder = (order_id) => {
@@ -39,7 +46,10 @@ const deleteFilesOrder = (order_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getFilesOrderWorker(action) {

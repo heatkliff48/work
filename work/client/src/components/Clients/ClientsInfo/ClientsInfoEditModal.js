@@ -18,14 +18,10 @@ import { useProjectContext } from '#components/contexts/Context.js';
 function ClientsEditModal(props) {
   const {
     currentClient,
-    setCurrentClient,
-    clients_info_table,
-    clients_legal_address_table,
   } = useProjectContext();
   const legalAddress = useSelector((state) => state.legalAddress);
 
   const [clientInput, setClientInput] = useState(currentClient);
-  const [clientLegalAddressInput, setClientLegalAddressInput] = useState({});
   const [c_name, setName] = useState(currentClient?.c_name);
   const [cifvat, setCIFVAT] = useState(currentClient?.cif_vat);
   const [category, setCategory] = useState(currentClient?.category);

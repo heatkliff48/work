@@ -1,10 +1,5 @@
 import {
-  DELETE_ORDER,
   ORDERS_LIST,
-  NEW_CONTACT_OF_ORDER,
-  NEW_DELIVERY_OF_ORDER,
-  STATUS_OF_ORDER,
-  NEW_ORDER,
 } from '../types/ordersTypes';
 import {
   DATASHIP_ORDER_SOCKET,
@@ -27,8 +22,7 @@ export const ordersReducer = (orders = [], action) => {
       return payload;
     }
 
-    case NEW_ORDER_SOCKET:
-    case NEW_ORDER: {
+    case NEW_ORDER_SOCKET: {
       if (orders.find((order) => order.id === payload.id)) return orders;
 
       return [...orders, payload];
@@ -97,13 +91,11 @@ export const ordersReducer = (orders = [], action) => {
       return result;
     }
 
-    case DELETE_ORDER:
     case DELETE_ORDER_SOCKET: {
       const result = orders.filter((el) => el.id !== payload);
       return result;
     }
 
-    case NEW_CONTACT_OF_ORDER:
     case UPDATE_CONTACT_OF_ORDER_SOCKET: {
       const { contact_id, order_id } = payload;
       return orders.map((order) => {
@@ -112,7 +104,6 @@ export const ordersReducer = (orders = [], action) => {
       });
     }
 
-    case NEW_DELIVERY_OF_ORDER:
     case UPDATE_ADRESS_OF_ORDER_SOCKET: {
       const { address_id, order_id } = payload;
       return orders.map((order) => {
@@ -121,8 +112,7 @@ export const ordersReducer = (orders = [], action) => {
       });
     }
 
-    case STATUS_OF_ORDER_SOCKET:
-    case STATUS_OF_ORDER: {
+    case STATUS_OF_ORDER_SOCKET: {
       const { status, order_id } = payload;
       return orders.map((order) => {
         if (order.id === order_id) return { ...order, status };

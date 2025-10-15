@@ -24,6 +24,8 @@ export const ModalContextProvider = ({ children }) => {
   const [anchorProductModalOrder, setAnchorProductModalOrder] = useState(false);
   const [warehouseInfoCurIdModal, setWarehouseInfoCurIdModal] = useState(null);
   const [dryMixedProductModalOrder, setDryMixedProductModalOrder] = useState(false);
+  const [rawMaterialConsumptionMadal, setRawMaterialConsumptionMadal] =
+    useState(false);
   const [relatedMaterialProductModalOrder, setRelatedMaterialProductModalOrder] =
     useState(false);
 
@@ -74,6 +76,8 @@ export const ModalContextProvider = ({ children }) => {
         setWmoctPdfAddDataModal,
         relatedMaterialProductModalOrder,
         setRelatedMaterialProductModalOrder,
+        rawMaterialConsumptionMadal,
+        setRawMaterialConsumptionMadal,
       }}
     >
       {children}

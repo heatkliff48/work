@@ -1,4 +1,5 @@
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_BATCH_OUTSIDE,
   DELETE_BATCH_OUTSIDE,
@@ -23,7 +24,10 @@ const getBatchOutside = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewBatchOutside = (batchOutside) => {
@@ -32,7 +36,10 @@ const addNewBatchOutside = (batchOutside) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteBatchOutside = (batch_id) => {
@@ -41,7 +48,10 @@ const deleteBatchOutside = (batch_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateBatchOutside = (batchOutside) => {
@@ -50,7 +60,10 @@ const updateBatchOutside = (batchOutside) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getBatchOutsideWorker(action) {

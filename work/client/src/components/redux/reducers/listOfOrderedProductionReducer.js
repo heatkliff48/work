@@ -1,3 +1,4 @@
+import showMessage from '#components/Utils/showMessage.js';
 import {
   NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
   UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
@@ -6,9 +7,7 @@ import {
 import {
   AUTOCLAVE_CALENDAR,
   LIST_OF_ORDERED_PRODUCTION,
-  UPDATE_LIST_OF_ORDERED_PRODUCTION,
   NEW_AUTOCLAVE_CALENDAR,
-  NEW_ORDERED_PRODUCTION,
 } from '../types/warehouseTypes';
 
 export const listOfOrderedProductionReducer = (
@@ -21,13 +20,10 @@ export const listOfOrderedProductionReducer = (
       return payload;
     }
 
-    case NEW_ORDERED_PRODUCTION:
-    case NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET:
-      {
-        return [...listOfOrderedProduction, payload];
-      }
+    case NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET: {
+      return [...listOfOrderedProduction, payload];
+    }
 
-    case UPDATE_LIST_OF_ORDERED_PRODUCTION:
     case UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET: {
       const { id, quantity_in_warehouse } = payload;
       const result = listOfOrderedProduction.map((el) => {
@@ -56,10 +52,12 @@ export const autoclaveCalendarReducer = (autoclave_calendar = [], action) => {
     }
 
     case NEW_AUTOCLAVE_CALENDAR: {
+      showMessage('New autoclave calendar data added', 'success');
       return value;
     }
 
     case UPDATE_AUTOCLAVE_CALENDAR_SOCKET: {
+      showMessage('Autoclave calendar data updated', 'success');
       return value;
     }
 

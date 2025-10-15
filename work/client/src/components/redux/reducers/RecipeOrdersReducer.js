@@ -1,8 +1,5 @@
-import {
-  NEW_RAW_MAT_CONSUMPTION,
-  RAW_MAT_CONSUMPTION,
-  RECIPE_ORDERS_DATA,
-} from '../types/recipeTypes';
+import showMessage from '#components/Utils/showMessage.js';
+import { RAW_MAT_CONSUMPTION, RECIPE_ORDERS_DATA } from '../types/recipeTypes';
 import {
   NEES_DELETE_MATERIAL_PLAN_SOCKET,
   NEW_MATERIAL_PLAN_SOCKET,
@@ -18,6 +15,7 @@ export const recipeOrdersReducer = (recipeOrders = [], action) => {
     }
 
     case NEW_MATERIAL_PLAN_SOCKET: {
+      showMessage('New material plan has been added', 'success');
       return payload ?? recipeOrders;
     }
 
