@@ -1,69 +1,76 @@
-'use strict';
+"use strict";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert(
-      'RawMaterialsWarehouses',
+      "RawMaterialsWarehouses",
       [
         {
-          material_type: 'Sand',
+          material_type: "Sand",
           remaining_quantity: 0,
           last_updated: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          material_type: 'Lime',
+          material_type: "Lime",
           remaining_quantity: 0,
           last_updated: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          material_type: 'Cement',
+          material_type: "Cement",
           remaining_quantity: 0,
           last_updated: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          material_type: 'Gypsum',
+          material_type: "Gypsum",
           remaining_quantity: 0,
           last_updated: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          material_type: 'Gypsum stone',
+          material_type: "Gypsum stone",
           remaining_quantity: 0,
           last_updated: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          material_type: 'Aluminum 1',
+          material_type: "Aluminum 1",
           remaining_quantity: 0,
           last_updated: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          material_type: 'Aluminum 2',
+          material_type: "Aluminum 2",
           remaining_quantity: 0,
           last_updated: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          material_type: 'Grinding Balls',
+          material_type: "Grinding Balls",
           remaining_quantity: 0,
           last_updated: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          material_type: 'AAC',
+          material_type: "AAC",
+          remaining_quantity: 0,
+          last_updated: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          material_type: "Sand slurry (dry)",
           remaining_quantity: 0,
           last_updated: new Date(),
           createdAt: new Date(),
@@ -75,6 +82,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('RawMaterialsWarehouses', null, {});
+    await queryInterface.bulkDelete("RawMaterialsWarehouses", null, {});
   },
 };

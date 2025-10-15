@@ -65,10 +65,6 @@ const RecipeContextProvider = ({ children }) => {
       Header: 'Water total',
       accessor: 'water_total',
     },
-    {
-      Header: 'Water total',
-      accessor: 'water_total',
-    },
   ];
 
   const COLUMNS_RAW_MAT_CONSUMPTION = [
