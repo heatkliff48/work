@@ -1,4 +1,5 @@
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
 import {
@@ -43,7 +44,10 @@ const getDryMixesJournal = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewDryMixesJournal = (dryMixesJournal) => {
@@ -52,7 +56,10 @@ const addNewDryMixesJournal = (dryMixesJournal) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateDryMixesJournal = (dryMixesJournal) => {
@@ -61,7 +68,10 @@ const updateDryMixesJournal = (dryMixesJournal) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getRelatedMaterialsJournal = () => {
@@ -70,7 +80,10 @@ const getRelatedMaterialsJournal = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewRelatedMaterialsJournal = (relatedMaterialsJournal) => {
@@ -79,7 +92,10 @@ const addNewRelatedMaterialsJournal = (relatedMaterialsJournal) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRelatedMaterialsJournal = (relatedMaterialsJournal) => {
@@ -88,7 +104,10 @@ const updateRelatedMaterialsJournal = (relatedMaterialsJournal) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getAnchor = () => {
@@ -97,7 +116,10 @@ const getAnchor = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewAnchor = (anchor) => {
@@ -106,7 +128,10 @@ const addNewAnchor = (anchor) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateAnchor = (anchor) => {
@@ -115,7 +140,10 @@ const updateAnchor = (anchor) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getTool = () => {
@@ -124,7 +152,10 @@ const getTool = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewTool = (tool) => {
@@ -133,7 +164,10 @@ const addNewTool = (tool) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateTool = (tool) => {
@@ -142,7 +176,10 @@ const updateTool = (tool) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getProductCode = () => {
@@ -151,7 +188,10 @@ const getProductCode = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateProductCode = (productCode) => {
@@ -160,7 +200,10 @@ const updateProductCode = (productCode) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getDryMixesJournalWorker() {

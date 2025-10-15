@@ -1,6 +1,7 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   GET_ALL_CLIENTS,
   ALL_CLIENTS,
@@ -33,7 +34,10 @@ const getAllClients = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewClient = ({ client }) => {
@@ -42,7 +46,10 @@ const addNewClient = ({ client }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateClient = ({ client }) => {
@@ -51,7 +58,10 @@ const updateClient = ({ client }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getLegalAddress = (currentClientID) => {
@@ -60,7 +70,10 @@ const getLegalAddress = (currentClientID) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewLegalAddress = ({ legalAddress }) => {
@@ -69,7 +82,10 @@ const addNewLegalAddress = ({ legalAddress }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateLegalAddress = ({ legalAddress }) => {
@@ -78,7 +94,10 @@ const updateLegalAddress = ({ legalAddress }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // delivery address
@@ -88,7 +107,10 @@ const getAllDeliveryAddresses = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewDeliveryAddress = ({ deliveryAddress }) => {
@@ -97,7 +119,10 @@ const addNewDeliveryAddress = ({ deliveryAddress }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // Contact Info
@@ -107,7 +132,10 @@ const getAllContactInfo = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewContactInfo = ({ contactInfo }) => {
@@ -116,7 +144,10 @@ const addNewContactInfo = ({ contactInfo }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getAllClientsWatcher(action) {

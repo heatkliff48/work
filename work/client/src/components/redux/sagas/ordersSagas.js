@@ -1,6 +1,7 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 
 import {
   ADD_NEW_ORDER,
@@ -84,7 +85,10 @@ const getAllOrders = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewOrder = (order) => {
@@ -93,7 +97,10 @@ const addNewOrder = (order) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewDeliveryPrice = (order) => {
@@ -102,7 +109,10 @@ const addNewDeliveryPrice = (order) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addDataShipOrder = (date) => {
@@ -111,7 +121,10 @@ const addDataShipOrder = (date) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addDescriptionOrder = (desc) => {
@@ -120,7 +133,10 @@ const addDescriptionOrder = (desc) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addSecondaryContact = (sec_cnt) => {
@@ -129,7 +145,10 @@ const addSecondaryContact = (sec_cnt) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteSecondaryContact = (sec_cnt) => {
@@ -138,7 +157,10 @@ const deleteSecondaryContact = (sec_cnt) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getProductsOfOrder = () => {
@@ -147,7 +169,10 @@ const getProductsOfOrder = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getDryMixedProductsOfOrder = () => {
@@ -156,7 +181,10 @@ const getDryMixedProductsOfOrder = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getAnchorProductsOfOrder = () => {
@@ -165,7 +193,10 @@ const getAnchorProductsOfOrder = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getToolProductsOfOrder = () => {
@@ -174,7 +205,10 @@ const getToolProductsOfOrder = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getRelMatProductsOfOrder = () => {
@@ -183,7 +217,10 @@ const getRelMatProductsOfOrder = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getCurrentProductsOfOrder = (order_id) => {
@@ -192,7 +229,10 @@ const getCurrentProductsOfOrder = (order_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getUpdateProductsOfOrder = (newProductsOfOrder) => {
@@ -201,7 +241,10 @@ const getUpdateProductsOfOrder = (newProductsOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getUpdateDryMixedProductsOfOrder = (newDryMixedProductsOfOrder) => {
@@ -210,7 +253,10 @@ const getUpdateDryMixedProductsOfOrder = (newDryMixedProductsOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getUpdateAnchorProductsOfOrder = (newAnchorProductsOfOrder) => {
@@ -219,7 +265,10 @@ const getUpdateAnchorProductsOfOrder = (newAnchorProductsOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getUpdateToolProductsOfOrder = (newToolProductsOfOrder) => {
@@ -228,7 +277,10 @@ const getUpdateToolProductsOfOrder = (newToolProductsOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getUpdateRelMatProductsOfOrder = (newRelMatProductsOfOrder) => {
@@ -237,7 +289,10 @@ const getUpdateRelMatProductsOfOrder = (newRelMatProductsOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getUpdateProductInfoOfOrder = (productOfOrder) => {
@@ -246,7 +301,10 @@ const getUpdateProductInfoOfOrder = (productOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getUpdateDryMixedProductsInfoOfOrder = (productOfOrder) => {
@@ -255,7 +313,10 @@ const getUpdateDryMixedProductsInfoOfOrder = (productOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getUpdateAnchorProductsInfoOfOrder = (productOfOrder) => {
@@ -264,7 +325,10 @@ const getUpdateAnchorProductsInfoOfOrder = (productOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getUpdateToolProductsInfoOfOrder = (productOfOrder) => {
@@ -273,7 +337,10 @@ const getUpdateToolProductsInfoOfOrder = (productOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getUpdateRelMatProductsInfoOfOrder = (productOfOrder) => {
@@ -282,7 +349,10 @@ const getUpdateRelMatProductsInfoOfOrder = (productOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getDeleteProductOfOrder = (product_id) => {
@@ -291,7 +361,10 @@ const getDeleteProductOfOrder = (product_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getDeleteDryMixedProductOfOrder = (dry_mixed_id) => {
@@ -300,7 +373,10 @@ const getDeleteDryMixedProductOfOrder = (dry_mixed_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getDeleteAnchorProductOfOrder = (anchor_id) => {
@@ -309,7 +385,10 @@ const getDeleteAnchorProductOfOrder = (anchor_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getDeleteToolProductOfOrder = (tool_id) => {
@@ -318,7 +397,10 @@ const getDeleteToolProductOfOrder = (tool_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getDeleteRelMatProductOfOrder = (rel_mat_id) => {
@@ -327,7 +409,10 @@ const getDeleteRelMatProductOfOrder = (rel_mat_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getDeleteOrder = (order_id) => {
@@ -336,7 +421,10 @@ const getDeleteOrder = (order_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateContactOfOrder = (newContactOfOrder) => {
@@ -345,7 +433,10 @@ const updateContactOfOrder = (newContactOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateDeliveryOfOrder = (newDeliveryOfOrder) => {
@@ -354,7 +445,10 @@ const updateDeliveryOfOrder = (newDeliveryOfOrder) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateStatusOfOrder = (orderStatus) => {
@@ -363,7 +457,10 @@ const updateStatusOfOrder = (orderStatus) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateInChargeOfOrder = (orderInCharge) => {
@@ -372,7 +469,10 @@ const updateInChargeOfOrder = (orderInCharge) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addOrderRandomProducts = ({ order_id, order_article }) => {
@@ -381,7 +481,10 @@ const addOrderRandomProducts = ({ order_id, order_article }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getOrdersListWatcher() {

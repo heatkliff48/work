@@ -1,6 +1,7 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_FILES_WAREHOUSE,
   DELETE_FILES_WAREHOUSE,
@@ -21,7 +22,10 @@ const getFilesWarehouse = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewFilesWarehouse = (filesWarehouse) => {
@@ -30,7 +34,10 @@ const addNewFilesWarehouse = (filesWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteFilesWarehouse = (warehouse_id) => {
@@ -39,7 +46,10 @@ const deleteFilesWarehouse = (warehouse_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getFilesWarehouseWorker(action) {

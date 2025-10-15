@@ -1,4 +1,5 @@
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
 import {
@@ -39,7 +40,10 @@ const getDryMixesWarehouse = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewDryMixesWarehouse = (dryMixesWarehouse) => {
@@ -48,7 +52,10 @@ const addNewDryMixesWarehouse = (dryMixesWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateDryMixesWarehouse = (dryMixesWarehouse) => {
@@ -57,7 +64,10 @@ const updateDryMixesWarehouse = (dryMixesWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getRelatedMaterialsWarehouse = () => {
@@ -66,7 +76,10 @@ const getRelatedMaterialsWarehouse = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewRelatedMaterialsWarehouse = (relatedMaterialsWarehouse) => {
@@ -75,7 +88,10 @@ const addNewRelatedMaterialsWarehouse = (relatedMaterialsWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRelatedMaterialsWarehouse = (relatedMaterialsWarehouse) => {
@@ -84,7 +100,10 @@ const updateRelatedMaterialsWarehouse = (relatedMaterialsWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getAnchorsWarehouse = () => {
@@ -93,7 +112,10 @@ const getAnchorsWarehouse = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewAnchorsWarehouse = (anchorsWarehouse) => {
@@ -102,7 +124,10 @@ const addNewAnchorsWarehouse = (anchorsWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateAnchorsWarehouse = (anchorsWarehouse) => {
@@ -111,7 +136,10 @@ const updateAnchorsWarehouse = (anchorsWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getToolsWarehouse = () => {
@@ -120,7 +148,10 @@ const getToolsWarehouse = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewToolsWarehouse = (toolsWarehouse) => {
@@ -129,7 +160,10 @@ const addNewToolsWarehouse = (toolsWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateToolsWarehouse = (toolsWarehouse) => {
@@ -138,7 +172,10 @@ const updateToolsWarehouse = (toolsWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getDryMixesWarehouseWorker() {

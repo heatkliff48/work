@@ -1,4 +1,5 @@
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_STOCK_BALANCE,
   ALL_STOCK_BALANCE,
@@ -19,7 +20,10 @@ const getStockBalance = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addStockBalance = (stock) => {
@@ -28,7 +32,10 @@ const addStockBalance = (stock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getStockBalanceWatcher(action) {

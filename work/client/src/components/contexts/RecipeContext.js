@@ -90,6 +90,18 @@ const RecipeContextProvider = ({ children }) => {
     },
   ];
 
+  // const COLUMNS_RAW_MAT_CONSUMPTION_MODAL = [
+  //   { Header: 'Sand', accessor: 'Sand' },
+  //   { Header: 'Lime', accessor: 'Lime' },
+  //   { Header: 'Cement', accessor: 'Cement' },
+  //   { Header: 'Gypsum', accessor: 'Gypsum' },
+  //   { Header: 'Gypsum ston', accessor: 'Gypsum ston' },
+  //   { Header: 'Aluminum', accessor: 'Aluminum' },
+  //   { Header: 'Aluminum', accessor: 'Aluminum' },
+  //   { Header: 'Grinding Ball', accessor: 'Grinding Ball' },
+  //   { Header: 'AAC', accessor: 'AAC' },
+  // ];
+
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productOfRecipe, setProductOfRecipe] = useState({});
   const [selectedRecipe, setSelectedRecipe] = useState(null);

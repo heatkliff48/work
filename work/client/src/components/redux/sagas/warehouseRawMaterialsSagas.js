@@ -1,4 +1,5 @@
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_WAREHOUSE_SAND,
   DELETE_WAREHOUSE_SAND,
@@ -88,7 +89,10 @@ const getWarehouseSand = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouseSand = (warehouseSand) => {
@@ -97,7 +101,10 @@ const addNewWarehouseSand = (warehouseSand) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteWarehouseSand = (sand_warehouse_id) => {
@@ -106,7 +113,10 @@ const deleteWarehouseSand = (sand_warehouse_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWarehouseSand = (warehouseSand) => {
@@ -115,7 +125,10 @@ const updateWarehouseSand = (warehouseSand) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // Lime API functions
@@ -125,7 +138,10 @@ const getWarehouseLime = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouseLime = (warehouseLime) => {
@@ -134,7 +150,10 @@ const addNewWarehouseLime = (warehouseLime) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteWarehouseLime = (lime_warehouse_id) => {
@@ -143,7 +162,10 @@ const deleteWarehouseLime = (lime_warehouse_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWarehouseLime = (warehouseLime) => {
@@ -152,7 +174,10 @@ const updateWarehouseLime = (warehouseLime) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // Cement API functions
@@ -162,7 +187,10 @@ const getWarehouseCement = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouseCement = (warehouseCement) => {
@@ -171,7 +199,10 @@ const addNewWarehouseCement = (warehouseCement) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteWarehouseCement = (cement_warehouse_id) => {
@@ -180,7 +211,10 @@ const deleteWarehouseCement = (cement_warehouse_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWarehouseCement = (warehouseCement) => {
@@ -189,7 +223,10 @@ const updateWarehouseCement = (warehouseCement) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // Gypsum API functions
@@ -199,7 +236,10 @@ const getWarehouseGypsum = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouseGypsum = (warehouseGypsum) => {
@@ -208,7 +248,10 @@ const addNewWarehouseGypsum = (warehouseGypsum) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteWarehouseGypsum = (gypsum_warehouse_id) => {
@@ -217,7 +260,10 @@ const deleteWarehouseGypsum = (gypsum_warehouse_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWarehouseGypsum = (warehouseGypsum) => {
@@ -226,7 +272,10 @@ const updateWarehouseGypsum = (warehouseGypsum) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // Gypsum stone API functions
@@ -236,7 +285,10 @@ const getWarehouseGypsumStone = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouseGypsumStone = (warehouseGypsumStone) => {
@@ -245,7 +297,10 @@ const addNewWarehouseGypsumStone = (warehouseGypsumStone) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteWarehouseGypsumStone = (gypsum_stone_warehouse_id) => {
@@ -256,7 +311,10 @@ const deleteWarehouseGypsumStone = (gypsum_stone_warehouse_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWarehouseGypsumStone = (warehouseGypsumStone) => {
@@ -265,7 +323,10 @@ const updateWarehouseGypsumStone = (warehouseGypsumStone) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // Aluminum1 API functions
@@ -275,7 +336,10 @@ const getWarehouseAluminum1 = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouseAluminum1 = (warehouseAluminum1) => {
@@ -284,7 +348,10 @@ const addNewWarehouseAluminum1 = (warehouseAluminum1) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteWarehouseAluminum1 = (aluminum1_warehouse_id) => {
@@ -293,7 +360,10 @@ const deleteWarehouseAluminum1 = (aluminum1_warehouse_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWarehouseAluminum1 = (warehouseAluminum1) => {
@@ -302,7 +372,10 @@ const updateWarehouseAluminum1 = (warehouseAluminum1) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // Aluminum2 API functions
@@ -312,7 +385,10 @@ const getWarehouseAluminum2 = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouseAluminum2 = (warehouseAluminum2) => {
@@ -321,7 +397,10 @@ const addNewWarehouseAluminum2 = (warehouseAluminum2) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteWarehouseAluminum2 = (aluminum2_warehouse_id) => {
@@ -330,7 +409,10 @@ const deleteWarehouseAluminum2 = (aluminum2_warehouse_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWarehouseAluminum2 = (warehouseAluminum2) => {
@@ -339,7 +421,10 @@ const updateWarehouseAluminum2 = (warehouseAluminum2) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // Grinding Balls API functions
@@ -349,7 +434,10 @@ const getWarehouseGrindingBalls = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouseGrindingBalls = (warehouseGrindingBalls) => {
@@ -358,7 +446,10 @@ const addNewWarehouseGrindingBalls = (warehouseGrindingBalls) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteWarehouseGrindingBalls = (grinding_balls_warehouse_id) => {
@@ -369,7 +460,10 @@ const deleteWarehouseGrindingBalls = (grinding_balls_warehouse_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWarehouseGrindingBalls = (warehouseGrindingBalls) => {
@@ -378,7 +472,10 @@ const updateWarehouseGrindingBalls = (warehouseGrindingBalls) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // AAC API functions
@@ -388,7 +485,10 @@ const getWarehouseAAC = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouseAAC = (warehouseAAC) => {
@@ -397,7 +497,10 @@ const addNewWarehouseAAC = (warehouseAAC) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteWarehouseAAC = (aac_warehouse_id) => {
@@ -406,7 +509,10 @@ const deleteWarehouseAAC = (aac_warehouse_id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWarehouseAAC = (warehouseAAC) => {
@@ -415,7 +521,10 @@ const updateWarehouseAAC = (warehouseAAC) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // Sand Workers

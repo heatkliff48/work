@@ -1,6 +1,7 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_ORDERED_PRODUCTION,
   ADD_NEW_RESERVED_PRODUCT,
@@ -93,7 +94,10 @@ const getAllWarehouse = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewWarehouse = (new_warehouse) => {
@@ -102,7 +106,10 @@ const addNewWarehouse = (new_warehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRemStock = (upd_rem_srock) => {
@@ -111,7 +118,10 @@ const updateRemStock = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateWhQuantitys = (upd_rem_srock) => {
@@ -120,7 +130,10 @@ const updateWhQuantitys = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateDryMixedWhQuantitys = (upd_rem_srock) => {
@@ -129,7 +142,10 @@ const updateDryMixedWhQuantitys = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateAnchorWhQuantitys = (upd_rem_srock) => {
@@ -138,7 +154,10 @@ const updateAnchorWhQuantitys = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateToolWhQuantitys = (upd_rem_srock) => {
@@ -147,7 +166,10 @@ const updateToolWhQuantitys = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRelMatWhQuantitys = (upd_rem_srock) => {
@@ -156,7 +178,10 @@ const updateRelMatWhQuantitys = (upd_rem_srock) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfReservedProducts = () => {
@@ -165,7 +190,10 @@ const getListOfReservedProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewReservedProduct = (reserved_product) => {
@@ -174,7 +202,10 @@ const addNewReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updReservedProduct = (reserved_product) => {
@@ -183,7 +214,10 @@ const updReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteReservedProduct = (id) => {
@@ -192,7 +226,10 @@ const deleteReservedProduct = (id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfDryMixedReservedProducts = () => {
@@ -201,7 +238,10 @@ const getListOfDryMixedReservedProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewDryMixedReservedProduct = (reserved_product) => {
@@ -210,7 +250,10 @@ const addNewDryMixedReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updDryMixedReservedProduct = (reserved_product) => {
@@ -219,7 +262,10 @@ const updDryMixedReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteDryMixedReservedProduct = (id) => {
@@ -228,7 +274,10 @@ const deleteDryMixedReservedProduct = (id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfAnchorReservedProducts = () => {
@@ -237,7 +286,10 @@ const getListOfAnchorReservedProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewAnchorReservedProduct = (reserved_product) => {
@@ -246,7 +298,10 @@ const addNewAnchorReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updAnchorReservedProduct = (reserved_product) => {
@@ -255,7 +310,10 @@ const updAnchorReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteAnchorReservedProduct = (id) => {
@@ -264,7 +322,10 @@ const deleteAnchorReservedProduct = (id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfToolReservedProducts = () => {
@@ -273,7 +334,10 @@ const getListOfToolReservedProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewToolReservedProduct = (reserved_product) => {
@@ -282,7 +346,10 @@ const addNewToolReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updToolReservedProduct = (reserved_product) => {
@@ -291,7 +358,10 @@ const updToolReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteToolReservedProduct = (id) => {
@@ -300,7 +370,10 @@ const deleteToolReservedProduct = (id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfRelMatReservedProducts = () => {
@@ -309,7 +382,10 @@ const getListOfRelMatReservedProducts = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewRelMatReservedProduct = (reserved_product) => {
@@ -318,7 +394,10 @@ const addNewRelMatReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updRelMatReservedProduct = (reserved_product) => {
@@ -327,7 +406,10 @@ const updRelMatReservedProduct = (reserved_product) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const deleteRelMatReservedProduct = (id) => {
@@ -336,7 +418,10 @@ const deleteRelMatReservedProduct = (id) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getAutoclaveCalendar = () => {
@@ -345,7 +430,10 @@ const getAutoclaveCalendar = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewAutoclaveCalendar = (autoclave_calendar_data) => {
@@ -354,7 +442,10 @@ const addNewAutoclaveCalendar = (autoclave_calendar_data) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfOrderedProduction = () => {
@@ -363,7 +454,10 @@ const getListOfOrderedProduction = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewListOfOrderedProduction = (ordered_production) => {
@@ -372,7 +466,10 @@ const addNewListOfOrderedProduction = (ordered_production) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updListOfOrderedProduction = (ordered_production) => {
@@ -381,7 +478,10 @@ const updListOfOrderedProduction = (ordered_production) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getListOfOrderedProductionOEM = () => {
@@ -390,7 +490,10 @@ const getListOfOrderedProductionOEM = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewListOfOrderedProductionOEM = (ordered_production_oem) => {
@@ -399,7 +502,10 @@ const addNewListOfOrderedProductionOEM = (ordered_production_oem) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updListOfOrderedProductionOEM = (ordered_production_oem) => {
@@ -408,7 +514,10 @@ const updListOfOrderedProductionOEM = (ordered_production_oem) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getRawMaterialsWarehouse = () => {
@@ -417,7 +526,10 @@ const getRawMaterialsWarehouse = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
@@ -426,7 +538,10 @@ const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 function* getAllWarehouseWatcher() {

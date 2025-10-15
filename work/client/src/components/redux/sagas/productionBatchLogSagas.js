@@ -1,6 +1,7 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 
 import {
   ALL_PRODUCTION_BATCH_LOGS,
@@ -22,7 +23,10 @@ const getAllProductionBatchLogs = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewProductionBatchLog = ({ productionBatchLog }) => {
@@ -31,7 +35,10 @@ const addNewProductionBatchLog = ({ productionBatchLog }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateProductionBatchLog = ({ productionBatchLog }) => {
@@ -42,7 +49,10 @@ const updateProductionBatchLog = ({ productionBatchLog }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // workers

@@ -1,6 +1,7 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
-import showErrorMessage from '../../Utils/showErrorMessage';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   GET_ALL_USERS_INFO,
   ADD_NEW_USERS_INFO,
@@ -27,7 +28,10 @@ const getAllUsersInfo = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewUsersInfo = ({ usersInfo }) => {
@@ -36,7 +40,10 @@ const addNewUsersInfo = ({ usersInfo }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateUsersInfo = ({ usersInfo }) => {
@@ -45,7 +52,10 @@ const updateUsersInfo = ({ usersInfo }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const getAllUsersMainInfo = () => {
@@ -54,7 +64,10 @@ const getAllUsersMainInfo = () => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const addNewUsersMainInfo = ({ usersMainInfo }) => {
@@ -63,7 +76,10 @@ const addNewUsersMainInfo = ({ usersMainInfo }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 const updateUsersMainInfo = ({ usersMainInfo }) => {
@@ -72,7 +88,10 @@ const updateUsersMainInfo = ({ usersMainInfo }) => {
     .then((res) => {
       return res.data;
     })
-    .catch(showErrorMessage);
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
 };
 
 // workers
