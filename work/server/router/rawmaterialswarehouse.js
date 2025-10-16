@@ -1,5 +1,5 @@
 const rawMaterialsWarehouseRouter = require("express").Router();
-const { RawMaterialsWarehouse } = require("../db/models/index.js");
+const { RawMaterialsWarehouse, sequelize } = require("../db/models/index.js");
 const {
   WarehouseSand,
   WarehouseLime,
@@ -46,6 +46,7 @@ const {
   DELETE_WAREHOUSE_AAC_SOCKET,
 } = require("../src/constants/event.js");
 const { ErrorUtils } = require("../utils/Errors.js");
+const { Op } = require("sequelize");
 
 rawMaterialsWarehouseRouter.get("/", async (req, res) => {
   try {
@@ -59,33 +60,232 @@ rawMaterialsWarehouseRouter.get("/", async (req, res) => {
   }
 });
 
+// rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
+//   const { material_type, remaining_quantity, last_updated } = req.body;
+
+//   try {
+//     const rawMaterialsWarehouse = await RawMaterialsWarehouse.update(
+//       {
+//         remaining_quantity,
+//         last_updated,
+//       },
+//       {
+//         where: {
+//           material_type,
+//         },
+//         returning: true,
+//         plain: true,
+//       }
+//     );
+
+//     const updatedRecord = await RawMaterialsWarehouse.findOne({
+//       where: { material_type },
+//     });
+
+//     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedRecord);
+//     return res.json(updatedRecord).status(200);
+//   } catch (err) {
+//     console.error(err.message);
+//     return res.status(500).json(err);
+//   }
+// });
+
+// helpers
+// const dayjs = require('dayjs');
+// const customParseFormat = require('dayjs/plugin/customParseFormat');
+// dayjs.extend(customParseFormat);
+
+/*  входной массив должен выглядеть так:
+{
+  "materials": [
+    { "type": "sand",                "quantity": 12.5 },
+    { "type": "gypsum_stone",        "quantity": 8 },
+    { "type": "grinding_balls",      "quantity": 3 },
+    { "type": "aac",                 "quantity": 7 }
+  ]
+}
+*/
+
 rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
-  const { material_type, remaining_quantity, last_updated } = req.body;
+  const { materials } = req.body; // массив объектов {type, quantity}
 
-  try {
-    const rawMaterialsWarehouse = await RawMaterialsWarehouse.update(
-      {
-        remaining_quantity,
-        last_updated,
-      },
-      {
-        where: {
-          material_type,
-        },
-        returning: true,
-        plain: true,
-      }
-    );
-
-    const updatedRecord = await RawMaterialsWarehouse.findOne({
-      where: { material_type },
+  if (!Array.isArray(materials) || !materials.length)
+    return res.status(400).json({
+      error: "Поле materials обязательно и должно быть непустым массивом",
     });
 
-    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedRecord);
-    return res.json(updatedRecord).status(200);
+  const t = await sequelize.transaction(); // общая транзакция
+  try {
+    const deletedIds = []; // собираем id удалённых строк, если нужно
+
+    /* 1. Группируем материалы по типам для обновления RawMaterialsWarehouse */
+    const materialTotals = materials.reduce((acc, m) => {
+      const type = m.type;
+      const quantity = Number(m.quantity || 0);
+      acc[type] = (acc[type] || 0) - quantity;
+      return acc;
+    }, {});
+
+    /* 2. Обновляем записи в RawMaterialsWarehouse для каждого material_type */
+    const updatedMaterialTypes = Object.keys(materialTotals);
+    const updatedWarehouseRecords = [];
+
+    for (const materialType of updatedMaterialTypes) {
+      const totalQuantity = materialTotals[materialType];
+
+      const [updatedRows] = await RawMaterialsWarehouse.update(
+        {
+          remaining_quantity: sequelize.literal(
+            `remaining_quantity + ${totalQuantity}`
+          ),
+          last_updated: `${new Date()}`,
+        },
+        {
+          where: { material_type: materialType },
+          transaction: t,
+        }
+      );
+
+      // Если запись не найдена, создаем новую
+      if (!updatedRows) {
+        const newRecord = await RawMaterialsWarehouse.create(
+          {
+            material_type: materialType,
+            remaining_quantity: totalQuantity,
+            last_updated: `${new Date()}`,
+          },
+          { transaction: t }
+        );
+        updatedWarehouseRecords.push(newRecord);
+      }
+    }
+
+    /* 3. Прибавляем к «Sand slurry (dry)» общую сумму всех материалов */
+    const totalAllMaterials = materials.reduce(
+      (sum, m) => sum + Number(m.quantity || 0),
+      0
+    );
+
+    const [updatedSandSlurryRows] = await RawMaterialsWarehouse.update(
+      {
+        remaining_quantity: sequelize.literal(
+          `remaining_quantity + ${totalAllMaterials}`
+        ),
+        last_updated: `${new Date()}`,
+      },
+      { where: { material_type: "Sand slurry (dry)" }, transaction: t }
+    );
+
+    if (!updatedSandSlurryRows) {
+      await RawMaterialsWarehouse.create(
+        {
+          material_type: "Sand slurry (dry)",
+          remaining_quantity: totalAllMaterials,
+          last_updated: `${new Date()}`,
+        },
+        { transaction: t }
+      );
+    }
+
+    /* 4. Вычитаем из соответствующих складов (от «свежей» даты к «старой») */
+    for (const { type, quantity } of materials) {
+      if (!quantity) continue;
+
+      /* маппинг пришедшего type -> модель */
+      const modelMap = {
+        Sand: WarehouseSand,
+        "Gypsum stone": WarehouseGypsumStone,
+        "Grinding Balls": WarehouseGrindingBalls,
+        AAC: WarehouseAAC,
+      };
+      const Model = modelMap[type];
+      if (!Model) throw new Error(`Неизвестный тип материала: ${type}`);
+
+      let leftToWriteOff = Number(quantity);
+
+      console.log("leftToWriteOff start:", leftToWriteOff, "type:", type);
+
+      /* получаем записи отсортированные по убыванию даты */
+      const records = await Model.findAll({
+        order: [
+          // d.m.YYYY -> сортируем как строки, но в обратном порядке
+          [sequelize.literal("to_date(date, 'DD.MM.YYYY')"), "DESC"],
+        ],
+        transaction: t,
+      });
+
+      for (const rec of records) {
+        if (leftToWriteOff <= 0) break;
+
+        const inStock = Number(rec.quantity);
+
+        console.log({ id: rec.id, inStock, leftToWriteOff });
+
+        if (inStock <= leftToWriteOff) {
+          // убираем всю строку
+          deletedIds.push(rec.id);
+          await rec.destroy({ transaction: t });
+          leftToWriteOff -= inStock;
+        } else {
+          // частично списываем
+          const [affectedRows] = await Model.update(
+            { quantity: inStock - leftToWriteOff },
+            { where: { id: rec.id }, transaction: t }
+          );
+          console.log(
+            `📝 ${Model.name} id=${rec.id} affectedRows=${affectedRows}`
+          );
+          leftToWriteOff = 0;
+        }
+      }
+
+      if (leftToWriteOff > 0)
+        throw new Error(
+          `Недостаточно остатков для списания ${type} (не хватило ${leftToWriteOff})`
+        );
+    }
+
+    await t.commit();
+    console.log("✅ ТРАНЗАКЦИЯ УСПЕШНО ЗАКОММИТИЛАСЬ");
+
+    // Получаем все обновленные данные
+    const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
+      where: {
+        material_type: {
+          [Op.in]: [...updatedMaterialTypes, "Sand slurry (dry)"],
+        },
+      },
+    });
+
+    // Получаем текущие данные по всем складам материалов
+    const currentSand = await WarehouseSand.findAll();
+    const currentGypsumStone = await WarehouseGypsumStone.findAll();
+    const currentGrindingBalls = await WarehouseGrindingBalls.findAll();
+    const currentAAC = await WarehouseAAC.findAll();
+
+    /* 6. Сообщаем сокетам */
+    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
+
+    myEmitter.emit(UPDATE_WAREHOUSE_SAND_SOCKET, currentSand);
+
+    myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET, currentGypsumStone);
+
+    myEmitter.emit(
+      UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+      currentGrindingBalls
+    );
+
+    myEmitter.emit(UPDATE_WAREHOUSE_AAC_SOCKET, currentAAC);
+
+    return res.status(200).json({
+      updatedRecords: allUpdatedRecords,
+      deletedIds,
+    });
   } catch (err) {
+    console.log("❌ ОШИБКА, ROLLBACK:", err.message);
+    await t.rollback();
     console.error(err.message);
-    return res.status(500).json(err);
+    return res.status(500).json({ error: err.message });
   }
 });
 

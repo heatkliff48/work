@@ -8,7 +8,7 @@ import {
   FULL_WAREHOUSE_ALUMINUM2,
   FULL_WAREHOUSE_GRINDING_BALLS,
   FULL_WAREHOUSE_AAC,
-} from '../types/warehouseRawMaterialsTypes';
+} from "../types/warehouseRawMaterialsTypes";
 import {
   NEED_DELETE_WAREHOUSE_SAND_SOCKET,
   NEED_UPDATE_WAREHOUSE_SAND_SOCKET,
@@ -37,7 +37,7 @@ import {
   NEED_DELETE_WAREHOUSE_AAC_SOCKET,
   NEED_UPDATE_WAREHOUSE_AAC_SOCKET,
   NEW_WAREHOUSE_AAC_SOCKET,
-} from '../types/socketTypes/socket';
+} from "../types/socketTypes/socket";
 
 // Sand
 export const warehouseSandReducer = (warehouseSand = [], action) => {
@@ -54,11 +54,7 @@ export const warehouseSandReducer = (warehouseSand = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_SAND_SOCKET: {
-      const result = warehouseSand.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
-        return el;
-      });
-      return result;
+      return payload;
     }
     default:
       return warehouseSand;
@@ -81,7 +77,7 @@ export const warehouseLimeReducer = (warehouseLime = [], action) => {
     }
     case NEED_UPDATE_WAREHOUSE_LIME_SOCKET: {
       const result = warehouseLime.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
+        if (el.id === payload[0]?.id) return payload[0];
         return el;
       });
       return result;
@@ -107,7 +103,7 @@ export const warehouseCementReducer = (warehouseCement = [], action) => {
     }
     case NEED_UPDATE_WAREHOUSE_CEMENT_SOCKET: {
       const result = warehouseCement.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
+        if (el.id === payload[0]?.id) return payload[0];
         return el;
       });
       return result;
@@ -133,7 +129,7 @@ export const warehouseGypsumReducer = (warehouseGypsum = [], action) => {
     }
     case NEED_UPDATE_WAREHOUSE_GYPSUM_SOCKET: {
       const result = warehouseGypsum.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
+        if (el.id === payload[0]?.id) return payload[0];
         return el;
       });
       return result;
@@ -144,7 +140,10 @@ export const warehouseGypsumReducer = (warehouseGypsum = [], action) => {
 };
 
 // Gypsum stone
-export const warehouseGypsumStoneReducer = (warehouseGypsumStone = [], action) => {
+export const warehouseGypsumStoneReducer = (
+  warehouseGypsumStone = [],
+  action
+) => {
   const { type, payload } = action;
   switch (type) {
     case FULL_WAREHOUSE_GYPSUM_STONE: {
@@ -158,11 +157,7 @@ export const warehouseGypsumStoneReducer = (warehouseGypsumStone = [], action) =
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET: {
-      const result = warehouseGypsumStone.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
-        return el;
-      });
-      return result;
+      return payload;
     }
     default:
       return warehouseGypsumStone;
@@ -185,7 +180,7 @@ export const warehouseAluminum1Reducer = (warehouseAluminum1 = [], action) => {
     }
     case NEED_UPDATE_WAREHOUSE_ALUMINUM1_SOCKET: {
       const result = warehouseAluminum1.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
+        if (el.id === payload[0]?.id) return payload[0];
         return el;
       });
       return result;
@@ -211,7 +206,7 @@ export const warehouseAluminum2Reducer = (warehouseAluminum2 = [], action) => {
     }
     case NEED_UPDATE_WAREHOUSE_ALUMINUM2_SOCKET: {
       const result = warehouseAluminum2.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
+        if (el.id === payload[0]?.id) return payload[0];
         return el;
       });
       return result;
@@ -239,11 +234,7 @@ export const warehouseGrindingBallsReducer = (
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET: {
-      const result = warehouseGrindingBalls.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
-        return el;
-      });
-      return result;
+      return payload;
     }
     default:
       return warehouseGrindingBalls;
@@ -265,12 +256,15 @@ export const warehouseAACReducer = (warehouseAAC = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_AAC_SOCKET: {
-      const result = warehouseAAC.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
-        return el;
-      });
-      return result;
+      return payload;
     }
+    // case NEED_UPDATE_WAREHOUSE_AAC_SOCKET: {
+    //   const result = warehouseAAC.map((el) => {
+    //     if (el.id === payload[0]?.id) return payload[0];
+    //     return el;
+    //   });
+    //   return result;
+    // }
     default:
       return warehouseAAC;
   }

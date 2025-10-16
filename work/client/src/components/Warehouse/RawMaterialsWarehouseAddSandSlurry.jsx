@@ -110,9 +110,21 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     const date = `${day}.${month}.${year}`;
     dispatch(
       updateRawMaterialsWarehouse({
-        material_type: "Sand slurry (dry)",
-        remaining_quantity: summ,
-        last_updated: date,
+        // material_type: "Sand slurry (dry)",
+        // remaining_quantity: summ,
+        // last_updated: date,
+        materials: [
+          { type: "Sand", quantity: parseFloat(sandSlurryWarehouseInput.sand) },
+          {
+            type: "Gypsum stone",
+            quantity: parseFloat(sandSlurryWarehouseInput.gypsum_stone),
+          },
+          {
+            type: "Grinding Balls",
+            quantity: parseFloat(sandSlurryWarehouseInput.grinding_balls),
+          },
+          { type: "AAC", quantity: parseFloat(sandSlurryWarehouseInput.aac) },
+        ],
       })
     );
     setSandSlurryWarehouseInput({});
