@@ -3,13 +3,13 @@ import {
   NEW_WAREHOUSE_SOCKET,
   REMAINING_STOCK_SOCKET,
   WAREHOUSE_QUANTITYS_SOCKET,
-} from '../types/socketTypes/socket';
+} from "../types/socketTypes/socket";
 import {
   ALL_WAREHOUSE,
   RAW_MATERIALS_WAREHOUSE,
   REMAINING_STOCK,
   WAREHOSE_QUANTITYS,
-} from '../types/warehouseTypes';
+} from "../types/warehouseTypes";
 
 export const warehouseReducer = (warehouse = [], action) => {
   const { type, payload } = action;
@@ -38,7 +38,8 @@ export const warehouseReducer = (warehouse = [], action) => {
 
     case REMAINING_STOCK:
     case REMAINING_STOCK_SOCKET: {
-      const { warehouse_id, free_quantity_remaining, ordered_quantity } = payload;
+      const { warehouse_id, free_quantity_remaining, ordered_quantity } =
+        payload;
 
       const result = warehouse.map((el) => {
         if (el.id === warehouse_id) {
@@ -55,7 +56,10 @@ export const warehouseReducer = (warehouse = [], action) => {
   }
 };
 
-export const rawMaterialsWarehouseReducer = (rawMaterialsWarehouse = [], action) => {
+export const rawMaterialsWarehouseReducer = (
+  rawMaterialsWarehouse = [],
+  action
+) => {
   const { type, payload } = action;
   switch (type) {
     case RAW_MATERIALS_WAREHOUSE: {
@@ -63,10 +67,26 @@ export const rawMaterialsWarehouseReducer = (rawMaterialsWarehouse = [], action)
     }
 
     case NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET: {
-      const result = rawMaterialsWarehouse.map((el) => {
-        if (el.id === payload.id) return payload;
-        return el;
+      console.log({ rawMaterialsWarehouse }, "warehouseReducer.js line 70");
+      console.log({ payload }, "warehouseReducer.js line 71");
+
+      // Преобразуем в массив для единообразной обработки
+      const itemsToUpdate = Array.isArray(payload) ? payload : [payload];
+
+      let result = [...rawMaterialsWarehouse];
+
+      itemsToUpdate.forEach((item) => {
+        // Извлекаем updatedWarehouse если он есть
+        const updatedItem = item.updatedWarehouse || item;
+
+        const index = result.findIndex((el) => el.id === updatedItem.id);
+        if (index !== -1) {
+          result[index] = updatedItem;
+        } else {
+          result.push(updatedItem);
+        }
       });
+
       return result;
     }
 
