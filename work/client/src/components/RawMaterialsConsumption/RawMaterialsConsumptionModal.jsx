@@ -2,24 +2,10 @@ import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 
-/**
- * props:
- * - isOpen: boolean
- * - toggle: () => void
- * - selectedRow: { recipe_article, production_volume, logs? }
- * - onSave?: (payload) => void
- *
- * Как работает:
- * - Берёт первый объект из list_of_recipes (твоя структура).
- * - По materialsMap строит строки таблицы (что показывать и какой ключ брать из рецепта).
- * - Считает total = actual_reciepe * production_volume.
- * - Лог (колонка “Из лога”) — берёт selectedRow?.logs?.[key] если появится.
- */
 const RawMaterialsConsumptionModal = React.memo(
   ({ isOpen, toggle, selectedRow, onSave }) => {
     const { list_of_recipes = [] } = useRecipeContext();
 
-    // 1) Текущий рецепт-объект (у тебя в массиве length=1)
     const recipe = useMemo(
       () =>
         Array.isArray(list_of_recipes) && list_of_recipes.length
@@ -28,20 +14,21 @@ const RawMaterialsConsumptionModal = React.memo(
       [list_of_recipes]
     );
 
-    // 2) Маппинг “как показать → какой ключ взять из recipe”.
-    //    Подгони под свои поля. Если нужно — добавь/убери элементы.
     const materialsMap = useMemo(
       () => [
         {
           label: 'Sand',
-          key: recipe?.sand_dry != null ? 'sand_dry' : 'sand_slurry_dry',
+          key: 'sand_dry',
+        },
+        {
+          label: 'Sand slurry dry',
+          key: 'sand_slurry_dry',
         },
         { label: 'Lime', key: 'lime' },
-        { label: 'Cemento', key: 'cement' }, // как на скрине “Cemento”
+        { label: 'Cemento', key: 'cement' },
         { label: 'Gypsum', key: 'gypsum_dry' },
-        // Если у тебя разделены “gypsum stone” и т.д. — добавь нужный ключ:
-        { label: 'Gypsum stone', key: 'gypsum_stone' }, // если нет в объекте, строка просто покажет base: —
-        { label: 'Aluminum 1', key: 'aluminum_paste' }, // подгони при необходимости
+        { label: 'Gypsum stone', key: 'gypsum_stone' },
+        { label: 'Aluminum 1', key: 'aluminum_paste' },
         { label: 'Aluminum 2', key: 'aluminum_paste_2' },
         { label: 'Grinding Balls', key: 'grinding_balls' },
         { label: 'AAC', key: 'aac' },
@@ -49,14 +36,13 @@ const RawMaterialsConsumptionModal = React.memo(
       [recipe]
     );
 
-    // 3) Форма: для каждого материала храним actual и wasted.
     const [form, setForm] = useState({});
     useEffect(() => {
       if (!isOpen) return;
       const initial = {};
-      materialsMap.forEach(({ label }) => {
-        initial[`${label}_actual_reciepe`] = '';
-        initial[`${label}_Wasted`] = '';
+      materialsMap.forEach(({ key }) => {
+        initial[`${key}_actual_reciepe`] = '';
+        initial[`${key}_Wasted`] = '';
       });
       setForm(initial);
     }, [isOpen, materialsMap]);
@@ -68,25 +54,22 @@ const RawMaterialsConsumptionModal = React.memo(
       }
     };
 
-    // 4) Итого по каждому материалу (actual * production_volume)
     const totals = useMemo(() => {
       const pv = Number(selectedRow?.production_volume ?? 0);
       const t = {};
-      materialsMap.forEach(({ label }) => {
-        const a = Number(form[`${label}_actual_reciepe`] || 0);
-        t[`${label}_total`] = pv ? +(a * pv).toFixed(3) : '';
+      materialsMap.forEach(({ key }) => {
+        const a = Number(form[`${key}_actual_reciepe`] || 0);
+        t[`${key}_total`] = pv ? +(a * pv).toFixed(3) : '';
       });
       return t;
     }, [form, selectedRow, materialsMap]);
 
-    // 5) Значение из рецепта (база “By recipe”)
     const baseByLabel = (label, key) => {
       if (!recipe || !key || !(key in recipe)) return '—';
       const v = recipe[key];
       return typeof v === 'number' ? v : v ?? '—';
     };
 
-    // 6) Значение из лога (если появится структура с логами)
     const logByKey = (key) => {
       const logs = selectedRow?.logs;
       if (!logs || !(key in logs)) return '';
@@ -102,16 +85,14 @@ const RawMaterialsConsumptionModal = React.memo(
           key,
           base: baseByLabel(label, key),
           actual_reciepe:
-            form[`${label}_actual_reciepe`] === ''
+            form[`${key}_actual_reciepe`] === ''
               ? null
-              : Number(form[`${label}_actual_reciepe`]),
+              : Number(form[`${key}_actual_reciepe`]),
           total:
-            totals[`${label}_total`] === ''
-              ? null
-              : Number(totals[`${label}_total`]),
+            totals[`${key}_total`] === '' ? null : Number(totals[`${key}_total`]),
           log: logByKey(key) ?? null,
           wasted:
-            form[`${label}_Wasted`] === '' ? null : Number(form[`${label}_Wasted`]),
+            form[`${key}_Wasted`] === '' ? null : Number(form[`${key}_Wasted`]),
         })),
       };
       onSave?.(payload);
@@ -172,14 +153,13 @@ const RawMaterialsConsumptionModal = React.memo(
 
                 <tbody>
                   {materialsMap.map(({ label, key }) => {
-                    const aKey = `${label}_actual_reciepe`;
-                    const wKey = `${label}_Wasted`;
+                    const aKey = `${key}_actual_reciepe`;
+                    const wKey = `${key}_Wasted`;
                     const base = baseByLabel(label, key);
-                    const total = totals[`${label}_total`];
+                    const total = totals[`${key}_total`];
                     const log = logByKey(key);
                     return (
-                      <tr key={label}>
-                        {/* 1) By recipe (название + базовое значение из рецепта) */}
+                      <tr key={key}>
                         <td>
                           <div className="fw-semibold">{label}</div>
                           <div className="text-muted" style={{ fontSize: 12 }}>
@@ -187,7 +167,6 @@ const RawMaterialsConsumptionModal = React.memo(
                           </div>
                         </td>
 
-                        {/* 2) manual input — actual_reciepe */}
                         <td>
                           <label
                             className="form-label mb-1"

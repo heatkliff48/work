@@ -288,9 +288,10 @@ const QualityManagementTable = () => {
       }
 
       // Остальная логика с autoclave_calendar...
-      const { date, quantity_pallets } = batchOutside.find(
+      const { date, quantity_pallets } = batchOutside?.find(
         (el) => el.id === production_plan_id
       );
+
       const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
         (el) => el.article == product_article
       );
@@ -303,9 +304,13 @@ const QualityManagementTable = () => {
         return;
       }
 
+      const palletsPerArray = Math.max(
+        1,
+        Math.floor(m3InArray / volumeBlockOnPallet) || 1
+      );
+
       const total_arrays =
-        (accd?.total_arrays || 0) +
-        quantity_pallets / Math.floor(m3InArray / volumeBlockOnPallet);
+        (accd?.total_arrays || 0) + quantity_pallets / palletsPerArray;
 
       const filled_autoclaves = Math.floor(total_arrays / 21);
       const residual_arrays = total_arrays - filled_autoclaves * 21;
@@ -319,6 +324,30 @@ const QualityManagementTable = () => {
         },
       ];
 
+      recipeOrders?.forEach((el) => {
+        const batch = batchOutside.find((batch) => batch.id === production_plan_id);
+
+        const recipe = list_of_recipes.find((recipe) => recipe.id === el.id_recipe);
+
+        const haveRMC = raw_mat_consumption.find(
+          (item) =>
+            item?.recipe_article === recipe?.article &&
+            item?.batch_article === batch?.product_article
+        );
+
+        if (!haveRMC && recipe) {
+          dispatch(
+            addNewRawMatConsumption({
+              id: el.id,
+              recipe_article: recipe?.article || 'Unknown Recipe',
+              batch_article: batch?.product_article || 'Unknown Batch',
+              production_volume: reserved_quantity_allocated / palletsPerArray || 0,
+              date: batch?.date || 'Unknown Date',
+            })
+          );
+        }
+      });
+
       await dispatch(addNewAutoclaveCalendar(result));
       await dispatch(deleteQualityManagement(id));
 
@@ -327,32 +356,6 @@ const QualityManagementTable = () => {
           reserved_quantity_remaining <= 0 ||
           total_quantity_plan - reserved_quantity_allocated < 63
         ) {
-          recipeOrders?.forEach((el) => {
-            const batch = batchOutside.find(
-              (batch) => batch.id === production_plan_id
-            );
-            const recipe = list_of_recipes.find(
-              (recipe) => recipe.id === el.id_recipe
-            );
-
-            const haveRMC = raw_mat_consumption.find(
-              (item) =>
-                item?.recipe_article === recipe?.article &&
-                item?.batch_article === batch?.product_article
-            );
-
-            if (!haveRMC && recipe) {
-              dispatch(
-                addNewRawMatConsumption({
-                  id: el.id,
-                  recipe_article: recipe?.article || 'Unknown Recipe',
-                  batch_article: batch?.product_article || 'Unknown Batch',
-                  production_volume: el.production_volume || 0,
-                  date: batch?.date || 'Unknown Date',
-                })
-              );
-            }
-          });
           await dispatch(deleteBatchOutside(production_plan_id));
         } else {
           const batch = batchOutside.find((el) => el.id === production_plan_id);
