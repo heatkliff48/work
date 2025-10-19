@@ -341,7 +341,9 @@ const QualityManagementTable = () => {
               id: el.id,
               recipe_article: recipe?.article || 'Unknown Recipe',
               batch_article: batch?.product_article || 'Unknown Batch',
-              production_volume: reserved_quantity_allocated / palletsPerArray || 0,
+              production_volume:
+                (reserved_quantity_allocated + free_quantity_fact) /
+                  palletsPerArray || 0,
               date: batch?.date || 'Unknown Date',
             })
           );
