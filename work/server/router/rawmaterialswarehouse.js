@@ -107,18 +107,17 @@ rawMaterialsWarehouseRouter.get("/", async (req, res) => {
 */
 
 rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
-  const { materials } = req.body; // массив объектов {type, quantity}
+  const { materials } = req.body;
 
   if (!Array.isArray(materials) || !materials.length)
     return res.status(400).json({
       error: "Поле materials обязательно и должно быть непустым массивом",
     });
 
-  const t = await sequelize.transaction(); // общая транзакция
+  const t = await sequelize.transaction();
   try {
-    const deletedIds = []; // собираем id удалённых строк, если нужно
+    const deletedIds = [];
 
-    /* 1. Группируем материалы по типам для обновления RawMaterialsWarehouse */
     const materialTotals = materials.reduce((acc, m) => {
       const type = m.type;
       const quantity = Number(m.quantity || 0);
@@ -126,9 +125,15 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
       return acc;
     }, {});
 
-    /* 2. Обновляем записи в RawMaterialsWarehouse для каждого material_type */
     const updatedMaterialTypes = Object.keys(materialTotals);
     const updatedWarehouseRecords = [];
+
+    const today = new Date();
+    const day = today.getDate().toString().padStart(2, "0");
+    const month = (today.getMonth() + 1).toString().padStart(2, "0");
+    const year = today.getFullYear();
+
+    const date = `${day}.${month}.${year}`;
 
     for (const materialType of updatedMaterialTypes) {
       const totalQuantity = materialTotals[materialType];
@@ -138,7 +143,7 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
           remaining_quantity: sequelize.literal(
             `remaining_quantity + ${totalQuantity}`
           ),
-          last_updated: `${new Date()}`,
+          // last_updated: `${new Date()}`,
         },
         {
           where: { material_type: materialType },
@@ -146,13 +151,12 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
         }
       );
 
-      // Если запись не найдена, создаем новую
       if (!updatedRows) {
         const newRecord = await RawMaterialsWarehouse.create(
           {
             material_type: materialType,
             remaining_quantity: totalQuantity,
-            last_updated: `${new Date()}`,
+            last_updated: date,
           },
           { transaction: t }
         );
@@ -160,7 +164,6 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
       }
     }
 
-    /* 3. Прибавляем к «Sand slurry (dry)» общую сумму всех материалов */
     const totalAllMaterials = materials.reduce(
       (sum, m) => sum + Number(m.quantity || 0),
       0
@@ -171,7 +174,7 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
         remaining_quantity: sequelize.literal(
           `remaining_quantity + ${totalAllMaterials}`
         ),
-        last_updated: `${new Date()}`,
+        last_updated: date,
       },
       { where: { material_type: "Sand slurry (dry)" }, transaction: t }
     );
@@ -181,17 +184,15 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
         {
           material_type: "Sand slurry (dry)",
           remaining_quantity: totalAllMaterials,
-          last_updated: `${new Date()}`,
+          last_updated: date,
         },
         { transaction: t }
       );
     }
 
-    /* 4. Вычитаем из соответствующих складов (от «свежей» даты к «старой») */
     for (const { type, quantity } of materials) {
       if (!quantity) continue;
 
-      /* маппинг пришедшего type -> модель */
       const modelMap = {
         Sand: WarehouseSand,
         "Gypsum stone": WarehouseGypsumStone,
@@ -205,7 +206,6 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
 
       console.log("leftToWriteOff start:", leftToWriteOff, "type:", type);
 
-      /* получаем записи отсортированные по убыванию даты */
       const records = await Model.findAll({
         order: [
           // d.m.YYYY -> сортируем как строки, но в обратном порядке
@@ -222,12 +222,10 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
         console.log({ id: rec.id, inStock, leftToWriteOff });
 
         if (inStock <= leftToWriteOff) {
-          // убираем всю строку
           deletedIds.push(rec.id);
           await rec.destroy({ transaction: t });
           leftToWriteOff -= inStock;
         } else {
-          // частично списываем
           const [affectedRows] = await Model.update(
             { quantity: inStock - leftToWriteOff },
             { where: { id: rec.id }, transaction: t }
@@ -248,7 +246,6 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
     await t.commit();
     console.log("✅ ТРАНЗАКЦИЯ УСПЕШНО ЗАКОММИТИЛАСЬ");
 
-    // Получаем все обновленные данные
     const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
       where: {
         material_type: {
@@ -257,13 +254,11 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
       },
     });
 
-    // Получаем текущие данные по всем складам материалов
     const currentSand = await WarehouseSand.findAll();
     const currentGypsumStone = await WarehouseGypsumStone.findAll();
     const currentGrindingBalls = await WarehouseGrindingBalls.findAll();
     const currentAAC = await WarehouseAAC.findAll();
 
-    /* 6. Сообщаем сокетам */
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
 
     myEmitter.emit(UPDATE_WAREHOUSE_SAND_SOCKET, currentSand);

@@ -225,14 +225,6 @@ const WarehouseContextProvider = ({ children }) => {
     (state) => state.rawMaterialsWarehouse
   );
 
-  useEffect(() => {
-    console.log({ raw_materials_warehouse }, "WarehouseContext.js line 196");
-  }, [raw_materials_warehouse]);
-
-  useEffect(() => {
-    console.log({ warehouse_data }, "WarehouseContext.js line 196");
-  }, [warehouse_data]);
-
   const reservedMap = {
     product: list_of_reserved_products,
     dryMixed: list_of_dry_mix_reserved_products,
