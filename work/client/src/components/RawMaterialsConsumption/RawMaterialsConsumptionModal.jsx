@@ -16,14 +16,8 @@ const RawMaterialsConsumptionModal = React.memo(
 
     const materialsMap = useMemo(
       () => [
-        {
-          label: 'Sand',
-          key: 'sand_dry',
-        },
-        {
-          label: 'Sand slurry dry',
-          key: 'sand_slurry_dry',
-        },
+        { label: 'Sand', key: 'sand_dry' },
+        { label: 'Sand slurry dry', key: 'sand_slurry_dry' },
         { label: 'Lime', key: 'lime' },
         { label: 'Cemento', key: 'cement' },
         { label: 'Gypsum', key: 'gypsum_dry' },
@@ -34,6 +28,11 @@ const RawMaterialsConsumptionModal = React.memo(
         { label: 'AAC', key: 'aac' },
       ],
       [recipe]
+    );
+
+    const ALWAYS_VISIBLE = useMemo(
+      () => new Set(['Aluminum 1', 'Aluminum 2', 'Grinding Balls', 'AAC']),
+      []
     );
 
     const [form, setForm] = useState({});
@@ -74,6 +73,46 @@ const RawMaterialsConsumptionModal = React.memo(
       const logs = selectedRow?.logs;
       if (!logs || !(key in logs)) return '';
       return logs[key];
+    };
+
+    // helpers для проверки "пусто или 0"
+    const numOrNull = (v) => {
+      if (v === '' || v === null || v === undefined) return null;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    const isEmptyOrZero = (v) => {
+      // строка '—' из base считаем пустым
+      if (v === '' || v === null || v === undefined || v === '—') return true;
+      const n = Number(v);
+      return !Number.isFinite(n) || n === 0;
+    };
+
+    const shouldShowRow = (label, key) => {
+      if (ALWAYS_VISIBLE.has(label)) return true;
+
+      const base = baseByLabel(label, key);
+      const log = logByKey(key);
+      const aVal = numOrNull(form[`${key}_actual_reciepe`]);
+      const wVal = numOrNull(form[`${key}_Wasted`]);
+      const total = totals[`${key}_total`];
+
+      // показываем, если есть что-то осмысленное: не пусто и не 0
+      const hasMeaningfulBase = !isEmptyOrZero(base);
+      const hasMeaningfulLog = !isEmptyOrZero(log);
+      const hasMeaningfulA = aVal !== null && aVal !== 0;
+      const hasMeaningfulW = wVal !== null && wVal !== 0;
+      const hasMeaningfulTotal =
+        total !== '' && Number.isFinite(Number(total)) && Number(total) !== 0;
+
+      return (
+        hasMeaningfulBase ||
+        hasMeaningfulLog ||
+        hasMeaningfulA ||
+        hasMeaningfulW ||
+        hasMeaningfulTotal
+      );
     };
 
     const handleSave = () => {
@@ -129,10 +168,7 @@ const RawMaterialsConsumptionModal = React.memo(
                     <th style={{ minWidth: 220, background: '#fff59d' }}>
                       By recipe
                     </th>
-                    <th
-                      colSpan={2}
-                      style={{ background: '#ffe082', textAlign: 'center' }}
-                    >
+                    <th colSpan={2} style={{ background: '#ffe082', textAlign: 'center' }}>
                       manual input
                     </th>
                     <th style={{ background: '#c8e6c9', textAlign: 'center' }}>
@@ -153,25 +189,25 @@ const RawMaterialsConsumptionModal = React.memo(
 
                 <tbody>
                   {materialsMap.map(({ label, key }) => {
+                    if (!shouldShowRow(label, key)) return null;
+
                     const aKey = `${key}_actual_reciepe`;
                     const wKey = `${key}_Wasted`;
                     const base = baseByLabel(label, key);
                     const total = totals[`${key}_total`];
                     const log = logByKey(key);
+
                     return (
                       <tr key={key}>
                         <td>
                           <div className="fw-semibold">{label}</div>
                           <div className="text-muted" style={{ fontSize: 12 }}>
-                            base: {base}
+                            base: {isEmptyOrZero(base) ? '' : base}
                           </div>
                         </td>
 
                         <td>
-                          <label
-                            className="form-label mb-1"
-                            style={{ fontSize: 12 }}
-                          >
+                          <label className="form-label mb-1" style={{ fontSize: 12 }}>
                             {aKey}
                           </label>
                           <input
@@ -184,20 +220,16 @@ const RawMaterialsConsumptionModal = React.memo(
                           />
                         </td>
 
-                        {/* 3) manual input — total (автовычисление) */}
                         <td style={{ minWidth: 120 }}>
                           {total === '' ? '' : total}
                         </td>
 
-                        {/* 4) Из лога */}
-                        <td style={{ minWidth: 120 }}>{log ?? ''}</td>
+                        <td style={{ minWidth: 120 }}>
+                          {isEmptyOrZero(log) ? '' : log}
+                        </td>
 
-                        {/* 5) manual input — Wasted */}
                         <td>
-                          <label
-                            className="form-label mb-1"
-                            style={{ fontSize: 12 }}
-                          >
+                          <label className="form-label mb-1" style={{ fontSize: 12 }}>
                             Wasted
                           </label>
                           <input
