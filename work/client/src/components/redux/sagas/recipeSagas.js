@@ -6,6 +6,7 @@ import {
   ADD_NEW_RAW_MAT_CONSUMPTION,
   ADD_NEW_RECIPE,
   DELETE_MATERIAL_PLAN,
+  DELETE_RAW_MAT_CONSUMPTION,
   DELETE_RECIPE,
   FULL_RECIPE,
   GET_FULL_RECIPE,
@@ -17,7 +18,7 @@ import {
   RECIPE_ORDERS_DATA,
   SAVE_MATERIAL_PLAN,
 } from '../types/recipeTypes';
-import { NEW_RAW_MAT_CONSUMPTION_SOCKET } from '../types/socketTypes/socket';
+import { DELETE_RAW_MAT_CONSUMPTION_SOCKET, NEW_RAW_MAT_CONSUMPTION_SOCKET } from '../types/socketTypes/socket';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -120,6 +121,18 @@ const addNewRawMatConsumption = (rawMatConsumption) => {
     });
 };
 
+const deleteRawMatConsumption = (rawMatConsumption) => {
+  return url
+    .post('/recipe_orders/raw_mat_consumption/delete', rawMatConsumption)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 function* getRecipeWorker(action) {
   try {
     const { recipe } = yield call(getRecipe);
@@ -195,6 +208,14 @@ function* addNewRawMatConsumptionWorker(action) {
   }
 }
 
+function* deleteRawMatConsumptionWorker(action) {
+  try {
+    yield call(deleteRawMatConsumption, action.payload);
+  } catch (err) {
+    yield put({ type: DELETE_RAW_MAT_CONSUMPTION_SOCKET, payload: [] });
+  }
+}
+
 // watchers
 
 function* recipeWatcher() {
@@ -208,6 +229,7 @@ function* recipeWatcher() {
 
   yield takeLatest(GET_RAW_MAT_CONSUMPTION, getRawMatConsumptionWorker);
   yield takeLatest(ADD_NEW_RAW_MAT_CONSUMPTION, addNewRawMatConsumptionWorker);
+  yield takeLatest(DELETE_RAW_MAT_CONSUMPTION, deleteRawMatConsumptionWorker);
 }
 
 export default recipeWatcher;

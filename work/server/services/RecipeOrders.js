@@ -33,6 +33,11 @@ class RecipeOrdersServices {
     await RecipeOrdersRepository.addNewRawMatConsumptionOrdersData(newRawMatConsumption);
     return;
   }
+
+  static async deleteRawMatConsumptionOrdersData(rawMatConsumption) {
+    await RecipeOrdersRepository.deleteRawMatConsumptionOrdersData(rawMatConsumption);
+    return;
+  }
 }
 
 module.exports = RecipeOrdersServices;

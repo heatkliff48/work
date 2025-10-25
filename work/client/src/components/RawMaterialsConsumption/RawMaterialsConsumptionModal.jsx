@@ -1,10 +1,14 @@
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { useDispatch } from 'react-redux';
+import { updateRawMaterialConsumptionRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
+import { deleteRawMatConsumption } from '#components/redux/actions/recipeAction.js';
 
 const RawMaterialsConsumptionModal = React.memo(
-  ({ isOpen, toggle, selectedRow, onSave }) => {
+  ({ isOpen, toggle, selectedRow }) => {
     const { list_of_recipes = [] } = useRecipeContext();
+    const dispatch = useDispatch();
 
     const recipe = useMemo(
       () =>
@@ -17,9 +21,9 @@ const RawMaterialsConsumptionModal = React.memo(
     const materialsMap = useMemo(
       () => [
         { label: 'Sand', key: 'sand_dry' },
-        { label: 'Sand slurry dry', key: 'sand_slurry_dry' },
+        { label: 'Sand slurry (dry)', key: 'sand_slurry_dry' },
         { label: 'Lime', key: 'lime' },
-        { label: 'Cemento', key: 'cement' },
+        { label: 'Cement', key: 'cement' },
         { label: 'Gypsum', key: 'gypsum_dry' },
         { label: 'Gypsum stone', key: 'gypsum_stone' },
         { label: 'Aluminum 1', key: 'aluminum_paste' },
@@ -116,25 +120,22 @@ const RawMaterialsConsumptionModal = React.memo(
     };
 
     const handleSave = () => {
-      const payload = {
-        recipe_article: selectedRow?.recipe_article ?? null,
-        production_volume: selectedRow?.production_volume ?? null,
-        items: materialsMap.map(({ label, key }) => ({
-          label,
-          key,
-          base: baseByLabel(label, key),
-          actual_reciepe:
-            form[`${key}_actual_reciepe`] === ''
-              ? null
-              : Number(form[`${key}_actual_reciepe`]),
-          total:
-            totals[`${key}_total`] === '' ? null : Number(totals[`${key}_total`]),
-          log: logByKey(key) ?? null,
-          wasted:
-            form[`${key}_Wasted`] === '' ? null : Number(form[`${key}_Wasted`]),
-        })),
-      };
-      onSave?.(payload);
+      const materials = materialsMap
+        .map(({ label, key }) => {
+          const raw = form[`${key}_Wasted`];
+          const wasted =
+            raw === '' || raw === null || raw === undefined ? null : Number(raw);
+
+          if (wasted === null || Number.isNaN(wasted)) return null;
+
+          return { type: label, quantity: wasted };
+        })
+        .filter(Boolean);
+
+      const body = { materials };
+
+      dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
+      dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
       toggle?.();
     };
 
@@ -168,7 +169,10 @@ const RawMaterialsConsumptionModal = React.memo(
                     <th style={{ minWidth: 220, background: '#fff59d' }}>
                       By recipe
                     </th>
-                    <th colSpan={2} style={{ background: '#ffe082', textAlign: 'center' }}>
+                    <th
+                      colSpan={2}
+                      style={{ background: '#ffe082', textAlign: 'center' }}
+                    >
                       manual input
                     </th>
                     <th style={{ background: '#c8e6c9', textAlign: 'center' }}>
@@ -207,7 +211,10 @@ const RawMaterialsConsumptionModal = React.memo(
                         </td>
 
                         <td>
-                          <label className="form-label mb-1" style={{ fontSize: 12 }}>
+                          <label
+                            className="form-label mb-1"
+                            style={{ fontSize: 12 }}
+                          >
                             {aKey}
                           </label>
                           <input
@@ -229,7 +236,10 @@ const RawMaterialsConsumptionModal = React.memo(
                         </td>
 
                         <td>
-                          <label className="form-label mb-1" style={{ fontSize: 12 }}>
+                          <label
+                            className="form-label mb-1"
+                            style={{ fontSize: 12 }}
+                          >
                             Wasted
                           </label>
                           <input

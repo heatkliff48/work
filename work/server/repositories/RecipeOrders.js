@@ -98,6 +98,16 @@ class RecipeOrdersRepository {
       return error;
     }
   }
+
+  static async deleteRawMatConsumptionOrdersData(rawMatConsumption) {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionOrdersData');
+    try {
+      await RawMatConsumptions.destroy({ where: { id: rawMatConsumption } });
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
 }
 
 module.exports = RecipeOrdersRepository;

@@ -15,4 +15,8 @@ router.post(
   '/raw_mat_consumption',
   RecipeOrdersController.addNewRawMatConsumptionOrdersData
 );
+router.post(
+  '/raw_mat_consumption/delete',
+  RecipeOrdersController.deleteRawMatConsumptionOrdersData
+);
 module.exports = router;

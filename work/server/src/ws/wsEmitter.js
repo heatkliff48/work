@@ -130,6 +130,7 @@ const {
   ADD_NEW_WAREHOUSE_AAC_SOCKET,
   UPDATE_WAREHOUSE_AAC_SOCKET,
   DELETE_WAREHOUSE_AAC_SOCKET,
+  DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -883,6 +884,17 @@ function registerWsEmitter(map) {
       userConnect.send(
         JSON.stringify({
           type: ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
+          payload: rawMatConsumption,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET, (rawMatConsumption) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
           payload: rawMatConsumption,
         })
       );
