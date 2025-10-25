@@ -7,6 +7,7 @@ import {
   DELETE_MATERIAL_PLAN,
   GET_RAW_MAT_CONSUMPTION,
   ADD_NEW_RAW_MAT_CONSUMPTION,
+  DELETE_RAW_MAT_CONSUMPTION,
 } from '../types/recipeTypes';
 
 export const getRecipe = () => {
@@ -65,3 +66,9 @@ export const addNewRawMatConsumption = (rawMatConsumption) => {
   };
 };
 
+export const deleteRawMatConsumption = (rawMatConsumption) => {
+  return {
+    type: DELETE_RAW_MAT_CONSUMPTION,
+    payload: rawMatConsumption,
+  };
+};

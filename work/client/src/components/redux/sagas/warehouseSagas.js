@@ -57,6 +57,8 @@ import {
   UPDATE_RAW_MATERIALS_WAREHOUSE,
   GET_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
+  UPDATE_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
+  UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
 } from '../types/warehouseTypes';
 import {
   ANCHOR_QUANTITYS_SOCKET,
@@ -544,6 +546,20 @@ const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
     });
 };
 
+const updateRawMaterialsConsumptionRawMaterialsWarehouse = (
+  rawMaterialsWarehouse
+) => {
+  return url
+    .post('/rawMaterialsWarehouse/raw_mat_con/update', rawMaterialsWarehouse)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 function* getAllWarehouseWatcher() {
   try {
     const { warehouse } = yield call(getAllWarehouse);
@@ -935,6 +951,17 @@ function* updateNewRawMaterialsWarehouseWorker(action) {
   }
 }
 
+function* updateRawMaterialsConsumptionRawMaterialsWarehouseWorker(action) {
+  try {
+    yield call(updateRawMaterialsConsumptionRawMaterialsWarehouse, action.payload);
+  } catch (err) {
+    yield put({
+      type: UPDATE_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
+      payload: [],
+    });
+  }
+}
+
 function* warehouseWatcher() {
   yield takeLatest(GET_ALL_WAREHOUSE, getAllWarehouseWatcher);
   yield takeLatest(ADD_NEW_WAREHOUSE, addNewWarehouseWatcher);
@@ -1041,6 +1068,10 @@ function* warehouseWatcher() {
   yield takeLatest(
     UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
     updateNewRawMaterialsWarehouseWorker
+  );
+  yield takeLatest(
+    UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
+    updateRawMaterialsConsumptionRawMaterialsWarehouseWorker
   );
 }
 

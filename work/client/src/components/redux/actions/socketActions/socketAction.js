@@ -121,6 +121,7 @@ import {
   NEW_WAREHOUSE_AAC_SOCKET,
   NEED_UPDATE_WAREHOUSE_AAC_SOCKET,
   NEED_DELETE_WAREHOUSE_AAC_SOCKET,
+  DELETE_RAW_MAT_CONSUMPTION_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -511,6 +512,13 @@ export const addNewRecipeSocket = (recipe) => {
 export const addNewRawMatConsumptionSocket = (rawMatConsumption) => {
   return {
     type: NEW_RAW_MAT_CONSUMPTION_SOCKET,
+    payload: rawMatConsumption,
+  };
+};
+
+export const deleteRawMatConsumptionSocket = (rawMatConsumption) => {
+  return {
+    type: DELETE_RAW_MAT_CONSUMPTION_SOCKET,
     payload: rawMatConsumption,
   };
 };

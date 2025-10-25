@@ -37,6 +37,7 @@ import {
   ADD_NEW_AUTOCLAVE_CALENDAR,
   GET_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
+  UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
 } from '../types/warehouseTypes';
 
 export const getAllWarehouse = () => {
@@ -291,6 +292,13 @@ export const getRawMaterialsWarehouse = () => {
 export const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
   return {
     type: UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
+    payload: rawMaterialsWarehouse,
+  };
+};
+
+export const updateRawMaterialConsumptionRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
+  return {
+    type: UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
     payload: rawMaterialsWarehouse,
   };
 };

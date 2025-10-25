@@ -93,6 +93,7 @@ import {
   updateToolQuantitysSocket,
   updateRelMatQuantitysSocket,
   addNewRawMatConsumptionSocket,
+  deleteRawMatConsumptionSocket,
   updateRawMaterialsWarehouseSocket,
   addNewWarehouseSandSocket,
   updateWarehouseSandSocket,
@@ -281,6 +282,7 @@ import {
   GET_NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   GET_UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   GET_DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+  DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -543,6 +545,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET:
       dispatch(addNewRawMatConsumptionSocket(payload));
+      break;
+
+    case DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET:
+      dispatch(deleteRawMatConsumptionSocket(payload));
       break;
 
     case DELETE_RECIPE_SOCKET:
