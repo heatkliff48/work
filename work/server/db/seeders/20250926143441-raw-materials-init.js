@@ -16,7 +16,7 @@ module.exports = {
       "RawMaterialsWarehouses",
       [
         {
-          material_type: "Sand",
+          material_type: "Sand (dry)",
           remaining_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
@@ -37,7 +37,7 @@ module.exports = {
           updatedAt: currentDate,
         },
         {
-          material_type: "Gypsum",
+          material_type: "Gypsum (dry)",
           remaining_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
