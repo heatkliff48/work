@@ -24,7 +24,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
 
   const sand_slurry = [
     {
-      Header: "Sand",
+      Header: "Sand (dry)",
       accessor: "sand",
       Filter: TextSearchFilter,
     },
@@ -114,7 +114,10 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
         // remaining_quantity: summ,
         // last_updated: date,
         materials: [
-          { type: "Sand", quantity: parseFloat(sandSlurryWarehouseInput.sand) },
+          {
+            type: "Sand (dry)",
+            quantity: parseFloat(sandSlurryWarehouseInput.sand),
+          },
           {
             type: "Gypsum stone",
             quantity: parseFloat(sandSlurryWarehouseInput.gypsum_stone),

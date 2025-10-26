@@ -1,15 +1,15 @@
-import Table from '../Table/Table';
-import { TextSearchFilter } from '#components/Table/filters.js';
-import Modal from 'react-bootstrap/Modal';
-import { useCallback } from 'react';
-import { useSelector } from 'react-redux';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import { useNavigate } from 'react-router-dom';
-import RawMaterialsWarehouseAdd from './RawMaterialsWarehouseAdd';
-import RawMaterialsWarehouseSupplierInfoAdd from './RawMaterialsWarehouseSupplierInfoAdd';
-import '#components/Styles/modals.css';
+import Table from "../Table/Table";
+import { TextSearchFilter } from "#components/Table/filters.js";
+import Modal from "react-bootstrap/Modal";
+import { useCallback } from "react";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+import { useEffect } from "react";
+import { useUsersContext } from "#components/contexts/UserContext.js";
+import { useNavigate } from "react-router-dom";
+import RawMaterialsWarehouseAdd from "./RawMaterialsWarehouseAdd";
+import RawMaterialsWarehouseSupplierInfoAdd from "./RawMaterialsWarehouseSupplierInfoAdd";
+import "#components/Styles/modals.css";
 
 function RawMaterialsWarehouseInfo(props) {
   const [addModalShow, setAddModalShow] = useState(false);
@@ -18,30 +18,31 @@ function RawMaterialsWarehouseInfo(props) {
 
   const user = useSelector((state) => state.user);
 
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
 
   const navigate = useNavigate();
 
   const useRawMaterialSelector = (materialType) => {
     return useSelector((state) => {
       switch (materialType) {
-        case 'Sand':
+        case "Sand (dry)":
           return state.warehouseSand;
-        case 'Lime':
+        case "Lime":
           return state.warehouseLime;
-        case 'Cement':
+        case "Cement":
           return state.warehouseCement;
-        case 'Gypsum':
+        case "Gypsum (dry)":
           return state.warehouseGypsum;
-        case 'Gypsum stone':
+        case "Gypsum stone":
           return state.warehouseGypsumStone;
-        case 'Aluminum 1':
+        case "Aluminum 1":
           return state.warehouseAluminum1;
-        case 'Aluminum 2':
+        case "Aluminum 2":
           return state.warehouseAluminum2;
-        case 'Grinding Balls':
+        case "Grinding Balls":
           return state.warehouseGrindingBalls;
-        case 'AAC':
+        case "AAC":
           return state.warehouseAAC;
         default:
           return state.warehouseSand;
@@ -53,23 +54,23 @@ function RawMaterialsWarehouseInfo(props) {
 
   const raw_material_table = [
     {
-      Header: 'Supplier',
-      accessor: 'supplier',
+      Header: "Supplier",
+      accessor: "supplier",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity, kg',
-      accessor: 'quantity',
+      Header: "Quantity, kg",
+      accessor: "quantity",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Date',
-      accessor: 'date',
+      Header: "Date",
+      accessor: "date",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quality',
-      accessor: 'quality',
+      Header: "Quality",
+      accessor: "quality",
       Filter: TextSearchFilter,
     },
   ];
@@ -81,11 +82,11 @@ function RawMaterialsWarehouseInfo(props) {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Warehouse');
+      const access = checkUserAccess(user, roles, "Warehouse");
       setUserAccess(access);
 
       if (!access?.canRead) {
-        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+        navigate("/"); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }
   }, [user, roles]);
@@ -106,7 +107,7 @@ function RawMaterialsWarehouseInfo(props) {
         </Modal.Title> */}
         </Modal.Header>
         <Modal.Body className="p-0">
-          {' '}
+          {" "}
           {/* Убираем padding для полной ширины таблицы */}
           <Table
             COLUMN_DATA={raw_material_table}

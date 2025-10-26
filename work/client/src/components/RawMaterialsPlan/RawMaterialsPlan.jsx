@@ -1,5 +1,6 @@
 import { useProductsContext } from "#components/contexts/ProductContext.js";
 import { useRecipeContext } from "#components/contexts/RecipeContext.js";
+import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
 import { saveMaterialPlan } from "#components/redux/actions/recipeAction.js";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,6 +9,7 @@ import Select from "react-select";
 function RawMaterialsPlan() {
   const { list_of_recipes, recipe_info } = useRecipeContext();
   const { latestProducts } = useProductsContext();
+  const { raw_materials_warehouse } = useWarehouseContext();
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_ordered_production = useSelector(
     (state) => state.listOfOrderedProduction
@@ -31,11 +33,17 @@ function RawMaterialsPlan() {
 
   const rawMaterials = recipe_info
     .filter((item) => !excludedAccessors.includes(item.accessor))
-    .map((item) => ({
-      name: item.Header,
-      title: item.accessor,
-      remaining: 0,
-    }));
+    .map((item) => {
+      const warehouseMaterial = raw_materials_warehouse.find(
+        (warehouseItem) => warehouseItem.material_type === item.Header
+      );
+
+      return {
+        name: item.Header,
+        title: item.accessor,
+        remaining: warehouseMaterial ? warehouseMaterial.remaining_quantity : 0,
+      };
+    });
 
   // const rawMaterials = [
   //   { name: 'Sand', title: 'sand', remaining: 0 },
@@ -165,7 +173,7 @@ function RawMaterialsPlan() {
       };
     });
     setTotals(updatedTotals);
-  }, [manualOrderShare, productsArray]);
+  }, [manualOrderShare, productsArray, raw_materials_warehouse]);
 
   return (
     <div className="raw-materials-plan">
