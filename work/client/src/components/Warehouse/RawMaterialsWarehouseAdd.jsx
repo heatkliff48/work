@@ -1,17 +1,18 @@
-
-import { TextSearchFilter } from '#components/Table/filters.js';
-import { Modal, Button, Row, Col } from 'react-bootstrap';
-import { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import { useNavigate } from 'react-router-dom';
-import { Container } from 'reactstrap';
-import * as warehouseActions from '#components/redux/actions/warehouseRawMaterialsAction.js';
+import { TextSearchFilter } from "#components/Table/filters.js";
+import { Modal, Button, Row, Col } from "react-bootstrap";
+import { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import { useEffect } from "react";
+import { useUsersContext } from "#components/contexts/UserContext.js";
+import { useNavigate } from "react-router-dom";
+import { Container } from "reactstrap";
+import * as warehouseActions from "#components/redux/actions/warehouseRawMaterialsAction.js";
 
 function RawMaterialsWarehouseAdd(props) {
-  const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState({});
+  const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState(
+    {}
+  );
 
   const user = useSelector((state) => state.user);
 
@@ -22,18 +23,18 @@ function RawMaterialsWarehouseAdd(props) {
 
   const raw_material_table = [
     {
-      Header: 'Supplier',
-      accessor: 'supplier',
+      Header: "Supplier",
+      accessor: "supplier",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity, kg',
-      accessor: 'quantity',
+      Header: "Quantity, kg",
+      accessor: "quantity",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Date',
-      accessor: 'date',
+      Header: "Date",
+      accessor: "date",
       Filter: TextSearchFilter,
     },
   ];
@@ -47,11 +48,11 @@ function RawMaterialsWarehouseAdd(props) {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Warehouse');
+      const access = checkUserAccess(user, roles, "Warehouse");
       setUserAccess(access);
 
       if (!access?.canRead) {
-        navigate('/');
+        navigate("/");
       }
     }
   }, [user, roles]);
@@ -59,14 +60,14 @@ function RawMaterialsWarehouseAdd(props) {
   // Функция для получения правильного action
   const getAddAction = useCallback((materialType) => {
     const actionMap = {
-      Sand: warehouseActions.addNewWarehouseSand,
+      "Sand (dry)": warehouseActions.addNewWarehouseSand,
       Lime: warehouseActions.addNewWarehouseLime,
       Cement: warehouseActions.addNewWarehouseCement,
-      Gypsum: warehouseActions.addNewWarehouseGypsum,
-      'Gypsum stone': warehouseActions.addNewWarehouseGypsumStone,
-      'Aluminum 1': warehouseActions.addNewWarehouseAluminum1,
-      'Aluminum 2': warehouseActions.addNewWarehouseAluminum2,
-      'Grinding Balls': warehouseActions.addNewWarehouseGrindingBalls,
+      "Gypsum (dry)": warehouseActions.addNewWarehouseGypsum,
+      "Gypsum stone": warehouseActions.addNewWarehouseGypsumStone,
+      "Aluminum 1": warehouseActions.addNewWarehouseAluminum1,
+      "Aluminum 2": warehouseActions.addNewWarehouseAluminum2,
+      "Grinding Balls": warehouseActions.addNewWarehouseGrindingBalls,
       AAC: warehouseActions.addNewWarehouseAAC,
     };
 
@@ -107,7 +108,7 @@ function RawMaterialsWarehouseAdd(props) {
             <h3>Add {props?.material_type}</h3>
             <Row>
               {raw_material_table.map((el) =>
-                el.accessor === 'date' ? null : (
+                el.accessor === "date" ? null : (
                   <Col key={el.accessor}>
                     <div className="md:flex md:items-center mb-6">
                       <div className="md:w-1/3">
@@ -124,7 +125,7 @@ function RawMaterialsWarehouseAdd(props) {
                           id={el.accessor}
                           name={el.accessor}
                           type="text"
-                          value={rawMaterialWarehouseInput[el.accessor] || ''}
+                          value={rawMaterialWarehouseInput[el.accessor] || ""}
                           onChange={handleRawMaterialWarehouseInputChange}
                         />
                       </div>
