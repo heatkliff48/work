@@ -95,11 +95,22 @@ export default function ProductionPlannerCalendar({
     return Math.max(lo, Math.min(hi, x));
   }
 
-  function setQty(iso, qty) {
+  function toNum(v) {
+    return v === '' || v === null || v === undefined
+      ? 0
+      : Math.max(0, Number(v) || 0);
+  }
+
+  function setQty(iso, qtyRaw) {
     const prev = map[iso] ?? { scheduled_autoclaves: 0, produced_autoclave: 0 };
-    const nextQty = clamp(qty, min, max);
-    // не даём "выполнено" быть больше плана
-    const nextDone = clamp(prev.produced_autoclave, min, nextQty);
+
+    // поддержка пустой строки из инпута
+    const nextQty = qtyRaw === '' ? '' : clamp(qtyRaw, min, max);
+
+    // не даём "выполнено" быть больше плана — только если план число
+    const cap =
+      typeof nextQty === 'number' ? nextQty : Number(prev.scheduled_autoclaves) || 0;
+    const nextDone = clamp(prev.produced_autoclave, min, cap);
 
     const next = {
       ...map,
@@ -510,34 +521,174 @@ export default function ProductionPlannerCalendar({
                     )
                   }
                 </div>
-                {qty === 0 ? (
-                  <>
-                    {qty >= 0 && (
-                      <div style={styles.badgePlan} title="Scheduled autoclaves ">
-                        {qty}
+                {(() => {
+                  // используем твои qty / done, но приводим через toNum (есть в файле выше)
+                  const scheduled = toNum(qty);
+                  const filled = toNum(done);
+                  const producedMode = filled === scheduled && filled > 0;
+                  const showInitialZero = scheduled === 0 && filled === 0;
+
+                  if (showInitialZero) {
+                    // стартовое состояние: один красный ноль по центру
+                    return (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          paddingBottom: 8,
+                        }}
+                      >
+                        <span
+                          style={{
+                            minWidth: 26,
+                            height: 26,
+                            borderRadius: 999,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 700,
+                            fontSize: 12,
+                            color: '#0f172a',
+                            background: '#fecaca',
+                            boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.05)',
+                          }}
+                        >
+                          0
+                        </span>
                       </div>
-                    )}
-                  </>
-                ) : fill_ac === done && fill_ac > 0 && done > 0 ? (
-                  <>
-                    <div style={styles.badgeFinish} title="Produced autoclaves">
-                      {fill_ac}
+                    );
+                  }
+
+                  if (producedMode) {
+                    // Produced autoclaves (кружок #5aaccce6)
+                    return (
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: 6,
+                          padding: '4px 0 8px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 8,
+                            width: '100%',
+                          }}
+                        >
+                          <span style={{ fontSize: 12, color: '#475569' }}>
+                            Produced autoclaves
+                          </span>
+                          <span
+                            style={{
+                              minWidth: 26,
+                              height: 26,
+                              borderRadius: 999,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 700,
+                              fontSize: 12,
+                              color: '#0f172a',
+                              background: '#5aaccce6',
+                              boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.05)',
+                            }}
+                          >
+                            {filled}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // Обычный режим: сверху Filled (зелёный), по центру линия 50%, снизу Scheduled (красный)
+                  return (
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '4px 0 8px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                          width: '100%',
+                        }}
+                      >
+                        <span style={{ fontSize: 12, color: '#475569' }}>
+                          Filled autoclaves
+                        </span>
+                        <span
+                          style={{
+                            minWidth: 26,
+                            height: 26,
+                            borderRadius: 999,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 700,
+                            fontSize: 12,
+                            color: '#0f172a',
+                            background: '#9ae6b4',
+                            boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.05)',
+                          }}
+                        >
+                          {filled}
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          width: '50%',
+                          height: 0,
+                          borderTop: '2px solid #e2e8f0',
+                        }}
+                      />
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                          width: '100%',
+                        }}
+                      >
+                        <span style={{ fontSize: 12, color: '#475569' }}>
+                          Scheduled autoclaves
+                        </span>
+                        <span
+                          style={{
+                            minWidth: 26,
+                            height: 26,
+                            borderRadius: 999,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 700,
+                            fontSize: 12,
+                            color: '#0f172a',
+                            background: '#fecaca',
+                            boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.05)',
+                          }}
+                        >
+                          {scheduled}
+                        </span>
+                      </div>
                     </div>
-                  </>
-                ) : (
-                  <>
-                    {qty >= 0 && (
-                      <div style={styles.badgePlan} title="Scheduled autoclaves ">
-                        {qty}
-                      </div>
-                    )}
-                    {done >= 0 && (
-                      <div style={styles.badgeDone} title="Filled autoclaves">
-                        {done}
-                      </div>
-                    )}
-                  </>
-                )}
+                  );
+                })()}
               </button>
 
               {isOpen && (
@@ -551,9 +702,18 @@ export default function ProductionPlannerCalendar({
                       ✕
                     </button>
                   </div>
+
                   <div style={styles.row}>
                     <label style={styles.label}>Количество:</label>
-                    <input type="number" value={qty} style={styles.input} />
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      value={qty === 0 ? '' : qty}
+                      placeholder="0"
+                      onChange={(e) => setQty(iso, e.target.value)}
+                      style={styles.input}
+                    />
                   </div>
                   <div style={{ ...styles.row, gap: 6, flexWrap: 'wrap' }}>
                     {presets.map((p, idx) => (
@@ -580,6 +740,7 @@ export default function ProductionPlannerCalendar({
           );
         })}
       </div>
+
       <div style={styles.footer}>
         <button style={styles.saveBtn} onClick={saveHandler}>
           Save
