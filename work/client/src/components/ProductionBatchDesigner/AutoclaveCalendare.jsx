@@ -923,7 +923,7 @@ const styles = {
     fontSize: 13,
   },
   legendDot: { width: 10, height: 10, borderRadius: '50%', display: 'inline-block' },
-  dotRed: { background: '#ff0000' }, // как badgePlan
+  dotRed: { background: 'rgb(254, 202, 202)' }, // как badgePlan
   dotGreen: { background: 'rgba(9, 255, 0, 1)' }, // как badgeDone
   dotGray: { background: '#5aaccce6' }, // «не активен»/прошедший/вне месяца
 };
