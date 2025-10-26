@@ -463,8 +463,12 @@ export default function ProductionPlannerCalendar({
 
           const autoclaveData = autoclave_calendar.find((el) => el.date == iso);
 
-          const qty = obj.scheduled_autoclaves;
-          const done = obj.produced_autoclave;
+          const qty = autoclaveData
+            ? autoclaveData.scheduled_autoclaves
+            : obj.scheduled_autoclaves;
+          const done = autoclaveData
+            ? autoclaveData.produced_autoclave
+            : obj.produced_autoclave;
           const fill_ac = autoclaveData ? autoclaveData?.filled_autoclaves : 0;
 
           const todayISO = format(new Date(), 'yyyy-MM-dd'); // date-fns уже используешь
@@ -488,46 +492,47 @@ export default function ProductionPlannerCalendar({
                 <div style={styles.dayNumber}>
                   {format(day, 'd', { locale: ru })}
                   {
-                  // qty > 0 && done > 0 && 
-                  isPastBtn && fill_ac !== done && (
-                    <div
-                      style={styles.btnNext}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        nextHandler(qty, done, iso);
-                      }}
-                    >
-                      <img
-                        src={next3}
-                        alt="next3"
-                        style={{ width: '30px', height: '30px' }}
-                      />
-                    </div>
-                  )}
+                    // qty > 0 && done > 0 &&
+                    isPastBtn && fill_ac !== done && (
+                      <div
+                        style={styles.btnNext}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          nextHandler(qty, done, iso);
+                        }}
+                      >
+                        <img
+                          src={next3}
+                          alt="next3"
+                          style={{ width: '30px', height: '30px' }}
+                        />
+                      </div>
+                    )
+                  }
                 </div>
-                {qty == 0 ? (
+                {qty === 0 ? (
                   <>
                     {qty >= 0 && (
-                      <div style={styles.badgePlan} title="План">
+                      <div style={styles.badgePlan} title="Scheduled autoclaves ">
                         {qty}
                       </div>
                     )}
                   </>
                 ) : fill_ac === done && fill_ac > 0 && done > 0 ? (
                   <>
-                    <div style={styles.badgeDone} title="Произведено">
+                    <div style={styles.badgeFinish} title="Produced autoclaves">
                       {fill_ac}
                     </div>
                   </>
                 ) : (
                   <>
                     {qty >= 0 && (
-                      <div style={styles.badgePlan} title="План">
+                      <div style={styles.badgePlan} title="Scheduled autoclaves ">
                         {qty}
                       </div>
                     )}
                     {done >= 0 && (
-                      <div style={styles.badgeDone} title="Выполнено">
+                      <div style={styles.badgeDone} title="Filled autoclaves">
                         {done}
                       </div>
                     )}
@@ -581,6 +586,20 @@ export default function ProductionPlannerCalendar({
         </button>
         <div style={styles.hint}>
           Кликните по дате, чтобы установить план/выполнение.
+        </div>
+        <div style={styles.legend}>
+          <span style={styles.legendItem}>
+            <span style={{ ...styles.legendDot, ...styles.dotRed }} /> Scheduled
+            autoclaves
+          </span>
+          <span style={styles.legendItem}>
+            <span style={{ ...styles.legendDot, ...styles.dotGreen }} /> Filled
+            autoclaves
+          </span>
+          <span style={styles.legendItem}>
+            <span style={{ ...styles.legendDot, ...styles.dotGray }} /> Prduced
+            autoclaves
+          </span>
         </div>
       </div>
     </div>
@@ -670,6 +689,17 @@ const styles = {
     background: 'rgba(9, 255, 0, 1)',
     color: '#000000ff',
   },
+  badgeFinish: {
+    position: 'absolute',
+    bottom: 23,
+    right: 40,
+    fontSize: '20px',
+    padding: '0px 5px',
+    borderRadius: 1000,
+    border: '1px solid #94a3b8',
+    background: '#5aaccce6',
+    color: '#000000ff',
+  },
   popover: {
     position: 'absolute',
     zIndex: 1000,
@@ -723,4 +753,16 @@ const styles = {
     cursor: 'pointer',
   },
   hint: { marginTop: 8, fontSize: 12, color: '#64748b' },
+  legend: { display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' },
+  legendItem: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    color: '#475569',
+    fontSize: 13,
+  },
+  legendDot: { width: 10, height: 10, borderRadius: '50%', display: 'inline-block' },
+  dotRed: { background: '#ff0000' }, // как badgePlan
+  dotGreen: { background: 'rgba(9, 255, 0, 1)' }, // как badgeDone
+  dotGray: { background: '#5aaccce6' }, // «не активен»/прошедший/вне месяца
 };
