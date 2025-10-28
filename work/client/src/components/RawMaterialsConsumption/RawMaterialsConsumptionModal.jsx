@@ -4,10 +4,12 @@ import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { useDispatch } from 'react-redux';
 import { updateRawMaterialConsumptionRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
 import { deleteRawMatConsumption } from '#components/redux/actions/recipeAction.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 const RawMaterialsConsumptionModal = React.memo(
   ({ isOpen, toggle, selectedRow }) => {
     const { list_of_recipes = [] } = useRecipeContext();
+    const { raw_materials_warehouse = [] } = useWarehouseContext();
     const dispatch = useDispatch();
 
     const recipe = useMemo(
@@ -33,6 +35,16 @@ const RawMaterialsConsumptionModal = React.memo(
       ],
       [recipe]
     );
+
+    const warehouseByType = React.useMemo(() => {
+      const map = new Map();
+      (raw_materials_warehouse || []).forEach((row) => {
+        const type = String(row?.material_type ?? '').trim();
+        const qty = Number(row?.remaining_quantity ?? 0) || 0;
+        if (type) map.set(type, qty);
+      });
+      return map;
+    }, [raw_materials_warehouse]);
 
     const ALWAYS_VISIBLE = useMemo(
       () => new Set(['Aluminum 1', 'Aluminum 2', 'Grinding Balls', 'AAC']),
@@ -119,24 +131,79 @@ const RawMaterialsConsumptionModal = React.memo(
       );
     };
 
+    // const handleSave = () => {
+    //   const materials = materialsMap
+    //     .map(({ label, key }) => {
+    //       const raw = form[`${key}_Wasted`];
+    //       const wasted =
+    //         raw === '' || raw === null || raw === undefined ? null : Number(raw);
+
+    //       if (wasted === null || Number.isNaN(wasted)) return null;
+
+    //       return { type: label, quantity: wasted };
+    //     })
+    //     .filter(Boolean);
+
+    //   const body = { materials };
+
+    //   dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
+    //   dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+    //   toggle?.();
+    // };
+
+    // 2) обновлённый handleSave с проверкой наличия материалов
     const handleSave = () => {
+      // Собираем только введённые пользователем значения "Wasted"
       const materials = materialsMap
         .map(({ label, key }) => {
           const raw = form[`${key}_Wasted`];
           const wasted =
             raw === '' || raw === null || raw === undefined ? null : Number(raw);
-
-          if (wasted === null || Number.isNaN(wasted)) return null;
-
+          if (wasted === null || Number.isNaN(wasted) || wasted <= 0) return null;
           return { type: label, quantity: wasted };
         })
         .filter(Boolean);
 
-      const body = { materials };
+      // Если нечего списывать — просто выходим (можно показать уведомление, если нужно)
+      if (!materials.length) {
+        alert('Нет данных для списания материалов.');
+        return;
+      }
 
-      dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
-      dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
-      toggle?.();
+      // Проверяем наличие на складе
+      const shortages = [];
+      for (const { type, quantity } of materials) {
+        const have = warehouseByType.get(type) ?? 0;
+        if (quantity > have) {
+          shortages.push({
+            type,
+            need: +Number(quantity).toFixed(3),
+            have: +Number(have).toFixed(3),
+            lack: +Number(quantity - have).toFixed(3),
+          });
+        }
+      }
+
+      // Если есть дефицит — предупреждаем и НИЧЕГО не отправляем
+      if (shortages.length) {
+        const msg =
+          'Невозможно списать материалы — недостаточно на складе:\n\n' +
+          shortages
+            .map(
+              (s) =>
+                `${s.type}: нужно ${s.need}, на складе ${s.have} (не хватает ${s.lack})`
+            )
+            .join('\n');
+        alert(msg);
+        return;
+      }
+
+      // Всё ок — отправляем на списание
+      const body = { materials };
+      console.log('body', body);
+      // dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
+      // dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+      // toggle?.();
     };
 
     return (
