@@ -344,9 +344,11 @@ function AddNewRecipeModal({ show, onHide }) {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <button form="addNewRecipeModal" onClick={addRecipeHandler}>
-            Add new recipe
-          </button>
+          {haveProduct && (
+            <Button form="addNewRecipeModal" onClick={addRecipeHandler}>
+              Add new recipe
+            </Button>
+          )}
           <Button onClick={closeHandler}>Close</Button>
         </Modal.Footer>
       </Modal>

@@ -13,6 +13,7 @@ function RawMaterialsWarehouseAdd(props) {
   const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState(
     {}
   );
+  const [errors, setErrors] = useState({});
 
   const user = useSelector((state) => state.user);
 
@@ -44,6 +45,11 @@ function RawMaterialsWarehouseAdd(props) {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [e.target.name]: "",
+    }));
   }, []);
 
   useEffect(() => {
@@ -57,7 +63,6 @@ function RawMaterialsWarehouseAdd(props) {
     }
   }, [user, roles]);
 
-  // Функция для получения правильного action
   const getAddAction = useCallback((materialType) => {
     const actionMap = {
       "Sand (dry)": warehouseActions.addNewWarehouseSand,
@@ -74,8 +79,42 @@ function RawMaterialsWarehouseAdd(props) {
     return actionMap[materialType] || warehouseActions.addNewWarehouseSand;
   }, []);
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!rawMaterialWarehouseInput?.supplier?.trim()) {
+      newErrors.supplier = "Supplier is required";
+    }
+
+    if (!rawMaterialWarehouseInput?.quantity?.trim()) {
+      newErrors.quantity = "Quantity is required";
+    } else if (
+      isNaN(rawMaterialWarehouseInput.quantity) ||
+      parseFloat(rawMaterialWarehouseInput.quantity) <= 0
+    ) {
+      newErrors.quantity = "Quantity must be a positive number";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const resetModal = useCallback(() => {
+    setRawMaterialWarehouseInput({});
+    setErrors({});
+  }, []);
+
+  const handleHide = useCallback(() => {
+    props.onHide();
+    resetModal();
+  }, [props.onHide, resetModal]);
+
   const onSubmitForm = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
 
     const addAction = getAddAction(props?.material_type);
 
@@ -86,6 +125,7 @@ function RawMaterialsWarehouseAdd(props) {
       })
     );
     setRawMaterialWarehouseInput({});
+    setErrors({});
     props.onHide();
   };
 
@@ -96,6 +136,7 @@ function RawMaterialsWarehouseAdd(props) {
       aria-labelledby="contained-modal-title-vcenter"
       centered
       dialogClassName="modal-auto-size"
+      onExited={resetModal}
     >
       <Modal.Header closeButton></Modal.Header>
       <Modal.Body>
@@ -121,13 +162,22 @@ function RawMaterialsWarehouseAdd(props) {
                       </div>
                       <div className="md:w-2/3">
                         <input
-                          className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                          className={`bg-gray-200 appearance-none border-2 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500 ${
+                            errors[el.accessor]
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
                           id={el.accessor}
                           name={el.accessor}
                           type="text"
                           value={rawMaterialWarehouseInput[el.accessor] || ""}
                           onChange={handleRawMaterialWarehouseInputChange}
                         />
+                        {errors[el.accessor] && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors[el.accessor]}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </Col>
@@ -141,7 +191,7 @@ function RawMaterialsWarehouseAdd(props) {
         <Button form="addClientModel" type="submit">
           Add {props?.material_type.toLowerCase()}
         </Button>
-        <Button onClick={props.onHide}>Close</Button>
+        <Button onClick={handleHide}>Close</Button>
       </Modal.Footer>
     </Modal>
   );
