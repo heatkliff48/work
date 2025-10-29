@@ -1,15 +1,15 @@
-import { TextSearchFilter } from "#components/Table/filters.js";
-import { Modal, Button, Row, Col } from "react-bootstrap";
-import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { useNavigate } from "react-router-dom";
-import { Container } from "reactstrap";
-import * as warehouseActions from "#components/redux/actions/warehouseRawMaterialsAction.js";
-import { updateRawMaterialsWarehouse } from "#components/redux/actions/warehouseAction.js";
-import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
+import { TextSearchFilter } from '#components/Table/filters.js';
+import { Modal, Button, Row, Col } from 'react-bootstrap';
+import { useCallback, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { useNavigate } from 'react-router-dom';
+import { Container } from 'reactstrap';
+import * as warehouseActions from '#components/redux/actions/warehouseRawMaterialsAction.js';
+import { updateRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 function RawMaterialsWarehouseAddSandSlurry(props) {
   const [sandSlurryWarehouseInput, setSandSlurryWarehouseInput] = useState({});
@@ -24,28 +24,28 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
 
   const sand_slurry = [
     {
-      Header: "Sand (dry)",
-      accessor: "sand",
+      Header: 'Sand (dry)',
+      accessor: 'sand',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Gypsum stone",
-      accessor: "gypsum_stone",
+      Header: 'Gypsum stone',
+      accessor: 'gypsum_stone',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Water",
-      accessor: "water",
+      Header: 'Water',
+      accessor: 'water',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Grinding balls",
-      accessor: "grinding_balls",
+      Header: 'Grinding balls',
+      accessor: 'grinding_balls',
       Filter: TextSearchFilter,
     },
     {
-      Header: "AAC",
-      accessor: "aac",
+      Header: 'AAC scrap',
+      accessor: 'aac',
       Filter: TextSearchFilter,
     },
   ];
@@ -59,11 +59,11 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, "Warehouse");
+      const access = checkUserAccess(user, roles, 'Warehouse');
       setUserAccess(access);
 
       if (!access?.canRead) {
-        navigate("/");
+        navigate('/');
       }
     }
   }, [user, roles]);
@@ -79,7 +79,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     }
 
     const remainingQuantityPrev = raw_materials_warehouse.find(
-      (el) => el?.material_type == "Sand slurry (dry)"
+      (el) => el?.material_type == 'Sand slurry (dry)'
     ).remaining_quantity;
 
     return (
@@ -103,8 +103,8 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     //   })
     // );
     const today = new Date();
-    const day = today.getDate().toString().padStart(2, "0");
-    const month = (today.getMonth() + 1).toString().padStart(2, "0");
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
     const year = today.getFullYear();
 
     const date = `${day}.${month}.${year}`;
@@ -115,18 +115,18 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
         // last_updated: date,
         materials: [
           {
-            type: "Sand (dry)",
+            type: 'Sand (dry)',
             quantity: parseFloat(sandSlurryWarehouseInput.sand),
           },
           {
-            type: "Gypsum stone",
+            type: 'Gypsum stone',
             quantity: parseFloat(sandSlurryWarehouseInput.gypsum_stone),
           },
           {
-            type: "Grinding Balls",
+            type: 'Grinding Balls',
             quantity: parseFloat(sandSlurryWarehouseInput.grinding_balls),
           },
-          { type: "AAC", quantity: parseFloat(sandSlurryWarehouseInput.aac) },
+          { type: 'AAC', quantity: parseFloat(sandSlurryWarehouseInput.aac) },
         ],
       })
     );
@@ -153,7 +153,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
             <h3>Add sand slurry</h3>
             <Row>
               {sand_slurry.map((el) =>
-                el.accessor === "date" ? null : (
+                el.accessor === 'date' ? null : (
                   // <Col key={el.accessor}>
                   <div className="md:flex md:items-center mb-6">
                     <div className="md:w-1/3">
@@ -170,7 +170,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                         id={el.accessor}
                         name={el.accessor}
                         type="text"
-                        value={sandSlurryWarehouseInput[el.accessor] || ""}
+                        value={sandSlurryWarehouseInput[el.accessor] || ''}
                         onChange={handleRawMaterialWarehouseInputChange}
                       />
                     </div>
