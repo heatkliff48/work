@@ -1,76 +1,82 @@
-import Table from '#components/Table/Table';
-import Button from 'react-bootstrap/Button';
-import { FaPlus, FaMinus } from 'react-icons/fa';
-import { TextSearchFilter } from '#components/Table/filters.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import React, { Fragment, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import ShowQualityManagementAddModal from './QualityManagementAddModal';
+import Table from "#components/Table/Table";
+import Button from "react-bootstrap/Button";
+import { FaPlus, FaMinus } from "react-icons/fa";
+import { TextSearchFilter } from "#components/Table/filters.js";
+import { useUsersContext } from "#components/contexts/UserContext.js";
+import React, { Fragment, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ShowQualityManagementAddModal from "./QualityManagementAddModal";
 import {
   deleteQualityManagement,
   updateQualityManagement,
-} from '#components/redux/actions/qualityManagementAction.js';
+} from "#components/redux/actions/qualityManagementAction.js";
 import {
   addNewAutoclaveCalendar,
   addNewWarehouse,
   updListOfOrderedProduction,
-} from '#components/redux/actions/warehouseAction.js';
+} from "#components/redux/actions/warehouseAction.js";
 import {
   deleteBatchOutside,
   updateBatchOutside,
-} from '#components/redux/actions/batchOutsideAction.js';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.js';
-import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+} from "#components/redux/actions/batchOutsideAction.js";
+import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
+import { useProductsContext } from "#components/contexts/ProductContext.js";
+import { addNewRawMatConsumption } from "#components/redux/actions/recipeAction.js";
+import { useRecipeContext } from "#components/contexts/RecipeContext.js";
 
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
 
-  const { list_of_ordered_production, autoclave_calendar } = useWarehouseContext();
+  const { list_of_ordered_production, autoclave_calendar } =
+    useWarehouseContext();
   const { latestProducts } = useProductsContext();
-  const { raw_mat_consumption, recipeOrders, list_of_recipes } = useRecipeContext();
+  const { raw_mat_consumption, recipeOrders, list_of_recipes } =
+    useRecipeContext();
 
   const dispatch = useDispatch();
-  const qualityManagementData = useSelector((state) => state.qualityManagementData);
+  const qualityManagementData = useSelector(
+    (state) => state.qualityManagementData
+  );
   const batchOutside = useSelector((state) => state.batchOutside);
 
-  const [qualityManagementDataList, setQualityManagementDataList] = useState([]);
+  const [qualityManagementDataList, setQualityManagementDataList] = useState(
+    []
+  );
 
   const COLUMNS_QUALITY_MANAGEMENT = [
     {
-      Header: 'Batch ID',
-      accessor: 'batch_id',
+      Header: "Batch ID",
+      accessor: "batch_id",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Prodcut article',
-      accessor: 'product_article',
+      Header: "Prodcut article",
+      accessor: "product_article",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Total Qty in batch, plan, pallets',
-      accessor: 'total_quantity_plan',
+      Header: "Total Qty in batch, plan, pallets",
+      accessor: "total_quantity_plan",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Reserved Qty in batch, pallets',
-      accessor: 'reserved_quantity',
+      Header: "Reserved Qty in batch, pallets",
+      accessor: "reserved_quantity",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Reserved Qty in batch, allocated, pallets',
-      accessor: 'reserved_quantity_allocated',
+      Header: "Reserved Qty in batch, allocated, pallets",
+      accessor: "reserved_quantity_allocated",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Reserved Qty in batch, remaining, pallets',
-      accessor: 'reserved_quantity_remaining',
+      Header: "Reserved Qty in batch, remaining, pallets",
+      accessor: "reserved_quantity_remaining",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Free Qty in batch, fact, pallets',
-      accessor: 'free_quantity_fact',
+      Header: "Free Qty in batch, fact, pallets",
+      accessor: "free_quantity_fact",
       Filter: TextSearchFilter,
     },
   ];
@@ -205,13 +211,15 @@ const QualityManagementTable = () => {
         if (remainingFreeQty <= 0) {
           if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
             return reservedItem;
-          } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
+          } else if (
+            reservedItem.quantity > reservedItem.quantity_in_warehouse
+          ) {
             // ИСПРАВЛЕНИЕ: Добавляем к существующему количеству, а не заменяем
             const newQuantityInWarehouse = Math.min(
               reservedItem.quantity_in_warehouse + reserved_quantity_allocated,
               reservedItem.quantity
             );
-            console.log('objenewQuantityInWarehousect', newQuantityInWarehouse);
+            console.log("objenewQuantityInWarehousect", newQuantityInWarehouse);
             return {
               ...reservedItem,
               quantity_in_warehouse: newQuantityInWarehouse,
@@ -247,7 +255,9 @@ const QualityManagementTable = () => {
               ...reservedItem,
               // Добавляем к существующему количеству: базовое + зарезервированное + новое из свободного
               quantity_in_warehouse:
-                baseQuantityInWarehouse + reserved_quantity_allocated + deducted,
+                baseQuantityInWarehouse +
+                reserved_quantity_allocated +
+                deducted,
             }
           : {
               ...reservedItem,
@@ -258,27 +268,30 @@ const QualityManagementTable = () => {
 
       // Проверки на корректность
       if (reserved_quantity_allocated < 0) {
-        alert('Ошибка: reserved_quantity_allocated не может быть отрицательным.');
+        alert(
+          "Ошибка: reserved_quantity_allocated не может быть отрицательным."
+        );
         return;
       }
 
       if (summReserve < 0) {
-        alert('Ошибка: summReserve не может быть отрицательным.');
+        alert("Ошибка: summReserve не может быть отрицательным.");
         return;
       }
 
-      const calculatedOrderedQuantity = reserved_quantity_allocated + summReserve;
+      const calculatedOrderedQuantity =
+        reserved_quantity_allocated + summReserve;
 
       // Добавляем на склад
       await dispatch(
         addNewWarehouse({
           product_article,
           article: batch_id,
-          warehouse_loc: 'local',
+          warehouse_loc: "local",
           free_quantity_remaining: remainingFreeQty,
           ordered_quantity: calculatedOrderedQuantity,
           total_quantity: calculatedOrderedQuantity + remainingFreeQty,
-          type: 'OK',
+          type: "OK",
         })
       );
 
@@ -287,70 +300,76 @@ const QualityManagementTable = () => {
         await dispatch(updListOfOrderedProduction(ordered_production));
       }
 
-      // Остальная логика с autoclave_calendar...
-      const { date, quantity_pallets } = batchOutside?.find(
-        (el) => el.id === production_plan_id
-      );
-
-      const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
-        (el) => el.article == product_article
-      );
-
-      // ИСПРАВЛЕНО: используем === вместо =
-      const accd = autoclave_calendar.find((el) => el.date === date);
-
-      if (!accd) {
-        console.error('Autoclave calendar entry not found for date:', date);
-        return;
-      }
-
-      const palletsPerArray = Math.max(
-        1,
-        Math.floor(m3InArray / volumeBlockOnPallet) || 1
-      );
-
-      const total_arrays =
-        (accd?.total_arrays || 0) + quantity_pallets / palletsPerArray;
-
-      const filled_autoclaves = Math.floor(total_arrays / 21);
-      const residual_arrays = total_arrays - filled_autoclaves * 21;
-
-      const result = [
-        {
-          ...accd,
-          total_arrays,
-          residual_arrays,
-          filled_autoclaves,
-        },
-      ];
-
-      recipeOrders?.forEach((el) => {
-        const batch = batchOutside.find((batch) => batch.id === production_plan_id);
-
-        const recipe = list_of_recipes.find((recipe) => recipe.id === el.id_recipe);
-
-        const haveRMC = raw_mat_consumption.find(
-          (item) =>
-            item?.recipe_article === recipe?.article &&
-            item?.batch_article === batch?.product_article
+      if (production_plan_id) {
+        // Остальная логика с autoclave_calendar...
+        const { date, quantity_pallets } = batchOutside?.find(
+          (el) => el.id === production_plan_id
         );
 
-        if (!haveRMC && recipe) {
-          dispatch(
-            addNewRawMatConsumption({
-              id: el.id,
-              recipe_article: recipe?.article || 'Unknown Recipe',
-              batch_article: batch?.product_article || 'Unknown Batch',
-              production_volume:
-                (reserved_quantity_allocated + free_quantity_fact) /
-                  palletsPerArray || 0,
-              date: batch?.date || 'Unknown Date',
-            })
-          );
-        }
-      });
+        const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
+          (el) => el.article == product_article
+        );
 
-      await dispatch(addNewAutoclaveCalendar(result));
+        // ИСПРАВЛЕНО: используем === вместо =
+        const accd = autoclave_calendar.find((el) => el.date === date);
+
+        if (!accd) {
+          console.error("Autoclave calendar entry not found for date:", date);
+          return;
+        }
+
+        const palletsPerArray = Math.max(
+          1,
+          Math.floor(m3InArray / volumeBlockOnPallet) || 1
+        );
+
+        const total_arrays =
+          (accd?.total_arrays || 0) + quantity_pallets / palletsPerArray;
+
+        const filled_autoclaves = Math.floor(total_arrays / 21);
+        const residual_arrays = total_arrays - filled_autoclaves * 21;
+
+        const result = [
+          {
+            ...accd,
+            total_arrays,
+            residual_arrays,
+            filled_autoclaves,
+          },
+        ];
+
+        recipeOrders?.forEach((el) => {
+          const batch = batchOutside.find(
+            (batch) => batch.id === production_plan_id
+          );
+
+          const recipe = list_of_recipes.find(
+            (recipe) => recipe.id === el.id_recipe
+          );
+
+          const haveRMC = raw_mat_consumption.find(
+            (item) =>
+              item?.recipe_article === recipe?.article &&
+              item?.batch_article === batch?.product_article
+          );
+
+          if (!haveRMC && recipe) {
+            dispatch(
+              addNewRawMatConsumption({
+                id: el.id,
+                recipe_article: recipe?.article || "Unknown Recipe",
+                batch_article: batch?.product_article || "Unknown Batch",
+                production_volume:
+                  (reserved_quantity_allocated + free_quantity_fact) /
+                    palletsPerArray || 0,
+                date: batch?.date || "Unknown Date",
+              })
+            );
+          }
+        });
+
+        await dispatch(addNewAutoclaveCalendar(result));
+      }
       await dispatch(deleteQualityManagement(id));
 
       if (production_plan_id) {
@@ -364,7 +383,8 @@ const QualityManagementTable = () => {
           await dispatch(
             updateBatchOutside({
               ...batch,
-              quantity_pallets: total_quantity_plan - reserved_quantity_allocated,
+              quantity_pallets:
+                total_quantity_plan - reserved_quantity_allocated,
             })
           );
         }
@@ -388,17 +408,25 @@ const QualityManagementTable = () => {
       <Table
         COLUMN_DATA={COLUMNS_QUALITY_MANAGEMENT}
         dataOfTable={qualityManagementDataList}
-        tableName={'Quality Management'}
+        tableName={"Quality Management"}
         userAccess={userAccess}
         handleRowClick={(row) => {}}
       />
       {qualityManagementData.length > 0 && (
         <div className="d-flex gap-2 mb-2">
-          <Button variant="success" size="lg" onClick={qualityManagementPlusHandler}>
-            <FaPlus style={{ cursor: 'pointer', fontSize: '1.5rem' }} />
+          <Button
+            variant="success"
+            size="lg"
+            onClick={qualityManagementPlusHandler}
+          >
+            <FaPlus style={{ cursor: "pointer", fontSize: "1.5rem" }} />
           </Button>
-          <Button variant="danger" size="lg" onClick={qualityManagementMinusHandler}>
-            <FaMinus style={{ cursor: 'pointer', fontSize: '1.5rem' }} />
+          <Button
+            variant="danger"
+            size="lg"
+            onClick={qualityManagementMinusHandler}
+          >
+            <FaMinus style={{ cursor: "pointer", fontSize: "1.5rem" }} />
           </Button>
         </div>
       )}
