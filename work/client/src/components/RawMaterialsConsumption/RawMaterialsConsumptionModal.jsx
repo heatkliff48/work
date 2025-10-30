@@ -200,10 +200,10 @@ const RawMaterialsConsumptionModal = React.memo(
 
       // Всё ок — отправляем на списание
       const body = { materials };
-      console.log('body', body);
-      // dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
-      // dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
-      // toggle?.();
+
+      dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
+      dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+      toggle?.();
     };
 
     return (
