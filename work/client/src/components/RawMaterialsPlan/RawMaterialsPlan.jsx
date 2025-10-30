@@ -119,11 +119,16 @@ function RawMaterialsPlan() {
 
         if (!orderedProduct) return null;
         const productArticle = orderedProduct.product_article;
-        const quantity = batch.quantity_pallets / 3;
 
         const productDetails = latestProducts.find(
           (product) => product.article === productArticle
         );
+
+        const quantity =
+          batch.quantity_pallets /
+          Math.floor(
+            productDetails.m3InArray / productDetails.volumeBlockOnPallet
+          );
 
         if (!productDetails) return null;
 
@@ -139,6 +144,10 @@ function RawMaterialsPlan() {
           label: recipe.article,
         }));
 
+        const prodDescription = productDetails.description.match(
+          /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/
+        );
+
         return {
           id_batch: batch.id,
           product_article: productArticle,
@@ -146,6 +155,8 @@ function RawMaterialsPlan() {
           recipeArray,
           recipeOptions,
           current_recipe: recipeArray[0],
+          description: prodDescription ? prodDescription[1] : "",
+          date: batch.date,
         };
       })
       .filter(Boolean);
@@ -260,7 +271,8 @@ function RawMaterialsPlan() {
           {productsArray?.map((product, index) => (
             <tr>
               <th key={index} className="product-column">
-                <div>Product: {product.product_article}</div>
+                <div>Product: {product.description}</div>
+                <div>Date: {product.date}</div>
                 <div>
                   Recipe:
                   {product?.current_recipe ? (
