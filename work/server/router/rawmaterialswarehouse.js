@@ -51,77 +51,6 @@ const normalizeType = (t) => {
   return s;
 };
 
-/** Карта типов -> модель складских партий */
-const MODEL_BY_TYPE = {
-  Sand: WarehouseSand,
-  Lime: WarehouseLime,
-  Cement: WarehouseCement,
-  Gypsum: WarehouseGypsum, // именно «Gypsum (dry)» из списка — здесь как Gypsum
-  'Gypsum stone': WarehouseGypsumStone,
-  'Aluminum 1': WarehouseAluminum1,
-  'Aluminum 2': WarehouseAluminum2,
-  'Grinding Balls': WarehouseGrindingBalls,
-  AAC: WarehouseAAC,
-};
-
-const PROFILE_BY_TYPE = {
-  Sand: { Model: WarehouseSand, event: UPDATE_WAREHOUSE_SAND_SOCKET },
-  Lime: { Model: WarehouseLime, event: UPDATE_WAREHOUSE_LIME_SOCKET },
-  Cement: { Model: WarehouseCement, event: UPDATE_WAREHOUSE_CEMENT_SOCKET },
-  Gypsum: { Model: WarehouseGypsum, event: UPDATE_WAREHOUSE_GYPSUM_SOCKET },
-  'Gypsum stone': {
-    Model: WarehouseGypsumStone,
-    event: UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
-  },
-  'Aluminum 1': {
-    Model: WarehouseAluminum1,
-    event: UPDATE_WAREHOUSE_ALUMINUM1_SOCKET,
-  },
-  'Aluminum 2': {
-    Model: WarehouseAluminum2,
-    event: UPDATE_WAREHOUSE_ALUMINUM2_SOCKET,
-  },
-  'Grinding Balls': {
-    Model: WarehouseGrindingBalls,
-    event: UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
-  },
-  AAC: { Model: WarehouseAAC, event: UPDATE_WAREHOUSE_AAC_SOCKET },
-};
-
-/** Универсальное списание партий: «самые свежие сначала» */
-async function writeOffBatches({ Model, quantity, transaction }) {
-  let left = Number(quantity) || 0;
-  const deletedIds = [];
-  if (left <= 0) return { deletedIds };
-
-  const records = await Model.findAll({
-    order: [[sequelize.literal("to_date(date, 'DD.MM.YYYY')"), 'DESC']],
-    transaction,
-  });
-
-  for (const rec of records) {
-    if (left <= 0) break;
-    const inStock = Number(rec.quantity) || 0;
-
-    if (inStock <= left) {
-      deletedIds.push(rec.id);
-      await rec.destroy({ transaction });
-      left -= inStock;
-    } else {
-      await Model.update(
-        { quantity: inStock - left },
-        { where: { id: rec.id }, transaction }
-      );
-      left = 0;
-    }
-  }
-
-  if (left > 0) {
-    throw new Error(`Недостаточно остатков для списания (не хватило ${left})`);
-  }
-  return { deletedIds };
-}
-
 rawMaterialsWarehouseRouter.get('/', async (req, res) => {
   try {
     const rawMaterialsWarehouse = await RawMaterialsWarehouse.findAll({
@@ -203,8 +132,8 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
     const updatedWarehouseRecords = [];
 
     const today = new Date();
-    const day = today.getDate().toString().padStart(2, "0");
-    const month = (today.getMonth() + 1).toString().padStart(2, "0");
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
     const year = today.getFullYear();
 
     const date = `${day}.${month}.${year}`;
@@ -514,21 +443,9 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       const [affected] = await RawMaterialsWarehouse.update(
         {
           remaining_quantity: sequelize.literal(`remaining_quantity + ${delta}`),
-          last_updated: `${now}`,
         },
         { where: { material_type: 'Sand slurry (dry)' }, transaction: t }
       );
-
-      if (!affected) {
-        await RawMaterialsWarehouse.create(
-          {
-            material_type: 'Sand slurry (dry)',
-            remaining_quantity: delta,
-            last_updated: `${now}`,
-          },
-          { transaction: t }
-        );
-      }
 
       await t.commit();
 
@@ -565,17 +482,6 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
         },
         { where: { material_type: materialType }, transaction: t }
       );
-
-      if (!affected) {
-        await RawMaterialsWarehouse.create(
-          {
-            material_type: materialType,
-            remaining_quantity: delta,
-            last_updated: `${now}`,
-          },
-          { transaction: t }
-        );
-      }
     }
 
     // 3) Бизнес-правило: прибавляем к «Sand slurry (dry)» сумму всех СПИСАНИЙ
@@ -589,30 +495,6 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
         },
         { where: { material_type: 'Sand slurry (dry)' }, transaction: t }
       );
-      if (!affected) {
-        await RawMaterialsWarehouse.create(
-          {
-            material_type: 'Sand slurry (dry)',
-            remaining_quantity: totalAll,
-            last_updated: `${now}`,
-          },
-          { transaction: t }
-        );
-      }
-    }
-
-    // 4) Списываем партии с профильных складов по «свежести»
-    const deletedIds = [];
-    for (const { type, quantity } of normMaterials) {
-      const profile = PROFILE_BY_TYPE[type];
-      if (!profile) continue; // у slurry профиля нет, пропускаем
-
-      const { deletedIds: ids } = await writeOffBatches({
-        Model: profile.Model,
-        quantity,
-        transaction: t,
-      });
-      deletedIds.push(...ids);
     }
 
     // 5) Коммит транзакции
@@ -622,20 +504,6 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
     const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
       where: { material_type: { [Op.in]: [...updatedTypes, 'Sand slurry (dry)'] } },
     });
-
-    // 6.1) Собираем уникальные типы из запроса
-    const typesInPayload = Array.from(new Set(normMaterials.map((m) => m.type)));
-
-    // 6.2) Для каждого типа из пейлоада — выборка его записей и emit (только для тех, у кого есть профильная таблица)
-    await Promise.all(
-      typesInPayload.map(async (type) => {
-        const profile = PROFILE_BY_TYPE[type];
-        if (!profile) return; // нет профильной таблицы — ничего не шлём
-
-        const rows = await profile.Model.findAll();
-        myEmitter.emit(profile.event, rows);
-      })
-    );
 
     // 7) Эмитим сводную таблицу (всегда)
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
