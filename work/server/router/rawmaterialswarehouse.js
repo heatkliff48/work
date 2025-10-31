@@ -1,5 +1,5 @@
-const rawMaterialsWarehouseRouter = require('express').Router();
-const { RawMaterialsWarehouse, sequelize } = require('../db/models/index.js');
+const rawMaterialsWarehouseRouter = require("express").Router();
+const { RawMaterialsWarehouse, sequelize } = require("../db/models/index.js");
 const {
   WarehouseSand,
   WarehouseLime,
@@ -10,9 +10,9 @@ const {
   WarehouseAluminum2,
   WarehouseGrindingBalls,
   WarehouseAAC,
-} = require('../db/models/index.js');
+} = require("../db/models/index.js");
 
-const myEmitter = require('../src/ee.js');
+const myEmitter = require("../src/ee.js");
 const {
   UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
   ADD_NEW_WAREHOUSE_SAND_SOCKET,
@@ -42,19 +42,19 @@ const {
   ADD_NEW_WAREHOUSE_AAC_SOCKET,
   UPDATE_WAREHOUSE_AAC_SOCKET,
   DELETE_WAREHOUSE_AAC_SOCKET,
-} = require('../src/constants/event.js');
-const { ErrorUtils } = require('../utils/Errors.js');
-const { Op } = require('sequelize');
+} = require("../src/constants/event.js");
+const { ErrorUtils } = require("../utils/Errors.js");
+const { Op } = require("sequelize");
 
 const normalizeType = (t) => {
-  const s = String(t || '').trim();
+  const s = String(t || "").trim();
   return s;
 };
 
 rawMaterialsWarehouseRouter.get('/', async (req, res) => {
   try {
     const rawMaterialsWarehouse = await RawMaterialsWarehouse.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ rawMaterialsWarehouse });
@@ -109,12 +109,12 @@ rawMaterialsWarehouseRouter.get('/', async (req, res) => {
 }
 */
 
-rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
   const { materials } = req.body; // массив объектов {type, quantity}
 
   if (!Array.isArray(materials) || !materials.length)
     return res.status(400).json({
-      error: 'Поле materials обязательно и должно быть непустым массивом',
+      error: "Поле materials обязательно и должно быть непустым массивом",
     });
 
   const t = await sequelize.transaction();
@@ -179,13 +179,13 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
         ),
         last_updated: date,
       },
-      { where: { material_type: 'Sand slurry (dry)' }, transaction: t }
+      { where: { material_type: "Sand slurry (dry)" }, transaction: t }
     );
 
     if (!updatedSandSlurryRows) {
       await RawMaterialsWarehouse.create(
         {
-          material_type: 'Sand slurry (dry)',
+          material_type: "Sand slurry (dry)",
           remaining_quantity: totalAllMaterials,
           last_updated: date,
         },
@@ -197,9 +197,9 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
       if (!quantity) continue;
 
       const modelMap = {
-        'Sand (dry)': WarehouseSand,
-        'Gypsum stone': WarehouseGypsumStone,
-        'Grinding Balls': WarehouseGrindingBalls,
+        "Sand (dry)": WarehouseSand,
+        "Gypsum stone": WarehouseGypsumStone,
+        "Grinding Balls": WarehouseGrindingBalls,
         AAC: WarehouseAAC,
       };
       const Model = modelMap[type];
@@ -207,12 +207,12 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
 
       let leftToWriteOff = Number(quantity);
 
-      console.log('leftToWriteOff start:', leftToWriteOff, 'type:', type);
+      console.log("leftToWriteOff start:", leftToWriteOff, "type:", type);
 
       const records = await Model.findAll({
         order: [
           // d.m.YYYY -> сортируем как строки, но в обратном порядке
-          [sequelize.literal("to_date(date, 'DD.MM.YYYY')"), 'DESC'],
+          [sequelize.literal("to_date(date, 'DD.MM.YYYY')"), "DESC"],
         ],
         transaction: t,
       });
@@ -233,7 +233,9 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
             { quantity: inStock - leftToWriteOff },
             { where: { id: rec.id }, transaction: t }
           );
-          console.log(`📝 ${Model.name} id=${rec.id} affectedRows=${affectedRows}`);
+          console.log(
+            `📝 ${Model.name} id=${rec.id} affectedRows=${affectedRows}`
+          );
           leftToWriteOff = 0;
         }
       }
@@ -245,12 +247,12 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
     }
 
     await t.commit();
-    console.log('✅ ТРАНЗАКЦИЯ УСПЕШНО ЗАКОММИТИЛАСЬ');
+    console.log("✅ ТРАНЗАКЦИЯ УСПЕШНО ЗАКОММИТИЛАСЬ");
 
     const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
       where: {
         material_type: {
-          [Op.in]: [...updatedMaterialTypes, 'Sand slurry (dry)'],
+          [Op.in]: [...updatedMaterialTypes, "Sand slurry (dry)"],
         },
       },
     });
@@ -266,7 +268,10 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
 
     myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET, currentGypsumStone);
 
-    myEmitter.emit(UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET, currentGrindingBalls);
+    myEmitter.emit(
+      UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+      currentGrindingBalls
+    );
 
     myEmitter.emit(UPDATE_WAREHOUSE_AAC_SOCKET, currentAAC);
 
@@ -275,7 +280,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
       deletedIds,
     });
   } catch (err) {
-    console.log('❌ ОШИБКА, ROLLBACK:', err.message);
+    console.log("❌ ОШИБКА, ROLLBACK:", err.message);
     await t.rollback();
     console.error(err.message);
     return res.status(500).json({ error: err.message });
@@ -415,7 +420,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res, next) =
 
   if (!Array.isArray(materials) || materials.length === 0) {
     return res.status(400).json({
-      error: 'Поле materials обязательно и должно быть непустым массивом',
+      error: "Поле materials обязательно и должно быть непустым массивом",
     });
   }
 
@@ -450,13 +455,13 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res, next) =
           last_updated: nowIso,
           updatedAt: now,
         },
-        { where: { material_type: 'Sand slurry (dry)' }, transaction: t }
+        { where: { material_type: "Sand slurry (dry)" }, transaction: t }
       );
 
       await t.commit();
 
       const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
-        where: { material_type: { [Op.in]: ['Sand slurry (dry)'] } },
+        where: { material_type: { [Op.in]: ["Sand slurry (dry)"] } },
       });
 
       myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
@@ -531,10 +536,10 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res, next) =
 });
 
 // Sand
-rawMaterialsWarehouseRouter.get('/sand', async (req, res) => {
+rawMaterialsWarehouseRouter.get("/sand", async (req, res) => {
   try {
     const warehouseSand = await WarehouseSand.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ warehouseSand });
@@ -543,12 +548,12 @@ rawMaterialsWarehouseRouter.get('/sand', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/sand', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/sand", async (req, res) => {
   const { supplier, quantity } = req.body;
 
   const today = new Date();
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = today.getDate().toString().padStart(2, "0");
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear();
 
   const date = `${day}.${month}.${year}`;
@@ -560,11 +565,11 @@ rawMaterialsWarehouseRouter.post('/sand', async (req, res) => {
       date,
     });
 
-    const totalSandQuantity = await WarehouseSand.sum('quantity');
+    const totalSandQuantity = await WarehouseSand.sum("quantity");
 
     const latestRecord = await WarehouseSand.findOne({
-      order: [['date', 'DESC']],
-      attributes: ['date'],
+      order: [["date", "DESC"]],
+      attributes: ["date"],
     });
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -577,14 +582,14 @@ rawMaterialsWarehouseRouter.post('/sand', async (req, res) => {
       },
       {
         where: {
-          material_type: 'Sand (dry)',
+          material_type: "Sand (dry)",
         },
       }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_SAND_SOCKET, warehouseSand);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'Sand (dry)' },
+      where: { material_type: "Sand (dry)" },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseSand).status(200);
@@ -594,12 +599,12 @@ rawMaterialsWarehouseRouter.post('/sand', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/sand/update', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/sand/update", async (req, res) => {
   const { supplier, ...updateFields } = req.body;
 
   try {
     if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+      return res.status(400).json({ message: "Supplier is required" });
     }
 
     const updateData = Object.fromEntries(
@@ -609,7 +614,7 @@ rawMaterialsWarehouseRouter.post('/sand/update', async (req, res) => {
     );
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
+      return res.status(400).json({ message: "No valid fields to update" });
     }
 
     const warehouseSand = await WarehouseSand.update(updateData, {
@@ -626,7 +631,7 @@ rawMaterialsWarehouseRouter.post('/sand/update', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/sand/delete', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/sand/delete", async (req, res) => {
   const { sand_warehouse_id } = req.body;
 
   try {
@@ -640,10 +645,10 @@ rawMaterialsWarehouseRouter.post('/sand/delete', async (req, res) => {
 });
 
 // Lime
-rawMaterialsWarehouseRouter.get('/lime', async (req, res) => {
+rawMaterialsWarehouseRouter.get("/lime", async (req, res) => {
   try {
     const warehouseLime = await WarehouseLime.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ warehouseLime });
@@ -652,12 +657,12 @@ rawMaterialsWarehouseRouter.get('/lime', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/lime', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/lime", async (req, res) => {
   const { supplier, quantity } = req.body;
 
   const today = new Date();
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = today.getDate().toString().padStart(2, "0");
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear();
 
   const date = `${day}.${month}.${year}`;
@@ -669,11 +674,11 @@ rawMaterialsWarehouseRouter.post('/lime', async (req, res) => {
       date,
     });
 
-    const totalLimeQuantity = await WarehouseLime.sum('quantity');
+    const totalLimeQuantity = await WarehouseLime.sum("quantity");
 
     const latestRecord = await WarehouseLime.findOne({
-      order: [['date', 'DESC']],
-      attributes: ['date'],
+      order: [["date", "DESC"]],
+      attributes: ["date"],
     });
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -686,14 +691,14 @@ rawMaterialsWarehouseRouter.post('/lime', async (req, res) => {
       },
       {
         where: {
-          material_type: 'Lime',
+          material_type: "Lime",
         },
       }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_LIME_SOCKET, warehouseLime);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'Lime' },
+      where: { material_type: "Lime" },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseLime).status(200);
@@ -703,12 +708,12 @@ rawMaterialsWarehouseRouter.post('/lime', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/lime/update', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/lime/update", async (req, res) => {
   const { supplier, ...updateFields } = req.body;
 
   try {
     if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+      return res.status(400).json({ message: "Supplier is required" });
     }
 
     const updateData = Object.fromEntries(
@@ -718,7 +723,7 @@ rawMaterialsWarehouseRouter.post('/lime/update', async (req, res) => {
     );
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
+      return res.status(400).json({ message: "No valid fields to update" });
     }
 
     const warehouseLime = await WarehouseLime.update(updateData, {
@@ -735,7 +740,7 @@ rawMaterialsWarehouseRouter.post('/lime/update', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/lime/delete', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/lime/delete", async (req, res) => {
   const { lime_warehouse_id } = req.body;
 
   try {
@@ -749,10 +754,10 @@ rawMaterialsWarehouseRouter.post('/lime/delete', async (req, res) => {
 });
 
 // Cement
-rawMaterialsWarehouseRouter.get('/cement', async (req, res) => {
+rawMaterialsWarehouseRouter.get("/cement", async (req, res) => {
   try {
     const warehouseCement = await WarehouseCement.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ warehouseCement });
@@ -761,12 +766,12 @@ rawMaterialsWarehouseRouter.get('/cement', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/cement', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/cement", async (req, res) => {
   const { supplier, quantity } = req.body;
 
   const today = new Date();
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = today.getDate().toString().padStart(2, "0");
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear();
 
   const date = `${day}.${month}.${year}`;
@@ -778,11 +783,11 @@ rawMaterialsWarehouseRouter.post('/cement', async (req, res) => {
       date,
     });
 
-    const totalCementQuantity = await WarehouseCement.sum('quantity');
+    const totalCementQuantity = await WarehouseCement.sum("quantity");
 
     const latestRecord = await WarehouseCement.findOne({
-      order: [['date', 'DESC']],
-      attributes: ['date'],
+      order: [["date", "DESC"]],
+      attributes: ["date"],
     });
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -795,14 +800,14 @@ rawMaterialsWarehouseRouter.post('/cement', async (req, res) => {
       },
       {
         where: {
-          material_type: 'Cement',
+          material_type: "Cement",
         },
       }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_CEMENT_SOCKET, warehouseCement);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'Cement' },
+      where: { material_type: "Cement" },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseCement).status(200);
@@ -812,12 +817,12 @@ rawMaterialsWarehouseRouter.post('/cement', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/cement/update', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/cement/update", async (req, res) => {
   const { supplier, ...updateFields } = req.body;
 
   try {
     if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+      return res.status(400).json({ message: "Supplier is required" });
     }
 
     const updateData = Object.fromEntries(
@@ -827,7 +832,7 @@ rawMaterialsWarehouseRouter.post('/cement/update', async (req, res) => {
     );
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
+      return res.status(400).json({ message: "No valid fields to update" });
     }
 
     const warehouseCement = await WarehouseCement.update(updateData, {
@@ -844,7 +849,7 @@ rawMaterialsWarehouseRouter.post('/cement/update', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/cement/delete', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/cement/delete", async (req, res) => {
   const { cement_warehouse_id } = req.body;
 
   try {
@@ -858,10 +863,10 @@ rawMaterialsWarehouseRouter.post('/cement/delete', async (req, res) => {
 });
 
 // Gypsum
-rawMaterialsWarehouseRouter.get('/gypsum', async (req, res) => {
+rawMaterialsWarehouseRouter.get("/gypsum", async (req, res) => {
   try {
     const warehouseGypsum = await WarehouseGypsum.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ warehouseGypsum });
@@ -870,12 +875,12 @@ rawMaterialsWarehouseRouter.get('/gypsum', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/gypsum', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/gypsum", async (req, res) => {
   const { supplier, quantity } = req.body;
 
   const today = new Date();
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = today.getDate().toString().padStart(2, "0");
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear();
 
   const date = `${day}.${month}.${year}`;
@@ -887,11 +892,11 @@ rawMaterialsWarehouseRouter.post('/gypsum', async (req, res) => {
       date,
     });
 
-    const totalGypsumQuantity = await WarehouseGypsum.sum('quantity');
+    const totalGypsumQuantity = await WarehouseGypsum.sum("quantity");
 
     const latestRecord = await WarehouseGypsum.findOne({
-      order: [['date', 'DESC']],
-      attributes: ['date'],
+      order: [["date", "DESC"]],
+      attributes: ["date"],
     });
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -904,14 +909,14 @@ rawMaterialsWarehouseRouter.post('/gypsum', async (req, res) => {
       },
       {
         where: {
-          material_type: 'Gypsum (dry)',
+          material_type: "Gypsum (dry)",
         },
       }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_GYPSUM_SOCKET, warehouseGypsum);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'Gypsum (dry)' },
+      where: { material_type: "Gypsum (dry)" },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseGypsum).status(200);
@@ -921,12 +926,12 @@ rawMaterialsWarehouseRouter.post('/gypsum', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/gypsum/update', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/gypsum/update", async (req, res) => {
   const { supplier, ...updateFields } = req.body;
 
   try {
     if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+      return res.status(400).json({ message: "Supplier is required" });
     }
 
     const updateData = Object.fromEntries(
@@ -936,7 +941,7 @@ rawMaterialsWarehouseRouter.post('/gypsum/update', async (req, res) => {
     );
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
+      return res.status(400).json({ message: "No valid fields to update" });
     }
 
     const warehouseGypsum = await WarehouseGypsum.update(updateData, {
@@ -953,7 +958,7 @@ rawMaterialsWarehouseRouter.post('/gypsum/update', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/gypsum/delete', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/gypsum/delete", async (req, res) => {
   const { gypsum_warehouse_id } = req.body;
 
   try {
@@ -967,10 +972,10 @@ rawMaterialsWarehouseRouter.post('/gypsum/delete', async (req, res) => {
 });
 
 // Gypsum stone
-rawMaterialsWarehouseRouter.get('/gypsum-stone', async (req, res) => {
+rawMaterialsWarehouseRouter.get("/gypsum-stone", async (req, res) => {
   try {
     const warehouseGypsumStone = await WarehouseGypsumStone.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ warehouseGypsumStone });
@@ -979,12 +984,12 @@ rawMaterialsWarehouseRouter.get('/gypsum-stone', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/gypsum-stone', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/gypsum-stone", async (req, res) => {
   const { supplier, quantity } = req.body;
 
   const today = new Date();
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = today.getDate().toString().padStart(2, "0");
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear();
 
   const date = `${day}.${month}.${year}`;
@@ -996,11 +1001,11 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone', async (req, res) => {
       date,
     });
 
-    const totalGypsumStoneQuantity = await WarehouseGypsumStone.sum('quantity');
+    const totalGypsumStoneQuantity = await WarehouseGypsumStone.sum("quantity");
 
     const latestRecord = await WarehouseGypsumStone.findOne({
-      order: [['date', 'DESC']],
-      attributes: ['date'],
+      order: [["date", "DESC"]],
+      attributes: ["date"],
     });
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -1013,14 +1018,14 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone', async (req, res) => {
       },
       {
         where: {
-          material_type: 'Gypsum stone',
+          material_type: "Gypsum stone",
         },
       }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET, warehouseGypsumStone);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'Gypsum stone' },
+      where: { material_type: "Gypsum stone" },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseGypsumStone).status(200);
@@ -1030,12 +1035,12 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/gypsum-stone/update', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/gypsum-stone/update", async (req, res) => {
   const { supplier, ...updateFields } = req.body;
 
   try {
     if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+      return res.status(400).json({ message: "Supplier is required" });
     }
 
     const updateData = Object.fromEntries(
@@ -1045,7 +1050,7 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone/update', async (req, res) => {
     );
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
+      return res.status(400).json({ message: "No valid fields to update" });
     }
 
     const warehouseGypsumStone = await WarehouseGypsumStone.update(updateData, {
@@ -1062,7 +1067,7 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone/update', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/gypsum-stone/delete', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/gypsum-stone/delete", async (req, res) => {
   const { gypsum_stone_warehouse_id } = req.body;
 
   try {
@@ -1070,7 +1075,10 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone/delete', async (req, res) => {
       where: { id: gypsum_stone_warehouse_id },
     });
 
-    myEmitter.emit(DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET, gypsum_stone_warehouse_id);
+    myEmitter.emit(
+      DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+      gypsum_stone_warehouse_id
+    );
     return res.json(gypsum_stone_warehouse_id).status(200);
   } catch (err) {
     return ErrorUtils.catchError(res, err);
@@ -1078,10 +1086,10 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone/delete', async (req, res) => {
 });
 
 // Aluminum1
-rawMaterialsWarehouseRouter.get('/aluminum1', async (req, res) => {
+rawMaterialsWarehouseRouter.get("/aluminum1", async (req, res) => {
   try {
     const warehouseAluminum1 = await WarehouseAluminum1.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ warehouseAluminum1 });
@@ -1090,12 +1098,12 @@ rawMaterialsWarehouseRouter.get('/aluminum1', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/aluminum1", async (req, res) => {
   const { supplier, quantity } = req.body;
 
   const today = new Date();
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = today.getDate().toString().padStart(2, "0");
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear();
 
   const date = `${day}.${month}.${year}`;
@@ -1107,11 +1115,11 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
       date,
     });
 
-    const totalAluminum1Quantity = await WarehouseAluminum1.sum('quantity');
+    const totalAluminum1Quantity = await WarehouseAluminum1.sum("quantity");
 
     const latestRecord = await WarehouseAluminum1.findOne({
-      order: [['date', 'DESC']],
-      attributes: ['date'],
+      order: [["date", "DESC"]],
+      attributes: ["date"],
     });
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -1124,14 +1132,14 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
       },
       {
         where: {
-          material_type: 'Aluminum 1',
+          material_type: "Aluminum 1",
         },
       }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET, warehouseAluminum1);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'Aluminum 1' },
+      where: { material_type: "Aluminum 1" },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseAluminum1).status(200);
@@ -1141,12 +1149,12 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/aluminum1/update', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/aluminum1/update", async (req, res) => {
   const { supplier, ...updateFields } = req.body;
 
   try {
     if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+      return res.status(400).json({ message: "Supplier is required" });
     }
 
     const updateData = Object.fromEntries(
@@ -1156,7 +1164,7 @@ rawMaterialsWarehouseRouter.post('/aluminum1/update', async (req, res) => {
     );
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
+      return res.status(400).json({ message: "No valid fields to update" });
     }
 
     const warehouseAluminum1 = await WarehouseAluminum1.update(updateData, {
@@ -1173,7 +1181,7 @@ rawMaterialsWarehouseRouter.post('/aluminum1/update', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/aluminum1/delete', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/aluminum1/delete", async (req, res) => {
   const { aluminum1_warehouse_id } = req.body;
 
   try {
@@ -1187,10 +1195,10 @@ rawMaterialsWarehouseRouter.post('/aluminum1/delete', async (req, res) => {
 });
 
 // Aluminum2
-rawMaterialsWarehouseRouter.get('/aluminum2', async (req, res) => {
+rawMaterialsWarehouseRouter.get("/aluminum2", async (req, res) => {
   try {
     const warehouseAluminum2 = await WarehouseAluminum2.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ warehouseAluminum2 });
@@ -1199,12 +1207,12 @@ rawMaterialsWarehouseRouter.get('/aluminum2', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/aluminum2', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/aluminum2", async (req, res) => {
   const { supplier, quantity } = req.body;
 
   const today = new Date();
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = today.getDate().toString().padStart(2, "0");
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear();
 
   const date = `${day}.${month}.${year}`;
@@ -1216,11 +1224,11 @@ rawMaterialsWarehouseRouter.post('/aluminum2', async (req, res) => {
       date,
     });
 
-    const totalAluminum2Quantity = await WarehouseAluminum2.sum('quantity');
+    const totalAluminum2Quantity = await WarehouseAluminum2.sum("quantity");
 
     const latestRecord = await WarehouseAluminum2.findOne({
-      order: [['date', 'DESC']],
-      attributes: ['date'],
+      order: [["date", "DESC"]],
+      attributes: ["date"],
     });
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -1233,14 +1241,14 @@ rawMaterialsWarehouseRouter.post('/aluminum2', async (req, res) => {
       },
       {
         where: {
-          material_type: 'Aluminum 2',
+          material_type: "Aluminum 2",
         },
       }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_ALUMINUM2_SOCKET, warehouseAluminum2);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'Aluminum 2' },
+      where: { material_type: "Aluminum 2" },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseAluminum2).status(200);
@@ -1250,12 +1258,12 @@ rawMaterialsWarehouseRouter.post('/aluminum2', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/aluminum2/update', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/aluminum2/update", async (req, res) => {
   const { supplier, ...updateFields } = req.body;
 
   try {
     if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+      return res.status(400).json({ message: "Supplier is required" });
     }
 
     const updateData = Object.fromEntries(
@@ -1265,7 +1273,7 @@ rawMaterialsWarehouseRouter.post('/aluminum2/update', async (req, res) => {
     );
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
+      return res.status(400).json({ message: "No valid fields to update" });
     }
 
     const warehouseAluminum2 = await WarehouseAluminum2.update(updateData, {
@@ -1282,7 +1290,7 @@ rawMaterialsWarehouseRouter.post('/aluminum2/update', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/aluminum2/delete', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/aluminum2/delete", async (req, res) => {
   const { aluminum2_warehouse_id } = req.body;
 
   try {
@@ -1296,10 +1304,10 @@ rawMaterialsWarehouseRouter.post('/aluminum2/delete', async (req, res) => {
 });
 
 // Grinding Balls
-rawMaterialsWarehouseRouter.get('/grinding-balls', async (req, res) => {
+rawMaterialsWarehouseRouter.get("/grinding-balls", async (req, res) => {
   try {
     const warehouseGrindingBalls = await WarehouseGrindingBalls.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ warehouseGrindingBalls });
@@ -1308,12 +1316,12 @@ rawMaterialsWarehouseRouter.get('/grinding-balls', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/grinding-balls", async (req, res) => {
   const { supplier, quantity } = req.body;
 
   const today = new Date();
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = today.getDate().toString().padStart(2, "0");
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear();
 
   const date = `${day}.${month}.${year}`;
@@ -1325,11 +1333,13 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
       date,
     });
 
-    const totalGrindingBallsQuantity = await WarehouseGrindingBalls.sum('quantity');
+    const totalGrindingBallsQuantity = await WarehouseGrindingBalls.sum(
+      "quantity"
+    );
 
     const latestRecord = await WarehouseGrindingBalls.findOne({
-      order: [['date', 'DESC']],
-      attributes: ['date'],
+      order: [["date", "DESC"]],
+      attributes: ["date"],
     });
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -1342,14 +1352,17 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
       },
       {
         where: {
-          material_type: 'Grinding Balls',
+          material_type: "Grinding Balls",
         },
       }
     );
 
-    myEmitter.emit(ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET, warehouseGrindingBalls);
+    myEmitter.emit(
+      ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
+      warehouseGrindingBalls
+    );
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'Grinding Balls' },
+      where: { material_type: "Grinding Balls" },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseGrindingBalls).status(200);
@@ -1359,12 +1372,12 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/grinding-balls/update', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/grinding-balls/update", async (req, res) => {
   const { supplier, ...updateFields } = req.body;
 
   try {
     if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+      return res.status(400).json({ message: "Supplier is required" });
     }
 
     const updateData = Object.fromEntries(
@@ -1374,16 +1387,22 @@ rawMaterialsWarehouseRouter.post('/grinding-balls/update', async (req, res) => {
     );
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
+      return res.status(400).json({ message: "No valid fields to update" });
     }
 
-    const warehouseGrindingBalls = await WarehouseGrindingBalls.update(updateData, {
-      where: { supplier },
-      returning: true,
-      plain: true,
-    });
+    const warehouseGrindingBalls = await WarehouseGrindingBalls.update(
+      updateData,
+      {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      }
+    );
 
-    myEmitter.emit(UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET, warehouseGrindingBalls);
+    myEmitter.emit(
+      UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+      warehouseGrindingBalls
+    );
     return res.json(warehouseGrindingBalls).status(200);
   } catch (err) {
     console.error(err.message);
@@ -1391,7 +1410,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls/update', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/grinding-balls/delete', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/grinding-balls/delete", async (req, res) => {
   const { grinding_balls_warehouse_id } = req.body;
 
   try {
@@ -1410,10 +1429,10 @@ rawMaterialsWarehouseRouter.post('/grinding-balls/delete', async (req, res) => {
 });
 
 // AAC
-rawMaterialsWarehouseRouter.get('/aac', async (req, res) => {
+rawMaterialsWarehouseRouter.get("/aac", async (req, res) => {
   try {
     const warehouseAAC = await WarehouseAAC.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ warehouseAAC });
@@ -1422,12 +1441,12 @@ rawMaterialsWarehouseRouter.get('/aac', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/aac', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/aac", async (req, res) => {
   const { supplier, quantity } = req.body;
 
   const today = new Date();
-  const day = today.getDate().toString().padStart(2, '0');
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
+  const day = today.getDate().toString().padStart(2, "0");
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear();
 
   const date = `${day}.${month}.${year}`;
@@ -1439,11 +1458,11 @@ rawMaterialsWarehouseRouter.post('/aac', async (req, res) => {
       date,
     });
 
-    const totalAACQuantity = await WarehouseAAC.sum('quantity');
+    const totalAACQuantity = await WarehouseAAC.sum("quantity");
 
     const latestRecord = await WarehouseAAC.findOne({
-      order: [['date', 'DESC']],
-      attributes: ['date'],
+      order: [["date", "DESC"]],
+      attributes: ["date"],
     });
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -1456,14 +1475,14 @@ rawMaterialsWarehouseRouter.post('/aac', async (req, res) => {
       },
       {
         where: {
-          material_type: 'AAC',
+          material_type: "AAC",
         },
       }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_AAC_SOCKET, warehouseAAC);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'AAC' },
+      where: { material_type: "AAC" },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseAAC).status(200);
@@ -1473,12 +1492,12 @@ rawMaterialsWarehouseRouter.post('/aac', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/aac/update', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/aac/update", async (req, res) => {
   const { supplier, ...updateFields } = req.body;
 
   try {
     if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+      return res.status(400).json({ message: "Supplier is required" });
     }
 
     const updateData = Object.fromEntries(
@@ -1488,7 +1507,7 @@ rawMaterialsWarehouseRouter.post('/aac/update', async (req, res) => {
     );
 
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
+      return res.status(400).json({ message: "No valid fields to update" });
     }
 
     const warehouseAAC = await WarehouseAAC.update(updateData, {
@@ -1505,7 +1524,7 @@ rawMaterialsWarehouseRouter.post('/aac/update', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.post('/aac/delete', async (req, res) => {
+rawMaterialsWarehouseRouter.post("/aac/delete", async (req, res) => {
   const { aac_warehouse_id } = req.body;
 
   try {
