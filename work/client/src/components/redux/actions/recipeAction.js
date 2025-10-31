@@ -8,6 +8,9 @@ import {
   GET_RAW_MAT_CONSUMPTION,
   ADD_NEW_RAW_MAT_CONSUMPTION,
   DELETE_RAW_MAT_CONSUMPTION,
+  GET_MAIN_RAW_MAT_CONSUMPTION,
+  ADD_NEW_MAIN_RAW_MAT_CONSUMPTION,
+  DELETE_MAIN_RAW_MAT_CONSUMPTION,
 } from '../types/recipeTypes';
 
 export const getRecipe = () => {
@@ -69,6 +72,33 @@ export const addNewRawMatConsumption = (rawMatConsumption) => {
 export const deleteRawMatConsumption = (rawMatConsumption) => {
   return {
     type: DELETE_RAW_MAT_CONSUMPTION,
+    payload: rawMatConsumption,
+  };
+};
+
+export const getMainRawMatConsumption = () => {
+  return {
+    type: GET_MAIN_RAW_MAT_CONSUMPTION,
+  };
+};
+
+export const clearMainRawMatConsumption = (raw) => {
+  return {
+    type: GET_MAIN_RAW_MAT_CONSUMPTION,
+    payload: raw,
+  };
+};
+
+export const addNewMainRawMatConsumption = (rawMatConsumption) => {
+  return {
+    type: ADD_NEW_MAIN_RAW_MAT_CONSUMPTION,
+    payload: rawMatConsumption,
+  };
+};
+
+export const deleteMainRawMatConsumption = (rawMatConsumption) => {
+  return {
+    type: DELETE_MAIN_RAW_MAT_CONSUMPTION,
     payload: rawMatConsumption,
   };
 };

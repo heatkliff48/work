@@ -182,7 +182,6 @@ const QualityManagementTable = () => {
     if (isConfirmed) {
       const {
         id,
-        batch_id,
         product_article,
         reserved_quantity_allocated,
         reserved_quantity_remaining,
@@ -279,23 +278,6 @@ const QualityManagementTable = () => {
         return;
       }
 
-      const calculatedOrderedQuantity =
-        reserved_quantity_allocated + summReserve;
-
-      // Добавляем на склад
-      await dispatch(
-        addNewWarehouse({
-          product_article,
-          article: batch_id,
-          warehouse_loc: "local",
-          free_quantity_remaining: remainingFreeQty,
-          ordered_quantity: calculatedOrderedQuantity,
-          total_quantity: calculatedOrderedQuantity + remainingFreeQty,
-          type: "OK",
-        })
-      );
-
-      // Обновляем все затронутые позиции в list_of_ordered_production
       for (const ordered_production of updatedReserves) {
         await dispatch(updListOfOrderedProduction(ordered_production));
       }

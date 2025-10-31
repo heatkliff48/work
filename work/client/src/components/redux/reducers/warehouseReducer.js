@@ -77,7 +77,7 @@ export const rawMaterialsWarehouseReducer = (
 
       itemsToUpdate.forEach((item) => {
         // Извлекаем updatedWarehouse если он есть
-        const updatedItem = item.updatedWarehouse || item;
+        const updatedItem = item?.updatedWarehouse || item;
 
         const index = result.findIndex((el) => el.id === updatedItem.id);
         if (index !== -1) {
