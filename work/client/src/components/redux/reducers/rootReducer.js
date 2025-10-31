@@ -1,4 +1,5 @@
 import {
+  mainRawMatConsumptionReducer,
   rawMatConsumptionReducer,
   recipeOrdersReducer,
 } from './RecipeOrdersReducer';
@@ -125,6 +126,7 @@ export const rootReducer = combineReducers({
   productCode: productCodeReducer,
   autoclave_calendar: autoclaveCalendarReducer,
   rawMatConsumption: rawMatConsumptionReducer,
+  mainRawMatConsumption: mainRawMatConsumptionReducer,
   rawMaterialsWarehouse: rawMaterialsWarehouseReducer,
   warehouseSand: warehouseSandReducer,
   warehouseLime: warehouseLimeReducer,

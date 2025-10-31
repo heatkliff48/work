@@ -26,6 +26,8 @@ export const ModalContextProvider = ({ children }) => {
   const [dryMixedProductModalOrder, setDryMixedProductModalOrder] = useState(false);
   const [rawMaterialConsumptionMadal, setRawMaterialConsumptionMadal] =
     useState(false);
+  const [mainRawMaterialConsumptionMadal, setMainRawMaterialConsumptionMadal] =
+    useState(false);
   const [relatedMaterialProductModalOrder, setRelatedMaterialProductModalOrder] =
     useState(false);
 
@@ -78,6 +80,8 @@ export const ModalContextProvider = ({ children }) => {
         setRelatedMaterialProductModalOrder,
         rawMaterialConsumptionMadal,
         setRawMaterialConsumptionMadal,
+        mainRawMaterialConsumptionMadal,
+        setMainRawMaterialConsumptionMadal,
       }}
     >
       {children}

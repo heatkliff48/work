@@ -90,17 +90,32 @@ const RecipeContextProvider = ({ children }) => {
     },
   ];
 
-  // const COLUMNS_RAW_MAT_CONSUMPTION_MODAL = [
-  //   { Header: 'Sand', accessor: 'Sand' },
-  //   { Header: 'Lime', accessor: 'Lime' },
-  //   { Header: 'Cement', accessor: 'Cement' },
-  //   { Header: 'Gypsum', accessor: 'Gypsum' },
-  //   { Header: 'Gypsum ston', accessor: 'Gypsum ston' },
-  //   { Header: 'Aluminum', accessor: 'Aluminum' },
-  //   { Header: 'Aluminum', accessor: 'Aluminum' },
-  //   { Header: 'Grinding Ball', accessor: 'Grinding Ball' },
-  //   { Header: 'AAC', accessor: 'AAC' },
-  // ];
+  const COLUMNS_MAIN_RAW_MAT_CONSUMPTION = [
+    {
+      Header: 'ID',
+      accessor: 'id',
+    },
+    {
+      Header: 'Recipe',
+      accessor: 'recipe_article',
+    },
+    {
+      Header: 'Batch production',
+      accessor: 'batch_article',
+    },
+    {
+      Header: 'Production volume',
+      accessor: 'production_volume',
+    },
+    {
+      Header: 'Consumed volume',
+      accessor: 'consumed_volume',
+    },
+    {
+      Header: 'Date',
+      accessor: 'date',
+    },
+  ];
 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productOfRecipe, setProductOfRecipe] = useState({});
@@ -109,11 +124,15 @@ const RecipeContextProvider = ({ children }) => {
   const list_of_recipes = useSelector((state) => state.recipe);
   const recipeOrders = useSelector((state) => state.recipeOrders);
   const raw_mat_consumption = useSelector((state) => state.rawMatConsumption);
+  const main_raw_mat_consumption = useSelector(
+    (state) => state.mainRawMatConsumption
+  );
 
   return (
     <RecipeContext.Provider
       value={{
         COLUMNS_RAW_MAT_CONSUMPTION,
+        COLUMNS_MAIN_RAW_MAT_CONSUMPTION,
         recipe_info,
         selectedProduct,
         setSelectedProduct,
@@ -124,6 +143,7 @@ const RecipeContextProvider = ({ children }) => {
         setSelectedRecipe,
         raw_mat_consumption,
         recipeOrders,
+        main_raw_mat_consumption,
       }}
     >
       {children}

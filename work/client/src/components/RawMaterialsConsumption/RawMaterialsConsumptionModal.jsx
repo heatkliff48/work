@@ -2,14 +2,30 @@ import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { useDispatch } from 'react-redux';
-import { updateRawMaterialConsumptionRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
-import { deleteRawMatConsumption } from '#components/redux/actions/recipeAction.js';
+import {
+  addNewWarehouse,
+  updateRawMaterialConsumptionRawMaterialsWarehouse,
+  updListOfOrderedProduction,
+} from '#components/redux/actions/warehouseAction.js';
+import {
+  addNewMainRawMatConsumption,
+  deleteRawMatConsumption,
+} from '#components/redux/actions/recipeAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 
 const RawMaterialsConsumptionModal = React.memo(
   ({ isOpen, toggle, selectedRow }) => {
-    const { list_of_recipes = [] } = useRecipeContext();
-    const { raw_materials_warehouse = [] } = useWarehouseContext();
+    const { list_of_recipes = [], main_raw_mat_consumption } = useRecipeContext();
+    const { latestProducts } = useProductsContext();
+    const {
+      raw_materials_warehouse = [],
+      list_of_ordered_production,
+      getWarehouseArticle,
+    } = useWarehouseContext();
+
+    const { setMainRawMaterialConsumptionMadal } = useModalContext();
     const dispatch = useDispatch();
 
     const recipe = useMemo(
@@ -51,16 +67,46 @@ const RawMaterialsConsumptionModal = React.memo(
       []
     );
 
+    // \- Form state
     const [form, setForm] = useState({});
+    // production volume is now editable in the header
+    const [productionVolume, setProductionVolume] = useState('');
+
+    // Per-row mode: 'default' | 'from_actual' | 'manual'
+    // состояние
+    const [wastedMode, setWastedMode] = useState('default'); // 'default' | 'from_actual' | 'manual'
+
+    // обработчики для верхних чекбоксов
+    const onHeaderFromActual = (e) =>
+      setWastedMode(e.target.checked ? 'from_actual' : 'default');
+    const onHeaderManual = (e) =>
+      setWastedMode(e.target.checked ? 'manual' : 'default');
+
     useEffect(() => {
       if (!isOpen) return;
       const initial = {};
+      const modeInit = {};
       materialsMap.forEach(({ key }) => {
         initial[`${key}_actual_reciepe`] = '';
         initial[`${key}_Wasted`] = '';
+        modeInit[key] = 'default';
       });
       setForm(initial);
-    }, [isOpen, materialsMap]);
+      setWastedMode(modeInit);
+
+      const defaultVale =
+        selectedRow?.production_volume !== undefined &&
+        selectedRow?.production_volume !== null
+          ? String(selectedRow.production_volume)
+          : '';
+      const consumed_volume =
+        main_raw_mat_consumption?.find((item) => item.id === selectedRow?.id)
+          ?.consumed_volume || 0;
+
+      const prodValue = Number(defaultVale) - consumed_volume;
+
+      setProductionVolume(String(prodValue));
+    }, [isOpen, materialsMap, selectedRow]);
 
     const handleChange = (key) => (e) => {
       const v = e.target.value;
@@ -69,16 +115,17 @@ const RawMaterialsConsumptionModal = React.memo(
       }
     };
 
-    const totals = useMemo(() => {
-      const pv = Number(selectedRow?.production_volume ?? 0);
-      const t = {};
-      materialsMap.forEach(({ key }) => {
-        const a = Number(form[`${key}_actual_reciepe`] || 0);
-        t[`${key}_total`] = pv ? +(a * pv).toFixed(3) : '';
-      });
-      return t;
-    }, [form, selectedRow, materialsMap]);
+    const handlePvChange = (e) => {
+      const v = e.target.value;
+      if (v === '' || /^-?\d*\.?\d*$/.test(v)) setProductionVolume(v);
+    };
 
+    const pvNumber = useMemo(
+      () => (productionVolume === '' ? 0 : Number(productionVolume) || 0),
+      [productionVolume]
+    );
+
+    // Helpers
     const baseByLabel = (label, key) => {
       if (!recipe || !key || !(key in recipe)) return '—';
       const v = recipe[key];
@@ -91,7 +138,6 @@ const RawMaterialsConsumptionModal = React.memo(
       return logs[key];
     };
 
-    // helpers для проверки "пусто или 0"
     const numOrNull = (v) => {
       if (v === '' || v === null || v === undefined) return null;
       const n = Number(v);
@@ -99,10 +145,33 @@ const RawMaterialsConsumptionModal = React.memo(
     };
 
     const isEmptyOrZero = (v) => {
-      // строка '—' из base считаем пустым
       if (v === '' || v === null || v === undefined || v === '—') return true;
       const n = Number(v);
       return !Number.isFinite(n) || n === 0;
+    };
+
+    const computeTotalByActual = useMemo(() => {
+      const t = {};
+      materialsMap.forEach(({ key }) => {
+        const a = Number(form[`${key}_actual_reciepe`] || 0);
+        t[`${key}_total`] = pvNumber ? +(a * pvNumber).toFixed(3) : '';
+      });
+      return t;
+    }, [form, pvNumber, materialsMap]);
+
+    // Compute Wasted value per row depending on mode
+    const computeWasted = (key, label) => {
+      const mode = wastedMode || 'default';
+      const aVal = Number(form[`${key}_actual_reciepe`] || 0);
+      const baseNum = Number(baseByLabel(label, key));
+      if (mode === 'manual') {
+        const raw = form[`${key}_Wasted`];
+        return raw === '' ? '' : Number(raw);
+      }
+      if (pvNumber === 0) return '';
+      if (mode === 'from_actual') return +(aVal * pvNumber).toFixed(3);
+      if (!Number.isFinite(baseNum)) return '';
+      return +(baseNum * pvNumber).toFixed(3);
     };
 
     const shouldShowRow = (label, key) => {
@@ -112,65 +181,45 @@ const RawMaterialsConsumptionModal = React.memo(
       const log = logByKey(key);
       const aVal = numOrNull(form[`${key}_actual_reciepe`]);
       const wVal = numOrNull(form[`${key}_Wasted`]);
-      const total = totals[`${key}_total`];
+      const total = computeTotalByActual[`${key}_total`];
+      const wastedCalc = computeWasted(key, label);
 
-      // показываем, если есть что-то осмысленное: не пусто и не 0
       const hasMeaningfulBase = !isEmptyOrZero(base);
       const hasMeaningfulLog = !isEmptyOrZero(log);
       const hasMeaningfulA = aVal !== null && aVal !== 0;
       const hasMeaningfulW = wVal !== null && wVal !== 0;
-      const hasMeaningfulTotal =
-        total !== '' && Number.isFinite(Number(total)) && Number(total) !== 0;
+      const hasMeaningfulTotal = total !== '' && Number(total) !== 0;
+      const hasMeaningfulWasted = wastedCalc !== '' && Number(wastedCalc) !== 0;
 
       return (
         hasMeaningfulBase ||
         hasMeaningfulLog ||
         hasMeaningfulA ||
         hasMeaningfulW ||
-        hasMeaningfulTotal
+        hasMeaningfulTotal ||
+        hasMeaningfulWasted
       );
     };
 
-    // const handleSave = () => {
-    //   const materials = materialsMap
-    //     .map(({ label, key }) => {
-    //       const raw = form[`${key}_Wasted`];
-    //       const wasted =
-    //         raw === '' || raw === null || raw === undefined ? null : Number(raw);
+    const [confirmFlag, setConfirmFlag] = useState(false);
 
-    //       if (wasted === null || Number.isNaN(wasted)) return null;
-
-    //       return { type: label, quantity: wasted };
-    //     })
-    //     .filter(Boolean);
-
-    //   const body = { materials };
-
-    //   dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
-    //   dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
-    //   toggle?.();
-    // };
-
-    // 2) обновлённый handleSave с проверкой наличия материалов
     const handleSave = () => {
-      // Собираем только введённые пользователем значения "Wasted"
+      // Build materials using the computed Wasted according to mode
       const materials = materialsMap
         .map(({ label, key }) => {
-          const raw = form[`${key}_Wasted`];
-          const wasted =
-            raw === '' || raw === null || raw === undefined ? null : Number(raw);
+          const w = computeWasted(key, label);
+          const wasted = w === '' ? null : Number(w);
           if (wasted === null || Number.isNaN(wasted) || wasted <= 0) return null;
-          return { type: label, quantity: wasted };
+          return { type: label, quantity: +wasted.toFixed(3) };
         })
         .filter(Boolean);
 
-      // Если нечего списывать — просто выходим (можно показать уведомление, если нужно)
       if (!materials.length) {
         alert('Нет данных для списания материалов.');
         return;
       }
 
-      // Проверяем наличие на складе
+      // Stock check
       const shortages = [];
       for (const { type, quantity } of materials) {
         const have = warehouseByType.get(type) ?? 0;
@@ -184,7 +233,6 @@ const RawMaterialsConsumptionModal = React.memo(
         }
       }
 
-      // Если есть дефицит — предупреждаем и НИЧЕГО не отправляем
       if (shortages.length) {
         const msg =
           'Невозможно списать материалы — недостаточно на складе:\n\n' +
@@ -198,12 +246,95 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
-      // Всё ок — отправляем на списание
       const body = { materials };
-      console.log('body', body);
-      // dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
-      // dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
-      // toggle?.();
+      dispatch(
+        addNewMainRawMatConsumption({
+          ...selectedRow,
+          consumed_volume: Number(productionVolume),
+        })
+      );
+
+      addProductOrder();
+      dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
+      if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+
+      setMainRawMaterialConsumptionMadal(false);
+      toggle();
+    };
+
+    const addProductOrder = async () => {
+      const { batch_article } = selectedRow;
+
+      const free_quantity_remaining = productionVolume;
+      const ordered_quantity = 0;
+
+      const reservedProducts =
+        list_of_ordered_production?.filter(
+          (item) => item.product_article === batch_article
+        ) || [];
+
+      let remainingFreeQty = parseInt(free_quantity_remaining);
+      let summReserve = 0;
+
+      const updatedReserves = reservedProducts.map((reservedItem) => {
+        if (reservedItem.product_article !== batch_article) {
+          return reservedItem;
+        }
+
+        if (remainingFreeQty <= 0) {
+          if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
+            return reservedItem;
+          } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
+            return {
+              ...reservedItem,
+              quantity_in_warehouse: Math.min(
+                reservedItem.quantity_in_warehouse + parseInt(ordered_quantity),
+                reservedItem.quantity
+              ),
+            };
+          }
+        }
+
+        const deducted = Math.min(
+          reservedItem.quantity -
+            reservedItem.quantity_in_warehouse -
+            parseInt(ordered_quantity),
+          remainingFreeQty
+        );
+
+        remainingFreeQty -= deducted;
+        summReserve += deducted;
+
+        return {
+          ...reservedItem,
+          quantity_in_warehouse:
+            reservedItem.quantity_in_warehouse +
+            parseInt(ordered_quantity) +
+            deducted,
+        };
+      });
+
+      const product = latestProducts.find(
+        (item) => item.article == batch_article
+      );
+
+      const articleInfo = getWarehouseArticle(product);
+
+      dispatch(
+        addNewWarehouse({
+          product_article: batch_article,
+          article: articleInfo,
+          warehouse_loc: 'local',
+          type: 'OK',
+          free_quantity_remaining: remainingFreeQty,
+          ordered_quantity: parseInt(ordered_quantity) + summReserve,
+          total_quantity:
+            parseInt(ordered_quantity) + summReserve + remainingFreeQty,
+        })
+      );
+      for (const ordered_production of updatedReserves) {
+        dispatch(updListOfOrderedProduction(ordered_production));
+      }
     };
 
     return (
@@ -215,8 +346,16 @@ const RawMaterialsConsumptionModal = React.memo(
                 <span className="text-muted">Recipe article: </span>
                 <b>{selectedRow?.recipe_article ?? '—'}</b>
               </div>
-              <div className="text-muted">
-                Production volume: <b>{selectedRow?.production_volume ?? '—'}</b>
+              <div className="text-muted d-flex align-items-center gap-2">
+                <span>Production volume:</span>
+                <input
+                  className="form-control"
+                  inputMode="decimal"
+                  placeholder="0"
+                  value={productionVolume}
+                  onChange={handlePvChange}
+                  style={{ maxWidth: 160 }}
+                />
               </div>
             </div>
           </ModalHeader>
@@ -249,6 +388,46 @@ const RawMaterialsConsumptionModal = React.memo(
                       manual input
                     </th>
                   </tr>
+                  {/* Checkboxes row */}
+                  <tr>
+                    <th style={{ background: '#fffef0' }}>Raw material</th>
+                    <th style={{ background: '#fff6d5', verticalAlign: 'top' }}>
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          checked={wastedMode === 'from_actual'}
+                          onChange={onHeaderFromActual}
+                        />
+                        <label className="form-check-label" style={{ fontSize: 12 }}>
+                          чекбокс над *_actual_reciepe (переключает расчёт Wasted)
+                        </label>
+                      </div>
+                      <div className="text-muted" style={{ fontSize: 12 }}>
+                        место для названия
+                      </div>
+                    </th>
+                    <th style={{ background: '#fff6d5' }}>*_total</th>
+                    <th style={{ background: '#e9f6ea' }}>*_log</th>
+                    <th style={{ background: '#fff6d5', verticalAlign: 'top' }}>
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          checked={wastedMode === 'manual'}
+                          onChange={onHeaderManual}
+                        />
+                        <label className="form-check-label" style={{ fontSize: 12 }}>
+                          чекбокс над Wasted (ручной ввод)
+                        </label>
+                      </div>
+                      <div className="text-muted" style={{ fontSize: 12 }}>
+                        место для названия
+                      </div>
+                    </th>
+                  </tr>
+
+                  {/* Labels row */}
                   <tr>
                     <th style={{ background: '#fff59d' }}>Raw material</th>
                     <th style={{ background: '#ffe082' }}>*_actual_reciepe</th>
@@ -265,8 +444,10 @@ const RawMaterialsConsumptionModal = React.memo(
                     const aKey = `${key}_actual_reciepe`;
                     const wKey = `${key}_Wasted`;
                     const base = baseByLabel(label, key);
-                    const total = totals[`${key}_total`];
+                    const total = computeTotalByActual[`${key}_total`];
                     const log = logByKey(key);
+                    const mode = wastedMode[key] || 'default';
+                    const wastedVal = computeWasted(key, label);
 
                     return (
                       <tr key={key}>
@@ -277,6 +458,7 @@ const RawMaterialsConsumptionModal = React.memo(
                           </div>
                         </td>
 
+                        {/* *_actual_reciepe with row-level checkbox above */}
                         <td>
                           <label
                             className="form-label mb-1"
@@ -302,6 +484,7 @@ const RawMaterialsConsumptionModal = React.memo(
                           {isEmptyOrZero(log) ? '' : log}
                         </td>
 
+                        {/* Wasted with row-level checkbox above for manual input */}
                         <td>
                           <label
                             className="form-label mb-1"
@@ -313,9 +496,16 @@ const RawMaterialsConsumptionModal = React.memo(
                             className="form-control"
                             inputMode="decimal"
                             placeholder="0"
-                            value={form[wKey] ?? ''}
+                            value={
+                              wastedMode === 'manual'
+                                ? form[wKey] ?? ''
+                                : computeWasted(key, label) === ''
+                                ? ''
+                                : String(computeWasted(key, label))
+                            }
                             onChange={handleChange(wKey)}
                             style={{ maxWidth: 140 }}
+                            disabled={wastedMode !== 'manual'}
                           />
                         </td>
                       </tr>
@@ -325,13 +515,27 @@ const RawMaterialsConsumptionModal = React.memo(
               </table>
             </ModalBody>
 
-            <ModalFooter>
-              <button className="btn btn-outline-secondary" onClick={toggle}>
-                Cancel
-              </button>
-              <button className="btn btn-success" onClick={handleSave}>
-                Save
-              </button>
+            <ModalFooter className="d-flex justify-content-between">
+              <div className="d-flex align-items-center gap-2">
+                <input
+                  id="confirm-checkbox"
+                  className="form-check-input"
+                  type="checkbox"
+                  checked={confirmFlag}
+                  onChange={(e) => setConfirmFlag(e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor="confirm-checkbox">
+                  Подтверждаю корректность данных (чекбокс у кнопки сохранения)
+                </label>
+              </div>
+              <div className="d-flex gap-2">
+                <button className="btn btn-outline-secondary" onClick={toggle}>
+                  Cancel
+                </button>
+                <button className="btn btn-success" onClick={handleSave}>
+                  Save
+                </button>
+              </div>
             </ModalFooter>
           </Fragment>
         </Modal>

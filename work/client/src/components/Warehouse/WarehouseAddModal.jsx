@@ -12,9 +12,9 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 const WarehouseAddModal = React.memo(
-  ({ isOpen, toggle, COLUMNS_WAREHOUSE, warehouse_data }) => {
+  ({ isOpen, toggle, COLUMNS_WAREHOUSE }) => {
     const { COLUMNS, latestProducts } = useProductsContext();
-    const { list_of_ordered_production } = useWarehouseContext();
+    const { list_of_ordered_production, getWarehouseArticle } = useWarehouseContext();
     const dispatch = useDispatch();
 
     const [warehouseData, setWarehouseData] = useState([]);
@@ -39,23 +39,6 @@ const WarehouseAddModal = React.memo(
         label: 'Remnants',
       },
     ];
-
-    const getWarehouseArticle = (product) => {
-      let versionNumber = '0001';
-      const year = new Date().getFullYear().toString().slice(-2);
-      const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
-      const day = new Date().getDate();
-
-      const certificate = product.certificate.slice(0, 1);
-      const density = product.density.toString().slice(0, 1);
-
-      const articleId = warehouse_data.length === 0 ? 1 : warehouse_data.length + 1;
-      versionNumber = `0000000${articleId}`.slice(-6);
-
-      const warehouseArticle = `S00${certificate}${density}${year}${month}${day}${versionNumber}`;
-
-      return warehouseArticle;
-    };
 
     const handlerAddProductWarehouse = useCallback(
       (row) => {

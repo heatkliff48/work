@@ -1,5 +1,11 @@
 import showMessage from '#components/Utils/showMessage.js';
-import { RAW_MAT_CONSUMPTION, RECIPE_ORDERS_DATA } from '../types/recipeTypes';
+import {
+  DELETE_MAIN_RAW_MAT_CONSUMPTION,
+  GET_MAIN_RAW_MAT_CONSUMPTION,
+  ADD_NEW_MAIN_RAW_MAT_CONSUMPTION,
+  RAW_MAT_CONSUMPTION,
+  RECIPE_ORDERS_DATA,
+} from '../types/recipeTypes';
 import {
   DELETE_RAW_MAT_CONSUMPTION_SOCKET,
   NEES_DELETE_MATERIAL_PLAN_SOCKET,
@@ -47,5 +53,26 @@ export const rawMatConsumptionReducer = (rawMatConsumption = [], action) => {
 
     default:
       return rawMatConsumption;
+  }
+};
+
+export const mainRawMatConsumptionReducer = (mainRawMatConsumption = [], action) => {
+  const { type, payload } = action;
+
+  switch (type) {
+    case GET_MAIN_RAW_MAT_CONSUMPTION: {
+      return payload ?? mainRawMatConsumption;
+    }
+
+    case ADD_NEW_MAIN_RAW_MAT_CONSUMPTION: {
+      return [...mainRawMatConsumption, payload];
+    }
+
+    case DELETE_MAIN_RAW_MAT_CONSUMPTION: {
+      return mainRawMatConsumption.filter((el) => el.id !== payload);
+    }
+
+    default:
+      return mainRawMatConsumption;
   }
 };

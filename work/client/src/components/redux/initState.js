@@ -48,6 +48,7 @@ const initState = {
   productCode: [],
   autoclave_calendar: [],
   rawMatConsumption: [],
+  mainRawMatConsumption: [],
   rawMaterialsWarehouse: [],
   warehouseSand: [],
   warehouseLime: [],
