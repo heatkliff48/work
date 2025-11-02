@@ -18,6 +18,7 @@ module.exports = {
         {
           material_type: "Sand (dry)",
           remaining_quantity: 0,
+          consumed_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
           updatedAt: currentDate,
@@ -25,6 +26,7 @@ module.exports = {
         {
           material_type: "Lime",
           remaining_quantity: 0,
+          consumed_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
           updatedAt: currentDate,
@@ -32,6 +34,7 @@ module.exports = {
         {
           material_type: "Cement",
           remaining_quantity: 0,
+          consumed_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
           updatedAt: currentDate,
@@ -39,6 +42,7 @@ module.exports = {
         {
           material_type: "Gypsum (dry)",
           remaining_quantity: 0,
+          consumed_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
           updatedAt: currentDate,
@@ -46,6 +50,7 @@ module.exports = {
         {
           material_type: "Gypsum stone",
           remaining_quantity: 0,
+          consumed_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
           updatedAt: currentDate,
@@ -53,6 +58,7 @@ module.exports = {
         {
           material_type: "Aluminum 1",
           remaining_quantity: 0,
+          consumed_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
           updatedAt: currentDate,
@@ -60,6 +66,7 @@ module.exports = {
         {
           material_type: "Aluminum 2",
           remaining_quantity: 0,
+          consumed_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
           updatedAt: currentDate,
@@ -67,6 +74,7 @@ module.exports = {
         {
           material_type: "Grinding Balls",
           remaining_quantity: 0,
+          consumed_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
           updatedAt: currentDate,
@@ -74,6 +82,7 @@ module.exports = {
         {
           material_type: "AAC",
           remaining_quantity: 0,
+          consumed_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
           updatedAt: currentDate,
@@ -81,6 +90,7 @@ module.exports = {
         {
           material_type: "Sand slurry (dry)",
           remaining_quantity: 0,
+          consumed_quantity: 0,
           last_updated: formatDate(currentDate),
           createdAt: currentDate,
           updatedAt: currentDate,
