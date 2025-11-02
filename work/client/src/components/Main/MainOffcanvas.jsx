@@ -1,12 +1,12 @@
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import React, { useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useUsersContext } from "#components/contexts/UserContext.js";
+import React, { useState } from "react";
+import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Offcanvas from "react-bootstrap/Offcanvas";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 function MainOffcanvas() {
   const navigate = useNavigate();
@@ -47,7 +47,7 @@ function MainOffcanvas() {
         <Offcanvas.Body>
           <ButtonGroup vertical>
             {/* Администрирование */}
-            {checkUserAccess(user, roles, 'Users_info')?.canRead && (
+            {checkUserAccess(user, roles, "Users_info")?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
                 title="Admin"
@@ -58,7 +58,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/users_info');
+                      navigate("/users_info");
                       handleClose();
                     }}
                   >
@@ -69,7 +69,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/roles');
+                      navigate("/roles");
                       handleClose();
                     }}
                   >
@@ -90,7 +90,7 @@ function MainOffcanvas() {
                 <Button
                   className="custom-submenu-button"
                   onClick={() => {
-                    navigate('/products_type_journal');
+                    navigate("/products_type_journal");
                     handleClose();
                   }}
                 >
@@ -101,7 +101,7 @@ function MainOffcanvas() {
                 <Button
                   className="custom-submenu-button"
                   onClick={() => {
-                    navigate('/statistics');
+                    navigate("/statistics");
                     handleClose();
                   }}
                 >
@@ -111,11 +111,11 @@ function MainOffcanvas() {
             </DropdownButton>
 
             {/* Клиенты */}
-            {checkUserAccess(user, roles, 'Clients')?.canRead && (
+            {checkUserAccess(user, roles, "Clients")?.canRead && (
               <Button
                 className="custom-menu-button"
                 onClick={() => {
-                  navigate('/clients');
+                  navigate("/clients");
                   handleClose();
                 }}
               >
@@ -124,11 +124,11 @@ function MainOffcanvas() {
             )}
 
             {/* Заказы */}
-            {checkUserAccess(user, roles, 'Orders')?.canRead && (
+            {checkUserAccess(user, roles, "Orders")?.canRead && (
               <Button
                 className="custom-menu-button"
                 onClick={() => {
-                  navigate('/orders');
+                  navigate("/orders");
                   handleClose();
                 }}
               >
@@ -137,7 +137,8 @@ function MainOffcanvas() {
             )}
 
             {/* Производственные блоки */}
-            {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
+            {checkUserAccess(user, roles, "List_of_ordered_production")
+              ?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
                 title="Ordered products pipeline"
@@ -148,7 +149,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/list_of_ordered_production');
+                      navigate("/list_of_ordered_production");
                       handleClose();
                     }}
                   >
@@ -159,7 +160,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/list_of_ordered_production_oem');
+                      navigate("/list_of_ordered_production_oem");
                       handleClose();
                     }}
                   >
@@ -170,7 +171,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/related_materials_backorder_list');
+                      navigate("/related_materials_backorder_list");
                       handleClose();
                     }}
                   >
@@ -181,7 +182,8 @@ function MainOffcanvas() {
             )}
 
             {/* Планирование */}
-            {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
+            {checkUserAccess(user, roles, "production_batch_designer")
+              ?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
                 title="Production planner"
@@ -192,7 +194,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/autoclave_calendar');
+                      navigate("/autoclave_calendar");
                       handleClose();
                     }}
                   >
@@ -203,7 +205,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/production_batch_designer_new');
+                      navigate("/production_batch_designer_new");
                       handleClose();
                     }}
                   >
@@ -212,11 +214,11 @@ function MainOffcanvas() {
                 </Dropdown.Item>
               </DropdownButton>
             )}
-            {checkUserAccess(user, roles, 'production_plan')?.canRead && (
+            {checkUserAccess(user, roles, "production_plan")?.canRead && (
               <Button
                 className="custom-menu-button"
                 onClick={() => {
-                  navigate('/batch_outside');
+                  navigate("/batch_outside");
 
                   handleClose();
                 }}
@@ -226,7 +228,7 @@ function MainOffcanvas() {
             )}
 
             {/* Технологические рецепты */}
-            {checkUserAccess(user, roles, 'recipe_products')?.canRead && (
+            {checkUserAccess(user, roles, "recipe_products")?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
                 title="Technology planner"
@@ -237,7 +239,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/recipe_products');
+                      navigate("/recipe_products");
                       handleClose();
                     }}
                   >
@@ -248,7 +250,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/raw_materials_plan');
+                      navigate("/raw_materials_plan");
                       handleClose();
                     }}
                   >
@@ -259,7 +261,7 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/recipe_orders');
+                      navigate("/recipe_orders");
                       handleClose();
                     }}
                   >
@@ -270,20 +272,31 @@ function MainOffcanvas() {
                   <Button
                     className="custom-submenu-button"
                     onClick={() => {
-                      navigate('/raw_material_consumption');
+                      navigate("/raw_material_consumption");
                       handleClose();
                     }}
                   >
                     Raw material consumption
                   </Button>
                 </Dropdown.Item>
+                <Dropdown.Item eventKey="5">
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate("/lotes_list");
+                      handleClose();
+                    }}
+                  >
+                    Lotes list
+                  </Button>
+                </Dropdown.Item>
               </DropdownButton>
             )}
-            {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
+            {checkUserAccess(user, roles, "recipe_orders")?.canRead && (
               <Button
                 className="custom-menu-button"
                 onClick={() => {
-                  navigate('/recipe_orders');
+                  navigate("/recipe_orders");
 
                   handleClose();
                 }}
@@ -292,11 +305,11 @@ function MainOffcanvas() {
               </Button>
             )}
             {/* Качество */}
-            {checkUserAccess(user, roles, 'quality_management')?.canRead && (
+            {checkUserAccess(user, roles, "quality_management")?.canRead && (
               <Button
                 className="custom-menu-button"
                 onClick={() => {
-                  navigate('/quality_management');
+                  navigate("/quality_management");
                   handleClose();
                 }}
               >
@@ -305,11 +318,11 @@ function MainOffcanvas() {
             )}
 
             {/* Склад */}
-            {checkUserAccess(user, roles, 'Warehouse')?.canRead && (
+            {checkUserAccess(user, roles, "Warehouse")?.canRead && (
               <Button
                 className="custom-menu-button"
                 onClick={() => {
-                  navigate('/warehouse_products_type');
+                  navigate("/warehouse_products_type");
                   handleClose();
                 }}
               >
@@ -318,11 +331,11 @@ function MainOffcanvas() {
             )}
 
             {/* Отгрузка */}
-            {checkUserAccess(user, roles, 'warehouse_manager')?.canRead && (
+            {checkUserAccess(user, roles, "warehouse_manager")?.canRead && (
               <Button
                 className="custom-menu-button"
                 onClick={() => {
-                  navigate('/warehouse_manager');
+                  navigate("/warehouse_manager");
                   handleClose();
                 }}
               >
@@ -331,11 +344,11 @@ function MainOffcanvas() {
             )}
 
             {/* Бухгалтерия */}
-            {checkUserAccess(user, roles, 'accounting')?.canRead && (
+            {checkUserAccess(user, roles, "accounting")?.canRead && (
               <Button
                 className="custom-menu-button"
                 onClick={() => {
-                  navigate('/accounting');
+                  navigate("/accounting");
                   handleClose();
                 }}
               >

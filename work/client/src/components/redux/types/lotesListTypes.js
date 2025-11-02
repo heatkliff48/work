@@ -1,0 +1,5 @@
+export const GET_FULL_LOTES_LIST = "GET_FULL_LOTES_LIST";
+export const FULL_LOTES_LIST = "FULL_LOTES_LIST";
+
+export const ADD_NEW_LOTES_LIST = "ADD_NEW_LOTES_LIST";
+export const NEW_LOTES_LIST = "NEW_LOTES_LIST";
