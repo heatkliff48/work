@@ -122,7 +122,8 @@ import {
   NEED_UPDATE_WAREHOUSE_AAC_SOCKET,
   NEED_DELETE_WAREHOUSE_AAC_SOCKET,
   DELETE_RAW_MAT_CONSUMPTION_SOCKET,
-} from '#components/redux/types/socketTypes/socket.js';
+  NEW_LOTES_LIST_SOCKET,
+} from "#components/redux/types/socketTypes/socket.js";
 
 export const updateRolesSocket = (updRoleData) => {
   return {
@@ -607,14 +608,18 @@ export const updateDryMixesJournalSocket = (dryMixesJournal) => {
   };
 };
 
-export const addNewRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
+export const addNewRelatedMaterialsJournalSocket = (
+  relatedMaterialsJournal
+) => {
   return {
     type: NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
   };
 };
 
-export const updateRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
+export const updateRelatedMaterialsJournalSocket = (
+  relatedMaterialsJournal
+) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
@@ -663,14 +668,18 @@ export const updateDryMixesWarehouseSocket = (dryMixesWarehouse) => {
   };
 };
 
-export const addNewRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
+export const addNewRelatedMaterialsWarehouseSocket = (
+  relatedMaterialsWarehouse
+) => {
   return {
     type: NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
     payload: relatedMaterialsWarehouse,
   };
 };
 
-export const updateRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
+export const updateRelatedMaterialsWarehouseSocket = (
+  relatedMaterialsWarehouse
+) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
     payload: relatedMaterialsWarehouse,
@@ -965,7 +974,9 @@ export const updateWarehouseGrindingBallsSocket = (warehouseGrindingBalls) => {
   };
 };
 
-export const deleteWarehouseGrindingBallsSocket = (grinding_balls_warehouse_id) => {
+export const deleteWarehouseGrindingBallsSocket = (
+  grinding_balls_warehouse_id
+) => {
   return {
     type: NEED_DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
     payload: grinding_balls_warehouse_id,
@@ -990,5 +1001,12 @@ export const deleteWarehouseAACSocket = (aac_warehouse_id) => {
   return {
     type: NEED_DELETE_WAREHOUSE_AAC_SOCKET,
     payload: aac_warehouse_id,
+  };
+};
+
+export const addNewLotesListSocket = (lotesList) => {
+  return {
+    type: NEW_LOTES_LIST_SOCKET,
+    payload: lotesList,
   };
 };

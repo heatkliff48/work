@@ -122,7 +122,8 @@ import {
   addNewWarehouseAACSocket,
   updateWarehouseAACSocket,
   deleteWarehouseAACSocket,
-} from '#components/redux/actions/socketActions/socketAction.js';
+  addNewLotesListSocket,
+} from "#components/redux/actions/socketActions/socketAction.js";
 
 import {
   addNewClientSocket,
@@ -131,12 +132,12 @@ import {
   updateLegalAddressSocket,
   addNewDeliveryAddressSocket,
   addNewContactInfoSocket,
-} from '#components/redux/actions/socketActions/clientsActionSocket.js';
+} from "#components/redux/actions/socketActions/clientsActionSocket.js";
 import {
   addNewBatchOutsideSocket,
   deleteBatchOutsideSocket,
   updateBatchOutsideSocket,
-} from '#components/redux/actions/socketActions/batchOutsideActionSocket.js';
+} from "#components/redux/actions/socketActions/batchOutsideActionSocket.js";
 import {
   ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
   ADD_CONTACT_INFO_SOCKET,
@@ -283,12 +284,13 @@ import {
   GET_UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   GET_DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
-} from '#components/redux/types/socketTypes/socket.js';
+  ADD_NEW_LOTES_LIST_SOCKET,
+} from "#components/redux/types/socketTypes/socket.js";
 
 export const createSocketOnMessage = (dispatch) => (event) => {
   const parsedData = JSON.parse(event.data);
   const { type, payload } = parsedData;
-  console.log('createSocketOnMessage, parsedData', parsedData);
+  console.log("createSocketOnMessage, parsedData", parsedData);
 
   switch (type) {
     case ADD_NEW_PRODUCT_SOCKET:
@@ -815,6 +817,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case DELETE_WAREHOUSE_AAC_SOCKET:
       dispatch(deleteWarehouseAACSocket(payload));
+      break;
+
+    case ADD_NEW_LOTES_LIST_SOCKET:
+      dispatch(addNewLotesListSocket(payload));
       break;
 
     default:
