@@ -389,10 +389,8 @@ const RawMaterialsConsumptionModal = React.memo(
         })
       );
 
-      if (confirmFlag) {
-        for (const ordered_production of updatedReserves) {
-          dispatch(updListOfOrderedProduction(ordered_production));
-        }
+      for (const ordered_production of updatedReserves) {
+        dispatch(updListOfOrderedProduction(ordered_production));
       }
     };
 
