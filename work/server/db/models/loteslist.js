@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   LotesList.init(
     {
       cake_id: DataTypes.INTEGER,
+      cake_id_finish: DataTypes.INTEGER,
       production_date: DataTypes.STRING,
       product: DataTypes.STRING,
       recipe: DataTypes.STRING,

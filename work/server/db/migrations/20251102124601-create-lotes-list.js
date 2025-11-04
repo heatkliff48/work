@@ -12,6 +12,9 @@ module.exports = {
       cake_id: {
         type: Sequelize.INTEGER,
       },
+      cake_id_finish: {
+        type: Sequelize.INTEGER,
+      },
       production_date: {
         type: Sequelize.STRING,
       },
