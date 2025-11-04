@@ -243,37 +243,23 @@ const QualityManagementTable = () => {
           },
         ];
 
-        recipeOrders?.forEach((el) => {
-          const batch = batchOutside.find(
-            (batch) => batch.id === production_plan_id
-          );
+        const batch = batchOutside.find((batch) => batch.id === production_plan_id);
 
-          const recipe = list_of_recipes.find(
-            (recipe) => recipe.id === el.id_recipe
-          );
+        const recipe = list_of_recipes.find(
+          (recipe) => recipe.id_batch === production_plan_id
+        );
 
-          const haveRMC = raw_mat_consumption.find(
-            (item) =>
-              item?.recipe_article === recipe?.article &&
-              item?.batch_article === batch?.product_article
-          );
-
-          if (!haveRMC && recipe) {
-            dispatch(
-              addNewRawMatConsumption({
-                id: el.id,
-                recipe_article: recipe?.article || "Unknown Recipe",
-                batch_article: batch?.product_article || "Unknown Batch",
-                production_volume:
-                  Math.ceil(
-                    (reserved_quantity_allocated + free_quantity_fact) /
-                      palletsPerArray
-                  ) || 0,
-                date: batch?.date || "Unknown Date",
-              })
-            );
-          }
-        });
+        dispatch(
+          addNewRawMatConsumption({
+            recipe_article: recipe?.article || 'Unknown Recipe',
+            batch_article: batch?.product_article || 'Unknown Batch',
+            production_volume:
+              Math.ceil(
+                (reserved_quantity_allocated + free_quantity_fact) / palletsPerArray
+              ) || 0,
+            date: batch?.date || 'Unknown Date',
+          })
+        );
 
         await dispatch(addNewAutoclaveCalendar(result));
       }
