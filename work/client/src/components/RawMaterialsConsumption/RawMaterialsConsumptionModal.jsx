@@ -52,8 +52,7 @@ const RawMaterialsConsumptionModal = React.memo(
         // как в RawMaterialsPlan: по плотности и сертификату
         candidateRecipes = (list_of_recipes || []).filter(
           (r) =>
-            r.density === product.density &&
-            r.certificate === product.certificate
+            r.density === product.density && r.certificate === product.certificate
         );
       }
 
@@ -102,8 +101,8 @@ const RawMaterialsConsumptionModal = React.memo(
     );
 
     const [form, setForm] = useState({});
-    const [productionVolume, setProductionVolume] = useState("");
-    const [wastedMode, setWastedMode] = useState("default");
+    const [productionVolume, setProductionVolume] = useState('');
+    const [wastedMode, setWastedMode] = useState('default');
     const [confirmFlag, setConfirmFlag] = useState(false);
 
     const onHeaderFromActual = (e) =>
@@ -115,17 +114,17 @@ const RawMaterialsConsumptionModal = React.memo(
       if (!isOpen) return;
       const initial = {};
       materialsMap.forEach(({ key }) => {
-        initial[`${key}_actual_reciepe`] = "";
-        initial[`${key}_Wasted`] = "";
+        initial[`${key}_actual_reciepe`] = '';
+        initial[`${key}_Wasted`] = '';
       });
       setForm(initial);
-      setWastedMode("default");
+      setWastedMode('default');
 
       const defaultVale =
         selectedRow?.production_volume !== undefined &&
         selectedRow?.production_volume !== null
           ? String(selectedRow.production_volume)
-          : "";
+          : '';
 
       const consumed_volume =
         main_raw_mat_consumption?.find((item) => item.id === selectedRow?.id)
@@ -155,9 +154,9 @@ const RawMaterialsConsumptionModal = React.memo(
 
     // вот тут главная правка: берём данные из выбранного рецепта
     const baseByLabel = (label, key) => {
-      if (!selectedRecipe || !key || !(key in selectedRecipe)) return "—";
+      if (!selectedRecipe || !key || !(key in selectedRecipe)) return '—';
       const v = selectedRecipe[key];
-      return typeof v === "number" ? v : v ?? "—";
+      return typeof v === 'number' ? v : v ?? '—';
     };
 
     const logByKey = (key) => {
@@ -307,9 +306,7 @@ const RawMaterialsConsumptionModal = React.memo(
     const addProductOrder = async () => {
       const { batch_article } = selectedRow;
 
-      const product = latestProducts.find(
-        (item) => item.article == batch_article
-      );
+      const product = latestProducts.find((item) => item.article == batch_article);
 
       const arraysPerPalletRaw = Math.floor(
         (product?.m3InArray ?? 0) / (product?.volumeBlockOnPallet ?? 1)
@@ -318,51 +315,8 @@ const RawMaterialsConsumptionModal = React.memo(
       const free_quantity_remaining = productionVolume * arraysPerPalletRaw;
       const ordered_quantity = 0;
 
-      const reservedProducts =
-        list_of_ordered_production?.filter(
-          (item) => item.product_article === batch_article
-        ) || [];
-
       let remainingFreeQty = parseInt(free_quantity_remaining);
       let summReserve = 0;
-
-      const updatedReserves = reservedProducts.map((reservedItem) => {
-        if (reservedItem.product_article !== batch_article) {
-          return reservedItem;
-        }
-
-        if (remainingFreeQty <= 0) {
-          if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
-            return reservedItem;
-          } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
-            return {
-              ...reservedItem,
-              quantity_in_warehouse: Math.min(
-                reservedItem.quantity_in_warehouse + parseInt(ordered_quantity),
-                reservedItem.quantity
-              ),
-            };
-          }
-        }
-
-        const deducted = Math.min(
-          reservedItem.quantity -
-            reservedItem.quantity_in_warehouse -
-            parseInt(ordered_quantity),
-          remainingFreeQty
-        );
-
-        remainingFreeQty -= deducted;
-        summReserve += deducted;
-
-        return {
-          ...reservedItem,
-          quantity_in_warehouse:
-            reservedItem.quantity_in_warehouse +
-            parseInt(ordered_quantity) +
-            deducted,
-        };
-      });
 
       const articleInfo = getWarehouseArticle(product);
 
@@ -381,6 +335,49 @@ const RawMaterialsConsumptionModal = React.memo(
       );
 
       if (confirmFlag) {
+        const reservedProducts =
+          list_of_ordered_production?.filter(
+            (item) => item.product_article === batch_article
+          ) || [];
+
+        const updatedReserves = reservedProducts.map((reservedItem) => {
+          if (reservedItem.product_article !== batch_article) {
+            return reservedItem;
+          }
+
+          if (remainingFreeQty <= 0) {
+            if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
+              return reservedItem;
+            } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
+              return {
+                ...reservedItem,
+                quantity_in_warehouse: Math.min(
+                  reservedItem.quantity_in_warehouse + parseInt(ordered_quantity),
+                  reservedItem.quantity
+                ),
+              };
+            }
+          }
+
+          const deducted = Math.min(
+            reservedItem.quantity -
+              reservedItem.quantity_in_warehouse -
+              parseInt(ordered_quantity),
+            remainingFreeQty
+          );
+
+          remainingFreeQty -= deducted;
+          summReserve += deducted;
+
+          return {
+            ...reservedItem,
+            quantity_in_warehouse:
+              reservedItem.quantity_in_warehouse +
+              parseInt(ordered_quantity) +
+              deducted,
+          };
+        });
+
         for (const ordered_production of updatedReserves) {
           dispatch(updListOfOrderedProduction(ordered_production));
         }
@@ -397,23 +394,15 @@ const RawMaterialsConsumptionModal = React.memo(
       <div>
         <Modal isOpen={isOpen} toggle={toggle} size="xl">
           <ModalHeader toggle={toggle}>
-            <div
-              className="d-flex gap-3 w-100"
-              style={{ alignItems: "flex-start" }}
-            >
+            <div className="d-flex gap-3 w-100" style={{ alignItems: 'flex-start' }}>
               {/* левая колонка: article + production volume */}
               <div style={{ minWidth: 240 }}>
                 <span className="text-muted d-block" style={{ fontSize: 12 }}>
                   Recipe article:
                 </span>
-                <b className="d-block mb-2">
-                  {selectedRow?.recipe_article ?? "—"}
-                </b>
+                <b className="d-block mb-2">{selectedRow?.recipe_article ?? '—'}</b>
 
-                <span
-                  className="text-muted d-block mb-1"
-                  style={{ fontSize: 12 }}
-                >
+                <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
                   Production volume:
                 </span>
                 <input
@@ -427,10 +416,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
               {/* правая колонка: селектор */}
               <div style={{ flex: 1, minWidth: 280 }}>
-                <span
-                  className="text-muted d-block mb-1"
-                  style={{ fontSize: 12 }}
-                >
+                <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
                   Recipe:
                 </span>
                 {availableRecipes.length ? (
@@ -449,14 +435,14 @@ const RawMaterialsConsumptionModal = React.memo(
                         : null
                     }
                     menuPortalTarget={
-                      typeof document !== "undefined" ? document.body : null
+                      typeof document !== 'undefined' ? document.body : null
                     }
                     styles={{
                       control: (provided) => ({
                         ...provided,
-                        width: "40%",
+                        width: '40%',
                         minHeight: 36,
-                        backgroundColor: "white",
+                        backgroundColor: 'white',
                       }),
                       // сам выпадающий блок
                       menu: (provided) => ({
@@ -468,7 +454,7 @@ const RawMaterialsConsumptionModal = React.memo(
                       menuList: (provided) => ({
                         ...provided,
                         maxHeight: 360, // высота области со скроллом
-                        overflowY: "auto",
+                        overflowY: 'auto',
                       }),
                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                     }}
@@ -607,10 +593,10 @@ const RawMaterialsConsumptionModal = React.memo(
                             inputMode="decimal"
                             placeholder="0"
                             value={
-                              wastedMode === "manual"
-                                ? form[wKey] ?? ""
-                                : wastedVal === ""
-                                ? ""
+                              wastedMode === 'manual'
+                                ? form[wKey] ?? ''
+                                : wastedVal === ''
+                                ? ''
                                 : String(wastedVal)
                             }
                             onChange={handleChange(wKey)}
