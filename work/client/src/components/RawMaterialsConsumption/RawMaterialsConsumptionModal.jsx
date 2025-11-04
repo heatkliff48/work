@@ -397,7 +397,10 @@ const RawMaterialsConsumptionModal = React.memo(
     // новый обработчик выбора рецепта
     const handleRecipeChange = (selectedOption) => {
       const found = availableRecipes.find((r) => r.id === selectedOption.value);
+
       setSelectedRecipe(found || null);
+
+      selectedRow.recipe_article = found?.article || ''; // обновляем статью рецепта в выбранной строке
     };
 
     return (
