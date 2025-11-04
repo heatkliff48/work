@@ -10,9 +10,7 @@ import {
   deleteQualityManagement,
   updateQualityManagement,
 } from '#components/redux/actions/qualityManagementAction.js';
-import {
-  addNewAutoclaveCalendar,
-} from '#components/redux/actions/warehouseAction.js';
+import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
 import {
   deleteBatchOutside,
   updateBatchOutside,
@@ -27,7 +25,7 @@ const QualityManagementTable = () => {
 
   const { autoclave_calendar } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
-  const { list_of_recipes, recipeOrders } = useRecipeContext();
+  const { raw_mat_consumption, list_of_recipes, recipeOrders } = useRecipeContext();
 
   const dispatch = useDispatch();
   const qualityManagementData = useSelector((state) => state.qualityManagementData);

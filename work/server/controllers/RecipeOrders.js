@@ -53,13 +53,13 @@ class RecipeOrdersController {
   static async addNewRawMatConsumptionOrdersData(req, res) {
     const rawMatConsumption = req.body;
 
-    await RecipeOrdersServices.addNewRawMatConsumptionOrdersData(
+   const rawMat =  await RecipeOrdersServices.addNewRawMatConsumptionOrdersData(
       rawMatConsumption
     );
 
-    myEmitter.emit(ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET, rawMatConsumption);
+    myEmitter.emit(ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET, rawMat);
 
-    return res.status(200).json(rawMatConsumption);
+    return res.status(200).json(rawMat);
   }
 
   static async deleteRawMatConsumptionOrdersData(req, res) {

@@ -30,8 +30,8 @@ class RecipeOrdersServices {
   }
 
   static async addNewRawMatConsumptionOrdersData(newRawMatConsumption) {
-    await RecipeOrdersRepository.addNewRawMatConsumptionOrdersData(newRawMatConsumption);
-    return;
+   const rawMat = await RecipeOrdersRepository.addNewRawMatConsumptionOrdersData(newRawMatConsumption);
+    return rawMat;
   }
 
   static async deleteRawMatConsumptionOrdersData(rawMatConsumption) {
