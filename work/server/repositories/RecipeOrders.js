@@ -92,7 +92,9 @@ class RecipeOrdersRepository {
   static async addNewRawMatConsumptionOrdersData(newRawMatConsumption) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewRawMatConsumptionOrdersData');
     try {
-      await RawMatConsumptions.create(newRawMatConsumption);
+      const rawMat = await RawMatConsumptions.create(newRawMatConsumption);
+
+      return rawMat;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
