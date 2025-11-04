@@ -5,15 +5,16 @@ import { useDispatch } from "react-redux";
 import {
   addNewWarehouse,
   updateRawMaterialConsumptionRawMaterialsWarehouse,
-} from '#components/redux/actions/warehouseAction.js';
+} from "#components/redux/actions/warehouseAction.js";
 import {
   addNewMainRawMatConsumption,
   deleteRawMatConsumption,
-} from '#components/redux/actions/recipeAction.js';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import Select from 'react-select';
+} from "#components/redux/actions/recipeAction.js";
+import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
+import { useModalContext } from "#components/contexts/ModalContext.js";
+import { useProductsContext } from "#components/contexts/ProductContext.js";
+import { addNewLotesList } from "#components/redux/actions/lotesListAction.js";
+import Select from "react-select";
 
 const RawMaterialsConsumptionModal = React.memo(
   ({ isOpen, toggle, selectedRow }) => {
@@ -51,7 +52,8 @@ const RawMaterialsConsumptionModal = React.memo(
         // как в RawMaterialsPlan: по плотности и сертификату
         candidateRecipes = (list_of_recipes || []).filter(
           (r) =>
-            r.density === product.density && r.certificate === product.certificate
+            r.density === product.density &&
+            r.certificate === product.certificate
         );
       }
 
@@ -100,8 +102,8 @@ const RawMaterialsConsumptionModal = React.memo(
     );
 
     const [form, setForm] = useState({});
-    const [productionVolume, setProductionVolume] = useState('');
-    const [wastedMode, setWastedMode] = useState('default');
+    const [productionVolume, setProductionVolume] = useState("");
+    const [wastedMode, setWastedMode] = useState("default");
     const [confirmFlag, setConfirmFlag] = useState(false);
 
     const onHeaderFromActual = (e) =>
@@ -113,17 +115,17 @@ const RawMaterialsConsumptionModal = React.memo(
       if (!isOpen) return;
       const initial = {};
       materialsMap.forEach(({ key }) => {
-        initial[`${key}_actual_reciepe`] = '';
-        initial[`${key}_Wasted`] = '';
+        initial[`${key}_actual_reciepe`] = "";
+        initial[`${key}_Wasted`] = "";
       });
       setForm(initial);
-      setWastedMode('default');
+      setWastedMode("default");
 
       const defaultVale =
         selectedRow?.production_volume !== undefined &&
         selectedRow?.production_volume !== null
           ? String(selectedRow.production_volume)
-          : '';
+          : "";
 
       const consumed_volume =
         main_raw_mat_consumption?.find((item) => item.id === selectedRow?.id)
@@ -153,9 +155,9 @@ const RawMaterialsConsumptionModal = React.memo(
 
     // вот тут главная правка: берём данные из выбранного рецепта
     const baseByLabel = (label, key) => {
-      if (!selectedRecipe || !key || !(key in selectedRecipe)) return '—';
+      if (!selectedRecipe || !key || !(key in selectedRecipe)) return "—";
       const v = selectedRecipe[key];
-      return typeof v === 'number' ? v : v ?? '—';
+      return typeof v === "number" ? v : v ?? "—";
     };
 
     const logByKey = (key) => {
@@ -307,7 +309,9 @@ const RawMaterialsConsumptionModal = React.memo(
     const addProductOrder = async () => {
       const { batch_article } = selectedRow;
 
-      const product = latestProducts.find((item) => item.article == batch_article);
+      const product = latestProducts.find(
+        (item) => item.article == batch_article
+      );
 
       const arraysPerPalletRaw = Math.floor(
         (product?.m3InArray ?? 0) / (product?.volumeBlockOnPallet ?? 1)
@@ -395,15 +399,23 @@ const RawMaterialsConsumptionModal = React.memo(
       <div>
         <Modal isOpen={isOpen} toggle={toggle} size="xl">
           <ModalHeader toggle={toggle}>
-            <div className="d-flex gap-3 w-100" style={{ alignItems: 'flex-start' }}>
+            <div
+              className="d-flex gap-3 w-100"
+              style={{ alignItems: "flex-start" }}
+            >
               {/* левая колонка: article + production volume */}
               <div style={{ minWidth: 240 }}>
                 <span className="text-muted d-block" style={{ fontSize: 12 }}>
                   Recipe article:
                 </span>
-                <b className="d-block mb-2">{selectedRow?.recipe_article ?? '—'}</b>
+                <b className="d-block mb-2">
+                  {selectedRow?.recipe_article ?? "—"}
+                </b>
 
-                <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
+                <span
+                  className="text-muted d-block mb-1"
+                  style={{ fontSize: 12 }}
+                >
                   Production volume:
                 </span>
                 <input
@@ -417,7 +429,10 @@ const RawMaterialsConsumptionModal = React.memo(
 
               {/* правая колонка: селектор */}
               <div style={{ flex: 1, minWidth: 280 }}>
-                <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
+                <span
+                  className="text-muted d-block mb-1"
+                  style={{ fontSize: 12 }}
+                >
                   Recipe:
                 </span>
                 {availableRecipes.length ? (
@@ -429,18 +444,21 @@ const RawMaterialsConsumptionModal = React.memo(
                     }))}
                     value={
                       selectedRecipe
-                        ? { value: selectedRecipe.id, label: selectedRecipe.article }
+                        ? {
+                            value: selectedRecipe.id,
+                            label: selectedRecipe.article,
+                          }
                         : null
                     }
                     menuPortalTarget={
-                      typeof document !== 'undefined' ? document.body : null
+                      typeof document !== "undefined" ? document.body : null
                     }
                     styles={{
                       control: (provided) => ({
                         ...provided,
-                        width: '40%',
+                        width: "40%",
                         minHeight: 36,
-                        backgroundColor: 'white',
+                        backgroundColor: "white",
                       }),
                       // сам выпадающий блок
                       menu: (provided) => ({
@@ -452,7 +470,7 @@ const RawMaterialsConsumptionModal = React.memo(
                       menuList: (provided) => ({
                         ...provided,
                         maxHeight: 360, // высота области со скроллом
-                        overflowY: 'auto',
+                        overflowY: "auto",
                       }),
                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                     }}
@@ -598,10 +616,10 @@ const RawMaterialsConsumptionModal = React.memo(
                             inputMode="decimal"
                             placeholder="0"
                             value={
-                              wastedMode === 'manual'
-                                ? form[wKey] ?? ''
-                                : wastedVal === ''
-                                ? ''
+                              wastedMode === "manual"
+                                ? form[wKey] ?? ""
+                                : wastedVal === ""
+                                ? ""
                                 : String(wastedVal)
                             }
                             onChange={handleChange(wKey)}
