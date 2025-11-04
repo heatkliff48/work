@@ -310,7 +310,7 @@ function RawMaterialsPlan() {
                     <> No recipes</>
                   )}
                 </div>
-                <div>Quantity: {product.quantity}</div>
+                <div>Cake amount: {product.quantity}</div>
               </th>
 
               {

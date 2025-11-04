@@ -1,17 +1,20 @@
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import React, { useEffect } from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import { useRecipeContext } from '#components/contexts/RecipeContext.js';
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteRecipe } from '#components/redux/actions/recipeAction.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import { useNavigate } from 'react-router-dom';
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import React, { useEffect } from "react";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Table from "react-bootstrap/Table";
+import { useRecipeContext } from "#components/contexts/RecipeContext.js";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteRecipe } from "#components/redux/actions/recipeAction.js";
+import { useUsersContext } from "#components/contexts/UserContext.js";
+import { useNavigate } from "react-router-dom";
 
 function RecipeInfoModal(props) {
-  const { recipe_info, selectedRecipe } = useRecipeContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { recipe_info } = useRecipeContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
 
   const user = useSelector((state) => state.user);
 
@@ -20,28 +23,54 @@ function RecipeInfoModal(props) {
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
-
     props.onHide();
   };
 
   const deleteRecipeHandler = () => {
-    dispatch(deleteRecipe(selectedRecipe.id));
-
+    dispatch(deleteRecipe(props.selectedRecipe.id));
     props.onHide();
   };
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'recipe_products');
+      const access = checkUserAccess(user, roles, "recipe_products");
       setUserAccess(access);
 
-      console.log('access', access);
+      console.log("access", access);
 
       if (!access?.canRead) {
-        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+        navigate("/");
       }
     }
   }, [user, roles]);
+
+  const specialFields = [
+    {
+      Header: "Solids, kg",
+      accessor: "solids",
+    },
+    {
+      Header: "Volume, m3",
+      accessor: "volume",
+    },
+    {
+      Header: "Density, kg/m3",
+      accessor: "density_recipe",
+    },
+    {
+      Header: "Produced amount of return (dry), kg",
+      accessor: "produced_return_dry",
+    },
+    {
+      Header: "Water total, kg",
+      accessor: "water_total",
+    },
+  ];
+
+  const mainFields = recipe_info.filter(
+    (field) =>
+      !specialFields.some((special) => special.accessor === field.accessor)
+  );
 
   return (
     <>
@@ -54,7 +83,9 @@ function RecipeInfoModal(props) {
         dialogClassName="modal-auto-size"
       >
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">Recipe card</Modal.Title>
+          <Modal.Title id="contained-modal-title-vcenter">
+            Recipe card
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Container>
@@ -65,25 +96,63 @@ function RecipeInfoModal(props) {
                 onSubmitForm(e);
               }}
             >
-              <h3>{selectedRecipe?.article || 'No recipe selected'}</h3>
-              {/* <h3>
-                {parseInt(
-                  list_of_recipes[list_of_recipes.length - 1].article.slice(-6)
-                )}
-              </h3> */}
-              {selectedRecipe &&
-                recipe_info.map((el) => (
-                  <Row>
-                    <h3>
-                      {el.Header}: {selectedRecipe[el.accessor] || 'Empty'}
-                    </h3>
-                  </Row>
-                ))}
+              <h3 className="mb-4">
+                {props.selectedRecipe?.article || "No recipe selected"}
+              </h3>
+
+              <Row>
+                <Col xs={8}>
+                  {mainFields.length > 0 && (
+                    <div className="main-recipe-info">
+                      <Table striped bordered hover size="sm">
+                        <tbody>
+                          {props.selectedRecipe &&
+                            mainFields.map((el, index) => (
+                              <tr key={index}>
+                                <td>
+                                  <strong>{el.Header}</strong>
+                                </td>
+                                <td>
+                                  {props.selectedRecipe[el.accessor] || "Empty"}
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </Table>
+                    </div>
+                  )}
+                </Col>
+
+                <Col xs={4}>
+                  <div className="special-recipe-info">
+                    <Table
+                      striped
+                      bordered
+                      hover
+                      size="sm"
+                      className="bg-light"
+                    >
+                      <tbody>
+                        {props.selectedRecipe &&
+                          specialFields.map((el, index) => (
+                            <tr key={`special-${index}`}>
+                              <td>
+                                <strong>{el.Header}</strong>
+                              </td>
+                              <td>
+                                {props.selectedRecipe[el.accessor] || "Empty"}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                </Col>
+              </Row>
             </form>
           </Container>
         </Modal.Body>
         <Modal.Footer>
-          {/* <button form="RecipeInfoModal">Сохранить</button> */}
           {props.needDeleteButton && userAccess?.canWrite && (
             <Button onClick={deleteRecipeHandler}>Delete Recipe</Button>
           )}

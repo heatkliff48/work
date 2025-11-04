@@ -102,7 +102,7 @@ function AddNewRecipeModal({ show, onHide }) {
       (parseFloat(recipeInput.sand_slurry_dry) || 0) +
       (parseFloat(recipeInput.return_dry) || 0) +
       (parseFloat(recipeInput.aluminum_paste) || 0)
-    ).toFixed(3);
+    ).toFixed(0);
   }, [recipeInput]);
 
   const volume = useMemo(() => {
@@ -110,7 +110,7 @@ function AddNewRecipeModal({ show, onHide }) {
       return null;
     }
 
-    return (parseFloat(recipeInput.cake_height) * 6.262 * 1.58).toFixed(3);
+    return (parseFloat(recipeInput.cake_height) * 6.262 * 1.58).toFixed(0);
   }, [recipeInput?.cake_height]);
 
   const density_recipe = useMemo(() => {
@@ -118,7 +118,7 @@ function AddNewRecipeModal({ show, onHide }) {
       return null;
     }
 
-    return ((solids / volume) * 1.06).toFixed(3);
+    return ((solids / volume) * 1.06).toFixed(0);
   }, [volume, solids]);
 
   const producedReturnDry = useMemo(() => {
@@ -127,10 +127,10 @@ function AddNewRecipeModal({ show, onHide }) {
     }
 
     return selectedProduct?.width == 85
-      ? ((volume - 5.364) * (solids / volume)).toFixed(3)
+      ? ((volume - 5.364) * (solids / volume)).toFixed(0)
       : selectedProduct?.width == 75
-      ? ((volume - 5.31) * (solids / volume)).toFixed(3)
-      : ((volume - 5.4) * (solids / volume)).toFixed(3);
+      ? ((volume - 5.31) * (solids / volume)).toFixed(0)
+      : ((volume - 5.4) * (solids / volume)).toFixed(0);
   }, [volume, solids]);
 
   const water_total = useMemo(() => {
@@ -138,7 +138,7 @@ function AddNewRecipeModal({ show, onHide }) {
       return null;
     }
 
-    return (solids * parseFloat(recipeInput?.water_solids)).toFixed(3);
+    return (solids * parseFloat(recipeInput?.water_solids)).toFixed(0);
   }, [solids, recipeInput?.water_solids]);
 
   useEffect(() => {
