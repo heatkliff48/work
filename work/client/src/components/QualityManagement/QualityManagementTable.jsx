@@ -1,28 +1,28 @@
-import Table from "#components/Table/Table";
-import Button from "react-bootstrap/Button";
-import { FaPlus, FaMinus } from "react-icons/fa";
-import { TextSearchFilter } from "#components/Table/filters.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import React, { Fragment, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import ShowQualityManagementAddModal from "./QualityManagementAddModal";
+import Table from '#components/Table/Table';
+import Button from 'react-bootstrap/Button';
+import { FaPlus, FaMinus } from 'react-icons/fa';
+import { TextSearchFilter } from '#components/Table/filters.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import React, { Fragment, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import ShowQualityManagementAddModal from './QualityManagementAddModal';
 import {
   deleteQualityManagement,
   updateQualityManagement,
-} from "#components/redux/actions/qualityManagementAction.js";
+} from '#components/redux/actions/qualityManagementAction.js';
 import {
   addNewAutoclaveCalendar,
   addNewWarehouse,
   updListOfOrderedProduction,
-} from "#components/redux/actions/warehouseAction.js";
+} from '#components/redux/actions/warehouseAction.js';
 import {
   deleteBatchOutside,
   updateBatchOutside,
-} from "#components/redux/actions/batchOutsideAction.js";
-import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
-import { useProductsContext } from "#components/contexts/ProductContext.js";
-import { addNewRawMatConsumption } from "#components/redux/actions/recipeAction.js";
-import { useRecipeContext } from "#components/contexts/RecipeContext.js";
+} from '#components/redux/actions/batchOutsideAction.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.js';
+import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
@@ -32,49 +32,45 @@ const QualityManagementTable = () => {
   const { raw_mat_consumption, list_of_recipes, recipeOrders } = useRecipeContext();
 
   const dispatch = useDispatch();
-  const qualityManagementData = useSelector(
-    (state) => state.qualityManagementData
-  );
+  const qualityManagementData = useSelector((state) => state.qualityManagementData);
   const batchOutside = useSelector((state) => state.batchOutside);
 
-  const [qualityManagementDataList, setQualityManagementDataList] = useState(
-    []
-  );
+  const [qualityManagementDataList, setQualityManagementDataList] = useState([]);
 
   const COLUMNS_QUALITY_MANAGEMENT = [
     {
-      Header: "Batch ID",
-      accessor: "batch_id",
+      Header: 'Batch ID',
+      accessor: 'batch_id',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Prodcut article",
-      accessor: "product_article",
+      Header: 'Prodcut article',
+      accessor: 'product_article',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Total Qty in batch, plan, pallets",
-      accessor: "total_quantity_plan",
+      Header: 'Total Qty in batch, plan, pallets',
+      accessor: 'total_quantity_plan',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Reserved Qty in batch, pallets",
-      accessor: "reserved_quantity",
+      Header: 'Reserved Qty in batch, pallets',
+      accessor: 'reserved_quantity',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Reserved Qty in batch, allocated, pallets",
-      accessor: "reserved_quantity_allocated",
+      Header: 'Reserved Qty in batch, allocated, pallets',
+      accessor: 'reserved_quantity_allocated',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Reserved Qty in batch, remaining, pallets",
-      accessor: "reserved_quantity_remaining",
+      Header: 'Reserved Qty in batch, remaining, pallets',
+      accessor: 'reserved_quantity_remaining',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Free Qty in batch, fact, pallets",
-      accessor: "free_quantity_fact",
+      Header: 'Free Qty in batch, fact, pallets',
+      accessor: 'free_quantity_fact',
       Filter: TextSearchFilter,
     },
   ];
@@ -192,14 +188,12 @@ const QualityManagementTable = () => {
 
       // Проверки на корректность
       if (reserved_quantity_allocated < 0) {
-        alert(
-          "Ошибка: reserved_quantity_allocated не может быть отрицательным."
-        );
+        alert('Ошибка: reserved_quantity_allocated не может быть отрицательным.');
         return;
       }
 
       if (summReserve < 0) {
-        alert("Ошибка: summReserve не может быть отрицательным.");
+        alert('Ошибка: summReserve не может быть отрицательным.');
         return;
       }
 
@@ -217,7 +211,7 @@ const QualityManagementTable = () => {
         const accd = autoclave_calendar.find((el) => el.date === date);
 
         if (!accd) {
-          console.error("Autoclave calendar entry not found for date:", date);
+          console.error('Autoclave calendar entry not found for date:', date);
           return;
         }
 
@@ -249,7 +243,6 @@ const QualityManagementTable = () => {
 
         dispatch(
           addNewRawMatConsumption({
-            id: raw_mat_consumption.length + 1,
             recipe_article: recipe?.article || 'Unknown Recipe',
             batch_article: batch?.product_article || 'Unknown Batch',
             production_volume:
@@ -275,8 +268,7 @@ const QualityManagementTable = () => {
           await dispatch(
             updateBatchOutside({
               ...batch,
-              quantity_pallets:
-                total_quantity_plan - reserved_quantity_allocated,
+              quantity_pallets: total_quantity_plan - reserved_quantity_allocated,
             })
           );
         }
@@ -300,25 +292,17 @@ const QualityManagementTable = () => {
       <Table
         COLUMN_DATA={COLUMNS_QUALITY_MANAGEMENT}
         dataOfTable={qualityManagementDataList}
-        tableName={"Quality Management"}
+        tableName={'Quality Management'}
         userAccess={userAccess}
         handleRowClick={(row) => {}}
       />
       {qualityManagementData.length > 0 && (
         <div className="d-flex gap-2 mb-2">
-          <Button
-            variant="success"
-            size="lg"
-            onClick={qualityManagementPlusHandler}
-          >
-            <FaPlus style={{ cursor: "pointer", fontSize: "1.5rem" }} />
+          <Button variant="success" size="lg" onClick={qualityManagementPlusHandler}>
+            <FaPlus style={{ cursor: 'pointer', fontSize: '1.5rem' }} />
           </Button>
-          <Button
-            variant="danger"
-            size="lg"
-            onClick={qualityManagementMinusHandler}
-          >
-            <FaMinus style={{ cursor: "pointer", fontSize: "1.5rem" }} />
+          <Button variant="danger" size="lg" onClick={qualityManagementMinusHandler}>
+            <FaMinus style={{ cursor: 'pointer', fontSize: '1.5rem' }} />
           </Button>
         </div>
       )}
