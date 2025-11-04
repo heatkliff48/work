@@ -51,7 +51,7 @@ const normalizeType = (t) => {
   return s;
 };
 
-rawMaterialsWarehouseRouter.get("/", async (req, res) => {
+rawMaterialsWarehouseRouter.get('/', async (req, res) => {
   try {
     const rawMaterialsWarehouse = await RawMaterialsWarehouse.findAll({
       order: [["id", "ASC"]],
@@ -110,85 +110,55 @@ rawMaterialsWarehouseRouter.get("/", async (req, res) => {
 */
 
 rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
-  const { materials, mixing_hours, portion_size } = req.body;
+  const { materials } = req.body; // массив объектов {type, quantity}
 
   if (!Array.isArray(materials) || !materials.length)
     return res.status(400).json({
       error: "Поле materials обязательно и должно быть непустым массивом",
     });
 
-  if (!mixing_hours || !portion_size)
-    return res.status(400).json({
-      error: "Поля mixing_hours и portion_size обязательны",
-    });
-
   const t = await sequelize.transaction();
   try {
     const deletedIds = [];
 
-    const materialConsumption = materials.reduce((acc, m) => {
+    const materialTotals = materials.reduce((acc, m) => {
       const type = m.type;
       const quantity = Number(m.quantity || 0);
-      acc[type] = (acc[type] || 0) + quantity;
+      acc[type] = (acc[type] || 0) - quantity;
       return acc;
     }, {});
 
-    const updatedMaterialTypes = Object.keys(materialConsumption);
+    const updatedMaterialTypes = Object.keys(materialTotals);
     const updatedWarehouseRecords = [];
 
     const today = new Date();
-    const day = today.getDate().toString().padStart(2, "0");
-    const month = (today.getMonth() + 1).toString().padStart(2, "0");
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
     const year = today.getFullYear();
+
     const date = `${day}.${month}.${year}`;
 
     for (const materialType of updatedMaterialTypes) {
-      if (materialType === "water") {
-        continue;
-      }
-      const consumedQuantity = materialConsumption[materialType];
+      const totalQuantity = materialTotals[materialType];
 
-      const currentRecord = await RawMaterialsWarehouse.findOne({
-        where: { material_type: materialType },
-        transaction: t,
-      });
-
-      if (currentRecord) {
-        if (currentRecord.remaining_quantity < consumedQuantity) {
-          await t.rollback();
-          return res.status(400).json({
-            error: `Недостаточно материала "${materialType}" на складе. Доступно: ${currentRecord.remaining_quantity}, требуется: ${consumedQuantity}`,
-          });
+      const [updatedRows] = await RawMaterialsWarehouse.update(
+        {
+          remaining_quantity: sequelize.literal(
+            `remaining_quantity + ${totalQuantity}`
+          ),
+          // last_updated: `${new Date()}`,
+        },
+        {
+          where: { material_type: materialType },
+          transaction: t,
         }
+      );
 
-        const [updatedRows] = await RawMaterialsWarehouse.update(
-          {
-            consumed_quantity: sequelize.literal(
-              `consumed_quantity + ${consumedQuantity}`
-            ),
-            remaining_quantity: sequelize.literal(
-              `remaining_quantity - ${consumedQuantity}`
-            ),
-            last_updated: date,
-          },
-          {
-            where: { material_type: materialType },
-            transaction: t,
-          }
-        );
-      } else {
-        if (consumedQuantity < 0) {
-          await t.rollback();
-          return res.status(400).json({
-            error: `Невозможно создать запись для "${materialType}" с отрицательным количеством: ${consumedQuantity}`,
-          });
-        }
-
+      if (!updatedRows) {
         const newRecord = await RawMaterialsWarehouse.create(
           {
             material_type: materialType,
-            consumed_quantity: consumedQuantity,
-            remaining_quantity: -consumedQuantity,
+            remaining_quantity: totalQuantity,
             last_updated: date,
           },
           { transaction: t }
@@ -202,13 +172,10 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
       0
     );
 
-    const sandSlurryQuantity =
-      totalAllMaterials * mixing_hours * portion_size * 10;
-
     const [updatedSandSlurryRows] = await RawMaterialsWarehouse.update(
       {
         remaining_quantity: sequelize.literal(
-          `remaining_quantity + ${sandSlurryQuantity}`
+          `remaining_quantity + ${totalAllMaterials}`
         ),
         last_updated: date,
       },
@@ -219,68 +186,68 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
       await RawMaterialsWarehouse.create(
         {
           material_type: "Sand slurry (dry)",
-          remaining_quantity: sandSlurryQuantity,
+          remaining_quantity: totalAllMaterials,
           last_updated: date,
         },
         { transaction: t }
       );
     }
 
-    // Списание из отдельных таблиц
+    for (const { type, quantity } of materials) {
+      if (!quantity) continue;
 
-    // for (const { type, quantity } of materials) {
-    //   if (!quantity) continue;
+      const modelMap = {
+        "Sand (dry)": WarehouseSand,
+        "Gypsum stone": WarehouseGypsumStone,
+        "Grinding Balls": WarehouseGrindingBalls,
+        AAC: WarehouseAAC,
+      };
+      const Model = modelMap[type];
+      if (!Model) throw new Error(`Неизвестный тип материала: ${type}`);
 
-    //   const modelMap = {
-    //     "Sand (dry)": WarehouseSand,
-    //     "Gypsum stone": WarehouseGypsumStone,
-    //     "Grinding Balls": WarehouseGrindingBalls,
-    //     AAC: WarehouseAAC,
-    //   };
-    //   const Model = modelMap[type];
-    //   if (!Model) throw new Error(`Неизвестный тип материала: ${type}`);
+      let leftToWriteOff = Number(quantity);
 
-    //   let leftToWriteOff = Number(quantity);
+      console.log("leftToWriteOff start:", leftToWriteOff, "type:", type);
 
-    //   console.log("leftToWriteOff start:", leftToWriteOff, "type:", type);
+      const records = await Model.findAll({
+        order: [
+          // d.m.YYYY -> сортируем как строки, но в обратном порядке
+          [sequelize.literal("to_date(date, 'DD.MM.YYYY')"), "DESC"],
+        ],
+        transaction: t,
+      });
 
-    //   const records = await Model.findAll({
-    //     order: [
-    //       [sequelize.literal("to_date(date, 'DD.MM.YYYY')"), "DESC"],
-    //     ],
-    //     transaction: t,
-    //   });
+      for (const rec of records) {
+        if (leftToWriteOff <= 0) break;
 
-    //   for (const rec of records) {
-    //     if (leftToWriteOff <= 0) break;
+        const inStock = Number(rec.quantity);
 
-    //     const inStock = Number(rec.quantity);
+        console.log({ id: rec.id, inStock, leftToWriteOff });
 
-    //     console.log({ id: rec.id, inStock, leftToWriteOff });
+        if (inStock <= leftToWriteOff) {
+          deletedIds.push(rec.id);
+          await rec.destroy({ transaction: t });
+          leftToWriteOff -= inStock;
+        } else {
+          const [affectedRows] = await Model.update(
+            { quantity: inStock - leftToWriteOff },
+            { where: { id: rec.id }, transaction: t }
+          );
+          console.log(
+            `📝 ${Model.name} id=${rec.id} affectedRows=${affectedRows}`
+          );
+          leftToWriteOff = 0;
+        }
+      }
 
-    //     if (inStock <= leftToWriteOff) {
-    //       deletedIds.push(rec.id);
-    //       await rec.destroy({ transaction: t });
-    //       leftToWriteOff -= inStock;
-    //     } else {
-    //       const [affectedRows] = await Model.update(
-    //         { quantity: inStock - leftToWriteOff },
-    //         { where: { id: rec.id }, transaction: t }
-    //       );
-    //       console.log(
-    //         `📝 ${Model.name} id=${rec.id} affectedRows=${affectedRows}`
-    //       );
-    //       leftToWriteOff = 0;
-    //     }
-    //   }
-
-    //   if (leftToWriteOff > 0)
-    //     throw new Error(
-    //       `Недостаточно остатков для списания ${type} (не хватило ${leftToWriteOff})`
-    //     );
-    // }
+      if (leftToWriteOff > 0)
+        throw new Error(
+          `Недостаточно остатков для списания ${type} (не хватило ${leftToWriteOff})`
+        );
+    }
 
     await t.commit();
+    console.log("✅ ТРАНЗАКЦИЯ УСПЕШНО ЗАКОММИТИЛАСЬ");
 
     const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
       where: {
@@ -290,7 +257,23 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
       },
     });
 
+    const currentSand = await WarehouseSand.findAll();
+    const currentGypsumStone = await WarehouseGypsumStone.findAll();
+    const currentGrindingBalls = await WarehouseGrindingBalls.findAll();
+    const currentAAC = await WarehouseAAC.findAll();
+
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
+
+    myEmitter.emit(UPDATE_WAREHOUSE_SAND_SOCKET, currentSand);
+
+    myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET, currentGypsumStone);
+
+    myEmitter.emit(
+      UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+      currentGrindingBalls
+    );
+
+    myEmitter.emit(UPDATE_WAREHOUSE_AAC_SOCKET, currentAAC);
 
     return res.status(200).json({
       updatedRecords: allUpdatedRecords,
@@ -432,105 +415,43 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
 
 // Sand
 
-rawMaterialsWarehouseRouter.post(
-  "/raw_mat_con/update",
-  async (req, res, next) => {
-    const { materials } = req.body;
+rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res, next) => {
+  const { materials } = req.body;
 
-    if (!Array.isArray(materials) || materials.length === 0) {
-      return res.status(400).json({
-        error: "Поле materials обязательно и должно быть непустым массивом",
-      });
-    }
+  if (!Array.isArray(materials) || materials.length === 0) {
+    return res.status(400).json({
+      error: "Поле materials обязательно и должно быть непустым массивом",
+    });
+  }
 
-    // Нормализация и фильтрация (берём только положительные валидные количества)
-    const normMaterials = materials
-      .map((m) => ({
-        type: normalizeType(m.type),
-        quantity: Number(m.quantity),
-      }))
-      .filter((m) => m.type && Number.isFinite(m.quantity) && m.quantity > 0);
+  // Нормализация и фильтрация (берём только положительные валидные количества)
+  const normMaterials = materials
+    .map((m) => ({
+      type: normalizeType(m.type),
+      quantity: Number(m.quantity),
+    }))
+    .filter((m) => m.type && Number.isFinite(m.quantity) && m.quantity > 0);
 
-    if (normMaterials.length === 0) {
-      return res
-        .status(400)
-        .json({ error: "Нет валидных позиций для списания" });
-    }
+  if (normMaterials.length === 0) {
+    return res.status(400).json({ error: 'Нет валидных позиций для списания' });
+  }
 
-    const onlySandSlurryDry = normMaterials.every(
-      (m) => m.type === "Sand slurry (dry)"
-    );
+  const onlySandSlurryDry = normMaterials.every(
+    (m) => m.type === 'Sand slurry (dry)'
+  );
 
-    const t = await sequelize.transaction();
-    try {
-      const now = new Date();
-      const nowIso = now.toISOString();
+  const t = await sequelize.transaction();
+  try {
+    const now = new Date();
+    const nowIso = now.toISOString();
 
-      if (onlySandSlurryDry) {
-        const total = normMaterials.reduce((s, m) => s + m.quantity, 0);
-        const delta = -total; // уменьшаем остаток
+    if (onlySandSlurryDry) {
+      const total = normMaterials.reduce((s, m) => s + m.quantity, 0);
+      const delta = -total; // уменьшаем остаток
 
-        await RawMaterialsWarehouse.update(
-          {
-            remaining_quantity: sequelize.literal(
-              `remaining_quantity + ${delta}`
-            ),
-            last_updated: nowIso,
-            updatedAt: now,
-          },
-          { where: { material_type: "Sand slurry (dry)" }, transaction: t }
-        );
-
-        await t.commit();
-
-        const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
-          where: { material_type: { [Op.in]: ["Sand slurry (dry)"] } },
-        });
-
-        myEmitter.emit(
-          UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
-          allUpdatedRecords
-        );
-
-        return res.status(200).json({
-          updatedRecords: allUpdatedRecords,
-          deletedIds: [], // партий не трогали
-        });
-      }
-
-      // === ОБЫЧНЫЙ СЛУЧАЙ (есть и другие материалы) ===
-
-      // 1) Агрегируем дельты по типам (минусуем остатки)
-      const materialTotals = normMaterials.reduce((acc, m) => {
-        acc[m.type] = (acc[m.type] || 0) - m.quantity; // вычитание
-        return acc;
-      }, {});
-
-      const updatedTypes = Object.keys(materialTotals);
-
-      // 2) Применяем дельты
-      for (const materialType of updatedTypes) {
-        const delta = materialTotals[materialType];
-        await RawMaterialsWarehouse.update(
-          {
-            remaining_quantity: sequelize.literal(
-              `remaining_quantity + ${delta}`
-            ),
-            last_updated: nowIso,
-            updatedAt: now,
-          },
-          { where: { material_type: materialType }, transaction: t }
-        );
-      }
-
-      // 3) Бизнес-правило: прибавляем к "Sand slurry (dry)" сумму всех СПИСАНИЙ
-      // (если это действительно нужно именно так)
-      const totalAll = normMaterials.reduce((s, m) => s + m.quantity, 0);
       await RawMaterialsWarehouse.update(
         {
-          remaining_quantity: sequelize.literal(
-            `remaining_quantity + ${totalAll}`
-          ),
+          remaining_quantity: sequelize.literal(`remaining_quantity + ${delta}`),
           last_updated: nowIso,
           updatedAt: now,
         },
@@ -539,34 +460,80 @@ rawMaterialsWarehouseRouter.post(
 
       await t.commit();
 
-      // Собираем уникальные типы для чтения (обновлённые + slurry)
-      const typesToRead = Array.from(
-        new Set([...updatedTypes, "Sand slurry (dry)"])
-      );
-
       const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
-        where: { material_type: { [Op.in]: typesToRead } },
+        where: { material_type: { [Op.in]: ["Sand slurry (dry)"] } },
       });
 
       myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
 
-      // объявим deletedIds хотя бы пустым, чтобы не падать
-      const deletedIds = [];
       return res.status(200).json({
         updatedRecords: allUpdatedRecords,
-        deletedIds,
+        deletedIds: [], // партий не трогали
       });
-    } catch (err) {
-      try {
-        if (!t.finished) await t.rollback();
-      } catch (rbErr) {
-        console.error("Rollback failed:", rbErr);
-      }
-      console.error("❌ ROLLBACK /raw_mat_con/update:", err);
-      return res.status(500).json({ error: err.message });
     }
+
+    // === ОБЫЧНЫЙ СЛУЧАЙ (есть и другие материалы) ===
+
+    // 1) Агрегируем дельты по типам (минусуем остатки)
+    const materialTotals = normMaterials.reduce((acc, m) => {
+      acc[m.type] = (acc[m.type] || 0) - m.quantity; // вычитание
+      return acc;
+    }, {});
+
+    const updatedTypes = Object.keys(materialTotals);
+
+    // 2) Применяем дельты
+    for (const materialType of updatedTypes) {
+      const delta = materialTotals[materialType];
+      await RawMaterialsWarehouse.update(
+        {
+          remaining_quantity: sequelize.literal(`remaining_quantity + ${delta}`),
+          last_updated: nowIso,
+          updatedAt: now,
+        },
+        { where: { material_type: materialType }, transaction: t }
+      );
+    }
+
+    // 3) Бизнес-правило: прибавляем к "Sand slurry (dry)" сумму всех СПИСАНИЙ
+    // (если это действительно нужно именно так)
+    const totalAll = normMaterials.reduce((s, m) => s + m.quantity, 0);
+    await RawMaterialsWarehouse.update(
+      {
+        remaining_quantity: sequelize.literal(`remaining_quantity + ${totalAll}`),
+        last_updated: nowIso,
+        updatedAt: now,
+      },
+      { where: { material_type: 'Sand slurry (dry)' }, transaction: t }
+    );
+
+    await t.commit();
+
+    // Собираем уникальные типы для чтения (обновлённые + slurry)
+    const typesToRead = Array.from(new Set([...updatedTypes, 'Sand slurry (dry)']));
+
+    const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
+      where: { material_type: { [Op.in]: typesToRead } },
+    });
+
+    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
+
+    // объявим deletedIds хотя бы пустым, чтобы не падать
+    const deletedIds = [];
+    return res.status(200).json({
+      updatedRecords: allUpdatedRecords,
+      deletedIds,
+    });
+  } catch (err) {
+    try {
+      if (!t.finished) await t.rollback();
+    } catch (rbErr) {
+      console.error('Rollback failed:', rbErr);
+    }
+    console.error('❌ ROLLBACK /raw_mat_con/update:', err);
+    return res.status(500).json({ error: err.message });
   }
-);
+});
 
 // Sand
 rawMaterialsWarehouseRouter.get("/sand", async (req, res) => {
@@ -608,15 +575,9 @@ rawMaterialsWarehouseRouter.post("/sand", async (req, res) => {
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
 
-    const record = await RawMaterialsWarehouse.findOne({
-      where: {
-        material_type: "Sand (dry)",
-      },
-    });
-
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity: totalSandQuantity - record.consumed_quantity,
+        remaining_quantity: totalSandQuantity,
         last_updated: lastUpdated,
       },
       {
@@ -723,15 +684,9 @@ rawMaterialsWarehouseRouter.post("/lime", async (req, res) => {
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
 
-    const record = await RawMaterialsWarehouse.findOne({
-      where: {
-        material_type: "Lime",
-      },
-    });
-
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity: totalLimeQuantity - record.consumed_quantity,
+        remaining_quantity: totalLimeQuantity,
         last_updated: lastUpdated,
       },
       {
@@ -838,15 +793,9 @@ rawMaterialsWarehouseRouter.post("/cement", async (req, res) => {
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
 
-    const record = await RawMaterialsWarehouse.findOne({
-      where: {
-        material_type: "Cement",
-      },
-    });
-
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity: totalCementQuantity - record.consumed_quantity,
+        remaining_quantity: totalCementQuantity,
         last_updated: lastUpdated,
       },
       {
@@ -953,15 +902,9 @@ rawMaterialsWarehouseRouter.post("/gypsum", async (req, res) => {
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
 
-    const record = await RawMaterialsWarehouse.findOne({
-      where: {
-        material_type: "Gypsum (dry)",
-      },
-    });
-
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity: totalGypsumQuantity - record.consumed_quantity,
+        remaining_quantity: totalGypsumQuantity,
         last_updated: lastUpdated,
       },
       {
@@ -1068,15 +1011,9 @@ rawMaterialsWarehouseRouter.post("/gypsum-stone", async (req, res) => {
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
 
-    const record = await RawMaterialsWarehouse.findOne({
-      where: {
-        material_type: "Gypsum stone",
-      },
-    });
-
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity: totalGypsumStoneQuantity - record.consumed_quantity,
+        remaining_quantity: totalGypsumStoneQuantity,
         last_updated: lastUpdated,
       },
       {
@@ -1188,15 +1125,9 @@ rawMaterialsWarehouseRouter.post("/aluminum1", async (req, res) => {
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
 
-    const record = await RawMaterialsWarehouse.findOne({
-      where: {
-        material_type: "Aluminum 1",
-      },
-    });
-
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity: totalAluminum1Quantity - record.consumed_quantity,
+        remaining_quantity: totalAluminum1Quantity,
         last_updated: lastUpdated,
       },
       {
@@ -1303,15 +1234,9 @@ rawMaterialsWarehouseRouter.post("/aluminum2", async (req, res) => {
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
 
-    const record = await RawMaterialsWarehouse.findOne({
-      where: {
-        material_type: "Aluminum 2",
-      },
-    });
-
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity: totalAluminum2Quantity - record.consumed_quantity,
+        remaining_quantity: totalAluminum2Quantity,
         last_updated: lastUpdated,
       },
       {
@@ -1420,16 +1345,9 @@ rawMaterialsWarehouseRouter.post("/grinding-balls", async (req, res) => {
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
 
-    const record = await RawMaterialsWarehouse.findOne({
-      where: {
-        material_type: "Grinding Balls",
-      },
-    });
-
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity:
-          totalGrindingBallsQuantity - record.consumed_quantity,
+        remaining_quantity: totalGrindingBallsQuantity,
         last_updated: lastUpdated,
       },
       {
@@ -1550,15 +1468,9 @@ rawMaterialsWarehouseRouter.post("/aac", async (req, res) => {
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
 
-    const record = await RawMaterialsWarehouse.findOne({
-      where: {
-        material_type: "AAC",
-      },
-    });
-
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity: totalAACQuantity - record.consumed_quantity,
+        remaining_quantity: totalAACQuantity,
         last_updated: lastUpdated,
       },
       {

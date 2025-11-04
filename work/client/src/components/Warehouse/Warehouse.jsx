@@ -1,15 +1,19 @@
-import { useCallback, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import Table from '../Table/Table';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import WarehouseAddModal from './WarehouseAddModal';
-import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
+import { useCallback, useEffect } from "react";
+import { useSelector } from "react-redux";
+import Table from "../Table/Table";
+import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
+import WarehouseAddModal from "./WarehouseAddModal";
+import ListOfReservedProductsModal from "#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx";
+import { useModalContext } from "#components/contexts/ModalContext.js";
+import { useUsersContext } from "#components/contexts/UserContext.js";
+import { useProductsContext } from "#components/contexts/ProductContext.js";
+import { useMemo } from "react";
 
 function Warehouse() {
   const { COLUMNS_WAREHOUSE, warehouse_data } = useWarehouseContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { latestProducts } = useProductsContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
 
   const {
     setWarehouseModal,
@@ -27,13 +31,32 @@ function Warehouse() {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Warehouse');
+      const access = checkUserAccess(user, roles, "Warehouse");
 
       if (JSON.stringify(access) !== JSON.stringify(userAccess)) {
         setUserAccess(access);
       }
     }
   }, [user, roles, checkUserAccess, userAccess, setUserAccess]);
+
+  const extendedWarehouseData = useMemo(() => {
+    if (!warehouse_data || !latestProducts) return warehouse_data || [];
+
+    return warehouse_data.map((item) => {
+      const product = latestProducts.find(
+        (product) => product.article === item.product_article
+      );
+
+      const m3Value = product?.volumeBlockOnPallet || 0;
+      const totalQuantity = item.total_quantity || 0;
+      const total_m3 = m3Value * totalQuantity;
+
+      return {
+        ...item,
+        total_m3,
+      };
+    });
+  }, [warehouse_data, latestProducts]);
 
   return (
     <>
@@ -42,7 +65,7 @@ function Warehouse() {
           isOpen={warehouseModal}
           toggle={() => setWarehouseModal(!warehouseModal)}
           COLUMNS_WAREHOUSE={COLUMNS_WAREHOUSE}
-          warehouse_data={warehouse_data}
+          warehouse_data={extendedWarehouseData}
         />
       )}
       {warehouseInfoModal && (
@@ -54,13 +77,13 @@ function Warehouse() {
 
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE}
-        dataOfTable={warehouse_data}
+        dataOfTable={extendedWarehouseData}
         userAccess={userAccess}
         onClickButton={() => {
           setWarehouseModal(!warehouseModal);
         }}
-        buttonText={'Add new product on warehouse'}
-        tableName={'Warehouse'}
+        buttonText={"Add new product on warehouse"}
+        tableName={"Warehouse"}
         handleRowClick={handleRowClick}
       />
     </>

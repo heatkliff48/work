@@ -59,6 +59,7 @@ const initState = {
   warehouseAluminum2: [],
   warehouseGrindingBalls: [],
   warehouseAAC: [],
+  lotesList: [],
 };
 
 export default initState;

@@ -1,38 +1,39 @@
-import { useSelector } from 'react-redux';
-import Table from '../Table/Table';
-import { useEffect, useState } from 'react';
-import RecipeInfoModal from '#components/Recipe/RecipeInfoModal.jsx';
-import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { useSelector } from "react-redux";
+import Table from "../Table/Table";
+import { useEffect, useState } from "react";
+import RecipeInfoModal from "#components/Recipe/RecipeInfoModal.jsx";
+import { useRecipeContext } from "#components/contexts/RecipeContext.js";
 
 function RecipeOrders() {
-  const { setSelectedRecipe, list_of_recipes } = useRecipeContext();
+  const { list_of_recipes } = useRecipeContext();
 
   const recipeOrders = useSelector((state) => state.recipeOrders);
   const batchOutside = useSelector((state) => state.batchOutside);
 
   const [recipeModalShow, setRecipeModalShow] = useState(false);
   const [recipeDataList, setRecipeDataList] = useState([]);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   const COLUMNS_RECIPE_ORDERS = [
     {
-      Header: 'ID',
-      accessor: 'id',
+      Header: "ID",
+      accessor: "id",
     },
     {
-      Header: 'Recipe',
-      accessor: 'recipe_article',
+      Header: "Recipe",
+      accessor: "recipe_article",
     },
     {
-      Header: 'Batch production',
-      accessor: 'batch_article',
+      Header: "Batch production",
+      accessor: "batch_article",
     },
     {
-      Header: 'Production volume',
-      accessor: 'production_volume',
+      Header: "Cake amount",
+      accessor: "production_volume",
     },
     {
-      Header: 'Date',
-      accessor: 'date',
+      Header: "Date",
+      accessor: "date",
     },
   ];
 
@@ -42,7 +43,7 @@ function RecipeOrders() {
     );
 
     if (!recipe) {
-      console.error('Recipe not found');
+      console.error("Recipe not found");
       return;
     }
 
@@ -54,16 +55,18 @@ function RecipeOrders() {
     const updatedData = recipeOrders
       .map((el) => {
         const batch = batchOutside.find((batch) => batch.id === el.id_batch);
-        const recipe = list_of_recipes.find((recipe) => recipe.id === el.id_recipe);
+        const recipe = list_of_recipes.find(
+          (recipe) => recipe.id === el.id_recipe
+        );
 
         if (!batch || !recipe) return { id: null };
 
         return {
           id: el.id,
-          recipe_article: recipe?.article || 'Unknown Recipe',
-          batch_article: batch?.product_article || 'Unknown Batch',
+          recipe_article: recipe?.article || "Unknown Recipe",
+          batch_article: batch?.product_article || "Unknown Batch",
           production_volume: el.production_volume || 0,
-          date: batch?.date || 'Unknown Date',
+          date: batch?.date || "Unknown Date",
         };
       })
       .filter((el) => el.id);
@@ -78,12 +81,13 @@ function RecipeOrders() {
           show={recipeModalShow}
           onHide={() => setRecipeModalShow((prev) => !prev)}
           needDeleteButton={false}
+          selectedRecipe={selectedRecipe}
         />
       )}
       <Table
         COLUMN_DATA={COLUMNS_RECIPE_ORDERS}
         dataOfTable={recipeDataList}
-        tableName={'Raw material calendar'}
+        tableName={"Raw material calendar"}
         handleRowClick={(row) => handlerRecipeInfo(row)}
       />
     </>
