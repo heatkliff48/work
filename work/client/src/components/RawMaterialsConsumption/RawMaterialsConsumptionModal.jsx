@@ -112,28 +112,41 @@ const RawMaterialsConsumptionModal = React.memo(
 
     useEffect(() => {
       if (!isOpen) return;
-      const initial = {};
-      materialsMap.forEach(({ key }) => {
-        initial[`${key}_actual_reciepe`] = '';
-        initial[`${key}_Wasted`] = '';
-      });
-      setForm(initial);
-      setWastedMode('default');
 
-      const defaultVale =
-        selectedRow?.production_volume !== undefined &&
-        selectedRow?.production_volume !== null
-          ? String(selectedRow.production_volume)
-          : '';
+      const batchArticle = selectedRow?.batch_article;
 
-      const consumed_volume =
-        main_raw_mat_consumption?.find((item) => item.id === selectedRow?.id)
-          ?.consumed_volume || 0;
+      const product =
+        batchArticle &&
+        latestProducts?.find((p) => String(p.article) === String(batchArticle));
 
-      const prodValue = Number(defaultVale) - consumed_volume;
+      let candidateRecipes = [];
 
-      setProductionVolume(String(prodValue));
-    }, [isOpen, materialsMap, selectedRow, main_raw_mat_consumption]);
+      if (product) {
+        candidateRecipes = (list_of_recipes || []).filter(
+          (r) =>
+            r.density === product.density && r.certificate === product.certificate
+        );
+      }
+
+      if (!candidateRecipes.length) {
+        candidateRecipes = list_of_recipes || [];
+      }
+
+      setAvailableRecipes(candidateRecipes);
+
+      // 👉 пробуем найти именно тот рецепт, что в строке
+      const fromRowArticle = selectedRow?.recipe_article;
+      const matched =
+        fromRowArticle &&
+        candidateRecipes.find((r) => String(r.article) === String(fromRowArticle));
+
+      if (matched) {
+        setSelectedRecipe(matched);
+      } else {
+        // fallback на первый
+        setSelectedRecipe(candidateRecipes.length ? candidateRecipes[0] : null);
+      }
+    }, [isOpen, selectedRow, latestProducts, list_of_recipes]);
 
     const handleChange = (key) => (e) => {
       const v = e.target.value;
@@ -318,6 +331,49 @@ const RawMaterialsConsumptionModal = React.memo(
       let remainingFreeQty = parseInt(free_quantity_remaining);
       let summReserve = 0;
 
+      const reservedProducts =
+        list_of_ordered_production?.filter(
+          (item) => item.product_article === batch_article
+        ) || [];
+
+      const updatedReserves = reservedProducts.map((reservedItem) => {
+        if (reservedItem.product_article !== batch_article) {
+          return reservedItem;
+        }
+
+        if (remainingFreeQty <= 0) {
+          if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
+            return reservedItem;
+          } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
+            return {
+              ...reservedItem,
+              quantity_in_warehouse: Math.min(
+                reservedItem.quantity_in_warehouse + parseInt(ordered_quantity),
+                reservedItem.quantity
+              ),
+            };
+          }
+        }
+
+        const deducted = Math.min(
+          reservedItem.quantity -
+            reservedItem.quantity_in_warehouse -
+            parseInt(ordered_quantity),
+          remainingFreeQty
+        );
+
+        remainingFreeQty -= deducted;
+        summReserve += deducted;
+
+        return {
+          ...reservedItem,
+          quantity_in_warehouse:
+            reservedItem.quantity_in_warehouse +
+            parseInt(ordered_quantity) +
+            deducted,
+        };
+      });
+
       const articleInfo = getWarehouseArticle(product);
 
       dispatch(
@@ -329,55 +385,11 @@ const RawMaterialsConsumptionModal = React.memo(
           free_quantity_remaining: remainingFreeQty,
           ordered_quantity: parseInt(ordered_quantity) + summReserve,
           total_quantity:
-            (parseInt(ordered_quantity) + summReserve + remainingFreeQty) *
-            arraysPerPalletRaw,
+            parseInt(ordered_quantity) + summReserve + remainingFreeQty,
         })
       );
 
       if (confirmFlag) {
-        const reservedProducts =
-          list_of_ordered_production?.filter(
-            (item) => item.product_article === batch_article
-          ) || [];
-
-        const updatedReserves = reservedProducts.map((reservedItem) => {
-          if (reservedItem.product_article !== batch_article) {
-            return reservedItem;
-          }
-
-          if (remainingFreeQty <= 0) {
-            if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
-              return reservedItem;
-            } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
-              return {
-                ...reservedItem,
-                quantity_in_warehouse: Math.min(
-                  reservedItem.quantity_in_warehouse + parseInt(ordered_quantity),
-                  reservedItem.quantity
-                ),
-              };
-            }
-          }
-
-          const deducted = Math.min(
-            reservedItem.quantity -
-              reservedItem.quantity_in_warehouse -
-              parseInt(ordered_quantity),
-            remainingFreeQty
-          );
-
-          remainingFreeQty -= deducted;
-          summReserve += deducted;
-
-          return {
-            ...reservedItem,
-            quantity_in_warehouse:
-              reservedItem.quantity_in_warehouse +
-              parseInt(ordered_quantity) +
-              deducted,
-          };
-        });
-
         for (const ordered_production of updatedReserves) {
           dispatch(updListOfOrderedProduction(ordered_production));
         }
