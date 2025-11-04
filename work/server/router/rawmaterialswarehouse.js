@@ -110,11 +110,16 @@ rawMaterialsWarehouseRouter.get("/", async (req, res) => {
 */
 
 rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
-  const { materials } = req.body; // массив объектов {type, quantity}
+  const { materials, mixing_hours, portion_size } = req.body;
 
   if (!Array.isArray(materials) || !materials.length)
     return res.status(400).json({
       error: "Поле materials обязательно и должно быть непустым массивом",
+    });
+
+  if (!mixing_hours || !portion_size)
+    return res.status(400).json({
+      error: "Поля mixing_hours и portion_size обязательны",
     });
 
   const t = await sequelize.transaction();
@@ -138,6 +143,9 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
     const date = `${day}.${month}.${year}`;
 
     for (const materialType of updatedMaterialTypes) {
+      if (materialType === "water") {
+        continue;
+      }
       const consumedQuantity = materialConsumption[materialType];
 
       const currentRecord = await RawMaterialsWarehouse.findOne({
@@ -146,6 +154,13 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
       });
 
       if (currentRecord) {
+        if (currentRecord.remaining_quantity < consumedQuantity) {
+          await t.rollback();
+          return res.status(400).json({
+            error: `Недостаточно материала "${materialType}" на складе. Доступно: ${currentRecord.remaining_quantity}, требуется: ${consumedQuantity}`,
+          });
+        }
+
         const [updatedRows] = await RawMaterialsWarehouse.update(
           {
             consumed_quantity: sequelize.literal(
@@ -162,6 +177,13 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
           }
         );
       } else {
+        if (consumedQuantity < 0) {
+          await t.rollback();
+          return res.status(400).json({
+            error: `Невозможно создать запись для "${materialType}" с отрицательным количеством: ${consumedQuantity}`,
+          });
+        }
+
         const newRecord = await RawMaterialsWarehouse.create(
           {
             material_type: materialType,
@@ -180,10 +202,13 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
       0
     );
 
+    const sandSlurryQuantity =
+      totalAllMaterials * mixing_hours * portion_size * 10;
+
     const [updatedSandSlurryRows] = await RawMaterialsWarehouse.update(
       {
         remaining_quantity: sequelize.literal(
-          `remaining_quantity + ${totalAllMaterials}`
+          `remaining_quantity + ${sandSlurryQuantity}`
         ),
         last_updated: date,
       },
@@ -194,7 +219,7 @@ rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
       await RawMaterialsWarehouse.create(
         {
           material_type: "Sand slurry (dry)",
-          remaining_quantity: totalAllMaterials,
+          remaining_quantity: sandSlurryQuantity,
           last_updated: date,
         },
         { transaction: t }
