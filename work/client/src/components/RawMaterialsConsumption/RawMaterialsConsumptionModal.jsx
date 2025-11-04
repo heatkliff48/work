@@ -288,7 +288,13 @@ const RawMaterialsConsumptionModal = React.memo(
     const addProductOrder = async () => {
       const { batch_article } = selectedRow;
 
-      const free_quantity_remaining = productionVolume;
+      const product = latestProducts.find((item) => item.article == batch_article);
+
+      const arraysPerPalletRaw = Math.floor(
+        (product?.m3InArray ?? 0) / (product?.volumeBlockOnPallet ?? 1)
+      );
+
+      const free_quantity_remaining = productionVolume * arraysPerPalletRaw;
       const ordered_quantity = 0;
 
       const reservedProducts =
@@ -339,10 +345,6 @@ const RawMaterialsConsumptionModal = React.memo(
         };
       });
 
-      const product = latestProducts.find(
-        (item) => item.article == batch_article
-      );
-
       const articleInfo = getWarehouseArticle(product);
 
       dispatch(
@@ -354,12 +356,14 @@ const RawMaterialsConsumptionModal = React.memo(
           free_quantity_remaining: remainingFreeQty,
           ordered_quantity: parseInt(ordered_quantity) + summReserve,
           total_quantity:
-            parseInt(ordered_quantity) + summReserve + remainingFreeQty,
+            (parseInt(ordered_quantity) + summReserve + remainingFreeQty) *
+            arraysPerPalletRaw,
         })
       );
-      for (const ordered_production of updatedReserves) {
-        dispatch(updListOfOrderedProduction(ordered_production));
-      }
+
+      // for (const ordered_production of updatedReserves) {
+      //   dispatch(updListOfOrderedProduction(ordered_production));
+      // }
     };
 
     return (
