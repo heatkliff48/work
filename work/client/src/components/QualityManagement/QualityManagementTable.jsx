@@ -12,8 +12,6 @@ import {
 } from '#components/redux/actions/qualityManagementAction.js';
 import {
   addNewAutoclaveCalendar,
-  addNewWarehouse,
-  updListOfOrderedProduction,
 } from '#components/redux/actions/warehouseAction.js';
 import {
   deleteBatchOutside,
@@ -29,7 +27,7 @@ const QualityManagementTable = () => {
 
   const { autoclave_calendar } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
-  const { raw_mat_consumption, list_of_recipes, recipeOrders } = useRecipeContext();
+  const { list_of_recipes, recipeOrders } = useRecipeContext();
 
   const dispatch = useDispatch();
   const qualityManagementData = useSelector((state) => state.qualityManagementData);
@@ -241,9 +239,13 @@ const QualityManagementTable = () => {
           (recipe) => recipe.id_batch === production_plan_id
         );
 
+        const recipeDetails = list_of_recipes.find(
+          (rec) => rec.id === recipe?.id_recipe
+        );
+
         dispatch(
           addNewRawMatConsumption({
-            recipe_article: recipe?.article || 'Unknown Recipe',
+            recipe_article: recipeDetails?.article || 'Unknown Recipe',
             batch_article: batch?.product_article || 'Unknown Batch',
             production_volume:
               Math.ceil(
