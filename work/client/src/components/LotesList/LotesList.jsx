@@ -15,8 +15,12 @@ function LotesList() {
       accessor: "id",
     },
     {
-      Header: "Cake ID",
+      Header: "Cake ID start",
       accessor: "cake_id",
+    },
+    {
+      Header: "Cake ID finish",
+      accessor: "cake_id_finish",
     },
     {
       Header: "Production date",

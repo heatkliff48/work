@@ -33,7 +33,7 @@ lotesListRouter.post("/", async (req, res) => {
       order: [["id", "DESC"]],
     });
 
-    let cake_id;
+    let cake_id, cake_id_finish;
 
     if (lastLote) {
       cake_id = lastLote.cake_id + lastLote.quantity_cakes;
@@ -41,8 +41,11 @@ lotesListRouter.post("/", async (req, res) => {
       cake_id = 1;
     }
 
+    cake_id_finish = cake_id + quantityCakesInt - 1;
+
     const lotesList = await LotesList.create({
       cake_id,
+      cake_id_finish,
       production_date,
       product,
       recipe,
