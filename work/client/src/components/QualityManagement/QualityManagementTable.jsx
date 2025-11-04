@@ -27,11 +27,9 @@ import { useRecipeContext } from "#components/contexts/RecipeContext.js";
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
 
-  const { list_of_ordered_production, autoclave_calendar } =
-    useWarehouseContext();
+  const { autoclave_calendar } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
-  const { raw_mat_consumption, recipeOrders, list_of_recipes } =
-    useRecipeContext();
+  const { raw_mat_consumption, list_of_recipes, recipeOrders } = useRecipeContext();
 
   const dispatch = useDispatch();
   const qualityManagementData = useSelector(
@@ -245,12 +243,13 @@ const QualityManagementTable = () => {
 
         const batch = batchOutside.find((batch) => batch.id === production_plan_id);
 
-        const recipe = list_of_recipes.find(
+        const recipe = recipeOrders.find(
           (recipe) => recipe.id_batch === production_plan_id
         );
 
         dispatch(
           addNewRawMatConsumption({
+            id: raw_mat_consumption.length + 1,
             recipe_article: recipe?.article || 'Unknown Recipe',
             batch_article: batch?.product_article || 'Unknown Batch',
             production_volume:
