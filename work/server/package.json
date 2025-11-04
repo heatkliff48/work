@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
-  "scripts": {
-    "start": " node app.js",
-    "dev": " node update-env.js && nodemon app.js "
-  },
+"scripts": {
+  "start": "node app.js",
+  "dev": "node update-env.js && nodemon app.js",
+  "db": "npx sequelize db:migrate:undo:all && npx sequelize db:migrate && npx sequelize db:seed:all"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
