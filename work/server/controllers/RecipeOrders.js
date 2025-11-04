@@ -1,11 +1,11 @@
-const RecipeOrdersServices = require('../services/RecipeOrders');
+const RecipeOrdersServices = require("../services/RecipeOrders");
 const {
   SAVE_MATERIAL_PLAN_SOCKET,
   DELETE_MATERIAL_PLAN_SOCKET,
   ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
   DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
-} = require('../src/constants/event');
-const myEmitter = require('../src/ee');
+} = require("../src/constants/event");
+const myEmitter = require("../src/ee");
 
 class RecipeOrdersController {
   static async getRecipeOrdersData(req, res) {
@@ -25,10 +25,10 @@ class RecipeOrdersController {
       return res.status(200);
     } catch (error) {
       console.error(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..err.message',
+        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..err.message",
         error.message
       );
-      res.json({ error: 'Internal Server Error' }).status(500);
+      res.json({ error: "Internal Server Error" }).status(500);
     }
   }
 
@@ -53,7 +53,9 @@ class RecipeOrdersController {
   static async addNewRawMatConsumptionOrdersData(req, res) {
     const rawMatConsumption = req.body;
 
-    await RecipeOrdersServices.addNewRawMatConsumptionOrdersData(rawMatConsumption);
+    await RecipeOrdersServices.addNewRawMatConsumptionOrdersData(
+      rawMatConsumption
+    );
 
     myEmitter.emit(ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET, rawMatConsumption);
 
@@ -62,7 +64,7 @@ class RecipeOrdersController {
 
   static async deleteRawMatConsumptionOrdersData(req, res) {
     console.log(
-      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionOrdersData',
+      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionOrdersData",
       req.body
     );
     const { id } = req.body;
