@@ -13,6 +13,7 @@ import "#components/Styles/modals.css";
 
 function AddNewRecipeModal({ show, onHide }) {
   const [recipeInput, setRecipeInput] = useState({});
+  const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
 
   const { COLUMNS, latestProducts } = useProductsContext();
@@ -76,9 +77,17 @@ function AddNewRecipeModal({ show, onHide }) {
   }, []);
 
   const handleRecipeInfoInputChange = useCallback((e) => {
-    setRecipeInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    if (dryTotalSumm.includes(e.target.name)) {
-      setDryTotal((prev) => prev + Number(e.target.value));
+    const { name, value } = e.target;
+
+    let processedValue = value;
+    if (typeof value === "string") {
+      processedValue = value.replace(/(\d+),(\d*)/g, "$1.$2");
+    }
+
+    setRecipeInput((prev) => ({ ...prev, [name]: processedValue }));
+
+    if (dryTotalSumm.includes(name)) {
+      setDryTotal((prev) => prev + parseFloat(processedValue || 0));
     }
   }, []);
 
@@ -170,6 +179,34 @@ function AddNewRecipeModal({ show, onHide }) {
   };
 
   const addRecipeHandler = async () => {
+    const requiredFields =
+      selectedProduct?.density > 100
+        ? solidsNormalRequerideFields
+        : solidsOddRequerideFields;
+
+    const isFormValid = requiredFields.every((field) => {
+      const value = recipeInput[field];
+      return (
+        value !== undefined &&
+        value !== null &&
+        value !== "" &&
+        !isNaN(parseFloat(value))
+      );
+    });
+
+    if (
+      !recipeInput.cake_height ||
+      isNaN(parseFloat(recipeInput.cake_height))
+    ) {
+      alert("Please fill in the Cake Height field");
+      return;
+    }
+
+    if (!isFormValid) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
     const article = recipeArticle();
 
     // Create a local copy of recipeInput and update it
@@ -206,7 +243,6 @@ function AddNewRecipeModal({ show, onHide }) {
     setSelectedProduct({});
 
     onHide();
-    // }
   };
 
   const closeHandler = () => {

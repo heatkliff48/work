@@ -128,7 +128,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
 
     const materialConsumption = materials.reduce((acc, m) => {
       const type = m.type;
-      const quantity = Number(m.quantity || 0);
+      const quantity = Number(m.quantity || 0) * mixing_hours * 1000;
       acc[type] = (acc[type] || 0) + quantity;
       return acc;
     }, {});
