@@ -119,7 +119,7 @@ function AddNewRecipeModal({ show, onHide }) {
       return null;
     }
 
-    return (parseFloat(recipeInput.cake_height) * 6.262 * 1.58).toFixed(0);
+    return (parseFloat(recipeInput.cake_height) * 6.262 * 1.58).toFixed(2);
   }, [recipeInput?.cake_height]);
 
   const density_recipe = useMemo(() => {

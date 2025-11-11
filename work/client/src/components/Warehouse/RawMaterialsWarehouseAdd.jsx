@@ -8,12 +8,15 @@ import { useUsersContext } from "#components/contexts/UserContext.js";
 import { useNavigate } from "react-router-dom";
 import { Container } from "reactstrap";
 import * as warehouseActions from "#components/redux/actions/warehouseRawMaterialsAction.js";
+import DatePicker from "react-datepicker";
+import Select from "react-select";
 
 function RawMaterialsWarehouseAdd(props) {
   const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState(
     {}
   );
   const [errors, setErrors] = useState({});
+  const [dataValue, setDataValue] = useState(null);
 
   const user = useSelector((state) => state.user);
 
@@ -21,6 +24,12 @@ function RawMaterialsWarehouseAdd(props) {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const cementTypeOptions = [
+    { value: "type 1", label: "Type 1" },
+    { value: "type 2", label: "Type 2" },
+    { value: "type 3", label: "Type 3" },
+  ];
 
   const raw_material_table = [
     {
@@ -52,6 +61,36 @@ function RawMaterialsWarehouseAdd(props) {
     }));
   }, []);
 
+  const getSelectedOption = (fieldName) => {
+    if (fieldName === "cementType") {
+      return (
+        cementTypeOptions.find(
+          (option) => option.value === rawMaterialWarehouseInput.cementType
+        ) || cementTypeOptions[0]
+      );
+    }
+    return null;
+  };
+
+  const handleSelectChange = (selectedOption, fieldName) => {
+    setRawMaterialWarehouseInput((prev) => ({
+      ...prev,
+      [fieldName]: selectedOption.value,
+    }));
+  };
+
+  const handleDateChange = useCallback((date) => {
+    setRawMaterialWarehouseInput((prev) => ({
+      ...prev,
+      date: date.toString(),
+    }));
+    setDataValue(date);
+    setErrors((prev) => ({
+      ...prev,
+      date: "",
+    }));
+  }, []);
+
   useEffect(() => {
     if (user && roles.length > 0) {
       const access = checkUserAccess(user, roles, "Warehouse");
@@ -62,6 +101,15 @@ function RawMaterialsWarehouseAdd(props) {
       }
     }
   }, [user, roles]);
+
+  useEffect(() => {
+    if (props?.material_type === "Cement") {
+      setRawMaterialWarehouseInput((prev) => ({
+        ...prev,
+        cementType: cementTypeOptions[0].value,
+      }));
+    }
+  }, [props?.material_type]);
 
   const getAddAction = useCallback((materialType) => {
     const actionMap = {
@@ -95,6 +143,16 @@ function RawMaterialsWarehouseAdd(props) {
       newErrors.quantity = "Quantity must be a positive number";
     }
 
+    if (
+      props?.material_type === "Cement" &&
+      !rawMaterialWarehouseInput?.cementType
+    ) {
+      newErrors.cementType = "Cement type is required";
+    }
+    if (!rawMaterialWarehouseInput?.date?.trim()) {
+      newErrors.supplier = "Date is required";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -102,6 +160,7 @@ function RawMaterialsWarehouseAdd(props) {
   const resetModal = useCallback(() => {
     setRawMaterialWarehouseInput({});
     setErrors({});
+    setDataValue(null);
   }, []);
 
   const handleHide = useCallback(() => {
@@ -118,13 +177,23 @@ function RawMaterialsWarehouseAdd(props) {
 
     const addAction = getAddAction(props?.material_type);
 
-    dispatch(
-      addAction({
-        supplier: rawMaterialWarehouseInput?.supplier,
-        quantity: rawMaterialWarehouseInput?.quantity,
-      })
-    );
+    const formData =
+      props?.material_type === "Cement"
+        ? {
+            supplier: rawMaterialWarehouseInput?.supplier,
+            quantity: rawMaterialWarehouseInput?.quantity,
+            date: rawMaterialWarehouseInput?.date,
+            type_of_cement: rawMaterialWarehouseInput?.cementType,
+          }
+        : {
+            supplier: rawMaterialWarehouseInput?.supplier,
+            quantity: rawMaterialWarehouseInput?.quantity,
+            date: rawMaterialWarehouseInput?.date,
+          };
+
+    dispatch(addAction(formData));
     setRawMaterialWarehouseInput({});
+    setDataValue(null);
     setErrors({});
     props.onHide();
   };
@@ -184,6 +253,51 @@ function RawMaterialsWarehouseAdd(props) {
                 )
               )}
             </Row>
+            {props?.material_type === "Cement" && (
+              <Row>
+                <Col>
+                  <div className="md:flex md:items-center mb-6">
+                    <div className="md:w-1/3">
+                      <label
+                        className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                        htmlFor="cementType"
+                      >
+                        Cement Type
+                      </label>
+                    </div>
+                    <div className="md:w-2/3">
+                      <Select
+                        defaultValue={getSelectedOption("cementType")}
+                        onChange={(v) => {
+                          handleSelectChange(v, "cementType");
+                        }}
+                        options={cementTypeOptions}
+                      />
+                      {errors.cementType && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.cementType}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+            )}
+            <div>
+              <label
+                className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                htmlFor="cementType"
+              >
+                Date
+              </label>
+              <DatePicker
+                id="data_pcker"
+                type="text"
+                selected={dataValue}
+                onChange={(date) => handleDateChange(date)}
+                dateFormat="dd.MM.yyyy"
+              />
+            </div>
           </form>
         </Container>
       </Modal.Body>
