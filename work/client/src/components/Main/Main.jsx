@@ -128,6 +128,7 @@ function Main() {
     dispatch(getQualityManagement());
     dispatch(clearBatchState());
     dispatch(getLotesList());
+    dispatch(getRawMaterialsWarehouse());
     setStoredData(null);
     //dispatch(dataFetchedChange(true));
   }, []);

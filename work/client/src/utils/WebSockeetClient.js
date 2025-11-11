@@ -11,22 +11,22 @@ class WebSocketClient {
     this.socket = new WebSocket(this.socketUrl);
 
     this.socket.onopen = () => {
-      console.log('WebSocket connection established');
+      console.log("WebSocket connection established");
       this.reconnectInterval = 1000; // Сброс интервала при успешном подключении
     };
 
     this.socket.onmessage = (event) => {
-      console.log('Message from server:', event.data); // Обработка входящих сообщений
+      console.log("Message from server:", event.data); // Обработка входящих сообщений
       this.socketOnMessageFunc(event);
     };
 
     this.socket.onclose = (event) => {
-      console.log('WebSocket connection closed:', event);
+      console.log("WebSocket connection closed:", event);
       this.reconnect(); // Запуск механизма повторного подключения
     };
 
     this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error("WebSocket error:", error);
       // this.reconnect()
       this.socket.close(); // Закрываем соединение в случае ошибки
     };

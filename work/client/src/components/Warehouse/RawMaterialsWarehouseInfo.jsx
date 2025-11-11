@@ -63,6 +63,11 @@ function RawMaterialsWarehouseInfo(props) {
       accessor: "quantity",
       Filter: TextSearchFilter,
     },
+    props?.material_type === "Cement" && {
+      Header: "Type of Cement",
+      accessor: "type_of_cement",
+      Filter: TextSearchFilter,
+    },
     {
       Header: "Date",
       accessor: "date",
@@ -73,7 +78,7 @@ function RawMaterialsWarehouseInfo(props) {
       accessor: "quality",
       Filter: TextSearchFilter,
     },
-  ];
+  ].filter(Boolean);
 
   const handleRowClick = useCallback((row) => {
     setSupplierInfo(row.original);

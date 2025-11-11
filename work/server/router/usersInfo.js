@@ -1,11 +1,10 @@
-const usersInfoRouter = require('express').Router();
-const { UsersInfo } = require('../db/models/index.js');
+const usersInfoRouter = require("express").Router();
+const { UsersInfo } = require("../db/models/index.js");
 
-usersInfoRouter.get('/', async (req, res) => {
-
+usersInfoRouter.get("/", async (req, res) => {
   try {
     const allUsersInfo = await UsersInfo.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     return res.status(200).json({ allUsersInfo });
@@ -14,8 +13,7 @@ usersInfoRouter.get('/', async (req, res) => {
   }
 });
 
-usersInfoRouter.post('/', async (req, res) => {
-
+usersInfoRouter.post("/", async (req, res) => {
   try {
     const { fullName, group, shift, subdivision, phone } = req.body.usersInfo;
 
@@ -34,8 +32,9 @@ usersInfoRouter.post('/', async (req, res) => {
   }
 });
 
-usersInfoRouter.post('/update/:u_id', async (req, res) => {
-  const { u_id, fullName, group, shift, subdivision, phone } = req.body.usersInfo;
+usersInfoRouter.post("/update/:u_id", async (req, res) => {
+  const { u_id, fullName, group, shift, subdivision, phone } =
+    req.body.usersInfo;
 
   try {
     const usersInfo = await UsersInfo.update(
