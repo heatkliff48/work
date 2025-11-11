@@ -1,17 +1,17 @@
-const usersMainInfoRouter = require('express').Router();
-const { Users } = require('../db/models/index.js');
-const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
-const bcrypt = require('bcryptjs');
+const usersMainInfoRouter = require("express").Router();
+const { Users } = require("../db/models/index.js");
+const TokenService = require("../services/Token.js");
+const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
+const { COOKIE_SETTINGS } = require("../constants.js");
+const bcrypt = require("bcryptjs");
 
-usersMainInfoRouter.get('/', async (req, res) => {
+usersMainInfoRouter.get("/", async (req, res) => {
   // const fingerprint = req.fingerprint.hash;
   // const { id, username, email } = req.session.user;
 
   try {
     const allUsersMainInfo = await Users.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     // const payload = { id, username, email };
@@ -33,12 +33,14 @@ usersMainInfoRouter.get('/', async (req, res) => {
   }
 });
 
-usersMainInfoRouter.post('/', async (req, res) => {
+usersMainInfoRouter.post("/", async (req, res) => {
   // const fingerprint = req.fingerprint.hash;
   // const { id, username, email } = req.session.user;
 
   try {
     const { u_username, u_email, password, role } = req.body.usersMainInfo;
+
+    console.log(req.body.usersMainInfo, "usersMainInfo.js line 43");
 
     const hashedPassword = bcrypt.hashSync(password, 8);
 
@@ -67,7 +69,7 @@ usersMainInfoRouter.post('/', async (req, res) => {
   }
 });
 
-usersMainInfoRouter.post('/update/:u_id', async (req, res) => {
+usersMainInfoRouter.post("/update/:u_id", async (req, res) => {
   // const fingerprint = req.fingerprint.hash;
   // const { id, username, email } = req.session.user;
   const { u_id, password } = req.body.usersMainInfo;

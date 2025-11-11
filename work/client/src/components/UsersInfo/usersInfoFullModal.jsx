@@ -1,21 +1,22 @@
-import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
-import Container from 'react-bootstrap/Container';
-import Modal from 'react-bootstrap/Modal';
-import Row from 'react-bootstrap/Row';
-import './styles.css';
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Modal from "react-bootstrap/Modal";
+import Row from "react-bootstrap/Row";
+import "./styles.css";
 
-import ShowPasswordChangeModal from './userPasswordChangeModal';
-import { useProjectContext } from '#components/contexts/Context.js';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useUsersContext } from '#components/contexts/UserContext.js';
+import ShowPasswordChangeModal from "./userPasswordChangeModal";
+import { useProjectContext } from "#components/contexts/Context.js";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useUsersContext } from "#components/contexts/UserContext.js";
 
 function UsersInfoFullModal({ show, onHide }) {
   const usersInfo = useSelector((state) => state.usersInfo);
   const usersMainInfo = useSelector((state) => state.usersMainInfo);
   const { currentUsersInfo, setCurrentUsersInfo } = useProjectContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
   const user = useSelector((state) => state.user);
 
   const combine = (a, b, prop) =>
@@ -28,17 +29,20 @@ function UsersInfoFullModal({ show, onHide }) {
     );
 
   useEffect(() => {
+    if (!currentUsersInfo) {
+      return;
+    }
     if (Object.keys(currentUsersInfo).length === 0) {
       return;
     }
-    const combined = combine(usersInfo, usersMainInfo, 'id');
+    const combined = combine(usersInfo, usersMainInfo, "id");
     const user = combined.filter((el) => el.id === currentUsersInfo.id)[0];
     setCurrentUsersInfo(user);
   }, [usersMainInfo, usersInfo]);
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Clients');
+      const access = checkUserAccess(user, roles, "Clients");
       setUserAccess(access);
     }
   }, [user, roles]);

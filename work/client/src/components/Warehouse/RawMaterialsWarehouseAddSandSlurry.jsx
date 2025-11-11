@@ -54,9 +54,14 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
   ];
 
   const handleRawMaterialWarehouseInputChange = useCallback((e) => {
+    let processedValue = e.target.value;
+    if (typeof e.target.value === "string") {
+      processedValue = e.target.value.replace(/(\d+),(\d*)/g, "$1.$2");
+    }
+
     setSandSlurryWarehouseInput((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: processedValue,
     }));
     setErrors((prev) => ({
       ...prev,

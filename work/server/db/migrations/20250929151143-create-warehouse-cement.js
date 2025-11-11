@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('WarehouseCements', {
+    await queryInterface.createTable("WarehouseCements", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -14,6 +14,9 @@ module.exports = {
       },
       quantity: {
         type: Sequelize.FLOAT,
+      },
+      type_of_cement: {
+        type: Sequelize.STRING,
       },
       quality: {
         type: Sequelize.FLOAT,
@@ -32,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('WarehouseCements');
+    await queryInterface.dropTable("WarehouseCements");
   },
 };
