@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { useProjectContext } from '../contexts/Context';
-import { updateRoles } from '../redux/actions/rolesAction';
-import { useModalContext } from '#components/contexts/ModalContext.js';
+import React, { useState, useEffect } from "react";
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useProjectContext } from "../contexts/Context";
+import { updateRoles } from "../redux/actions/rolesAction";
+import { useModalContext } from "#components/contexts/ModalContext.js";
 
 function ModalRole() {
   const { roleId, setRoleId } = useProjectContext();
   const { modalRoleCard, setModalRoleCard } = useModalContext();
   const pages = useSelector((state) => state.pages);
-  const role = useSelector((state) => state.roles.find((el) => el.id === roleId));
+  const role = useSelector((state) =>
+    state.roles.find((el) => el.id === roleId)
+  );
   const [permissions, setPermissions] = useState([]);
   const dispatch = useDispatch();
 
@@ -64,7 +66,10 @@ function ModalRole() {
       toggle={() => setModalRoleCard(false)}
       className="role-modal"
     >
-      <ModalHeader toggle={() => setModalRoleCard(false)} className="role-header">
+      <ModalHeader
+        toggle={() => setModalRoleCard(false)}
+        className="role-header"
+      >
         {role?.role_name}
       </ModalHeader>
       <ModalBody>
@@ -76,19 +81,21 @@ function ModalRole() {
           </div>
           {permissions.map((perm) => (
             <div key={perm.page_id} className="table-row">
-              <div>{pages.find((page) => page.id === perm.page_id)?.page_name}</div>
+              <div>
+                {pages.find((page) => page.id === perm.page_id)?.page_name}
+              </div>
               <div>
                 <input
                   type="checkbox"
                   checked={perm.read}
-                  onChange={() => handleCheckboxChange(perm.page_id, 'read')}
+                  onChange={() => handleCheckboxChange(perm.page_id, "read")}
                 />
               </div>
               <div>
                 <input
                   type="checkbox"
                   checked={perm.write}
-                  onChange={() => handleCheckboxChange(perm.page_id, 'write')}
+                  onChange={() => handleCheckboxChange(perm.page_id, "write")}
                 />
               </div>
             </div>

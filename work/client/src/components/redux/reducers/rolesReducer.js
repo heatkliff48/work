@@ -1,8 +1,8 @@
-import { ALL_ROLES } from '../types/rolesTypes';
+import { ALL_ROLES } from "../types/rolesTypes";
 import {
   UPDATE_ROLE_ACTIVE_SOCKET,
   UPDATE_ROLE_SOCKET,
-} from '../types/socketTypes/socket';
+} from "../types/socketTypes/socket";
 
 export const rolesReducer = (roles = [], action) => {
   const { type, payload } = action;
@@ -16,6 +16,21 @@ export const rolesReducer = (roles = [], action) => {
 
       const updRole = roles.map((role) => {
         if (role.id === payload[0].role_id) {
+          if (!role.PageAndRolesArray) {
+            return {
+              ...role,
+              PageAndRolesArray: payload.map((p) => ({
+                id: p.page_id,
+                PageAndRoles: {
+                  page_id: p.page_id,
+                  role_id: p.role_id,
+                  read: p.read,
+                  write: p.write,
+                },
+              })),
+            };
+          }
+
           return {
             ...role,
             PageAndRolesArray: role.PageAndRolesArray.map((pageItem) => {
