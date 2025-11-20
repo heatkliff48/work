@@ -32,10 +32,12 @@ function Warehouse() {
   const [materialType, setMaterialType] = useState("");
 
   const handleRowClick = useCallback((row) => {
-    setMaterialType(row.original.material_type);
+    setMaterialType(row.original.material_type.replace(/, kg$/, "").trim());
     // setWarehouseInfoCurIdModal(row.original.id);
     // setWarehouseInfoModal(!warehouseInfoModal);
-    row.original.material_type !== "Sand slurry (dry)" && setModalShow(true);
+    row.original.material_type !== "Sand slurry (dry), kg" &&
+      row.original.material_type !== "Return slurry (dry), kg" &&
+      setModalShow(true);
   }, []);
 
   useEffect(() => {
@@ -61,6 +63,11 @@ function Warehouse() {
     dispatch(getWarehouseAAC());
   }, []);
 
+  const modifiedData = raw_materials_warehouse.map((item) => ({
+    ...item,
+    material_type: `${item.material_type}, kg`,
+  }));
+
   return (
     <>
       {/* {userAccess?.canWrite && (
@@ -69,7 +76,7 @@ function Warehouse() {
 
       <Table
         COLUMN_DATA={COLUMNS_RAW_MATERIALS_WAREHOUSE}
-        dataOfTable={raw_materials_warehouse}
+        dataOfTable={modifiedData}
         userAccess={userAccess}
         tableName={"Raw Materials Warehouse"}
         handleRowClick={handleRowClick}

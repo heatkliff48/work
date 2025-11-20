@@ -640,7 +640,7 @@ button:focus {
   width: 50%;
 }
 
-input[type='checkbox'] {
+input[type="checkbox"] {
   margin-left: auto;
 }
 
@@ -797,7 +797,7 @@ input[type='checkbox'] {
   width: 60px;
 }
 
-.raw-materials-plan input[type='number'] {
+.raw-materials-plan input[type="number"] {
   width: 100%;
   box-sizing: border-box;
   padding: 0;

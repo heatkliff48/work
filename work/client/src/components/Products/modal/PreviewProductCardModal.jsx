@@ -1,4 +1,4 @@
-import React, { useEffect, useState, version } from 'react';
+import React, { useEffect, useState, version } from "react";
 import {
   Button,
   Card,
@@ -9,24 +9,28 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-} from 'reactstrap';
-import ToggleButton from 'react-bootstrap/ToggleButton';
-import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
-import { useProjectContext } from '#components/contexts/Context.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import BarcodeGenerator from './BarcodeGenerator';
-import { useDispatch } from 'react-redux';
+} from "reactstrap";
+import ToggleButton from "react-bootstrap/ToggleButton";
+import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
+import { useProjectContext } from "#components/contexts/Context.js";
+import { useModalContext } from "#components/contexts/ModalContext.js";
+import { useProductsContext } from "#components/contexts/ProductContext.js";
+import BarcodeGenerator from "./BarcodeGenerator";
+import { useDispatch } from "react-redux";
 import {
   addNewProduct,
   repProduct,
-} from '#components/redux/actions/productsAction.js';
-import { updateProductCode } from '#components/redux/actions/productsTypeJournalAction.js';
+} from "#components/redux/actions/productsAction.js";
+import { updateProductCode } from "#components/redux/actions/productsTypeJournalAction.js";
 
 const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
   const { COLUMNS, getOptionValue, selectOptions } = useProductsContext();
-  const { previewProductData, setPreviewOperationName, setIsRepair, setIsEdit } =
-    useProjectContext();
+  const {
+    previewProductData,
+    setPreviewOperationName,
+    setIsRepair,
+    setIsEdit,
+  } = useProjectContext();
   const { previewProductModal, setPreviewProductModal } = useModalContext();
 
   const [selectedBarcodeValue, setSelectedBarcodeValue] = useState(1);
@@ -47,56 +51,62 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
       palletSize,
     } = prod;
 
-    let versionNumber = '0001';
+    let versionNumber = "0001";
     versionNumber = `000${version}`.slice(-4);
 
     const rightPlaceOfProduction = getOptionValue(
-      'placeOfProduction',
+      "placeOfProduction",
       placeOfProduction
     );
-    const rightTypeOfPackaging = getOptionValue('typeOfPackaging', typeOfPackaging);
+    const rightTypeOfPackaging = getOptionValue(
+      "typeOfPackaging",
+      typeOfPackaging
+    );
 
-    const rightPalletSize = getOptionValue('palletSize', palletSize);
+    const rightPalletSize = getOptionValue("palletSize", palletSize);
     const combinationMap = {
-      '0-0-0': 'A',
-      '0-0-1': 'B',
-      '0-0-2': 'C',
-      '0-1-0': 'D',
-      '0-1-1': 'E',
-      '0-1-2': 'F',
-      '1-0-0': 'G',
-      '1-0-1': 'H',
-      '1-0-2': 'I',
-      '1-1-0': 'J',
-      '1-1-1': 'K',
-      '1-1-2': 'L',
+      "0-0-0": "A",
+      "0-0-1": "B",
+      "0-0-2": "C",
+      "0-1-0": "D",
+      "0-1-1": "E",
+      "0-1-2": "F",
+      "1-0-0": "G",
+      "1-0-1": "H",
+      "1-0-2": "I",
+      "1-1-0": "J",
+      "1-1-1": "K",
+      "1-1-2": "L",
     };
 
     const combinationKey = `${rightPlaceOfProduction}-${rightTypeOfPackaging}-${rightPalletSize}`;
     const combinationLetter = combinationMap[combinationKey];
 
     if (!combinationLetter) {
-      console.warn('Unknown combination for prodArticle:', combinationKey);
+      console.warn("Unknown combination for prodArticle:", combinationKey);
     }
 
     const prodArticle = `T.${form
       ?.toUpperCase()
-      .slice(0, 1)}${combinationLetter}D${density.toString().slice(0, 2)}W${width
+      .slice(0, 1)}${combinationLetter}D${density
       .toString()
-      .slice(0, 2)}${certificate?.substr(0, 1)}${versionNumber}`;
+      .slice(0, 2)}W${width.toString().slice(0, 2)}${certificate?.substr(
+      0,
+      1
+    )}${versionNumber}`;
 
     return prodArticle;
   };
 
   const toggle = () => {
     setPreviewProductModal(!previewProductModal);
-    setPreviewOperationName('');
+    setPreviewOperationName("");
   };
 
   const header = {
-    add: 'You are creating a new product card',
-    edit: 'You are creating a new version of product',
-    repair: 'You are fixing product whitout changing version',
+    add: "You are creating a new product card",
+    edit: "You are creating a new version of product",
+    repair: "You are fixing product whitout changing version",
   };
 
   const saveHandler = () => {
@@ -104,17 +114,20 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
       previewProductData;
 
     const rightPlaceOfProduction = getOptionValue(
-      'placeOfProduction',
+      "placeOfProduction",
       placeOfProduction
     );
 
-    const rightTypeOfPackaging = getOptionValue('typeOfPackaging', typeOfPackaging);
+    const rightTypeOfPackaging = getOptionValue(
+      "typeOfPackaging",
+      typeOfPackaging
+    );
 
-    const rightPalletSize = getOptionValue('palletSize', palletSize);
-    const rightPalletHeight = getOptionValue('palletHeight', palletHeight);
+    const rightPalletSize = getOptionValue("palletSize", palletSize);
+    const rightPalletHeight = getOptionValue("palletHeight", palletHeight);
 
     const newVersion =
-      previewOperationName === 'add' ? 1 : previewProductData.version;
+      previewOperationName === "add" ? 1 : previewProductData.version;
 
     const obj = {
       ...previewProductData,
@@ -125,7 +138,7 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
       palletHeight: rightPalletHeight,
     };
 
-    if (['add', 'edit'].includes(previewOperationName)) {
+    if (["add", "edit"].includes(previewOperationName)) {
       dispatch(addNewProduct(obj));
     } else {
       dispatch(repProduct(obj));
@@ -137,7 +150,7 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
       })
     );
     setPreviewProductModal(!previewProductModal);
-    setPreviewOperationName('');
+    setPreviewOperationName("");
     setIsEdit(false);
     setIsRepair(false);
   };
@@ -149,7 +162,9 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
   return (
     <div>
       <Modal isOpen={previewProductModal} toggle={toggle} size="lg">
-        <ModalHeader toggle={toggle}>{header[previewOperationName]}</ModalHeader>
+        <ModalHeader toggle={toggle}>
+          {header[previewOperationName]}
+        </ModalHeader>
         <ModalHeader>
           <div className="product_card_header">
             <div>
@@ -165,9 +180,9 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
             {COLUMNS.map((el) => {
               const { accessor } = el;
               if (
-                accessor === 'id' ||
-                accessor === 'article' ||
-                accessor === 'version'
+                accessor === "id" ||
+                accessor === "article" ||
+                accessor === "version"
               ) {
                 return null;
               } else if (selectOptions[accessor]) {
@@ -183,7 +198,7 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
                     color="secondary"
                     outline
                     style={{
-                      width: '8rem',
+                      width: "8rem",
                     }}
                   >
                     <CardHeader>{el.Header}</CardHeader>
@@ -192,26 +207,26 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
                     </CardBody>
                   </Card>
                 );
-              } else if (accessor !== 'productCode')
+              } else if (accessor !== "productCode")
                 return (
                   <Card
                     className="my-2"
                     color="secondary"
                     outline
                     style={{
-                      width: '8rem',
+                      width: "8rem",
                     }}
                   >
                     <CardHeader>{el.Header}</CardHeader>
                     <CardBody>
                       <CardText>
-                        {['article', 'id', 'version'].includes(accessor)
+                        {["article", "id", "version"].includes(accessor)
                           ? null
-                          : accessor === 'activeStatus'
+                          : accessor === "activeStatus"
                           ? previewProductData?.[accessor]
-                            ? 'Available'
-                            : 'Not available'
-                          : previewProductData?.[accessor] || ''}
+                            ? "Available"
+                            : "Not available"
+                          : previewProductData?.[accessor] || ""}
                       </CardText>
                     </CardBody>
                   </Card>
@@ -226,7 +241,7 @@ const PreviewProductCardModal = React.memo(({ previewOperationName }) => {
                       onChange={handleChange}
                     >
                       <ToggleButton id="tbg-radio-preview-1" value={1}>
-                        Block barcode
+                        Unit barcode
                       </ToggleButton>
                       <ToggleButton id="tbg-radio-preview-2" value={2}>
                         Pallet barcode

@@ -1,104 +1,104 @@
-import { TextSearchFilter, DropdownFilter } from '#components/Table/filters.js';
-import { createContext, useContext, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { FaCheck, FaTimes } from 'react-icons/fa';
-import { getData } from 'country-list';
+import { TextSearchFilter, DropdownFilter } from "#components/Table/filters.js";
+import { createContext, useContext, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { FaCheck, FaTimes } from "react-icons/fa";
+import { getData } from "country-list";
 
 const ProductsTypeJournalContext = createContext();
 
 const ProductsTypeJournalContextProvider = ({ children }) => {
   const COLUMNS_DRY_MIXED_PRODUCT = [
     {
-      Header: 'Product name',
-      accessor: 'name',
+      Header: "Product name",
+      accessor: "name",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Product ID',
-      accessor: 'article',
+      Header: "Product ID",
+      accessor: "article",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Width, mm',
-      accessor: 'width',
+      Header: "Width, mm",
+      accessor: "width",
     },
     {
-      Header: 'Lengths, mm',
-      accessor: 'lengths',
+      Header: "Lengths, mm",
+      accessor: "lengths",
     },
     {
-      Header: 'Height, mm',
-      accessor: 'height',
+      Header: "Height, mm",
+      accessor: "height",
     },
     {
-      Header: 'Units of measurement',
-      accessor: 'units_of_measurement',
+      Header: "Units of measurement",
+      accessor: "units_of_measurement",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Altura x Palet',
-      accessor: 'altura_x_palet',
+      Header: "Altura x Palet",
+      accessor: "altura_x_palet",
     },
     {
-      Header: 'Unit x Base',
-      accessor: 'unit_x_base',
+      Header: "Unit x Base",
+      accessor: "unit_x_base",
     },
     {
-      Header: 'Units per pallet',
-      accessor: 'units_per_pallet',
+      Header: "Units per pallet",
+      accessor: "units_per_pallet",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Bag weight',
-      accessor: 'bag_weight',
+      Header: "Bag weight, kg",
+      accessor: "bag_weight",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Pallet weight',
-      accessor: 'pallet_weight',
+      Header: "Pallet weight, kg",
+      accessor: "pallet_weight",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Type of mix',
-      accessor: 'type_of_mix',
+      Header: "Type of mix",
+      accessor: "type_of_mix",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Place of production',
-      accessor: 'place_of_production',
+      Header: "Place of production",
+      accessor: "place_of_production",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Manufacturer name',
-      accessor: 'manufacturer_name',
+      Header: "Manufacturer name",
+      accessor: "manufacturer_name",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Price per unit',
-      accessor: 'price_per_unit',
+      Header: "Price per unit, €",
+      accessor: "price_per_unit",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Price per kilogram',
-      accessor: 'price_per_kilogram',
+      Header: "Price per kilogram, €",
+      accessor: "price_per_kilogram",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity per truck',
-      accessor: 'qty_per_truck',
+      Header: "Quantity per truck, pallets",
+      accessor: "qty_per_truck",
     },
     {
-      Header: 'Quantity per contendor',
-      accessor: 'qty_per_contendor',
+      Header: "Quantity per contendor, pallets",
+      accessor: "qty_per_contendor",
     },
     {
-      Header: 'Description',
-      accessor: 'description',
+      Header: "Description",
+      accessor: "description",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Product availability',
-      accessor: 'active_status',
+      Header: "Product availability",
+      accessor: "active_status",
       Filter: DropdownFilter,
       Cell: ({ cell }) =>
         cell.row.values.active_status ? (
@@ -111,65 +111,65 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
 
   const COLUMNS_ANCHOR_PRODUCT = [
     {
-      Header: 'Product name',
-      accessor: 'name',
+      Header: "Product name",
+      accessor: "name",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Product ID',
-      accessor: 'article',
-      Filter: TextSearchFilter,
-    },
-
-    {
-      Header: 'Units of measurement',
-      accessor: 'units_of_measurement',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Pieces per unit',
-      accessor: 'pieces_per_unit',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Boxes on a pallet',
-      accessor: 'boxes_on_a_pallet',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Box weight',
-      accessor: 'box_weight',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Pallet weight',
-      accessor: 'pallet_weight',
+      Header: "Product ID",
+      accessor: "article",
       Filter: TextSearchFilter,
     },
 
     {
-      Header: 'Place of production',
-      accessor: 'place_of_production',
+      Header: "Units of measurement",
+      accessor: "units_of_measurement",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Manufacturer name',
-      accessor: 'manufacturer_name',
+      Header: "Pieces per unit",
+      accessor: "pieces_per_unit",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Price per unit',
-      accessor: 'price_per_unit',
+      Header: "Boxes on a pallet",
+      accessor: "boxes_on_a_pallet",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Description',
-      accessor: 'description',
+      Header: "Box weight, kg",
+      accessor: "box_weight",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Product availability',
-      accessor: 'active_status',
+      Header: "Pallet weight, kg",
+      accessor: "pallet_weight",
+      Filter: TextSearchFilter,
+    },
+
+    {
+      Header: "Place of production",
+      accessor: "place_of_production",
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: "Manufacturer name",
+      accessor: "manufacturer_name",
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: "Price per unit, €",
+      accessor: "price_per_unit",
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: "Description",
+      accessor: "description",
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: "Product availability",
+      accessor: "active_status",
       Filter: DropdownFilter,
       Cell: ({ cell }) =>
         cell.row.values.active_status ? (
@@ -182,45 +182,45 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
 
   const COLUMNS_RELATED_MATERIALS_JOURNAL = [
     {
-      Header: 'Product name',
-      accessor: 'name',
+      Header: "Product name",
+      accessor: "name",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Product ID',
-      accessor: 'article',
-      Filter: TextSearchFilter,
-    },
-
-    {
-      Header: 'Units of measurement',
-      accessor: 'units_of_measurement',
+      Header: "Product ID",
+      accessor: "article",
       Filter: TextSearchFilter,
     },
 
     {
-      Header: 'Place of production',
-      accessor: 'place_of_production',
+      Header: "Units of measurement",
+      accessor: "units_of_measurement",
+      Filter: TextSearchFilter,
+    },
+
+    {
+      Header: "Place of production",
+      accessor: "place_of_production",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Manufacturer name',
-      accessor: 'manufacturer_name',
+      Header: "Manufacturer name",
+      accessor: "manufacturer_name",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Price per unit',
-      accessor: 'price_per_unit',
+      Header: "Price per unit, €",
+      accessor: "price_per_unit",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Description',
-      accessor: 'description',
+      Header: "Description",
+      accessor: "description",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Product availability',
-      accessor: 'active_status',
+      Header: "Product availability",
+      accessor: "active_status",
       Filter: DropdownFilter,
       Cell: ({ cell }) =>
         cell.row.values.active_status ? (
@@ -233,78 +233,78 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
 
   const COLUMNS_TOOLS_PRODUCT = [
     {
-      Header: 'Product name',
-      accessor: 'name',
+      Header: "Product name",
+      accessor: "name",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Product ID',
-      accessor: 'article',
+      Header: "Product ID",
+      accessor: "article",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Width, mm',
-      accessor: 'width',
+      Header: "Width, mm",
+      accessor: "width",
     },
     {
-      Header: 'Lengths, mm',
-      accessor: 'lengths',
+      Header: "Lengths, mm",
+      accessor: "lengths",
     },
     {
-      Header: 'Height, mm',
-      accessor: 'height',
+      Header: "Height, mm",
+      accessor: "height",
     },
     {
-      Header: 'Units of measurement',
-      accessor: 'units_of_measurement',
+      Header: "Units of measurement",
+      accessor: "units_of_measurement",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Units per pallet',
-      accessor: 'units_per_pallet',
+      Header: "Units per pallet",
+      accessor: "units_per_pallet",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Piece weight',
-      accessor: 'piece_weight',
+      Header: "Unit weight, kg",
+      accessor: "piece_weight",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Pallet weight',
-      accessor: 'pallet_weight',
+      Header: "Pallet weight, kg",
+      accessor: "pallet_weight",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Place of production',
-      accessor: 'place_of_production',
+      Header: "Place of production",
+      accessor: "place_of_production",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Manufacturer name',
-      accessor: 'manufacturer_name',
+      Header: "Manufacturer name",
+      accessor: "manufacturer_name",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Price per unit',
-      accessor: 'price_per_unit',
+      Header: "Price per unit, €",
+      accessor: "price_per_unit",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity per truck',
-      accessor: 'qty_per_truck',
+      Header: "Quantity per truck, pallet",
+      accessor: "qty_per_truck",
     },
     {
-      Header: 'Quantity per contendor',
-      accessor: 'qty_per_contendor',
+      Header: "Quantity per contendor, pallet",
+      accessor: "qty_per_contendor",
     },
     {
-      Header: 'Description',
-      accessor: 'description',
+      Header: "Description",
+      accessor: "description",
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Product availability',
-      accessor: 'active_status',
+      Header: "Product availability",
+      accessor: "active_status",
       Filter: DropdownFilter,
       Cell: ({ cell }) =>
         cell.row.values.active_status ? (
@@ -316,16 +316,16 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
   ];
 
   const unitsOfMeasurementOptions = [
-    { value: 'pieces', label: 'Pieces' },
-    { value: 'kilograms', label: 'Kilograms' },
-    { value: 'bags', label: 'Bags' },
-    { value: 'boxes', label: 'Boxes' },
-    { value: 'pallets', label: 'Pallets' },
+    { value: "pieces", label: "Pieces" },
+    { value: "kilograms", label: "Kilograms" },
+    { value: "bags", label: "Bags" },
+    { value: "boxes", label: "Boxes" },
+    { value: "pallets", label: "Pallets" },
   ];
   const typeOfMixOptions = [
-    { value: 0, label: 'Dry mix' },
-    { value: 1, label: 'Plaster' },
-    { value: 2, label: 'Glue' },
+    { value: 0, label: "Dry mix" },
+    { value: 1, label: "Plaster" },
+    { value: 2, label: "Glue" },
   ];
 
   const placeOfProductionOptions = getData().map(({ code, name }) => ({
@@ -419,5 +419,6 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
 
 export default ProductsTypeJournalContextProvider;
 
-const useProductsTypeJournalContext = () => useContext(ProductsTypeJournalContext);
+const useProductsTypeJournalContext = () =>
+  useContext(ProductsTypeJournalContext);
 export { useProductsTypeJournalContext };

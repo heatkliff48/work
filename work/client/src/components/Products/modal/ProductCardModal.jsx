@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import Select from 'react-select';
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import Select from "react-select";
 import {
   Button,
   Card,
@@ -11,19 +11,19 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-} from 'reactstrap';
-import FilesMain from '#components/FileUpload/Product/FilesMain.jsx';
-import { useProjectContext } from '#components/contexts/Context.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useStatisticContext } from '#components/contexts/StatisticContext.js';
-import ModalWindow from './ModalWindow';
-import BarcodeGenerator from './BarcodeGenerator';
-import ToggleButton from 'react-bootstrap/ToggleButton';
-import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
+} from "reactstrap";
+import FilesMain from "#components/FileUpload/Product/FilesMain.jsx";
+import { useProjectContext } from "#components/contexts/Context.js";
+import { useModalContext } from "#components/contexts/ModalContext.js";
+import { useProductsContext } from "#components/contexts/ProductContext.js";
+import { useUsersContext } from "#components/contexts/UserContext.js";
+import { useOrderContext } from "#components/contexts/OrderContext.js";
+import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
+import { useStatisticContext } from "#components/contexts/StatisticContext.js";
+import ModalWindow from "./ModalWindow";
+import BarcodeGenerator from "./BarcodeGenerator";
+import ToggleButton from "react-bootstrap/ToggleButton";
+import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
 
 const ProductCardModal = React.memo(() => {
   const { userAccess } = useUsersContext();
@@ -51,7 +51,9 @@ const ProductCardModal = React.memo(() => {
   } = useModalContext();
 
   const productionBatchLog = useSelector((state) => state.productionBatchLog);
-  const qualityManagementData = useSelector((state) => state.qualityManagementData);
+  const qualityManagementData = useSelector(
+    (state) => state.qualityManagementData
+  );
 
   const [lastVersion, setLastVersion] = useState(1);
   const [repairButton, setRepairButton] = useState(true);
@@ -73,43 +75,49 @@ const ProductCardModal = React.memo(() => {
       palletSize,
     } = prod;
 
-    let versionNumber = '0001';
+    let versionNumber = "0001";
     versionNumber = `000${version}`.slice(-4);
 
     const rightPlaceOfProduction = getOptionValue(
-      'placeOfProduction',
+      "placeOfProduction",
       placeOfProduction
     );
-    const rightTypeOfPackaging = getOptionValue('typeOfPackaging', typeOfPackaging);
+    const rightTypeOfPackaging = getOptionValue(
+      "typeOfPackaging",
+      typeOfPackaging
+    );
 
-    const rightPalletSize = getOptionValue('palletSize', palletSize);
+    const rightPalletSize = getOptionValue("palletSize", palletSize);
     const combinationMap = {
-      '0-0-0': 'A',
-      '0-0-1': 'B',
-      '0-0-2': 'C',
-      '0-1-0': 'D',
-      '0-1-1': 'E',
-      '0-1-2': 'F',
-      '1-0-0': 'G',
-      '1-0-1': 'H',
-      '1-0-2': 'I',
-      '1-1-0': 'J',
-      '1-1-1': 'K',
-      '1-1-2': 'L',
+      "0-0-0": "A",
+      "0-0-1": "B",
+      "0-0-2": "C",
+      "0-1-0": "D",
+      "0-1-1": "E",
+      "0-1-2": "F",
+      "1-0-0": "G",
+      "1-0-1": "H",
+      "1-0-2": "I",
+      "1-1-0": "J",
+      "1-1-1": "K",
+      "1-1-2": "L",
     };
 
     const combinationKey = `${rightPlaceOfProduction}-${rightTypeOfPackaging}-${rightPalletSize}`;
     const combinationLetter = combinationMap[combinationKey];
 
     if (!combinationLetter) {
-      console.warn('Unknown combination for prodArticle:', combinationKey);
+      console.warn("Unknown combination for prodArticle:", combinationKey);
     }
 
     const prodArticle = `T.${form
       ?.toUpperCase()
-      .slice(0, 1)}${combinationLetter}D${density.toString().slice(0, 2)}W${width
+      .slice(0, 1)}${combinationLetter}D${density
       .toString()
-      .slice(0, 2)}${certificate?.substr(0, 1)}${versionNumber}`;
+      .slice(0, 2)}W${width.toString().slice(0, 2)}${certificate?.substr(
+      0,
+      1
+    )}${versionNumber}`;
 
     return prodArticle;
   };
@@ -214,7 +222,7 @@ const ProductCardModal = React.memo(() => {
   useEffect(() => {
     const searchArticle = productCardData.article
       ? productCardData.article.slice(0, productCardData.article.length)
-      : '';
+      : "";
     const prodArrVers = products?.reduce((acc, el) => {
       const { article, version } = el;
       if (article === searchArticle)
@@ -250,7 +258,11 @@ const ProductCardModal = React.memo(() => {
               {productCardData?.description && (
                 <div
                   className="product_description"
-                  style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#555' }}
+                  style={{
+                    fontSize: "0.9rem",
+                    marginTop: "0.3rem",
+                    color: "#555",
+                  }}
                 >
                   {productCardData.description}
                 </div>
@@ -263,7 +275,7 @@ const ProductCardModal = React.memo(() => {
                 <Select
                   onChange={handleSelectChange}
                   options={productByVersion}
-                  defaultValue={getSelectedOption('version')}
+                  defaultValue={getSelectedOption("version")}
                 />
               </div>
             </div>
@@ -273,31 +285,31 @@ const ProductCardModal = React.memo(() => {
           <div className="item_content">
             {COLUMNS.map((el) => {
               if (
-                el.accessor === 'id' ||
-                el.accessor === 'article' ||
-                el.accessor === 'version'
+                el.accessor === "id" ||
+                el.accessor === "article" ||
+                el.accessor === "version"
               )
                 return null;
-              if (el.accessor !== 'productCode')
+              if (el.accessor !== "productCode")
                 return (
                   <Card
                     className="my-2"
                     color="secondary"
                     outline
                     style={{
-                      width: '8rem',
+                      width: "8rem",
                     }}
                   >
                     <CardHeader>{el.Header}</CardHeader>
                     <CardBody>
                       <CardText>
-                        {['article', 'id', 'version'].includes(el.accessor)
+                        {["article", "id", "version"].includes(el.accessor)
                           ? null
-                          : el.accessor === 'activeStatus'
+                          : el.accessor === "activeStatus"
                           ? productCardData?.[el.accessor]
-                            ? 'Available'
-                            : 'Not available'
-                          : productCardData?.[el.accessor] || ''}
+                            ? "Available"
+                            : "Not available"
+                          : productCardData?.[el.accessor] || ""}
                       </CardText>
                     </CardBody>
                   </Card>
@@ -312,7 +324,7 @@ const ProductCardModal = React.memo(() => {
                       onChange={handleChange}
                     >
                       <ToggleButton id="tbg-radio-1" value={1}>
-                        Block barcode
+                        Unit barcode
                       </ToggleButton>
                       <ToggleButton id="tbg-radio-2" value={2}>
                         Pallet barcode
@@ -338,7 +350,7 @@ const ProductCardModal = React.memo(() => {
               <div className="product_card_btn">
                 <Button
                   color="success"
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                   onClick={() => {
                     setIsRepair(false);
                     setIsEdit(true);
@@ -348,7 +360,7 @@ const ProductCardModal = React.memo(() => {
                   Edit
                 </Button>
                 <Button
-                  style={{ width: '100%' }}
+                  style={{ width: "100%" }}
                   color="success"
                   onClick={() => {
                     setIsRepair(true);
