@@ -1,0 +1,93 @@
+/* ======  БАЗОВЫЕ ПЕРЕМЕННЫЕ (если нужно) ====== */
+:root {
+  --color-header-bg-first: #fff59d;
+  --color-header-bg-second: #fff59d;
+  --color-header-bg-log: #def7e0;
+  --color-header-bg-sub: #ffe082;
+  --color-header-bg-log-sub: #c8e6c9;
+  --color-hover: #e3f2fd; /* очень светло-голубой */
+  --color-stripe: #f5f5f5; /* светло-серый для чётных строк */
+}
+/* ======  ОБЁРТКА ТАБЛИЦЫ (опц.) ====== */
+.waste-table-wrapper {
+  max-height: 70vh; /* при необходимости скролла */
+  overflow: auto;
+}
+/* ======  САМА ТАБЛИЦА ====== */
+.table-waste {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  background: transparent;
+}
+/* ------  HEADER  ------ */
+.table-waste thead tr:first-child th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.table-waste th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: #212529;
+}
+.th-raw-first {
+  background: var(--color-header-bg-first);
+}
+.th-mod-recipe {
+  background: var(--color-header-bg-second);
+}
+.th-total {
+  background: var(--color-header-bg-second);
+}
+.th-from-log {
+  background: var(--color-header-bg-log);
+}
+.th-manual {
+  background: var(--color-header-bg-second);
+}
+/* вторая строка заголовков */
+.th-raw-second {
+  background: var(--color-header-bg-sub);
+}
+.th-mod-recipe-sub {
+  background: var(--color-header-bg-sub);
+}
+.th-total-sub {
+  background: var(--color-header-bg-sub);
+}
+.th-from-log-sub {
+  background: var(--color-header-bg-log-sub);
+}
+.th-wasted-sub {
+  background: var(--color-header-bg-sub);
+}
+/* ------  BODY  ------ */
+.table-waste tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* нечётные – белые */
+}
+.table-waste tbody tr:nth-child(even) {
+  background-color: var(--color-stripe); /* чётные – серые */
+}
+.table-waste tbody tr:hover {
+  background-color: var(--color-hover);
+}
+.table-waste td {
+  padding: 0.5rem 1rem;
+  vertical-align: middle;
+}
+/* ------  ПОЛЯ ВВОДА  ------ */
+.table-waste .form-control {
+  max-width: 160px;
+}
+.table-waste td input[disabled] {
+  background-color: #fafafa;
+  color: #777;
+  cursor: not-allowed;
+}
+/* ------ МЕЛКИЙ ТЕКСТ «base: …» ------ */
+.text-muted-small {
+  font-size: 12px;
+  color: #6c757d;
+}

@@ -95,6 +95,14 @@ module.exports = {
           createdAt: currentDate,
           updatedAt: currentDate,
         },
+        {
+          material_type: "Return slurry (dry)",
+          remaining_quantity: 0,
+          consumed_quantity: 0,
+          last_updated: formatDate(currentDate),
+          createdAt: currentDate,
+          updatedAt: currentDate,
+        },
       ],
       {}
     );

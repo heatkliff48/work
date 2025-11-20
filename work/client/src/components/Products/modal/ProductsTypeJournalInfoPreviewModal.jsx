@@ -1,17 +1,17 @@
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useState } from 'react';
-import 'react-international-phone/style.css';
-import Select from 'react-select';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { useDispatch, useSelector } from 'react-redux';
-import './styles.css';
-import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
-import BarcodeGenerator from './BarcodeGenerator';
-import ToggleButton from 'react-bootstrap/ToggleButton';
-import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import React, { useCallback, useEffect, useState } from "react";
+import "react-international-phone/style.css";
+import Select from "react-select";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { useDispatch, useSelector } from "react-redux";
+import "./styles.css";
+import { useProductsTypeJournalContext } from "#components/contexts/ProductsTypeJournalContext.js";
+import BarcodeGenerator from "./BarcodeGenerator";
+import ToggleButton from "react-bootstrap/ToggleButton";
+import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
 import {
   addNewAnchor,
   addNewDryMixesJournal,
@@ -21,8 +21,8 @@ import {
   updateDryMixesJournal,
   updateRelatedMaterialsJournal,
   updateTool,
-} from '#components/redux/actions/productsTypeJournalAction.js';
-import { updateProductCode } from '#components/redux/actions/productsTypeJournalAction.js';
+} from "#components/redux/actions/productsTypeJournalAction.js";
+import { updateProductCode } from "#components/redux/actions/productsTypeJournalAction.js";
 
 function ProductsTypeJournalInfoPreviewModal(props) {
   const {
@@ -59,7 +59,8 @@ function ProductsTypeJournalInfoPreviewModal(props) {
   const [currentVersion, setCurrentVersion] = useState(
     productsTypeJournalPreviewInput?.version
   );
-  const [selectedBarcodePreviewValue, setSelectedBarcodePreviewValue] = useState(1);
+  const [selectedBarcodePreviewValue, setSelectedBarcodePreviewValue] =
+    useState(1);
   // const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   // const user = useSelector((state) => state.user);
@@ -71,7 +72,9 @@ function ProductsTypeJournalInfoPreviewModal(props) {
   function hasMatchingObject(array, newObj, excludedAttrs) {
     return array.findLast((item) => {
       // Получаем все ключи нового объекта, исключая указанные атрибуты
-      const keys = Object.keys(newObj).filter((key) => !excludedAttrs.includes(key));
+      const keys = Object.keys(newObj).filter(
+        (key) => !excludedAttrs.includes(key)
+      );
       // Проверяем, что все соответствующие значения совпадают
       return keys.every((key) => {
         // Проверяем, что ключ существует в объекте из массива
@@ -99,16 +102,16 @@ function ProductsTypeJournalInfoPreviewModal(props) {
           dryMixesJournal,
           productsTypeJournalPreviewInput,
           [
-            'id',
-            'price_per_unit',
-            'price_per_kilogram',
-            'description',
-            'article',
-            'product_code',
-            'active_status',
-            'version',
-            'createdAt',
-            'updatedAt',
+            "id",
+            "price_per_unit",
+            "price_per_kilogram",
+            "description",
+            "article",
+            "product_code",
+            "active_status",
+            "version",
+            "createdAt",
+            "updatedAt",
           ]
         );
 
@@ -168,15 +171,15 @@ function ProductsTypeJournalInfoPreviewModal(props) {
           relatedMaterialsJournal,
           productsTypeJournalPreviewInput,
           [
-            'id',
-            'price_per_unit',
-            'description',
-            'article',
-            'product_code',
-            'active_status',
-            'version',
-            'createdAt',
-            'updatedAt',
+            "id",
+            "price_per_unit",
+            "description",
+            "article",
+            "product_code",
+            "active_status",
+            "version",
+            "createdAt",
+            "updatedAt",
           ]
         );
 
@@ -238,15 +241,15 @@ function ProductsTypeJournalInfoPreviewModal(props) {
           anchor,
           productsTypeJournalPreviewInput,
           [
-            'id',
-            'price_per_unit',
-            'description',
-            'article',
-            'product_code',
-            'active_status',
-            'version',
-            'createdAt',
-            'updatedAt',
+            "id",
+            "price_per_unit",
+            "description",
+            "article",
+            "product_code",
+            "active_status",
+            "version",
+            "createdAt",
+            "updatedAt",
           ]
         );
 
@@ -304,15 +307,15 @@ function ProductsTypeJournalInfoPreviewModal(props) {
           tool,
           productsTypeJournalPreviewInput,
           [
-            'id',
-            'price_per_unit',
-            'description',
-            'article',
-            'product_code',
-            'active_status',
-            'version',
-            'createdAt',
-            'updatedAt',
+            "id",
+            "price_per_unit",
+            "description",
+            "article",
+            "product_code",
+            "active_status",
+            "version",
+            "createdAt",
+            "updatedAt",
           ]
         );
 
@@ -406,14 +409,14 @@ function ProductsTypeJournalInfoPreviewModal(props) {
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">
-            Confirm{' '}
+            Confirm{" "}
             {props.addNewVersion
               ? `Edit`
               : props.repair
               ? `Repair`
               : props.duplicate
               ? `Duplicate`
-              : `Add ${props.title}`}{' '}
+              : `Add ${props.title}`}{" "}
             Page
           </Modal.Title>
         </Modal.Header>
@@ -432,19 +435,19 @@ function ProductsTypeJournalInfoPreviewModal(props) {
                     dataTable.map((el) => (
                       <Row>
                         <h3>
-                          {el.Header}:{' '}
-                          {el.accessor === 'active_status'
+                          {el.Header}:{" "}
+                          {el.accessor === "active_status"
                             ? productsTypeJournalPreviewInput?.[el.accessor]
-                              ? 'Available'
-                              : 'Not available'
-                            : el.accessor === 'type_of_mix'
+                              ? "Available"
+                              : "Not available"
+                            : el.accessor === "type_of_mix"
                             ? typeOfMixOptions.find(
                                 (type) =>
                                   type.value ==
                                   productsTypeJournalPreviewInput?.type_of_mix
-                              )?.label || ''
+                              )?.label || ""
                             : productsTypeJournalPreviewInput[el.accessor] ??
-                              'Empty'}
+                              "Empty"}
                         </h3>
                       </Row>
                     ))}
@@ -452,7 +455,8 @@ function ProductsTypeJournalInfoPreviewModal(props) {
                 <Col xs={6} md={4}>
                   <div>
                     <h5>
-                      Current version: {productsTypeJournalPreviewInput?.version}
+                      Current version:{" "}
+                      {productsTypeJournalPreviewInput?.version}
                     </h5>
                   </div>
                   <ToggleButtonGroup
@@ -462,7 +466,7 @@ function ProductsTypeJournalInfoPreviewModal(props) {
                     onChange={handleChange}
                   >
                     <ToggleButton id="tbg-radio-preview-1" value={1}>
-                      Block barcode
+                      Unit barcode
                     </ToggleButton>
                     <ToggleButton id="tbg-radio-preview-2" value={2}>
                       Box barcode
@@ -494,7 +498,7 @@ function ProductsTypeJournalInfoPreviewModal(props) {
         </Modal.Body>
         <Modal.Footer>
           <Button form="AuxProdPreviewInfoModal" type="submit">
-            Confirm{' '}
+            Confirm{" "}
             {props.addNewVersion
               ? `Edit`
               : props.repair

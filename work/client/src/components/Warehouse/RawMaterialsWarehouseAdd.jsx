@@ -38,7 +38,7 @@ function RawMaterialsWarehouseAdd(props) {
       Filter: TextSearchFilter,
     },
     {
-      Header: "Quantity, kg",
+      Header: "Quantity, t",
       accessor: "quantity",
       Filter: TextSearchFilter,
     },
@@ -50,9 +50,13 @@ function RawMaterialsWarehouseAdd(props) {
   ];
 
   const handleRawMaterialWarehouseInputChange = useCallback((e) => {
+    let processedValue = e.target.value;
+    if (typeof e.target.value === "string") {
+      processedValue = e.target.value.replace(/(\d+),(\d*)/g, "$1.$2");
+    }
     setRawMaterialWarehouseInput((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e.target.name]: processedValue,
     }));
 
     setErrors((prev) => ({
@@ -181,13 +185,13 @@ function RawMaterialsWarehouseAdd(props) {
       props?.material_type === "Cement"
         ? {
             supplier: rawMaterialWarehouseInput?.supplier,
-            quantity: rawMaterialWarehouseInput?.quantity,
+            quantity: rawMaterialWarehouseInput?.quantity * 1000,
             date: rawMaterialWarehouseInput?.date,
             type_of_cement: rawMaterialWarehouseInput?.cementType,
           }
         : {
             supplier: rawMaterialWarehouseInput?.supplier,
-            quantity: rawMaterialWarehouseInput?.quantity,
+            quantity: rawMaterialWarehouseInput?.quantity * 1000,
             date: rawMaterialWarehouseInput?.date,
           };
 

@@ -1,14 +1,14 @@
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useState, useRef } from 'react';
-import 'react-international-phone/style.css';
-import Select from 'react-select';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import { useSelector } from 'react-redux';
-import './styles.css';
-import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
-import ProductsTypeJournalInfoPreviewModal from './ProductsTypeJournalInfoPreviewModal';
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import React, { useCallback, useEffect, useState, useRef } from "react";
+import "react-international-phone/style.css";
+import Select from "react-select";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import { useSelector } from "react-redux";
+import "./styles.css";
+import { useProductsTypeJournalContext } from "#components/contexts/ProductsTypeJournalContext.js";
+import ProductsTypeJournalInfoPreviewModal from "./ProductsTypeJournalInfoPreviewModal";
 
 function ProductsTypeJournalModal(props) {
   const {
@@ -31,34 +31,34 @@ function ProductsTypeJournalModal(props) {
   const product_code = useSelector((state) => state.productCode);
 
   const requiredFieldsDryMix = [
-    'name',
-    'place_of_production',
-    'price_per_unit',
-    'bag_weight',
-    'units_per_pallet',
+    "name",
+    "place_of_production",
+    "price_per_unit",
+    "bag_weight",
+    "units_per_pallet",
   ];
 
   const requiredFieldsRelatedMaterial = [
-    'name',
-    'place_of_production',
-    'price_per_unit',
+    "name",
+    "place_of_production",
+    "price_per_unit",
   ];
 
   const requiredFieldsAnchors = [
-    'name',
-    'place_of_production',
-    'price_per_unit',
-    'boxes_on_a_pallet',
-    'box_weight',
-    'pieces_per_unit',
+    "name",
+    "place_of_production",
+    "price_per_unit",
+    "boxes_on_a_pallet",
+    "box_weight",
+    "pieces_per_unit",
   ];
 
   const requiredFieldsTools = [
-    'name',
-    'place_of_production',
-    'price_per_unit',
-    'piece_weight',
-    'pallet_weight',
+    "name",
+    "place_of_production",
+    "price_per_unit",
+    "piece_weight",
+    "pallet_weight",
   ];
 
   const handleProductsTypeJournalInputChange = useCallback((e) => {
@@ -100,7 +100,7 @@ function ProductsTypeJournalModal(props) {
     const { bag_weight, units_per_pallet, units_of_measurement } =
       productsTypeJournalInput;
     if (bag_weight && units_per_pallet && units_of_measurement) {
-      const constante = units_of_measurement == 'pallets' ? 20 : 0;
+      const constante = units_of_measurement == "pallets" ? 20 : 0;
       const palletWeight =
         parseFloat(bag_weight) * parseFloat(units_per_pallet) + constante;
       setProductsTypeJournalInput((prev) => ({
@@ -118,7 +118,7 @@ function ProductsTypeJournalModal(props) {
     const { piece_weight, units_per_pallet, units_of_measurement } =
       productsTypeJournalInput;
     if (piece_weight && units_per_pallet && units_of_measurement) {
-      const constante = units_of_measurement == 'pallets' ? 20 : 0;
+      const constante = units_of_measurement == "pallets" ? 20 : 0;
       const palletWeight =
         parseFloat(piece_weight) * parseFloat(units_per_pallet) + constante;
       setProductsTypeJournalInput((prev) => ({
@@ -141,7 +141,10 @@ function ProductsTypeJournalModal(props) {
         price_per_kilogram: pricePerKilo,
       }));
     }
-  }, [productsTypeJournalInput.price_per_unit, productsTypeJournalInput.bag_weight]);
+  }, [
+    productsTypeJournalInput.price_per_unit,
+    productsTypeJournalInput.bag_weight,
+  ]);
 
   useEffect(() => {
     const { unit_x_base, altura_x_palet } = productsTypeJournalInput;
@@ -212,17 +215,17 @@ function ProductsTypeJournalModal(props) {
     const placeOfProductionOption = options.find(
       (option) => option.value === productsTypeJournalInput?.[accessor]
     );
-    return placeOfProductionOption || options.find((opt) => opt.value === 'ES'); // 'ES' — код Испании
+    return placeOfProductionOption || options.find((opt) => opt.value === "ES"); // 'ES' — код Испании
   };
 
   useEffect(() => {
     const defaultCountry = placeOfProductionOptions.find(
-      (opt) => opt.value === 'ES'
+      (opt) => opt.value === "ES"
     );
     if (props.addNewVersion || props.repair) {
       setProductsTypeJournalInput({ ...selectedProductsType });
     } else if (props.duplicate) {
-      let code = '0001';
+      let code = "0001";
       const articleId =
         props.target == 1
           ? latestDryMix.length === 0
@@ -251,61 +254,67 @@ function ProductsTypeJournalModal(props) {
           : `3`) + `0000${articleId}`.slice(-4);
 
       const productCode = calculateEAN13Checksum(
-        '84' +
-          '36626' +
-          '34' +
-          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-            -3
-          )
+        "84" +
+          "36626" +
+          "34" +
+          (
+            "00" +
+            ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+          ).slice(-3)
       );
       // const articleId = products.length === 0 ? 1 : products.length + 1;
       const fullPorductCode =
-        '84' +
-        '36626' +
-        '34' +
-        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-          -3
-        ) +
+        "84" +
+        "36626" +
+        "34" +
+        (
+          "00" +
+          ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+        ).slice(-3) +
         productCode;
 
       const boxProductCode = calculateEAN14Checksum(
-        '1' +
-          '84' +
-          '36626' +
-          '34' +
-          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-            -3
-          )
+        "2" +
+          "84" +
+          "36626" +
+          "34" +
+          (
+            "00" +
+            ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+          ).slice(-3)
       );
 
       const fullBoxProductCode =
-        '1' +
-        '84' +
-        '36626' +
-        '34' +
-        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-          -3
-        ) +
+        "2" +
+        "84" +
+        "36626" +
+        "34" +
+        (
+          "00" +
+          ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+        ).slice(-3) +
         boxProductCode;
 
       const palletProductCode = calculateEAN14Checksum(
-        '2' +
-          '84' +
-          '36626' +
-          '34' +
-          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-            -3
-          )
+        "1" +
+          "84" +
+          "36626" +
+          "34" +
+          (
+            "00" +
+            ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+          ).slice(-3)
       );
 
       const fullPalletProductCode =
-        '2' +
-        '84' +
-        '36626' +
-        '34' +
-        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-          -3
-        ) +
+        "1" +
+        "84" +
+        "36626" +
+        "34" +
+        (
+          "00" +
+          ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+        ).slice(-3) +
         palletProductCode;
 
       setProductsTypeJournalInput({
@@ -326,64 +335,70 @@ function ProductsTypeJournalModal(props) {
       });
     } else {
       const productCode = calculateEAN13Checksum(
-        '84' +
-          '36626' +
-          '34' +
-          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-            -3
-          )
+        "84" +
+          "36626" +
+          "34" +
+          (
+            "00" +
+            ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+          ).slice(-3)
       );
       // const articleId = products.length === 0 ? 1 : products.length + 1;
       const fullPorductCode =
-        '84' +
-        '36626' +
-        '34' +
-        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-          -3
-        ) +
+        "84" +
+        "36626" +
+        "34" +
+        (
+          "00" +
+          ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+        ).slice(-3) +
         productCode;
 
       const boxProductCode = calculateEAN14Checksum(
-        '1' +
-          '84' +
-          '36626' +
-          '34' +
-          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-            -3
-          )
+        "2" +
+          "84" +
+          "36626" +
+          "34" +
+          (
+            "00" +
+            ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+          ).slice(-3)
       );
 
       const fullBoxProductCode =
-        '1' +
-        '84' +
-        '36626' +
-        '34' +
-        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-          -3
-        ) +
+        "2" +
+        "84" +
+        "36626" +
+        "34" +
+        (
+          "00" +
+          ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+        ).slice(-3) +
         boxProductCode;
 
       const palletProductCode = calculateEAN14Checksum(
-        '2' +
-          '84' +
-          '36626' +
-          '34' +
-          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-            -3
-          )
+        "1" +
+          "84" +
+          "36626" +
+          "34" +
+          (
+            "00" +
+            ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+          ).slice(-3)
       );
 
       const fullPalletProductCode =
-        '2' +
-        '84' +
-        '36626' +
-        '34' +
-        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
-          -3
-        ) +
+        "1" +
+        "84" +
+        "36626" +
+        "34" +
+        (
+          "00" +
+          ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
+        ).slice(-3) +
         palletProductCode;
 
-      let code = '0001';
+      let code = "0001";
       const articleId =
         props.target == 1
           ? latestDryMix.length === 0
@@ -444,7 +459,7 @@ function ProductsTypeJournalModal(props) {
       requiredFieldsDryMix.forEach((field) => {
         const value = productsTypeJournalInput[field];
         if (!value) {
-          newErrors[field] = 'This field cannot be empty';
+          newErrors[field] = "This field cannot be empty";
         }
       });
 
@@ -457,7 +472,7 @@ function ProductsTypeJournalModal(props) {
       requiredFieldsRelatedMaterial.forEach((field) => {
         const value = productsTypeJournalInput[field];
         if (!value) {
-          newErrors[field] = 'This field cannot be empty';
+          newErrors[field] = "This field cannot be empty";
         }
       });
 
@@ -470,7 +485,7 @@ function ProductsTypeJournalModal(props) {
       requiredFieldsAnchors.forEach((field) => {
         const value = productsTypeJournalInput[field];
         if (!value) {
-          newErrors[field] = 'This field cannot be empty';
+          newErrors[field] = "This field cannot be empty";
         }
       });
 
@@ -483,7 +498,7 @@ function ProductsTypeJournalModal(props) {
       requiredFieldsTools.forEach((field) => {
         const value = productsTypeJournalInput[field];
         if (!value) {
-          newErrors[field] = 'This field cannot be empty';
+          newErrors[field] = "This field cannot be empty";
         }
       });
 
@@ -505,26 +520,29 @@ function ProductsTypeJournalModal(props) {
     if (props?.addNewVersion) {
       return props.target == 1
         ? [
-            'name',
-            'manufacturer_name',
-            'units_per_pallet',
-            'bag_weight',
-            'pallet_weight',
+            "name",
+            "manufacturer_name",
+            "units_per_pallet",
+            "bag_weight",
+            "pallet_weight",
           ].includes(fieldName)
         : props.target == 2
-        ? ['name', 'manufacturer_name'].includes(fieldName)
+        ? ["name", "manufacturer_name"].includes(fieldName)
         : props.target == 3
         ? [
-            'name',
-            'manufacturer_name',
-            'pieces_per_unit',
-            'boxes_on_a_pallet',
-            'box_weight',
-            'pallet_weight',
+            "name",
+            "manufacturer_name",
+            "pieces_per_unit",
+            "boxes_on_a_pallet",
+            "box_weight",
+            "pallet_weight",
           ].includes(fieldName)
-        : ['name', 'manufacturer_name', 'piece_weight', 'pallet_weight'].includes(
-            fieldName
-          );
+        : [
+            "name",
+            "manufacturer_name",
+            "piece_weight",
+            "pallet_weight",
+          ].includes(fieldName);
     }
     return false;
   };
@@ -571,73 +589,90 @@ function ProductsTypeJournalModal(props) {
                         className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
                         for="version"
                       >
-                        {el.Header === 'Product availability' ? null : el.Header}
+                        {el.Header === "Product availability"
+                          ? null
+                          : el.Header}
                       </label>
                     </div>
                     <div className="md:w-2/3">
-                      {el.accessor === 'units_of_measurement' ? (
+                      {el.accessor === "units_of_measurement" ? (
                         <Select
                           isDisabled={props?.addNewVersion || false}
                           defaultValue={getSelectedUnitsOfMeasurementOption(
                             el.accessor
                           )}
                           onChange={(v) => {
-                            handleProductsTypeJournalSelectChange(v, el.accessor);
+                            handleProductsTypeJournalSelectChange(
+                              v,
+                              el.accessor
+                            );
                           }}
                           options={unitsOfMeasurementOptions}
                         />
-                      ) : el.accessor === 'type_of_mix' && props.target == 1 ? (
+                      ) : el.accessor === "type_of_mix" && props.target == 1 ? (
                         <Select
                           isDisabled={props?.addNewVersion || false}
                           defaultValue={getSelectedTypeOfMixOption(el.accessor)}
                           onChange={(v) => {
-                            handleProductsTypeJournalSelectChange(v, el.accessor);
+                            handleProductsTypeJournalSelectChange(
+                              v,
+                              el.accessor
+                            );
                           }}
                           options={typeOfMixOptions}
                         />
-                      ) : el.accessor === 'place_of_production' ? (
+                      ) : el.accessor === "place_of_production" ? (
                         <Select
                           isDisabled={props?.addNewVersion || false}
                           defaultValue={getSelectedPlaceOfProductionOption(
                             el.accessor
                           )}
                           onChange={(v) => {
-                            handleProductsTypeJournalSelectChange(v, el.accessor);
+                            handleProductsTypeJournalSelectChange(
+                              v,
+                              el.accessor
+                            );
                           }}
                           options={placeOfProductionOptions}
                         />
-                      ) : el.accessor === 'article' ? (
-                        <h4>{productsTypeJournalInput[el.accessor] || ''}</h4>
-                      ) : el.accessor === 'description' ? (
+                      ) : el.accessor === "article" ? (
+                        <h4>{productsTypeJournalInput[el.accessor] || ""}</h4>
+                      ) : el.accessor === "description" ? (
                         <AutoResizeTextarea
                           id={el.accessor}
                           name={el.accessor}
-                          value={productsTypeJournalInput[el.accessor] || ''}
-                          onChange={(e) => handleProductsTypeJournalInputChange(e)}
+                          value={productsTypeJournalInput[el.accessor] || ""}
+                          onChange={(e) =>
+                            handleProductsTypeJournalInputChange(e)
+                          }
                           placeholder=""
                         />
-                      ) : el.accessor === 'active_status' ? null : (
+                      ) : el.accessor === "active_status" ? null : (
                         <div>
                           <input
                             disabled={isFieldDisabled(el.accessor)}
                             className={`${
                               errors[el.accessor]
-                                ? 'border-red-500'
-                                : 'border-gray-200'
+                                ? "border-red-500"
+                                : "border-gray-200"
                             } rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500`}
                             id={el.accessor}
                             name={el.accessor}
                             type="text"
-                            value={productsTypeJournalInput[el.accessor] || ''}
-                            onChange={(e) => handleProductsTypeJournalInputChange(e)}
+                            value={productsTypeJournalInput[el.accessor] || ""}
+                            onChange={(e) =>
+                              handleProductsTypeJournalInputChange(e)
+                            }
                             style={{
-                              border: `${errors[el.accessor] ? 'solid red' : ''}`,
+                              border: `${
+                                errors[el.accessor] ? "solid red" : ""
+                              }`,
                             }}
                           />
                           {errors[el.accessor] && (
                             <p
                               className="mt-1 text-sm "
-                              style={{ color: '#ef4444' }}
+                              style={{ color: "#ef4444" }}
                             >
                               {errors[el.accessor]}
                             </p>
@@ -703,7 +738,7 @@ const AutoResizeTextarea = ({ value, onChange, ...props }) => {
 
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'; // Сброс высоты
+      textareaRef.current.style.height = "auto"; // Сброс высоты
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Установка новой
     }
   }, [value]);
@@ -714,11 +749,11 @@ const AutoResizeTextarea = ({ value, onChange, ...props }) => {
       value={value}
       onChange={onChange}
       style={{
-        width: '100%',
-        boxSizing: 'border-box',
-        padding: '10px',
-        overflow: 'hidden', // Скрываем scroll при авто-расширении
-        resize: 'none', // Отключаем ручное изменение размера
+        width: "100%",
+        boxSizing: "border-box",
+        padding: "10px",
+        overflow: "hidden", // Скрываем scroll при авто-расширении
+        resize: "none", // Отключаем ручное изменение размера
       }}
       {...props}
     />

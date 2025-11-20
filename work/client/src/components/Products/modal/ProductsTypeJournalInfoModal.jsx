@@ -1,31 +1,32 @@
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useState } from 'react';
-import 'react-international-phone/style.css';
-import Select from 'react-select';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { useDispatch, useSelector } from 'react-redux';
-import './styles.css';
-import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
-import BarcodeGenerator from './BarcodeGenerator';
-import ToggleButton from 'react-bootstrap/ToggleButton';
-import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import React, { useCallback, useEffect, useState } from "react";
+import "react-international-phone/style.css";
+import Select from "react-select";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { useDispatch, useSelector } from "react-redux";
+import "./styles.css";
+import { useProductsTypeJournalContext } from "#components/contexts/ProductsTypeJournalContext.js";
+import BarcodeGenerator from "./BarcodeGenerator";
+import ToggleButton from "react-bootstrap/ToggleButton";
+import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
 import {
   updateAnchor,
   updateDryMixesJournal,
   updateRelatedMaterialsJournal,
   updateTool,
-} from '#components/redux/actions/productsTypeJournalAction.js';
-import ShowProductsTypeJournalModal from './ProductsTypeJournalModal';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import { useNavigate } from 'react-router-dom';
+} from "#components/redux/actions/productsTypeJournalAction.js";
+import ShowProductsTypeJournalModal from "./ProductsTypeJournalModal";
+import { useOrderContext } from "#components/contexts/OrderContext.js";
+import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
+import { useUsersContext } from "#components/contexts/UserContext.js";
+import { useNavigate } from "react-router-dom";
 
 function ProductsTypeJournalInfoModal(props) {
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
   const {
     COLUMNS_DRY_MIXED_PRODUCT,
     COLUMNS_ANCHOR_PRODUCT,
@@ -53,7 +54,9 @@ function ProductsTypeJournalInfoModal(props) {
       : state.tool
   );
   const user = useSelector((state) => state.user);
-  const [isChecked, setIsChecked] = useState(selectedProductsType?.active_status);
+  const [isChecked, setIsChecked] = useState(
+    selectedProductsType?.active_status
+  );
   const [lastVersion, setLastVersion] = useState(1);
   const [productByVersion, setProductByVersion] = useState();
   const [currentVersion, setCurrentVersion] = useState(
@@ -163,8 +166,11 @@ function ProductsTypeJournalInfoModal(props) {
     setIsChecked(selectedProductsType?.active_status);
 
     const searchArticle = selectedProductsType?.article
-      ? selectedProductsType?.article.slice(0, selectedProductsType?.article.length)
-      : '';
+      ? selectedProductsType?.article.slice(
+          0,
+          selectedProductsType?.article.length
+        )
+      : "";
     const prodArrVers = products?.reduce((acc, el) => {
       const { article, version } = el;
       if (article === searchArticle)
@@ -185,7 +191,7 @@ function ProductsTypeJournalInfoModal(props) {
   }, [selectedProductsType, products]);
 
   useEffect(() => {
-    setCurrentVersion(getSelectedOption('version'));
+    setCurrentVersion(getSelectedOption("version"));
   }, [props.show, productByVersion]);
 
   const onSubmitForm = async (e) => {
@@ -207,13 +213,13 @@ function ProductsTypeJournalInfoModal(props) {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Products');
+      const access = checkUserAccess(user, roles, "Products");
       setUserAccess(access);
 
-      console.log('access', access);
+      console.log("access", access);
 
       if (!access?.canRead) {
-        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
+        navigate("/"); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }
   }, [user, roles]);
@@ -229,7 +235,9 @@ function ProductsTypeJournalInfoModal(props) {
         dialogClassName="modal-auto-size"
       >
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">{props.title}</Modal.Title>
+          <Modal.Title id="contained-modal-title-vcenter">
+            {props.title}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Container>
@@ -246,17 +254,18 @@ function ProductsTypeJournalInfoModal(props) {
                     dataTable.map((el) => (
                       <Row>
                         <h3>
-                          {el.Header}:{' '}
-                          {el.accessor === 'active_status'
+                          {el.Header}:{" "}
+                          {el.accessor === "active_status"
                             ? selectedProductsType?.[el.accessor]
-                              ? 'Available'
-                              : 'Not available'
-                            : el.accessor === 'type_of_mix'
+                              ? "Available"
+                              : "Not available"
+                            : el.accessor === "type_of_mix"
                             ? typeOfMixOptions.find(
                                 (type) =>
-                                  type.value == selectedProductsType?.type_of_mix
-                              )?.label || ''
-                            : selectedProductsType[el.accessor] ?? 'Empty'}
+                                  type.value ==
+                                  selectedProductsType?.type_of_mix
+                              )?.label || ""
+                            : selectedProductsType[el.accessor] ?? "Empty"}
                         </h3>
                       </Row>
                     ))}
@@ -287,7 +296,7 @@ function ProductsTypeJournalInfoModal(props) {
                     onChange={handleChange}
                   >
                     <ToggleButton id="tbg-radio-1" value={1}>
-                      Block barcode
+                      Unit barcode
                     </ToggleButton>
                     <ToggleButton id="tbg-radio-2" value={2}>
                       Box barcode
@@ -326,12 +335,12 @@ function ProductsTypeJournalInfoModal(props) {
               target={props.target}
               title={
                 props.target == 1
-                  ? 'dry mix'
+                  ? "dry mix"
                   : props.target == 2
-                  ? 'related material'
+                  ? "related material"
                   : props.target == 3
-                  ? 'fastener'
-                  : 'tool'
+                  ? "fastener"
+                  : "tool"
               }
               productCode={selectedProductsType?.productCode}
               disabled={repairButton}
@@ -352,12 +361,12 @@ function ProductsTypeJournalInfoModal(props) {
               target={props.target}
               title={
                 props.target == 1
-                  ? 'dry mix'
+                  ? "dry mix"
                   : props.target == 2
-                  ? 'related material'
+                  ? "related material"
                   : props.target == 3
-                  ? 'fastener'
-                  : 'tool'
+                  ? "fastener"
+                  : "tool"
               }
               productCode={selectedProductsType?.productCode}
               addNewVersion={true}
@@ -377,12 +386,12 @@ function ProductsTypeJournalInfoModal(props) {
               target={props.target}
               title={
                 props.target == 1
-                  ? 'dry mix'
+                  ? "dry mix"
                   : props.target == 2
-                  ? 'related material'
+                  ? "related material"
                   : props.target == 3
-                  ? 'fastener'
-                  : 'tool'
+                  ? "fastener"
+                  : "tool"
               }
               productCode={selectedProductsType?.productCode}
               duplicate={true}
