@@ -35,7 +35,9 @@ function RawMaterialsPlan() {
     .filter((item) => !excludedAccessors.includes(item.accessor))
     .map((item) => {
       const warehouseMaterial = raw_materials_warehouse.find(
-        (warehouseItem) => warehouseItem.material_type === item.Header
+        (warehouseItem) =>
+          warehouseItem.material_type ===
+          item.Header.replace(/, kg$/, "").trim()
       );
 
       return {

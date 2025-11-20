@@ -221,14 +221,14 @@ function Main() {
             Batch planner New
           </button>
         )}
-        {/* {checkUserAccess(user, roles, 'autoclave_calendar')?.canRead && ( */}
-        <button
-          className="nav-button"
-          onClick={() => navigate("/autoclave_calendar")}
-        >
-          Autoclave Calendare
-        </button>
-        {/* )} */}
+        {checkUserAccess(user, roles, "production_batch_designer")?.canRead && (
+          <button
+            className="nav-button"
+            onClick={() => navigate("/autoclave_calendar")}
+          >
+            Autoclave Calendare
+          </button>
+        )}
         {checkUserAccess(user, roles, "List_of_ordered_production")
           ?.canRead && (
           <button
