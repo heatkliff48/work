@@ -20,7 +20,7 @@ import "#components/Styles/table.css";
 
 const RawMaterialsConsumptionModal = React.memo(
   ({ isOpen, toggle, selectedRow }) => {
-    const { list_of_recipes = [], main_raw_mat_consumption } =
+    const { list_of_recipes = [] } =
       useRecipeContext();
     const { latestProducts } = useProductsContext();
     const {
@@ -79,6 +79,7 @@ const RawMaterialsConsumptionModal = React.memo(
         { label: "Lime", key: "lime" },
         { label: "Cement", key: "cement" },
         { label: "Gypsum", key: "gypsum_dry" },
+        { label: "Return (dry)", key: "return_dry" },
         { label: "Gypsum stone", key: "gypsum_stone" },
         { label: "Aluminum 1", key: "aluminum_paste" },
         { label: "Aluminum 2", key: "aluminum_paste_2" },
