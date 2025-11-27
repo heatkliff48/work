@@ -20,7 +20,7 @@ import "#components/Styles/table.css";
 
 const RawMaterialsConsumptionModal = React.memo(
   ({ isOpen, toggle, selectedRow }) => {
-    const { list_of_recipes = [] } =
+    const { list_of_recipes = [], main_raw_mat_consumption } =
       useRecipeContext();
     const { latestProducts } = useProductsContext();
     const {
