@@ -1,30 +1,32 @@
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import React, { useState, useCallback, useEffect } from 'react';
-import { PhoneInput } from 'react-international-phone';
-import 'react-international-phone/style.css';
-import Select from 'react-select';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { useDispatch, useSelector } from 'react-redux';
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import React, { useState, useCallback, useEffect } from "react";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
+import Select from "react-select";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { useDispatch, useSelector } from "react-redux";
 import {
   updateClient,
   updateLegalAddress,
-} from '#components/redux/actions/clientAction';
-import './styles.css';
-import { useProjectContext } from '#components/contexts/Context.js';
+} from "#components/redux/actions/clientAction";
+import "./styles.css";
+import { useProjectContext } from "#components/contexts/Context.js";
 
 function ClientsEditModal(props) {
-  const {
-    currentClient,
-  } = useProjectContext();
+  const { currentClient, categoryOptions, priceCategoryOptions } =
+    useProjectContext();
   const legalAddress = useSelector((state) => state.legalAddress);
 
   const [clientInput, setClientInput] = useState(currentClient);
   const [c_name, setName] = useState(currentClient?.c_name);
   const [cifvat, setCIFVAT] = useState(currentClient?.cif_vat);
   const [category, setCategory] = useState(currentClient?.category);
+  const [priceCategory, setPriceCategory] = useState(
+    currentClient?.price_category
+  );
   const [street, setStreet] = useState(legalAddress?.street);
   const [additional_info, setAddInfo] = useState(legalAddress?.additional_info);
   const [city, setCity] = useState(legalAddress?.city);
@@ -36,19 +38,6 @@ function ClientsEditModal(props) {
   const [phone_mobile, setPhoneMobile] = useState(legalAddress?.phone_mobile);
   const [web_link, setWebLink] = useState(legalAddress?.web_link);
   const [c_email, setEmail] = useState(legalAddress?.email);
-
-  const categoryOptions = [
-    { value: 'constructor_de_gobieno', label: 'Constructor de gobieno' },
-    { value: 'promotor', label: 'Promotor' },
-    { value: 'constructor', label: 'Constructor' },
-    { value: 'arquitecto', label: 'Arquitecto' },
-    { value: 'distributor_con_almacen', label: 'Distributor con almacen' },
-    { value: 'distributor_sin_almacen', label: 'Distributor sin almacen' },
-    { value: 'tienda_de_la_construccion', label: 'Tienda de la construccion' },
-    { value: 'equipos_de_construccion', label: 'Equipos de construccion' },
-    { value: 'agente', label: 'Agente' },
-    { value: 'cliente_privado', label: 'Cliente privado' },
-  ];
 
   const handleClientPhoneInput = useCallback((phone) => {
     // setClientLegalAddressInput((prev) => ({ ...prev, phone_office: phone }));
@@ -67,6 +56,13 @@ function ClientsEditModal(props) {
     setClientInput((prev) => ({ ...prev, category: selectedOption.value }));
     setCategory(selectedOption.value);
   };
+  const handlePriceCategorySelectChange = (selectedOption) => {
+    setClientInput((prev) => ({
+      ...prev,
+      price_category: selectedOption.value,
+    }));
+    setPriceCategory(selectedOption.value);
+  };
 
   const getSelectedOption = (accessor) => {
     const options = categoryOptions;
@@ -76,13 +72,24 @@ function ClientsEditModal(props) {
     return categoryOption || options[0];
   };
 
+  const getPriceCategoryOption = (accessor) => {
+    const options = priceCategoryOptions;
+    if (!options) return null;
+    const priceCategoryOption = options.find(
+      (option) => option.value === clientInput?.[accessor]
+    );
+    return priceCategoryOption || options[0];
+  };
+
   useEffect(() => {
     setClientInput((prev) => ({
       ...prev,
       category: getSelectedOption(currentClient?.category).value,
+      price_category: getPriceCategoryOption(currentClient?.price_category)
+        .value,
     }));
     setCategory(clientInput.category);
-    setPhoneOffice(legalAddress?.phone_office || '');
+    setPhoneOffice(legalAddress?.phone_office || "");
   }, [props.show]);
 
   const dispatch = useDispatch();
@@ -95,6 +102,7 @@ function ClientsEditModal(props) {
       c_name,
       cifvat,
       category,
+      price_category: priceCategory,
     };
 
     dispatch(updateClient({ client }));
@@ -125,7 +133,9 @@ function ClientsEditModal(props) {
       dialogClassName="modal-auto-size"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Edit Client</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Edit Client
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Container>
@@ -198,6 +208,39 @@ function ClientsEditModal(props) {
                         // setCategory(v.value)
                       }}
                       options={categoryOptions}
+                    />
+                    {/* <input
+                      className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                      id="category"
+                      type="text"
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                    /> */}
+                  </div>
+                </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <div className="md:flex md:items-center mb-6">
+                  <div className="md:w-1/3">
+                    <label
+                      className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                      for="discription"
+                    >
+                      Price category
+                    </label>
+                  </div>
+                  <div className="md:w-2/3">
+                    <Select
+                      defaultValue={getPriceCategoryOption(
+                        currentClient?.price_category
+                      )}
+                      onChange={(v) => {
+                        handlePriceCategorySelectChange(v);
+                        // setCategory(v.value)
+                      }}
+                      options={priceCategoryOptions}
                     />
                     {/* <input
                       className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
