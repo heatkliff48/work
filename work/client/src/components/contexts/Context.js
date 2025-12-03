@@ -67,6 +67,11 @@ const ProjectContextProvider = ({ children }) => {
       accessor: "category",
       Filter: DropdownFilter,
     },
+    {
+      Header: "Price category",
+      accessor: "price_category",
+      Filter: DropdownFilter,
+    },
   ];
 
   const clients_legal_address_table = [
@@ -199,6 +204,45 @@ const ProjectContextProvider = ({ children }) => {
     {
       Header: "Social",
       accessor: "social",
+    },
+  ];
+
+  const categoryOptions = [
+    { value: "constructor_de_gobieno", label: "Constructor de gobieno" },
+    { value: "promotor", label: "Promotor" },
+    { value: "constructor", label: "Constructor" },
+    { value: "arquitecto", label: "Arquitecto" },
+    { value: "distributor_con_almacen", label: "Distributor con almacen" },
+    { value: "distributor_sin_almacen", label: "Distributor sin almacen" },
+    { value: "tienda_de_la_construccion", label: "Tienda de la construccion" },
+    { value: "equipos_de_construccion", label: "Equipos de construccion" },
+    { value: "agente", label: "Agente" },
+    { value: "cliente_privado", label: "Cliente privado" },
+  ];
+
+  const priceCategoryOptions = [
+    {
+      value: "promotor_constructor_de_gobierno",
+      label: "Promotor/Constructor de gobierno",
+    },
+    { value: "promotor", label: "Promotor" },
+    { value: "constructor", label: "Constructor" },
+    { value: "arquitecto", label: "Arquitecto" },
+    { value: "distribuidor_con_almacen", label: "Distribuidor con almacen" },
+    { value: "distribuidor_sin_almacen", label: "Distribuidor sin almacen" },
+    { value: "tienda_de_la_construccion", label: "Tienda de la construcción" },
+    { value: "equipo_de_construction", label: "Equipo de construction" },
+    { value: "agente", label: "Agente" },
+    { value: "cliente_privado", label: "Сliente privado" },
+    { value: "constructor_pequeno", label: "Constructor pequeño" },
+    { value: "almacenista_pequeno", label: "Almacenista pequeno" },
+    {
+      value: "distribuidor_en_nuestra_lista",
+      label: "Distribuidor en nuestra lista",
+    },
+    {
+      value: "arquitecto_en_nuestra_lista",
+      label: "Arquitecto en nuestra lista",
     },
   ];
 
@@ -423,6 +467,8 @@ const ProjectContextProvider = ({ children }) => {
         clients_legal_address_table,
         clients_delivery_addresses_table,
         clients_contact_information_table,
+        categoryOptions,
+        priceCategoryOptions,
         currentClient,
         setCurrentClient,
         currentDelivery,
