@@ -1,37 +1,32 @@
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useState } from 'react';
-import { PhoneInput } from 'react-international-phone';
-import 'react-international-phone/style.css';
-import Select from 'react-select';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { useDispatch } from 'react-redux';
-import { addNewClient, addNewLegalAddress } from '../../redux/actions/clientAction';
-import './styles.css';
-import { useProjectContext } from '#components/contexts/Context.js';
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import React, { useCallback, useEffect, useState } from "react";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
+import Select from "react-select";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { useDispatch } from "react-redux";
+import {
+  addNewClient,
+  addNewLegalAddress,
+} from "../../redux/actions/clientAction";
+import "./styles.css";
+import { useProjectContext } from "#components/contexts/Context.js";
 
 function ClientsModal(props) {
-  const { clients_info_table, clients_legal_address_table } = useProjectContext();
+  const {
+    clients_info_table,
+    clients_legal_address_table,
+    categoryOptions,
+    priceCategoryOptions,
+  } = useProjectContext();
   const [clientInput, setClientInput] = useState({});
   const [clientLegalAddressInput, setClientLegalAddressInput] = useState({});
   const regexp = new RegExp(`^[0-9]*$`);
-  const isValid = (value) => value !== '' && value !== '-';
+  const isValid = (value) => value !== "" && value !== "-";
   const [valid, setValid] = useState(isValid(clientLegalAddressInput.zip_code));
-
-  const categoryOptions = [
-    { value: 'constructor_de_gobieno', label: 'Constructor de gobieno' },
-    { value: 'promotor', label: 'Promotor' },
-    { value: 'constructor', label: 'Constructor' },
-    { value: 'arquitecto', label: 'Arquitecto' },
-    { value: 'distributor_con_almacen', label: 'Distributor con almacen' },
-    { value: 'distributor_sin_almacen', label: 'Distributor sin almacen' },
-    { value: 'tienda_de_la_construccion', label: 'Tienda de la construccion' },
-    { value: 'equipos_de_construccion', label: 'Equipos de construccion' },
-    { value: 'agente', label: 'Agente' },
-    { value: 'cliente_privado', label: 'Cliente privado' },
-  ];
 
   const dispatch = useDispatch();
 
@@ -65,6 +60,15 @@ function ClientsModal(props) {
     return categoryOption || options[0];
   };
 
+  const getPriceCategoryOption = (accessor) => {
+    const options = priceCategoryOptions;
+    if (!options) return null;
+    const priceCategoryOption = options.find(
+      (option) => option.value === clientInput?.[accessor]
+    );
+    return priceCategoryOption || options[0];
+  };
+
   const handleClientLegalAddressInputChange = useCallback((e) => {
     setClientLegalAddressInput((prev) => ({
       ...prev,
@@ -73,7 +77,11 @@ function ClientsModal(props) {
   }, []);
 
   useEffect(() => {
-    setClientInput((prev) => ({ ...prev, category: categoryOptions[0].value }));
+    setClientInput((prev) => ({
+      ...prev,
+      category: categoryOptions[0].value,
+      price_category: priceCategoryOptions[0].value,
+    }));
   }, [props.show]);
 
   const onSubmitForm = async (e) => {
@@ -121,9 +129,17 @@ function ClientsModal(props) {
                       </label>
                     </div>
                     <div className="md:w-2/3">
-                      {el.accessor === 'category' ? (
+                      {el.accessor === "category" ? (
                         <Select
                           defaultValue={getSelectedOption(el.accessor)}
+                          onChange={(v) => {
+                            handleSelectChange(v, el.accessor);
+                          }}
+                          options={categoryOptions}
+                        />
+                      ) : el.accessor === "price_category" ? (
+                        <Select
+                          defaultValue={getPriceCategoryOption(el.accessor)}
                           onChange={(v) => {
                             handleSelectChange(v, el.accessor);
                           }}
@@ -135,7 +151,7 @@ function ClientsModal(props) {
                           id={el.accessor}
                           name={el.accessor}
                           type="text"
-                          value={clientInput[el.accessor] || ''}
+                          value={clientInput[el.accessor] || ""}
                           onChange={(e) => handleClientInputChange(e)}
                         />
                       )}
@@ -157,31 +173,31 @@ function ClientsModal(props) {
                   </label>
                 </div>
                 <div className="md:w-2/3" key={el.id}>
-                  {el.accessor === 'phone_office' ? (
+                  {el.accessor === "phone_office" ? (
                     <PhoneInput
                       defaultCountry="es"
-                      value={clientInput[el.accessor] || ''}
+                      value={clientInput[el.accessor] || ""}
                       onChange={(phone) => handleClientPhoneInput(phone)}
                     />
-                  ) : el.accessor === 'fax' ? (
+                  ) : el.accessor === "fax" ? (
                     <PhoneInput
                       defaultCountry="es"
-                      value={clientInput[el.accessor] || ''}
+                      value={clientInput[el.accessor] || ""}
                       onChange={(phone) => handleClientFaxInput(phone)}
                     />
-                  ) : el.accessor === 'phone_mobile' ? (
+                  ) : el.accessor === "phone_mobile" ? (
                     <PhoneInput
                       defaultCountry="es"
-                      value={clientInput[el.accessor] || ''}
+                      value={clientInput[el.accessor] || ""}
                       onChange={(phone) => handleClientPhoneMobileInput(phone)}
                     />
-                  ) : el.accessor === 'zip_code' ? (
+                  ) : el.accessor === "zip_code" ? (
                     <input
-                      className={valid ? '' : 'invalid'}
+                      className={valid ? "" : "invalid"}
                       id={el.accessor}
                       name={el.accessor}
                       type="text"
-                      value={clientLegalAddressInput[el.accessor] || ''}
+                      value={clientLegalAddressInput[el.accessor] || ""}
                       // onKeyPress={(e) => !/[0-9]/.test(e.key) && e.preventDefault()}
                       onChange={(e) => {
                         if (regexp.test(e.target.value)) {
@@ -195,7 +211,7 @@ function ClientsModal(props) {
                       id={el.accessor}
                       name={el.accessor}
                       type="text"
-                      value={clientLegalAddressInput[el.accessor] || ''}
+                      value={clientLegalAddressInput[el.accessor] || ""}
                       onChange={(e) => handleClientLegalAddressInputChange(e)}
                     />
                   )}

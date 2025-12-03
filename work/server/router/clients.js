@@ -1,21 +1,21 @@
-const clientsRouter = require('express').Router();
-const { Clients } = require('../db/models');
-const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
-const myEmitter = require('../src/ee.js');
+const clientsRouter = require("express").Router();
+const { Clients } = require("../db/models");
+const TokenService = require("../services/Token.js");
+const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
+const { COOKIE_SETTINGS } = require("../constants.js");
+const myEmitter = require("../src/ee.js");
 const {
   ADD_NEW_CLIENT_SOCKET,
   UPDATE_CLIENT_SOCKET,
-} = require('../src/constants/event.js');
+} = require("../src/constants/event.js");
 
-clientsRouter.get('/', async (req, res) => {
+clientsRouter.get("/", async (req, res) => {
   // const fingerprint = req.fingerprint.hash;
   // const { id, username, email } = req.session.user;
 
   try {
     const allClients = await Clients.findAll({
-      order: [['id', 'ASC']],
+      order: [["id", "ASC"]],
     });
 
     // const payload = { id, username, email };
@@ -37,14 +37,15 @@ clientsRouter.get('/', async (req, res) => {
   }
 });
 
-clientsRouter.post('/', async (req, res) => {
-  const { c_name, cif_vat, category } = req.body.client;
+clientsRouter.post("/", async (req, res) => {
+  const { c_name, cif_vat, category, price_category } = req.body.client;
 
   try {
     const client = await Clients.create({
       c_name,
       cif_vat,
       category,
+      price_category,
     });
 
     myEmitter.emit(ADD_NEW_CLIENT_SOCKET, client);
@@ -61,11 +62,11 @@ clientsRouter.post('/', async (req, res) => {
   }
 });
 
-clientsRouter.get('/:id', async (req, res) => {
+clientsRouter.get("/:id", async (req, res) => {
   try {
     const lastID = await Clients.findOne({
-      attributes: ['id'],
-      order: [['id', 'DESC']],
+      attributes: ["id"],
+      order: [["id", "DESC"]],
     });
 
     return res.status(200).json({ lastID });
@@ -82,8 +83,8 @@ clientsRouter.get('/:id', async (req, res) => {
   }
 });
 
-clientsRouter.post('/update/:c_id', async (req, res) => {
-  const { c_id, c_name, cif_vat, category } = req.body.client;
+clientsRouter.post("/update/:c_id", async (req, res) => {
+  const { c_id, c_name, cif_vat, category, price_category } = req.body.client;
 
   try {
     //const {c_id} = req.params;
@@ -92,6 +93,7 @@ clientsRouter.post('/update/:c_id', async (req, res) => {
         c_name,
         cif_vat,
         category,
+        price_category,
       },
       {
         where: {
