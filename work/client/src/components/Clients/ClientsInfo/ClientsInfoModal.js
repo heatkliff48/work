@@ -143,7 +143,7 @@ function ClientsModal(props) {
                           onChange={(v) => {
                             handleSelectChange(v, el.accessor);
                           }}
-                          options={categoryOptions}
+                          options={priceCategoryOptions}
                         />
                       ) : (
                         <input
