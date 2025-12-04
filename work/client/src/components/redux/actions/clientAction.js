@@ -9,6 +9,8 @@ import {
   ADD_DELIVERY_ADDRESSES,
   GET_ALL_CONTACT_INFO,
   ADD_CONTACT_INFO,
+  GET_CLIENT_PRICE_INFO,
+  NEED_UPDATE_CLIENT_PRICE_INFO,
 } from '../types/clientsTypes';
 
 export const getAllClients = () => {
@@ -85,5 +87,18 @@ export const addNewContactInfo = ({ contactInfo }) => {
   return {
     type: ADD_CONTACT_INFO,
     payload: { contactInfo },
+  };
+};
+
+export const getClientPriceInfo = () => {
+  return {
+    type: GET_CLIENT_PRICE_INFO,
+  };
+};
+
+export const updClientPriceInfo = (cpi) => {
+  return {
+    type: NEED_UPDATE_CLIENT_PRICE_INFO,
+    payload: cpi,
   };
 };

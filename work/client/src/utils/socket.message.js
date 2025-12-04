@@ -132,6 +132,7 @@ import {
   updateLegalAddressSocket,
   addNewDeliveryAddressSocket,
   addNewContactInfoSocket,
+  updContactPriceInfoSocket,
 } from "#components/redux/actions/socketActions/clientsActionSocket.js";
 import {
   addNewBatchOutsideSocket,
@@ -285,6 +286,7 @@ import {
   GET_DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
   ADD_NEW_LOTES_LIST_SOCKET,
+  NEED_UPD_CONTACT_PRICE_INFO_SOCKET,
 } from "#components/redux/types/socketTypes/socket.js";
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -439,6 +441,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_CONTACT_INFO_SOCKET:
       dispatch(addNewContactInfoSocket(payload));
+      break;
+
+    case NEED_UPD_CONTACT_PRICE_INFO_SOCKET:
+      dispatch(updContactPriceInfoSocket(payload));
       break;
 
     case ADD_DELIVERY_ADDRESSES_SOCKET:

@@ -5,6 +5,7 @@ import {
   getAllClients,
   getAllContactInfo,
   getAllDeliveryAddresses,
+  getClientPriceInfo,
 } from '#components/redux/actions/clientAction.js';
 import {
   getAnchorProductsOfOrders,
@@ -97,6 +98,7 @@ function Main() {
     dispatch(getAnchorProductsOfOrders());
     dispatch(getAnchorsWarehouse());
     dispatch(getBatchOutside());
+    dispatch(getClientPriceInfo());
     dispatch(getDryMixesJournal());
     dispatch(getDryMixedProductsOfOrders());
     dispatch(getDryMixesWarehouse());

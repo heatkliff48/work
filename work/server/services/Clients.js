@@ -7,8 +7,10 @@ class ClientsService {
     return clientsPriceInfos;
   }
 
-  static async updClientsPriceInfo() {
-   
+  static async updClientsPriceInfo(updClient) {
+      await ClientsRepository.updClientsPriceInfo(updClient);
+
+    return 
   }
 }
 

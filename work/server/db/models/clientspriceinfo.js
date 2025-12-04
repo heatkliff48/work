@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   ClientsPriceInfos.init({
     title: DataTypes.STRING,
-    price: DataTypes.INTEGER,
+    client_type: DataTypes.STRING,
     discont: DataTypes.INTEGER
   }, {
     sequelize,

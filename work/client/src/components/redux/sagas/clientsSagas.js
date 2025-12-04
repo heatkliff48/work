@@ -21,6 +21,10 @@ import {
   ALL_CONTACT_INFO,
   ADD_CONTACT_INFO,
   NEW_CONTACT_INFO,
+  CLIENT_PRICE_INFO,
+  UPDATE_CLIENT_PRICE_INFO,
+  GET_CLIENT_PRICE_INFO,
+  NEED_UPDATE_CLIENT_PRICE_INFO,
 } from '../types/clientsTypes';
 
 const url = axios.create({
@@ -149,6 +153,30 @@ const addNewContactInfo = ({ contactInfo }) => {
       throw err;
     });
 };
+// Contact price Info
+const getAllContactPriceInfo = () => {
+  return url
+    .get(`/clientsPriceInfo`)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updContactPriceInfo = (updClient) => {
+  return url
+    .post('/clientsPriceInfo/upd', updClient)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
 
 function* getAllClientsWatcher(action) {
   try {
@@ -240,6 +268,24 @@ function* getAllContactInfoWorker(action) {
   }
 }
 
+function* getAllContactPriceInfoWorker(action) {
+  try {
+    const contactPriceInfo = yield call(getAllContactPriceInfo);
+
+    yield put({ type: CLIENT_PRICE_INFO, payload: contactPriceInfo });
+  } catch (err) {
+    yield put({ type: CLIENT_PRICE_INFO, payload: [] });
+  }
+}
+
+function* updContactPriceInfoWorker(action) {
+  try {
+    yield call(updContactPriceInfo, action.payload);
+  } catch (err) {
+    yield put({ type: UPDATE_CLIENT_PRICE_INFO, payload: [] });
+  }
+}
+
 function* addNewContactInfoWorker(action) {
   try {
     const { contactInfo } = yield call(addNewContactInfo, action.payload);
@@ -264,6 +310,9 @@ function* clientsWatcher() {
 
   yield takeLatest(GET_ALL_CONTACT_INFO, getAllContactInfoWorker);
   yield takeLatest(ADD_CONTACT_INFO, addNewContactInfoWorker);
+
+  yield takeLatest(GET_CLIENT_PRICE_INFO, getAllContactPriceInfoWorker);
+  yield takeLatest(NEED_UPDATE_CLIENT_PRICE_INFO, updContactPriceInfoWorker);
 }
 
 export default clientsWatcher;

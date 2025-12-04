@@ -5,9 +5,36 @@ class ClientsRepository {
     const clientsPriceInfos = await ClientsPriceInfos.findAll();
     return clientsPriceInfos;
   }
-  static async updClientsPriceInfo(client) {
-    // const newClient = await ClientsPriceInfos.create(client);
-    // return newClient;
+
+  static async updClientsPriceInfo(updClient) {
+    if (!Array.isArray(updClient) || updClient.length === 0) {
+      throw new Error('Не переданы данные для обновления');
+    }
+
+    for (const item of updClient) {
+      try {
+        const { client_type, discont, title } = item;
+
+        const existingRecord = await ClientsPriceInfos.findOne({
+          where: {
+            client_type,
+            title,
+          },
+        });
+
+        if (existingRecord) {
+          await existingRecord.update({
+            discont: parseFloat(discont) || 0,
+            updatedAt: new Date(),
+          });
+        } else {
+          await ClientsPriceInfos.create(item);
+        }
+      } catch (error) {
+        console.log('=========ERROR=========', error);
+      }
+    }
+    return;
   }
 }
 

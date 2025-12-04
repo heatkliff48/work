@@ -1,7 +1,7 @@
 const ClientsService = require('../services/Clients.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 const myEmitter = require('../src/ee.js');
-const { ADD_NEW_CLIENT_SOCKET } = require('../src/constants/event.js');
+const { NEED_UPD_CONTACT_PRICE_INFO_SOCKET } = require('../src/constants/event.js');
 
 class ClientsController {
   static async getClientsPriceInfo(req, res) {
@@ -18,9 +18,9 @@ class ClientsController {
     const updClient = req.body;
 
     try {
-      const updClientsPriceInfos = await ClientsService.addNewClient(updClient);
+      await ClientsService.updClientsPriceInfo(updClient);
 
-      // myEmitter.emit(ADD_NEW_CLIENT_SOCKET, updClientsPriceInfos);
+      myEmitter.emit(NEED_UPD_CONTACT_PRICE_INFO_SOCKET, updClient);
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
