@@ -3,7 +3,7 @@ const ClientsController = require('../controllers/Clients.js');
 
 const router = Router();
 
-router.post('/all', ClientsController.getAllClients);
-router.post('/add', ClientsController.addClient);
+router.post('/all/price_info', ClientsController.getClientsPriceInfo);
+router.post('/upd/price_info', ClientsController.updClientsPriceInfo);
 
 module.exports = router;

@@ -1,14 +1,14 @@
-const { ClientCards } = require('../db/models');
+const { ClientsPriceInfos } = require('../db/models');
 
-class ClientssRepository {
-  static async getAllClientsData() {
-    const clients = await ClientCards.findAll();
-    return clients;
+class ClientsRepository {
+  static async getClientsPriceInfo() {
+    const clientsPriceInfos = await ClientsPriceInfos.findAll();
+    return clientsPriceInfos;
   }
-  static async addNewClientData(client) {
-    const newClient = await ClientCards.create(client);
-    return newClient;
+  static async updClientsPriceInfo(client) {
+    // const newClient = await ClientsPriceInfos.create(client);
+    // return newClient;
   }
 }
 
-module.exports = ClientssRepository;
+module.exports = ClientsRepository;

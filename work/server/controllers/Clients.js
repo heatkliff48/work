@@ -1,59 +1,31 @@
 const ClientsService = require('../services/Clients.js');
 const { ErrorUtils } = require('../utils/Errors.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
 const myEmitter = require('../src/ee.js');
 const { ADD_NEW_CLIENT_SOCKET } = require('../src/constants/event.js');
 
 class ClientsController {
-  static async getAllClients(req, res) {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.body.user;
+  static async getClientsPriceInfo(req, res) {
     try {
-      const { accessToken, refreshToken, accessTokenExpiration, clients } =
-        await ClientsService.getAllClients({ id, username, email, fingerprint });
+      const clientsPriceInfos = await ClientsService.getClientsPriceInfo();
 
-      return res.status(200).json({ clients });
-      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      // .json({ clients, accessToken, accessTokenExpiration });
+      return res.status(200).json(clientsPriceInfos);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
   }
 
-  static async addClient(req, res) {
-    const fingerprint = req.fingerprint.hash;
-    const { id, username, email } = req.body.user;
-    const { client } = req.body;
+  static async updClientsPriceInfo(req, res) {
+    const updClient = req.body;
 
     try {
-      const { accessToken, refreshToken, accessTokenExpiration, client } =
-        await ClientsService.addNewClient({
-          id,
-          username,
-          email,
-          fingerprint,
-          client,
-        });
-      myEmitter.emit(ADD_NEW_CLIENT_SOCKET, client);
-      return res.status(200); //.json({ client });
-      // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-      // .json({ client, accessToken, accessTokenExpiration })
+      const updClientsPriceInfos = await ClientsService.addNewClient(updClient);
+
+      // myEmitter.emit(ADD_NEW_CLIENT_SOCKET, updClientsPriceInfos);
+      return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
   }
-
-  // static async delClient(req, res) {
-  //   const { fingerprint } = req;
-  //   const refreshToken = req.cookies.refreshToken;
-  //   try {
-  //     await ClientsService.logOut(refreshToken);
-
-  //     return res.clearCookie('refreshToken').sendStatus(200);
-  //   } catch (err) {
-  //     return ErrorUtils.catchError(res, err);
-  //   }
-  // }
 }
 
 module.exports = ClientsController;
