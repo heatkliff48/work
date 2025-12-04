@@ -12,6 +12,7 @@ import {
   legalAddressReducer,
   deliveryAddressesReducer,
   contactInfoReducer,
+  contactPriceInfoReducer,
 } from "./clientsReducer";
 import { dataFetchedReducer } from "./dataFetchedReducer";
 import { filesOrderReducer } from "./filesOrderReducer";
@@ -142,4 +143,5 @@ export const rootReducer = combineReducers({
   warehouseGrindingBalls: warehouseGrindingBallsReducer,
   warehouseAAC: warehouseAACReducer,
   lotesList: lotesListReducer,
+  contactPriceInfo:contactPriceInfoReducer
 });

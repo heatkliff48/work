@@ -1,14 +1,41 @@
-const { ClientCards } = require('../db/models');
+const { ClientsPriceInfos } = require('../db/models');
 
-class ClientssRepository {
-  static async getAllClientsData() {
-    const clients = await ClientCards.findAll();
-    return clients;
+class ClientsRepository {
+  static async getClientsPriceInfo() {
+    const clientsPriceInfos = await ClientsPriceInfos.findAll();
+    return clientsPriceInfos;
   }
-  static async addNewClientData(client) {
-    const newClient = await ClientCards.create(client);
-    return newClient;
+
+  static async updClientsPriceInfo(updClient) {
+    if (!Array.isArray(updClient) || updClient.length === 0) {
+      throw new Error('Не переданы данные для обновления');
+    }
+
+    for (const item of updClient) {
+      try {
+        const { client_type, discont, title } = item;
+
+        const existingRecord = await ClientsPriceInfos.findOne({
+          where: {
+            client_type,
+            title,
+          },
+        });
+
+        if (existingRecord) {
+          await existingRecord.update({
+            discont: parseFloat(discont) || 0,
+            updatedAt: new Date(),
+          });
+        } else {
+          await ClientsPriceInfos.create(item);
+        }
+      } catch (error) {
+        console.log('=========ERROR=========', error);
+      }
+    }
+    return;
   }
 }
 
-module.exports = ClientssRepository;
+module.exports = ClientsRepository;

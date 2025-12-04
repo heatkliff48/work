@@ -1,8 +1,10 @@
+import showMessage from '#components/Utils/showMessage.js';
 import {
   ALL_CLIENTS,
   ONE_LEGAL_ADDRESS,
   ALL_DELIVERY_ADDRESSES,
   ALL_CONTACT_INFO,
+  CLIENT_PRICE_INFO,
 } from '../types/clientsTypes';
 import {
   NEED_UPDATE_CLIENT_SOCKET,
@@ -10,6 +12,7 @@ import {
   NEW_CONTACT_INFO_SOCKET,
   NEW_DELIVERY_ADDRESSES_SOCKET,
   ONE_LEGAL_ADDRESS_SOCKET,
+  UPD_CONTACT_PRICE_INFO_SOCKET,
 } from '../types/socketTypes/socket';
 
 export const clientsReducer = (clients = [], action) => {
@@ -27,7 +30,6 @@ export const clientsReducer = (clients = [], action) => {
         return el;
       });
       return updateClient;
-
     }
     default:
       return clients;
@@ -73,5 +75,36 @@ export const contactInfoReducer = (contactInfo = [], action) => {
     }
     default:
       return contactInfo;
+  }
+};
+
+export const contactPriceInfoReducer = (contactPriceInfo = [], action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case CLIENT_PRICE_INFO: {
+      return payload;
+    }
+    case UPD_CONTACT_PRICE_INFO_SOCKET: {
+      const data = contactPriceInfo.find(
+        (el) => el.title === payload.title && el.client_type === payload.client_type
+      );
+      if (data) {
+        const result = contactPriceInfo.map((el) => {
+          if (el.title === payload.title && el.client_type === payload.client_type) {
+            return payload;
+          }
+          return el;
+        });
+        showMessage('Contact price info data updated', 'success');
+
+        return result;
+      } else {
+        showMessage('Contact price info data added', 'success');
+
+        return [...contactPriceInfo, payload];
+      }
+    }
+    default:
+      return contactPriceInfo;
   }
 };

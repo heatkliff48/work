@@ -4,6 +4,7 @@ import {
   NEW_CONTACT_INFO_SOCKET,
   NEW_DELIVERY_ADDRESSES_SOCKET,
   ONE_LEGAL_ADDRESS_SOCKET,
+  UPD_CONTACT_PRICE_INFO_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const addNewClientSocket = (client) => {
@@ -38,6 +39,13 @@ export const addNewContactInfoSocket = (contactInfo) => {
   return {
     type: NEW_CONTACT_INFO_SOCKET,
     payload: contactInfo,
+  };
+};
+
+export const updContactPriceInfoSocket = (updClient) => {
+  return {
+    type: UPD_CONTACT_PRICE_INFO_SOCKET,
+    payload: updClient,
   };
 };
 

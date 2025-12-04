@@ -1,11 +1,12 @@
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { clearBatchState } from "#components/redux/actions/batchDesignerAction.js";
-import { getBatchOutside } from "#components/redux/actions/batchOutsideAction.js";
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
+import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import {
   getAllClients,
   getAllContactInfo,
   getAllDeliveryAddresses,
-} from "#components/redux/actions/clientAction.js";
+  getClientPriceInfo,
+} from '#components/redux/actions/clientAction.js';
 import {
   getAnchorProductsOfOrders,
   getDryMixedProductsOfOrders,
@@ -13,30 +14,30 @@ import {
   getProductsOfOrders,
   getToolProductsOfOrders,
   getRelMatProductsOfOrders,
-} from "#components/redux/actions/ordersAction.js";
-import { getAllProducts } from "#components/redux/actions/productsAction.js";
+} from '#components/redux/actions/ordersAction.js';
+import { getAllProducts } from '#components/redux/actions/productsAction.js';
 import {
   getAnchor,
   getDryMixesJournal,
   getProductCode,
   getRelatedMaterialsJournal,
   getTool,
-} from "#components/redux/actions/productsTypeJournalAction.js";
+} from '#components/redux/actions/productsTypeJournalAction.js';
 import {
   getAnchorsWarehouse,
   getDryMixesWarehouse,
   getRelatedMaterialsWarehouse,
   getToolsWarehouse,
-} from "#components/redux/actions/productsTypeWarehouseAction.js";
+} from '#components/redux/actions/productsTypeWarehouseAction.js';
 import {
   getMainRawMatConsumption,
   getRawMatConsumption,
   getRecipe,
   getRecipeOrdersData,
-} from "#components/redux/actions/recipeAction.js";
-import { getRelatedMaterialsBackorder } from "#components/redux/actions/relatedMaterialsBackorderListAction.js";
-import { getAllRoles } from "#components/redux/actions/rolesAction.js";
-import { getAllStockBalance } from "#components/redux/actions/stockBalanceAction.js";
+} from '#components/redux/actions/recipeAction.js';
+import { getRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
+import { getAllRoles } from '#components/redux/actions/rolesAction.js';
+import { getAllStockBalance } from '#components/redux/actions/stockBalanceAction.js';
 import {
   getAllWarehouse,
   getAutoclaveCalendar,
@@ -48,23 +49,23 @@ import {
   getListOfReservedProducts,
   getListOfToolReservedProducts,
   getRawMaterialsWarehouse,
-} from "#components/redux/actions/warehouseAction.js";
-import { getFilesWarehouse } from "#components/redux/actions/filesWarehouseAction.js";
-import { getFilesProduct } from "#components/redux/actions/filesProductAction.js";
-import { getFilesOrder } from "#components/redux/actions/filesOrderAction.js";
-import { getAllProductionBatchLogs } from "#components/redux/actions/productionBatchLogAction.js";
-import { getQualityManagement } from "#components/redux/actions/qualityManagementAction.js";
-import { getPagesList } from "#components/redux/actions/pagesAction";
+} from '#components/redux/actions/warehouseAction.js';
+import { getFilesWarehouse } from '#components/redux/actions/filesWarehouseAction.js';
+import { getFilesProduct } from '#components/redux/actions/filesProductAction.js';
+import { getFilesOrder } from '#components/redux/actions/filesOrderAction.js';
+import { getAllProductionBatchLogs } from '#components/redux/actions/productionBatchLogAction.js';
+import { getQualityManagement } from '#components/redux/actions/qualityManagementAction.js';
+import { getPagesList } from '#components/redux/actions/pagesAction';
 import {
   getAllUsersInfo,
   getAllUsersMainInfo,
-} from "#components/redux/actions/usersInfoAction";
-import { getAldabaran } from "#components/redux/actions/aldabaranAction.js";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { useOrderContext } from "#components/contexts/OrderContext.js";
-import { getLotesList } from "#components/redux/actions/lotesListAction.js";
+} from '#components/redux/actions/usersInfoAction';
+import { getAldabaran } from '#components/redux/actions/aldabaranAction.js';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { getLotesList } from '#components/redux/actions/lotesListAction.js';
 
 function Main() {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ function Main() {
 
   useEffect(() => {
     if (!user) {
-      navigate("/sign-in");
+      navigate('/sign-in');
     }
   }, [user]);
 
@@ -97,6 +98,7 @@ function Main() {
     dispatch(getAnchorProductsOfOrders());
     dispatch(getAnchorsWarehouse());
     dispatch(getBatchOutside());
+    dispatch(getClientPriceInfo());
     dispatch(getDryMixesJournal());
     dispatch(getDryMixedProductsOfOrders());
     dispatch(getDryMixesWarehouse());
@@ -137,65 +139,64 @@ function Main() {
     <div className="main-container">
       <h1 className="main-title">Main Page</h1>
       <div className="button-container">
-        {checkUserAccess(user, roles, "Users_info")?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate("/users_info")}
-          >
+        {checkUserAccess(user, roles, 'Users_info')?.canRead && (
+          <button className="nav-button" onClick={() => navigate('/users_info')}>
             Users Info
           </button>
         )}
-        {checkUserAccess(user, roles, "Roles")?.canRead && (
-          <button className="nav-button" onClick={() => navigate("/roles")}>
+        {checkUserAccess(user, roles, 'Roles')?.canRead && (
+          <button className="nav-button" onClick={() => navigate('/roles')}>
             Roles
           </button>
         )}
-        {checkUserAccess(user, roles, "warehouse_manager")?.canRead && (
+        {checkUserAccess(user, roles, 'warehouse_manager')?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/warehouse_manager")}
+            onClick={() => navigate('/warehouse_manager')}
           >
             Order dispatch
           </button>
         )}
-        {checkUserAccess(user, roles, "Products")?.canRead && (
+        {checkUserAccess(user, roles, 'Products')?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/products_type_journal")}
+            onClick={() => navigate('/products_type_journal')}
           >
             Products Type Journal
           </button>
         )}
-        {checkUserAccess(user, roles, "Statistics")?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate("/statistics")}
-          >
+        {checkUserAccess(user, roles, 'Statistics')?.canRead && (
+          <button className="nav-button" onClick={() => navigate('/statistics')}>
             Statistics
           </button>
         )}
-        {checkUserAccess(user, roles, "Orders")?.canRead && (
-          <button className="nav-button" onClick={() => navigate("/orders")}>
+        {checkUserAccess(user, roles, 'Orders')?.canRead && (
+          <button className="nav-button" onClick={() => navigate('/orders')}>
             Orders
           </button>
         )}
-        {checkUserAccess(user, roles, "accounting")?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate("/accounting")}
-          >
+        {checkUserAccess(user, roles, 'accounting')?.canRead && (
+          <button className="nav-button" onClick={() => navigate('/accounting')}>
             Accounting
           </button>
         )}
-        {checkUserAccess(user, roles, "Clients")?.canRead && (
-          <button className="nav-button" onClick={() => navigate("/clients")}>
+        {checkUserAccess(user, roles, 'Clients')?.canRead && (
+          <button className="nav-button" onClick={() => navigate('/clients')}>
             Clients
           </button>
         )}
-        {checkUserAccess(user, roles, "Warehouse")?.canRead && (
+        {checkUserAccess(user, roles, 'Clients')?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/warehouse_products_type")}
+            onClick={() => navigate('/clients_Price_info')}
+          >
+            Clients Price Info
+          </button>
+        )}
+        {checkUserAccess(user, roles, 'Warehouse')?.canRead && (
+          <button
+            className="nav-button"
+            onClick={() => navigate('/warehouse_products_type')}
           >
             Warehouse
           </button>
@@ -213,85 +214,77 @@ function Main() {
             Batch planner
           </button>
         )} */}
-        {checkUserAccess(user, roles, "production_batch_designer")?.canRead && (
+        {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/production_batch_designer_new")}
+            onClick={() => navigate('/production_batch_designer_new')}
           >
             Batch planner New
           </button>
         )}
-        {checkUserAccess(user, roles, "production_batch_designer")?.canRead && (
+        {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/autoclave_calendar")}
+            onClick={() => navigate('/autoclave_calendar')}
           >
             Autoclave Calendare
           </button>
         )}
-        {checkUserAccess(user, roles, "List_of_ordered_production")
-          ?.canRead && (
+        {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/list_of_ordered_production")}
+            onClick={() => navigate('/list_of_ordered_production')}
           >
             Ordered blocks pipeline
           </button>
         )}
-        {checkUserAccess(user, roles, "list_of_ordered_production_oem")
-          ?.canRead && (
+        {checkUserAccess(user, roles, 'list_of_ordered_production_oem')?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/list_of_ordered_production_oem")}
+            onClick={() => navigate('/list_of_ordered_production_oem')}
           >
             Ordered OEM blocks pipeline
           </button>
         )}
-        {checkUserAccess(user, roles, "related_materials_backorder_list")
+        {checkUserAccess(user, roles, 'related_materials_backorder_list')
           ?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/related_materials_backorder_list")}
+            onClick={() => navigate('/related_materials_backorder_list')}
           >
             Related materials backorder list
           </button>
         )}
-        {checkUserAccess(user, roles, "production_plan")?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate("/batch_outside")}
-          >
+        {checkUserAccess(user, roles, 'production_plan')?.canRead && (
+          <button className="nav-button" onClick={() => navigate('/batch_outside')}>
             Batch calendar
           </button>
         )}
-        {checkUserAccess(user, roles, "recipe_products")?.canRead && (
+        {checkUserAccess(user, roles, 'recipe_products')?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/recipe_products")}
+            onClick={() => navigate('/recipe_products')}
           >
             Recipe Products
           </button>
         )}
-        {checkUserAccess(user, roles, "raw_materials_plan")?.canRead && (
+        {checkUserAccess(user, roles, 'raw_materials_plan')?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/raw_materials_plan")}
+            onClick={() => navigate('/raw_materials_plan')}
           >
             Raw Materials Plan
           </button>
         )}
-        {checkUserAccess(user, roles, "recipe_orders")?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate("/recipe_orders")}
-          >
+        {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
+          <button className="nav-button" onClick={() => navigate('/recipe_orders')}>
             Raw material calendar
           </button>
         )}
-        {checkUserAccess(user, roles, "quality_management")?.canRead && (
+        {checkUserAccess(user, roles, 'quality_management')?.canRead && (
           <button
             className="nav-button"
-            onClick={() => navigate("/quality_management")}
+            onClick={() => navigate('/quality_management')}
           >
             Quality Management
           </button>

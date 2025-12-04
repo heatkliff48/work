@@ -7,6 +7,7 @@ const initState = {
   legalAddress: {},
   deliveryAddresses: [],
   contactInfo: [],
+  contactPriceInfo: [],
   roles: [],
   pages: [],
   orders: [],
