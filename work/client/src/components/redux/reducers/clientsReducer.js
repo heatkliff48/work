@@ -85,25 +85,30 @@ export const contactPriceInfoReducer = (contactPriceInfo = [], action) => {
       return payload;
     }
     case UPD_CONTACT_PRICE_INFO_SOCKET: {
-      const data = contactPriceInfo.find(
-        (el) => el.title === payload.title && el.client_type === payload.client_type
-      );
-      if (data) {
-        const result = contactPriceInfo.map((el) => {
-          if (el.title === payload.title && el.client_type === payload.client_type) {
-            return payload;
-          }
-          return el;
-        });
-        showMessage('Contact price info data updated', 'success');
+      // Приводим payload к массиву
+      const incoming = Array.isArray(payload) ? payload : [payload];
 
-        return result;
-      } else {
-        showMessage('Contact price info data added', 'success');
+      let updated = [...contactPriceInfo];
 
-        return [...contactPriceInfo, payload];
-      }
+      incoming.forEach((item) => {
+        const index = updated.findIndex(
+          (el) => el.title === item.title && el.client_type === item.client_type
+        );
+
+        if (index !== -1) {
+          // обновить
+          updated[index] = item;
+        } else {
+          // добавить
+          updated.push(item);
+        }
+      });
+
+      showMessage('Contact price info updated', 'success');
+
+      return updated;
     }
+
     default:
       return contactPriceInfo;
   }

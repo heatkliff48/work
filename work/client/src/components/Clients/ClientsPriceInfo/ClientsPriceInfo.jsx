@@ -1,20 +1,34 @@
+import { useProjectContext } from '#components/contexts/Context.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { updClientPriceInfo } from '#components/redux/actions/clientAction.js';
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 const categoryOptions = [
   { value: 'base', label: 'Base' },
-  { value: 'constructor_de_gobieno', label: 'Constructor de gobieno' },
+  {
+    value: 'promotor_constructor_de_gobierno',
+    label: 'Promotor/Constructor de gobierno',
+  },
   { value: 'promotor', label: 'Promotor' },
   { value: 'constructor', label: 'Constructor' },
   { value: 'arquitecto', label: 'Arquitecto' },
-  { value: 'distributor_con_almacen', label: 'Distributor con almacen' },
-  { value: 'distributor_sin_almacen', label: 'Distributor sin almacen' },
-  { value: 'tienda_de_la_construccion', label: 'Tienda de la construccion' },
-  { value: 'equipos_de_construccion', label: 'Equipos de construccion' },
+  { value: 'distribuidor_con_almacen', label: 'Distribuidor con almacen' },
+  { value: 'distribuidor_sin_almacen', label: 'Distribuidor sin almacen' },
+  { value: 'tienda_de_la_construccion', label: 'Tienda de la construcción' },
+  { value: 'equipo_de_construction', label: 'Equipo de construction' },
   { value: 'agente', label: 'Agente' },
-  { value: 'cliente_privado', label: 'Cliente privado' },
+  { value: 'cliente_privado', label: 'Сliente privado' },
+  { value: 'constructor_pequeno', label: 'Constructor pequeño' },
+  { value: 'almacenista_pequeno', label: 'Almacenista pequeno' },
+  {
+    value: 'distribuidor_en_nuestra_lista',
+    label: 'Distribuidor en nuestra lista',
+  },
+  {
+    value: 'arquitecto_en_nuestra_lista',
+    label: 'Arquitecto en nuestra lista',
+  },
 ];
 
 function formatDisplayValue(v) {
@@ -70,8 +84,16 @@ function valuesAreEqual(val1, val2) {
   return Number(parsed1) === Number(parsed2);
 }
 
+// Функция для расчета цены на основе базовой цены и скидки
+function calculatePrice(basePrice, discount) {
+  if (basePrice === 0) return 0;
+  const price = basePrice * (1 - discount / 100);
+  return Math.max(0, price);
+}
+
 export default function ClientsPriceInfo() {
   const { latestProducts } = useProductsContext();
+  const { clientPriceInfo } = useProjectContext();
   const categories = categoryOptions;
 
   const [clientsProducts, setClientsProducts] = useState([]);
@@ -84,7 +106,25 @@ export default function ClientsPriceInfo() {
 
   const dispatch = useDispatch();
 
-  // Инициализация rowsState при загрузке продуктов
+  // Создаем Map для быстрого поиска данных из clientPriceInfo
+  const buildClientPriceMap = useCallback(() => {
+    if (!clientPriceInfo || !Array.isArray(clientPriceInfo)) return new Map();
+
+    const map = new Map();
+
+    clientPriceInfo.forEach((item) => {
+      const key = `${item.client_type}_${item.title}`;
+      map.set(key, {
+        discount: item.discont || 0,
+        title: item.title,
+        client_type: item.client_type,
+      });
+    });
+
+    return map;
+  }, [clientPriceInfo]);
+
+  // Инициализация rowsState при загрузке продуктов и clientPriceInfo
   useEffect(() => {
     if (!latestProducts?.length) {
       setClientsProducts([]);
@@ -104,10 +144,14 @@ export default function ClientsPriceInfo() {
 
     setClientsProducts(transformedProducts);
 
+    // Создаем Map данных из БД
+    const clientPriceMap = buildClientPriceMap();
+
     // Инициализируем rowsState
     const newRowsState = {};
     const baseRow = {};
 
+    // Заполняем базовую строку
     transformedProducts.forEach((p) => {
       baseRow[p.id] = {
         price: p.price,
@@ -116,14 +160,31 @@ export default function ClientsPriceInfo() {
     });
     newRowsState['base'] = baseRow;
 
+    // Заполняем строки для каждого типа клиента
     categories.forEach((c) => {
       if (c.value !== 'base') {
         const obj = {};
         transformedProducts.forEach((p) => {
-          obj[p.id] = {
-            price: '',
-            discount: '',
-          };
+          // Ищем данные для этой комбинации client_type + product
+          const key = `${c.value}_${p.title}`;
+          const clientPriceData = clientPriceMap.get(key);
+
+          if (clientPriceData) {
+            // Если есть данные в БД, используем их
+            const discount = Number(clientPriceData.discount) || 0;
+            const price = calculatePrice(p.price, discount);
+
+            obj[p.id] = {
+              price: formatDisplayValue(price),
+              discount: formatDisplayValue(discount),
+            };
+          } else {
+            // Если нет данных в БД, оставляем пустым
+            obj[p.id] = {
+              price: '',
+              discount: '',
+            };
+          }
         });
         newRowsState[c.value] = obj;
       }
@@ -133,12 +194,12 @@ export default function ClientsPriceInfo() {
     // Сохраняем исходные данные для сравнения
     setInitialData(JSON.parse(JSON.stringify(newRowsState)));
     setModifiedData([]);
-  }, [latestProducts]);
+  }, [latestProducts, clientPriceInfo, categories, buildClientPriceMap]);
 
   // Получение базовых значений
   const getBase = useCallback(() => rowsState['base'] || {}, [rowsState]);
 
-  // При изменении базовых цен пересчитываем скидки для заполненных строк
+  // При изменении базовых цен пересчитываем цены для строк со скидками
   useEffect(() => {
     const base = getBase();
     if (!base || Object.keys(base).length === 0) return;
@@ -154,34 +215,29 @@ export default function ClientsPriceInfo() {
 
         for (const pid of baseKeys) {
           const basePrice = Number(base[pid]?.price || 0);
-          const currentPrice = parseInputValue(row[pid]?.price);
+          const currentDiscount = parseInputValue(row[pid]?.discount);
 
-          if (currentPrice === '') continue;
-
-          let newDiscount = 0;
-          if (basePrice > 0) {
-            newDiscount = Math.max(
-              0,
-              ((basePrice - currentPrice) / basePrice) * 100
-            );
-          }
-
-          newDiscount = Number(newDiscount);
-          const formattedDiscount = formatDisplayValue(newDiscount);
-          const currentDiscount = formatDisplayValue(row[pid]?.discount);
-
-          if (!row[pid]) {
-            row[pid] = {
-              price: currentPrice,
-              discount: formattedDiscount,
-            };
-            changed = true;
-          } else if (currentDiscount !== formattedDiscount) {
+          // Если есть скидка, но цена пустая - пересчитываем цену
+          if (currentDiscount !== '' && row[pid]?.price === '') {
+            const calculatedPrice = calculatePrice(basePrice, currentDiscount);
             row[pid] = {
               ...row[pid],
-              discount: formattedDiscount,
+              price: formatDisplayValue(calculatedPrice),
             };
             changed = true;
+          }
+          // Если изменилась базовая цена, пересчитываем цену для строк со скидкой
+          else if (currentDiscount !== '') {
+            const calculatedPrice = calculatePrice(basePrice, currentDiscount);
+            const currentPrice = parseInputValue(row[pid]?.price);
+
+            if (Math.abs(calculatedPrice - currentPrice) > 0.01) {
+              row[pid] = {
+                ...row[pid],
+                price: formatDisplayValue(calculatedPrice),
+              };
+              changed = true;
+            }
           }
         }
         updated[category.value] = row;
@@ -293,13 +349,7 @@ export default function ClientsPriceInfo() {
       } else {
         const baseEntry = getBase()[productId] || { price: 0 };
         const basePrice = Number(baseEntry.price || 0);
-        let computedPrice = basePrice * (1 - parsedValue / 100);
-
-        if (computedPrice > basePrice) {
-          computedPrice = basePrice;
-        }
-        if (computedPrice < 0) computedPrice = 0;
-
+        const computedPrice = calculatePrice(basePrice, parsedValue);
         entry.price = formatDisplayValue(computedPrice);
       }
 
@@ -308,6 +358,10 @@ export default function ClientsPriceInfo() {
       return next;
     });
   };
+
+  useEffect(() => {
+    console.log('Измененные данные:', clientPriceInfo);
+  }, [clientPriceInfo]);
 
   const handleSave = () => {
     if (modifiedData.length === 0) {
@@ -318,7 +372,6 @@ export default function ClientsPriceInfo() {
     console.log('Измененные данные для сохранения:', modifiedData);
 
     dispatch(updClientPriceInfo(modifiedData));
-    alert(`Сохранено ${modifiedData.length} измененных записей!`);
 
     setInitialData(JSON.parse(JSON.stringify(rowsState)));
     setModifiedData([]);
@@ -604,6 +657,7 @@ export default function ClientsPriceInfo() {
             относительно эталонной цены, при вводе скидки автоматически
             пересчитывается цена
           </li>
+          <li>Данные из базы загружаются автоматически при наличии записей</li>
           <li>Измененные ячейки выделены желтым цветом с оранжевой точкой</li>
           <li>Сохранены будут только измененные записи</li>
         </ul>

@@ -1,356 +1,357 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { DropdownFilter, TextSearchFilter } from "#components/Table/filters.js";
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { DropdownFilter, TextSearchFilter } from '#components/Table/filters.js';
 
 const ProjectContext = createContext();
 
 const ProjectContextProvider = ({ children }) => {
   const displayNames = {
-    product_article: "Order number",
-    project_name: "Project name",
-    quantity_m2: "Quantity, m2",
-    quantity_ud: "Quantity, Ud",
-    quantity_palet: "Quantity of pallets",
-    quantity_real: "Real quantity, m2",
-    quantity_real_ud: "Real quantity, Ud",
-    price_m2: "Price, EURO per m2",
-    price_m3: "Price, EURO per m3",
-    discount: "Discount, %",
-    final_price: "Final price, EURO",
-    total: "Total, kg",
-    pvp: "PVP",
-    dry_mixed_id: "Dry mixed product id",
-    quantity_palet_dry: "Quantity of pallets",
-    anchor_id: "Anchor product id",
-    quantity_palet_anchor: "Quantity of pallets",
-    tool_id: "Tool product id",
-    rel_mat_id: "Related material product id",
-    c_name: "Name of owner",
-    cif_vat: "CIF/VAT",
-    category: "Category",
-    street: "Street",
-    additional_info: "Additional info",
-    city: "City",
-    zip_code: "Zip code",
-    province: "Province",
-    country: "Country",
-    phone_office: "Phone (office)",
-    fax: "Fax",
-    phone_mobile: "Phone Mobile",
-    web_link: "Web link",
-    email: "E-mail",
-    first_name: "First name",
-    last_name: "Last name",
-    address: "Address",
-    formal_position: "Formal position",
-    role_in_the_org: "Role",
-    phone_number_office: "Phone number office",
-    phone_number_mobile: "Phone number mobile",
-    phone_number_messenger: "Phone number messenger",
-    linkedin: "Linkedin",
-    social: "Social",
+    product_article: 'Order number',
+    project_name: 'Project name',
+    quantity_m2: 'Quantity, m2',
+    quantity_ud: 'Quantity, Ud',
+    quantity_palet: 'Quantity of pallets',
+    quantity_real: 'Real quantity, m2',
+    quantity_real_ud: 'Real quantity, Ud',
+    price_m2: 'Price, EURO per m2',
+    price_m3: 'Price, EURO per m3',
+    discount: 'Discount, %',
+    final_price: 'Final price, EURO',
+    total: 'Total, kg',
+    pvp: 'PVP',
+    dry_mixed_id: 'Dry mixed product id',
+    quantity_palet_dry: 'Quantity of pallets',
+    anchor_id: 'Anchor product id',
+    quantity_palet_anchor: 'Quantity of pallets',
+    tool_id: 'Tool product id',
+    rel_mat_id: 'Related material product id',
+    c_name: 'Name of owner',
+    cif_vat: 'CIF/VAT',
+    category: 'Category',
+    street: 'Street',
+    additional_info: 'Additional info',
+    city: 'City',
+    zip_code: 'Zip code',
+    province: 'Province',
+    country: 'Country',
+    phone_office: 'Phone (office)',
+    fax: 'Fax',
+    phone_mobile: 'Phone Mobile',
+    web_link: 'Web link',
+    email: 'E-mail',
+    first_name: 'First name',
+    last_name: 'Last name',
+    address: 'Address',
+    formal_position: 'Formal position',
+    role_in_the_org: 'Role',
+    phone_number_office: 'Phone number office',
+    phone_number_mobile: 'Phone number mobile',
+    phone_number_messenger: 'Phone number messenger',
+    linkedin: 'Linkedin',
+    social: 'Social',
   };
 
   const clients_info_table = [
     {
-      Header: "Client`s Name",
-      accessor: "c_name",
+      Header: 'Client`s Name',
+      accessor: 'c_name',
       Filter: TextSearchFilter,
     },
     {
-      Header: "CIF/VAT",
-      accessor: "cif_vat",
+      Header: 'CIF/VAT',
+      accessor: 'cif_vat',
     },
     {
-      Header: "Category",
-      accessor: "category",
+      Header: 'Category',
+      accessor: 'category',
       Filter: DropdownFilter,
     },
     {
-      Header: "Price category",
-      accessor: "price_category",
+      Header: 'Price category',
+      accessor: 'price_category',
       Filter: DropdownFilter,
     },
   ];
 
   const clients_legal_address_table = [
     {
-      Header: "Street",
-      accessor: "street",
+      Header: 'Street',
+      accessor: 'street',
     },
     {
-      Header: "Additional info",
-      accessor: "additional_info",
+      Header: 'Additional info',
+      accessor: 'additional_info',
     },
     {
-      Header: "City",
-      accessor: "city",
+      Header: 'City',
+      accessor: 'city',
     },
     {
-      Header: "ZIP code",
-      accessor: "zip_code",
+      Header: 'ZIP code',
+      accessor: 'zip_code',
     },
     {
-      Header: "Province",
-      accessor: "province",
+      Header: 'Province',
+      accessor: 'province',
     },
     {
-      Header: "Country",
-      accessor: "country",
+      Header: 'Country',
+      accessor: 'country',
     },
     {
-      Header: "Phone (office)",
-      accessor: "phone_office",
+      Header: 'Phone (office)',
+      accessor: 'phone_office',
     },
     {
-      Header: "Fax",
-      accessor: "fax",
+      Header: 'Fax',
+      accessor: 'fax',
     },
     {
-      Header: "Phone mobile",
-      accessor: "phone_mobile",
+      Header: 'Phone mobile',
+      accessor: 'phone_mobile',
     },
     {
-      Header: "Web link",
-      accessor: "web_link",
+      Header: 'Web link',
+      accessor: 'web_link',
     },
     {
-      Header: "Email",
-      accessor: "email",
+      Header: 'Email',
+      accessor: 'email',
     },
   ];
 
   const clients_delivery_addresses_table = [
     {
-      Header: "Project name",
-      accessor: "project_name",
+      Header: 'Project name',
+      accessor: 'project_name',
     },
     {
-      Header: "Street",
-      accessor: "street",
+      Header: 'Street',
+      accessor: 'street',
     },
     {
-      Header: "Additional info",
-      accessor: "additional_info",
+      Header: 'Additional info',
+      accessor: 'additional_info',
     },
     {
-      Header: "City",
-      accessor: "city",
+      Header: 'City',
+      accessor: 'city',
     },
     {
-      Header: "ZIP code",
-      accessor: "zip_code",
+      Header: 'ZIP code',
+      accessor: 'zip_code',
     },
     {
-      Header: "Province",
-      accessor: "province",
+      Header: 'Province',
+      accessor: 'province',
     },
     {
-      Header: "Country",
-      accessor: "country",
+      Header: 'Country',
+      accessor: 'country',
     },
     {
-      Header: "Phone number",
-      accessor: "phone_number",
+      Header: 'Phone number',
+      accessor: 'phone_number',
     },
     {
-      Header: "Email",
-      accessor: "email",
+      Header: 'Email',
+      accessor: 'email',
     },
   ];
 
   const clients_contact_information_table = [
     {
-      Header: "First name",
-      accessor: "first_name",
+      Header: 'First name',
+      accessor: 'first_name',
     },
     {
-      Header: "Last name",
-      accessor: "last_name",
+      Header: 'Last name',
+      accessor: 'last_name',
     },
     {
-      Header: "Address",
-      accessor: "address",
+      Header: 'Address',
+      accessor: 'address',
     },
     {
-      Header: "Formal position",
-      accessor: "formal_position",
+      Header: 'Formal position',
+      accessor: 'formal_position',
     },
     {
-      Header: "Role in the organization",
-      accessor: "role_in_the_org",
+      Header: 'Role in the organization',
+      accessor: 'role_in_the_org',
     },
     {
-      Header: "Phone number - office",
-      accessor: "phone_number_office",
+      Header: 'Phone number - office',
+      accessor: 'phone_number_office',
     },
     {
-      Header: "Phone number - mobile",
-      accessor: "phone_number_mobile",
+      Header: 'Phone number - mobile',
+      accessor: 'phone_number_mobile',
     },
     {
-      Header: "Phone number - messenger",
-      accessor: "phone_number_messenger",
+      Header: 'Phone number - messenger',
+      accessor: 'phone_number_messenger',
     },
     {
-      Header: "Email",
-      accessor: "email",
+      Header: 'Email',
+      accessor: 'email',
     },
     {
-      Header: "Linkedin",
-      accessor: "linkedin",
+      Header: 'Linkedin',
+      accessor: 'linkedin',
     },
     {
-      Header: "Social",
-      accessor: "social",
+      Header: 'Social',
+      accessor: 'social',
     },
   ];
 
   const categoryOptions = [
-    { value: "constructor_de_gobieno", label: "Constructor de gobieno" },
-    { value: "promotor", label: "Promotor" },
-    { value: "constructor", label: "Constructor" },
-    { value: "arquitecto", label: "Arquitecto" },
-    { value: "distributor_con_almacen", label: "Distributor con almacen" },
-    { value: "distributor_sin_almacen", label: "Distributor sin almacen" },
-    { value: "tienda_de_la_construccion", label: "Tienda de la construccion" },
-    { value: "equipos_de_construccion", label: "Equipos de construccion" },
-    { value: "agente", label: "Agente" },
-    { value: "cliente_privado", label: "Cliente privado" },
+    { value: 'constructor_de_gobieno', label: 'Constructor de gobieno' },
+    { value: 'promotor', label: 'Promotor' },
+    { value: 'constructor', label: 'Constructor' },
+    { value: 'arquitecto', label: 'Arquitecto' },
+    { value: 'distributor_con_almacen', label: 'Distributor con almacen' },
+    { value: 'distributor_sin_almacen', label: 'Distributor sin almacen' },
+    { value: 'tienda_de_la_construccion', label: 'Tienda de la construccion' },
+    { value: 'equipos_de_construccion', label: 'Equipos de construccion' },
+    { value: 'agente', label: 'Agente' },
+    { value: 'cliente_privado', label: 'Cliente privado' },
   ];
 
   const priceCategoryOptions = [
     {
-      value: "promotor_constructor_de_gobierno",
-      label: "Promotor/Constructor de gobierno",
+      value: 'promotor_constructor_de_gobierno',
+      label: 'Promotor/Constructor de gobierno',
     },
-    { value: "promotor", label: "Promotor" },
-    { value: "constructor", label: "Constructor" },
-    { value: "arquitecto", label: "Arquitecto" },
-    { value: "distribuidor_con_almacen", label: "Distribuidor con almacen" },
-    { value: "distribuidor_sin_almacen", label: "Distribuidor sin almacen" },
-    { value: "tienda_de_la_construccion", label: "Tienda de la construcción" },
-    { value: "equipo_de_construction", label: "Equipo de construction" },
-    { value: "agente", label: "Agente" },
-    { value: "cliente_privado", label: "Сliente privado" },
-    { value: "constructor_pequeno", label: "Constructor pequeño" },
-    { value: "almacenista_pequeno", label: "Almacenista pequeno" },
+    { value: 'promotor', label: 'Promotor' },
+    { value: 'constructor', label: 'Constructor' },
+    { value: 'arquitecto', label: 'Arquitecto' },
+    { value: 'distribuidor_con_almacen', label: 'Distribuidor con almacen' },
+    { value: 'distribuidor_sin_almacen', label: 'Distribuidor sin almacen' },
+    { value: 'tienda_de_la_construccion', label: 'Tienda de la construcción' },
+    { value: 'equipo_de_construction', label: 'Equipo de construction' },
+    { value: 'agente', label: 'Agente' },
+    { value: 'cliente_privado', label: 'Сliente privado' },
+    { value: 'constructor_pequeno', label: 'Constructor pequeño' },
+    { value: 'almacenista_pequeno', label: 'Almacenista pequeno' },
     {
-      value: "distribuidor_en_nuestra_lista",
-      label: "Distribuidor en nuestra lista",
+      value: 'distribuidor_en_nuestra_lista',
+      label: 'Distribuidor en nuestra lista',
     },
     {
-      value: "arquitecto_en_nuestra_lista",
-      label: "Arquitecto en nuestra lista",
+      value: 'arquitecto_en_nuestra_lista',
+      label: 'Arquitecto en nuestra lista',
     },
   ];
 
   const users_info_table = [
     {
-      Header: "E-mail",
-      accessor: "email",
+      Header: 'E-mail',
+      accessor: 'email',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Full Name",
-      accessor: "fullName",
+      Header: 'Full Name',
+      accessor: 'fullName',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Role",
-      accessor: "role",
+      Header: 'Role',
+      accessor: 'role',
       Filter: DropdownFilter,
     },
   ];
 
   const users_main_info_table = [
     {
-      Header: "Username",
-      accessor: "u_username",
+      Header: 'Username',
+      accessor: 'u_username',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Email",
-      accessor: "u_email",
+      Header: 'Email',
+      accessor: 'u_email',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Password",
-      accessor: "password",
+      Header: 'Password',
+      accessor: 'password',
     },
     {
-      Header: "Role",
-      accessor: "role",
+      Header: 'Role',
+      accessor: 'role',
     },
   ];
 
   const users_additional_info_table = [
     {
-      Header: "Full Name",
-      accessor: "fullName",
+      Header: 'Full Name',
+      accessor: 'fullName',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Shift",
-      accessor: "shift",
+      Header: 'Shift',
+      accessor: 'shift',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Subdivision",
-      accessor: "subdivision",
+      Header: 'Subdivision',
+      accessor: 'subdivision',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Phone",
-      accessor: "phone",
+      Header: 'Phone',
+      accessor: 'phone',
       Filter: TextSearchFilter,
     },
   ];
 
   const production_batch_log = [
     {
-      Header: "Article of product",
-      accessor: "products_article",
+      Header: 'Article of product',
+      accessor: 'products_article',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Article of an order",
-      accessor: "orders_article",
+      Header: 'Article of an order',
+      accessor: 'orders_article',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Production date",
-      accessor: "production_date",
+      Header: 'Production date',
+      accessor: 'production_date',
     },
   ];
 
   const WAREHOUSE_MANAGER_TABLE = [
     {
-      Header: "Order number",
-      accessor: "orders_article",
+      Header: 'Order number',
+      accessor: 'orders_article',
     },
     {
-      Header: "Project name",
-      accessor: "projects_name",
+      Header: 'Project name',
+      accessor: 'projects_name',
     },
     {
-      Header: "Delivery due date",
-      accessor: "production_date",
+      Header: 'Delivery due date',
+      accessor: 'production_date',
     },
     {
-      Header: "Order products",
-      accessor: "orders_products",
+      Header: 'Order products',
+      accessor: 'orders_products',
     },
   ];
 
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  const clientPriceInfo = useSelector((state) => state.contactPriceInfo);
 
   const [currentContact, setCurrentContact] = useState();
   const [currentDelivery, setCurrentDelivery] = useState();
   const [previewProductData, setPreviewProductData] = useState();
-  const [previewOperationName, setPreviewOperationName] = useState("");
+  const [previewOperationName, setPreviewOperationName] = useState('');
 
   const [version, setVersion] = useState(1);
   const [roleId, setRoleId] = useState(0);
@@ -369,79 +370,79 @@ const ProjectContextProvider = ({ children }) => {
   const [productionBatchLogData, setProductionBatchLogData] = useState([]);
 
   const roleTable = [
-    { id: 1, label: "Production Manager" },
-    { id: 2, label: "Head of Sales Department" },
-    { id: 3, label: "System administrator" },
-    { id: 4, label: "Chief technologist" },
-    { id: 5, label: "Mill operators" },
-    { id: 6, label: "Casting operators" },
-    { id: 7, label: "Cutting operators" },
-    { id: 8, label: "Green array operators" },
-    { id: 9, label: "Autoclave operators" },
-    { id: 10, label: "White array operators" },
-    { id: 11, label: "Packaging operators" },
-    { id: 12, label: "Quality manager" },
-    { id: 13, label: "Production director" },
-    { id: 14, label: "Mechanical-electrical technicians" },
-    { id: 15, label: "Forklift drivers" },
-    { id: 16, label: "Sales department director" },
-    { id: 17, label: "Sales department manager" },
-    { id: 18, label: "Warehouse department director" },
-    { id: 19, label: "Warehouse department manager" },
-    { id: 20, label: "Accountant" },
+    { id: 1, label: 'Production Manager' },
+    { id: 2, label: 'Head of Sales Department' },
+    { id: 3, label: 'System administrator' },
+    { id: 4, label: 'Chief technologist' },
+    { id: 5, label: 'Mill operators' },
+    { id: 6, label: 'Casting operators' },
+    { id: 7, label: 'Cutting operators' },
+    { id: 8, label: 'Green array operators' },
+    { id: 9, label: 'Autoclave operators' },
+    { id: 10, label: 'White array operators' },
+    { id: 11, label: 'Packaging operators' },
+    { id: 12, label: 'Quality manager' },
+    { id: 13, label: 'Production director' },
+    { id: 14, label: 'Mechanical-electrical technicians' },
+    { id: 15, label: 'Forklift drivers' },
+    { id: 16, label: 'Sales department director' },
+    { id: 17, label: 'Sales department manager' },
+    { id: 18, label: 'Warehouse department director' },
+    { id: 19, label: 'Warehouse department manager' },
+    { id: 20, label: 'Accountant' },
   ];
 
   const pageTitles = {
-    "/": "Main Page",
-    "/sign-in": "Sign In",
-    "/roles": "Roles",
-    "/products": "HCCA Blocks",
-    "/dry_mixes_journal": "Dry mixes journal",
-    "/related_materials_journal": "Related materials journal",
-    "/anchors": "Fasteners",
-    "/tools": "Tools",
-    "/products/edit": "Редактирование",
-    "/clients": "Clients",
-    "/users_info": "Users Info",
-    "/warehouse_manager": "Order dispatch",
-    "/products_type_journal": "Products catalog",
-    "/statistics": "Statistics",
-    "/orders": "Orders",
-    "/order_card": "Order cart",
-    "/accounting": "Accounting",
-    "/warehouse_products_type": "Warehouse",
-    "/warehouse_HCCA_blocks": "HCCA Blocks Warehouse",
-    "/warehouse_dry_mixes": "Dry Mixes Warehouse",
-    "/warehouse_related_materials": "Related Materials Warehouse",
-    "/warehouse_anchors": "Fasteners Warehouse",
-    "/warehouse_tools": "Tools Warehouse",
-    "/warehouse_raw_materials": "Raw Materials Warehouse",
-    "/production_batch_designer": "Batch planner",
-    "/production_batch_designer_new": "Batch planner",
-    "/list_of_ordered_production": "Ordered blocks pipeline",
-    "/list_of_ordered_production_oem": "Ordered OEM blocks pipeline",
-    "/related_materials_backorder_list": "Related materials backorder list",
-    "/batch_outside": "Batch calendar",
-    "/recipe_products": "Recipes catalog",
-    "/raw_materials_plan": "Batch recipe planner",
-    "/recipe_orders": "Raw material calendar",
-    "/quality_management": "Quality Management",
-    "/autoclave_calendar": "Autoclave calendar",
-    "/raw_material_consumption": "Raw materials consumption",
+    '/': 'Main Page',
+    '/sign-in': 'Sign In',
+    '/roles': 'Roles',
+    '/products': 'HCCA Blocks',
+    '/dry_mixes_journal': 'Dry mixes journal',
+    '/related_materials_journal': 'Related materials journal',
+    '/anchors': 'Fasteners',
+    '/tools': 'Tools',
+    '/products/edit': 'Редактирование',
+    '/clients': 'Clients',
+    '/users_info': 'Users Info',
+    '/warehouse_manager': 'Order dispatch',
+    '/products_type_journal': 'Products catalog',
+    '/statistics': 'Statistics',
+    '/orders': 'Orders',
+    '/order_card': 'Order cart',
+    '/accounting': 'Accounting',
+    '/warehouse_products_type': 'Warehouse',
+    '/warehouse_HCCA_blocks': 'HCCA Blocks Warehouse',
+    '/warehouse_dry_mixes': 'Dry Mixes Warehouse',
+    '/warehouse_related_materials': 'Related Materials Warehouse',
+    '/warehouse_anchors': 'Fasteners Warehouse',
+    '/warehouse_tools': 'Tools Warehouse',
+    '/warehouse_raw_materials': 'Raw Materials Warehouse',
+    '/production_batch_designer': 'Batch planner',
+    '/production_batch_designer_new': 'Batch planner',
+    '/list_of_ordered_production': 'Ordered blocks pipeline',
+    '/list_of_ordered_production_oem': 'Ordered OEM blocks pipeline',
+    '/related_materials_backorder_list': 'Related materials backorder list',
+    '/batch_outside': 'Batch calendar',
+    '/recipe_products': 'Recipes catalog',
+    '/raw_materials_plan': 'Batch recipe planner',
+    '/recipe_orders': 'Raw material calendar',
+    '/quality_management': 'Quality Management',
+    '/autoclave_calendar': 'Autoclave calendar',
+    '/raw_material_consumption': 'Raw materials consumption',
   };
 
   function getPageTitleByPath(pathname = window.location.pathname) {
-    return pageTitles[pathname] || "Страница";
+    return pageTitles[pathname] || 'Страница';
   }
 
   const getRoleName = (roleId) => {
-    return roleTable.find((el) => el.id == roleId)?.label ?? "null";
+    return roleTable.find((el) => el.id == roleId)?.label ?? 'null';
   };
 
   useEffect(() => {
     //сделать диспатч чек юзер на нахождение юзера в бд
     if (isCheckedAuth && !user) {
-      navigate("/sign-in");
+      navigate('/sign-in');
     }
   }, []);
 
@@ -450,6 +451,7 @@ const ProjectContextProvider = ({ children }) => {
       value={{
         WAREHOUSE_MANAGER_TABLE,
         user,
+        clientPriceInfo,
         displayNames,
         version,
         setVersion,
