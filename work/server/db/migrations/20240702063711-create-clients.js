@@ -21,6 +21,9 @@ module.exports = {
       price_category: {
         type: Sequelize.TEXT,
       },
+      bitrix_id: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

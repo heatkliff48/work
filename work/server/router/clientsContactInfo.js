@@ -1,17 +1,18 @@
-const clientsContactInfo = require('express').Router();
-const { ContactInfos } = require('../db/models');
-const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
-const myEmitter = require('../src/ee.js');
-const { ADD_CONTACT_INFO_SOCKET } = require('../src/constants/event.js');
+const clientsContactInfo = require("express").Router();
+const { ContactInfos } = require("../db/models");
+const TokenService = require("../services/Token.js");
+const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
+const { COOKIE_SETTINGS } = require("../constants.js");
+const myEmitter = require("../src/ee.js");
+const { ADD_CONTACT_INFO_SOCKET } = require("../src/constants/event.js");
 
-clientsContactInfo.post('/', async (req, res) => {
+clientsContactInfo.post("/", async (req, res) => {
   try {
     const {
       currentClientID,
       first_name,
       last_name,
+      preffered_name,
       address,
       formal_position,
       role_in_the_org,
@@ -27,6 +28,7 @@ clientsContactInfo.post('/', async (req, res) => {
       client_id: currentClientID,
       first_name,
       last_name,
+      preffered_name,
       address,
       formal_position,
       role_in_the_org,
@@ -51,7 +53,7 @@ clientsContactInfo.post('/', async (req, res) => {
   }
 });
 
-clientsContactInfo.get('/', async (req, res) => {
+clientsContactInfo.get("/", async (req, res) => {
   try {
     const contactInfo = await ContactInfos.findAll();
 

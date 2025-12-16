@@ -1,5 +1,6 @@
 const clientsRouter = require("express").Router();
 const { Clients } = require("../db/models");
+const { ClientLegalAddresses } = require("../db/models");
 const TokenService = require("../services/Token.js");
 const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
 const { COOKIE_SETTINGS } = require("../constants.js");
@@ -7,6 +8,10 @@ const myEmitter = require("../src/ee.js");
 const {
   ADD_NEW_CLIENT_SOCKET,
   UPDATE_CLIENT_SOCKET,
+} = require("../src/constants/event.js");
+const {
+  ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
+  UPDATE_LEGAL_ADDRESS_SOCKET,
 } = require("../src/constants/event.js");
 
 clientsRouter.get("/", async (req, res) => {
@@ -49,16 +54,90 @@ clientsRouter.post("/", async (req, res) => {
     });
 
     myEmitter.emit(ADD_NEW_CLIENT_SOCKET, client);
-    return res.status(200); //.json({ client });
-    // .cookie('refreshToken', refreshToken, COOKIE_SETTINGS.REFRESH_TOKEN)
-    // .json({
-    //   client,
-    //   accessToken,
-    //   accessTokenExpiration: ACCESS_TOKEN_EXPIRATION,
-    // })
+    return res.status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
+  }
+});
+
+clientsRouter.post("/bitrix-new-client", async (req, res) => {
+  try {
+    // Для Bitrix данные могут приходить в разном формате
+    // Вариант 1: Если Bitrix отправляет в req.body
+    const {
+      c_name,
+      cif_vat,
+      category,
+      price_category,
+      street,
+      additional_info,
+      city,
+      zip_code,
+      province,
+      country,
+      phone_office,
+      fax,
+      phone_mobile,
+      web_link,
+      email,
+      bitrix_id,
+    } = req.body;
+
+    // Проверка обязательных полей
+    // if (!name || !cif_vat) {
+    //   return res.status(400).json({
+    //     error: "Обязательные поля: name и cif_vat",
+    //   });
+    // }
+
+    // Создание клиента в базе данных
+    const client = await Clients.create({
+      c_name, // Преобразуем имя поля под нашу БД
+      cif_vat,
+      category,
+      price_category,
+      bitrix_id, // Сохраняем ID из Bitrix для связи
+    });
+    const legalAddress = await ClientLegalAddresses.create({
+      street,
+      additional_info,
+      city,
+      zip_code,
+      province,
+      country,
+      phone_office,
+      fax,
+      phone_mobile,
+      web_link,
+      email,
+    });
+
+    // Отправляем событие в сокеты (если нужно)
+    myEmitter.emit(ADD_NEW_CLIENT_SOCKET, client);
+    myEmitter.emit(ADD_CLIENTS_LEGAL_ADDRESS_SOCKET, legalAddress);
+
+    // Возвращаем успешный ответ
+    return res.status(200).json({
+      client: client,
+      id: client.id, // ID в нашей базе
+      bitrix_id,
+    });
+  } catch (err) {
+    console.error("Ошибка при добавлении клиента из Bitrix:", err.message);
+
+    // Обработка уникальных ошибок (например, дубликат CIF/VAT)
+    // if (err.name === "SequelizeUniqueConstraintError") {
+    //   return res.status(409).json({
+    //     error: "Клиент с таким CIF/VAT уже существует",
+    //     details: err.errors.map((e) => e.message),
+    //   });
+    // }
+
+    return res.status(500).json({
+      error: "Внутренняя ошибка сервера",
+      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
   }
 });
 

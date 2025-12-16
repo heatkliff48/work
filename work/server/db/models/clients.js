@@ -34,6 +34,9 @@ module.exports = (sequelize, DataTypes) => {
       price_category: {
         type: DataTypes.STRING,
       },
+      bitrix_id: {
+        type: DataTypes.INTEGER,
+      },
     },
     {
       sequelize,
