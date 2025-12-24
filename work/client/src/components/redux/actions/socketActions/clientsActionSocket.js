@@ -1,11 +1,13 @@
 import {
   NEED_UPDATE_CLIENT_SOCKET,
+  NEED_UPDATE_CONTACT_INFO_SOCKET,
+  NEED_UPDATE_DELIVERY_ADDRESSES_SOCKET,
   NEW_CLIENT_SOCKET,
   NEW_CONTACT_INFO_SOCKET,
   NEW_DELIVERY_ADDRESSES_SOCKET,
   ONE_LEGAL_ADDRESS_SOCKET,
   UPD_CONTACT_PRICE_INFO_SOCKET,
-} from '#components/redux/types/socketTypes/socket.js';
+} from "#components/redux/types/socketTypes/socket.js";
 
 export const addNewClientSocket = (client) => {
   return {
@@ -42,6 +44,13 @@ export const addNewContactInfoSocket = (contactInfo) => {
   };
 };
 
+export const updateContactInfoSocket = (contactInfo) => {
+  return {
+    type: NEED_UPDATE_CONTACT_INFO_SOCKET,
+    payload: contactInfo,
+  };
+};
+
 export const updContactPriceInfoSocket = (updClient) => {
   return {
     type: UPD_CONTACT_PRICE_INFO_SOCKET,
@@ -52,6 +61,13 @@ export const updContactPriceInfoSocket = (updClient) => {
 export const addNewDeliveryAddressSocket = (deliveryAddress) => {
   return {
     type: NEW_DELIVERY_ADDRESSES_SOCKET,
+    payload: deliveryAddress,
+  };
+};
+
+export const updateDeliveryAddressSocket = (deliveryAddress) => {
+  return {
+    type: NEED_UPDATE_DELIVERY_ADDRESSES_SOCKET,
     payload: deliveryAddress,
   };
 };

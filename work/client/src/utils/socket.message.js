@@ -133,6 +133,8 @@ import {
   addNewDeliveryAddressSocket,
   addNewContactInfoSocket,
   updContactPriceInfoSocket,
+  updateContactInfoSocket,
+  updateDeliveryAddressSocket,
 } from "#components/redux/actions/socketActions/clientsActionSocket.js";
 import {
   addNewBatchOutsideSocket,
@@ -287,6 +289,8 @@ import {
   DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
   ADD_NEW_LOTES_LIST_SOCKET,
   NEED_UPD_CONTACT_PRICE_INFO_SOCKET,
+  UPDATE_CONTACT_INFO_SOCKET,
+  UPDATE_DELIVERY_ADDRESSES_SOCKET,
 } from "#components/redux/types/socketTypes/socket.js";
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -443,12 +447,20 @@ export const createSocketOnMessage = (dispatch) => (event) => {
       dispatch(addNewContactInfoSocket(payload));
       break;
 
+    case UPDATE_CONTACT_INFO_SOCKET:
+      dispatch(updateContactInfoSocket(payload));
+      break;
+
     case NEED_UPD_CONTACT_PRICE_INFO_SOCKET:
       dispatch(updContactPriceInfoSocket(payload));
       break;
 
     case ADD_DELIVERY_ADDRESSES_SOCKET:
       dispatch(addNewDeliveryAddressSocket(payload));
+      break;
+
+    case UPDATE_DELIVERY_ADDRESSES_SOCKET:
+      dispatch(updateDeliveryAddressSocket(payload));
       break;
 
     case ADD_NEW_BATCH_OUTSIDE_SOCKET:

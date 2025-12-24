@@ -11,7 +11,9 @@ import {
   ADD_CONTACT_INFO,
   GET_CLIENT_PRICE_INFO,
   NEED_UPDATE_CLIENT_PRICE_INFO,
-} from '../types/clientsTypes';
+  NEED_UPDATE_DELIVERY_ADDRESSES,
+  NEED_UPDATE_CONTACT_INFO,
+} from "../types/clientsTypes";
 
 export const getAllClients = () => {
   return {
@@ -68,6 +70,13 @@ export const addNewDeliveryAddress = ({ deliveryAddress }) => {
   };
 };
 
+export const updateDeliveryAddress = ({ deliveryAddress }) => {
+  return {
+    type: NEED_UPDATE_DELIVERY_ADDRESSES,
+    payload: { deliveryAddress },
+  };
+};
+
 export const getAllContactInfo = () => {
   return {
     type: GET_ALL_CONTACT_INFO,
@@ -86,6 +95,13 @@ export const getAllContactInfo = () => {
 export const addNewContactInfo = ({ contactInfo }) => {
   return {
     type: ADD_CONTACT_INFO,
+    payload: { contactInfo },
+  };
+};
+
+export const updateContactInfo = ({ contactInfo }) => {
+  return {
+    type: NEED_UPDATE_CONTACT_INFO,
     payload: { contactInfo },
   };
 };
