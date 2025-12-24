@@ -202,4 +202,85 @@ clientsRouter.post("/update/:c_id", async (req, res) => {
   }
 });
 
+clientsRouter.post("/bitrix-update-client", async (req, res) => {
+  const {
+    c_name,
+    cif_vat,
+    category,
+    price_category,
+    street,
+    additional_info,
+    city,
+    zip_code,
+    province,
+    country,
+    phone_office,
+    fax,
+    phone_mobile,
+    web_link,
+    email,
+    bitrix_id,
+  } = req.body;
+
+  const oldClient = await Clients.findOne({
+    where: {
+      bitrix_id: bitrix_id,
+    },
+  });
+
+  try {
+    const client = await Clients.update(
+      {
+        c_name,
+        cif_vat,
+        category,
+        price_category,
+      },
+      {
+        where: {
+          id: oldClient.id,
+        },
+        returning: true,
+        plain: true,
+      }
+    );
+
+    const legalAddress = await ClientLegalAddresses.update(
+      {
+        street,
+        additional_info,
+        city,
+        zip_code,
+        province,
+        country,
+        phone_office,
+        fax,
+        phone_mobile,
+        web_link,
+        email,
+      },
+      {
+        where: {
+          id: oldClient.id,
+        },
+      }
+    );
+
+    myEmitter.emit(UPDATE_CLIENT_SOCKET, client);
+    myEmitter.emit(UPDATE_LEGAL_ADDRESS_SOCKET, legalAddress);
+    return res.status(200).json({
+      client: client,
+      id: client.id, // ID в нашей базе
+      bitrix_id,
+    });
+  } catch (err) {
+    console.error("Ошибка при обновлении клиента из Bitrix:", err.message);
+
+    return res.status(500).json({
+      error: "Внутренняя ошибка сервера",
+      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+});
+
 module.exports = clientsRouter;

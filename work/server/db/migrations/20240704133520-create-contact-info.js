@@ -53,6 +53,12 @@ module.exports = {
       social: {
         type: Sequelize.TEXT,
       },
+      bitrix_id: {
+        type: Sequelize.INTEGER,
+      },
+      bitrix_client_id: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

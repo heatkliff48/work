@@ -54,6 +54,12 @@ module.exports = (sequelize, DataTypes) => {
       social: {
         type: DataTypes.STRING,
       },
+      bitrix_id: {
+        type: DataTypes.INTEGER,
+      },
+      bitrix_client_id: {
+        type: DataTypes.INTEGER,
+      },
     },
     {
       sequelize,
