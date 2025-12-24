@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('DeliveryAddresses', {
+    await queryInterface.createTable("DeliveryAddresses", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,8 +13,8 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-          model: 'Clients',
-          key: 'id',
+          model: "Clients",
+          key: "id",
         },
       },
       project_name: {
@@ -44,6 +44,12 @@ module.exports = {
       email: {
         type: Sequelize.TEXT,
       },
+      bitrix_id: {
+        type: Sequelize.INTEGER,
+      },
+      bitrix_client_id: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -55,6 +61,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('DeliveryAddresses');
+    await queryInterface.dropTable("DeliveryAddresses");
   },
 };
