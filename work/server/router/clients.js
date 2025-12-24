@@ -14,13 +14,13 @@ const {
   UPDATE_LEGAL_ADDRESS_SOCKET,
 } = require('../src/constants/event.js');
 
-clientsRouter.get("/", async (req, res) => {
+clientsRouter.get('/', async (req, res) => {
   // const fingerprint = req.fingerprint.hash;
   // const { id, username, email } = req.session.user;
 
   try {
     const allClients = await Clients.findAll({
-      order: [["id", "ASC"]],
+      order: [['id', 'ASC']],
     });
 
     // const payload = { id, username, email };
@@ -144,8 +144,8 @@ clientsRouter.post('/bitrix-new-client', async (req, res) => {
 clientsRouter.get('/:id', async (req, res) => {
   try {
     const lastID = await Clients.findOne({
-      attributes: ["id"],
-      order: [["id", "DESC"]],
+      attributes: ['id'],
+      order: [['id', 'DESC']],
     });
 
     return res.status(200).json({ lastID });
