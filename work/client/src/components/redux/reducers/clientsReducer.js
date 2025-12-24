@@ -1,19 +1,21 @@
-import showMessage from '#components/Utils/showMessage.js';
+import showMessage from "#components/Utils/showMessage.js";
 import {
   ALL_CLIENTS,
   ONE_LEGAL_ADDRESS,
   ALL_DELIVERY_ADDRESSES,
   ALL_CONTACT_INFO,
   CLIENT_PRICE_INFO,
-} from '../types/clientsTypes';
+} from "../types/clientsTypes";
 import {
   NEED_UPDATE_CLIENT_SOCKET,
+  NEED_UPDATE_CONTACT_INFO_SOCKET,
+  NEED_UPDATE_DELIVERY_ADDRESSES_SOCKET,
   NEW_CLIENT_SOCKET,
   NEW_CONTACT_INFO_SOCKET,
   NEW_DELIVERY_ADDRESSES_SOCKET,
   ONE_LEGAL_ADDRESS_SOCKET,
   UPD_CONTACT_PRICE_INFO_SOCKET,
-} from '../types/socketTypes/socket';
+} from "../types/socketTypes/socket";
 
 export const clientsReducer = (clients = [], action) => {
   const { type, payload } = action;
@@ -59,6 +61,13 @@ export const deliveryAddressesReducer = (deliveryAddresses = [], action) => {
     case NEW_DELIVERY_ADDRESSES_SOCKET: {
       return [...deliveryAddresses, payload];
     }
+    case NEED_UPDATE_DELIVERY_ADDRESSES_SOCKET: {
+      const updateDeliveryAddresses = deliveryAddresses.map((el) => {
+        if (el.id === payload[1].id) return payload[1];
+        return el;
+      });
+      return updateDeliveryAddresses;
+    }
     default:
       return deliveryAddresses;
   }
@@ -72,6 +81,13 @@ export const contactInfoReducer = (contactInfo = [], action) => {
     }
     case NEW_CONTACT_INFO_SOCKET: {
       return [...contactInfo, payload];
+    }
+    case NEED_UPDATE_CONTACT_INFO_SOCKET: {
+      const updateContactInfo = contactInfo.map((el) => {
+        if (el.id === payload[1].id) return payload[1];
+        return el;
+      });
+      return updateContactInfo;
     }
     default:
       return contactInfo;
@@ -104,7 +120,7 @@ export const contactPriceInfoReducer = (contactPriceInfo = [], action) => {
         }
       });
 
-      showMessage('Contact price info updated', 'success');
+      showMessage("Contact price info updated", "success");
 
       return updated;
     }

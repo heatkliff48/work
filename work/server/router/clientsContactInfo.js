@@ -5,7 +5,10 @@ const TokenService = require("../services/Token.js");
 const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
 const { COOKIE_SETTINGS } = require("../constants.js");
 const myEmitter = require("../src/ee.js");
-const { ADD_CONTACT_INFO_SOCKET } = require("../src/constants/event.js");
+const {
+  ADD_CONTACT_INFO_SOCKET,
+  UPDATE_CONTACT_INFO_SOCKET,
+} = require("../src/constants/event.js");
 
 clientsContactInfo.post("/", async (req, res) => {
   try {
@@ -106,6 +109,66 @@ clientsContactInfo.post("/bitrix-new-contact-info", async (req, res) => {
     });
   } catch (err) {
     console.error("Ошибка при добавлении клиента из Bitrix:", err.message);
+
+    return res.status(500).json({
+      error: "Внутренняя ошибка сервера",
+      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+});
+
+clientsContactInfo.post("/bitrix-update-contact-info", async (req, res) => {
+  try {
+    const {
+      bitrix_id,
+      bitrix_client_id,
+      first_name,
+      last_name,
+      preffered_name,
+      address,
+      formal_position,
+      role_in_the_org,
+      phone_number_office,
+      phone_number_mobile,
+      phone_number_messenger,
+      email,
+      linkedin,
+      social,
+    } = req.body;
+
+    const contactInfo = await ContactInfos.update(
+      {
+        first_name,
+        last_name,
+        preffered_name,
+        address,
+        formal_position,
+        role_in_the_org,
+        phone_number_office,
+        phone_number_mobile,
+        phone_number_messenger,
+        email,
+        linkedin,
+        social,
+      },
+      {
+        where: {
+          bitrix_id,
+        },
+        returning: true,
+        plain: true,
+      }
+    );
+
+    myEmitter.emit(UPDATE_CONTACT_INFO_SOCKET, contactInfo);
+    return res.status(200).json({
+      contact_info: contactInfo[1],
+      id: contactInfo.id,
+      bitrix_id,
+      bitrix_client_id,
+    });
+  } catch (err) {
+    console.error("Ошибка при обновлении клиента из Bitrix:", err.message);
 
     return res.status(500).json({
       error: "Внутренняя ошибка сервера",

@@ -133,8 +133,10 @@ const {
   DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
   ADD_NEW_LOTES_LIST_SOCKET,
   NEED_UPD_CONTACT_PRICE_INFO_SOCKET,
-} = require('../constants/event');
-const myEmitter = require('../ee');
+  UPDATE_CONTACT_INFO_SOCKET,
+  UPDATE_DELIVERY_ADDRESSES_SOCKET,
+} = require("../constants/event");
+const myEmitter = require("../ee");
 
 function registerWsEmitter(map) {
   myEmitter.on(ADD_NEW_PRODUCT_SOCKET, (products) => {
@@ -327,27 +329,33 @@ function registerWsEmitter(map) {
     }
   );
 
-  myEmitter.on(UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET, (anchor_product_of_order) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
-          payload: anchor_product_of_order,
-        })
-      );
+  myEmitter.on(
+    UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+    (anchor_product_of_order) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+            payload: anchor_product_of_order,
+          })
+        );
+      }
     }
-  });
+  );
 
-  myEmitter.on(UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET, (newToolProductsOfOrder) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
-          payload: newToolProductsOfOrder,
-        })
-      );
+  myEmitter.on(
+    UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+    (newToolProductsOfOrder) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+            payload: newToolProductsOfOrder,
+          })
+        );
+      }
     }
-  });
+  );
 
   myEmitter.on(
     UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
@@ -465,38 +473,47 @@ function registerWsEmitter(map) {
     }
   );
 
-  myEmitter.on(GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET, (upd_prod_info) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
-          payload: upd_prod_info,
-        })
-      );
+  myEmitter.on(
+    GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
+    (upd_prod_info) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
+            payload: upd_prod_info,
+          })
+        );
+      }
     }
-  });
+  );
 
-  myEmitter.on(GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET, (upd_prod_info) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
-          payload: upd_prod_info,
-        })
-      );
+  myEmitter.on(
+    GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
+    (upd_prod_info) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
+            payload: upd_prod_info,
+          })
+        );
+      }
     }
-  });
+  );
 
-  myEmitter.on(GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET, (upd_prod_info) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
-          payload: upd_prod_info,
-        })
-      );
+  myEmitter.on(
+    GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+    (upd_prod_info) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+            payload: upd_prod_info,
+          })
+        );
+      }
     }
-  });
+  );
 
   myEmitter.on(ADD_NEW_WAREHOUSE_SOCKET, (new_warehouse) => {
     for (let [id, userConnect] of map) {
@@ -564,6 +581,17 @@ function registerWsEmitter(map) {
     }
   });
 
+  myEmitter.on(UPDATE_CONTACT_INFO_SOCKET, (contactInfo) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_CONTACT_INFO_SOCKET,
+          payload: contactInfo,
+        })
+      );
+    }
+  });
+
   myEmitter.on(NEED_UPD_CONTACT_PRICE_INFO_SOCKET, (updClient) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
@@ -580,6 +608,17 @@ function registerWsEmitter(map) {
       userConnect.send(
         JSON.stringify({
           type: ADD_DELIVERY_ADDRESSES_SOCKET,
+          payload: deliveryAddress,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_DELIVERY_ADDRESSES_SOCKET, (deliveryAddress) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_DELIVERY_ADDRESSES_SOCKET,
           payload: deliveryAddress,
         })
       );
@@ -619,16 +658,19 @@ function registerWsEmitter(map) {
     }
   });
 
-  myEmitter.on(GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET, (new_reserved_product) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-          payload: new_reserved_product,
-        })
-      );
+  myEmitter.on(
+    GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+    (new_reserved_product) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+            payload: new_reserved_product,
+          })
+        );
+      }
     }
-  });
+  );
 
   myEmitter.on(
     GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
@@ -1223,49 +1265,61 @@ function registerWsEmitter(map) {
     }
   });
 
-  myEmitter.on(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, (rawMaterialsWarehouse) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
-          payload: rawMaterialsWarehouse,
-        })
-      );
+  myEmitter.on(
+    UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+    (rawMaterialsWarehouse) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+            payload: rawMaterialsWarehouse,
+          })
+        );
+      }
     }
-  });
+  );
 
-  myEmitter.on(ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET, (qualityManagementData) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
-          payload: qualityManagementData,
-        })
-      );
+  myEmitter.on(
+    ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
+    (qualityManagementData) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
+            payload: qualityManagementData,
+          })
+        );
+      }
     }
-  });
+  );
 
-  myEmitter.on(UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET, (qualityManagementData) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
-          payload: qualityManagementData,
-        })
-      );
+  myEmitter.on(
+    UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
+    (qualityManagementData) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
+            payload: qualityManagementData,
+          })
+        );
+      }
     }
-  });
+  );
 
-  myEmitter.on(DELETE_QUALITY_MANAGEMENT_DATA_SOCKET, (qualityManagementDataID) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
-          payload: qualityManagementDataID,
-        })
-      );
+  myEmitter.on(
+    DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
+    (qualityManagementDataID) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
+            payload: qualityManagementDataID,
+          })
+        );
+      }
     }
-  });
+  );
 
   myEmitter.on(
     ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
@@ -1317,16 +1371,19 @@ function registerWsEmitter(map) {
     }
   });
 
-  myEmitter.on(GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET, (updAutoclaveCalendares) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
-          payload: updAutoclaveCalendares,
-        })
-      );
+  myEmitter.on(
+    GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
+    (updAutoclaveCalendares) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
+            payload: updAutoclaveCalendares,
+          })
+        );
+      }
     }
-  });
+  );
 
   myEmitter.on(
     ADD_NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
@@ -1520,16 +1577,19 @@ function registerWsEmitter(map) {
   });
 
   // Gypsum stone
-  myEmitter.on(ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET, (warehouseGypsumStone) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET,
-          payload: warehouseGypsumStone,
-        })
-      );
+  myEmitter.on(
+    ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET,
+    (warehouseGypsumStone) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET,
+            payload: warehouseGypsumStone,
+          })
+        );
+      }
     }
-  });
+  );
 
   myEmitter.on(UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET, (warehouseGypsumStone) => {
     for (let [id, userConnect] of map) {
@@ -1542,16 +1602,19 @@ function registerWsEmitter(map) {
     }
   });
 
-  myEmitter.on(DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET, (gypsum_stone_warehouse_id) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
-          payload: gypsum_stone_warehouse_id,
-        })
-      );
+  myEmitter.on(
+    DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+    (gypsum_stone_warehouse_id) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+            payload: gypsum_stone_warehouse_id,
+          })
+        );
+      }
     }
-  });
+  );
 
   // Aluminum1
   myEmitter.on(ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET, (warehouseAluminum1) => {
@@ -1622,27 +1685,33 @@ function registerWsEmitter(map) {
   });
 
   // Grinding Balls
-  myEmitter.on(ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET, (warehouseGrindingBalls) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
-          payload: warehouseGrindingBalls,
-        })
-      );
+  myEmitter.on(
+    ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
+    (warehouseGrindingBalls) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
+            payload: warehouseGrindingBalls,
+          })
+        );
+      }
     }
-  });
+  );
 
-  myEmitter.on(UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET, (warehouseGrindingBalls) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
-          payload: warehouseGrindingBalls,
-        })
-      );
+  myEmitter.on(
+    UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+    (warehouseGrindingBalls) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+            payload: warehouseGrindingBalls,
+          })
+        );
+      }
     }
-  });
+  );
 
   myEmitter.on(
     DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
