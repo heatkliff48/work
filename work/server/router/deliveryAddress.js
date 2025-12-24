@@ -1,12 +1,13 @@
-const deliveryAddress = require('express').Router();
-const { DeliveryAddresses } = require('../db/models');
-const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
-const myEmitter = require('../src/ee.js');
-const { ADD_DELIVERY_ADDRESSES_SOCKET } = require('../src/constants/event.js');
+const deliveryAddress = require("express").Router();
+const { DeliveryAddresses } = require("../db/models");
+const { Clients } = require("../db/models");
+const TokenService = require("../services/Token.js");
+const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
+const { COOKIE_SETTINGS } = require("../constants.js");
+const myEmitter = require("../src/ee.js");
+const { ADD_DELIVERY_ADDRESSES_SOCKET } = require("../src/constants/event.js");
 
-deliveryAddress.post('/', async (req, res) => {
+deliveryAddress.post("/", async (req, res) => {
   try {
     const {
       currentClientID,
@@ -47,7 +48,61 @@ deliveryAddress.post('/', async (req, res) => {
   }
 });
 
-deliveryAddress.get('/', async (req, res) => {
+deliveryAddress.post("/bitrix-new-delivery-address", async (req, res) => {
+  try {
+    const {
+      bitrix_id,
+      bitrix_client_id,
+      project_name,
+      street,
+      additional_info,
+      city,
+      zip_code,
+      province,
+      country,
+      phone_number,
+      email,
+    } = req.body;
+
+    const client = await Clients.findOne({
+      where: {
+        bitrix_id: bitrix_client_id,
+      },
+    });
+
+    const deliveryAddress = await DeliveryAddresses.create({
+      client_id: client.id,
+      bitrix_id,
+      bitrix_client_id,
+      project_name,
+      street,
+      additional_info,
+      city,
+      zip_code,
+      province,
+      country,
+      phone_number,
+      email,
+    });
+
+    myEmitter.emit(ADD_DELIVERY_ADDRESSES_SOCKET, deliveryAddress);
+    return res.status(200).json({
+      delivery_address: deliveryAddress,
+      id: deliveryAddress.id,
+      bitrix_id,
+      bitrix_client_id,
+    });
+  } catch (err) {
+    console.error("Ошибка при добавлении клиента из Bitrix:", err.message);
+
+    return res.status(500).json({
+      error: "Внутренняя ошибка сервера",
+      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  }
+});
+
+deliveryAddress.get("/", async (req, res) => {
   try {
     const deliveryAddresses = await DeliveryAddresses.findAll();
 

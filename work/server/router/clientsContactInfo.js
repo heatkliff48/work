@@ -1,5 +1,6 @@
 const clientsContactInfo = require("express").Router();
 const { ContactInfos } = require("../db/models");
+const { Clients } = require("../db/models");
 const TokenService = require("../services/Token.js");
 const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
 const { COOKIE_SETTINGS } = require("../constants.js");
@@ -50,6 +51,66 @@ clientsContactInfo.post("/", async (req, res) => {
     // });
   } catch (err) {
     console.error(err.message);
+  }
+});
+
+clientsContactInfo.post("/bitrix-new-contact-info", async (req, res) => {
+  try {
+    const {
+      bitrix_id,
+      bitrix_client_id,
+      first_name,
+      last_name,
+      preffered_name,
+      address,
+      formal_position,
+      role_in_the_org,
+      phone_number_office,
+      phone_number_mobile,
+      phone_number_messenger,
+      email,
+      linkedin,
+      social,
+    } = req.body;
+
+    const client = await Clients.findOne({
+      where: {
+        bitrix_id: bitrix_client_id,
+      },
+    });
+
+    const contactInfo = await ContactInfos.create({
+      client_id: client.id,
+      bitrix_id,
+      bitrix_client_id,
+      first_name,
+      last_name,
+      preffered_name,
+      address,
+      formal_position,
+      role_in_the_org,
+      phone_number_office,
+      phone_number_mobile,
+      phone_number_messenger,
+      email,
+      linkedin,
+      social,
+    });
+
+    myEmitter.emit(ADD_CONTACT_INFO_SOCKET, contactInfo);
+    return res.status(200).json({
+      contact_info: contactInfo,
+      id: contactInfo.id,
+      bitrix_id,
+      bitrix_client_id,
+    });
+  } catch (err) {
+    console.error("Ошибка при добавлении клиента из Bitrix:", err.message);
+
+    return res.status(500).json({
+      error: "Внутренняя ошибка сервера",
+      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
   }
 });
 
