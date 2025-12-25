@@ -31,17 +31,25 @@ const RawMaterialsConsumptionModal = React.memo(
     const { setMainRawMaterialConsumptionMadal } = useModalContext();
     const dispatch = useDispatch();
 
-    // -----------------------------
-    // 1. Состояние для рецептов (то, чего не хватало)
-    // -----------------------------
-    const [availableRecipes, setAvailableRecipes] = useState([]);
+    const [form, setForm] = useState({});
+    const [wastedMode, setWastedMode] = useState('default');
+    const [confirmFlag, setConfirmFlag] = useState(false);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
+    const [availableRecipes, setAvailableRecipes] = useState([]);
+    const [productionVolume, setProductionVolume] = useState('');
 
-    // когда модалка открылась или поменялась строка, готовим список рецептов под её продукт
+    useEffect(() => {
+      setAvailableRecipes([]);
+      setSelectedRecipe([]);
+      setForm({});
+      setProductionVolume('');
+      setWastedMode('default');
+      setConfirmFlag(false);
+    }, []);
+
     useEffect(() => {
       if (!isOpen) return;
 
-      // по строке находим продукт
       const batchArticle = selectedRow?.batch_article;
       const product =
         batchArticle &&
@@ -50,14 +58,12 @@ const RawMaterialsConsumptionModal = React.memo(
       let candidateRecipes = [];
 
       if (product) {
-        // как в RawMaterialsPlan: по плотности и сертификату
         candidateRecipes = (list_of_recipes || []).filter(
           (r) =>
             r.density === product.density && r.certificate === product.certificate
         );
       }
 
-      // если по продукту ничего не нашли — подстраховка: все рецепты
       if (!candidateRecipes.length) {
         candidateRecipes = list_of_recipes || [];
       }
@@ -65,10 +71,6 @@ const RawMaterialsConsumptionModal = React.memo(
       setAvailableRecipes(candidateRecipes);
       setSelectedRecipe(candidateRecipes.length ? candidateRecipes[0] : null);
     }, [isOpen, selectedRow, latestProducts, list_of_recipes]);
-
-    // -----------------------------
-    // Дальше всё то же, что у тебя было, только завязано на selectedRecipe
-    // -----------------------------
 
     const materialsMap = useMemo(
       () => [
@@ -102,11 +104,6 @@ const RawMaterialsConsumptionModal = React.memo(
       []
     );
 
-    const [form, setForm] = useState({});
-    const [productionVolume, setProductionVolume] = useState('');
-    const [wastedMode, setWastedMode] = useState('default');
-    const [confirmFlag, setConfirmFlag] = useState(false);
-
     const onHeaderFromActual = (e) =>
       setWastedMode(e.target.checked ? 'from_actual' : 'default');
     const onHeaderManual = (e) =>
@@ -136,7 +133,6 @@ const RawMaterialsConsumptionModal = React.memo(
 
       setAvailableRecipes(candidateRecipes);
 
-      // 👉 пробуем найти именно тот рецепт, что в строке
       const fromRowArticle = selectedRow?.recipe_article;
       const matched =
         fromRowArticle &&
@@ -145,7 +141,6 @@ const RawMaterialsConsumptionModal = React.memo(
       if (matched) {
         setSelectedRecipe(matched);
       } else {
-        // fallback на первый
         setSelectedRecipe(candidateRecipes.length ? candidateRecipes[0] : null);
       }
     }, [isOpen, selectedRow, latestProducts, list_of_recipes]);
@@ -167,7 +162,6 @@ const RawMaterialsConsumptionModal = React.memo(
       [productionVolume]
     );
 
-    // вот тут главная правка: берём данные из выбранного рецепта
     const baseByLabel = (label, key) => {
       if (!selectedRecipe || !key || !(key in selectedRecipe)) return '—';
       const v = selectedRecipe[key];
@@ -410,13 +404,12 @@ const RawMaterialsConsumptionModal = React.memo(
       }
     };
 
-    // новый обработчик выбора рецепта
     const handleRecipeChange = (selectedOption) => {
       const found = availableRecipes.find((r) => r.id === selectedOption.value);
 
       setSelectedRecipe(found || null);
 
-      selectedRow.recipe_article = found?.article || ''; // обновляем статью рецепта в выбранной строке
+      selectedRow.recipe_article = found?.article || '';
     };
 
     return (
@@ -424,7 +417,6 @@ const RawMaterialsConsumptionModal = React.memo(
         <Modal isOpen={isOpen} toggle={toggle} size="xl">
           <ModalHeader toggle={toggle}>
             <div className="d-flex gap-3 w-100" style={{ alignItems: 'flex-start' }}>
-              {/* левая колонка: article + production volume */}
               <div style={{ minWidth: 240 }}>
                 <span className="text-muted d-block" style={{ fontSize: 12 }}>
                   Recipe article:
@@ -442,8 +434,6 @@ const RawMaterialsConsumptionModal = React.memo(
                   onChange={handlePvChange}
                 />
               </div>
-
-              {/* правая колонка: селектор */}
               <div style={{ flex: 1, minWidth: 280 }}>
                 <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
                   Recipe:
@@ -473,16 +463,14 @@ const RawMaterialsConsumptionModal = React.memo(
                         minHeight: 36,
                         backgroundColor: 'white',
                       }),
-                      // сам выпадающий блок
                       menu: (provided) => ({
                         ...provided,
-                        maxHeight: 360, // было ~200, делаем выше
+                        maxHeight: 360,
                         zIndex: 9999,
                       }),
-                      // внутренняя прокрутка
                       menuList: (provided) => ({
                         ...provided,
-                        maxHeight: 360, // высота области со скроллом
+                        maxHeight: 360,
                         overflowY: 'auto',
                       }),
                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
@@ -497,7 +485,6 @@ const RawMaterialsConsumptionModal = React.memo(
 
           <Fragment>
             <ModalBody style={{ overflow: 'auto', maxHeight: '70vh' }}>
-              {/* Стили для этой таблицы в components/Styles/table.css */}
               <table className="table-waste">
                 <thead>
                   <tr>
