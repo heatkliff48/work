@@ -20,24 +20,25 @@ recipeRouter.get('/', async (req, res) => {
 });
 
 recipeRouter.post('/', async (req, res) => {
-    const {
+  const {
     article,
-      certificate,
-      cake_height,
-      lime,
-      cement,
-      sand_dry,
-      sand_slurry_dry,
-      gypsum_dry,
-      return_dry,
-      aluminum_paste,
-      water_solids,
-      solids,
-      volume,
-      density,
-      density_recipe,
-      produced_return_dry,
-      water_total
+    certificate,
+    cake_height,
+    lime,
+    cement,
+    sand_dry,
+    sand_slurry_dry,
+    gypsum_dry,
+    return_dry,
+    aluminum_paste,
+    aluminum_paste_2,
+    water_solids,
+    solids,
+    volume,
+    density,
+    density_recipe,
+    produced_return_dry,
+    water_total,
   } = req.body;
 
   try {
@@ -52,13 +53,14 @@ recipeRouter.post('/', async (req, res) => {
       gypsum_dry,
       return_dry,
       aluminum_paste,
+      aluminum_paste_2,
       water_solids,
       solids,
       volume,
       density,
       density_recipe,
       produced_return_dry,
-      water_total
+      water_total,
     });
 
     myEmitter.emit(ADD_NEW_RECIPE_SOCKET, recipe);
@@ -70,7 +72,7 @@ recipeRouter.post('/', async (req, res) => {
 });
 
 recipeRouter.post('/delete', async (req, res) => {
-    const { recipe_id } = req.body;
+  const { recipe_id } = req.body;
 
   try {
     await Recipe.destroy({ where: { id: recipe_id } });

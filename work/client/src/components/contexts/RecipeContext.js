@@ -1,119 +1,123 @@
-import { createContext, useContext, useState } from "react";
-import { useSelector } from "react-redux";
+import { createContext, useContext, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const RecipeContext = createContext();
 
 const RecipeContextProvider = ({ children }) => {
   const recipe_info = [
     {
-      Header: "Recipe ID",
-      accessor: "article",
+      Header: 'Recipe ID',
+      accessor: 'article',
     },
     {
-      Header: "Cake height, meter",
-      accessor: "cake_height",
+      Header: 'Cake height, meter',
+      accessor: 'cake_height',
     },
     {
-      Header: "Lime, kg",
-      accessor: "lime",
+      Header: 'Lime, kg',
+      accessor: 'lime',
     },
     {
-      Header: "Cement, kg",
-      accessor: "cement",
+      Header: 'Cement, kg',
+      accessor: 'cement',
     },
     {
-      Header: "Sand (dry), kg",
-      accessor: "sand_dry",
+      Header: 'Sand (dry), kg',
+      accessor: 'sand_dry',
     },
     {
-      Header: "Sand slurry (dry), kg",
-      accessor: "sand_slurry_dry",
+      Header: 'Sand slurry (dry), kg',
+      accessor: 'sand_slurry_dry',
     },
     {
-      Header: "Gypsum (dry), kg",
-      accessor: "gypsum_dry",
+      Header: 'Gypsum (dry), kg',
+      accessor: 'gypsum_dry',
     },
     {
-      Header: "Return (dry), kg",
-      accessor: "return_dry",
+      Header: 'Return (dry), kg',
+      accessor: 'return_dry',
     },
     {
-      Header: "Aluminium paste, kg",
-      accessor: "aluminum_paste",
+      Header: 'Aluminum 1',
+      accessor: 'aluminum_paste',
     },
     {
-      Header: "Water solids",
-      accessor: "water_solids",
+      Header: 'Aluminum 2',
+      accessor: 'aluminum_paste_2',
     },
     {
-      Header: "Solids, kg",
-      accessor: "solids",
+      Header: 'Water solids',
+      accessor: 'water_solids',
     },
     {
-      Header: "Volume, m3",
-      accessor: "volume",
+      Header: 'Solids, kg',
+      accessor: 'solids',
     },
     {
-      Header: "Density, kg/m3",
-      accessor: "density_recipe",
+      Header: 'Volume, m3',
+      accessor: 'volume',
     },
     {
-      Header: "Produced amount of return (dry), kg",
-      accessor: "produced_return_dry",
+      Header: 'Density, kg/m3',
+      accessor: 'density_recipe',
     },
     {
-      Header: "Water total, kg",
-      accessor: "water_total",
+      Header: 'Produced amount of return (dry), kg',
+      accessor: 'produced_return_dry',
+    },
+    {
+      Header: 'Water total, kg',
+      accessor: 'water_total',
     },
   ];
 
   const COLUMNS_RAW_MAT_CONSUMPTION = [
     {
-      Header: "ID",
-      accessor: "id",
+      Header: 'ID',
+      accessor: 'id',
     },
     {
-      Header: "Recipe",
-      accessor: "recipe_article",
+      Header: 'Recipe',
+      accessor: 'recipe_article',
     },
     {
-      Header: "Batch production",
-      accessor: "batch_article",
+      Header: 'Batch production',
+      accessor: 'batch_article',
     },
     {
-      Header: "Cake amount",
-      accessor: "production_volume",
+      Header: 'Cake amount',
+      accessor: 'production_volume',
     },
     {
-      Header: "Date",
-      accessor: "date",
+      Header: 'Date',
+      accessor: 'date',
     },
   ];
 
   const COLUMNS_MAIN_RAW_MAT_CONSUMPTION = [
     {
-      Header: "ID",
-      accessor: "id",
+      Header: 'ID',
+      accessor: 'id',
     },
     {
-      Header: "Recipe",
-      accessor: "recipe_article",
+      Header: 'Recipe',
+      accessor: 'recipe_article',
     },
     {
-      Header: "Batch production",
-      accessor: "batch_article",
+      Header: 'Batch production',
+      accessor: 'batch_article',
     },
     {
-      Header: "Cake amount",
-      accessor: "production_volume",
+      Header: 'Cake amount',
+      accessor: 'production_volume',
     },
     {
-      Header: "Consumed volume",
-      accessor: "consumed_volume",
+      Header: 'Consumed volume',
+      accessor: 'consumed_volume',
     },
     {
-      Header: "Date",
-      accessor: "date",
+      Header: 'Date',
+      accessor: 'date',
     },
   ];
 
