@@ -34,6 +34,7 @@ const RawMaterialsConsumptionModal = React.memo(
     const [form, setForm] = useState({});
     const [wastedMode, setWastedMode] = useState('default');
     const [confirmFlag, setConfirmFlag] = useState(false);
+    const [writeInWarehouse, setWriteInWarehouse] = useState(true);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [availableRecipes, setAvailableRecipes] = useState([]);
     const [productionVolume, setProductionVolume] = useState('');
@@ -45,6 +46,7 @@ const RawMaterialsConsumptionModal = React.memo(
       setProductionVolume('');
       setWastedMode('default');
       setConfirmFlag(false);
+      setWriteInWarehouse(true);
     }, []);
 
     useEffect(() => {
@@ -384,20 +386,22 @@ const RawMaterialsConsumptionModal = React.memo(
         };
       });
 
-      const articleInfo = getWarehouseArticle(product);
+      if (writeInWarehouse) {
+        const articleInfo = getWarehouseArticle(product);
 
-      dispatch(
-        addNewWarehouse({
-          product_article: batch_article,
-          article: articleInfo,
-          warehouse_loc: 'local',
-          type: 'OK',
-          free_quantity_remaining: remainingFreeQty,
-          ordered_quantity: parseInt(ordered_quantity) + summReserve,
-          total_quantity:
-            parseInt(ordered_quantity) + summReserve + remainingFreeQty,
-        })
-      );
+        dispatch(
+          addNewWarehouse({
+            product_article: batch_article,
+            article: articleInfo,
+            warehouse_loc: 'local',
+            type: 'OK',
+            free_quantity_remaining: remainingFreeQty,
+            ordered_quantity: parseInt(ordered_quantity) + summReserve,
+            total_quantity:
+              parseInt(ordered_quantity) + summReserve + remainingFreeQty,
+          })
+        );
+      }
 
       for (const ordered_production of updatedReserves) {
         dispatch(updListOfOrderedProduction(ordered_production));
@@ -598,6 +602,19 @@ const RawMaterialsConsumptionModal = React.memo(
                   Production batch completed
                 </label>
               </div>
+              <div className="d-flex align-items-center gap-2">
+                <input
+                  id="warehouse-checkbox"
+                  className="form-check-input"
+                  type="checkbox"
+                  checked={writeInWarehouse}
+                  onChange={(e) => setWriteInWarehouse(e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor="warehouse-checkbox">
+                  Продукт произведен полностью
+                </label>
+              </div>
+
               <div className="d-flex gap-2">
                 <button className="btn btn-outline-secondary" onClick={toggle}>
                   Cancel
