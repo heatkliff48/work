@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       gypsum_dry: DataTypes.FLOAT,
       return_dry: DataTypes.FLOAT,
       aluminum_paste: DataTypes.FLOAT,
+      aluminum_paste_2: DataTypes.FLOAT,
       water_solids: DataTypes.FLOAT,
       solids: DataTypes.FLOAT,
       volume: DataTypes.FLOAT,
