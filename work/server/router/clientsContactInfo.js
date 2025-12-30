@@ -154,6 +154,7 @@ clientsContactInfo.post("/bitrix-update-contact-info", async (req, res) => {
       {
         where: {
           bitrix_id,
+          bitrix_client_id,
         },
         returning: true,
         plain: true,
