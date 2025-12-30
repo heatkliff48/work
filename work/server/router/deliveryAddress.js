@@ -136,6 +136,7 @@ deliveryAddress.post("/bitrix-update-delivery-address", async (req, res) => {
       {
         where: {
           bitrix_id,
+          bitrix_client_id,
         },
         returning: true,
         plain: true,
