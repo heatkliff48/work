@@ -162,7 +162,7 @@ clientsContactInfo.post("/bitrix-update-contact-info", async (req, res) => {
 
     myEmitter.emit(UPDATE_CONTACT_INFO_SOCKET, contactInfo);
     return res.status(200).json({
-      contact_info: contactInfo[1],
+      contact_info: contactInfo,
       id: contactInfo.id,
       bitrix_id,
       bitrix_client_id,
