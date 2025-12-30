@@ -144,7 +144,7 @@ deliveryAddress.post("/bitrix-update-delivery-address", async (req, res) => {
 
     myEmitter.emit(UPDATE_DELIVERY_ADDRESSES_SOCKET, deliveryAddress);
     return res.status(200).json({
-      delivery_address: deliveryAddress[1],
+      delivery_address: deliveryAddress,
       id: deliveryAddress.id,
       bitrix_id,
       bitrix_client_id,
