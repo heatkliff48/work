@@ -20,7 +20,7 @@ import '#components/Styles/table.css';
 
 const RawMaterialsConsumptionModal = React.memo(
   ({ isOpen, toggle, selectedRow }) => {
-    const { list_of_recipes = [] } = useRecipeContext();
+    const { list_of_recipes = [], main_raw_mat_consumption } = useRecipeContext();
     const { latestProducts } = useProductsContext();
     const {
       raw_materials_warehouse = [],
@@ -211,6 +211,57 @@ const RawMaterialsConsumptionModal = React.memo(
       return +(baseNum * pvNumber).toFixed(3);
     };
 
+    const getRecipeVolumeInfo = () => {
+      const recipeArticle = selectedRow?.recipe_article;
+
+      const planned = Number(selectedRow?.production_volume || 0);
+      const current = Number(productionVolume || 0);
+
+      const alreadyConsumed = (main_raw_mat_consumption || [])
+        .filter((r) => String(r.recipe_article) === String(recipeArticle))
+        .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
+
+      const totalAfterSave = alreadyConsumed + current;
+      const diff = totalAfterSave - planned;
+
+      return {
+        planned,
+        alreadyConsumed,
+        current,
+        totalAfterSave,
+        diff,
+      };
+    };
+
+    const confirmProductionVolume = () => {
+      const info = getRecipeVolumeInfo();
+
+      if (!info.planned) return true;
+
+      if (info.diff > 0) {
+        return window.confirm(
+          `⚠️ Превышение production volume\n\n` +
+            `План: ${info.planned}\n` +
+            `Уже учтено: ${info.alreadyConsumed}\n` +
+            `Текущее: ${info.current}\n\n` +
+            `Сверх плана: ${info.diff}\n\n` +
+            `Продолжить?`
+        );
+      }
+
+      if (info.diff < 0) {
+        return window.confirm(
+          `ℹ️ Production volume не достигнут\n\n` +
+            `План: ${info.planned}\n` +
+            `Будет учтено всего: ${info.totalAfterSave}\n\n` +
+            `Осталось: ${Math.abs(info.diff)}\n\n` +
+            `Продолжить?`
+        );
+      }
+
+      return true;
+    };
+
     const shouldShowRow = (label, key) => {
       if (ALWAYS_VISIBLE.has(label)) return true;
 
@@ -239,6 +290,9 @@ const RawMaterialsConsumptionModal = React.memo(
     };
 
     const handleSave = () => {
+      const ok = confirmProductionVolume();
+      if (!ok) return;
+
       const materials = materialsMap
         .map(({ label, key }) => {
           const w = computeWasted(key, label);
