@@ -43,7 +43,6 @@ const RawMaterialsConsumptionModal = React.memo(
       setAvailableRecipes([]);
       setSelectedRecipe([]);
       setForm({});
-      setProductionVolume('');
       setWastedMode('default');
       setConfirmFlag(false);
       setWriteInWarehouse(true);
@@ -470,6 +469,18 @@ const RawMaterialsConsumptionModal = React.memo(
       selectedRow.recipe_article = found?.article || '';
     };
 
+    useEffect(() => {
+      const recipeArticle = selectedRow?.recipe_article;
+      const planned = Number(selectedRow?.production_volume || 0);
+
+      const alreadyConsumed = (main_raw_mat_consumption || [])
+        .filter((r) => String(r.recipe_article) === String(recipeArticle))
+        .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
+
+      const total = planned - alreadyConsumed;
+      setProductionVolume(total);
+    }, [selectedRow]);
+
     return (
       <div>
         <Modal isOpen={isOpen} toggle={toggle} size="xl">
@@ -663,6 +674,19 @@ const RawMaterialsConsumptionModal = React.memo(
                   type="checkbox"
                   checked={writeInWarehouse}
                   onChange={(e) => setWriteInWarehouse(e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor="warehouse-checkbox">
+                  Продукт произведен полностью
+                </label>
+              </div>
+              <div className="d-flex align-items-center gap-2">
+                <input
+                  id="warehouse-checkbox"
+                  className="form-check-input"
+                  type="checkbox"
+                  checked="true"
+                  // checked={writeInWarehouse}
+                  // onChange={(e) => setWriteInWarehouse(e.target.checked)}
                 />
                 <label className="form-check-label" htmlFor="warehouse-checkbox">
                   Продукт произведен полностью
