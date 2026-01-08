@@ -121,9 +121,10 @@ const RecipeContextProvider = ({ children }) => {
     },
   ];
 
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [productOfRecipe, setProductOfRecipe] = useState({});
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [productOfRecipe, setProductOfRecipe] = useState({});
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedLotesRecipe, setSelectedLotesRecipe] = useState(null);
 
   const list_of_recipes = useSelector((state) => state.recipe);
   const recipeOrders = useSelector((state) => state.recipeOrders);
@@ -148,6 +149,8 @@ const RecipeContextProvider = ({ children }) => {
         raw_mat_consumption,
         recipeOrders,
         main_raw_mat_consumption,
+        selectedLotesRecipe,
+        setSelectedLotesRecipe,
       }}
     >
       {children}

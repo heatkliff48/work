@@ -30,6 +30,42 @@ module.exports = {
       warehouse_id: {
         type: Sequelize.STRING,
       },
+      custom_recipe: {
+        type: Sequelize.BOOLEAN,
+      },
+      sand_dry: {
+        type: Sequelize.STRING,
+      },
+      sand_slurry_dry: {
+        type: Sequelize.STRING,
+      },
+      lime: {
+        type: Sequelize.STRING,
+      },
+      cement: {
+        type: Sequelize.STRING,
+      },
+      gypsum_dry: {
+        type: Sequelize.STRING,
+      },
+      return_dry: {
+        type: Sequelize.STRING,
+      },
+      gypsum_stone: {
+        type: Sequelize.STRING,
+      },
+      aluminum_paste: {
+        type: Sequelize.STRING,
+      },
+      aluminum_paste_2: {
+        type: Sequelize.STRING,
+      },
+      grinding_balls: {
+        type: Sequelize.STRING,
+      },
+      aac: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

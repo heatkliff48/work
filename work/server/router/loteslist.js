@@ -1,13 +1,13 @@
-const lotesListRouter = require("express").Router();
-const { LotesList } = require("../db/models/index.js");
-const myEmitter = require("../src/ee.js");
-const { ADD_NEW_LOTES_LIST_SOCKET } = require("../src/constants/event.js");
-const { ErrorUtils } = require("../utils/Errors.js");
+const lotesListRouter = require('express').Router();
+const { LotesList } = require('../db/models/index.js');
+const myEmitter = require('../src/ee.js');
+const { ADD_NEW_LOTES_LIST_SOCKET } = require('../src/constants/event.js');
+const { ErrorUtils } = require('../utils/Errors.js');
 
-lotesListRouter.get("/", async (req, res) => {
+lotesListRouter.get('/', async (req, res) => {
   try {
     const lotesList = await LotesList.findAll({
-      order: [["id", "ASC"]],
+      order: [['id', 'ASC']],
     });
 
     return res.status(200).json({ lotesList });
@@ -16,9 +16,26 @@ lotesListRouter.get("/", async (req, res) => {
   }
 });
 
-lotesListRouter.post("/", async (req, res) => {
-  const { production_date, product, recipe, quantity_cakes, warehouse_id } =
-    req.body;
+lotesListRouter.post('/', async (req, res) => {
+  const {
+    production_date,
+    product,
+    recipe,
+    quantity_cakes,
+    warehouse_id,
+    custom_recipe,
+    sand_dry,
+    sand_slurry_dry,
+    lime,
+    cement,
+    gypsum_dry,
+    return_dry,
+    gypsum_stone,
+    aluminum_paste,
+    aluminum_paste_2,
+    grinding_balls,
+    aac,
+  } = req.body;
 
   try {
     const quantityCakesInt = Math.floor(parseFloat(quantity_cakes));
@@ -26,11 +43,11 @@ lotesListRouter.post("/", async (req, res) => {
     if (isNaN(quantityCakesInt) || quantityCakesInt <= 0) {
       return res
         .status(400)
-        .json({ error: "quantity_cakes must be a positive number" });
+        .json({ error: 'quantity_cakes must be a positive number' });
     }
 
     const lastLote = await LotesList.findOne({
-      order: [["id", "DESC"]],
+      order: [['id', 'DESC']],
     });
 
     let cake_id, cake_id_finish;
@@ -51,6 +68,18 @@ lotesListRouter.post("/", async (req, res) => {
       recipe,
       quantity_cakes: quantityCakesInt,
       warehouse_id,
+      custom_recipe,
+      sand_dry,
+      sand_slurry_dry,
+      lime,
+      cement,
+      gypsum_dry,
+      return_dry,
+      gypsum_stone,
+      aluminum_paste,
+      aluminum_paste_2,
+      grinding_balls,
+      aac,
     });
 
     myEmitter.emit(ADD_NEW_LOTES_LIST_SOCKET, lotesList);

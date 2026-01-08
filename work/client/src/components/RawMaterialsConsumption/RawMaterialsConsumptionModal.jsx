@@ -44,6 +44,7 @@ const RawMaterialsConsumptionModal = React.memo(
       setSelectedRecipe([]);
       setForm({});
       setWastedMode('default');
+      setProductionVolume('');
       setConfirmFlag(false);
       setWriteInWarehouse(true);
     }, []);
@@ -288,6 +289,25 @@ const RawMaterialsConsumptionModal = React.memo(
       );
     };
 
+    const buildRecipeSnapshot = () => {
+      const snapshot = {};
+
+      materialsMap.forEach(({ key }) => {
+        const actual = Number(form[`${key}_actual_reciepe`]);
+
+        if (wastedMode !== 'default' && Number.isFinite(actual) && actual > 0) {
+          // пользователь менял рецепт
+          snapshot[key] = +actual.toFixed(5);
+        } else {
+          // базовый рецепт
+          const base = Number(selectedRecipe?.[key]);
+          snapshot[key] = Number.isFinite(base) ? +base.toFixed(5) : 0;
+        }
+      });
+
+      return snapshot;
+    };
+
     const handleSave = () => {
       const ok = confirmProductionVolume();
       if (!ok) return;
@@ -320,7 +340,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const shortages = [];
       for (const { type, quantity } of materials) {
-        if (type === 'Return slurry (dry)') continue;
+        if (type === 'Return slurry (dry)' || type === 'Return (dry)') continue;
 
         const have = warehouseByType.get(type) ?? 0;
         if (quantity > have) {
@@ -364,17 +384,23 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const articleInfo = getWarehouseArticle(productDetails);
 
+      const recipeSnapshot = buildRecipeSnapshot();
+
+      console.log('wastedMode !==', wastedMode !== 'default');
+      const new_lotestList = {
+        production_date: selectedRow?.date,
+        product: prodDescription[1],
+        recipe: selectedRow?.recipe_article,
+        quantity_cakes: Number(productionVolume),
+        warehouse_id: articleInfo,
+        custom_recipe: wastedMode !== 'default',
+        ...recipeSnapshot,
+      };
+
+      console.log('new_lotestList', new_lotestList);
       addProductOrder();
       dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
-      dispatch(
-        addNewLotesList({
-          production_date: selectedRow?.date,
-          product: prodDescription[1],
-          recipe: selectedRow?.recipe_article,
-          quantity_cakes: productionVolume,
-          warehouse_id: articleInfo,
-        })
-      );
+      dispatch(addNewLotesList(new_lotestList));
       if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
 
       setMainRawMaterialConsumptionMadal(false);
@@ -477,7 +503,7 @@ const RawMaterialsConsumptionModal = React.memo(
         .filter((r) => String(r.recipe_article) === String(recipeArticle))
         .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
-      const total = planned - alreadyConsumed;
+      const total = planned - alreadyConsumed < 0 ? 0 : planned - alreadyConsumed;
       setProductionVolume(total);
     }, [selectedRow]);
 
