@@ -20,7 +20,7 @@ import '#components/Styles/table.css';
 
 const RawMaterialsConsumptionModal = React.memo(
   ({ isOpen, toggle, selectedRow }) => {
-    const { list_of_recipes = [] } = useRecipeContext();
+    const { list_of_recipes = [], main_raw_mat_consumption } = useRecipeContext();
     const { latestProducts } = useProductsContext();
     const {
       raw_materials_warehouse = [],
@@ -34,6 +34,7 @@ const RawMaterialsConsumptionModal = React.memo(
     const [form, setForm] = useState({});
     const [wastedMode, setWastedMode] = useState('default');
     const [confirmFlag, setConfirmFlag] = useState(false);
+    const [writeInWarehouse, setWriteInWarehouse] = useState(true);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [availableRecipes, setAvailableRecipes] = useState([]);
     const [productionVolume, setProductionVolume] = useState('');
@@ -45,6 +46,7 @@ const RawMaterialsConsumptionModal = React.memo(
       setProductionVolume('');
       setWastedMode('default');
       setConfirmFlag(false);
+      setWriteInWarehouse(true);
     }, []);
 
     useEffect(() => {
@@ -209,6 +211,57 @@ const RawMaterialsConsumptionModal = React.memo(
       return +(baseNum * pvNumber).toFixed(3);
     };
 
+    const getRecipeVolumeInfo = () => {
+      const recipeArticle = selectedRow?.recipe_article;
+
+      const planned = Number(selectedRow?.production_volume || 0);
+      const current = Number(productionVolume || 0);
+
+      const alreadyConsumed = (main_raw_mat_consumption || [])
+        .filter((r) => String(r.recipe_article) === String(recipeArticle))
+        .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
+
+      const totalAfterSave = alreadyConsumed + current;
+      const diff = totalAfterSave - planned;
+
+      return {
+        planned,
+        alreadyConsumed,
+        current,
+        totalAfterSave,
+        diff,
+      };
+    };
+
+    const confirmProductionVolume = () => {
+      const info = getRecipeVolumeInfo();
+
+      if (!info.planned) return true;
+
+      if (info.diff > 0) {
+        return window.confirm(
+          `⚠️ Превышение production volume\n\n` +
+            `План: ${info.planned}\n` +
+            `Уже учтено: ${info.alreadyConsumed}\n` +
+            `Текущее: ${info.current}\n\n` +
+            `Сверх плана: ${info.diff}\n\n` +
+            `Продолжить?`
+        );
+      }
+
+      if (info.diff < 0) {
+        return window.confirm(
+          `ℹ️ Production volume не достигнут\n\n` +
+            `План: ${info.planned}\n` +
+            `Будет учтено всего: ${info.totalAfterSave}\n\n` +
+            `Осталось: ${Math.abs(info.diff)}\n\n` +
+            `Продолжить?`
+        );
+      }
+
+      return true;
+    };
+
     const shouldShowRow = (label, key) => {
       if (ALWAYS_VISIBLE.has(label)) return true;
 
@@ -237,6 +290,9 @@ const RawMaterialsConsumptionModal = React.memo(
     };
 
     const handleSave = () => {
+      const ok = confirmProductionVolume();
+      if (!ok) return;
+
       const materials = materialsMap
         .map(({ label, key }) => {
           const w = computeWasted(key, label);
@@ -384,20 +440,22 @@ const RawMaterialsConsumptionModal = React.memo(
         };
       });
 
-      const articleInfo = getWarehouseArticle(product);
+      if (writeInWarehouse) {
+        const articleInfo = getWarehouseArticle(product);
 
-      dispatch(
-        addNewWarehouse({
-          product_article: batch_article,
-          article: articleInfo,
-          warehouse_loc: 'local',
-          type: 'OK',
-          free_quantity_remaining: remainingFreeQty,
-          ordered_quantity: parseInt(ordered_quantity) + summReserve,
-          total_quantity:
-            parseInt(ordered_quantity) + summReserve + remainingFreeQty,
-        })
-      );
+        dispatch(
+          addNewWarehouse({
+            product_article: batch_article,
+            article: articleInfo,
+            warehouse_loc: 'local',
+            type: 'OK',
+            free_quantity_remaining: remainingFreeQty,
+            ordered_quantity: parseInt(ordered_quantity) + summReserve,
+            total_quantity:
+              parseInt(ordered_quantity) + summReserve + remainingFreeQty,
+          })
+        );
+      }
 
       for (const ordered_production of updatedReserves) {
         dispatch(updListOfOrderedProduction(ordered_production));
@@ -598,6 +656,19 @@ const RawMaterialsConsumptionModal = React.memo(
                   Production batch completed
                 </label>
               </div>
+              <div className="d-flex align-items-center gap-2">
+                <input
+                  id="warehouse-checkbox"
+                  className="form-check-input"
+                  type="checkbox"
+                  checked={writeInWarehouse}
+                  onChange={(e) => setWriteInWarehouse(e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor="warehouse-checkbox">
+                  Продукт произведен полностью
+                </label>
+              </div>
+
               <div className="d-flex gap-2">
                 <button className="btn btn-outline-secondary" onClick={toggle}>
                   Cancel
