@@ -386,7 +386,6 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const recipeSnapshot = buildRecipeSnapshot();
 
-      console.log('wastedMode !==', wastedMode !== 'default');
       const new_lotestList = {
         production_date: selectedRow?.date,
         product: prodDescription[1],
@@ -397,8 +396,7 @@ const RawMaterialsConsumptionModal = React.memo(
         ...recipeSnapshot,
       };
 
-      console.log('new_lotestList', new_lotestList);
-      addProductOrder();
+      // addProductOrder();
       dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
       dispatch(addNewLotesList(new_lotestList));
       if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
