@@ -5,7 +5,7 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { getLotesList } from '#components/redux/actions/lotesListAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
-import RecipeInfoModal from '#components/Recipe/RecipeInfoModal.jsx';
+import LotesListModal from './LotesListModal';
 
 function LotesList() {
   const {
@@ -88,14 +88,16 @@ function LotesList() {
     const baseRecipe = list_of_recipes.find(
       (r) => String(r.article) === String(lotesListItem.recipe)
     );
-    console.log('baseRecipe', baseRecipe);
-
+    
     if (!baseRecipe) {
       console.error('Recipe not found:', lotesListItem.recipe);
       return;
     }
 
-    let resolvedRecipe = { ...baseRecipe };
+    let resolvedRecipe = { 
+        ...baseRecipe, 
+        ...lotesListItem 
+    };
 
     if (lotesListItem.custom_recipe === true) {
       RECIPE_PARAMS.forEach((key) => {
@@ -111,7 +113,6 @@ function LotesList() {
         }
       });
     }
-    console.log('resolvedRecipe', resolvedRecipe);
 
     setSelectedLotesRecipe(resolvedRecipe);
     setLotesListModal(true);
@@ -128,7 +129,7 @@ function LotesList() {
           openModal(row.original);
         }}
       />
-      <RecipeInfoModal
+      <LotesListModal
         show={lotesListModal}
         onHide={() => setLotesListModal(false)}
         selectedRecipe={selectedLotesRecipe}

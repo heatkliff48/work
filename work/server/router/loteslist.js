@@ -17,25 +17,7 @@ lotesListRouter.get('/', async (req, res) => {
 });
 
 lotesListRouter.post('/', async (req, res) => {
-  const {
-    production_date,
-    product,
-    recipe,
-    quantity_cakes,
-    warehouse_id,
-    custom_recipe,
-    sand_dry,
-    sand_slurry_dry,
-    lime,
-    cement,
-    gypsum_dry,
-    return_dry,
-    gypsum_stone,
-    aluminum_paste,
-    aluminum_paste_2,
-    grinding_balls,
-    aac,
-  } = req.body;
+  const { quantity_cakes } = req.body;
 
   try {
     const quantityCakesInt = Math.floor(parseFloat(quantity_cakes));
@@ -63,24 +45,10 @@ lotesListRouter.post('/', async (req, res) => {
     const lotesList = await LotesList.create({
       cake_id,
       cake_id_finish,
-      production_date,
-      product,
-      recipe,
       quantity_cakes: quantityCakesInt,
-      warehouse_id,
-      custom_recipe,
-      sand_dry,
-      sand_slurry_dry,
-      lime,
-      cement,
-      gypsum_dry,
-      return_dry,
-      gypsum_stone,
-      aluminum_paste,
-      aluminum_paste_2,
-      grinding_balls,
-      aac,
+      ...req.body,
     });
+    console.log('>>>>>>>>>>>>>>>>>>>lotesList', lotesList);
 
     myEmitter.emit(ADD_NEW_LOTES_LIST_SOCKET, lotesList);
     return res.status(200).json(lotesList);
