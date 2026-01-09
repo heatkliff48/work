@@ -81,7 +81,7 @@ const RawMaterialsConsumptionModal = React.memo(
         { label: 'Lime', key: 'lime' },
         { label: 'Cement', key: 'cement' },
         { label: 'Gypsum', key: 'gypsum_dry' },
-        { label: 'Return (dry)', key: 'return_dry' },
+        { label: 'Return slurry (dry)', key: 'return_dry' },
         { label: 'Gypsum stone', key: 'gypsum_stone' },
         { label: 'Aluminum 1', key: 'aluminum_paste' },
         { label: 'Aluminum 2', key: 'aluminum_paste_2' },
@@ -614,7 +614,7 @@ const RawMaterialsConsumptionModal = React.memo(
                     <th className="th-mod-recipe-sub">Modified recipe</th>
                     <th className="th-total-sub">total</th>
                     <th className="th-from-log-sub">from log</th>
-                    <th className="th-wasted-sub">Wasted</th>
+                    <th className="th-wasted-sub">Consumed</th>
                   </tr>
                 </thead>
 
@@ -700,7 +700,7 @@ const RawMaterialsConsumptionModal = React.memo(
                   onChange={(e) => setWriteInWarehouse(e.target.checked)}
                 />
                 <label className="form-check-label" htmlFor="warehouse-checkbox">
-                  Продукт произведен полностью
+                  Add to warehouse
                 </label>
               </div>
               <div className="d-flex align-items-center gap-2">
@@ -713,7 +713,7 @@ const RawMaterialsConsumptionModal = React.memo(
                   // onChange={(e) => setWriteInWarehouse(e.target.checked)}
                 />
                 <label className="form-check-label" htmlFor="warehouse-checkbox">
-                  Продукт произведен полностью
+                  New batch
                 </label>
               </div>
 
