@@ -135,6 +135,7 @@ const {
   NEED_UPD_CONTACT_PRICE_INFO_SOCKET,
   UPDATE_CONTACT_INFO_SOCKET,
   UPDATE_DELIVERY_ADDRESSES_SOCKET,
+  UPDATE_LOTES_LIST_SOCKET,
 } = require("../constants/event");
 const myEmitter = require("../ee");
 
@@ -1766,6 +1767,17 @@ function registerWsEmitter(map) {
       userConnect.send(
         JSON.stringify({
           type: ADD_NEW_LOTES_LIST_SOCKET,
+          payload: lotesList,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_LOTES_LIST_SOCKET, (lotesList) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_LOTES_LIST_SOCKET,
           payload: lotesList,
         })
       );

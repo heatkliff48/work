@@ -1,26 +1,26 @@
-const clientsRouter = require("express").Router();
-const { Clients } = require("../db/models");
-const { ClientLegalAddresses } = require("../db/models");
-const TokenService = require("../services/Token.js");
-const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
-const { COOKIE_SETTINGS } = require("../constants.js");
-const myEmitter = require("../src/ee.js");
+const clientsRouter = require('express').Router();
+const { Clients } = require('../db/models');
+const { ClientLegalAddresses } = require('../db/models');
+const TokenService = require('../services/Token.js');
+const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
+const { COOKIE_SETTINGS } = require('../constants.js');
+const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_CLIENT_SOCKET,
   UPDATE_CLIENT_SOCKET,
-} = require("../src/constants/event.js");
+} = require('../src/constants/event.js');
 const {
   ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
   UPDATE_LEGAL_ADDRESS_SOCKET,
-} = require("../src/constants/event.js");
+} = require('../src/constants/event.js');
 
-clientsRouter.get("/", async (req, res) => {
+clientsRouter.get('/', async (req, res) => {
   // const fingerprint = req.fingerprint.hash;
   // const { id, username, email } = req.session.user;
 
   try {
     const allClients = await Clients.findAll({
-      order: [["id", "ASC"]],
+      order: [['id', 'ASC']],
     });
 
     // const payload = { id, username, email };
@@ -42,7 +42,7 @@ clientsRouter.get("/", async (req, res) => {
   }
 });
 
-clientsRouter.post("/", async (req, res) => {
+clientsRouter.post('/', async (req, res) => {
   const { c_name, cif_vat, category, price_category } = req.body.client;
 
   try {
@@ -61,7 +61,7 @@ clientsRouter.post("/", async (req, res) => {
   }
 });
 
-clientsRouter.post("/bitrix-new-client", async (req, res) => {
+clientsRouter.post('/bitrix-new-client', async (req, res) => {
   try {
     // Для Bitrix данные могут приходить в разном формате
     // Вариант 1: Если Bitrix отправляет в req.body
@@ -124,7 +124,7 @@ clientsRouter.post("/bitrix-new-client", async (req, res) => {
       bitrix_id,
     });
   } catch (err) {
-    console.error("Ошибка при добавлении клиента из Bitrix:", err.message);
+    console.error('Ошибка при добавлении клиента из Bitrix:', err.message);
 
     // Обработка уникальных ошибок (например, дубликат CIF/VAT)
     // if (err.name === "SequelizeUniqueConstraintError") {
@@ -135,17 +135,17 @@ clientsRouter.post("/bitrix-new-client", async (req, res) => {
     // }
 
     return res.status(500).json({
-      error: "Внутренняя ошибка сервера",
-      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+      error: 'Внутренняя ошибка сервера',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
 });
 
-clientsRouter.get("/:id", async (req, res) => {
+clientsRouter.get('/:id', async (req, res) => {
   try {
     const lastID = await Clients.findOne({
-      attributes: ["id"],
-      order: [["id", "DESC"]],
+      attributes: ['id'],
+      order: [['id', 'DESC']],
     });
 
     return res.status(200).json({ lastID });
@@ -162,7 +162,7 @@ clientsRouter.get("/:id", async (req, res) => {
   }
 });
 
-clientsRouter.post("/update/:c_id", async (req, res) => {
+clientsRouter.post('/update/:c_id', async (req, res) => {
   const { c_id, c_name, cif_vat, category, price_category } = req.body.client;
 
   try {
@@ -202,7 +202,7 @@ clientsRouter.post("/update/:c_id", async (req, res) => {
   }
 });
 
-clientsRouter.post("/bitrix-update-client", async (req, res) => {
+clientsRouter.post('/bitrix-update-client', async (req, res) => {
   const {
     c_name,
     cif_vat,
@@ -274,11 +274,11 @@ clientsRouter.post("/bitrix-update-client", async (req, res) => {
       bitrix_id,
     });
   } catch (err) {
-    console.error("Ошибка при обновлении клиента из Bitrix:", err.message);
+    console.error('Ошибка при обновлении клиента из Bitrix:', err.message);
 
     return res.status(500).json({
-      error: "Внутренняя ошибка сервера",
-      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+      error: 'Внутренняя ошибка сервера',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
 });
