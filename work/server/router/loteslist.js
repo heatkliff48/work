@@ -17,7 +17,6 @@ lotesListRouter.get('/', async (req, res) => {
 });
 
 lotesListRouter.post('/', async (req, res) => {
-  console.log('req.body', req.body);
   const { new_lotestList, lotesListCheck } = req.body;
   const { quantity_cakes, product, production_date } = new_lotestList;
 

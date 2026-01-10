@@ -249,8 +249,19 @@ function LotesList() {
     }
   }, [user, roles, checkUserAccess, userAccess, setUserAccess]);
 
+  const getRelatedBatches = (item) => {
+    return lotesList.filter(
+      (r) =>
+        r.product === item.product &&
+        r.production_date === item.production_date &&
+        r.cake_id === item.cake_id
+    );
+  };
+
   const openModal = (lotesListItem) => {
     if (!lotesListItem) return;
+
+    const relatedBatches = getRelatedBatches(lotesListItem);
 
     const baseRecipe = list_of_recipes.find(
       (r) => String(r.article) === String(lotesListItem.recipe)
@@ -281,11 +292,15 @@ function LotesList() {
       });
     }
 
-    setSelectedLotesRecipe(resolvedRecipe);
+    setSelectedLotesRecipe({
+      ...resolvedRecipe,
+      relatedBatches, // 👈 добавили
+      activeBatchId: lotesListItem.id,
+    });
+
     setLotesListModal(true);
   };
-  console.log('groupedLotesList', groupedLotesList);
-  console.log('lotesList', lotesList);
+
   return (
     <>
       <Table
@@ -301,6 +316,7 @@ function LotesList() {
         show={lotesListModal}
         onHide={() => setLotesListModal(false)}
         selectedRecipe={selectedLotesRecipe}
+        lotesList={lotesList}
       />
     </>
   );

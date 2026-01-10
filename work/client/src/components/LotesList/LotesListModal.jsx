@@ -8,6 +8,7 @@ import Form from 'react-bootstrap/Form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useNavigate } from 'react-router-dom';
+import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 
 const SECTIONS = {
   batchInfo: {
@@ -177,8 +178,9 @@ const RenderSection = ({
 
 function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { list_of_recipes } = useRecipeContext();
   const user = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({});
@@ -221,6 +223,51 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   //   }
   // };
 
+  const buildResolvedRecipe = (batch, list_of_recipes) => {
+    if (!batch) return null;
+
+    const baseRecipe = list_of_recipes.find(
+      (r) => String(r.article) === String(batch.recipe)
+    );
+
+    if (!baseRecipe) return null;
+
+    const RECIPE_PARAMS = [
+      'sand_dry',
+      'sand_slurry_dry',
+      'lime',
+      'cement',
+      'gypsum_dry',
+      'return_dry',
+      'gypsum_stone',
+      'aluminum_paste',
+      'aluminum_paste_2',
+      'grinding_balls',
+      'aac',
+    ];
+
+    let resolved = {
+      ...baseRecipe,
+      ...batch,
+    };
+
+    if (batch.custom_recipe === true) {
+      RECIPE_PARAMS.forEach((key) => {
+        const val = batch[key];
+        if (
+          val !== null &&
+          val !== undefined &&
+          Number(val) !== 0 &&
+          Number.isFinite(Number(val))
+        ) {
+          resolved[key] = Number(val);
+        }
+      });
+    }
+
+    return resolved;
+  };
+
   return (
     <Modal
       show={show}
@@ -230,11 +277,47 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       centered
       dialogClassName="modal-auto-size"
     >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Batch Details: {formData.id || 'New'}
-        </Modal.Title>
-      </Modal.Header>
+      <Modal.Title className="d-flex align-items-center gap-2">
+        Batch Details: {formData.id}
+        {formData.relatedBatches?.length > 1 && (
+          <>
+            <span className="ms-3">id</span>
+            <Form.Select
+              size="sm"
+              style={{ width: 120 }}
+              value={formData.id}
+              onChange={(e) => {
+                const selectedId = Number(e.target.value);
+
+                const selectedBatch = formData.relatedBatches.find(
+                  (b) => b.id === selectedId
+                );
+
+                if (!selectedBatch) return;
+
+                const resolved = buildResolvedRecipe(
+                  selectedBatch,
+                  formData.relatedBatchesRecipes || list_of_recipes
+                );
+
+                if (resolved) {
+                  setFormData({
+                    ...resolved,
+                    relatedBatches: formData.relatedBatches,
+                  });
+                }
+              }}
+            >
+              {formData.relatedBatches.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.id}
+                </option>
+              ))}
+            </Form.Select>
+          </>
+        )}
+      </Modal.Title>
+
       <Modal.Body>
         <Container fluid>
           <Form onSubmit={onSubmitForm}>
