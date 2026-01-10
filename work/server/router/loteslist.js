@@ -1,7 +1,10 @@
 const lotesListRouter = require('express').Router();
 const { LotesList } = require('../db/models/index.js');
 const myEmitter = require('../src/ee.js');
-const { ADD_NEW_LOTES_LIST_SOCKET } = require('../src/constants/event.js');
+const {
+  ADD_NEW_LOTES_LIST_SOCKET,
+  UPDATE_LOTES_LIST_SOCKET,
+} = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 
 lotesListRouter.get('/', async (req, res) => {
@@ -65,6 +68,32 @@ lotesListRouter.post('/', async (req, res) => {
 
     myEmitter.emit(ADD_NEW_LOTES_LIST_SOCKET, lotesList);
     return res.status(200).json(lotesList);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+lotesListRouter.post('/update', async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    const [count, rows] = await LotesList.update(
+      { ...req.body },
+      {
+        where: { id },
+        returning: true,
+      }
+    );
+
+    if (count === 0) {
+      return res.status(404).json({ error: 'Record not found' });
+    }
+
+    const updatedLotes = rows[0];
+
+    myEmitter.emit(UPDATE_LOTES_LIST_SOCKET, updatedLotes);
+    return res.status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json({ error: err.message });

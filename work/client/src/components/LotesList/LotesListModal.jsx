@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useNavigate } from 'react-router-dom';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { updateLotesList } from '#components/redux/actions/lotesListAction.js';
 
 const SECTIONS = {
   batchInfo: {
@@ -180,7 +181,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { list_of_recipes } = useRecipeContext();
   const user = useSelector((state) => state.user);
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({});
@@ -209,10 +210,17 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     }));
   };
 
+  const preparePayloadForSave = (formData) => {
+    const { activeBatchId, relatedBatches, ...payload } = formData;
+
+    return payload;
+  };
+
   const onSubmitForm = async (e) => {
     e.preventDefault();
     console.log('Submitting data:', formData);
-    // dispatch(updateRecipe(formData));
+    const result = preparePayloadForSave(formData);
+    dispatch(updateLotesList(result));
     onHide();
   };
 

@@ -123,7 +123,8 @@ import {
   updateWarehouseAACSocket,
   deleteWarehouseAACSocket,
   addNewLotesListSocket,
-} from "#components/redux/actions/socketActions/socketAction.js";
+  updateLotesListSocket,
+} from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
   addNewClientSocket,
@@ -135,12 +136,12 @@ import {
   updContactPriceInfoSocket,
   updateContactInfoSocket,
   updateDeliveryAddressSocket,
-} from "#components/redux/actions/socketActions/clientsActionSocket.js";
+} from '#components/redux/actions/socketActions/clientsActionSocket.js';
 import {
   addNewBatchOutsideSocket,
   deleteBatchOutsideSocket,
   updateBatchOutsideSocket,
-} from "#components/redux/actions/socketActions/batchOutsideActionSocket.js";
+} from '#components/redux/actions/socketActions/batchOutsideActionSocket.js';
 import {
   ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
   ADD_CONTACT_INFO_SOCKET,
@@ -291,12 +292,13 @@ import {
   NEED_UPD_CONTACT_PRICE_INFO_SOCKET,
   UPDATE_CONTACT_INFO_SOCKET,
   UPDATE_DELIVERY_ADDRESSES_SOCKET,
-} from "#components/redux/types/socketTypes/socket.js";
+  UPDATE_LOTES_LIST_SOCKET,
+} from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
   const parsedData = JSON.parse(event.data);
   const { type, payload } = parsedData;
-  console.log("createSocketOnMessage, parsedData", parsedData);
+  console.log('createSocketOnMessage, parsedData', parsedData);
 
   switch (type) {
     case ADD_NEW_PRODUCT_SOCKET:
@@ -729,6 +731,8 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET:
       dispatch(updateListOfOrderedProductionOEMSocket(payload));
+      break;
+
     case ADD_NEW_WAREHOUSE_SAND_SOCKET:
       dispatch(addNewWarehouseSandSocket(payload));
       break;
@@ -839,6 +843,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_LOTES_LIST_SOCKET:
       dispatch(addNewLotesListSocket(payload));
+      break;
+
+    case UPDATE_LOTES_LIST_SOCKET:
+      dispatch(updateLotesListSocket(payload));
       break;
 
     default:
