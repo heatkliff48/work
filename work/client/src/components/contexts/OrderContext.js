@@ -1,153 +1,159 @@
 // import { useNavigate } from 'react-router-dom';
-import { DropdownFilter } from '#components/Table/filters';
+import { DropdownFilter } from "#components/Table/filters";
 import {
   addAccountingDataList,
   getOrders,
   updAccountingDataList,
-} from '#components/redux/actions/ordersAction.js';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+} from "#components/redux/actions/ordersAction.js";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const OrderContext = createContext();
 
 const OrderContextProvider = ({ children }) => {
   const COLUMNS_ORDERS = [
     {
-      Header: 'Order number',
-      accessor: 'article',
+      Header: "Order number",
+      accessor: "article",
       disableSortBy: true,
     },
     {
-      Header: 'Name of owner',
-      accessor: 'owner',
-      sortType: 'string',
+      Header: "Name of owner",
+      accessor: "owner",
+      sortType: "string",
     },
     {
-      Header: 'Project name', // 'Delivery address',
-      accessor: 'del_adr_id',
-      sortType: 'string',
+      Header: "Project name", // 'Delivery address',
+      accessor: "project_name", // del_adr_id
+      sortType: "string",
     },
     {
-      Header: 'Status of order',
-      accessor: 'status',
+      Header: "Status of order",
+      accessor: "status",
       Filter: DropdownFilter,
-      sortType: 'string',
+      sortType: "string",
     },
     {
-      Header: 'Person in charge of the order',
-      accessor: 'person_in_charge',
+      Header: "Person in charge of the order",
+      accessor: "person_in_charge",
     },
   ];
 
   const COLUMNS_ACCOUNTING = [
     {
-      Header: 'Order number',
-      accessor: 'orders_article',
+      Header: "Order number",
+      accessor: "orders_article",
       disableSortBy: true,
     },
     {
-      Header: 'Status of order',
-      accessor: 'orders_status',
+      Header: "Status of order",
+      accessor: "orders_status",
       disableSortBy: true,
     },
   ];
 
   const COLUMNS_ORDER_PRODUCT = [
     {
-      Header: 'Product ID',
-      accessor: 'product_article',
+      Header: "Product ID",
+      accessor: "product_article",
       disableSortBy: true,
     },
     {
-      Header: 'Quantity, m2',
-      accessor: 'quantity_m2',
-      sortType: 'number',
+      Header: "Quantity, m2",
+      accessor: "quantity_m2",
+      sortType: "number",
     },
     {
-      Header: 'Quantity of pallets',
-      accessor: 'quantity_palet',
-      sortType: 'number',
+      Header: "Quantity of pallets",
+      accessor: "quantity_palet",
+      sortType: "number",
     },
     {
-      Header: 'Real quantity, m2',
-      accessor: 'quantity_real',
-      sortType: 'number',
+      Header: "Real quantity, m2",
+      accessor: "quantity_real",
+      sortType: "number",
     },
     {
-      Header: 'Price, EURO per m2',
-      accessor: 'price_m2',
-      sortType: 'number',
+      Header: "Price, EURO per m2",
+      accessor: "price_m2",
+      sortType: "number",
     },
     {
-      Header: 'Price, EURO per m3',
-      accessor: 'price_m3',
-      sortType: 'number',
+      Header: "Price, EURO per m3",
+      accessor: "price_m3",
+      sortType: "number",
     },
     {
-      Header: 'Discount, %',
-      accessor: 'discount',
+      Header: "Discount, %",
+      accessor: "discount",
       defaultValue: 0,
     },
     {
-      Header: 'Final price, EURO',
-      accessor: 'final_price',
-      sortType: 'number',
+      Header: "Final price, EURO",
+      accessor: "final_price",
+      sortType: "number",
     },
   ];
 
   const COLUMNS_ORDER_DRY_MIXES = [
     {
-      Header: 'Product ID',
-      accessor: 'dry_mixed_article',
+      Header: "Product ID",
+      accessor: "dry_mixed_article",
       disableSortBy: true,
     },
     {
-      Header: 'Quantity, Ud',
-      accessor: 'quantity_ud',
-      sortType: 'number',
+      Header: "Quantity, Ud",
+      accessor: "quantity_ud",
+      sortType: "number",
     },
     {
-      Header: 'Quantity of pallets',
-      accessor: 'quantity_palet_dry',
-      sortType: 'number',
+      Header: "Quantity of pallets",
+      accessor: "quantity_palet_dry",
+      sortType: "number",
     },
     {
-      Header: 'Real quantity, ud',
-      accessor: 'quantity_real_ud',
-      sortType: 'number',
+      Header: "Real quantity, ud",
+      accessor: "quantity_real_ud",
+      sortType: "number",
     },
     {
-      Header: 'Total, kg',
-      accessor: 'total',
-      sortType: 'number',
+      Header: "Total, kg",
+      accessor: "total",
+      sortType: "number",
     },
     {
-      Header: 'Discount, %',
-      accessor: 'discount',
+      Header: "Discount, %",
+      accessor: "discount",
       defaultValue: 0,
     },
     {
-      Header: 'PVP',
-      accessor: 'pvp',
+      Header: "PVP",
+      accessor: "pvp",
       defaultValue: 0,
     },
     {
-      Header: 'Final price, EURO',
-      accessor: 'final_price',
-      sortType: 'number',
+      Header: "Final price, EURO",
+      accessor: "final_price",
+      sortType: "number",
     },
   ];
 
   const COLUMNS_ORDER_ANCHOR = [
     {
-      Header: 'Product ID',
-      accessor: 'anchor_article',
+      Header: "Product ID",
+      accessor: "anchor_article",
       disableSortBy: true,
     },
     {
-      Header: 'Quantity, Ud',
-      accessor: 'quantity_ud',
-      sortType: 'number',
+      Header: "Quantity, Ud",
+      accessor: "quantity_ud",
+      sortType: "number",
     },
     // {
     //   Header: 'Quantity of pallets',
@@ -155,137 +161,137 @@ const OrderContextProvider = ({ children }) => {
     //   sortType: 'number',
     // },
     {
-      Header: 'Real quantity, ud',
-      accessor: 'quantity_real_ud',
-      sortType: 'number',
+      Header: "Real quantity, ud",
+      accessor: "quantity_real_ud",
+      sortType: "number",
     },
     {
-      Header: 'Total, kg',
-      accessor: 'total',
-      sortType: 'number',
+      Header: "Total, kg",
+      accessor: "total",
+      sortType: "number",
     },
     {
-      Header: 'Discount, %',
-      accessor: 'discount',
+      Header: "Discount, %",
+      accessor: "discount",
       defaultValue: 0,
     },
     {
-      Header: 'PVP',
-      accessor: 'pvp',
+      Header: "PVP",
+      accessor: "pvp",
       defaultValue: 0,
     },
     {
-      Header: 'Final price, EURO',
-      accessor: 'final_price',
-      sortType: 'number',
+      Header: "Final price, EURO",
+      accessor: "final_price",
+      sortType: "number",
     },
   ];
 
   const COLUMNS_ORDER_TOOL = [
     {
-      Header: 'Product ID',
-      accessor: 'tool_article',
+      Header: "Product ID",
+      accessor: "tool_article",
       disableSortBy: true,
     },
     {
-      Header: 'Quantity, Ud',
-      accessor: 'quantity_ud',
-      sortType: 'number',
+      Header: "Quantity, Ud",
+      accessor: "quantity_ud",
+      sortType: "number",
     },
     {
-      Header: 'Total, Ud',
-      accessor: 'total',
-      sortType: 'number',
+      Header: "Total, Ud",
+      accessor: "total",
+      sortType: "number",
     },
     {
-      Header: 'Discount, %',
-      accessor: 'discount',
+      Header: "Discount, %",
+      accessor: "discount",
       defaultValue: 0,
     },
     {
-      Header: 'PVP',
-      accessor: 'pvp',
+      Header: "PVP",
+      accessor: "pvp",
       defaultValue: 0,
     },
     {
-      Header: 'Final price, EURO',
-      accessor: 'final_price',
-      sortType: 'number',
+      Header: "Final price, EURO",
+      accessor: "final_price",
+      sortType: "number",
     },
   ];
 
   const COLUMNS_ORDER_RELATED_MATERIAL = [
     {
-      Header: 'Product ID',
-      accessor: 'rel_mat_article',
+      Header: "Product ID",
+      accessor: "rel_mat_article",
       disableSortBy: true,
     },
     {
-      Header: 'Quantity, Ud',
-      accessor: 'quantity_ud',
-      sortType: 'number',
+      Header: "Quantity, Ud",
+      accessor: "quantity_ud",
+      sortType: "number",
     },
     {
-      Header: 'Total, Ud',
-      accessor: 'total',
-      sortType: 'number',
+      Header: "Total, Ud",
+      accessor: "total",
+      sortType: "number",
     },
     {
-      Header: 'Discount, %',
-      accessor: 'discount',
+      Header: "Discount, %",
+      accessor: "discount",
       defaultValue: 0,
     },
     {
-      Header: 'PVP',
-      accessor: 'pvp',
+      Header: "PVP",
+      accessor: "pvp",
       defaultValue: 0,
     },
     {
-      Header: 'Final price, EURO',
-      accessor: 'final_price',
-      sortType: 'number',
+      Header: "Final price, EURO",
+      accessor: "final_price",
+      sortType: "number",
     },
   ];
 
   const status_list = [
     {
-      Header: 'Initial contact',
+      Header: "Initial contact",
       accessor: 1,
     },
     {
-      Header: 'Inquiry in progress',
+      Header: "Inquiry in progress",
       accessor: 2,
     },
     {
-      Header: 'Proposal approved by us',
+      Header: "Proposal approved by us",
       accessor: 3,
     },
     {
-      Header: 'Proposal accepted by client',
+      Header: "Proposal accepted by client",
       accessor: 4,
     },
     {
-      Header: 'Contracted order', // date
+      Header: "Contracted order", // date
       accessor: 5,
     },
     {
-      Header: 'Order allowed for production',
+      Header: "Order allowed for production",
       accessor: 6,
     },
     {
-      Header: 'Order produced',
+      Header: "Order produced",
       accessor: 7,
     },
     {
-      Header: 'Shipping allowed',
+      Header: "Shipping allowed",
       accessor: 8,
     },
     {
-      Header: 'Order shipped',
+      Header: "Order shipped",
       accessor: 9,
     },
     {
-      Header: 'Order completed',
+      Header: "Order completed",
       accessor: 10,
     },
   ];
@@ -319,7 +325,9 @@ const OrderContextProvider = ({ children }) => {
     (state) => state.anchorProductsOfOrders
   );
 
-  const toolProductsOfOrders = useSelector((state) => state.toolProductsOfOrders);
+  const toolProductsOfOrders = useSelector(
+    (state) => state.toolProductsOfOrders
+  );
 
   const relMatProductsOfOrders = useSelector(
     (state) => state.relMatProductsOfOrders
@@ -334,15 +342,15 @@ const OrderContextProvider = ({ children }) => {
   const accountingAccessStatusList = [5, 7, 9];
   const accountingStatusList = [
     {
-      Header: 'Allowed for production by accounting',
+      Header: "Allowed for production by accounting",
       accessor: 1,
     },
     {
-      Header: 'Allowed to shipping by accounting',
+      Header: "Allowed to shipping by accounting",
       accessor: 2,
     },
     {
-      Header: 'Allowed to close by accounting',
+      Header: "Allowed to close by accounting",
       accessor: 3,
     },
   ];
@@ -395,7 +403,7 @@ const OrderContextProvider = ({ children }) => {
     const tempPersonsInChargeList = [
       {
         value: 0,
-        label: 'None',
+        label: "None",
       },
     ];
 
@@ -422,7 +430,9 @@ const OrderContextProvider = ({ children }) => {
 
   const getCurrentOrderInfoHandler = useCallback(
     (order_info) => {
-      const order = list_of_orders.find((el) => el.article === order_info?.article);
+      const order = list_of_orders.find(
+        (el) => el.article === order_info?.article
+      );
       const client = clients.find((client) => client.id === order?.owner);
       const deliveryAddress = deliveryAddresses.find(
         (address) =>
@@ -451,7 +461,7 @@ const OrderContextProvider = ({ children }) => {
         delivery: order?.delivery,
       };
 
-      localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
+      localStorage.setItem("orderCartData", JSON.stringify(currentOrder));
       setOrderCartData(currentOrder);
     },
     [list_of_orders, clients, deliveryAddresses]
@@ -490,14 +500,15 @@ const OrderContextProvider = ({ children }) => {
           article,
           description: order?.description,
           status:
-            status_list?.find((stat) => stat.accessor == status)?.Header || status,
-          owner: client ? client.c_name : '',
-          del_adr_id: deliveryAddress ? deliveryAddress.street : '',
+            status_list?.find((stat) => stat.accessor == status)?.Header ||
+            status,
+          owner: client ? client.c_name : "",
+          project_name: deliveryAddress ? deliveryAddress.project_name : "",
           shipping_date,
           person_in_charge:
             person_in_charge != 0
               ? usersInfo.find((user) => user.id === person_in_charge)?.fullName
-              : 'None',
+              : "None",
         };
       });
 
