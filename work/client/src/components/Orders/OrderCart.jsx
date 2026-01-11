@@ -1,13 +1,13 @@
-import React, { useEffect, useMemo, useCallback, useState } from 'react';
-import 'react-datepicker/dist/react-datepicker.css';
-import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
-import ListOfOrderedProductionReserveModal from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProductionReserveModal.jsx';
-import { useProjectContext } from '#components/contexts/Context.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { useUsersContext } from '#components/contexts/UserContext.js';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import React, { useEffect, useMemo, useCallback, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import FilesMain from "#components/FileUpload/Order/FilesMain.jsx";
+import ListOfOrderedProductionReserveModal from "#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProductionReserveModal.jsx";
+import { useProjectContext } from "#components/contexts/Context.js";
+import { useModalContext } from "#components/contexts/ModalContext.js";
+import { useOrderContext } from "#components/contexts/OrderContext.js";
+import { useProductsContext } from "#components/contexts/ProductContext.js";
+import { useUsersContext } from "#components/contexts/UserContext.js";
+import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
 import {
   addDataShipOrder,
   addDescription,
@@ -21,41 +21,41 @@ import {
   updAccountingDataList,
   updateOrderInCharge,
   updateOrderStatus,
-} from '#components/redux/actions/ordersAction.js';
+} from "#components/redux/actions/ordersAction.js";
 import {
   addNewListOfOrderedProduction,
   addNewListOfOrderedProductionOEM,
   updateRemainingStock,
-} from '#components/redux/actions/warehouseAction.js';
-import PDFgenerate from './OrdersPDF.jsx';
-import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
-import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
-import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
-import DatePicker from 'react-datepicker';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import Select from 'react-select';
-import { Button } from 'reactstrap';
-import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
-import BlocksJournalTableOrder from './product_table_order/BlocksJournalTableOrder.jsx';
-import DryMixesJournalTableOrder from './product_table_order/DryMixesJournalTableOrder.jsx';
-import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
-import AnchorJournalTableOrder from './product_table_order/AnchorJournalTableOrder.jsx';
-import ToolJournalTableOrder from './product_table_order/ToolJournalTableOrder.jsx';
+} from "#components/redux/actions/warehouseAction.js";
+import PDFgenerate from "./OrdersPDF.jsx";
+import ShowOrderContactEditModal from "./modal/OrderCartContactEditModal.jsx";
+import ShowOrderDeliveryEditModal from "./modal/OrderCartDeliveryEditModal.jsx";
+import OrderProductCardInfoModal from "./modal/OrderProductCardInfoModal.jsx";
+import DatePicker from "react-datepicker";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Select from "react-select";
+import { Button } from "reactstrap";
+import ListOfReservedProductsModal from "#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx";
+import BlocksJournalTableOrder from "./product_table_order/BlocksJournalTableOrder.jsx";
+import DryMixesJournalTableOrder from "./product_table_order/DryMixesJournalTableOrder.jsx";
+import { useProductsTypeJournalContext } from "#components/contexts/ProductsTypeJournalContext.js";
+import AnchorJournalTableOrder from "./product_table_order/AnchorJournalTableOrder.jsx";
+import ToolJournalTableOrder from "./product_table_order/ToolJournalTableOrder.jsx";
 import {
   getDeleteAnchorProductOfOrder,
   getDeleteDryMixedProductOfOrder,
   getDeleteToolProductOfOrder,
-} from '#components/redux/actions/ordersAction.js';
-import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo.js';
+} from "#components/redux/actions/ordersAction.js";
+import ClientsContactInfo from "#components/Clients/ClientsContactInfo/ClientsContactInfo.js";
 import {
   updateAnchorsWarehouse,
   updateDryMixesWarehouse,
   updateRelatedMaterialsWarehouse,
   updateToolsWarehouse,
-} from '#components/redux/actions/productsTypeWarehouseAction.js';
-import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
-import RelatedMaterialJournalTableOrder from './product_table_order/RelatedMaterialJournalTableOrder.jsx';
+} from "#components/redux/actions/productsTypeWarehouseAction.js";
+import { addNewRelatedMaterialsBackorder } from "#components/redux/actions/relatedMaterialsBackorderListAction.js";
+import RelatedMaterialJournalTableOrder from "./product_table_order/RelatedMaterialJournalTableOrder.jsx";
 
 const OrderCart = React.memo(() => {
   const {
@@ -84,7 +84,8 @@ const OrderCart = React.memo(() => {
   } = useModalContext();
   const { displayNames, user } = useProjectContext();
 
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
   const { latestProducts } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
@@ -107,7 +108,7 @@ const OrderCart = React.memo(() => {
 
   const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
   const [dataValue, setDataValue] = useState(new Date());
-  const [newDescription, setNewDescription] = useState('');
+  const [newDescription, setNewDescription] = useState("");
   const [formatDataValue, setFormatDataValue] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isAddSecCont, setIsAddSecCont] = useState(false);
@@ -142,20 +143,20 @@ const OrderCart = React.memo(() => {
 
   const getCorrectProductId = (arrName) => {
     switch (arrName) {
-      case 'products':
-        return 'product_id';
+      case "products":
+        return "product_id";
 
-      case 'dryMixes':
-        return 'dry_mixed_id';
+      case "dryMixes":
+        return "dry_mixed_id";
 
-      case 'anchors':
-        return 'anchor_id';
+      case "anchors":
+        return "anchor_id";
 
-      case 'tools':
-        return 'tool_id';
+      case "tools":
+        return "tool_id";
 
-      case 'related_materials':
-        return 'rel_mat_id';
+      case "related_materials":
+        return "rel_mat_id";
 
       default:
         break;
@@ -164,13 +165,15 @@ const OrderCart = React.memo(() => {
 
   const filterKeys = useMemo(
     () => [
-      'id',
-      'order_id',
-      'dry_mixed_id',
-      'client_id',
-      'product_id',
-      'createdAt',
-      'updatedAt',
+      "id",
+      "order_id",
+      "dry_mixed_id",
+      "client_id",
+      "product_id",
+      "createdAt",
+      "updatedAt",
+      "bitrix_id",
+      "bitrix_client_id",
     ],
     []
   );
@@ -184,11 +187,11 @@ const OrderCart = React.memo(() => {
       Object.entries(data || {})
         .filter(([key]) => !filterKeys?.includes(key))
         .map(([key, value]) => {
-          if (!key || key === 'warehouse_id') return null;
+          if (!key || key === "warehouse_id") return null;
 
           // Если значение — объект, преобразуем его в строку
           let displayValue = value;
-          if (displayValue && typeof displayValue === 'object') {
+          if (displayValue && typeof displayValue === "object") {
             displayValue = JSON.stringify(displayValue);
           }
 
@@ -207,14 +210,14 @@ const OrderCart = React.memo(() => {
     (date) => {
       const currentDate = new Date();
       if (date < currentDate) {
-        alert('The selected date cannot be before than the current date');
+        alert("The selected date cannot be before than the current date");
         return;
       }
       setDataValue(date);
-      const formattedDate = date.toLocaleDateString('ru-RU', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
+      const formattedDate = date.toLocaleDateString("ru-RU", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
       });
       setFormatDataValue(formattedDate);
     },
@@ -230,7 +233,9 @@ const OrderCart = React.memo(() => {
     const currentDate = new Date();
     const shippingDateString = orderCartData?.shipping_date;
 
-    const shippingDate = new Date(shippingDateString.split('.').reverse().join('-'));
+    const shippingDate = new Date(
+      shippingDateString.split(".").reverse().join("-")
+    );
 
     const timeDiff = shippingDate.getTime() - currentDate.getTime();
     const daysUntil = Math.ceil(timeDiff / (1000 * 3600 * 24));
@@ -252,7 +257,10 @@ const OrderCart = React.memo(() => {
 
   const addSecCntFunc = (secCnt) => {
     dispatch(
-      addSecondaryContact({ secondary_contact: secCnt, order_id: orderCartData.id })
+      addSecondaryContact({
+        secondary_contact: secCnt,
+        order_id: orderCartData.id,
+      })
     );
 
     setIsAddSecCont(false);
@@ -260,7 +268,12 @@ const OrderCart = React.memo(() => {
 
   const addProductArticleToOrderList = useCallback(
     (productsOfOrders, productsTable, arrayName) => {
-      if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
+      if (
+        !productsOfOrders ||
+        !productsTable ||
+        !arrayName ||
+        !orderCartData?.id
+      )
         return [];
 
       const updatedOrderProducts = productsOfOrders
@@ -268,15 +281,27 @@ const OrderCart = React.memo(() => {
         .map((orderProduct) => {
           const id = getCorrectProductId(arrayName);
 
-          const { project_name } = deliveryAddresses.find(
-            (el) => el.client_id == orderCartData.owner.id
+          // const { project_name } = deliveryAddresses.find(
+          //   (el) => el.client_id == orderCartData.owner.id
+          // );
+
+          const product = productsTable.find(
+            (p) => p.id === orderProduct?.[id]
           );
 
-          const product = productsTable.find((p) => p.id === orderProduct?.[id]);
-
           return product
-            ? { product_article: product.article, project_name, ...orderProduct }
-            : { ...orderProduct, product_article: 'Unknown' };
+            ? {
+                product_article: product.article,
+                // project_name,
+                description:
+                  arrayName == "products" ||
+                  arrayName == "tools" ||
+                  arrayName == "related_materials"
+                    ? product.description
+                    : `${product?.name} BAUBLOCK Sacos de ${product?.pallet_weight}kg`,
+                ...orderProduct,
+              }
+            : { ...orderProduct, product_article: "Unknown" };
         });
 
       return updatedOrderProducts;
@@ -288,7 +313,7 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       productsOfOrders,
       latestProducts,
-      'products'
+      "products"
     );
   }, [productsOfOrders, latestProducts, addProductArticleToOrderList]);
 
@@ -305,7 +330,7 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       dryMixedProductsOfOrders,
       latestDryMix,
-      'dryMixes'
+      "dryMixes"
     );
   }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
 
@@ -323,7 +348,7 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       anchorProductsOfOrders,
       latestAnchors,
-      'anchors'
+      "anchors"
     );
   }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
 
@@ -337,7 +362,11 @@ const OrderCart = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools');
+    return addProductArticleToOrderList(
+      toolProductsOfOrders,
+      latestTools,
+      "tools"
+    );
   }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
 
   useEffect(() => {
@@ -353,9 +382,13 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       relMatProductsOfOrders,
       latestRelatedMaterials,
-      'related_materials'
+      "related_materials"
     );
-  }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
+  }, [
+    relMatProductsOfOrders,
+    latestRelatedMaterials,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedRelatedMaterialsListOrder.length > 0) {
@@ -376,15 +409,15 @@ const OrderCart = React.memo(() => {
   const onProductClickHandler = (sel_prod) => {
     if (orderCartData?.status < 3) {
       const product =
-        sel_prod.product_article.slice(2, 3) == 'N'
+        sel_prod.product_article.slice(2, 3) == "N"
           ? latestProducts.find((el) => el.article === sel_prod.product_article)
-          : sel_prod.product_article.slice(2, 3) == 'M'
+          : sel_prod.product_article.slice(2, 3) == "M"
           ? latestDryMix.find((el) => el.article === sel_prod.product_article)
-          : sel_prod.product_article.slice(2, 3) == 'P'
+          : sel_prod.product_article.slice(2, 3) == "P"
           ? latestRelatedMaterials.find(
               (el) => el.article === sel_prod.product_article
             )
-          : sel_prod.product_article.slice(2, 3) == 'F'
+          : sel_prod.product_article.slice(2, 3) == "F"
           ? latestAnchors.find((el) => el.article === sel_prod.product_article)
           : latestTools.find((el) => el.article === sel_prod.product_article);
       setSelectedProduct(product);
@@ -399,7 +432,7 @@ const OrderCart = React.memo(() => {
         status.accessor < orderCartData?.status ||
         status.accessor > orderCartData?.status + 1
       ) {
-        return alert('This status cannot be set');
+        return alert("This status cannot be set");
       }
 
       if (!aproveAccounting) {
@@ -413,8 +446,12 @@ const OrderCart = React.memo(() => {
         ? orderCartData?.shipping_date
         : formatDataValue;
 
-    if (!bypass && status.accessor > status_list[3].accessor && !hasShippingDate) {
-      alert('Пожалуйста, выберите дату отправки');
+    if (
+      !bypass &&
+      status.accessor > status_list[3].accessor &&
+      !hasShippingDate
+    ) {
+      alert("Пожалуйста, выберите дату отправки");
       return;
     } else if (bypass) {
       const today = new Date();
@@ -423,12 +460,12 @@ const OrderCart = React.memo(() => {
       randomDate.setDate(today.getDate() + randomDays);
 
       const formattedDate = randomDate
-        .toLocaleDateString('ru-RU', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
+        .toLocaleDateString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
         })
-        .replace(/\//g, '.');
+        .replace(/\//g, ".");
 
       dispatch(
         addDataShipOrder({
@@ -456,7 +493,7 @@ const OrderCart = React.memo(() => {
       );
       if (
         status.accessor === status_list[5].accessor &&
-        loc === 'Spain' &&
+        loc === "Spain" &&
         !haveProductReserve
       ) {
         const reservedProduct = productsOfOrders.find(
@@ -474,7 +511,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate
@@ -527,7 +567,7 @@ const OrderCart = React.memo(() => {
         (el) => el.article == product.product_article
       )?.place_of_production;
 
-      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+      if (status.accessor === status_list[5].accessor && loc === "ES") {
         const reservedProduct = dryMixedProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
@@ -544,7 +584,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate
@@ -585,7 +628,7 @@ const OrderCart = React.memo(() => {
         (el) => el.article == product.product_article
       )?.place_of_production;
 
-      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+      if (status.accessor === status_list[5].accessor && loc === "ES") {
         const reservedProduct = anchorProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
@@ -602,7 +645,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate
@@ -643,7 +689,7 @@ const OrderCart = React.memo(() => {
         (el) => el.article == product.product_article
       )?.place_of_production;
 
-      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+      if (status.accessor === status_list[5].accessor && loc === "ES") {
         const reservedProduct = toolProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
@@ -660,7 +706,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate
@@ -700,7 +749,7 @@ const OrderCart = React.memo(() => {
         (el) => el.article == product.product_article
       )?.place_of_production;
 
-      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+      if (status.accessor === status_list[5].accessor && loc === "ES") {
         const reservedProduct = relMatProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
@@ -717,7 +766,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate
@@ -775,28 +827,30 @@ const OrderCart = React.memo(() => {
   };
 
   const deleteHandler = (product) => {
-    const res_prod = list_of_reserved_products.find((el) => el.id === product.id);
-    if (res_prod) alert('Этот продукт зарервировван на складе');
-    if (product?.product_article.charAt(0) === 'T') {
+    const res_prod = list_of_reserved_products.find(
+      (el) => el.id === product.id
+    );
+    if (res_prod) alert("Этот продукт зарервировван на складе");
+    if (product?.product_article.charAt(0) === "T") {
       dispatch(getDeleteProductOfOrder(product?.id));
-    } else if (product?.product_article.charAt(2) === 'M') {
+    } else if (product?.product_article.charAt(2) === "M") {
       dispatch(getDeleteDryMixedProductOfOrder(product?.id));
-    } else if (product?.product_article.charAt(2) === 'F') {
+    } else if (product?.product_article.charAt(2) === "F") {
       dispatch(getDeleteAnchorProductOfOrder(product?.id));
-    } else if (product?.product_article.charAt(2) === 'T') {
+    } else if (product?.product_article.charAt(2) === "T") {
       dispatch(getDeleteToolProductOfOrder(product?.id));
-    } else if (product?.product_article.charAt(2) === 'P') {
+    } else if (product?.product_article.charAt(2) === "P") {
       dispatch(getDeleteRelMatProductOfOrder(product?.id));
     }
   };
 
   const final_price_product = useMemo(() => {
     const allProducts = [
-      ...productLists['products'],
-      ...productLists['dryMixes'],
-      ...productLists['anchors'],
-      ...productLists['tools'],
-      ...productLists['related_materials'],
+      ...productLists["products"],
+      ...productLists["dryMixes"],
+      ...productLists["anchors"],
+      ...productLists["tools"],
+      ...productLists["related_materials"],
     ];
 
     return allProducts.reduce(
@@ -822,10 +876,13 @@ const OrderCart = React.memo(() => {
     if (!final_price_product || !vatValue.vat_procent) {
       setVatValue((prev) => ({ ...prev, vat_result: 0 }));
     } else {
-      const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
+      const vat_euro = (
+        (vatValue.vat_procent * final_price_product) /
+        100
+      ).toFixed(2);
+      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(
         2
       );
-      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
       const vat_result_del = orderCartData?.delivery
         ? vat_result + orderCartData?.delivery
         : 0;
@@ -860,8 +917,8 @@ const OrderCart = React.memo(() => {
   };
 
   useEffect(() => {
-    const storedData = localStorage.getItem('orderCartData')
-      ? JSON.parse(localStorage.getItem('orderCartData'))
+    const storedData = localStorage.getItem("orderCartData")
+      ? JSON.parse(localStorage.getItem("orderCartData"))
       : null;
 
     const updatedOrderCartData = list_of_orders.find(
@@ -880,7 +937,10 @@ const OrderCart = React.memo(() => {
     }
 
     if (updatedOrderCartData && updatedOrderCartData !== orderCartData) {
-      setOrderCartData((prev) => ({ ...prev, status: updatedOrderCartData.status }));
+      setOrderCartData((prev) => ({
+        ...prev,
+        status: updatedOrderCartData.status,
+      }));
     }
 
     if (!ordersStatus.includes(updatedOrderCartData?.status))
@@ -891,22 +951,22 @@ const OrderCart = React.memo(() => {
       description: updatedOrderCartData?.description,
     }));
 
-    localStorage.setItem('orderCartData', JSON.stringify(storedData));
+    localStorage.setItem("orderCartData", JSON.stringify(storedData));
   }, [list_of_orders]);
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Orders');
+      const access = checkUserAccess(user, roles, "Orders");
       setUserAccess(access);
 
-      const statusAccess = checkUserAccess(user, roles, 'Orders_status');
+      const statusAccess = checkUserAccess(user, roles, "Orders_status");
       setOrderStatusAccess(statusAccess);
 
-      const deleteAccess = checkUserAccess(user, roles, 'Del_orders');
+      const deleteAccess = checkUserAccess(user, roles, "Del_orders");
       setDeleteOrderAccess(deleteAccess);
 
       if (!access?.canRead) {
-        navigate('/');
+        navigate("/");
       }
     }
   }, [user, roles]);
@@ -1060,8 +1120,8 @@ const OrderCart = React.memo(() => {
             setWarehouseInfoCurIdModal(row.original.id);
             setReserveModalShow(!reserveModalShow);
             // без этого лочится скролл, я хз почему
-            document.body.style.overflow = 'auto';
-            document.body.style.paddingRight = '0px';
+            document.body.style.overflow = "auto";
+            document.body.style.paddingRight = "0px";
             setWarehouseInfoModal(!warehouseInfoModal);
           }}
         />
@@ -1079,7 +1139,7 @@ const OrderCart = React.memo(() => {
               <h4>Description</h4>
               {orderCartData?.description && !isEditing ? (
                 <>
-                  <p style={{ height: '90%' }}>{orderCartData.description}</p>
+                  <p style={{ height: "90%" }}>{orderCartData.description}</p>
                   <button className="edit-button" onClick={onEditHandler}>
                     Edit
                   </button>
@@ -1090,12 +1150,12 @@ const OrderCart = React.memo(() => {
                     placeholder="Enter description..."
                     value={newDescription}
                     disabled={
-                      !checkUserAccess(user, roles, 'orders_description_edit')
+                      !checkUserAccess(user, roles, "orders_description_edit")
                         ?.canWrite
                     }
                     onChange={(e) => setNewDescription(e.target.value)}
                   />
-                  {checkUserAccess(user, roles, 'orders_description_edit')
+                  {checkUserAccess(user, roles, "orders_description_edit")
                     ?.canWrite && (
                     <button
                       className="save-button"
@@ -1131,7 +1191,7 @@ const OrderCart = React.memo(() => {
               <h4>Secondary Contacts</h4>
               {haveSecondaryContact && (
                 <button
-                  style={{ marginTop: '0' }}
+                  style={{ marginTop: "0" }}
                   onClick={() => {
                     dispatch(delSecondaryContact(orderCartData?.id));
                   }}
@@ -1144,7 +1204,10 @@ const OrderCart = React.memo(() => {
               filterAndMapData(orderCartData?.secondaryContact, filterKeys)
             ) : isAddSecCont ? (
               <>
-                <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
+                <ClientsContactInfo
+                  clickFunk={addSecCntFunc}
+                  fullContact={true}
+                />
               </>
             ) : (
               <button onClick={() => addSecondaryContactHandler()}>
@@ -1157,7 +1220,7 @@ const OrderCart = React.memo(() => {
             <Button
               onClick={() => {
                 dispatch(deleteOrder(orderCartData?.id));
-                navigate('/orders');
+                navigate("/orders");
               }}
             >
               Delete Order
@@ -1172,6 +1235,7 @@ const OrderCart = React.memo(() => {
           filterKeys={filterKeys}
           productHandler={productHandler}
           deleteHandler={deleteHandler}
+          displayNames={displayNames}
         />
         <DryMixesJournalTableOrder
           productListOrder={updatedDryMixesListOrder}
@@ -1179,6 +1243,7 @@ const OrderCart = React.memo(() => {
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeys}
           deleteHandler={deleteHandler}
+          displayNames={displayNames}
         />
         <AnchorJournalTableOrder
           productListOrder={updatedAnchorsListOrder}
@@ -1186,6 +1251,7 @@ const OrderCart = React.memo(() => {
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeys}
           deleteHandler={deleteHandler}
+          displayNames={displayNames}
         />
         <ToolJournalTableOrder
           productListOrder={updatedToolsListOrder}
@@ -1193,6 +1259,7 @@ const OrderCart = React.memo(() => {
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeys}
           deleteHandler={deleteHandler}
+          displayNames={displayNames}
         />
         <RelatedMaterialJournalTableOrder
           productListOrder={updatedRelatedMaterialsListOrder}
@@ -1200,6 +1267,7 @@ const OrderCart = React.memo(() => {
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeys}
           deleteHandler={deleteHandler}
+          displayNames={displayNames}
         />
 
         <div className="footer_data">
@@ -1223,7 +1291,7 @@ const OrderCart = React.memo(() => {
                       handleInputChange(e);
                     }}
                     onBlur={() => {
-                      if (vatValue.vat_procent.trim() === '') {
+                      if (vatValue.vat_procent.trim() === "") {
                         setVatValue((prev) => ({
                           ...prev,
                           vat_procent: 21,
@@ -1256,16 +1324,19 @@ const OrderCart = React.memo(() => {
                     }}
                     readOnly={orderCartData?.status < 3 ? false : true}
                     disabled={
-                      !checkUserAccess(user, roles, 'orders_save_delivery_price')
-                        ?.canWrite
+                      !checkUserAccess(
+                        user,
+                        roles,
+                        "orders_save_delivery_price"
+                      )?.canWrite
                     }
                   />
-                  {checkUserAccess(user, roles, 'orders_description_edit')
+                  {checkUserAccess(user, roles, "orders_description_edit")
                     ?.canWrite && (
                     <button
                       style={{
-                        padding: '4px 10px',
-                        marginLeft: '20px',
+                        padding: "4px 10px",
+                        marginLeft: "20px",
                       }}
                       onClick={() => {
                         deliveryFunc();
@@ -1291,8 +1362,8 @@ const OrderCart = React.memo(() => {
               {orderCartData.status >= 4 ? (
                 haveShipDate ? (
                   <p>
-                    Shipping date: {haveShipDate} ({handleDayBeforShipping()} days
-                    before shipment)
+                    Shipping date: {haveShipDate} ({handleDayBeforShipping()}{" "}
+                    days before shipment)
                   </p>
                 ) : (
                   <div>
@@ -1308,12 +1379,14 @@ const OrderCart = React.memo(() => {
                 )
               ) : null}
             </div>
-            {checkUserAccess(user, roles, 'orders_change_person_in_charge')
+            {checkUserAccess(user, roles, "orders_change_person_in_charge")
               ?.canWrite && (
               <div className="footer_button">
                 <p>Person in charge</p>
                 <Select
-                  defaultValue={getSelectedOption(orderCartData?.person_in_charge)}
+                  defaultValue={getSelectedOption(
+                    orderCartData?.person_in_charge
+                  )}
                   onChange={(v) => {
                     handleSelectChange(v);
                   }}
@@ -1335,7 +1408,10 @@ const OrderCart = React.memo(() => {
           {orderStatusAccess?.canRead && (
             <div className="status-table">
               {!aproveAccounting && (
-                <div className="status-row" style={{ backgroundColor: 'yellow' }}>
+                <div
+                  className="status-row"
+                  style={{ backgroundColor: "yellow" }}
+                >
                   Awaiting accounting approval
                 </div>
               )}
