@@ -7,18 +7,14 @@ import AddProductOrderModal from "../modal/addProductModal/AddProductOrderModal"
 const BlocksJournalTableOrder = ({
   productListOrder,
   onProductClickHandler,
-  filterKeys = [],
+  filterAndMapData,
+  filterKeys,
   productHandler,
   deleteHandler,
-  displayNames = {},
 }) => {
   const { setNewOrder, orderCartData } = useOrderContext();
   const { productModalOrder, setProductModalOrder } = useModalContext();
   const { userAccess } = useUsersContext();
-
-  const columns = Object.keys(productListOrder?.[0] || {}).filter(
-    (key) => !filterKeys.includes(key) && key !== "warehouse_id" && key
-  );
 
   return (
     <>
@@ -28,49 +24,38 @@ const BlocksJournalTableOrder = ({
           toggle={() => setProductModalOrder(!productModalOrder)}
         />
       )}
-
       <table className="product-table">
         <thead>
           <tr>
-            <td colSpan={columns.length + 1} style={{ fontWeight: "bold" }}>
-              HCCA Blocks
-            </td>
-          </tr>
-          <tr>
-            {columns.map((key) => (
-              <th key={key}>{displayNames[key] || key}</th>
-            ))}
-            <th>Actions</th>
+            <td>HCCA Blocks</td>
           </tr>
         </thead>
-
         <tbody>
           {Array.isArray(productListOrder) &&
-            productListOrder.map((product) => (
-              <tr
-                key={product?.id || Math.random()}
-                onClick={() => onProductClickHandler(product)}
-                style={{ cursor: "pointer" }}
-              >
-                {columns.map((key) => {
-                  let value = product[key];
-                  if (value && typeof value === "object") {
-                    value = JSON.stringify(value);
-                  }
-                  return <td key={key}>{value ?? ""}</td>;
-                })}
-
-                <td onClick={(e) => e.stopPropagation()}>
+            productListOrder?.map((product) => (
+              <tr key={product?.id || Math.random()} className="product-row">
+                <td
+                  onClick={() => {
+                    onProductClickHandler(product);
+                  }}
+                >
+                  {filterAndMapData(product, filterKeys)}
                   {product?.warehouse_id !== null ? (
-                    <Button size="sm" onClick={() => productHandler(product)}>
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        productHandler(product);
+                      }}
+                    >
                       Show batch
                     </Button>
                   ) : (
                     orderCartData?.status < 3 && (
                       <Button
-                        size="sm"
-                        color="danger"
-                        onClick={() => deleteHandler(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteHandler(product);
+                        }}
                       >
                         Delete
                       </Button>
@@ -79,12 +64,10 @@ const BlocksJournalTableOrder = ({
                 </td>
               </tr>
             ))}
-
           {userAccess?.canWrite && orderCartData?.status < 3 && (
             <tr>
-              <td colSpan={columns.length + 1}>
+              <td colSpan="100%">
                 <Button
-                  block
                   onClick={() => {
                     setNewOrder((prev) => ({
                       ...prev,

@@ -1,6 +1,6 @@
-const { ErrorUtils } = require('../utils/Errors.js');
-const OrdersService = require('../services/Orders.js');
-const myEmitter = require('../src/ee.js');
+const { ErrorUtils } = require("../utils/Errors.js");
+const OrdersService = require("../services/Orders.js");
+const myEmitter = require("../src/ee.js");
 const {
   ADD_NEW_ORDER_SOCKET,
   ADD_DATASHIP_ORDER_SOCKET,
@@ -28,7 +28,7 @@ const {
   GET_UPDATE_CONTACT_OF_ORDER_SOCKET,
   GET_UPDATE_ADRESS_OF_ORDER_SOCKET,
   GET_DELETE_ORDER_SOCKET,
-} = require('../src/constants/event.js');
+} = require("../src/constants/event.js");
 
 class OrdersController {
   static async getOrdersList(req, res) {
@@ -65,7 +65,7 @@ class OrdersController {
 
   static async addDeliveryPrice(req, res) {
     const { order_id, delivery } = req.body;
-    console.log('req.body>>>>>>>>>>>', req.body);
+    console.log("req.body>>>>>>>>>>>", req.body);
 
     try {
       await OrdersService.addDeliveryPrice({ order_id, delivery });
@@ -155,7 +155,8 @@ class OrdersController {
 
   static async getAnchorProductsOfOrder(req, res) {
     try {
-      const anchor_product_list = await OrdersService.getAnchorProductsOfOrder();
+      const anchor_product_list =
+        await OrdersService.getAnchorProductsOfOrder();
 
       return res.status(200).json(anchor_product_list);
     } catch (err) {
@@ -175,7 +176,8 @@ class OrdersController {
 
   static async getRelMatProductsOfOrder(req, res) {
     try {
-      const rel_mat_product_list = await OrdersService.getRelMatProductsOfOrder();
+      const rel_mat_product_list =
+        await OrdersService.getRelMatProductsOfOrder();
 
       return res.status(200).json(rel_mat_product_list);
     } catch (err) {
@@ -247,9 +249,14 @@ class OrdersController {
 
     try {
       const anchor_product_of_order =
-        await OrdersService.getUpdateAnchorProductsOfOrder(newAnchorProductsOfOrder);
+        await OrdersService.getUpdateAnchorProductsOfOrder(
+          newAnchorProductsOfOrder
+        );
 
-      myEmitter.emit(UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET, anchor_product_of_order);
+      myEmitter.emit(
+        UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+        anchor_product_of_order
+      );
 
       return res.status(200).json(anchor_product_of_order);
     } catch (err) {
@@ -261,11 +268,15 @@ class OrdersController {
     const newToolProductsOfOrder = req.body;
 
     try {
-      const tool_product_of_order = await OrdersService.getUpdateToolProductsOfOrder(
-        newToolProductsOfOrder
-      );
+      const tool_product_of_order =
+        await OrdersService.getUpdateToolProductsOfOrder(
+          newToolProductsOfOrder
+        );
 
-      myEmitter.emit(UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET, tool_product_of_order);
+      myEmitter.emit(
+        UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+        tool_product_of_order
+      );
 
       return res.status(200).json(tool_product_of_order);
     } catch (err) {
@@ -278,7 +289,9 @@ class OrdersController {
 
     try {
       const rel_mat_product_of_order =
-        await OrdersService.getUpdateRelMatProductsOfOrder(newRelMatProductsOfOrder);
+        await OrdersService.getUpdateRelMatProductsOfOrder(
+          newRelMatProductsOfOrder
+        );
 
       myEmitter.emit(
         UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
@@ -386,11 +399,10 @@ class OrdersController {
     const productOfOrder = req.body;
 
     try {
-      const upd_prod_info = await OrdersService.getUpdateDryMixedProductsInfoOfOrder(
-        {
+      const upd_prod_info =
+        await OrdersService.getUpdateDryMixedProductsInfoOfOrder({
           productOfOrder,
-        }
-      );
+        });
 
       myEmitter.emit(
         GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
@@ -407,11 +419,15 @@ class OrdersController {
     const productOfOrder = req.body;
 
     try {
-      const upd_prod_info = await OrdersService.getUpdateAnchorProductsInfoOfOrder({
-        productOfOrder,
-      });
+      const upd_prod_info =
+        await OrdersService.getUpdateAnchorProductsInfoOfOrder({
+          productOfOrder,
+        });
 
-      myEmitter.emit(GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET, upd_prod_info);
+      myEmitter.emit(
+        GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
+        upd_prod_info
+      );
 
       return res.status(200).json(upd_prod_info);
     } catch (err) {
@@ -423,11 +439,15 @@ class OrdersController {
     const productOfOrder = req.body;
 
     try {
-      const upd_prod_info = await OrdersService.getUpdateToolProductsInfoOfOrder({
-        productOfOrder,
-      });
+      const upd_prod_info =
+        await OrdersService.getUpdateToolProductsInfoOfOrder({
+          productOfOrder,
+        });
 
-      myEmitter.emit(GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET, upd_prod_info);
+      myEmitter.emit(
+        GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
+        upd_prod_info
+      );
 
       return res.status(200).json(upd_prod_info);
     } catch (err) {
@@ -439,11 +459,15 @@ class OrdersController {
     const productOfOrder = req.body;
 
     try {
-      const upd_prod_info = await OrdersService.getUpdateRelMatProductsInfoOfOrder({
-        productOfOrder,
-      });
+      const upd_prod_info =
+        await OrdersService.getUpdateRelMatProductsInfoOfOrder({
+          productOfOrder,
+        });
 
-      myEmitter.emit(GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET, upd_prod_info);
+      myEmitter.emit(
+        GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
+        upd_prod_info
+      );
 
       return res.status(200).json(upd_prod_info);
     } catch (err) {
@@ -460,7 +484,10 @@ class OrdersController {
         order_id,
       });
 
-      myEmitter.emit(GET_UPDATE_CONTACT_OF_ORDER_SOCKET, { contact_id, order_id });
+      myEmitter.emit(GET_UPDATE_CONTACT_OF_ORDER_SOCKET, {
+        contact_id,
+        order_id,
+      });
 
       return res.status(200);
     } catch (err) {
@@ -477,7 +504,10 @@ class OrdersController {
         order_id,
       });
 
-      myEmitter.emit(GET_UPDATE_ADRESS_OF_ORDER_SOCKET, { address_id, order_id });
+      myEmitter.emit(GET_UPDATE_ADRESS_OF_ORDER_SOCKET, {
+        address_id,
+        order_id,
+      });
       return res.status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
