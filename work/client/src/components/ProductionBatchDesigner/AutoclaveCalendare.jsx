@@ -522,14 +522,21 @@ export default function ProductionPlannerCalendar({
                   }
                 </div>
                 {(() => {
-                  // используем твои qty / done, но приводим через toNum (есть в файле выше)
                   const scheduled = toNum(qty);
                   const filled = toNum(done);
-                  const producedMode = filled === scheduled && filled > 0;
+
+                  const batchOutsideForDay = Array.isArray(batchOutside)
+                    ? batchOutside.filter((item) => item?.date === iso)
+                    : [];
+
+                  const showProducedAutoclave =
+                    fill_ac > 0 && batchOutsideForDay.length === 0;
+
+                  const producedMode =
+                    showProducedAutoclave && filled === scheduled && filled > 0;
                   const showInitialZero = scheduled === 0 && filled === 0;
 
                   if (showInitialZero) {
-                    // стартовое состояние: один красный ноль по центру
                     return (
                       <div
                         style={{
