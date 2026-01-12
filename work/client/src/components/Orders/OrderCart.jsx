@@ -294,10 +294,12 @@ const OrderCart = React.memo(() => {
                 product_article: product.article,
                 // project_name,
                 description:
-                  arrayName == "products" ||
-                  arrayName == "tools" ||
-                  arrayName == "related_materials"
+                  arrayName == "products"
                     ? product.description
+                    : arrayName == "tools" || arrayName == "related_materials"
+                    ? `${product?.name}`
+                    : arrayName == "anchors"
+                    ? `${product?.name} Sacos de ${product?.pallet_weight}kg`
                     : `${product?.name} BAUBLOCK Sacos de ${product?.pallet_weight}kg`,
                 ...orderProduct,
               }
