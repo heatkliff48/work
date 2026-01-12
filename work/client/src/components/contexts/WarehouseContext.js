@@ -297,6 +297,8 @@ const WarehouseContextProvider = ({ children }) => {
         }, 0);
       });
 
+      // console.log(reservedQuantities, "WarehouseContext.js line 300");
+
       acc[key].products.push({
         product_article: item.product_article,
         total_quantity: item.quantity,
@@ -870,6 +872,8 @@ const WarehouseContextProvider = ({ children }) => {
         (order) => order.article === order_article
       );
 
+      console.log(currOrder, "WarehouseContext.js line 873");
+
       if (currOrder?.id && !order_status.includes(currOrder?.status)) {
         dispatch(
           updateOrderStatus({
@@ -886,42 +890,46 @@ const WarehouseContextProvider = ({ children }) => {
       }
     });
 
-    let groupedOrders = processOrders(list_of_ordered_production, {});
+    // let groupedOrders = processOrders(list_of_ordered_production, {});
 
-    groupedOrders = processOrders(
-      list_of_ordered_production_oem,
-      groupedOrders
-    );
+    // groupedOrders = processOrders(
+    //   list_of_ordered_production_oem,
+    //   groupedOrders
+    // );
 
-    groupedOrders = processOrders(
-      related_materials_backorder_list,
-      groupedOrders
-    );
+    // groupedOrders = processOrders(
+    //   related_materials_backorder_list,
+    //   groupedOrders
+    // );
 
-    Object.values(groupedOrders)?.forEach((group) => {
-      const order = list_of_orders.find((el) => el.id === group.orderId);
-      if (order_status.includes(order?.status)) return;
+    // console.log(groupedOrders, "WarehouseContext.js line 903");
 
-      const allMatch = group.products.every(
-        (product) =>
-          product.total_quantity <= product.total_quantity_in_warehouse
-      );
+    // Object.values(groupedOrders)?.forEach((group) => {
+    //   const order = list_of_orders.find((el) => el.id === group.orderId);
+    //   if (order_status.includes(order?.status)) return;
 
-      if (allMatch) {
-        dispatch(
-          updateOrderStatus({
-            order_id: group.orderId,
-            status: 7,
-          })
-        );
-        dispatch(
-          updAccountingDataList({
-            orders_article: order.article,
-            aproved: false,
-          })
-        );
-      }
-    });
+    //   console.log(group.products, "WarehouseContext.js line 908");
+
+    //   const allMatch = group.products.every(
+    //     (product) =>
+    //       product.total_quantity <= product.total_quantity_in_warehouse
+    //   );
+
+    //   if (allMatch) {
+    //     dispatch(
+    //       updateOrderStatus({
+    //         order_id: group.orderId,
+    //         status: 7,
+    //       })
+    //     );
+    //     dispatch(
+    //       updAccountingDataList({
+    //         orders_article: order.article,
+    //         aproved: false,
+    //       })
+    //     );
+    //   }
+    // });
   }, [
     latestProducts,
     list_of_orders,
