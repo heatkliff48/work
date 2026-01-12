@@ -66,8 +66,8 @@ export default function ProductionPlannerCalendar({
   const weekDayHeaders = useMemo(() => {
     const base = startOfWeek(new Date(), { weekStartsOn });
     return Array.from({ length: 7 }, (_, i) => ({
-      key: i, // уникальный ключ
-      label: format(addDays(base, i), 'EEEEE', { locale: ru }), // видимую букву оставляем
+      key: i,
+      label: format(addDays(base, i), 'EEEEE', { locale: ru }),
     }));
   }, [weekStartsOn]);
 
@@ -75,7 +75,7 @@ export default function ProductionPlannerCalendar({
     if (!autoclave_calendar || !Array.isArray(autoclave_calendar)) return;
     const seeded = Object.create(null);
     for (const r of autoclave_calendar) {
-      const iso = String(r.date).slice(0, 10); // 'YYYY-MM-DD'
+      const iso = String(r.date).slice(0, 10);
       seeded[iso] = {
         scheduled_autoclaves: Number(r.scheduled_autoclaves) || 0,
         produced_autoclave: Number(r.produced_autoclave ?? 0) || 0,
@@ -142,7 +142,7 @@ export default function ProductionPlannerCalendar({
   function findQocVsNextQuantityViolation(corridor) {
     if (!corridor || corridor.length < 2) return null;
 
-    let maxRequired = 0; // максимум scheduled_autoclaves впереди
+    let maxRequired = 0;
     for (let i = 0; i < corridor.length - 1; i++) {
       const nextQty = Number(corridor[i + 1]?.scheduled_autoclaves) || 0;
       if (nextQty >= maxRequired) maxRequired = nextQty;
@@ -167,7 +167,6 @@ export default function ProductionPlannerCalendar({
         const base = prev ?? { scheduled_autoclaves: 0, produced_autoclave: 0 };
         return {
           ...base,
-          // план оставляем как был в карте (если хочешь — ставь r.scheduled_autoclaves)
           scheduled_autoclaves: base.scheduled_autoclaves,
           produced_autoclave: Number(r.produced_autoclave) || 0,
         };
@@ -196,7 +195,6 @@ export default function ProductionPlannerCalendar({
       return { redistributed: corridor ?? [], transfers: [] };
     }
 
-    // Снимок "до"
     const work = corridor.map((d) => ({
       date: d.date,
       qty: Number(d.scheduled_autoclaves) || 0,
@@ -207,26 +205,19 @@ export default function ProductionPlannerCalendar({
     const finalQoc = Array(n).fill(0);
     const transfers = [];
 
-    // 1) Для каждого i переносим его старый qoc к i+1 (ограничиваем планом приемника)
     for (let i = 0; i < n - 1; i++) {
       const moved = Math.min(work[i].oldQoc, work[i + 1].qty);
-      // фиксируем соседний шаг i -> i+1
+
       if (moved > 0) {
         transfers.push({ from: work[i].date, to: work[i + 1].date, amount: moved });
       }
-      // левый день теряет отданное (остаток у него пока не ставим — см. шаг 2)
-      // приемник i+1 получит РОВНО moved (без сложения со своим старым)
+
       finalQoc[i + 1] = moved;
     }
 
-    // 2) Левый край: у самого левого остаётся только то, что не смог отдать вправо
     const movedFromLeft = Math.min(work[0].oldQoc, work[1].qty);
     finalQoc[0] = work[0].oldQoc - movedFromLeft;
 
-    // 3) Промежуточные дни: держат только вход с предыдущего (уже установлен в шаге 1)
-    //    т.е. никакого сложения со своим старым qoc не делаем.
-
-    // 4) Собираем результат
     const redistributed = work.map((w, idx) => ({
       date: w.date,
       scheduled_autoclaves: w.qty,
@@ -247,15 +238,13 @@ export default function ProductionPlannerCalendar({
       return items ?? [];
     }
 
-    // 1) Копия и нормализация дат
     const out = (items ?? []).map((x) => ({
       ...x,
       date: String(x.date).slice(0, 10),
     }));
-    // Сортируем батчи по дате (возрастание), чтобы индексация была стабильной
+
     out.sort((a, b) => a.date.localeCompare(b.date));
 
-    // 2) Индексация по дате: Map<ISO, number[]>
     const byDate = new Map();
     for (let i = 0; i < out.length; i++) {
       const iso = out[i].date;
@@ -267,8 +256,6 @@ export default function ProductionPlannerCalendar({
       return byDate.get(iso);
     };
 
-    // 3) Сортируем transfers: сначала правые цели
-    //    — по to (desc), при равенстве — по from (desc), затем по amount (desc) для стабильности
     const ordered = [...transfers].sort((a, b) => {
       const t = String(b.to).localeCompare(String(a.to));
       if (t !== 0) return t;
@@ -277,11 +264,10 @@ export default function ProductionPlannerCalendar({
       return (Number(b.amount) || 0) - (Number(a.amount) || 0);
     });
 
-    // малые хелперы выборки/перемещения
     const takeOneIndexFrom = (iso) => {
       const bucket = byDate.get(iso);
       if (!bucket || bucket.length === 0) return null;
-      // берём с конца — дешевле модифицировать массив
+
       return bucket.pop();
     };
     const moveIndexTo = (idx, isoTo) => {
@@ -289,13 +275,11 @@ export default function ProductionPlannerCalendar({
       ensureBucket(isoTo).push(idx);
     };
 
-    // 4) Проигрываем план переносов по шагам
     for (const { from, to, amount } of ordered) {
       let need = Math.max(0, Math.floor(Number(amount) || 0));
       if (need === 0) continue;
 
       if (!unitField) {
-        // режим: 1 запись = 1 единица
         while (need > 0) {
           const idx = takeOneIndexFrom(from);
           if (idx == null) {
@@ -313,7 +297,6 @@ export default function ProductionPlannerCalendar({
           need -= 1;
         }
       } else {
-        // режим: перенос по числовому полю (запись может дробиться)
         while (need > 0) {
           const bucket = byDate.get(from);
           if (!bucket || bucket.length === 0) {
@@ -327,22 +310,20 @@ export default function ProductionPlannerCalendar({
             );
             break;
           }
-          const idx = bucket[bucket.length - 1]; // смотрим на последнюю
+          const idx = bucket[bucket.length - 1];
           const rec = out[idx];
           const units = Math.max(0, Number(rec[unitField]) || 0);
           if (units <= 0) {
-            bucket.pop(); // пустая — убираем
+            bucket.pop();
             continue;
           }
 
           const take = Math.min(need, units);
           if (take === units) {
-            // переносим запись целиком
             bucket.pop();
             moveIndexTo(idx, to);
           } else {
-            // дробим запись: часть остаётся, часть — переносим как новую
-            out[idx] = { ...rec, [unitField]: units - take, date: from }; // остаток
+            out[idx] = { ...rec, [unitField]: units - take, date: from };
             const moved = { ...rec, [unitField]: take, date: to };
             const newIdx = out.length;
             out.push(moved);
@@ -353,17 +334,13 @@ export default function ProductionPlannerCalendar({
         }
       }
 
-      // синхронизируем корзину донора (если опустела, оставим пустой массив)
       if (!byDate.has(from)) byDate.set(from, []);
     }
-
-    // 5) В финале придержим хронологию (не обязательно, но удобно для логов/UI)
     out.sort((a, b) => a.date.localeCompare(b.date));
     return out;
   }
 
   const nextHandler = (planQtyNum, doneNum, dayISO) => {
-    // 1) Собираем и сортируем календарь
     const arr = Object.entries(map)
       .map(([date, obj]) => {
         const existing = autoclave_calendar.find((i) => i.date === date);
@@ -377,32 +354,27 @@ export default function ProductionPlannerCalendar({
       })
       .sort((a, b) => a.date.localeCompare(b.date));
 
-    // 3) Поиск ближайшего подходящего «next» (как было)
     const fits = (rec) =>
       rec.produced_autoclave === 0 ||
       rec.scheduled_autoclaves - rec.produced_autoclave >= doneNum;
 
     const searchTail = arr.filter((r) => r.date > dayISO);
 
-    // берём самый дальний подходящий, а не первый
     const farthestFit = (() => {
       const candidates = searchTail.filter(fits);
       return candidates.length ? candidates[candidates.length - 1] : null;
     })();
 
-    // если ни один день не подошёл по fits — берём самый правый из хвоста
     const next =
       farthestFit ?? (searchTail.length ? searchTail[searchTail.length - 1] : null);
 
-    // база от выбранного дня
     const tailFromDay = arr.filter((r) => r.date >= dayISO);
 
-    // коридор включает next ДОЛЖЕННО (<=), чтобы сдвиг дошёл до самого правого дня
     const before = next
       ? tailFromDay.filter((r) => r.date <= next.date)
       : tailFromDay;
 
-    const corridorForCheck = before; // before уже включает next
+    const corridorForCheck = before;
     const qvErr = findQocVsNextQuantityViolation(corridorForCheck);
     if (qvErr) {
       window.alert(
@@ -412,7 +384,6 @@ export default function ProductionPlannerCalendar({
       return;
     }
 
-    // 5) Старая проверка план/выполнено в коридоре
     const violating = before.find(
       (d) => d.scheduled_autoclaves > planQtyNum && d.produced_autoclave < doneNum
     );
@@ -421,13 +392,11 @@ export default function ProductionPlannerCalendar({
       return;
     }
 
-    // 6) (опционально) правки rightBatchOutside по датам коридора
     const beforeDates = new Set(before.map((r) => r.date));
     const rightBatchOutside = (batchOutside ?? []).filter((item) =>
       beforeDates.has(item?.date)
     );
 
-    // 7) Перераспределяем и применяем (как у нас уже сделано)
     const { redistributed, transfers } = shiftForwardOneStepWithPlan(before);
     const movedRightA = replanRightBatchOutside(rightBatchOutside, transfers);
 
@@ -482,7 +451,7 @@ export default function ProductionPlannerCalendar({
             : obj.produced_autoclave;
           const fill_ac = autoclaveData ? autoclaveData?.filled_autoclaves : 0;
 
-          const todayISO = format(new Date(), 'yyyy-MM-dd'); // date-fns уже используешь
+          const todayISO = format(new Date(), 'yyyy-MM-dd');
           const isPastBtn = iso < todayISO;
 
           return (
@@ -503,7 +472,7 @@ export default function ProductionPlannerCalendar({
                 <div style={styles.dayNumber}>
                   {format(day, 'd', { locale: ru })}
                   {
-                    // qty > 0 && done > 0 &&
+
                     isPastBtn && fill_ac !== done && (
                       <div
                         style={styles.btnNext}
