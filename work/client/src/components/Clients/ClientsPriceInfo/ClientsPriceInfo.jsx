@@ -85,7 +85,7 @@ function valuesAreEqual(val1, val2) {
 function calculatePrice(basePrice, discount) {
   if (basePrice === 0) return 0;
   const price = basePrice * (1 - discount / 100);
-  return Math.max(0, price);
+  return Math.max(0, Math.round(price));
 }
 
 export default function ClientsPriceInfo() {
@@ -130,7 +130,7 @@ export default function ClientsPriceInfo() {
 
     const transformedProducts = latestProducts.map((el) => ({
       title: extractProductTitle(el.description),
-      price: Number(el.price || 0),
+      price: Math.floor(Number(el.price || 0)),
       id: el.id,
       discont: 0,
     }));

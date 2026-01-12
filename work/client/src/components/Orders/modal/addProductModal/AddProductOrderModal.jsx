@@ -10,6 +10,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import '#components/Styles/modals.css';
+import { useProjectContext } from '#components/contexts/Context.js';
 
 const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -26,12 +27,24 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     setRandomFillComplete,
   } = useOrderContext();
   const { COLUMNS, latestProducts } = useProductsContext();
+  const { clientPriceInfo } = useProjectContext();
 
   const [inProgress, setInProgress] = useState(false);
   const [haveChangePriceM3, setHaveChangePriceM3] = useState(false);
 
   const dispatch = useDispatch();
 
+  function extractProductTitle(description) {
+    if (!description) return '';
+
+    const match = description.match(/BAUBLOCK®\s*(.+?)\s*(?:Medidas|$)/i);
+
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+
+    return description;
+  }
   const haveProduct = useMemo(
     () => productOfOrder?.product_article ?? false,
     [productOfOrder?.product_article]
@@ -41,19 +54,39 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     (el) => el.article === orderCartData.article
   );
 
-  const handlerAddProductOrder = useCallback((row) => {
-    const product = latestProducts.filter((el) => el.id === row.original.id)[0];
+  const handlerAddProductOrder = useCallback(
+    (row) => {
+      const product = latestProducts.filter((el) => el.id === row.original.id)[0];
 
-    setSelectedProduct(product);
-    setProductOfOrder((prev) => ({
-      ...prev,
-      product_article: row.original.article,
-      product_id: product?.id,
-      price_m3: formatFixed(product?.price || 0, ','),
-      discount: 0,
-    }));
-    setHaveChangePriceM3(false);
-  }, []);
+      const productTitle = extractProductTitle(product?.description || '');
+
+      let discountFromClient = 0;
+      if (clientPriceInfo && productTitle) {
+        const clientPrice = clientPriceInfo.find(
+          (item) =>
+            item.title === productTitle &&
+            item.client_type === orderCartData?.owner?.price_category
+        );
+
+        if (clientPrice) {
+          discountFromClient = clientPrice.discont || 0;
+        }
+      }
+
+      const newPriceM3 = product?.price * (1 - discountFromClient / 100);
+
+      setSelectedProduct(product);
+      setProductOfOrder((prev) => ({
+        ...prev,
+        product_article: row.original.article,
+        product_id: product?.id,
+        price_m3: formatFixed(newPriceM3 || 0, ','),
+        discount: discountFromClient,
+      }));
+      setHaveChangePriceM3(false);
+    },
+    [latestProducts, clientPriceInfo, orderCartData]
+  );
 
   const handlePriceM3Change = (e) => {
     const { name, value } = e.target;
