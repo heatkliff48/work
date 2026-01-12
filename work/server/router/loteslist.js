@@ -43,8 +43,22 @@ lotesListRouter.post('/', async (req, res) => {
         order: [['id', 'DESC']],
       });
 
-      cake_id = lastLoteWithSameProduct.cake_id;
-      cake_id_finish = lastLoteWithSameProduct.cake_id_finish + quantityCakesInt;
+      if (lastLoteWithSameProduct) {
+        cake_id = lastLoteWithSameProduct.cake_id;
+        cake_id_finish = lastLoteWithSameProduct.cake_id_finish + quantityCakesInt;
+      } else {
+        const lastLote = await LotesList.findOne({
+          order: [['id', 'DESC']],
+        });
+
+        if (lastLote) {
+          cake_id = lastLote.cake_id + lastLote.quantity_cakes;
+        } else {
+          cake_id = 1;
+        }
+
+        cake_id_finish = cake_id + quantityCakesInt - 1;
+      }
     } else {
       const lastLote = await LotesList.findOne({
         order: [['id', 'DESC']],
