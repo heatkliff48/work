@@ -1,4 +1,4 @@
-const { RecipeOrders, RawMatConsumptions } = require('../db/models');
+const { RecipeOrders, RawMatConsumptions, sequelize } = require('../db/models');
 
 class RecipeOrdersRepository {
   static async getRecipeOrdersData() {
@@ -16,50 +16,43 @@ class RecipeOrdersRepository {
   static async saveMaterialPlan(material_plan) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>saveMaterialPlan');
 
+    const transaction = await sequelize.transaction();
+
     try {
-      const allRecipeOrdersInDB = await RecipeOrders.findAll();
+      const allRecipeOrdersInDB = await RecipeOrders.findAll({ transaction });
 
-      if (allRecipeOrdersInDB.length === 0) {
-        for (let i = 0; i < material_plan.length; i++) {
-          const { current_recipe, id_batch, quantity } = material_plan[i];
-          const obj = {
-            id_recipe: current_recipe?.id,
-            id_batch,
-            production_volume: quantity,
-          };
+      const existingOrdersByBatch = {};
+      allRecipeOrdersInDB.forEach((order) => {
+        existingOrdersByBatch[order.id_batch] = order;
+      });
 
-          await RecipeOrders.create(obj);
-        }
-      } else {
-        const newRecipes = material_plan.filter((newRecipe) => {
-          return !allRecipeOrdersInDB.some(
-            (existingRecipe) =>
-              existingRecipe.id_batch === newRecipe.id_batch &&
-              existingRecipe.id_recipe === newRecipe.current_recipe.id
-          );
-        });
+      const batchIdsInPlan = new Set();
 
-        if (newRecipes.length != 0) {
-          for (let i = 0; i < newRecipes.length; i++) {
-            const { current_recipe, id_batch, quantity } = newRecipes[i];
-            const obj = {
-              id_recipe: current_recipe?.id,
-              id_batch,
-              production_volume: quantity,
-            };
-            await RecipeOrders.create(obj);
-          }
+      for (let i = 0; i < material_plan.length; i++) {
+        const { current_recipe, id_batch, quantity } = material_plan[i];
+        batchIdsInPlan.add(id_batch);
+
+        const obj = {
+          id_recipe: current_recipe?.id,
+          id_batch,
+          production_volume: quantity,
+        };
+
+        if (existingOrdersByBatch[id_batch]) {
+          await existingOrdersByBatch[id_batch].update(obj, { transaction });
+        } else {
+          await RecipeOrders.create(obj, { transaction });
         }
       }
+
+      await transaction.commit();
       const allRecipeOrders = await RecipeOrders.findAll();
 
       return allRecipeOrders;
     } catch (error) {
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>...error',
-        error
-      );
-      return error;
+      await transaction.rollback();
+      console.log('Error saving material plan:', error);
+      throw error;
     }
   }
 
