@@ -76,7 +76,7 @@ function Main() {
   const { roles, checkUserAccess } = useUsersContext();
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !localStorage.getItem('user')) {
       navigate('/sign-in');
     }
   }, [user]);
