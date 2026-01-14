@@ -206,6 +206,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   };
 
   useEffect(() => {
+    if (wmoctProduct?.length) return;
     const initialProducts = product_list.orders_products.map((el) => {
       const [article, quantityStr] = el.split(':').map((s) => s.trim());
       const quantity = Number(quantityStr.slice(0, -1));
@@ -284,9 +285,14 @@ const WMOCTable = ({ product_list, orderCartData }) => {
       }
 
       if (list_of_batches?.length > 0) {
-        list_of_batches.forEach((batch) => {
-          const { quantity } = batch;
+        const seen = new Set();
 
+        list_of_batches.forEach((batch) => {
+          const uniqKey = String(batch.warehouse_id);
+          if (seen.has(uniqKey)) return;
+          seen.add(uniqKey);
+
+          const quantity = Number(batch.quantity) || 0;
           const wrh_item = wh_arr.find((el) => el.id == batch.warehouse_id);
 
           batches.push({
@@ -295,6 +301,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
             allocated: quantity,
             minAllocated: quantity ?? 0,
           });
+
           shipped += quantity;
           qty_rem -= quantity;
         });
@@ -320,7 +327,34 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     });
 
     setWmoctProduct(initialProducts);
-  }, [product_list, latestProducts, list_of_orders, list_of_reserved_products]);
+  }, [
+    product_list,
+    // каталоги/справочники
+    latestProducts,
+    latestDryMix,
+    latestAnchors,
+    latestTools,
+    latestRelatedMaterials,
+    // связки order<->product
+    productsOfOrders,
+    dryMixedProductsOfOrders,
+    anchorProductsOfOrders,
+    toolProductsOfOrders,
+    relMatProductsOfOrders,
+    list_of_orders,
+    // склады
+    warehouse_data,
+    dry_mixes_warehouse_data,
+    anchors_warehouse_data,
+    tools_warehouse_data,
+    related_materials_warehouse_data,
+    // резервы
+    list_of_reserved_products,
+    list_of_dry_mix_reserved_products,
+    list_of_anchor_reserved_products,
+    list_of_tool_reserved_products,
+    list_of_rel_mat_reserved_products,
+  ]);
 
   useEffect(() => {
     const lastNum = aldabaran.length > 0 ? aldabaran.length + 1 : 1;
