@@ -55,14 +55,15 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
       (order) => order.id === storedData?.id
     );
 
-    if (storedData) {
-      setOrderCartData(storedData);
+    const nextOrderCartData = updatedOrderCartData || storedData;
+
+    if (nextOrderCartData) {
+      setOrderCartData(nextOrderCartData);
+      localStorage.setItem('orderCartData', JSON.stringify(nextOrderCartData));
     }
 
     if (!ordersStatus.includes(updatedOrderCartData?.status))
       setOrdersStatus((prev) => [...prev, updatedOrderCartData?.status]);
-
-    localStorage.setItem("orderCartData", JSON.stringify(storedData));
   }, [list_of_orders]);
 
   return (

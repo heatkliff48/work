@@ -1,7 +1,7 @@
 import {
   updAccountingDataList,
   updateOrderStatus,
-} from "#components/redux/actions/ordersAction.js";
+} from '#components/redux/actions/ordersAction.js';
 import {
   addNewAnchorReservedProducts,
   addNewDryMixedReservedProducts,
@@ -18,11 +18,11 @@ import {
   updRelMatReservedProducts,
   updReservedProducts,
   updToolReservedProducts,
-} from "#components/redux/actions/warehouseAction.js";
-import { useProductsContext } from "./ProductContext";
-import { createContext, useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { addNewAldabaran } from "#components/redux/actions/aldabaranAction.js";
+} from '#components/redux/actions/warehouseAction.js';
+import { useProductsContext } from './ProductContext';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addNewAldabaran } from '#components/redux/actions/aldabaranAction.js';
 
 const WarehouseContext = createContext();
 
@@ -31,44 +31,44 @@ const WarehouseContextProvider = ({ children }) => {
 
   const COLUMNS_WAREHOUSE = [
     {
-      Header: "Warehouse ID",
-      accessor: "article",
-      sortType: "string",
+      Header: 'Warehouse ID',
+      accessor: 'article',
+      sortType: 'string',
     },
     {
-      Header: "Product ID",
-      accessor: "product_article",
-      sortType: "string",
+      Header: 'Product ID',
+      accessor: 'product_article',
+      sortType: 'string',
     },
     {
-      Header: "Free quantity remaining, pallet",
-      accessor: "free_quantity_remaining",
-      sortType: "number",
+      Header: 'Free quantity remaining, pallet',
+      accessor: 'free_quantity_remaining',
+      sortType: 'number',
     },
     {
-      Header: "Total quantity, pallet",
-      accessor: "total_quantity",
-      sortType: "number",
+      Header: 'Total quantity, pallet',
+      accessor: 'total_quantity',
+      sortType: 'number',
     },
     {
-      Header: "Ordered quantity, pallet",
-      accessor: "ordered_quantity",
-      sortType: "number",
+      Header: 'Ordered quantity, pallet',
+      accessor: 'ordered_quantity',
+      sortType: 'number',
     },
     {
-      Header: "Total m3",
-      accessor: "total_m3",
-      sortType: "number",
+      Header: 'Total m3',
+      accessor: 'total_m3',
+      sortType: 'number',
     },
     {
-      Header: "Warehouse location",
-      accessor: "warehouse_loc",
-      sortType: "string",
+      Header: 'Warehouse location',
+      accessor: 'warehouse_loc',
+      sortType: 'string',
     },
     {
-      Header: "Type",
-      accessor: "type",
-      sortType: "string",
+      Header: 'Type',
+      accessor: 'type',
+      sortType: 'string',
     },
   ];
 
@@ -112,104 +112,104 @@ const WarehouseContextProvider = ({ children }) => {
 
   const COLUMNS_RAW_MATERIALS_WAREHOUSE = [
     {
-      Header: "Material type",
-      accessor: "material_type",
-      sortType: "string",
+      Header: 'Material type',
+      accessor: 'material_type',
+      sortType: 'string',
     },
     {
-      Header: "Remaining quantity, kg",
-      accessor: "remaining_quantity",
-      sortType: "number",
+      Header: 'Remaining quantity, kg',
+      accessor: 'remaining_quantity',
+      sortType: 'number',
     },
     {
-      Header: "Last updated",
-      accessor: "last_updated",
-      sortType: "string",
+      Header: 'Last updated',
+      accessor: 'last_updated',
+      sortType: 'string',
     },
   ];
 
   const COLUMNS_LIST_OF_ORDERED_PRODUCTION = [
     {
-      Header: "Date of shipping",
-      accessor: "shipping_date",
-      sortType: "string",
+      Header: 'Date of shipping',
+      accessor: 'shipping_date',
+      sortType: 'string',
     },
     {
-      Header: "Product article",
-      accessor: "product_article",
-      sortType: "string",
+      Header: 'Product article',
+      accessor: 'product_article',
+      sortType: 'string',
     },
-    { Header: "Order article", accessor: "order_article", sortType: "string" },
-    { Header: "Quantity of pallets", accessor: "quantity", sortType: "number" },
+    { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
+    { Header: 'Quantity of pallets', accessor: 'quantity', sortType: 'number' },
     {
-      Header: "Quantity of cakes",
-      accessor: "quantity_cakes",
-      sortType: "number",
-    },
-    {
-      Header: "Quantity in batch, cakes",
-      accessor: "quantity_in_batch",
-      sortType: "number",
+      Header: 'Quantity of cakes',
+      accessor: 'quantity_cakes',
+      sortType: 'number',
     },
     {
-      Header: "Quantity in warehouse, pallets",
-      accessor: "quantity_in_warehouse",
-      sortType: "number",
+      Header: 'Quantity in batch, cakes',
+      accessor: 'quantity_in_batch',
+      sortType: 'number',
+    },
+    {
+      Header: 'Quantity in warehouse, pallets',
+      accessor: 'quantity_in_warehouse',
+      sortType: 'number',
     },
   ];
 
   const COLUMNS_LIST_OF_ORDERED_PRODUCTION_OEM = [
     {
-      Header: "Date of shipping",
-      accessor: "shipping_date",
-      sortType: "string",
+      Header: 'Date of shipping',
+      accessor: 'shipping_date',
+      sortType: 'string',
     },
     {
-      Header: "Product article",
-      accessor: "product_article",
-      sortType: "string",
+      Header: 'Product article',
+      accessor: 'product_article',
+      sortType: 'string',
     },
-    { Header: "Order article", accessor: "order_article", sortType: "string" },
-    { Header: "Quantity of pallets", accessor: "quantity", sortType: "number" },
-    { Header: "Status", accessor: "status", sortType: "string" },
+    { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
+    { Header: 'Quantity of pallets', accessor: 'quantity', sortType: 'number' },
+    { Header: 'Status', accessor: 'status', sortType: 'string' },
   ];
 
   const COLUMNS_RELATED_MATERIALS_BACKORDER_LIST = [
     {
-      Header: "Date of shipping",
-      accessor: "shipping_date",
-      sortType: "string",
+      Header: 'Date of shipping',
+      accessor: 'shipping_date',
+      sortType: 'string',
     },
     {
-      Header: "Product article",
-      accessor: "product_article",
-      sortType: "string",
+      Header: 'Product article',
+      accessor: 'product_article',
+      sortType: 'string',
     },
-    { Header: "Order article", accessor: "order_article", sortType: "string" },
-    { Header: "Quantity", accessor: "quantity", sortType: "number" },
+    { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
+    { Header: 'Quantity', accessor: 'quantity', sortType: 'number' },
     {
-      Header: "Quantity in warehouse, pallets",
-      accessor: "quantity_in_warehouse",
-      sortType: "number",
+      Header: 'Quantity in warehouse, pallets',
+      accessor: 'quantity_in_warehouse',
+      sortType: 'number',
     },
   ];
 
   const ordered_production_oem_status = [
     {
-      Header: "Not startered",
-      accessor: "not_start",
+      Header: 'Not startered',
+      accessor: 'not_start',
     },
     {
-      Header: "Ordered",
-      accessor: "ordered",
+      Header: 'Ordered',
+      accessor: 'ordered',
     },
     {
-      Header: "Shipped",
-      accessor: "shipped",
+      Header: 'Shipped',
+      accessor: 'shipped',
     },
     {
-      Header: "Done",
-      accessor: "done",
+      Header: 'Done',
+      accessor: 'done',
     },
   ];
 
@@ -217,9 +217,7 @@ const WarehouseContextProvider = ({ children }) => {
 
   const warehouse_data = useSelector((state) => state.warehouse);
   const autoclave_calendar = useSelector((state) => state.autoclave_calendar);
-  const dry_mixes_warehouse_data = useSelector(
-    (state) => state.dryMixesWarehouse
-  );
+  const dry_mixes_warehouse_data = useSelector((state) => state.dryMixesWarehouse);
   const related_materials_warehouse_data = useSelector(
     (state) => state.relatedMaterialsWarehouse
   );
@@ -234,9 +232,7 @@ const WarehouseContextProvider = ({ children }) => {
     relMat: related_materials_warehouse_data,
   };
 
-  const list_of_reserved_products = useSelector(
-    (state) => state.reservedProducts
-  );
+  const list_of_reserved_products = useSelector((state) => state.reservedProducts);
 
   const list_of_dry_mix_reserved_products = useSelector(
     (state) => state.reservedDryMixedProducts
@@ -291,9 +287,7 @@ const WarehouseContextProvider = ({ children }) => {
   const [listOfOrderedCakes, setListOfOrderedCakes] = useState([]);
   const [wmoctProductShippedBD, setWmoctProductShippedBD] = useState([]);
   const [listOfOrderedAuxilary, setListOfOrderedAuxilary] = useState([]);
-  const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState(
-    []
-  );
+  const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
 
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_orders = useSelector((state) => state.orders);
@@ -369,30 +363,29 @@ const WarehouseContextProvider = ({ children }) => {
           prod?.quantity_palet_anchor ||
           prod?.quantity_ud;
 
-        return `${lProduct?.article || "???"}: ${quantity}, `;
+        return `${lProduct?.article || '???'}: ${quantity}, `;
       });
   };
 
   function getProductType(article) {
-    if (article.startsWith("T.")) return "product";
-    if (article.startsWith("X.P")) return "relMat";
-    if (article.startsWith("X.T")) return "tool";
-    if (article.startsWith("X.M")) return "dryMixed";
-    if (article.startsWith("X.F")) return "anchor";
-    return "UNKNOWN";
+    if (article.startsWith('T.')) return 'product';
+    if (article.startsWith('X.P')) return 'relMat';
+    if (article.startsWith('X.T')) return 'tool';
+    if (article.startsWith('X.M')) return 'dryMixed';
+    if (article.startsWith('X.F')) return 'anchor';
+    return 'UNKNOWN';
   }
 
   const getWarehouseArticle = (product) => {
-    let versionNumber = "0001";
+    let versionNumber = '0001';
     const year = new Date().getFullYear().toString().slice(-2);
-    const month = (new Date().getMonth() + 1).toString().padStart(2, "0");
+    const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
     const day = new Date().getDate();
 
     const certificate = product?.certificate?.slice(0, 1);
     const density = product?.density?.toString().slice(0, 1);
 
-    const articleId =
-      warehouse_data.length === 0 ? 1 : warehouse_data.length + 1;
+    const articleId = warehouse_data.length === 0 ? 1 : warehouse_data.length + 1;
     versionNumber = `0000000${articleId}`.slice(-6);
 
     const warehouseArticle = `S00${certificate}${density}${year}${month}${day}${versionNumber}`;
@@ -400,9 +393,226 @@ const WarehouseContextProvider = ({ children }) => {
     return warehouseArticle;
   };
 
+  // const saveHandler = () => {
+  //   const newReserved = [];
+  //   const wh_arr = [];
+
+  //   let orderId;
+
+  //   wmoctProduct.forEach((el) => {
+  //     const { orders_products_id, order_id } = el;
+  //     orderId = order_id;
+
+  //     const type = getProductType(el.article);
+  //     const warehouse_arr = warehouseMap[type];
+  //     const reserved_arr = reservedMap[type];
+
+  //     el?.batches?.forEach((elem) => {
+  //       const wh = warehouse_arr.find((el) => el.article == elem.batchId);
+
+  //       const haveReserve = reserved_arr.find(
+  //         (el) =>
+  //           el.warehouse_id == wh.id && el.orders_products_id == orders_products_id
+  //       );
+
+  //       const prevQty = (haveReserve?.quantity ?? elem?.minAllocated ?? 0) || 0;
+
+  //       const obj = {
+  //         article: el.article,
+  //         warehouse_id: wh.id,
+  //         orders_products_id,
+  //         quantity: elem.allocated,
+  //       };
+
+  //       if (prevQty === 0 && elem.allocated > 0) {
+  //         newReserved.push(obj);
+  //       }
+
+  //       if (!haveReserve) {
+  //         wh_arr.push({
+  //           warehouse_id: wh.id,
+  //           total_quantity: wh.total_quantity - elem.allocated,
+  //           ordered_quantity: wh.ordered_quantity - elem.allocated,
+  //           type,
+  //         });
+  //       }
+
+  //       if (haveReserve && haveReserve.quantity != elem.allocated) {
+  //         const quantity = haveReserve.quantity - elem.allocated;
+
+  //         wh_arr.push({
+  //           warehouse_id: wh.id,
+  //           total_quantity: wh.total_quantity + quantity,
+  //           ordered_quantity: wh.ordered_quantity + quantity,
+  //           type,
+  //         });
+
+  //         switch (type) {
+  //           case 'product':
+  //             dispatch(updReservedProducts(obj));
+  //             break;
+
+  //           case 'relMat':
+  //             dispatch(updRelMatReservedProducts(obj));
+  //             break;
+
+  //           case 'tool':
+  //             dispatch(updToolReservedProducts(obj));
+  //             break;
+
+  //           case 'dryMixed':
+  //             dispatch(updDryMixedReservedProducts(obj));
+  //             break;
+
+  //           case 'anchor':
+  //             dispatch(updAnchorReservedProducts(obj));
+  //             break;
+
+  //           default:
+  //             break;
+  //         }
+  //       }
+  //     });
+  //   });
+
+  //   wh_arr.forEach((el) => {
+  //     const { warehouse_id, total_quantity, ordered_quantity, type } = el;
+  //     switch (type) {
+  //       case 'product':
+  //         dispatch(
+  //           updateWarehouseQuantitys({
+  //             warehouse_id,
+  //             total_quantity,
+  //             ordered_quantity,
+  //           })
+  //         );
+  //         break;
+
+  //       case 'dryMixed':
+  //         updateDryMixedWarehouseQuantitys({
+  //           warehouse_id,
+  //           total_quantity,
+  //           ordered_quantity,
+  //         });
+  //         break;
+
+  //       case 'anchor':
+  //         updateAnchorWarehouseQuantitys({
+  //           warehouse_id,
+  //           total_quantity,
+  //           ordered_quantity,
+  //         });
+  //         break;
+
+  //       case 'tool':
+  //         updateToolWarehouseQuantitys({
+  //           warehouse_id,
+  //           total_quantity,
+  //           ordered_quantity,
+  //         });
+  //         break;
+
+  //       case 'relMat':
+  //         updateRelMatWarehouseQuantitys({
+  //           warehouse_id,
+  //           total_quantity,
+  //           ordered_quantity,
+  //         });
+  //         break;
+
+  //       default:
+  //         break;
+  //     }
+  //   });
+
+  //   const allShipped = wmoctProduct.every((el) => el.qty_total === el.shipped);
+
+  //   if (allShipped) {
+  //     const article = list_of_orders.find((el) => el.id == orderId)?.article;
+  //     dispatch(
+  //       updateOrderStatus({
+  //         order_id: orderId,
+  //         status: 9,
+  //       })
+  //     );
+
+  //     dispatch(
+  //       updAccountingDataList({
+  //         orders_article: article,
+  //         aproved: false,
+  //       })
+  //     );
+  //   }
+
+  //   const pad = (n) => String(n).padStart(2, '0');
+
+  //   const now = new Date();
+  //   const dateTimeStr =
+  //     `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+  //     `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  //   dispatch(addNewAldabaran({ num: aldabaranNum, data: dateTimeStr }));
+
+  //   const grouped = {
+  //     product: [],
+  //     relMat: [],
+  //     tool: [],
+  //     dryMixed: [],
+  //     anchor: [],
+  //   };
+
+  //   newReserved.forEach((item) => {
+  //     const { article, warehouse_id, orders_products_id, quantity } = item;
+
+  //     const obj = { warehouse_id, orders_products_id, quantity };
+
+  //     if (article.startsWith('T.')) {
+  //       grouped.product.push(obj);
+  //     } else if (article.startsWith('X.P')) {
+  //       grouped.relMat.push(obj);
+  //     } else if (article.startsWith('X.T')) {
+  //       grouped.tool.push(obj);
+  //     } else if (article.startsWith('X.M')) {
+  //       grouped.dryMixed.push(obj);
+  //     } else if (article.startsWith('X.F')) {
+  //       grouped.anchor.push(obj);
+  //     }
+  //   });
+
+  //   Object.entries(grouped).forEach(([key, items]) => {
+  //     switch (key) {
+  //       case 'product':
+  //         dispatch(addNewReservedProducts(items));
+  //         break;
+
+  //       case 'relMat':
+  //         dispatch(addNewRelMatReservedProducts(items));
+  //         break;
+
+  //       case 'tool':
+  //         dispatch(addNewToolReservedProducts(items));
+  //         break;
+
+  //       case 'dryMixed':
+  //         dispatch(addNewDryMixedReservedProducts(items));
+  //         break;
+
+  //       case 'anchor':
+  //         dispatch(addNewAnchorReservedProducts(items));
+  //         break;
+
+  //       default:
+  //         break;
+  //     }
+  //   });
+
+  //   setWmoctProductShippedBD([]);
+  //   setSelectedOrder(null);
+  // };
+
   const saveHandler = () => {
     const newReserved = [];
-    const wh_arr = [];
+    const whDeltaMap = new Map();
 
     let orderId;
 
@@ -417,11 +627,14 @@ const WarehouseContextProvider = ({ children }) => {
       el?.batches?.forEach((elem) => {
         const wh = warehouse_arr.find((el) => el.article == elem.batchId);
 
+        if (!wh) return;
+
         const haveReserve = reserved_arr.find(
           (el) =>
-            el.warehouse_id == wh.id &&
-            el.orders_products_id == orders_products_id
+            el.warehouse_id == wh.id && el.orders_products_id == orders_products_id
         );
+
+        const prevQty = (haveReserve?.quantity ?? elem?.minAllocated ?? 0) || 0;
 
         const obj = {
           article: el.article,
@@ -430,58 +643,60 @@ const WarehouseContextProvider = ({ children }) => {
           quantity: elem.allocated,
         };
 
-        if (!haveReserve) {
+        if (prevQty === 0 && elem.allocated > 0) {
           newReserved.push(obj);
-          wh_arr.push({
-            warehouse_id: wh.id,
-            total_quantity: wh.total_quantity - elem.allocated,
-            ordered_quantity: wh.ordered_quantity - elem.allocated,
-            type,
-          });
         }
 
-        if (haveReserve && haveReserve.quantity != elem.allocated) {
-          const quantity = haveReserve.quantity - elem.allocated;
-
-          wh_arr.push({
+        if (prevQty !== elem.allocated) {
+          const delta = prevQty - elem.allocated;
+          const key = `${type}:${wh.id}`;
+          const acc = whDeltaMap.get(key) || {
             warehouse_id: wh.id,
-            total_quantity: wh.total_quantity + quantity,
-            ordered_quantity: wh.ordered_quantity + quantity,
             type,
-          });
+            delta: 0,
+          };
+          acc.delta += delta;
+          whDeltaMap.set(key, acc);
 
-          switch (type) {
-            case "product":
-              dispatch(updReservedProducts(obj));
-              break;
+          if (prevQty > 0) {
+            switch (type) {
+              case 'product':
+                dispatch(updReservedProducts(obj));
+                break;
 
-            case "relMat":
-              dispatch(updRelMatReservedProducts(obj));
-              break;
+              case 'relMat':
+                dispatch(updRelMatReservedProducts(obj));
+                break;
 
-            case "tool":
-              dispatch(updToolReservedProducts(obj));
-              break;
+              case 'tool':
+                dispatch(updToolReservedProducts(obj));
+                break;
 
-            case "dryMixed":
-              dispatch(updDryMixedReservedProducts(obj));
-              break;
+              case 'dryMixed':
+                dispatch(updDryMixedReservedProducts(obj));
+                break;
 
-            case "anchor":
-              dispatch(updAnchorReservedProducts(obj));
-              break;
+              case 'anchor':
+                dispatch(updAnchorReservedProducts(obj));
+                break;
 
-            default:
-              break;
+              default:
+                break;
+            }
           }
         }
       });
     });
 
-    wh_arr.forEach((el) => {
-      const { warehouse_id, total_quantity, ordered_quantity, type } = el;
+    for (const { warehouse_id, type, delta } of whDeltaMap.values()) {
+      const wh = warehouseMap[type]?.find((w) => w.id == warehouse_id);
+      if (!wh) continue;
+
+      const total_quantity = wh.total_quantity + delta;
+      const ordered_quantity = wh.ordered_quantity + delta;
+
       switch (type) {
-        case "product":
+        case 'product':
           dispatch(
             updateWarehouseQuantitys({
               warehouse_id,
@@ -491,42 +706,50 @@ const WarehouseContextProvider = ({ children }) => {
           );
           break;
 
-        case "dryMixed":
-          updateDryMixedWarehouseQuantitys({
-            warehouse_id,
-            total_quantity,
-            ordered_quantity,
-          });
+        case 'dryMixed':
+          dispatch(
+            updateDryMixedWarehouseQuantitys({
+              warehouse_id,
+              total_quantity,
+              ordered_quantity,
+            })
+          );
           break;
 
-        case "anchor":
-          updateAnchorWarehouseQuantitys({
-            warehouse_id,
-            total_quantity,
-            ordered_quantity,
-          });
+        case 'anchor':
+          dispatch(
+            updateAnchorWarehouseQuantitys({
+              warehouse_id,
+              total_quantity,
+              ordered_quantity,
+            })
+          );
           break;
 
-        case "tool":
-          updateToolWarehouseQuantitys({
-            warehouse_id,
-            total_quantity,
-            ordered_quantity,
-          });
+        case 'tool':
+          dispatch(
+            updateToolWarehouseQuantitys({
+              warehouse_id,
+              total_quantity,
+              ordered_quantity,
+            })
+          );
           break;
 
-        case "relmat":
-          updateRelMatWarehouseQuantitys({
-            warehouse_id,
-            total_quantity,
-            ordered_quantity,
-          });
+        case 'relMat':
+          dispatch(
+            updateRelMatWarehouseQuantitys({
+              warehouse_id,
+              total_quantity,
+              ordered_quantity,
+            })
+          );
           break;
 
         default:
           break;
       }
-    });
+    }
 
     const allShipped = wmoctProduct.every((el) => el.qty_total === el.shipped);
 
@@ -547,14 +770,12 @@ const WarehouseContextProvider = ({ children }) => {
       );
     }
 
-    const pad = (n) => String(n).padStart(2, "0");
+    const pad = (n) => String(n).padStart(2, '0');
 
     const now = new Date();
     const dateTimeStr =
       `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
-      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(
-        now.getSeconds()
-      )}`;
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
     dispatch(addNewAldabaran({ num: aldabaranNum, data: dateTimeStr }));
 
@@ -566,43 +787,58 @@ const WarehouseContextProvider = ({ children }) => {
       anchor: [],
     };
 
+    const seenNewReserved = {
+      product: new Set(),
+      relMat: new Set(),
+      tool: new Set(),
+      dryMixed: new Set(),
+      anchor: new Set(),
+    };
+
     newReserved.forEach((item) => {
       const { article, warehouse_id, orders_products_id, quantity } = item;
 
       const obj = { warehouse_id, orders_products_id, quantity };
 
-      if (article.startsWith("T.")) {
-        grouped.product.push(obj);
-      } else if (article.startsWith("X.P")) {
-        grouped.relMat.push(obj);
-      } else if (article.startsWith("X.T")) {
-        grouped.tool.push(obj);
-      } else if (article.startsWith("X.M")) {
-        grouped.dryMixed.push(obj);
-      } else if (article.startsWith("X.F")) {
-        grouped.anchor.push(obj);
+      const pushUnique = (key) => {
+        const uniqKey = `${warehouse_id}:${orders_products_id}`;
+        if (seenNewReserved[key].has(uniqKey)) return;
+        seenNewReserved[key].add(uniqKey);
+        grouped[key].push(obj);
+      };
+
+      if (article.startsWith('T.')) {
+        pushUnique('product');
+      } else if (article.startsWith('X.P')) {
+        pushUnique('relMat');
+      } else if (article.startsWith('X.T')) {
+        pushUnique('tool');
+      } else if (article.startsWith('X.M')) {
+        pushUnique('dryMixed');
+      } else if (article.startsWith('X.F')) {
+        pushUnique('anchor');
       }
     });
 
     Object.entries(grouped).forEach(([key, items]) => {
       switch (key) {
-        case "product":
+        case 'product':
           dispatch(addNewReservedProducts(items));
           break;
 
-        case "relMat":
+        case 'relMat':
           dispatch(addNewRelMatReservedProducts(items));
           break;
 
-        case "tool":
+        case 'tool':
           dispatch(addNewToolReservedProducts(items));
           break;
 
-        case "dryMixed":
+        case 'dryMixed':
           dispatch(addNewDryMixedReservedProducts(items));
           break;
 
-        case "anchor":
+        case 'anchor':
           dispatch(addNewAnchorReservedProducts(items));
           break;
 
@@ -663,9 +899,9 @@ const WarehouseContextProvider = ({ children }) => {
   // Надёжный парсер дат
   const toTime = (d) => {
     if (d == null) return Number.MAX_SAFE_INTEGER; // пустое => в конец
-    if (typeof d === "number") return d; // уже ms
+    if (typeof d === 'number') return d; // уже ms
     if (d instanceof Date) return d.getTime(); // Date -> ms
-    if (typeof d === "string") {
+    if (typeof d === 'string') {
       // 1) пробуем стандартный парсер (ISO и пр.)
       const t = Date.parse(d);
       if (!Number.isNaN(t)) return t;
@@ -765,10 +1001,7 @@ const WarehouseContextProvider = ({ children }) => {
 
       if (!art) continue;
 
-      producedByArticle.set(
-        art,
-        (producedByArticle.get(art) || 0) + producedUnits
-      );
+      producedByArticle.set(art, (producedByArticle.get(art) || 0) + producedUnits);
     }
 
     // Распределение произведённого: идём по заказам (после сортировки) и "раздаём"
@@ -910,7 +1143,7 @@ const WarehouseContextProvider = ({ children }) => {
         (order) => order.article === order_article
       );
 
-      console.log(currOrder, "WarehouseContext.js line 873");
+      console.log(currOrder, 'WarehouseContext.js line 873');
 
       if (currOrder?.id && !order_status.includes(currOrder?.status)) {
         dispatch(
