@@ -72,6 +72,44 @@ const WarehouseContextProvider = ({ children }) => {
     },
   ];
 
+  const COLUMNS_WAREHOUSE_AUX = [
+    {
+      Header: "Warehouse ID",
+      accessor: "article",
+      sortType: "string",
+    },
+    {
+      Header: "Product ID",
+      accessor: "product_article",
+      sortType: "string",
+    },
+    {
+      Header: "Free quantity remaining, pallet",
+      accessor: "free_quantity_remaining",
+      sortType: "number",
+    },
+    {
+      Header: "Total quantity, pallet",
+      accessor: "total_quantity",
+      sortType: "number",
+    },
+    {
+      Header: "Ordered quantity, pallet",
+      accessor: "ordered_quantity",
+      sortType: "number",
+    },
+    {
+      Header: "Warehouse location",
+      accessor: "warehouse_loc",
+      sortType: "string",
+    },
+    {
+      Header: "Type",
+      accessor: "type",
+      sortType: "string",
+    },
+  ];
+
   const COLUMNS_RAW_MATERIALS_WAREHOUSE = [
     {
       Header: 'Material type',
@@ -321,9 +359,9 @@ const WarehouseContextProvider = ({ children }) => {
 
         const quantity =
           prod?.quantity_palet ||
-          prod?.quantity_ud ||
           prod?.quantity_palet_dry ||
-          prod?.quantity_palet_anchor;
+          prod?.quantity_palet_anchor ||
+          prod?.quantity_ud;
 
         return `${lProduct?.article || '???'}: ${quantity}, `;
       });
@@ -1180,6 +1218,7 @@ const WarehouseContextProvider = ({ children }) => {
     <WarehouseContext.Provider
       value={{
         COLUMNS_WAREHOUSE,
+        COLUMNS_WAREHOUSE_AUX,
         COLUMNS_RAW_MATERIALS_WAREHOUSE,
         COLUMNS_LIST_OF_ORDERED_PRODUCTION,
         COLUMNS_LIST_OF_ORDERED_PRODUCTION_OEM,
