@@ -1,10 +1,10 @@
 const {
   AutoclaveCalendares,
   Warehouses,
-  DryMixesWarehouses,
-  RelatedMaterialsWarehouses,
-  AnchorsWarehouses,
-  ToolsWarehouses,
+  DryMixesWarehouse,
+  RelatedMaterialsWarehouse,
+  AnchorsWarehouse,
+  ToolsWarehouse,
   ReservedProducts,
   ReservedDryMixes,
   ReservedAnchors,
@@ -263,7 +263,7 @@ class WarehouseRepository {
 
       const { warehouse_id, total_quantity, ordered_quantity } = upd_rem_srock;
 
-      await DryMixesWarehouses.update(
+      await DryMixesWarehouse.update(
         { total_quantity, ordered_quantity },
         { where: { id: warehouse_id } }
       );
@@ -282,7 +282,7 @@ class WarehouseRepository {
     try {
       const { warehouse_id, total_quantity, ordered_quantity } = upd_rem_srock;
 
-      await AnchorsWarehouses.update(
+      await AnchorsWarehouse.update(
         { total_quantity, ordered_quantity },
         { where: { id: warehouse_id } }
       );
@@ -301,7 +301,7 @@ class WarehouseRepository {
     try {
       const { warehouse_id, total_quantity, ordered_quantity } = upd_rem_srock;
 
-      await ToolsWarehouses.update(
+      await ToolsWarehouse.update(
         { total_quantity, ordered_quantity },
         { where: { id: warehouse_id } }
       );
@@ -320,7 +320,7 @@ class WarehouseRepository {
     try {
       const { warehouse_id, total_quantity, ordered_quantity } = upd_rem_srock;
 
-      await RelatedMaterialsWarehouses.update(
+      await RelatedMaterialsWarehouse.update(
         { total_quantity, ordered_quantity },
         { where: { id: warehouse_id } }
       );
