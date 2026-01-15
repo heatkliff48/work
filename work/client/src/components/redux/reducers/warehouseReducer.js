@@ -1,15 +1,16 @@
+import showMessage from '#components/Utils/showMessage.js';
 import {
   NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
   NEW_WAREHOUSE_SOCKET,
   REMAINING_STOCK_SOCKET,
   WAREHOUSE_QUANTITYS_SOCKET,
-} from "../types/socketTypes/socket";
+} from '../types/socketTypes/socket';
 import {
   ALL_WAREHOUSE,
   RAW_MATERIALS_WAREHOUSE,
   REMAINING_STOCK,
   WAREHOSE_QUANTITYS,
-} from "../types/warehouseTypes";
+} from '../types/warehouseTypes';
 
 export const warehouseReducer = (warehouse = [], action) => {
   const { type, payload } = action;
@@ -27,7 +28,13 @@ export const warehouseReducer = (warehouse = [], action) => {
       const { warehouse_id, total_quantity, ordered_quantity } = payload;
 
       const result = warehouse.map((el) => {
-        if (el.id === warehouse_id) {
+        const { id, article, product_article } = payload;
+        if (id === warehouse_id) {
+          showMessage(
+            `Order ${article} · Product ${product_article} · Total: ${total_quantity}, Ordered: ${ordered_quantity} — $`,
+            'success'
+          );
+
           return { ...el, total_quantity, ordered_quantity };
         }
 
@@ -38,8 +45,7 @@ export const warehouseReducer = (warehouse = [], action) => {
 
     case REMAINING_STOCK:
     case REMAINING_STOCK_SOCKET: {
-      const { warehouse_id, free_quantity_remaining, ordered_quantity } =
-        payload;
+      const { warehouse_id, free_quantity_remaining, ordered_quantity } = payload;
 
       const result = warehouse.map((el) => {
         if (el.id === warehouse_id) {
@@ -56,10 +62,7 @@ export const warehouseReducer = (warehouse = [], action) => {
   }
 };
 
-export const rawMaterialsWarehouseReducer = (
-  rawMaterialsWarehouse = [],
-  action
-) => {
+export const rawMaterialsWarehouseReducer = (rawMaterialsWarehouse = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case RAW_MATERIALS_WAREHOUSE: {
@@ -67,8 +70,8 @@ export const rawMaterialsWarehouseReducer = (
     }
 
     case NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET: {
-      console.log({ rawMaterialsWarehouse }, "warehouseReducer.js line 70");
-      console.log({ payload }, "warehouseReducer.js line 71");
+      console.log({ rawMaterialsWarehouse }, 'warehouseReducer.js line 70');
+      console.log({ payload }, 'warehouseReducer.js line 71');
 
       // Преобразуем в массив для единообразной обработки
       const itemsToUpdate = Array.isArray(payload) ? payload : [payload];

@@ -23,7 +23,7 @@ export const ordersReducer = (orders = [], action) => {
     }
 
     case NEW_ORDER_SOCKET: {
-      if (orders.find((order) => order.id === payload.id)) return orders;
+      // if (orders.find((order) => order.id === payload.id)) return orders;
 
       return [...orders, payload];
     }

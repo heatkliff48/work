@@ -369,7 +369,10 @@ const WMOPdf = ({ orderCartData, toggle }) => {
 
         const type = getTypeByArticle(article);
 
-        const bd_ship = wmoctProductShippedBD?.find((el) => el.article == article);
+        const bd_ship = wmoctProductShippedBD?.find(
+          (el) => el.article === article && el.order_id === prod.order_id
+        );
+
         const shippedBD = Number(bd_ship?.shipped) || 0;
 
         const productArr = productMap[type] || [];
@@ -567,8 +570,8 @@ const WMOPdf = ({ orderCartData, toggle }) => {
             </button>
             <button
               style={{ width: '8%' }}
-              onClick={() => {
-                saveHandler();
+              onClick={async () => {
+                await saveHandler();
                 toggle();
               }}
             >

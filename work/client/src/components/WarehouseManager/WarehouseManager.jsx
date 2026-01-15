@@ -18,10 +18,11 @@ function WarehouseManager() {
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
   const {
-    setWmoctProductShippedBD,
     selectedOrder,
     setSelectedOrder,
     getProductsByOrder,
+    setWmoctProduct,
+    setWmoctProductShippedBD,
   } = useWarehouseContext();
   const {
     list_of_orders,
@@ -74,6 +75,7 @@ function WarehouseManager() {
         ];
 
         const obj = {
+          order_id: el.id,
           orders_article: el.article,
           projects_name: del_adr?.project_name || '',
           production_date: el.shipping_date || '',
@@ -85,7 +87,6 @@ function WarehouseManager() {
       }, []);
 
     setWarehouseMdata(result);
-    setWmoctProductShippedBD([]);
   }, [list_of_orders]);
 
   return (
@@ -101,8 +102,11 @@ function WarehouseManager() {
           buttonText={''}
           tableName={'Order dispatch'}
           handleRowClick={(row) => {
-            getCurrentOrderInfoHandler({ article: row.original.orders_article });
+            localStorage.removeItem('orderCartData');
+            setWmoctProduct([]);
+            setWmoctProductShippedBD([]);
 
+            getCurrentOrderInfoHandler({ order_id: row.original.order_id });
             setSelectedOrder(row.original);
           }}
         />
