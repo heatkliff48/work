@@ -80,6 +80,7 @@ function NavBar() {
     dispatch(delUser());
     navigate('/sign-in');
     window.localStorage.clear();
+    localStorage.clear();
   };
 
   const { pathname } = useLocation();

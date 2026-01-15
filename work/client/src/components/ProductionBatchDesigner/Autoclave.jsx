@@ -1103,6 +1103,28 @@ function Autoclave({ acData, autoclaveCalendarData }) {
     });
   };
 
+  const clearAutoclaves = () => {
+    const emptyRows = Array.from({ length: initialRowCount }, () =>
+      Array.from({ length: CELLS_PER_AUTOCLAVE }, () => ({ ...EMPTY_CELL }))
+    );
+
+    setAutoclave(emptyRows);
+
+    setBatchOrderIDs([]);
+    setQuantityPallets({});
+
+    batchDesigner.forEach((b) => {
+      dispatch(
+        updateBatchState({
+          id: b.id,
+          cakes_in_batch: 0,
+          cakes_residue: b.total_cakes,
+        })
+      );
+      dispatch(unlockButton({ id: b.id, isButtonLocked: false }));
+    });
+  };
+
   const onSaveHandler = async () => {
     const filledCount = Array.isArray(autoclave)
       ? autoclave.flat().filter((cell) => cell?.id !== null).length
@@ -1246,6 +1268,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
     });
 
     setSelectedCell(null);
+    clearAutoclaves();
   };
 
   const selectedLabel = useMemo(() => {
