@@ -74,39 +74,39 @@ const WarehouseContextProvider = ({ children }) => {
 
   const COLUMNS_WAREHOUSE_AUX = [
     {
-      Header: "Warehouse ID",
-      accessor: "article",
-      sortType: "string",
+      Header: 'Warehouse ID',
+      accessor: 'article',
+      sortType: 'string',
     },
     {
-      Header: "Product ID",
-      accessor: "product_article",
-      sortType: "string",
+      Header: 'Product ID',
+      accessor: 'product_article',
+      sortType: 'string',
     },
     {
-      Header: "Free quantity remaining, pallet",
-      accessor: "free_quantity_remaining",
-      sortType: "number",
+      Header: 'Free quantity remaining, pallet',
+      accessor: 'free_quantity_remaining',
+      sortType: 'number',
     },
     {
-      Header: "Total quantity, pallet",
-      accessor: "total_quantity",
-      sortType: "number",
+      Header: 'Total quantity, pallet',
+      accessor: 'total_quantity',
+      sortType: 'number',
     },
     {
-      Header: "Ordered quantity, pallet",
-      accessor: "ordered_quantity",
-      sortType: "number",
+      Header: 'Ordered quantity, pallet',
+      accessor: 'ordered_quantity',
+      sortType: 'number',
     },
     {
-      Header: "Warehouse location",
-      accessor: "warehouse_loc",
-      sortType: "string",
+      Header: 'Warehouse location',
+      accessor: 'warehouse_loc',
+      sortType: 'string',
     },
     {
-      Header: "Type",
-      accessor: "type",
-      sortType: "string",
+      Header: 'Type',
+      accessor: 'type',
+      sortType: 'string',
     },
   ];
 
@@ -610,6 +610,26 @@ const WarehouseContextProvider = ({ children }) => {
   //   setSelectedOrder(null);
   // };
 
+  const commitWmoctAfterSave = () => {
+    setWmoctProductShippedBD((prev) =>
+      wmoctProduct.map((p) => ({
+        article: p.article,
+        order_id: p.order_id,
+        shipped: p.shipped,
+      }))
+    );
+
+    setWmoctProduct((prev) =>
+      prev.map((p) => ({
+        ...p,
+        batches: p.batches.map((b) => ({
+          ...b,
+          minAllocated: b.allocated,
+        })),
+      }))
+    );
+  };
+
   const saveHandler = () => {
     const newReserved = [];
     const whDeltaMap = new Map();
@@ -847,7 +867,7 @@ const WarehouseContextProvider = ({ children }) => {
       }
     });
 
-    setWmoctProductShippedBD([]);
+    commitWmoctAfterSave();
     setSelectedOrder(null);
   };
 
@@ -873,7 +893,6 @@ const WarehouseContextProvider = ({ children }) => {
     return { sources: out, placed: amount - remaining, leftover: remaining };
   };
 
-  // Обратная операция: "забрать" n массивов, начиная с приоритетного source
   const collectFromSources = (sources, amount, onEachUpdate) => {
     let remaining = amount;
     const out = sources.map((s) => ({ ...s }));

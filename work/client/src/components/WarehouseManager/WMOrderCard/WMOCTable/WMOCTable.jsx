@@ -1,13 +1,13 @@
-import { Fragment, useEffect, useState } from "react";
-import WMOCTableModal from "./WMOCTableModal";
-import { useModalContext } from "#components/contexts/ModalContext.js";
-import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
-import { useOrderContext } from "#components/contexts/OrderContext.js";
-import { useProductsContext } from "#components/contexts/ProductContext.js";
-import WMOCPDFModal from "../WMOPdf/WMOPDFModal";
-import WMOCTableDataModal from "./WMOCTableDataModal";
-import WMOCTProduct from "./WMOCTProduct/WMOCTProduct";
-import { useProductsTypeJournalContext } from "#components/contexts/ProductsTypeJournalContext.js";
+import { Fragment, useEffect, useState } from 'react';
+import WMOCTableModal from './WMOCTableModal';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import WMOCPDFModal from '../WMOPdf/WMOPDFModal';
+import WMOCTableDataModal from './WMOCTableDataModal';
+import WMOCTProduct from './WMOCTProduct/WMOCTProduct';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
 const WMOCTable = ({ product_list, orderCartData }) => {
   const {
@@ -62,7 +62,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
 
   //ради коммента
   useEffect(() => {
-    console.log("wmoctProduct state:", wmoctProduct);
+    console.log('wmoctProduct state:', wmoctProduct);
   }, [wmoctProduct]);
 
   const handlePlusBatch = (product) => {
@@ -71,10 +71,13 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   };
 
   const handlePlus = (batch, batchIndex) => {
-    console.log("handlePlus called with:", { batch, batchIndex });
+    console.log('handlePlus called with:', { batch, batchIndex });
     setWmoctProduct((prev) =>
       prev.map((wmoctItem) => {
-        if (wmoctItem.article === batch.article) {
+        if (
+          wmoctItem.article === batch.article &&
+          wmoctItem.order_id === batch.order_id
+        ) {
           let { shipped, qty_rem, qty_total } = wmoctItem;
 
           const newBatches = wmoctItem.batches.map((el, i) => {
@@ -87,7 +90,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
                 qty_rem > 0 && // есть неотгруженное количество
                 shipped < qty_total; // общее отгруженное меньше общего заказанного
 
-              console.log("Plus check:", {
+              console.log('Plus check:', {
                 remainingInBatch,
                 allocated,
                 qty_rem,
@@ -128,7 +131,10 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   const handleMinus = (batch, batchIndex) => {
     setWmoctProduct((prev) =>
       prev.map((wmoctItem) => {
-        if (wmoctItem.article === batch.article) {
+        if (
+          wmoctItem.article === batch.article &&
+          wmoctItem.order_id === batch.order_id
+        ) {
           let { shipped, qty_rem } = wmoctItem;
 
           const newBatches = wmoctItem.batches.map((el, i) => {
@@ -138,7 +144,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
               let minimunAllocated = !minAllocated ? 0 : minAllocated;
               const canMinus = allocated !== 0 && allocated > minimunAllocated;
 
-              console.log("Minus check:", {
+              console.log('Minus check:', {
                 allocated,
                 minAllocated: minimunAllocated,
                 remainingInBatch,
@@ -208,9 +214,9 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   useEffect(() => {
     if (wmoctProduct?.length) return;
     const initialProducts = product_list.orders_products.map((el) => {
-      console.log(product_list, "product_list WMOCTable.jsx line 210");
-      const [article, quantityStr] = el.split(":").map((s) => s.trim());
-      console.log(quantityStr, "quantityStr WMOCTable.jsx line 212");
+      console.log(product_list, 'product_list WMOCTable.jsx line 210');
+      const [article, quantityStr] = el.split(':').map((s) => s.trim());
+      console.log(quantityStr, 'quantityStr WMOCTable.jsx line 212');
       const quantity = Number(quantityStr.slice(0, -1));
 
       let shipped = 0;
@@ -245,39 +251,38 @@ const WMOCTable = ({ product_list, orderCartData }) => {
           poo.rel_mat_id;
 
         return (
-          productId === product_from_list_id &&
-          poo.order_id === order_from_list_id
+          productId === product_from_list_id && poo.order_id === order_from_list_id
         );
       })?.id;
 
       let list_of_batches;
 
       switch (productType) {
-        case "product":
+        case 'product':
           list_of_batches = list_of_reserved_products.filter(
             (batch) => batch.orders_products_id === orders_products_id
           );
           break;
 
-        case "relMat":
+        case 'relMat':
           list_of_batches = list_of_rel_mat_reserved_products?.filter(
             (batch) => batch.orders_products_id === orders_products_id
           );
           break;
 
-        case "tool":
+        case 'tool':
           list_of_batches = list_of_tool_reserved_products?.filter(
             (batch) => batch.orders_products_id === orders_products_id
           );
           break;
 
-        case "dryMixed":
+        case 'dryMixed':
           list_of_batches = list_of_dry_mix_reserved_products?.filter(
             (batch) => batch.orders_products_id === orders_products_id
           );
           break;
 
-        case "anchor":
+        case 'anchor':
           list_of_batches = list_of_anchor_reserved_products?.filter(
             (batch) => batch.orders_products_id === orders_products_id
           );
@@ -311,9 +316,20 @@ const WMOCTable = ({ product_list, orderCartData }) => {
       }
 
       setWmoctProductShippedBD((prev) => {
-        const haveProd = prev.find((el) => el.article == article);
-        if (haveProd) return prev;
-        return [...prev, { article, shipped }];
+        const exists = prev.find(
+          (el) => el.article === article && el.order_id === order_from_list_id
+        );
+
+        if (exists) return prev;
+
+        return [
+          ...prev,
+          {
+            article,
+            order_id: order_from_list_id,
+            shipped,
+          },
+        ];
       });
 
       let productObj = {
