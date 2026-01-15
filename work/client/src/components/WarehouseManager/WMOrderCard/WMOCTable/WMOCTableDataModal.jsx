@@ -32,7 +32,7 @@ const WMOCTableDataModal = ({ isOpen, toggle }) => {
 
     toggle();
   };
-
+  if (!isOpen) return null;
   return (
     <div>
       <Modal isOpen={isOpen} toggle={toggle}>

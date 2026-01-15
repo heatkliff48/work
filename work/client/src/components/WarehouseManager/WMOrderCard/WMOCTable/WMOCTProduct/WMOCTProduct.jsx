@@ -141,14 +141,14 @@ const WMOCTProduct = ({
             </Fragment>
           ))}
         </tbody>
-        <button
-          onClick={() => {
-            setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
-          }}
-        >
-          SAVE
-        </button>
       </table>
+      <button
+        onClick={() => {
+          setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
+        }}
+      >
+        SAVE
+      </button>
     </div>
   );
 };
