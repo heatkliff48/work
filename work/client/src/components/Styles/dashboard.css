@@ -1,0 +1,470 @@
+/* =======================
+   TOKENS
+   ======================= */
+:root {
+  --bb-bg: #fafafb;
+  --bb-border: #dee1e6;
+  --bb-text: #171a1f;
+  --bb-muted: #565d6d;
+  --bb-red: #bc1212;
+  --bb-white: #ffffff;
+}
+
+/* =======================
+     PAGE LAYOUT
+     ======================= */
+.bb-page {
+  min-height: 100vh;
+  background: var(--bb-bg);
+  display: flex;
+}
+
+/* Main column */
+.bb-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Content */
+.bb-content {
+  padding: 18px 48px 48px;
+}
+
+/* =======================
+     SIDEBAR
+     ======================= */
+.bb-sidebar {
+  width: 256px;
+  background: var(--bb-white);
+  border-right: 1px solid var(--bb-border);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Brand */
+.bb-brand {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 18px;
+  white-space: nowrap;
+
+  font-family: Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--bb-red);
+  user-select: none;
+}
+
+.bb-sidebar-menu {
+  padding: 8px 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bb-sidebar-item {
+  border: 0;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  padding: 10px 10px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  cursor: pointer;
+
+  font-family: Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bb-muted);
+}
+
+.bb-sidebar-item:hover {
+  background: #f1f3f7;
+  color: #1e2128;
+}
+
+.bb-sidebar-item.bb-active {
+  background: #eef0f5;
+  color: #1e2128;
+}
+
+.bb-sidebar-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+/* Emoji icon inside bb-sidebar-icon */
+.bb-emoji {
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  width: 20px;
+  justify-content: center;
+}
+
+/* Group / accordion */
+.bb-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.bb-group-btn {
+  justify-content: space-between;
+}
+
+.bb-group-title {
+  flex: 1;
+}
+
+.bb-chevron {
+  margin-left: auto;
+  opacity: 0.7;
+  transform: rotate(0deg);
+  transition: transform 0.15s ease;
+}
+
+.bb-chevron.open {
+  transform: rotate(180deg);
+}
+
+.bb-group-children {
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bb-child {
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+/* =======================
+     TOPBAR
+     ======================= */
+.bb-topbar {
+  height: 64px;
+  background: var(--bb-red);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 0 18px;
+}
+
+.bb-topbar-left {
+  width: 256px; /* aligns center title with content when sidebar expanded */
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bb-topbar-center {
+  flex: 1 1 auto;
+  text-align: center;
+  color: #fff;
+  user-select: none;
+
+  font-family: Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.bb-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 0 0 auto;
+}
+
+/* user info */
+.bb-userbox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+  color: #fff;
+
+  font-family: Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.bb-username {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.bb-userrole {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* logout */
+.bb-logout {
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+
+  background: #ffffff;
+  color: var(--bb-red);
+
+  font-family: Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bb-logout:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* burger button */
+.bb-menu-btn {
+  height: 40px;
+  width: 44px;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bb-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.bb-burger-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* =======================
+     MAIN PAGE (DASHBOARD)
+     ======================= */
+.bb-section-title {
+  margin: 10px 0 12px;
+  font-family: Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--bb-text);
+}
+
+.bb-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bb-action-btn {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--bb-border);
+  background: var(--bb-white);
+  cursor: pointer;
+
+  font-family: Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e2128;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bb-action-btn:hover {
+  background: #f6f7fa;
+}
+
+.bb-action-btn.bb-primary {
+  border-color: var(--bb-red);
+  background: var(--bb-red);
+  color: var(--bb-white);
+}
+
+.bb-action-btn.bb-primary:hover {
+  filter: brightness(0.98);
+}
+
+/* =======================
+     MOBILE DRAWER
+     ======================= */
+.bb-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 999;
+}
+
+@media (max-width: 900px) {
+  /* compact content */
+  .bb-content {
+    padding: 14px 12px 24px;
+  }
+
+  .bb-section-title {
+    font-size: 20px;
+  }
+
+  /* quick actions stacked */
+  .bb-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bb-action-btn {
+    width: 100%;
+    justify-content: center;
+    height: 44px;
+    font-size: 15px;
+  }
+
+  /* topbar compact */
+  .bb-topbar {
+    padding: 0 12px;
+    gap: 10px;
+  }
+
+  .bb-topbar-left {
+    width: auto;
+  }
+
+  .bb-topbar-center {
+    font-size: 16px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .bb-userbox {
+    display: none;
+  }
+
+  .bb-logout {
+    height: 38px;
+    padding: 0 12px;
+  }
+
+  /* sidebar becomes off-canvas drawer */
+  .bb-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 86vw;
+    max-width: 320px;
+    z-index: 1000;
+
+    transform: translateX(-110%);
+    transition: transform 0.18s ease;
+    box-shadow: 10px 0 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .bb-sidebar.bb-open {
+    transform: translateX(0);
+  }
+
+  .bb-sidebar-item {
+    padding: 11px 10px;
+    font-size: 15px;
+  }
+
+  .bb-brand {
+    height: 60px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 360px) {
+  .bb-topbar-center {
+    font-size: 14px;
+  }
+  .bb-logout {
+    font-size: 13px;
+  }
+}
+
+/* =======================
+     DESKTOP COLLAPSED SIDEBAR
+     ======================= */
+@media (min-width: 901px) {
+  .bb-sidebar.bb-collapsed {
+    width: 64px;
+  }
+
+  /* brand becomes "ERP" */
+  .bb-sidebar.bb-collapsed .bb-brand {
+    justify-content: center;
+    padding: 0;
+    font-size: 16px;
+    font-weight: 700;
+
+    color: transparent;
+    position: relative;
+  }
+
+  .bb-sidebar.bb-collapsed .bb-brand::after {
+    content: 'ERP';
+    color: var(--bb-red);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* hide all labels in items (keep icons/emoji) */
+  .bb-sidebar.bb-collapsed .bb-sidebar-item {
+    justify-content: center;
+    padding: 12px 0;
+  }
+
+  .bb-sidebar.bb-collapsed .bb-sidebar-icon {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .bb-sidebar.bb-collapsed
+    .bb-sidebar-item
+    span:not(.bb-sidebar-icon):not(.bb-emoji) {
+    display: none;
+  }
+
+  /* hide group children when collapsed */
+  .bb-sidebar.bb-collapsed .bb-group-children {
+    display: none !important;
+  }
+
+  /* keep center title aligned when sidebar collapsed */
+  .bb-sidebar.bb-collapsed ~ .bb-main .bb-topbar-left {
+    width: 64px;
+  }
+
+  /* slightly tighter content */
+  .bb-content {
+    padding: 18px 32px 48px;
+  }
+}
