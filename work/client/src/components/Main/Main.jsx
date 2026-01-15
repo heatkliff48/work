@@ -74,6 +74,9 @@ import {
 import '#components/Styles/dashboard.css';
 
 
+import '#components/Styles/dashboard.css';
+
+
 function Main() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
