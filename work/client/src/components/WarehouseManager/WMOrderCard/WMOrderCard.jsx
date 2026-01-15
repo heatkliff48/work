@@ -29,7 +29,6 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
         .map(([key, value]) => {
           if (!key || key === "warehouse_id") return null;
 
-          // Если значение — объект, преобразуем его в строку
           let displayValue = value;
           if (displayValue && typeof displayValue === "object") {
             displayValue = JSON.stringify(displayValue);
@@ -38,12 +37,13 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
           return (
             <div className="data-text" key={key}>
               <p>
-                {displayNames[key] || key}: {displayValue}
+                {displayNames?.[key] || key}: {String(displayValue ?? '')}
               </p>
             </div>
           );
-        }),
-    [orderCartData]
+        })
+        .filter(Boolean),
+    [displayNames]
   );
 
   useEffect(() => {
@@ -55,13 +55,11 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
       (order) => order.id === storedData?.id
     );
 
-    const nextOrderCartData = updatedOrderCartData || storedData;
-
-    if (nextOrderCartData) {
-      setOrderCartData(nextOrderCartData);
-      localStorage.setItem('orderCartData', JSON.stringify(nextOrderCartData));
+    if (storedData) {
+      setOrderCartData(storedData);
     }
 
+    localStorage.setItem('orderCartData', JSON.stringify(storedData));
     if (!ordersStatus.includes(updatedOrderCartData?.status))
       setOrdersStatus((prev) => [...prev, updatedOrderCartData?.status]);
   }, [list_of_orders]);

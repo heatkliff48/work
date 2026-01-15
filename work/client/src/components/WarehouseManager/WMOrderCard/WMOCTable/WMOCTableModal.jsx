@@ -70,12 +70,13 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
       .filter((el) => el.ordered_quantity > 0)
       .map((el) => ({
         batch_article: el.article,
-        free_quantity_remaining:  el.free_quantity_remaining,
+        free_quantity_remaining: el.free_quantity_remaining,
         quantity: el.ordered_quantity,
       }));
     setWmoctModal(result);
   }, [selectedProduct, wmoctProduct]);
 
+  if (!isOpen) return null;
   return (
     <div>
       <Modal

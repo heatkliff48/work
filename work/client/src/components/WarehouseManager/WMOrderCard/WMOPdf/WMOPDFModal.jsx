@@ -3,6 +3,8 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import WMOPdf from './WMOPdf';
 
 const WMOCPDFModal = ({ isOpen, toggle, orderCartData }) => {
+  if (!isOpen) return null;
+
   return (
     <div>
       <Modal
