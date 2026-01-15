@@ -422,7 +422,11 @@ const OrderContextProvider = ({ children }) => {
 
   const getCurrentOrderInfoHandler = useCallback(
     (order_info) => {
-      const order = list_of_orders.find((el) => el.id === order_info?.order_id);
+      console.log('order_info', order_info);
+      const orderId = order_info?.id ?? order_info?.order_id;
+      const order = list_of_orders.find((el) => el.id === orderId);
+      if (!order) return;
+
       const client = clients.find((client) => client.id === order?.owner);
       const deliveryAddress = deliveryAddresses.find(
         (address) =>

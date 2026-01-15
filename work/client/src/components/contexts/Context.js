@@ -9,6 +9,7 @@ const ProjectContextProvider = ({ children }) => {
   const displayNames = {
     product_article: "Ref.",
     description: "Description",
+    price_category: "Price category",
     project_name: "Project name",
     quantity_m2: "Quantity, m2",
     quantity_ud: "Quantity, Ud",
