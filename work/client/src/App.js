@@ -47,7 +47,6 @@ import RelatedMaterialsBackorderList from '#components/Warehouse/RelatedMaterial
 import AutoclaveCalendare from '#components/ProductionBatchDesigner/AutoclaveCalendare.jsx';
 import ProductionBatchDesignerNew from '#components/ProductionBatchDesigner/ProductionBatchDesignerNew.jsx';
 import RawMaterialsConsumption from '#components/RawMaterialsConsumption/RawMaterialsConsumption.jsx';
-import TabsBar from './components/Main/TabsBar';
 import LotesList from '#components/LotesList/LotesList.jsx';
 import ClientsPriceInfo from '#components/Clients/ClientsPriceInfo/ClientsPriceInfo.jsx';
 
@@ -75,86 +74,95 @@ function App() {
     <MainContextProvider>
       <div className="wrapper">
         <SnackbarProvider />
-        <NavBar />
-        <TabsBar />
+
         <Routes>
-          <Route path="/" element={<Main />} />
-          <Route path="/accounting" element={<Accounting />} />
-          <Route path="/anchors" element={<AnchorsTable />} />
-
-          <Route path="/batch_outside" element={<BatchOutside />} />
-          <Route path="/clients" element={<ClientsInfo />} />
-          <Route path="/clients_price_info" element={<ClientsPriceInfo />} />
-          <Route path="/dry_mixes_journal" element={<DryMixesJournal />} />
-
-          <Route
-            path="/list_of_ordered_production"
-            element={<ListOfOrderedProduction />}
-          />
-          <Route
-            path="/list_of_ordered_production_oem"
-            element={<ListOfOrderedProductionOEM />}
-          />
-          <Route
-            path="/related_materials_backorder_list"
-            element={<RelatedMaterialsBackorderList />}
-          />
-          <Route path="/orders" element={<OrdersTable />} />
-          <Route path="/order_card" element={<OrderCart />} />
-
-          <Route path="/products" element={<Products />} />
-          <Route
-            path="/production_batch_designer"
-            element={<ProductionBatchDesigner />}
-          />
-          <Route
-            path="/production_batch_designer_new"
-            element={<ProductionBatchDesignerNew />}
-          />
-          <Route path="/autoclave_calendar" element={<AutoclaveCalendare />} />
-          <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
-
-          <Route path="/quality_management" element={<QualityManagementTable />} />
-
-          <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
-          <Route path="/recipe_products" element={<ProductsListForRecipes />} />
-          <Route path="/recipe_orders" element={<RecipeOrders />} />
-          <Route
-            path="/raw_material_consumption"
-            element={<RawMaterialsConsumption />}
-          />
-          <Route
-            path="/related_materials_journal"
-            element={<RelatedMaterialsJournal />}
-          />
-          <Route path="/roles" element={<Roles />} />
-
+          {/* публичная страница */}
           <Route path="/sign-in" element={<LoginForm />} />
-          <Route path="/statistics" element={<Statistics />} />
-          <Route path="/stock_balance" element={<StockBalance />} />
 
-          <Route path="/tools" element={<ToolsTable />} />
-          <Route path="/users_info" element={<UsersInfo />} />
-          <Route path="/warehouse_HCCA_blocks" element={<Warehouse />} />
-          <Route path="/warehouse_dry_mixes" element={<DryMixesWarehouse />} />
-          <Route
-            path="/warehouse_related_materials"
-            element={<RelatedMaterialsWarehouse />}
-          />
-          <Route path="/warehouse_anchors" element={<AnchorsWarehouse />} />
-          <Route path="/warehouse_tools" element={<ToolsWarehouse />} />
-          <Route
-            path="/warehouse_raw_materials"
-            element={<RawMaterialsWarehouse />}
-          />
-          <Route
-            path="/warehouse_products_type"
-            element={<ProductsTypeWarehouse />}
-          />
-          <Route path="/warehouse_manager" element={<WarehouseManager />} />
-          <Route path="/lotes_list" element={<LotesList />} />
+          {/* layout со sidebar + topbar для всех остальных */}
+          <Route element={<NavBar />}>
+            <Route path="/" element={<Main />} />
+            <Route path="/accounting" element={<Accounting />} />
+            <Route path="/anchors" element={<AnchorsTable />} />
 
-          <Route path="*" element={<Navigate to={'sign-in'} />} />
+            <Route path="/batch_outside" element={<BatchOutside />} />
+            <Route path="/clients" element={<ClientsInfo />} />
+            <Route path="/clients_price_info" element={<ClientsPriceInfo />} />
+            <Route path="/dry_mixes_journal" element={<DryMixesJournal />} />
+
+            <Route
+              path="/list_of_ordered_production"
+              element={<ListOfOrderedProduction />}
+            />
+            <Route
+              path="/list_of_ordered_production_oem"
+              element={<ListOfOrderedProductionOEM />}
+            />
+            <Route
+              path="/related_materials_backorder_list"
+              element={<RelatedMaterialsBackorderList />}
+            />
+
+            <Route path="/orders" element={<OrdersTable />} />
+            <Route path="/order_card" element={<OrderCart />} />
+
+            <Route path="/products" element={<Products />} />
+            <Route
+              path="/production_batch_designer"
+              element={<ProductionBatchDesigner />}
+            />
+            <Route
+              path="/production_batch_designer_new"
+              element={<ProductionBatchDesignerNew />}
+            />
+            <Route path="/autoclave_calendar" element={<AutoclaveCalendare />} />
+
+            <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
+            <Route path="/quality_management" element={<QualityManagementTable />} />
+
+            <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
+            <Route path="/recipe_products" element={<ProductsListForRecipes />} />
+            <Route path="/recipe_orders" element={<RecipeOrders />} />
+            <Route
+              path="/raw_material_consumption"
+              element={<RawMaterialsConsumption />}
+            />
+
+            <Route
+              path="/related_materials_journal"
+              element={<RelatedMaterialsJournal />}
+            />
+            <Route path="/roles" element={<Roles />} />
+
+            <Route path="/statistics" element={<Statistics />} />
+            <Route path="/stock_balance" element={<StockBalance />} />
+
+            <Route path="/tools" element={<ToolsTable />} />
+            <Route path="/users_info" element={<UsersInfo />} />
+
+            <Route path="/warehouse_HCCA_blocks" element={<Warehouse />} />
+            <Route path="/warehouse_dry_mixes" element={<DryMixesWarehouse />} />
+            <Route
+              path="/warehouse_related_materials"
+              element={<RelatedMaterialsWarehouse />}
+            />
+            <Route path="/warehouse_anchors" element={<AnchorsWarehouse />} />
+            <Route path="/warehouse_tools" element={<ToolsWarehouse />} />
+            <Route
+              path="/warehouse_raw_materials"
+              element={<RawMaterialsWarehouse />}
+            />
+            <Route
+              path="/warehouse_products_type"
+              element={<ProductsTypeWarehouse />}
+            />
+            <Route path="/warehouse_manager" element={<WarehouseManager />} />
+
+            <Route path="/lotes_list" element={<LotesList />} />
+
+            {/* всё неизвестное — на sign-in */}
+            <Route path="*" element={<Navigate to="/sign-in" />} />
+          </Route>
         </Routes>
       </div>
     </MainContextProvider>

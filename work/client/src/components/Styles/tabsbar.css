@@ -76,3 +76,12 @@
   color: #333;
   margin-left: 8px;
 }
+@media (max-width: 900px) {
+  .tabsbar-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tabsbar-scroll {
+    min-width: max-content;
+  }
+}

@@ -1,4 +1,5 @@
 import { useUsersContext } from '#components/contexts/UserContext.js';
+import { useLocation } from 'react-router-dom';
 import { clearBatchState } from '#components/redux/actions/batchDesignerAction.js';
 import { getBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import {
@@ -61,7 +62,7 @@ import {
   getAllUsersMainInfo,
 } from '#components/redux/actions/usersInfoAction';
 import { getAldabaran } from '#components/redux/actions/aldabaranAction.js';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
@@ -70,11 +71,13 @@ import {
   getLotesListCakes,
 } from '#components/redux/actions/lotesListAction.js';
 
+import '#components/Styles/dashboard.css';
+
+
 function Main() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  // const dataFetched = useSelector((state) => state.dataFetched);
   const { setStoredData } = useOrderContext();
   const { roles, checkUserAccess } = useUsersContext();
 
@@ -136,165 +139,47 @@ function Main() {
     dispatch(getLotesListCakes());
     dispatch(getRawMaterialsWarehouse());
     setStoredData(null);
-    //dispatch(dataFetchedChange(true));
-  }, []);
+  }, [dispatch, setStoredData]);
 
   return (
-    <div className="main-container">
-      <h1 className="main-title">Main Page</h1>
-      <div className="button-container">
-        {checkUserAccess(user, roles, 'Users_info')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/users_info')}>
-            Users Info
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'Roles')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/roles')}>
-            Roles
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'warehouse_manager')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/warehouse_manager')}
-          >
-            Order dispatch
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'Products')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/products_type_journal')}
-          >
-            Products Type Journal
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'Statistics')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/statistics')}>
-            Statistics
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'Orders')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/orders')}>
-            Orders
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'accounting')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/accounting')}>
-            Accounting
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'Clients')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/clients')}>
-            Clients
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'Clients')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/clients_Price_info')}
-          >
-            Clients Price Info
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'Warehouse')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/warehouse_products_type')}
-          >
-            Warehouse
-          </button>
-        )}
-        {/* {checkUserAccess(user, roles, 'Production_batch_log')?.canRead && (
-        <button className="nav-button" onClick={() => navigate('/production_batch_log')}>
-          Production Batch Log 
+    <>
+      <div className="bb-section-title">Quick Actions</div>
+
+      <div className="bb-actions">
+        <button
+          className="bb-action-btn bb-primary"
+          onClick={() => navigate('/orders')}
+          type="button"
+        >
+          Add New Order
         </button>
-      )} */}
-        {/* {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/production_batch_designer')}
-          >
-            Batch planner
-          </button>
-        )} */}
-        {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/production_batch_designer_new')}
-          >
-            Batch planner New
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/autoclave_calendar')}
-          >
-            Autoclave Calendare
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'List_of_ordered_production')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/list_of_ordered_production')}
-          >
-            Ordered blocks pipeline
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'list_of_ordered_production_oem')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/list_of_ordered_production_oem')}
-          >
-            Ordered OEM blocks pipeline
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'related_materials_backorder_list')
-          ?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/related_materials_backorder_list')}
-          >
-            Related materials backorder list
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'production_plan')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/batch_outside')}>
-            Batch calendar
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'recipe_products')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/recipe_products')}
-          >
-            Recipe Products
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'raw_materials_plan')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/raw_materials_plan')}
-          >
-            Raw Materials Plan
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
-          <button className="nav-button" onClick={() => navigate('/recipe_orders')}>
-            Raw material calendar
-          </button>
-        )}
-        {checkUserAccess(user, roles, 'quality_management')?.canRead && (
-          <button
-            className="nav-button"
-            onClick={() => navigate('/quality_management')}
-          >
-            Quality Management
-          </button>
-        )}
+
+        <button
+          className="bb-action-btn"
+          onClick={() => navigate('/clients')}
+          type="button"
+        >
+          Add New Client
+        </button>
+
+        <button
+          className="bb-action-btn"
+          onClick={() => navigate('/warehouse_products_type')}
+          type="button"
+        >
+          Update Inventory
+        </button>
+
+        <button
+          className="bb-action-btn"
+          onClick={() => navigate('/production_batch_designer_new')}
+          type="button"
+        >
+          Batch Plan
+        </button>
       </div>
-    </div>
+    </>
   );
 }
+
 export default Main;
