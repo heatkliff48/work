@@ -1210,6 +1210,34 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     setCakeData(found ? { ...found } : { id: nextCakeId });
   };
 
+  const onSelectSubBatch = (nextSubRaw) => {
+    const nextSub = Number(nextSubRaw);
+    if (!Number.isFinite(nextSub)) return;
+
+    const related = Array.isArray(batchData.relatedBatches)
+      ? batchData.relatedBatches
+      : [];
+
+    const nextBatch = related.find((b) => Number(b?.sub_batch_id) === nextSub);
+    if (!nextBatch) return;
+
+    setBatchData((prev) => ({
+      ...prev,
+      ...nextBatch,
+      relatedBatches: related,
+      activeSubBatchId: nextSub,
+    }));
+
+    const start = Number(nextBatch.cake_id_start);
+    const finish = Number(nextBatch.cake_id_finish);
+    const initialCakeId =
+      Number.isFinite(start) && Number.isFinite(finish) && finish >= start
+        ? start
+        : null;
+
+    setSelectedCakeId(initialCakeId);
+  };
+
   const buildBatchPayload = () => {
     const {
       relatedBatches,
@@ -1265,7 +1293,34 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
         className="d-flex align-items-center gap-2"
         style={{ padding: '12px 16px' }}
       >
-        Batch Details: {batchData.batch_id} / sub {batchData.sub_batch_id}
+        <span>
+          Batch Details: {batchData.batch_id} / sub {batchData.sub_batch_id}
+        </span>
+
+        {Array.isArray(batchData.relatedBatches) &&
+          batchData.relatedBatches.length > 1 && (
+            <>
+              <span className="ms-3" style={{ fontWeight: 600 }}>
+                sub
+              </span>
+
+              <Form.Select
+                size="sm"
+                style={{ width: 140 }}
+                value={batchData.sub_batch_id ?? batchData.activeSubBatchId ?? ''}
+                onChange={(e) => onSelectSubBatch(e.target.value)}
+              >
+                {batchData.relatedBatches
+                  .slice()
+                  .sort((a, b) => Number(a.sub_batch_id) - Number(b.sub_batch_id))
+                  .map((b) => (
+                    <option key={b.sub_batch_id} value={b.sub_batch_id}>
+                      {b.sub_batch_id}
+                    </option>
+                  ))}
+              </Form.Select>
+            </>
+          )}
       </Modal.Title>
 
       <Modal.Body>
