@@ -9,7 +9,7 @@ export const ModalContextProvider = ({ children }) => {
   const [modalRoleCard, setModalRoleCard] = useState(false);
   const [warehouseModal, setWarehouseModal] = useState(false);
   const [modalAddClient, setModalAddClient] = useState(false);
-  const [lotesListModal, setLotesListModal] = useState(false);
+  const [lotesListBatchesModal, setLotesListBatchesModal] = useState(false);
   const [modalProductCard, setModalProductCard] = useState(false);
   const [clientModalOrder, setClientModalOrder] = useState(false);
   const [productBatchModal, setProductBatchModal] = useState(false);
@@ -53,8 +53,8 @@ export const ModalContextProvider = ({ children }) => {
         setAnchorProductModalOrder,
         toolProductModalOrder,
         setToolProductModalOrder,
-        lotesListModal,
-        setLotesListModal,
+        lotesListBatchesModal,
+        setLotesListBatchesModal,
         productInfoModalOrder,
         setProductInfoModalOrder,
         warehouseModal,

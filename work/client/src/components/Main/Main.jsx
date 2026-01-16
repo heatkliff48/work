@@ -65,7 +65,10 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { getLotesList } from '#components/redux/actions/lotesListAction.js';
+import {
+  getLotesList,
+  getLotesListCakes,
+} from '#components/redux/actions/lotesListAction.js';
 
 function Main() {
   const navigate = useNavigate();
@@ -130,6 +133,7 @@ function Main() {
     dispatch(getQualityManagement());
     dispatch(clearBatchState());
     dispatch(getLotesList());
+    dispatch(getLotesListCakes());
     dispatch(getRawMaterialsWarehouse());
     setStoredData(null);
     //dispatch(dataFetchedChange(true));

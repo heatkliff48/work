@@ -2,67 +2,67 @@ import {
   mainRawMatConsumptionReducer,
   rawMatConsumptionReducer,
   recipeOrdersReducer,
-} from "./RecipeOrdersReducer";
-import { accountingReducer } from "./accoutingReducer";
-import { aldabaranReducer } from "./aldabaranReducer";
-import batchDesignerReducer from "./batchDesignerReducer";
-import { batchOutsideReducer } from "./batchOutsideReducer";
+} from './RecipeOrdersReducer';
+import { accountingReducer } from './accoutingReducer';
+import { aldabaranReducer } from './aldabaranReducer';
+import batchDesignerReducer from './batchDesignerReducer';
+import { batchOutsideReducer } from './batchOutsideReducer';
 import {
   clientsReducer,
   legalAddressReducer,
   deliveryAddressesReducer,
   contactInfoReducer,
   contactPriceInfoReducer,
-} from "./clientsReducer";
-import { dataFetchedReducer } from "./dataFetchedReducer";
-import { filesOrderReducer } from "./filesOrderReducer";
-import { filesProductReducer } from "./filesProductReducer";
-import { filesWarehouseReducer } from "./filesWarehouseReducer";
-import { jwtReducer } from "./jwtReducer";
-import { listOfOrderedProductionOEMReducer } from "./listOfOrderedProductionOEMReducer";
+} from './clientsReducer';
+import { dataFetchedReducer } from './dataFetchedReducer';
+import { filesOrderReducer } from './filesOrderReducer';
+import { filesProductReducer } from './filesProductReducer';
+import { filesWarehouseReducer } from './filesWarehouseReducer';
+import { jwtReducer } from './jwtReducer';
+import { listOfOrderedProductionOEMReducer } from './listOfOrderedProductionOEMReducer';
 import {
   autoclaveCalendarReducer,
   listOfOrderedProductionReducer,
-} from "./listOfOrderedProductionReducer";
-import { lotesListReducer } from "./lotesListReducer";
-import { ordersReducer } from "./orderReducer";
-import { pagesReducer } from "./pagesReducer";
-import { productionBatchLogReducer } from "./productionBatchLogReducer";
+} from './listOfOrderedProductionReducer';
+import { lotesListBatchesReducer, lotesListCakesReducer } from './lotesListReducer';
+import { ordersReducer } from './orderReducer';
+import { pagesReducer } from './pagesReducer';
+import { productionBatchLogReducer } from './productionBatchLogReducer';
 import {
   anchorProductsOfOrdersReducer,
   dryMixedProductsOfOrdersReducer,
   productsOfOrdersReducer,
   relMatProductsOfOrdersReducer,
   toolProductsOfOrdersReducer,
-} from "./productsOfOrdersReducer";
-import { productsReducer } from "./productsReducer";
+} from './productsOfOrdersReducer';
+import { productsReducer } from './productsReducer';
 import {
   anchorReducer,
   dryMixesJournalReducer,
   productCodeReducer,
   relatedMaterialsJournalReducer,
   toolReducer,
-} from "./productsTypeJournalReducer";
+} from './productsTypeJournalReducer';
 import {
   anchorsWarehouseReducer,
   dryMixesWarehouseReducer,
   relatedMaterialsWarehouseReducer,
   toolsWarehouseReducer,
-} from "./productsTypeWarehouseReducer";
-import { qualityManagementReducer } from "./qualityManagementReducer";
-import { recipeReducer } from "./recipeReducer";
-import { relatedMaterialsBackorderListReducer } from "./relatedMaterialsBackorderListReducer";
+} from './productsTypeWarehouseReducer';
+import { qualityManagementReducer } from './qualityManagementReducer';
+import { recipeReducer } from './recipeReducer';
+import { relatedMaterialsBackorderListReducer } from './relatedMaterialsBackorderListReducer';
 import {
   reservedAnchorProductsReducer,
   reservedDryMixedProductsReducer,
   reservedProductsReducer,
   reservedRelMatProductsReducer,
   reservedToolProductsReducer,
-} from "./reservedProductsReducer";
-import { rolesReducer } from "./rolesReducer";
-import { stockBalanceReducer } from "./stockBalanceReducer";
-import { userReducer } from "./userReducer";
-import { usersInfoReducer, usersMainInfoReducer } from "./usersInfoReducer";
+} from './reservedProductsReducer';
+import { rolesReducer } from './rolesReducer';
+import { stockBalanceReducer } from './stockBalanceReducer';
+import { userReducer } from './userReducer';
+import { usersInfoReducer, usersMainInfoReducer } from './usersInfoReducer';
 import {
   warehouseAACReducer,
   warehouseAluminum1Reducer,
@@ -73,12 +73,9 @@ import {
   warehouseGypsumStoneReducer,
   warehouseLimeReducer,
   warehouseSandReducer,
-} from "./warehouseRawMaterialsReducer";
-import {
-  warehouseReducer,
-  rawMaterialsWarehouseReducer,
-} from "./warehouseReducer";
-import { combineReducers } from "redux";
+} from './warehouseRawMaterialsReducer';
+import { warehouseReducer, rawMaterialsWarehouseReducer } from './warehouseReducer';
+import { combineReducers } from 'redux';
 
 export const rootReducer = combineReducers({
   user: userReducer,
@@ -142,6 +139,7 @@ export const rootReducer = combineReducers({
   warehouseAluminum2: warehouseAluminum2Reducer,
   warehouseGrindingBalls: warehouseGrindingBallsReducer,
   warehouseAAC: warehouseAACReducer,
-  lotesList: lotesListReducer,
-  contactPriceInfo:contactPriceInfoReducer
+  lotesListBatches: lotesListBatchesReducer,
+  lotesListCakes: lotesListCakesReducer,
+  contactPriceInfo: contactPriceInfoReducer,
 });
