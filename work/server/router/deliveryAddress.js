@@ -1,16 +1,16 @@
-const deliveryAddress = require('express').Router();
-const { DeliveryAddresses } = require('../db/models');
-const { Clients } = require('../db/models');
-const TokenService = require('../services/Token.js');
-const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
-const { COOKIE_SETTINGS } = require('../constants.js');
-const myEmitter = require('../src/ee.js');
+const deliveryAddress = require("express").Router();
+const { DeliveryAddresses } = require("../db/models");
+const { Clients } = require("../db/models");
+const TokenService = require("../services/Token.js");
+const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
+const { COOKIE_SETTINGS } = require("../constants.js");
+const myEmitter = require("../src/ee.js");
 const {
   ADD_DELIVERY_ADDRESSES_SOCKET,
   UPDATE_DELIVERY_ADDRESSES_SOCKET,
-} = require('../src/constants/event.js');
+} = require("../src/constants/event.js");
 
-deliveryAddress.post('/', async (req, res) => {
+deliveryAddress.post("/", async (req, res) => {
   try {
     const {
       currentClientID,
@@ -51,7 +51,7 @@ deliveryAddress.post('/', async (req, res) => {
   }
 });
 
-deliveryAddress.post('/bitrix-new-delivery-address', async (req, res) => {
+deliveryAddress.post("/bitrix-new-delivery-address", async (req, res) => {
   try {
     const {
       bitrix_id,
@@ -66,6 +66,11 @@ deliveryAddress.post('/bitrix-new-delivery-address', async (req, res) => {
       phone_number,
       email,
     } = req.body;
+
+    console.log(
+      req.body,
+      "req.body Post Bitrix ------------- deliveryAddress.js line 70"
+    );
 
     const client = await Clients.findOne({
       where: {
@@ -96,16 +101,16 @@ deliveryAddress.post('/bitrix-new-delivery-address', async (req, res) => {
       bitrix_client_id,
     });
   } catch (err) {
-    console.error('Ошибка при добавлении клиента из Bitrix:', err.message);
+    console.error("Ошибка при добавлении клиента из Bitrix:", err.message);
 
     return res.status(500).json({
-      error: 'Внутренняя ошибка сервера',
-      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+      error: "Внутренняя ошибка сервера",
+      details: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 });
 
-deliveryAddress.post('/bitrix-update-delivery-address', async (req, res) => {
+deliveryAddress.post("/bitrix-update-delivery-address", async (req, res) => {
   try {
     const {
       bitrix_id,
@@ -120,6 +125,11 @@ deliveryAddress.post('/bitrix-update-delivery-address', async (req, res) => {
       phone_number,
       email,
     } = req.body;
+
+    console.log(
+      req.body,
+      "req.body Update Bitrix ------------- deliveryAddress.js line 131"
+    );
 
     const deliveryAddress = await DeliveryAddresses.update(
       {
@@ -151,16 +161,16 @@ deliveryAddress.post('/bitrix-update-delivery-address', async (req, res) => {
       bitrix_client_id,
     });
   } catch (err) {
-    console.error('Ошибка при обновлении клиента из Bitrix:', err.message);
+    console.error("Ошибка при обновлении клиента из Bitrix:", err.message);
 
     return res.status(500).json({
-      error: 'Внутренняя ошибка сервера',
-      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+      error: "Внутренняя ошибка сервера",
+      details: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 });
 
-deliveryAddress.get('/', async (req, res) => {
+deliveryAddress.get("/", async (req, res) => {
   try {
     const deliveryAddresses = await DeliveryAddresses.findAll();
 
