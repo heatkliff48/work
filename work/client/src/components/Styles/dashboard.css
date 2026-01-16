@@ -468,3 +468,10 @@
     padding: 18px 32px 48px;
   }
 }
+
+.bb-sidebar-icon-img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  pointer-events: none;
+}
