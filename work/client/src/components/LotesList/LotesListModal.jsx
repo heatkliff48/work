@@ -908,7 +908,10 @@ import { useNavigate } from 'react-router-dom';
 import {
   updateLotesListRecipe,
   addNewLotesListCakes,
+  updateLotesListCakesRecipe,
 } from '#components/redux/actions/lotesListAction.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import QuickCheckingModal from './QuickCheckingModal';
 
 const SECTIONS = {
   batchInfo: {
@@ -1123,6 +1126,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   const [batchData, setBatchData] = useState({});
   const [selectedCakeId, setSelectedCakeId] = useState(null);
   const [cakeData, setCakeData] = useState({});
+  const { showQuickChecking, setShowQuickChecking } = useModalContext();
 
   // Если хочешь вернуть ACL — раскомментируй
   // useEffect(() => {
@@ -1183,6 +1187,15 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     for (let i = start; i <= finish; i += 1) arr.push(i);
     return arr;
   }, [batchData.cake_id_start, batchData.cake_id_finish]);
+
+  const quickCheckingInitialByCake = useMemo(() => {
+    const map = {};
+    cakeOptions.forEach((id) => {
+      const c = getCakeFromStore(id);
+      if (c) map[id] = c;
+    });
+    return map;
+  }, [cakeOptions, lotesListCakes, selectedRecipe]);
 
   const handleBatchChange = (e) => {
     const { name, value } = e.target;
@@ -1281,129 +1294,151 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     onHide();
   };
 
+  const onSaveQuickChecking = (changes) => {
+    dispatch(updateLotesListCakesRecipe(changes));
+
+    setShowQuickChecking(false);
+  };
+
   return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="xl"
-      centered
-      dialogClassName="modal-auto-size"
-    >
-      <Modal.Title
-        className="d-flex align-items-center gap-2"
-        style={{ padding: '12px 16px' }}
+    <>
+      <Modal
+        show={show}
+        onHide={onHide}
+        size="xl"
+        centered
+        dialogClassName="modal-auto-size"
       >
-        <span>
-          Batch Details: {batchData.batch_id} / sub {batchData.sub_batch_id}
-        </span>
+        <Modal.Title
+          className="d-flex align-items-center gap-2"
+          style={{ padding: '12px 16px' }}
+        >
+          <span>
+            Batch Details: {batchData.batch_id} / sub {batchData.sub_batch_id}
+          </span>
 
-        {Array.isArray(batchData.relatedBatches) &&
-          batchData.relatedBatches.length > 1 && (
-            <>
-              <span className="ms-3" style={{ fontWeight: 600 }}>
-                sub
-              </span>
+          {Array.isArray(batchData.relatedBatches) &&
+            batchData.relatedBatches.length > 1 && (
+              <>
+                <span className="ms-3" style={{ fontWeight: 600 }}>
+                  sub
+                </span>
 
-              <Form.Select
-                size="sm"
-                style={{ width: 140 }}
-                value={batchData.sub_batch_id ?? batchData.activeSubBatchId ?? ''}
-                onChange={(e) => onSelectSubBatch(e.target.value)}
-              >
-                {batchData.relatedBatches
-                  .slice()
-                  .sort((a, b) => Number(a.sub_batch_id) - Number(b.sub_batch_id))
-                  .map((b) => (
-                    <option key={b.sub_batch_id} value={b.sub_batch_id}>
-                      {b.sub_batch_id}
-                    </option>
-                  ))}
-              </Form.Select>
-            </>
-          )}
-      </Modal.Title>
+                <Form.Select
+                  size="sm"
+                  style={{ width: 140 }}
+                  value={batchData.sub_batch_id ?? batchData.activeSubBatchId ?? ''}
+                  onChange={(e) => onSelectSubBatch(e.target.value)}
+                >
+                  {batchData.relatedBatches
+                    .slice()
+                    .sort((a, b) => Number(a.sub_batch_id) - Number(b.sub_batch_id))
+                    .map((b) => (
+                      <option key={b.sub_batch_id} value={b.sub_batch_id}>
+                        {b.sub_batch_id}
+                      </option>
+                    ))}
+                </Form.Select>
+              </>
+            )}
+        </Modal.Title>
 
-      <Modal.Body>
-        <Container fluid>
-          <Form onSubmit={onSaveAll}>
-            <Row>
-              <Col md={4}>
-                <RenderSection
-                  section={SECTIONS.batchInfo}
-                  formData={batchData}
-                  onChange={handleBatchChange}
-                />
-              </Col>
+        <Modal.Body>
+          <Container fluid>
+            <Form onSubmit={onSaveAll}>
+              <Row>
+                <Col md={4}>
+                  <RenderSection
+                    section={SECTIONS.batchInfo}
+                    formData={batchData}
+                    onChange={handleBatchChange}
+                  />
+                </Col>
 
-              <Col md={4}>
-                <RenderSection
-                  section={SECTIONS.mixerBatch}
-                  formData={batchData}
-                  onChange={handleBatchChange}
-                />
-              </Col>
+                <Col md={4}>
+                  <RenderSection
+                    section={SECTIONS.mixerBatch}
+                    formData={batchData}
+                    onChange={handleBatchChange}
+                  />
+                </Col>
 
-              <Col md={4}>
-                <RenderSection
-                  section={SECTIONS.mixerCake}
-                  formData={cakeData}
-                  onChange={handleCakeChange}
-                  headerRight={
-                    <div className="d-flex align-items-center gap-2">
-                      <span style={{ fontWeight: 600 }}>cake id</span>
-                      <Form.Select
-                        size="sm"
-                        style={{ width: 140 }}
-                        value={selectedCakeId ?? ''}
-                        onChange={(e) => onSelectCake(e.target.value)}
-                        disabled={!cakeOptions.length}
-                      >
-                        {cakeOptions.map((id) => (
-                          <option key={id} value={id}>
-                            {id}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </div>
-                  }
-                />
-              </Col>
-            </Row>
+                <Col md={4}>
+                  <RenderSection
+                    section={SECTIONS.mixerCake}
+                    formData={cakeData}
+                    onChange={handleCakeChange}
+                    headerRight={
+                      <div className="d-flex align-items-center gap-2">
+                        <span style={{ fontWeight: 600 }}>cake id</span>
+                        <Form.Select
+                          size="sm"
+                          style={{ width: 140 }}
+                          value={selectedCakeId ?? ''}
+                          onChange={(e) => onSelectCake(e.target.value)}
+                          disabled={!cakeOptions.length}
+                        >
+                          {cakeOptions.map((id) => (
+                            <option key={id} value={id}>
+                              {id}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </div>
+                    }
+                  />
+                </Col>
+              </Row>
 
-            <Row>
-              <Col md={12}>
-                <RenderSection
-                  section={SECTIONS.actualRecipe}
-                  formData={batchData}
-                  onChange={handleBatchChange}
-                />
-              </Col>
-            </Row>
+              <Row>
+                <Col md={12}>
+                  <RenderSection
+                    section={SECTIONS.actualRecipe}
+                    formData={batchData}
+                    onChange={handleBatchChange}
+                  />
+                </Col>
+              </Row>
 
-            <Row>
-              <Col md={12}>
-                <RenderSection
-                  section={SECTIONS.rawMaterials}
-                  formData={batchData}
-                  onChange={handleBatchChange}
-                />
-              </Col>
-            </Row>
-          </Form>
-        </Container>
-      </Modal.Body>
+              <Row>
+                <Col md={12}>
+                  <RenderSection
+                    section={SECTIONS.rawMaterials}
+                    formData={batchData}
+                    onChange={handleBatchChange}
+                  />
+                </Col>
+              </Row>
+            </Form>
+          </Container>
+        </Modal.Body>
 
-      <Modal.Footer>
-        {userAccess?.canWrite && (
-          <Button variant="primary" onClick={onSaveAll}>
-            Save
+        <Modal.Footer>
+          <Button
+            variant="outline-primary"
+            onClick={() => setShowQuickChecking(true)}
+          >
+            Show quick checking
           </Button>
-        )}
-        <Button variant="secondary" onClick={onHide}>
-          Close
-        </Button>
-      </Modal.Footer>
-    </Modal>
+
+          {userAccess?.canWrite && (
+            <Button variant="primary" onClick={onSaveAll}>
+              Save
+            </Button>
+          )}
+          <Button variant="secondary" onClick={onHide}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <QuickCheckingModal
+        show={showQuickChecking}
+        onHide={() => setShowQuickChecking(false)}
+        cakeOptions={cakeOptions}
+        initialRecipe={quickCheckingInitialByCake}
+        onSave={onSaveQuickChecking}
+      />
+    </>
   );
 }
 

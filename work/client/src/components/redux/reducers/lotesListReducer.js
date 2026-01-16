@@ -45,13 +45,13 @@ export const lotesListCakesReducer = (lotesListCakes = [], action) => {
     }
 
     case UPD_LOTES_LIST_CAKES_SOCKET: {
-      console.log('UPD_LOTES_LIST_CAKES_SOCKET payload', payload);
-      const { id } = payload;
-      const updatedLotesList = lotesListCakes.map((el) => {
-        if (el.id === id) return payload;
-        return el;
-      });
-      return updatedLotesList;
+      const updates = Array.isArray(payload) ? payload : [payload];
+
+      const updatesById = new Map(
+        updates.filter((x) => x && x.id != null).map((x) => [x.id, x])
+      );
+
+      return lotesListCakes.map((el) => updatesById.get(el.id) ?? el);
     }
 
     default:
