@@ -9,9 +9,9 @@ export const ModalContextProvider = ({ children }) => {
   const [modalRoleCard, setModalRoleCard] = useState(false);
   const [warehouseModal, setWarehouseModal] = useState(false);
   const [modalAddClient, setModalAddClient] = useState(false);
-  const [lotesListBatchesModal, setLotesListBatchesModal] = useState(false);
   const [modalProductCard, setModalProductCard] = useState(false);
   const [clientModalOrder, setClientModalOrder] = useState(false);
+  const [showQuickChecking, setShowQuickChecking] = useState(false);
   const [productBatchModal, setProductBatchModal] = useState(false);
   const [stockBalanceModal, setStockBalanceModal] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
@@ -20,6 +20,7 @@ export const ModalContextProvider = ({ children }) => {
   const [reserveProductModal, setReserveProductModal] = useState(false);
   const [previewProductModal, setPreviewProductModal] = useState(false);
   const [wmoctPdfAddDataModal, setWmoctPdfAddDataModal] = useState(false);
+  const [lotesListBatchesModal, setLotesListBatchesModal] = useState(false);
   const [toolProductModalOrder, setToolProductModalOrder] = useState(false);
   const [productInfoModalOrder, setProductInfoModalOrder] = useState(false);
   const [anchorProductModalOrder, setAnchorProductModalOrder] = useState(false);
@@ -85,6 +86,8 @@ export const ModalContextProvider = ({ children }) => {
         setRawMaterialConsumptionMadal,
         mainRawMaterialConsumptionMadal,
         setMainRawMaterialConsumptionMadal,
+        showQuickChecking,
+        setShowQuickChecking,
       }}
     >
       {children}

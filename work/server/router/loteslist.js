@@ -124,6 +124,7 @@ const {
   ADD_NEW_LOTES_LIST_SOCKET,
   UPDATE_LOTES_LIST_SOCKET,
   ADD_NEW_LOTES_LIST_CAKES_SOCKET,
+  UPDATE_LOTES_LIST_CAKES_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 
@@ -275,24 +276,56 @@ lotesListRouter.get('/cakes', async (req, res) => {
 });
 
 lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
-  const { cake_id, recipe } = req.body;
-
   try {
-    const [count, rows] = await LotesListsCakes.update(
-      { ...recipe },
-      {
-        where: { id: cake_id },
-        returning: true,
-      }
-    );
+    const payload = Array.isArray(req.body) ? req.body : [req.body];
 
-    if (count === 0) {
-      return res.status(404).json({ error: 'Record not found' });
+    const normalized = payload
+      .map((item) => ({
+        cake_id: Number(item?.cake_id),
+        recipe: item?.recipe,
+      }))
+      .filter(
+        (x) =>
+          Number.isFinite(x.cake_id) &&
+          x.cake_id > 0 &&
+          x.recipe &&
+          typeof x.recipe === 'object' &&
+          !Array.isArray(x.recipe)
+      );
+
+    if (normalized.length === 0) {
+      return res.status(400).json({
+        error:
+          'Invalid payload. Expected {cake_id, recipe} or array of {cake_id, recipe}.',
+      });
     }
 
-    const updatedLotes = rows[0];
+    console.log('normalized', normalized);
 
-    myEmitter.emit(UPDATE_LOTES_LIST_SOCKET, updatedLotes);
+    const updatedRows = [];
+
+    for (const { cake_id, recipe } of normalized) {
+      const [count, rows] = await LotesListsCakes.update(
+        { ...recipe },
+        {
+          where: { id: cake_id },
+          returning: true,
+        }
+      );
+
+      if (count === 0) continue;
+
+      const updatedCake = rows[0];
+      updatedRows.push(updatedCake);
+      console.log(updatedRows);
+
+      myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, updatedCake);
+    }
+
+    if (updatedRows.length === 0) {
+      return res.status(404).json({ error: 'No records updated' });
+    }
+
     return res.status(200);
   } catch (err) {
     console.error(err.message);
