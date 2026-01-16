@@ -136,6 +136,8 @@ const {
   UPDATE_CONTACT_INFO_SOCKET,
   UPDATE_DELIVERY_ADDRESSES_SOCKET,
   UPDATE_LOTES_LIST_SOCKET,
+  ADD_NEW_LOTES_LIST_CAKES_SOCKET,
+  UPDATE_LOTES_LIST_CAKES_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -1717,23 +1719,45 @@ function registerWsEmitter(map) {
     }
   });
 
-  myEmitter.on(ADD_NEW_LOTES_LIST_SOCKET, (lotesList) => {
+  myEmitter.on(ADD_NEW_LOTES_LIST_SOCKET, (lotesListBatches) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
         JSON.stringify({
           type: ADD_NEW_LOTES_LIST_SOCKET,
-          payload: lotesList,
+          payload: lotesListBatches,
         })
       );
     }
   });
 
-  myEmitter.on(UPDATE_LOTES_LIST_SOCKET, (lotesList) => {
+  myEmitter.on(UPDATE_LOTES_LIST_SOCKET, (lotesListBatches) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
         JSON.stringify({
           type: UPDATE_LOTES_LIST_SOCKET,
-          payload: lotesList,
+          payload: lotesListBatches,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_LOTES_LIST_CAKES_SOCKET, (lotesListBatches) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_LOTES_LIST_CAKES_SOCKET,
+          payload: lotesListBatches,
+        })
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_LOTES_LIST_CAKES_SOCKET, (lotesListBatches) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_LOTES_LIST_CAKES_SOCKET,
+          payload: lotesListBatches,
         })
       );
     }

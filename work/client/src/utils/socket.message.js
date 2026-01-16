@@ -124,6 +124,8 @@ import {
   deleteWarehouseAACSocket,
   addNewLotesListSocket,
   updateLotesListSocket,
+  addNewLotesListCakesSocket,
+  updateLotesListCakesSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -293,6 +295,8 @@ import {
   UPDATE_CONTACT_INFO_SOCKET,
   UPDATE_DELIVERY_ADDRESSES_SOCKET,
   UPDATE_LOTES_LIST_SOCKET,
+  ADD_NEW_LOTES_LIST_CAKES_SOCKET,
+  UPDATE_LOTES_LIST_CAKES_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -847,6 +851,14 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_LOTES_LIST_SOCKET:
       dispatch(updateLotesListSocket(payload));
+      break;
+
+    case ADD_NEW_LOTES_LIST_CAKES_SOCKET:
+      dispatch(addNewLotesListCakesSocket(payload));
+      break;
+
+    case UPDATE_LOTES_LIST_CAKES_SOCKET:
+      dispatch(updateLotesListCakesSocket(payload));
       break;
 
     default:

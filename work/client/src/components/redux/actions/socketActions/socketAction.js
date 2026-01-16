@@ -124,6 +124,8 @@ import {
   DELETE_RAW_MAT_CONSUMPTION_SOCKET,
   NEW_LOTES_LIST_SOCKET,
   UPD_LOTES_LIST_SOCKET,
+  NEW_LOTES_LIST_CAKES_SOCKET,
+  UPD_LOTES_LIST_CAKES_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -995,16 +997,30 @@ export const deleteWarehouseAACSocket = (aac_warehouse_id) => {
   };
 };
 
-export const addNewLotesListSocket = (lotesList) => {
+export const addNewLotesListSocket = (lotesListBatches) => {
   return {
     type: NEW_LOTES_LIST_SOCKET,
-    payload: lotesList,
+    payload: lotesListBatches,
   };
 };
 
-export const updateLotesListSocket = (lotesList) => {
+export const updateLotesListSocket = (lotesListBatches) => {
   return {
     type: UPD_LOTES_LIST_SOCKET,
-    payload: lotesList,
+    payload: lotesListBatches,
+  };
+};
+
+export const addNewLotesListCakesSocket = (lotesListCakes) => {
+  return {
+    type: NEW_LOTES_LIST_CAKES_SOCKET,
+    payload: lotesListCakes,
+  };
+};
+
+export const updateLotesListCakesSocket = (lotesListCakes) => {
+  return {
+    type: UPD_LOTES_LIST_CAKES_SOCKET,
+    payload: lotesListCakes,
   };
 };

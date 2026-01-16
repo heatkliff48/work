@@ -1,8 +1,11 @@
 import {
   ADD_NEW_LOTES_LIST,
+  ADD_NEW_LOTES_LIST_CAKES,
   GET_FULL_LOTES_LIST,
+  GET_FULL_LOTES_LIST_CAKES,
   UPDATE_LOTES_LIST,
-} from "../types/lotesListTypes";
+  UPDATE_LOTES_LIST_CAKES,
+} from '../types/lotesListTypes';
 
 export const getLotesList = () => {
   return {
@@ -10,16 +13,36 @@ export const getLotesList = () => {
   };
 };
 
-export const addNewLotesList = (lotesList) => {
+export const addNewLotesList = (lotesListBatches) => {
   return {
     type: ADD_NEW_LOTES_LIST,
-    payload: lotesList,
+    payload: lotesListBatches,
   };
 };
 
-export const updateLotesList = (lotesList) => {
+export const updateLotesListRecipe = (lotesListBatches) => {
   return {
     type: UPDATE_LOTES_LIST,
-    payload: lotesList,
+    payload: lotesListBatches,
+  };
+};
+//--------------Lotes List Cakes------------------LotesListsCakes
+export const getLotesListCakes = () => {
+  return {
+    type: GET_FULL_LOTES_LIST_CAKES,
+  };
+};
+
+export const addNewLotesListCakes = (lotesListBatches) => {
+  return {
+    type: ADD_NEW_LOTES_LIST_CAKES,
+    payload: lotesListBatches,
+  };
+};
+
+export const updateLotesListCakesRecipe = (lotesListBatches) => {
+  return {
+    type: UPDATE_LOTES_LIST_CAKES,
+    payload: lotesListBatches,
   };
 };

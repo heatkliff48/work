@@ -66,7 +66,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { getLotesList } from '#components/redux/actions/lotesListAction.js';
+import {
+  getLotesList,
+  getLotesListCakes,
+} from '#components/redux/actions/lotesListAction.js';
+
+import '#components/Styles/dashboard.css';
+
 
 import '#components/Styles/dashboard.css';
 
@@ -133,6 +139,7 @@ function Main() {
     dispatch(getQualityManagement());
     dispatch(clearBatchState());
     dispatch(getLotesList());
+    dispatch(getLotesListCakes());
     dispatch(getRawMaterialsWarehouse());
     setStoredData(null);
   }, [dispatch, setStoredData]);
