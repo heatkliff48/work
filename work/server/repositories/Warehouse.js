@@ -250,6 +250,7 @@ class WarehouseRepository {
       const { warehouse_id, ordered_quantity, product_article } = upd_rem_srock;
 
       const wh_data = await Warehouses.findOne({ where: { id: warehouse_id } });
+
       const wh_data_ordered = await Warehouses.findOne({
         where: { product_article: wh_data.product_article },
         order: [['ordered_quantity', 'DESC']],
@@ -258,18 +259,20 @@ class WarehouseRepository {
       let new_ordered_quantity = 0;
       let new_total_quantity = 0;
       let new_free_quantity_remaining = 0;
+
       if (ordered_quantity < 0) {
-        let shipped = ordered_quantity * -1;
+        let plus_ordered_quantity = ordered_quantity * -1;
+        let shipped = wh_data.ordered_quantity + plus_ordered_quantity;
         new_ordered_quantity = 0;
-        new_total_quantity = wh_data.ordered_quantity + shipped;
-        new_free_quantity_remaining = wh_data.free_quantity_remaining - shipped;
+        new_total_quantity = wh_data.total_quantity - shipped;
+        new_free_quantity_remaining =
+          wh_data.free_quantity_remaining - plus_ordered_quantity;
 
         await Warehouses.update(
           {
-            total_quantity: wh_data_ordered.total_quantity - shipped,
-            ordered_quantity: wh_data_ordered.ordered_quantity - shipped,
-            free_quantity_remaining:
-              wh_data_ordered.free_quantity_remaining - shipped,
+            total_quantity: wh_data_ordered.total_quantity - plus_ordered_quantity,
+            ordered_quantity:
+              wh_data_ordered.ordered_quantity - plus_ordered_quantity,
           },
           { where: { id: wh_data_ordered.id } }
         );
@@ -308,6 +311,7 @@ class WarehouseRepository {
       const wh_data = await DryMixesWarehouse.findOne({
         where: { id: warehouse_id },
       });
+
       const wh_data_ordered = await DryMixesWarehouse.findOne({
         where: { product_article: wh_data.product_article },
         order: [['ordered_quantity', 'DESC']],
@@ -316,18 +320,20 @@ class WarehouseRepository {
       let new_ordered_quantity = 0;
       let new_total_quantity = 0;
       let new_free_quantity_remaining = 0;
+
       if (ordered_quantity < 0) {
-        let shipped = ordered_quantity * -1;
+        let plus_ordered_quantity = ordered_quantity * -1;
+        let shipped = wh_data.ordered_quantity + plus_ordered_quantity;
         new_ordered_quantity = 0;
-        new_total_quantity = wh_data.ordered_quantity + shipped;
-        new_free_quantity_remaining = wh_data.free_quantity_remaining - shipped;
+        new_total_quantity = wh_data.total_quantity - shipped;
+        new_free_quantity_remaining =
+          wh_data.free_quantity_remaining - plus_ordered_quantity;
 
         await DryMixesWarehouse.update(
           {
-            total_quantity: wh_data_ordered.total_quantity - shipped,
-            ordered_quantity: wh_data_ordered.ordered_quantity - shipped,
-            free_quantity_remaining:
-              wh_data_ordered.free_quantity_remaining - shipped,
+            total_quantity: wh_data_ordered.total_quantity - plus_ordered_quantity,
+            ordered_quantity:
+              wh_data_ordered.ordered_quantity - plus_ordered_quantity,
           },
           { where: { id: wh_data_ordered.id } }
         );
@@ -373,18 +379,20 @@ class WarehouseRepository {
       let new_ordered_quantity = 0;
       let new_total_quantity = 0;
       let new_free_quantity_remaining = 0;
+
       if (ordered_quantity < 0) {
-        let shipped = ordered_quantity * -1;
+        let plus_ordered_quantity = ordered_quantity * -1;
+        let shipped = wh_data.ordered_quantity + plus_ordered_quantity;
         new_ordered_quantity = 0;
-        new_total_quantity = wh_data.ordered_quantity + shipped;
-        new_free_quantity_remaining = wh_data.free_quantity_remaining - shipped;
+        new_total_quantity = wh_data.total_quantity - shipped;
+        new_free_quantity_remaining =
+          wh_data.free_quantity_remaining - plus_ordered_quantity;
 
         await AnchorsWarehouse.update(
           {
-            total_quantity: wh_data_ordered.total_quantity - shipped,
-            ordered_quantity: wh_data_ordered.ordered_quantity - shipped,
-            free_quantity_remaining:
-              wh_data_ordered.free_quantity_remaining - shipped,
+            total_quantity: wh_data_ordered.total_quantity - plus_ordered_quantity,
+            ordered_quantity:
+              wh_data_ordered.ordered_quantity - plus_ordered_quantity,
           },
           { where: { id: wh_data_ordered.id } }
         );
@@ -430,18 +438,20 @@ class WarehouseRepository {
       let new_ordered_quantity = 0;
       let new_total_quantity = 0;
       let new_free_quantity_remaining = 0;
+
       if (ordered_quantity < 0) {
-        let shipped = ordered_quantity * -1;
+        let plus_ordered_quantity = ordered_quantity * -1;
+        let shipped = wh_data.ordered_quantity + plus_ordered_quantity;
         new_ordered_quantity = 0;
-        new_total_quantity = wh_data.ordered_quantity + shipped;
-        new_free_quantity_remaining = wh_data.free_quantity_remaining - shipped;
+        new_total_quantity = wh_data.total_quantity - shipped;
+        new_free_quantity_remaining =
+          wh_data.free_quantity_remaining - plus_ordered_quantity;
 
         await ToolsWarehouse.update(
           {
-            total_quantity: wh_data_ordered.total_quantity - shipped,
-            ordered_quantity: wh_data_ordered.ordered_quantity - shipped,
-            free_quantity_remaining:
-              wh_data_ordered.free_quantity_remaining - shipped,
+            total_quantity: wh_data_ordered.total_quantity - plus_ordered_quantity,
+            ordered_quantity:
+              wh_data_ordered.ordered_quantity - plus_ordered_quantity,
           },
           { where: { id: wh_data_ordered.id } }
         );
@@ -487,18 +497,20 @@ class WarehouseRepository {
       let new_ordered_quantity = 0;
       let new_total_quantity = 0;
       let new_free_quantity_remaining = 0;
+
       if (ordered_quantity < 0) {
-        let shipped = ordered_quantity * -1;
+        let plus_ordered_quantity = ordered_quantity * -1;
+        let shipped = wh_data.ordered_quantity + plus_ordered_quantity;
         new_ordered_quantity = 0;
-        new_total_quantity = wh_data.ordered_quantity + shipped;
-        new_free_quantity_remaining = wh_data.free_quantity_remaining - shipped;
+        new_total_quantity = wh_data.total_quantity - shipped;
+        new_free_quantity_remaining =
+          wh_data.free_quantity_remaining - plus_ordered_quantity;
 
         await RelatedMaterialsWarehouse.update(
           {
-            total_quantity: wh_data_ordered.total_quantity - shipped,
-            ordered_quantity: wh_data_ordered.ordered_quantity - shipped,
-            free_quantity_remaining:
-              wh_data_ordered.free_quantity_remaining - shipped,
+            total_quantity: wh_data_ordered.total_quantity - plus_ordered_quantity,
+            ordered_quantity:
+              wh_data_ordered.ordered_quantity - plus_ordered_quantity,
           },
           { where: { id: wh_data_ordered.id } }
         );
