@@ -249,6 +249,7 @@ class WarehouseRepository {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
       const { warehouse_id, total_quantity, ordered_quantity, product_article } =
         upd_rem_srock;
+
       await Warehouses.update(
         { total_quantity, ordered_quantity },
         { where: { id: warehouse_id, product_article } }
@@ -262,7 +263,7 @@ class WarehouseRepository {
   }
 
   static async updateDryMixedWarehouseQuantitys(upd_rem_srock) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateWarehouseQuantitys');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateDryMixedWarehouseQuantitys');
 
     try {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
@@ -283,7 +284,7 @@ class WarehouseRepository {
   }
 
   static async updateAnchorWarehouseQuantitys(upd_rem_srock) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateWarehouseQuantitys');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateAnchorWarehouseQuantitys');
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
     try {
@@ -303,7 +304,7 @@ class WarehouseRepository {
   }
 
   static async updateToolWarehouseQuantitys(upd_rem_srock) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateWarehouseQuantitys');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateToolWarehouseQuantitys');
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
     try {
@@ -323,7 +324,7 @@ class WarehouseRepository {
   }
 
   static async updateRelMatWarehouseQuantitys(upd_rem_srock) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateWarehouseQuantitys');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRelMatWarehouseQuantitys');
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
     try {
@@ -418,7 +419,7 @@ class WarehouseRepository {
   }
 
   static async addNewReservedDryMixedProducts(reserved_product) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedDryMixedProducts');
 
     try {
       for (let i = 0; i < reserved_product.length; i++) {
@@ -440,7 +441,7 @@ class WarehouseRepository {
   }
 
   static async updReservedDryMixedProducts(reserved_product) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedDryMixedProducts');
     const { warehouse_id, orders_products_id, quantity } = reserved_product;
     try {
       await ReservedDryMixes.update(
@@ -456,7 +457,7 @@ class WarehouseRepository {
   }
 
   static async deleteReservedDryMixedProducts({ id }) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedDryMixedProducts');
 
     try {
       await ReservedDryMixes.destroy({ where: { id } });
@@ -480,7 +481,7 @@ class WarehouseRepository {
   }
 
   static async addNewReservedAnchorProducts(reserved_product) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedAnchorProducts');
 
     try {
       for (let i = 0; i < reserved_product.length; i++) {
@@ -502,7 +503,7 @@ class WarehouseRepository {
   }
 
   static async updReservedAnchorProducts(reserved_product) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedAnchorProducts');
     const { warehouse_id, orders_products_id, quantity } = reserved_product;
     try {
       await ReservedAnchors.update(
@@ -518,7 +519,7 @@ class WarehouseRepository {
   }
 
   static async deleteReservedAnchorProducts({ id }) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedAnchorProducts');
 
     try {
       await ReservedAnchors.destroy({ where: { id } });
@@ -530,7 +531,7 @@ class WarehouseRepository {
   }
 
   static async getListOfReservedToolProducts() {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedToolProducts');
 
     try {
       const listOfReservedProducts = await ReservedTools.findAll();
@@ -542,7 +543,7 @@ class WarehouseRepository {
   }
 
   static async addNewReservedToolProducts(reserved_product) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedToolProducts');
 
     try {
       for (let i = 0; i < reserved_product.length; i++) {
@@ -564,7 +565,7 @@ class WarehouseRepository {
   }
 
   static async updReservedToolProducts(reserved_product) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedToolProducts');
     const { warehouse_id, orders_products_id, quantity } = reserved_product;
     try {
       await ReservedTools.update(
@@ -580,7 +581,7 @@ class WarehouseRepository {
   }
 
   static async deleteReservedToolProducts({ id }) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedToolProducts');
 
     try {
       await ReservedTools.destroy({ where: { id } });
@@ -592,7 +593,9 @@ class WarehouseRepository {
   }
 
   static async getListOfReservedRelatedMaterialsProducts() {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedProducts');
+    console.log(
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedRelatedMaterialsProducts'
+    );
 
     try {
       const listOfReservedProducts = await ReservedRelatedMaterials.findAll();
@@ -604,7 +607,7 @@ class WarehouseRepository {
   }
 
   static async addNewReservedRelMatProducts(reserved_product) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedRelMatProducts');
 
     try {
       for (let i = 0; i < reserved_product.length; i++) {
@@ -626,7 +629,7 @@ class WarehouseRepository {
   }
 
   static async updReservedRelMatProducts(reserved_product) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedRelMatProducts');
     const { warehouse_id, orders_products_id, quantity } = reserved_product;
     try {
       await ReservedRelatedMaterials.update(
@@ -642,7 +645,7 @@ class WarehouseRepository {
   }
 
   static async deleteReservedRelMatProducts({ id }) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedProducts');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedRelMatProducts');
 
     try {
       await ReservedRelatedMaterials.destroy({ where: { id } });

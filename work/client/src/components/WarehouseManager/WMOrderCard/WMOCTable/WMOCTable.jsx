@@ -65,7 +65,6 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   }, [wmoctProduct]);
 
   const handlePlusBatch = (product) => {
-    console.log('Adding batch for product:', product.article);
     setSelectedProduct(product.article);
     setWmoctModal(true);
   };
@@ -430,6 +429,9 @@ const WMOCTable = ({ product_list, orderCartData }) => {
           relMat: related_materials_warehouse_data,
         };
 
+        console.log(warehouseMap, 'warehouseMap WMOCTable.jsx line 432');
+        console.log(productMap, 'productMap WMOCTable.jsx line 432');
+
         const wh_arr = warehouseMap[productType];
         const [arr, orderArr] = productMap[productType] || [[], []];
 
@@ -455,6 +457,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
         }
 
         let list_of_batches = [];
+
         const reservedMap = {
           product: list_of_reserved_products,
           dryMixed: list_of_dry_mix_reserved_products,
@@ -504,6 +507,8 @@ const WMOCTable = ({ product_list, orderCartData }) => {
         if (list_of_batches?.length > 0) {
           const processedWarehouseIds = new Set();
 
+          console.log(list_of_batches, 'list_of_batches WMOCTable.jsx line 505');
+
           list_of_batches.forEach((batch) => {
             const wh_item = wh_arr?.find((el) => el.id == batch.warehouse_id);
 
@@ -514,15 +519,14 @@ const WMOCTable = ({ product_list, orderCartData }) => {
               const totalQuantity = Number(wh_item.total_quantity) || 0;
               const orderedQuantity = Number(wh_item.ordered_quantity) || 0;
 
-              const baseAvailable = Math.max(
-                totalQuantity - orderedQuantity + batchQuantity,
-                0
-              );
+              console.log(batchQuantity, 'batchQuantity WMOCTable.jsx line 518');
+              console.log(totalQuantity, 'totalQuantity WMOCTable.jsx line 519');
+              console.log(orderedQuantity, 'orderedQuantity WMOCTable.jsx line 520');
 
               batches.push({
                 batchId: wh_item.article,
-                baseRemainingInBatch: baseAvailable,
-                remainingInBatch: baseAvailable,
+                baseRemainingInBatch: orderedQuantity,
+                remainingInBatch: orderedQuantity,
                 allocated: batchQuantity,
                 minAllocated: batchQuantity,
                 warehouseId: wh_item.id,

@@ -264,6 +264,45 @@ const WarehouseContextProvider = ({ children }) => {
     (state) => state.rawMaterialsWarehouse
   );
 
+  useEffect(() => {
+    console.log(
+      'list_of_reserved_products WarehouseContext.js line 268',
+      list_of_reserved_products
+    );
+  }, [list_of_reserved_products]);
+
+  useEffect(() => {
+    console.log(
+      'list_of_dry_mix_reserved_products WarehouseContext.js line 268',
+      list_of_dry_mix_reserved_products
+    );
+  }, [list_of_dry_mix_reserved_products]);
+
+  useEffect(() => {
+    console.log(
+      'list_of_tool_reserved_products WarehouseContext.js line 268',
+      list_of_tool_reserved_products
+    );
+  }, [list_of_tool_reserved_products]);
+
+  useEffect(() => {
+    console.log('warehouse_data WarehouseContext.js line 268', warehouse_data);
+  }, [warehouse_data]);
+
+  useEffect(() => {
+    console.log(
+      'dry_mixes_warehouse_data WarehouseContext.js line 268',
+      dry_mixes_warehouse_data
+    );
+  }, [dry_mixes_warehouse_data]);
+
+  useEffect(() => {
+    console.log(
+      'tools_warehouse_data WarehouseContext.js line 268',
+      tools_warehouse_data
+    );
+  }, [tools_warehouse_data]);
+
   const reservedMap = {
     product: list_of_reserved_products,
     dryMixed: list_of_dry_mix_reserved_products,
@@ -409,7 +448,10 @@ const WarehouseContextProvider = ({ children }) => {
       const reserved_arr = reservedMap[type];
 
       el?.batches?.forEach((elem) => {
-        const wh = warehouse_arr.find((el) => el.article == elem.batchId);
+        const wh = warehouse_arr.find(
+          (elwh) =>
+            elwh.article == elem.batchId && elwh.product_article == el.article
+        );
 
         const haveReserve = reserved_arr.find(
           (el) =>
@@ -437,6 +479,7 @@ const WarehouseContextProvider = ({ children }) => {
         if (!haveReserve) {
           wh_arr.push({
             warehouse_id: wh.id,
+            product_article: wh.product_article,
             total_quantity: wh.total_quantity - elem.allocated,
             ordered_quantity: wh.ordered_quantity - elem.allocated,
             type,
@@ -448,6 +491,7 @@ const WarehouseContextProvider = ({ children }) => {
 
           wh_arr.push({
             warehouse_id: wh.id,
+            product_article: wh.product_article,
             total_quantity: wh.total_quantity + quantity,
             ordered_quantity: wh.ordered_quantity + quantity,
             type,
@@ -482,7 +526,14 @@ const WarehouseContextProvider = ({ children }) => {
     });
 
     wh_arr.forEach((el) => {
-      const { warehouse_id, total_quantity, ordered_quantity, type } = el;
+      const {
+        warehouse_id,
+        total_quantity,
+        ordered_quantity,
+        product_article,
+        type,
+      } = el;
+
       switch (type) {
         case 'product':
           dispatch(
@@ -490,6 +541,7 @@ const WarehouseContextProvider = ({ children }) => {
               warehouse_id,
               total_quantity,
               ordered_quantity,
+              product_article,
             })
           );
           break;
@@ -500,6 +552,7 @@ const WarehouseContextProvider = ({ children }) => {
               warehouse_id,
               total_quantity,
               ordered_quantity,
+              product_article,
             })
           );
           break;
@@ -510,6 +563,7 @@ const WarehouseContextProvider = ({ children }) => {
               warehouse_id,
               total_quantity,
               ordered_quantity,
+              product_article,
             })
           );
           break;
@@ -520,6 +574,7 @@ const WarehouseContextProvider = ({ children }) => {
               warehouse_id,
               total_quantity,
               ordered_quantity,
+              product_article,
             })
           );
           break;
@@ -530,6 +585,7 @@ const WarehouseContextProvider = ({ children }) => {
               warehouse_id,
               total_quantity,
               ordered_quantity,
+              product_article,
             })
           );
           break;
@@ -592,6 +648,7 @@ const WarehouseContextProvider = ({ children }) => {
         grouped.anchor.push(obj);
       }
     });
+
     console.log('New reserved to save:', newReserved);
 
     Object.entries(grouped).forEach(([key, items]) => {

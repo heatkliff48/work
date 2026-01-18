@@ -75,6 +75,9 @@ function WarehouseManager() {
   useEffect(() => {
     setWmoctPdfModal(false);
     setSelectedOrder(null);
+  }, []);
+
+  useEffect(() => {
     // Fetch reserved products data
     dispatch(getListOfReservedProducts());
     dispatch(getListOfDryMixedReservedProducts());
@@ -155,7 +158,6 @@ function WarehouseManager() {
     const result = list_of_orders
       .filter((el) => el.status === 8)
       .reduce((acc, el) => {
-
         const del_adr = deliveryAddresses?.find((del) => del?.id == el?.del_adr_id);
 
         const products = [];
@@ -179,7 +181,6 @@ function WarehouseManager() {
           anchorProductsOfOrders,
           latestAnchors
         );
-        console.log('Анкеры:', anchorProducts);
         products.push(...anchorProducts);
 
         const toolProducts = getProductsByOrder(
@@ -187,7 +188,6 @@ function WarehouseManager() {
           toolProductsOfOrders,
           latestTools
         );
-        console.log('Инструменты:', toolProducts);
         products.push(...toolProducts);
 
         const relMatProducts = getProductsByOrder(
@@ -207,18 +207,18 @@ function WarehouseManager() {
           })
           .filter((product) => product && product.length > 0);
 
-          const obj = {
-            order_id: el.id,
-            orders_article: el.article,
-            projects_name: del_adr?.project_name || '',
-            production_date: el.shipping_date || '',
-            orders_products: normalizedProducts,
-          };
-          acc.push(obj);
+        const obj = {
+          order_id: el.id,
+          orders_article: el.article,
+          projects_name: del_adr?.project_name || '',
+          production_date: el.shipping_date || '',
+          orders_products: normalizedProducts,
+        };
+        acc.push(obj);
 
         return acc;
       }, []);
-
+    console.log('result WarehouseManager.jsx line 221', result);
     setWarehouseMdata(result);
     setWmoctProductShippedBD([]);
   }, [
@@ -249,8 +249,8 @@ function WarehouseManager() {
           buttonText={''}
           tableName={'Order dispatch'}
           handleRowClick={(row) => {
-            getCurrentOrderInfoHandler(row.original.order_id);
-            console.log('row.original', row.original);
+            getCurrentOrderInfoHandler({ order_id: row.original.order_id });
+
             setSelectedOrder(row.original);
           }}
         />
