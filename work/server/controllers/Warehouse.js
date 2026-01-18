@@ -205,10 +205,7 @@ class WarehouseController {
       await WarehouseService.updateWarehouseQuantitys({
         upd_rem_srock,
       });
-      console.log(
-        'upd_rem_srock ---------- updateWarehouseQuantitys line 209',
-        upd_rem_srock
-      );
+
       myEmitter.emit(UPDATE_WAREHOUSE_QUANTITYS_SOCKET, upd_rem_srock);
 
       return res.status(200).json(upd_rem_srock);
@@ -224,10 +221,7 @@ class WarehouseController {
       await WarehouseService.updateDryMixedWarehouseQuantitys({
         upd_rem_srock,
       });
-      console.log(
-        'upd_rem_srock ---------- updateDryMixedWarehouseQuantitys line 209',
-        upd_rem_srock
-      );
+
       myEmitter.emit(UPDATE_DRY_MIXES_QUANTITYS_SOCKET, upd_rem_srock);
 
       return res.status(200).json(upd_rem_srock);
@@ -259,11 +253,6 @@ class WarehouseController {
       await WarehouseService.updateToolWarehouseQuantitys({
         upd_rem_srock,
       });
-
-      console.log(
-        'upd_rem_srock ---------- updateToolWarehouseQuantitys line 209',
-        upd_rem_srock
-      );
 
       myEmitter.emit(UPDATE_TOOL_QUANTITYS_SOCKET, upd_rem_srock);
 
@@ -308,11 +297,6 @@ class WarehouseController {
         reserved_product,
       });
 
-      console.log(
-        'reserved_product ---------- addNewReservedProducts line 209',
-        reserved_product
-      );
-
       myEmitter.emit(GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET, reserved_product);
 
       return res.status(200);
@@ -328,11 +312,6 @@ class WarehouseController {
       await WarehouseService.updReservedProducts({
         reserved_product,
       });
-
-      console.log(
-        'reserved_product ---------- updReservedProducts line 209',
-        reserved_product
-      );
 
       myEmitter.emit(GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET, reserved_product);
 
@@ -377,11 +356,6 @@ class WarehouseController {
         reserved_product,
       });
 
-      console.log(
-        'reserved_product ---------- addNewReservedDryMixedProducts line 209',
-        reserved_product
-      );
-
       myEmitter.emit(
         GET_NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
         reserved_product
@@ -400,11 +374,6 @@ class WarehouseController {
       await WarehouseService.updReservedDryMixedProducts({
         reserved_product,
       });
-
-      console.log(
-        'reserved_product ---------- updReservedDryMixedProducts line 209',
-        reserved_product
-      );
 
       myEmitter.emit(
         GET_UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
@@ -521,11 +490,6 @@ class WarehouseController {
         reserved_product,
       });
 
-      console.log(
-        'reserved_product ---------- addNewReservedToolProducts line 209',
-        reserved_product
-      );
-
       myEmitter.emit(
         GET_NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
         reserved_product
@@ -544,11 +508,6 @@ class WarehouseController {
       await WarehouseService.updReservedToolProducts({
         reserved_product,
       });
-
-      console.log(
-        'reserved_product ---------- updReservedToolProducts line 209',
-        reserved_product
-      );
 
       myEmitter.emit(
         GET_UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,

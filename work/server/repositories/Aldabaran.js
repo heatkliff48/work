@@ -13,7 +13,7 @@ class AldabaranRepository {
       data,
       num,
     });
-    console.log('createAldabaran Aldabaran.js line 16', createAldabaran);
+    console.log('currentAldabaran Aldabaran.js line 16', currentAldabaran);
     return currentAldabaran;
   }
 }

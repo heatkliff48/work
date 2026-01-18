@@ -467,10 +467,6 @@ const WarehouseContextProvider = ({ children }) => {
           quantity: elem.allocated,
         };
 
-        console.log(
-          `${type}: prevQty=${prevQty}, allocated=${elem.allocated}, orders_products_id=${orders_products_id}`
-        );
-
         if (prevQty === 0 && elem.allocated > 0) {
           newReserved.push(obj);
           console.log(`New reserved added for ${type}:`, obj);
@@ -1104,6 +1100,7 @@ const WarehouseContextProvider = ({ children }) => {
         getWarehouseArticle,
         wmoctProductDeltaForPdf,
         setWmoctProductDeltaForPdf,
+        warehouseMap,
       }}
     >
       {children}
