@@ -19,7 +19,7 @@ class AldabaranController {
 
     try {
       const currentAldabaran = await AldabaranService.createAldabaran(data);
-
+      console.log('currentAldabaran Aldabaran.js line 22', currentAldabaran);
       myEmitter.emit(ADD_NEW_ALDABARAN_SOCKET, currentAldabaran);
       return res.status(200);
     } catch (err) {

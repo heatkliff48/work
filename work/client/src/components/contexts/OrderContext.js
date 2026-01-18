@@ -454,6 +454,7 @@ const OrderContextProvider = ({ children }) => {
         delivery: order?.delivery,
       };
 
+console.log('currentOrder OrderContext.js line 458', currentOrder)
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
       setOrderCartData(currentOrder);
     },
