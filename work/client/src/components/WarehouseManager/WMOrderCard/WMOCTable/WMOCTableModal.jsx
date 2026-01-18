@@ -25,6 +25,11 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
 
   const onClickHandler = (batch) => {
     setWmoctProduct((prev) => {
+      console.log('batch WMOCTableModal.jsx line 28', batch);
+      const remainingInBatch =
+        batch.ordered_quantity > 0
+          ? batch.ordered_quantity
+          : batch.free_quantity_remaining;
       return prev.map((el) => {
         if (el.article == selectedProduct)
           return {
@@ -33,8 +38,8 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
               ...el.batches,
               {
                 batchId: batch.batch_article,
-                baseRemainingInBatch: batch.quantity,
-                remainingInBatch: batch.quantity,
+                baseRemainingInBatch: remainingInBatch,
+                remainingInBatch: remainingInBatch,
                 allocated: 0,
                 minAllocated: 0,
               },
@@ -61,17 +66,15 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
         return product_article == selectedProduct;
       })
       .filter((warehouseItem) => {
-        const isArticleInAnyWMOCTBatches = wmoctProduct.some(
-          (wmoctItem) =>
-            wmoctItem.article === selectedProduct &&
-            wmoctItem.batches?.some(
-              (batchItem) => batchItem.batchId === warehouseItem.article
-            )
-        );
+        const isArticleInAnyWMOCTBatches = wmoctProduct.some((wmoctItem) => {
+          return wmoctItem.batches.some((batchItem) => {
+            return batchItem.batchId == warehouseItem.article;
+          });
+        });
 
         return !isArticleInAnyWMOCTBatches;
       })
-      .filter((el) => el.ordered_quantity > 0)
+      .filter((el) => el.ordered_quantity > 0 || el.free_quantity_remaining > 0)
       .map((el) => ({
         batch_article: el.article,
         free_quantity_remaining: el.free_quantity_remaining,

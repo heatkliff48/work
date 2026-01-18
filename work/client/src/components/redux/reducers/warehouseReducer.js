@@ -28,13 +28,7 @@ export const warehouseReducer = (warehouse = [], action) => {
       const { warehouse_id, total_quantity, ordered_quantity } = payload;
 
       const result = warehouse.map((el) => {
-        const { id, article, product_article } = payload;
-        if (id === warehouse_id) {
-          showMessage(
-            `Order ${article} · Product ${product_article} · Total: ${total_quantity}, Ordered: ${ordered_quantity} — $`,
-            'success'
-          );
-
+        if (el.id == warehouse_id) {
           return { ...el, total_quantity, ordered_quantity };
         }
 
@@ -48,7 +42,7 @@ export const warehouseReducer = (warehouse = [], action) => {
       const { warehouse_id, free_quantity_remaining, ordered_quantity } = payload;
 
       const result = warehouse.map((el) => {
-        if (el.id === warehouse_id) {
+        if (el.id == warehouse_id) {
           return { ...el, free_quantity_remaining, ordered_quantity };
         }
 
@@ -73,13 +67,11 @@ export const rawMaterialsWarehouseReducer = (rawMaterialsWarehouse = [], action)
       console.log({ rawMaterialsWarehouse }, 'warehouseReducer.js line 70');
       console.log({ payload }, 'warehouseReducer.js line 71');
 
-      // Преобразуем в массив для единообразной обработки
       const itemsToUpdate = Array.isArray(payload) ? payload : [payload];
 
       let result = [...rawMaterialsWarehouse];
 
       itemsToUpdate.forEach((item) => {
-        // Извлекаем updatedWarehouse если он есть
         const updatedItem = item?.updatedWarehouse || item;
 
         const index = result.findIndex((el) => el.id === updatedItem.id);

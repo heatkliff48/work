@@ -27,6 +27,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     anchors_warehouse_data,
     tools_warehouse_data,
     related_materials_warehouse_data,
+    warehouseMap,
   } = useWarehouseContext();
 
   const {
@@ -421,24 +422,12 @@ const WMOCTable = ({ product_list, orderCartData }) => {
 
         const productType = getProductType(article);
 
-        const warehouseMap = {
-          product: warehouse_data,
-          dryMixed: dry_mixes_warehouse_data,
-          anchor: anchors_warehouse_data,
-          tool: tools_warehouse_data,
-          relMat: related_materials_warehouse_data,
-        };
-
-        console.log(warehouseMap, 'warehouseMap WMOCTable.jsx line 432');
-        console.log(productMap, 'productMap WMOCTable.jsx line 432');
-
         const wh_arr = warehouseMap[productType];
         const [arr, orderArr] = productMap[productType] || [[], []];
 
         const product_from_list_id = arr?.find((p) => p.article === article)?.id;
         const order_from_list_id = product_list.order_id;
 
-        // Находим orders_products_id
         let orders_products_id = null;
         if (orderArr && product_from_list_id) {
           const orderProduct = orderArr.find((poo) => {
@@ -457,14 +446,6 @@ const WMOCTable = ({ product_list, orderCartData }) => {
         }
 
         let list_of_batches = [];
-
-        const reservedMap = {
-          product: list_of_reserved_products,
-          dryMixed: list_of_dry_mix_reserved_products,
-          anchor: list_of_anchor_reserved_products,
-          tool: list_of_tool_reserved_products,
-          relMat: list_of_rel_mat_reserved_products,
-        };
 
         if (orders_products_id) {
           switch (productType) {
@@ -503,11 +484,8 @@ const WMOCTable = ({ product_list, orderCartData }) => {
           }
         }
 
-        // Формируем batches
         if (list_of_batches?.length > 0) {
           const processedWarehouseIds = new Set();
-
-          console.log(list_of_batches, 'list_of_batches WMOCTable.jsx line 505');
 
           list_of_batches.forEach((batch) => {
             const wh_item = wh_arr?.find((el) => el.id == batch.warehouse_id);
@@ -516,12 +494,10 @@ const WMOCTable = ({ product_list, orderCartData }) => {
               processedWarehouseIds.add(wh_item.id);
 
               const batchQuantity = Number(batch.quantity) || 0;
-              const totalQuantity = Number(wh_item.total_quantity) || 0;
-              const orderedQuantity = Number(wh_item.ordered_quantity) || 0;
-
-              console.log(batchQuantity, 'batchQuantity WMOCTable.jsx line 518');
-              console.log(totalQuantity, 'totalQuantity WMOCTable.jsx line 519');
-              console.log(orderedQuantity, 'orderedQuantity WMOCTable.jsx line 520');
+              const orderedQuantity = Number(wh_item.total_quantity);
+              // Number(wh_item.ordered_quantity) > 0
+              //   ? Number(wh_item.ordered_quantity)
+              //   : Number(wh_item.free_quantity_remaining) || 0;
 
               batches.push({
                 batchId: wh_item.article,
@@ -537,34 +513,6 @@ const WMOCTable = ({ product_list, orderCartData }) => {
               qty_rem = Math.max(quantity - shipped, 0);
             }
           });
-
-          // list_of_batches.forEach((batch) => {
-          //   const wh_item = wh_arr?.find((el) => el.id == batch.warehouse_id);
-
-          //   if (wh_item) {
-          //     const batchQuantity = Number(batch.quantity) || 0;
-          //     const totalQuantity = Number(wh_item.total_quantity) || 0;
-          //     const orderedQuantity = Number(wh_item.ordered_quantity) || 0;
-
-          //     // Рассчитываем доступное количество в партии
-          //     const baseAvailable = Math.max(
-          //       totalQuantity - orderedQuantity + batchQuantity,
-          //       0
-          //     );
-
-          //     batches.push({
-          //       batchId: wh_item.article || batch.warehouse_id,
-          //       baseRemainingInBatch: baseAvailable,
-          //       remainingInBatch: baseAvailable,
-          //       allocated: batchQuantity,
-          //       minAllocated: batchQuantity,
-          //       warehouseId: wh_item.id,
-          //     });
-
-          //     shipped += batchQuantity;
-          //     qty_rem = Math.max(quantity - shipped, 0);
-          //   }
-          // });
         }
 
         shippedBDNext.push({
