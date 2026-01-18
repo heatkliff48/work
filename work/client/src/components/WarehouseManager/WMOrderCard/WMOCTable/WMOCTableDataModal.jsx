@@ -13,7 +13,11 @@ import {
 } from 'reactstrap';
 
 const WMOCTableDataModal = ({ isOpen, toggle }) => {
-  const { setAdditionalInfoPDF } = useWarehouseContext();
+  const {
+    setAdditionalInfoPDF,
+    setWmoctProductDeltaForPdf,
+    wmoctProduct,
+  } = useWarehouseContext();
   const { setWmoctPdfModal, wmoctPdfModal } = useModalContext();
 
   const [formData, setFormData] = useState({
@@ -27,12 +31,27 @@ const WMOCTableDataModal = ({ isOpen, toggle }) => {
   };
 
   const handleSave = () => {
+    const deltaForPdf = (wmoctProduct || []).map((p) => {
+      const delta = (p.batches || []).reduce((sum, b) => {
+        const prev = Number(b.minAllocated || 0);
+        const cur = Number(b.allocated || 0);
+        return sum + Math.max(cur - prev, 0);
+      }, 0);
+
+      return {
+        article: p.article,
+        product_name: p.product_name,
+        delta,
+      };
+    });
+
+    setWmoctProductDeltaForPdf(deltaForPdf);
+
     setAdditionalInfoPDF(formData);
     setWmoctPdfModal(!wmoctPdfModal);
-
     toggle();
   };
-  if (!isOpen) return null;
+
   return (
     <div>
       <Modal isOpen={isOpen} toggle={toggle}>

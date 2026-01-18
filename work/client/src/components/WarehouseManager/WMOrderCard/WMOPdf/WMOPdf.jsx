@@ -318,6 +318,7 @@ const WMOPdf = ({ orderCartData, toggle }) => {
     saveHandler,
     additionalInfoPDF,
     aldabaranNum,
+    wmoctProductDeltaForPdf,
   } = useWarehouseContext();
 
   const { latestProducts } = useProductsContext();
@@ -365,15 +366,15 @@ const WMOPdf = ({ orderCartData, toggle }) => {
     const pdfProducts = wmoctProduct
       ?.map((prod) => {
         const article = prod?.article ?? '';
-        const shippedNow = Number(prod?.shipped) || 0;
 
         const type = getTypeByArticle(article);
 
-        const bd_ship = wmoctProductShippedBD?.find(
-          (el) => el.article === article && el.order_id === prod.order_id
-        );
+        // const bd_ship = wmoctProductShippedBD?.find(
+        //   (el) => el.article === article && el.order_id === prod.order_id
+        // );
 
-        const shippedBD = Number(bd_ship?.shipped) || 0;
+        // const shippedNow = Number(prod?.shipped) || 0;
+        // const shippedBD = Number(bd_ship?.shipped) || 0;
 
         const productArr = productMap[type] || [];
         const product = productArr.find((el) => el.article == article);
@@ -386,7 +387,12 @@ const WMOPdf = ({ orderCartData, toggle }) => {
               product?.density ?? ''
             }kg/m³`;
 
-        const palet = shippedNow - shippedBD;
+        const deltaRow = (wmoctProductDeltaForPdf || []).find(
+          (x) => x.article === article
+        );
+
+        const palet = Number(deltaRow?.delta ?? deltaRow?.palet ?? 0) || 0;
+
         pallet_sum += palet;
 
         const valuue =

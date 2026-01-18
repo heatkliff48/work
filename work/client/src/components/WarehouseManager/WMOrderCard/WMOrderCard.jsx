@@ -11,16 +11,7 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
   const [ordersStatus, setOrdersStatus] = useState([]);
 
   const filterKeys = useMemo(
-    () => [
-      'id',
-      'order_id',
-      'client_id',
-      'bitrix_client_id',
-      'bitrix_id',
-      'product_id',
-      'createdAt',
-      'updatedAt',
-    ],
+    () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
     []
   );
 
@@ -39,13 +30,12 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
           return (
             <div className="data-text" key={key}>
               <p>
-                {displayNames?.[key] || key}: {String(displayValue ?? '')}
+                {displayNames[key] || key}: {displayValue}
               </p>
             </div>
           );
-        })
-        .filter(Boolean),
-    [displayNames]
+        }),
+    [orderCartData]
   );
 
   useEffect(() => {
@@ -59,9 +49,9 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
 
     if (storedData) {
       setOrderCartData(storedData);
+      localStorage.setItem('orderCartData', JSON.stringify(storedData));
     }
 
-    localStorage.setItem('orderCartData', JSON.stringify(storedData));
     if (!ordersStatus.includes(updatedOrderCartData?.status))
       setOrdersStatus((prev) => [...prev, updatedOrderCartData?.status]);
   }, [list_of_orders]);
