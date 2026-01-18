@@ -3,7 +3,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
-  const [wmoctmodal, setWmoctModal] = useState();
+  const [wmoctmodalData, setWmoctModalData] = useState();
   const {
     wmoctProduct,
     setWmoctProduct,
@@ -33,8 +33,10 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
               ...el.batches,
               {
                 batchId: batch.batch_article,
+                baseRemainingInBatch: batch.quantity,
                 remainingInBatch: batch.quantity,
                 allocated: 0,
+                minAllocated: 0,
               },
             ],
           };
@@ -59,11 +61,13 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
         return product_article == selectedProduct;
       })
       .filter((warehouseItem) => {
-        const isArticleInAnyWMOCTBatches = wmoctProduct.some((wmoctItem) => {
-          return wmoctItem.batches.some((batchItem) => {
-            return batchItem.batchId == warehouseItem.article;
-          });
-        });
+        const isArticleInAnyWMOCTBatches = wmoctProduct.some(
+          (wmoctItem) =>
+            wmoctItem.article === selectedProduct &&
+            wmoctItem.batches?.some(
+              (batchItem) => batchItem.batchId === warehouseItem.article
+            )
+        );
 
         return !isArticleInAnyWMOCTBatches;
       })
@@ -73,10 +77,9 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
         free_quantity_remaining: el.free_quantity_remaining,
         quantity: el.ordered_quantity,
       }));
-    setWmoctModal(result);
+    setWmoctModalData(result);
   }, [selectedProduct, wmoctProduct]);
 
-  if (!isOpen) return null;
   return (
     <div>
       <Modal
@@ -104,7 +107,7 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
               </thead>
 
               <tbody>
-                {wmoctmodal?.map((product, productIndex) => (
+                {wmoctmodalData?.map((product, productIndex) => (
                   <Fragment key={productIndex}>
                     <tr
                       onClick={() => {

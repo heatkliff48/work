@@ -151,6 +151,7 @@ class WarehouseRepository {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewWarehouse');
     try {
       const new_warehouse = await Warehouses.create(warehouse);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewWarehouse', new_warehouse);
       return new_warehouse;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
@@ -225,6 +226,10 @@ class WarehouseRepository {
     try {
       const { warehouse_id, free_quantity_remaining, ordered_quantity } =
         upd_rem_srock;
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRemainingStock upd_rem_srock',
+        upd_rem_srock
+      );
       await Warehouses.update(
         { free_quantity_remaining, ordered_quantity },
         { where: { id: warehouse_id } }
@@ -242,10 +247,11 @@ class WarehouseRepository {
 
     try {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
-      const { warehouse_id, total_quantity, ordered_quantity } = upd_rem_srock;
+      const { warehouse_id, total_quantity, ordered_quantity, product_article } =
+        upd_rem_srock;
       await Warehouses.update(
         { total_quantity, ordered_quantity },
-        { where: { id: warehouse_id } }
+        { where: { id: warehouse_id, product_article } }
       );
 
       return;
@@ -261,11 +267,12 @@ class WarehouseRepository {
     try {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
-      const { warehouse_id, total_quantity, ordered_quantity } = upd_rem_srock;
+      const { warehouse_id, total_quantity, ordered_quantity, product_article } =
+        upd_rem_srock;
 
       await DryMixesWarehouse.update(
         { total_quantity, ordered_quantity },
-        { where: { id: warehouse_id } }
+        { where: { id: warehouse_id, product_article } }
       );
 
       return;
@@ -280,11 +287,12 @@ class WarehouseRepository {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
     try {
-      const { warehouse_id, total_quantity, ordered_quantity } = upd_rem_srock;
+      const { warehouse_id, total_quantity, ordered_quantity, product_article } =
+        upd_rem_srock;
 
       await AnchorsWarehouse.update(
         { total_quantity, ordered_quantity },
-        { where: { id: warehouse_id } }
+        { where: { id: warehouse_id, product_article } }
       );
 
       return;
@@ -299,11 +307,12 @@ class WarehouseRepository {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
     try {
-      const { warehouse_id, total_quantity, ordered_quantity } = upd_rem_srock;
+      const { warehouse_id, total_quantity, ordered_quantity, product_article } =
+        upd_rem_srock;
 
       await ToolsWarehouse.update(
         { total_quantity, ordered_quantity },
-        { where: { id: warehouse_id } }
+        { where: { id: warehouse_id, product_article } }
       );
 
       return;
@@ -318,11 +327,12 @@ class WarehouseRepository {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
     try {
-      const { warehouse_id, total_quantity, ordered_quantity } = upd_rem_srock;
+      const { warehouse_id, total_quantity, ordered_quantity, product_article } =
+        upd_rem_srock;
 
       await RelatedMaterialsWarehouse.update(
         { total_quantity, ordered_quantity },
-        { where: { id: warehouse_id } }
+        { where: { id: warehouse_id, product_article } }
       );
 
       return;

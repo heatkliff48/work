@@ -9,6 +9,28 @@ import WMOrderCard from './WMOrderCard/WMOrderCard';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useDispatch } from 'react-redux';
+import {
+  getAllWarehouse,
+  getListOfAnchorReservedProducts,
+  getListOfDryMixedReservedProducts,
+  getListOfRelMatReservedProducts,
+  getListOfReservedProducts,
+  getListOfToolReservedProducts,
+} from '#components/redux/actions/warehouseAction.js';
+import {
+  getAnchorProductsOfOrders,
+  getDryMixedProductsOfOrders,
+  getProductsOfOrders,
+  getRelMatProductsOfOrders,
+  getToolProductsOfOrders,
+} from '#components/redux/actions/ordersAction.js';
+import {
+  getAnchorsWarehouse,
+  getDryMixesWarehouse,
+  getRelatedMaterialsWarehouse,
+  getToolsWarehouse,
+} from '#components/redux/actions/productsTypeWarehouseAction.js';
 
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
@@ -18,11 +40,10 @@ function WarehouseManager() {
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
   const {
+    setWmoctProductShippedBD,
     selectedOrder,
     setSelectedOrder,
     getProductsByOrder,
-    setWmoctProduct,
-    setWmoctProductShippedBD,
   } = useWarehouseContext();
   const {
     list_of_orders,
@@ -38,6 +59,7 @@ function WarehouseManager() {
   const { setWmoctPdfModal } = useModalContext();
 
   const [warehouseMdata, setWarehouseMdata] = useState([]);
+  const dispatch = useDispatch();
 
   // useEffect(() => {
   //   if (user && roles.length > 0) {
@@ -52,42 +74,167 @@ function WarehouseManager() {
 
   useEffect(() => {
     setWmoctPdfModal(false);
+    setSelectedOrder(null);
+    // Fetch reserved products data
+    dispatch(getListOfReservedProducts());
+    dispatch(getListOfDryMixedReservedProducts());
+    dispatch(getListOfAnchorReservedProducts());
+    dispatch(getListOfToolReservedProducts());
+    dispatch(getListOfRelMatReservedProducts());
+    // Fetch products of orders data
+    dispatch(getProductsOfOrders());
+    dispatch(getDryMixedProductsOfOrders());
+    dispatch(getAnchorProductsOfOrders());
+    dispatch(getToolProductsOfOrders());
+    dispatch(getRelMatProductsOfOrders());
+    // Fetch products of orders data
+    dispatch(getAllWarehouse());
+    dispatch(getDryMixesWarehouse());
+    dispatch(getAnchorsWarehouse());
+    dispatch(getToolsWarehouse());
+    dispatch(getRelatedMaterialsWarehouse());
   }, []);
 
+  // useEffect(() => {
+  //   const result = list_of_orders
+  //     .filter((el) => el.status === 8)
+  //     .reduce((acc, el) => {
+  //       const del_adr = deliveryAddresses?.find((del) => del?.id == el?.del_adr_id);
+
+  //       const products = [
+  //         ...getProductsByOrder(el.id, productsOfOrders, latestProducts),
+  //         ...getProductsByOrder(el.id, dryMixedProductsOfOrders, latestDryMix),
+  //         ...getProductsByOrder(el.id, anchorProductsOfOrders, latestAnchors),
+  //         ...getProductsByOrder(el.id, toolProductsOfOrders, latestTools),
+  //         ...getProductsByOrder(
+  //           el.id,
+  //           relMatProductsOfOrders,
+  //           latestRelatedMaterials
+  //         ),
+  //       ];
+
+  //       const normalizedProducts = (products || [])
+  //         .map((s) => String(s).trim())
+  //         .map((s) => s.replace(/,\s*$/, ' '))
+  //         .filter(Boolean);
+
+  //       const obj = {
+  //         order_id: el.id,
+  //         orders_article: el.article,
+  //         projects_name: del_adr?.project_name || '',
+  //         production_date: el.shipping_date || '',
+  //         orders_products: normalizedProducts || [],
+  //       };
+
+  //       acc.push(obj);
+  //       return acc;
+  //     }, []);
+
+  //   setWarehouseMdata(result);
+  //   setWmoctProductShippedBD([]);
+  // }, [
+  //   list_of_orders,
+  //   deliveryAddresses,
+
+  //   productsOfOrders,
+  //   dryMixedProductsOfOrders,
+  //   anchorProductsOfOrders,
+  //   toolProductsOfOrders,
+  //   relMatProductsOfOrders,
+
+  //   latestProducts,
+  //   latestDryMix,
+  //   latestAnchors,
+  //   latestTools,
+  //   latestRelatedMaterials,
+  // ]);
+
   useEffect(() => {
-    setSelectedOrder(null);
+    console.log('====== НАЧАЛО ФОРМИРОВАНИЯ ДАННЫХ ======');
 
     const result = list_of_orders
       .filter((el) => el.status === 8)
       .reduce((acc, el) => {
+
         const del_adr = deliveryAddresses?.find((del) => del?.id == el?.del_adr_id);
 
-        const products = [
-          ...getProductsByOrder(el.id, productsOfOrders, latestProducts),
-          ...getProductsByOrder(el.id, dryMixedProductsOfOrders, latestDryMix),
-          ...getProductsByOrder(el.id, anchorProductsOfOrders, latestAnchors),
-          ...getProductsByOrder(el.id, toolProductsOfOrders, latestTools),
-          ...getProductsByOrder(
-            el.id,
-            relMatProductsOfOrders,
-            latestRelatedMaterials
-          ),
-        ];
+        const products = [];
 
-        const obj = {
-          order_id: el.id,
-          orders_article: el.article,
-          projects_name: del_adr?.project_name || '',
-          production_date: el.shipping_date || '',
-          orders_products: products || [],
-        };
+        const regularProducts = getProductsByOrder(
+          el.id,
+          productsOfOrders,
+          latestProducts
+        );
+        products.push(...regularProducts);
 
-        acc.push(obj);
+        const dryMixProducts = getProductsByOrder(
+          el.id,
+          dryMixedProductsOfOrders,
+          latestDryMix
+        );
+        products.push(...dryMixProducts);
+
+        const anchorProducts = getProductsByOrder(
+          el.id,
+          anchorProductsOfOrders,
+          latestAnchors
+        );
+        console.log('Анкеры:', anchorProducts);
+        products.push(...anchorProducts);
+
+        const toolProducts = getProductsByOrder(
+          el.id,
+          toolProductsOfOrders,
+          latestTools
+        );
+        console.log('Инструменты:', toolProducts);
+        products.push(...toolProducts);
+
+        const relMatProducts = getProductsByOrder(
+          el.id,
+          relMatProductsOfOrders,
+          latestRelatedMaterials
+        );
+        products.push(...relMatProducts);
+
+        const normalizedProducts = products
+          .map((product) => {
+            if (!product) {
+              return '';
+            }
+            const trimmed = product.trim().replace(/,\s*$/, ' ');
+            return trimmed;
+          })
+          .filter((product) => product && product.length > 0);
+
+          const obj = {
+            order_id: el.id,
+            orders_article: el.article,
+            projects_name: del_adr?.project_name || '',
+            production_date: el.shipping_date || '',
+            orders_products: normalizedProducts,
+          };
+          acc.push(obj);
+
         return acc;
       }, []);
 
     setWarehouseMdata(result);
-  }, [list_of_orders]);
+    setWmoctProductShippedBD([]);
+  }, [
+    list_of_orders,
+    deliveryAddresses,
+    productsOfOrders,
+    dryMixedProductsOfOrders,
+    anchorProductsOfOrders,
+    toolProductsOfOrders,
+    relMatProductsOfOrders,
+    latestProducts,
+    latestDryMix,
+    latestAnchors,
+    latestTools,
+    latestRelatedMaterials,
+  ]);
 
   return (
     <>
@@ -102,11 +249,8 @@ function WarehouseManager() {
           buttonText={''}
           tableName={'Order dispatch'}
           handleRowClick={(row) => {
-            localStorage.removeItem('orderCartData');
-            setWmoctProduct([]);
-            setWmoctProductShippedBD([]);
-
-            getCurrentOrderInfoHandler({ order_id: row.original.order_id });
+            getCurrentOrderInfoHandler(row.original.order_id);
+            console.log('row.original', row.original);
             setSelectedOrder(row.original);
           }}
         />

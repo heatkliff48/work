@@ -35,7 +35,7 @@ const WMOCTProduct = ({
         </thead>
         <tbody>
           {wmoctProduct?.map((product, productIndex) => (
-            <Fragment key={productIndex}>
+            <Fragment key={product.article}>
               {/* Основная строка продукта */}
               <tr>
                 <td className="border p-1" style={{ width: '25%' }}>
@@ -89,8 +89,7 @@ const WMOCTProduct = ({
               </tr>
               {/* Дополнительные строки для батчей */}
               {product.batches?.slice(1).map((batch, batchIndex) => (
-                <tr key={batchIndex + 1}>
-                  {/* Первые 4 колонки оставляем пустыми, так как они уже отображены в основной строке */}
+                <tr key={`${product.article}__${batch.batchId}`}>
                   <td className="border p-1"></td>
                   <td className="border p-1"></td>
                   <td className="border p-1"></td>
@@ -114,7 +113,6 @@ const WMOCTProduct = ({
                   <td className="border p-1">{batch.allocated}</td>
                 </tr>
               ))}
-              {/* Всегда отображаем пустую строку для добавления нового батча */}
               {haveBatches(productIndex) ? (
                 <tr>
                   <td className="border p-1"></td>
@@ -141,14 +139,14 @@ const WMOCTProduct = ({
             </Fragment>
           ))}
         </tbody>
+        <button
+          onClick={() => {
+            setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
+          }}
+        >
+          SAVE
+        </button>
       </table>
-      <button
-        onClick={() => {
-          setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
-        }}
-      >
-        SAVE
-      </button>
     </div>
   );
 };
