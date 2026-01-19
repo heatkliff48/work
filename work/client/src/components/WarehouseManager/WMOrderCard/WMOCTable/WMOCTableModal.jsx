@@ -26,10 +26,7 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
   const onClickHandler = (batch) => {
     setWmoctProduct((prev) => {
       console.log('batch WMOCTableModal.jsx line 28', batch);
-      const remainingInBatch =
-        batch.ordered_quantity > 0
-          ? batch.ordered_quantity
-          : batch.free_quantity_remaining;
+      const remainingInBatch = batch.total_quantity;
       return prev.map((el) => {
         if (el.article == selectedProduct)
           return {
@@ -79,6 +76,7 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
         batch_article: el.article,
         free_quantity_remaining: el.free_quantity_remaining,
         quantity: el.ordered_quantity,
+        total_quantity: el.total_quantity,
       }));
     setWmoctModalData(result);
   }, [selectedProduct, wmoctProduct]);
