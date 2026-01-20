@@ -1,5 +1,5 @@
-const { ErrorUtils } = require('../utils/Errors.js');
-const WarehouseService = require('../services/Warehouse.js');
+const { ErrorUtils } = require("../utils/Errors.js");
+const WarehouseService = require("../services/Warehouse.js");
 
 const {
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
@@ -29,8 +29,8 @@ const {
   UPDATE_ANCHOR_QUANTITYS_SOCKET,
   UPDATE_TOOL_QUANTITYS_SOCKET,
   UPDATE_REL_MAT_QUANTITYS_SOCKET,
-} = require('../src/constants/event.js');
-const myEmitter = require('../src/ee.js');
+} = require("../src/constants/event.js");
+const myEmitter = require("../src/ee.js");
 
 class WarehouseController {
   static async getAllWarehouse(req, res) {
@@ -45,7 +45,8 @@ class WarehouseController {
 
   static async getListOfOrderedProduction(req, res) {
     try {
-      const orderedProduction = await WarehouseService.getListOfOrderedProduction();
+      const orderedProduction =
+        await WarehouseService.getListOfOrderedProduction();
 
       return res.status(200).json({ orderedProduction });
     } catch (err) {
@@ -68,9 +69,14 @@ class WarehouseController {
 
     try {
       const updAutoclaveCalendares =
-        await WarehouseService.addNewAutoclaveCalendarData(autoclave_calendar_data);
+        await WarehouseService.addNewAutoclaveCalendarData(
+          autoclave_calendar_data,
+        );
 
-      myEmitter.emit(GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET, updAutoclaveCalendares);
+      myEmitter.emit(
+        GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
+        updAutoclaveCalendares,
+      );
 
       return res.status(200).json(updAutoclaveCalendares);
     } catch (err) {
@@ -217,15 +223,6 @@ console.log('updatedCake Warehouse.js line 198', updatedCake)
       } else {
         const { wh_data } = updatedProduct;
 
-        console.log(' ------- ');
-        console.log(' ------- ');
-        console.log(' ------- ');
-
-        console.log(wh_data, 'wh_data Warehouse.js line 227');
-
-        console.log(' ------- ');
-        console.log(' ------- ');
-        console.log(' ------- ');
 
         for (const [type, data] of Object.entries(wh_data)) {
           if (data && data.length > 0) {
@@ -363,7 +360,10 @@ console.log('updatedCake Warehouse.js line 198', updatedCake)
         reserved_product,
       });
 
-      myEmitter.emit(GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET, reserved_product);
+      myEmitter.emit(
+        GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+        reserved_product,
+      );
 
       return res.status(200);
     } catch (err) {
