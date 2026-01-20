@@ -33,9 +33,6 @@ module.exports = {
       quantity_cakes: {
         type: Sequelize.INTEGER,
       },
-      warehouse_id: {
-        type: Sequelize.STRING,
-      },
       custom_recipe: {
         type: Sequelize.BOOLEAN,
       },

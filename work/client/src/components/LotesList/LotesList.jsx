@@ -425,10 +425,6 @@ function LotesList() {
       Header: 'Quantity cakes',
       accessor: 'quantity_cakes',
     },
-    {
-      Header: 'Warehouse ID',
-      accessor: 'warehouse_id',
-    },
   ];
 
   const lotesListBatches = useSelector((state) => state.lotesListBatches);
@@ -493,34 +489,28 @@ function LotesList() {
 
     const relatedBatches = getRelatedBatches(lotesListItem);
 
-    const baseRecipe = list_of_recipes.find(
-      (r) => String(r.article) === String(lotesListItem.recipe)
-    );
-
-    if (!baseRecipe) {
-      console.error('Recipe not found:', lotesListItem.recipe);
-      return;
-    }
-
-    let resolvedRecipe = {
-      ...baseRecipe,
-      ...lotesListItem,
-    };
+    let resolvedRecipe;
 
     if (lotesListItem.custom_recipe === true) {
-      RECIPE_PARAMS.forEach((key) => {
-        const val = lotesListItem[key];
+      resolvedRecipe = {
+        ...lotesListItem,
+      };
+    } else {
+      const baseRecipe = list_of_recipes.find(
+        (r) => String(r.article) === String(lotesListItem.recipe)
+      );
 
-        if (
-          val !== null &&
-          val !== undefined &&
-          Number(val) !== 0 &&
-          Number.isFinite(Number(val))
-        ) {
-          resolvedRecipe[key] = Number(val);
-        }
-      });
+      if (!baseRecipe) {
+        console.error('Recipe not found:', lotesListItem.recipe);
+        return;
+      }
+
+      resolvedRecipe = {
+        ...baseRecipe,
+        ...lotesListItem,
+      };
     }
+    console.log('resolvedRecipe LotesList.jsx line 513', resolvedRecipe);
 
     setSelectedLotesRecipe({
       ...resolvedRecipe,

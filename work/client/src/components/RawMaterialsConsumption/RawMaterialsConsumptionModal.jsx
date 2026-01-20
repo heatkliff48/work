@@ -43,6 +43,7 @@ const RawMaterialsConsumptionModal = React.memo(
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [availableRecipes, setAvailableRecipes] = useState([]);
     const [productionVolume, setProductionVolume] = useState('');
+    const [recipeArticle, setRecipeArticle] = useState('');
 
     useEffect(() => {
       setAvailableRecipes([]);
@@ -57,28 +58,8 @@ const RawMaterialsConsumptionModal = React.memo(
 
     useEffect(() => {
       if (!isOpen) return;
-
-      const batchArticle = selectedRow?.batch_article;
-      const product =
-        batchArticle &&
-        latestProducts?.find((p) => String(p.article) === String(batchArticle));
-
-      let candidateRecipes = [];
-
-      if (product) {
-        candidateRecipes = (list_of_recipes || []).filter(
-          (r) =>
-            r.density === product.density && r.certificate === product.certificate
-        );
-      }
-
-      if (!candidateRecipes.length) {
-        candidateRecipes = list_of_recipes || [];
-      }
-
-      setAvailableRecipes(candidateRecipes);
-      setSelectedRecipe(candidateRecipes.length ? candidateRecipes[0] : null);
-    }, [isOpen, selectedRow, latestProducts, list_of_recipes]);
+      setRecipeArticle(selectedRow?.recipe_article ?? '');
+    }, [selectedRow, isOpen]);
 
     const materialsMap = useMemo(
       () => [
@@ -112,10 +93,23 @@ const RawMaterialsConsumptionModal = React.memo(
       []
     );
 
-    const onHeaderFromActual = (e) =>
-      setWastedMode(e.target.checked ? 'from_actual' : 'default');
-    const onHeaderManual = (e) =>
-      setWastedMode(e.target.checked ? 'manual' : 'default');
+    const resolvedRecipe = useMemo(() => {
+      if (wastedMode === 'from_actual') {
+        return selectedRow || null;
+      }
+
+      return selectedRecipe || null;
+    }, [wastedMode, selectedRecipe]);
+
+    const isRecipeLocked = wastedMode !== 'default';
+
+    const onHeaderFromActual = (e) => {
+      setWastedMode((prev) => (e.target.checked ? 'from_actual' : 'default'));
+    };
+
+    const onHeaderManual = (e) => {
+      setWastedMode((prev) => (e.target.checked ? 'manual' : 'default'));
+    };
 
     useEffect(() => {
       if (!isOpen) return;
@@ -171,8 +165,8 @@ const RawMaterialsConsumptionModal = React.memo(
     );
 
     const baseByLabel = (label, key) => {
-      if (!selectedRecipe || !key || !(key in selectedRecipe)) return '—';
-      const v = selectedRecipe[key];
+      if (!resolvedRecipe || !key || !(key in resolvedRecipe)) return '—';
+      const v = resolvedRecipe[key];
       return typeof v === 'number' ? v : v ?? '—';
     };
 
@@ -218,7 +212,7 @@ const RawMaterialsConsumptionModal = React.memo(
     };
 
     const getRecipeVolumeInfo = () => {
-      const recipeArticle = selectedRow?.recipe_article;
+      const recipeArticleLocal = recipeArticle;
 
       const planned = Number(selectedRow?.production_volume || 0);
       const current = Number(productionVolume || 0);
@@ -300,13 +294,14 @@ const RawMaterialsConsumptionModal = React.memo(
 
       materialsMap.forEach(({ key }) => {
         const actual = Number(form[`${key}_actual_reciepe`]);
-
+        console.log(
+          'wastedMode RawMaterialsConsumptionModal.jsx line 300',
+          wastedMode
+        );
         if (wastedMode !== 'default' && Number.isFinite(actual) && actual > 0) {
-          // пользователь менял рецепт
           snapshot[key] = +actual.toFixed(5);
         } else {
-          // базовый рецепт
-          const base = Number(selectedRecipe?.[key]);
+          const base = Number(resolvedRecipe?.[key]);
           snapshot[key] = Number.isFinite(base) ? +base.toFixed(5) : 0;
         }
       });
@@ -332,9 +327,9 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
-      if (selectedRecipe?.produced_return_dry && Number(productionVolume) > 0) {
+      if (resolvedRecipe?.produced_return_dry && Number(productionVolume) > 0) {
         const producedReturn =
-          selectedRecipe.produced_return_dry * Number(productionVolume);
+          resolvedRecipe.produced_return_dry * Number(productionVolume);
 
         if (Number.isFinite(producedReturn) && producedReturn > 0) {
           materials.push({
@@ -388,21 +383,16 @@ const RawMaterialsConsumptionModal = React.memo(
         /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/
       );
 
-      // const articleInfo = getWarehouseArticle(productDetails);
-
       const recipeSnapshot = buildRecipeSnapshot();
 
       const new_lotestList = {
         production_date: selectedRow?.date,
         product: prodDescription[1],
-        recipe: selectedRow?.recipe_article,
         quantity_cakes: Number(productionVolume),
-        warehouse_id: null, //articleInfo,
         custom_recipe: wastedMode !== 'default',
         ...recipeSnapshot,
       };
 
-      // addProductOrder();
       dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
       dispatch(addNewLotesList({ new_lotestList, lotesListCheck }));
       if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
@@ -412,92 +402,12 @@ const RawMaterialsConsumptionModal = React.memo(
       setProductionVolume('');
     };
 
-    // const addProductOrder = async () => {
-    //   const { batch_article } = selectedRow;
-
-    //   const product = latestProducts.find((item) => item.article == batch_article);
-
-    //   const arraysPerPalletRaw = Math.floor(
-    //     (product?.m3InArray ?? 0) / (product?.volumeBlockOnPallet ?? 1)
-    //   );
-
-    //   const free_quantity_remaining = productionVolume * arraysPerPalletRaw;
-    //   const ordered_quantity = 0;
-
-    //   let remainingFreeQty = parseInt(free_quantity_remaining);
-    //   let summReserve = 0;
-
-    //   const reservedProducts =
-    //     list_of_ordered_production?.filter(
-    //       (item) => item.product_article === batch_article
-    //     ) || [];
-
-    //   const updatedReserves = reservedProducts.map((reservedItem) => {
-    //     if (reservedItem.product_article !== batch_article) {
-    //       return reservedItem;
-    //     }
-
-    //     if (remainingFreeQty <= 0) {
-    //       if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
-    //         return reservedItem;
-    //       } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
-    //         return {
-    //           ...reservedItem,
-    //           quantity_in_warehouse: Math.min(
-    //             reservedItem.quantity_in_warehouse + parseInt(ordered_quantity),
-    //             reservedItem.quantity
-    //           ),
-    //         };
-    //       }
-    //     }
-
-    //     const deducted = Math.min(
-    //       reservedItem.quantity -
-    //         reservedItem.quantity_in_warehouse -
-    //         parseInt(ordered_quantity),
-    //       remainingFreeQty
-    //     );
-
-    //     remainingFreeQty -= deducted;
-    //     summReserve += deducted;
-
-    //     return {
-    //       ...reservedItem,
-    //       quantity_in_warehouse:
-    //         reservedItem.quantity_in_warehouse +
-    //         parseInt(ordered_quantity) +
-    //         deducted,
-    //     };
-    //   });
-
-    //   if (writeInWarehouse) {
-    //     const articleInfo = getWarehouseArticle(product);
-
-    //     dispatch(
-    //       addNewWarehouse({
-    //         product_article: batch_article,
-    //         article: articleInfo,
-    //         warehouse_loc: 'local',
-    //         type: 'OK',
-    //         free_quantity_remaining: remainingFreeQty,
-    //         ordered_quantity: parseInt(ordered_quantity) + summReserve,
-    //         total_quantity:
-    //           parseInt(ordered_quantity) + summReserve + remainingFreeQty,
-    //       })
-    //     );
-    //   }
-
-    //   for (const ordered_production of updatedReserves) {
-    //     dispatch(updListOfOrderedProduction(ordered_production));
-    //   }
-    // };
-
     const handleRecipeChange = (selectedOption) => {
       const found = availableRecipes.find((r) => r.id === selectedOption.value);
 
       setSelectedRecipe(found || null);
 
-      selectedRow.recipe_article = found?.article || '';
+      setRecipeArticle(found?.article || '');
     };
 
     useEffect(() => {
@@ -521,7 +431,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 <span className="text-muted d-block" style={{ fontSize: 12 }}>
                   Recipe article:
                 </span>
-                <b className="d-block mb-2">{selectedRow?.recipe_article ?? '—'}</b>
+                <b className="d-block mb-2">{recipeArticle || '—'}</b>
 
                 <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
                   Production volume:
@@ -540,6 +450,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 </span>
                 {availableRecipes.length ? (
                   <Select
+                    isDisabled={isRecipeLocked}
                     onChange={handleRecipeChange}
                     options={availableRecipes.map((r) => ({
                       value: r.id,

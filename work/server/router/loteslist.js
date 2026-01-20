@@ -147,7 +147,7 @@ lotesListRouter.get('/batches', async (req, res) => {
 lotesListRouter.post('/batches', async (req, res) => {
   console.log('>>>req.body<<<<<<<<<<<<<<<<<<<<<<<<<<', req.body);
   const { new_lotestList } = req.body;
-  const { quantity_cakes, product, production_date, recipe } = new_lotestList;
+  const { quantity_cakes, product, production_date } = new_lotestList;
 
   try {
     const quantityCakesInt = Math.floor(parseFloat(quantity_cakes));
