@@ -1114,17 +1114,21 @@ class WarehouseRepository {
             { where: { id: reserved_product[i].orders_products_id } },
           );
         }
+        const reservedProducts = await ReservedProducts.findAll();
+        return reservedProducts;
       } else {
-        await ReservedProducts.create(reserved_product);
+        const reservedProducts = await ReservedProducts.create(
+          reserved_product,
+        );
         await OrdersProducts.update(
           {
             warehouse_id: reserved_product.warehouse_id,
           },
           { where: { id: reserved_product.orders_products_id } },
         );
-      }
 
-      return reservedProducts;
+        return reservedProducts;
+      }
     } catch (error) {
       console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
       return error;
@@ -1193,14 +1197,19 @@ class WarehouseRepository {
             { where: { id: reserved_product[i].orders_products_id } },
           );
         }
+        const reservedDryMixes = await ReservedDryMixes.findAll();
+        return reservedDryMixes;
       } else {
-        await ReservedDryMixes.create(reserved_product);
+        const reservedDryMixes = await ReservedDryMixes.create(
+          reserved_product,
+        );
         await OrderDryMixedProducts.update(
           {
             warehouse_id: reserved_product.warehouse_id,
           },
           { where: { id: reserved_product.orders_products_id } },
         );
+        return reservedDryMixes;
       }
       // for (let i = 0; i < reserved_product.length; i++) {
       //   console.log(
@@ -1283,14 +1292,17 @@ class WarehouseRepository {
             { where: { id: reserved_product[i].orders_products_id } },
           );
         }
+        const reservedAnchors = await ReservedAnchors.findAll();
+        return reservedAnchors;
       } else {
-        await ReservedAnchors.create(reserved_product);
+        const reservedAnchors = await ReservedAnchors.create(reserved_product);
         await OrderAnchorProducts.update(
           {
             warehouse_id: reserved_product.warehouse_id,
           },
           { where: { id: reserved_product.orders_products_id } },
         );
+        return reservedAnchors;
       }
       // for (let i = 0; i < reserved_product.length; i++) {
       //   await ReservedAnchors.create(reserved_product[i]);
@@ -1368,14 +1380,17 @@ class WarehouseRepository {
             { where: { id: reserved_product[i].orders_products_id } },
           );
         }
+        const reservedTools = await ReservedTools.findAll();
+        return reservedTools;
       } else {
-        await ReservedTools.create(reserved_product);
+        const reservedTools = await ReservedTools.create(reserved_product);
         await OrderToolProducts.update(
           {
             warehouse_id: reserved_product.warehouse_id,
           },
           { where: { id: reserved_product.orders_products_id } },
         );
+        return reservedTools;
       }
       // for (let i = 0; i < reserved_product.length; i++) {
       //   await ReservedTools.create(reserved_product[i]);
@@ -1457,14 +1472,19 @@ class WarehouseRepository {
             { where: { id: reserved_product[i].orders_products_id } },
           );
         }
+        const reservedRelMats = await ReservedRelatedMaterials.findAll();
+        return reservedRelMats;
       } else {
-        await ReservedRelatedMaterials.create(reserved_product);
+        const reservedRelMats = await ReservedRelatedMaterials.create(
+          reserved_product,
+        );
         await OrderRelMatProducts.update(
           {
             warehouse_id: reserved_product.warehouse_id,
           },
           { where: { id: reserved_product.orders_products_id } },
         );
+        return reservedRelMats;
       }
       // for (let i = 0; i < reserved_product.length; i++) {
       //   console.log(
