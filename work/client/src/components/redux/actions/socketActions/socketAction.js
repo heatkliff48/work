@@ -126,6 +126,7 @@ import {
   UPD_LOTES_LIST_SOCKET,
   NEW_LOTES_LIST_CAKES_SOCKET,
   UPD_LOTES_LIST_CAKES_SOCKET,
+  UPD_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -1021,6 +1022,13 @@ export const addNewLotesListCakesSocket = (lotesListCakes) => {
 export const updateLotesListCakesSocket = (lotesListCakes) => {
   return {
     type: UPD_LOTES_LIST_CAKES_SOCKET,
+    payload: lotesListCakes,
+  };
+};
+
+export const updateLotesListCakesBooleanSocket = (lotesListCakes) => {
+  return {
+    type: UPD_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
     payload: lotesListCakes,
   };
 };
