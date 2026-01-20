@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class OrderAnchorProducts extends Model {
     /**
@@ -13,19 +11,23 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  OrderAnchorProducts.init({
-    order_id: DataTypes.INTEGER,
-    anchor_id: DataTypes.INTEGER,
-    quantity_ud: DataTypes.FLOAT,
-    quantity_palet_anchor: DataTypes.FLOAT,
-    quantity_real_ud: DataTypes.FLOAT,
-    total: DataTypes.FLOAT,
-    discount: DataTypes.INTEGER,
-    pvp: DataTypes.FLOAT,
-    final_price: DataTypes.FLOAT
-  }, {
-    sequelize,
-    modelName: 'OrderAnchorProducts',
-  });
+  OrderAnchorProducts.init(
+    {
+      order_id: DataTypes.INTEGER,
+      anchor_id: DataTypes.INTEGER,
+      quantity_ud: DataTypes.FLOAT,
+      quantity_palet_anchor: DataTypes.FLOAT,
+      quantity_real_ud: DataTypes.FLOAT,
+      total: DataTypes.FLOAT,
+      discount: DataTypes.INTEGER,
+      pvp: DataTypes.FLOAT,
+      final_price: DataTypes.FLOAT,
+      warehouse_id: DataTypes.INTEGER,
+    },
+    {
+      sequelize,
+      modelName: "OrderAnchorProducts",
+    },
+  );
   return OrderAnchorProducts;
 };
