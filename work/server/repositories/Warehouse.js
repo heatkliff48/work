@@ -37,24 +37,6 @@ function getModelByType(type) {
   }
   return model;
 }
-
-const MODELS_BY_TYPE = {
-  product: Warehouses,
-  dryMixed: DryMixesWarehouse,
-  relMat: RelatedMaterialsWarehouse,
-  tool: ToolsWarehouse,
-  anchor: AnchorsWarehouse,
-};
-
-// Функция для получения модели по типу
-function getModelByType(type) {
-  const model = MODELS_BY_TYPE[type];
-  if (!model) {
-    throw new Error(`Неизвестный тип склада: ${type}`);
-  }
-  return model;
-}
-
 class WarehouseRepository {
   static async getAllWarehouse() {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAllWarehouse");
