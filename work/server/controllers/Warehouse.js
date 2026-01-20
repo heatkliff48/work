@@ -1,5 +1,5 @@
-const { ErrorUtils } = require('../utils/Errors.js');
-const WarehouseService = require('../services/Warehouse.js');
+const { ErrorUtils } = require("../utils/Errors.js");
+const WarehouseService = require("../services/Warehouse.js");
 
 const {
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
@@ -29,8 +29,8 @@ const {
   UPDATE_ANCHOR_QUANTITYS_SOCKET,
   UPDATE_TOOL_QUANTITYS_SOCKET,
   UPDATE_REL_MAT_QUANTITYS_SOCKET,
-} = require('../src/constants/event.js');
-const myEmitter = require('../src/ee.js');
+} = require("../src/constants/event.js");
+const myEmitter = require("../src/ee.js");
 
 class WarehouseController {
   static async getAllWarehouse(req, res) {
@@ -45,7 +45,8 @@ class WarehouseController {
 
   static async getListOfOrderedProduction(req, res) {
     try {
-      const orderedProduction = await WarehouseService.getListOfOrderedProduction();
+      const orderedProduction =
+        await WarehouseService.getListOfOrderedProduction();
 
       return res.status(200).json({ orderedProduction });
     } catch (err) {
@@ -68,9 +69,14 @@ class WarehouseController {
 
     try {
       const updAutoclaveCalendares =
-        await WarehouseService.addNewAutoclaveCalendarData(autoclave_calendar_data);
+        await WarehouseService.addNewAutoclaveCalendarData(
+          autoclave_calendar_data,
+        );
 
-      myEmitter.emit(GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET, updAutoclaveCalendares);
+      myEmitter.emit(
+        GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
+        updAutoclaveCalendares,
+      );
 
       return res.status(200).json(updAutoclaveCalendares);
     } catch (err) {
@@ -93,7 +99,9 @@ class WarehouseController {
     const warehouse = req.body;
 
     try {
-      const new_warehouse = await WarehouseService.addNewWarehouse({ warehouse });
+      const new_warehouse = await WarehouseService.addNewWarehouse({
+        warehouse,
+      });
 
       myEmitter.emit(ADD_NEW_WAREHOUSE_SOCKET, new_warehouse);
       return res.status(200).json({ new_warehouse });
@@ -107,11 +115,13 @@ class WarehouseController {
 
     try {
       const new_ordered_production =
-        await WarehouseService.addNewListOfOrderedProduction({ orderedProduction });
+        await WarehouseService.addNewListOfOrderedProduction({
+          orderedProduction,
+        });
 
       myEmitter.emit(
         ADD_NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
-        new_ordered_production
+        new_ordered_production,
       );
 
       return res.status(200).json(new_ordered_production);
@@ -125,7 +135,9 @@ class WarehouseController {
     const { id, quantity_in_warehouse } = orderedProduction;
 
     try {
-      await WarehouseService.updateListOfOrderedProduction({ orderedProduction });
+      await WarehouseService.updateListOfOrderedProduction({
+        orderedProduction,
+      });
 
       myEmitter.emit(GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET, {
         id,
@@ -152,7 +164,7 @@ class WarehouseController {
 
       myEmitter.emit(
         ADD_NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
-        new_ordered_production_oem
+        new_ordered_production_oem,
       );
 
       return res.status(200).json({ new_ordered_production_oem });
@@ -202,13 +214,57 @@ class WarehouseController {
     const upd_rem_srock = req.body;
 
     try {
-      await WarehouseService.updateWarehouseQuantitys({
+      const updatedProduct = await WarehouseService.updateWarehouseQuantitys({
         upd_rem_srock,
       });
 
-      myEmitter.emit(UPDATE_WAREHOUSE_QUANTITYS_SOCKET, upd_rem_srock);
+      if (updatedProduct.isArray === false) {
+        myEmitter.emit(UPDATE_WAREHOUSE_QUANTITYS_SOCKET, updatedProduct);
+        return res.json(updatedProduct).status(200);
+      } else {
+        const { wh_data } = updatedProduct;
 
-      return res.status(200).json(upd_rem_srock);
+        console.log(" ------- ");
+        console.log(" ------- ");
+        console.log(" ------- ");
+
+        console.log(wh_data, "wh_data Warehouse.js line 227");
+
+        console.log(" ------- ");
+        console.log(" ------- ");
+        console.log(" ------- ");
+
+        for (const [type, data] of Object.entries(wh_data)) {
+          if (data && data.length > 0) {
+            switch (type) {
+              case "product":
+                myEmitter.emit(UPDATE_WAREHOUSE_QUANTITYS_SOCKET, data);
+                continue;
+
+              case "relMat":
+                myEmitter.emit(UPDATE_REL_MAT_QUANTITYS_SOCKET, data);
+                continue;
+
+              case "tool":
+                myEmitter.emit(UPDATE_TOOL_QUANTITYS_SOCKET, data);
+                continue;
+
+              case "dryMixed":
+                myEmitter.emit(UPDATE_DRY_MIXES_QUANTITYS_SOCKET, data);
+                continue;
+
+              case "anchor":
+                myEmitter.emit(UPDATE_ANCHOR_QUANTITYS_SOCKET, data);
+                continue;
+
+              default:
+                break;
+            }
+          }
+        }
+
+        return res.json(updatedProduct).status(200);
+      }
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -218,13 +274,14 @@ class WarehouseController {
     const upd_rem_srock = req.body;
 
     try {
-      await WarehouseService.updateDryMixedWarehouseQuantitys({
-        upd_rem_srock,
-      });
+      const updatedDryMixes =
+        await WarehouseService.updateDryMixedWarehouseQuantitys({
+          upd_rem_srock,
+        });
 
-      myEmitter.emit(UPDATE_DRY_MIXES_QUANTITYS_SOCKET, upd_rem_srock);
+      myEmitter.emit(UPDATE_DRY_MIXES_QUANTITYS_SOCKET, updatedDryMixes);
 
-      return res.status(200).json(upd_rem_srock);
+      return res.json(updatedDryMixes).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -234,13 +291,14 @@ class WarehouseController {
     const upd_rem_srock = req.body;
 
     try {
-      await WarehouseService.updateAnchorWarehouseQuantitys({
-        upd_rem_srock,
-      });
+      const updatedAnchors =
+        await WarehouseService.updateAnchorWarehouseQuantitys({
+          upd_rem_srock,
+        });
 
-      myEmitter.emit(UPDATE_ANCHOR_QUANTITYS_SOCKET, upd_rem_srock);
+      myEmitter.emit(UPDATE_ANCHOR_QUANTITYS_SOCKET, updatedAnchors);
 
-      return res.status(200).json(upd_rem_srock);
+      return res.json(updatedAnchors).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -250,13 +308,13 @@ class WarehouseController {
     const upd_rem_srock = req.body;
 
     try {
-      await WarehouseService.updateToolWarehouseQuantitys({
+      const updatedTools = await WarehouseService.updateToolWarehouseQuantitys({
         upd_rem_srock,
       });
 
-      myEmitter.emit(UPDATE_TOOL_QUANTITYS_SOCKET, upd_rem_srock);
+      myEmitter.emit(UPDATE_TOOL_QUANTITYS_SOCKET, updatedTools);
 
-      return res.status(200).json(upd_rem_srock);
+      return res.json(updatedTools).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -266,13 +324,14 @@ class WarehouseController {
     const upd_rem_srock = req.body;
 
     try {
-      await WarehouseService.updateRelMatWarehouseQuantitys({
-        upd_rem_srock,
-      });
+      const updatedRelMats =
+        await WarehouseService.updateRelMatWarehouseQuantitys({
+          upd_rem_srock,
+        });
 
-      myEmitter.emit(UPDATE_REL_MAT_QUANTITYS_SOCKET, upd_rem_srock);
+      myEmitter.emit(UPDATE_REL_MAT_QUANTITYS_SOCKET, updatedRelMats);
 
-      return res.status(200).json(upd_rem_srock);
+      return res.json(updatedRelMats).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -293,13 +352,16 @@ class WarehouseController {
     const reserved_product = req.body;
 
     try {
-      await WarehouseService.addNewReservedProducts({
+      const reservedProduct = await WarehouseService.addNewReservedProducts({
         reserved_product,
       });
 
-      myEmitter.emit(GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET, reserved_product);
+      myEmitter.emit(
+        GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+        reservedProduct,
+      );
 
-      return res.status(200);
+      return res.json(reservedProduct).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -313,7 +375,10 @@ class WarehouseController {
         reserved_product,
       });
 
-      myEmitter.emit(GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET, reserved_product);
+      myEmitter.emit(
+        GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
+        reserved_product,
+      );
 
       return res.status(200);
     } catch (err) {
@@ -329,7 +394,7 @@ class WarehouseController {
 
       myEmitter.emit(
         GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_products_id
+        reserved_products_id,
       );
       return res.status(200);
     } catch (err) {
@@ -352,16 +417,17 @@ class WarehouseController {
     const reserved_product = req.body;
 
     try {
-      await WarehouseService.addNewReservedDryMixedProducts({
-        reserved_product,
-      });
+      const reservedDryMixes =
+        await WarehouseService.addNewReservedDryMixedProducts({
+          reserved_product,
+        });
 
       myEmitter.emit(
         GET_NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_product
+        reservedDryMixes,
       );
 
-      return res.status(200);
+      return res.json(reservedDryMixes).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -377,7 +443,7 @@ class WarehouseController {
 
       myEmitter.emit(
         GET_UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_product
+        reserved_product,
       );
 
       return res.status(200);
@@ -396,7 +462,7 @@ class WarehouseController {
 
       myEmitter.emit(
         GET_DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_products_id
+        reserved_products_id,
       );
       return res.status(200);
     } catch (err) {
@@ -419,16 +485,17 @@ class WarehouseController {
     const reserved_product = req.body;
 
     try {
-      await WarehouseService.addNewReservedAnchorProducts({
-        reserved_product,
-      });
+      const reservedAnchors =
+        await WarehouseService.addNewReservedAnchorProducts({
+          reserved_product,
+        });
 
       myEmitter.emit(
         GET_NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_product
+        reservedAnchors,
       );
 
-      return res.status(200);
+      return res.json(reservedAnchors).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -444,7 +511,7 @@ class WarehouseController {
 
       myEmitter.emit(
         GET_UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_product
+        reserved_product,
       );
 
       return res.status(200);
@@ -463,7 +530,7 @@ class WarehouseController {
 
       myEmitter.emit(
         GET_DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_products_id
+        reserved_products_id,
       );
       return res.status(200);
     } catch (err) {
@@ -486,16 +553,16 @@ class WarehouseController {
     const reserved_product = req.body;
 
     try {
-      await WarehouseService.addNewReservedToolProducts({
+      const reservedTools = await WarehouseService.addNewReservedToolProducts({
         reserved_product,
       });
 
       myEmitter.emit(
         GET_NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_product
+        reservedTools,
       );
 
-      return res.status(200);
+      return res.json(reservedTools).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -511,7 +578,7 @@ class WarehouseController {
 
       myEmitter.emit(
         GET_UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_product
+        reserved_product,
       );
 
       return res.status(200);
@@ -530,7 +597,7 @@ class WarehouseController {
 
       myEmitter.emit(
         GET_DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_products_id
+        reserved_products_id,
       );
       return res.status(200);
     } catch (err) {
@@ -553,16 +620,17 @@ class WarehouseController {
     const reserved_product = req.body;
 
     try {
-      await WarehouseService.addNewReservedRelMatProducts({
-        reserved_product,
-      });
+      const reservedRelMats =
+        await WarehouseService.addNewReservedRelMatProducts({
+          reserved_product,
+        });
 
       myEmitter.emit(
         GET_NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_product
+        reservedRelMats,
       );
 
-      return res.status(200);
+      return res.json(reservedRelMats).status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -578,7 +646,7 @@ class WarehouseController {
 
       myEmitter.emit(
         GET_UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_product
+        reserved_product,
       );
 
       return res.status(200);
@@ -597,7 +665,7 @@ class WarehouseController {
 
       myEmitter.emit(
         GET_DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_products_id
+        reserved_products_id,
       );
       return res.status(200);
     } catch (err) {

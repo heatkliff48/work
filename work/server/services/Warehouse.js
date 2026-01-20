@@ -1,4 +1,4 @@
-const WarehouseRepository = require('../repositories/Warehouse.js');
+const WarehouseRepository = require("../repositories/Warehouse.js");
 
 class WarehouseService {
   static async getAllWarehouse() {
@@ -8,20 +8,24 @@ class WarehouseService {
   }
 
   static async getListOfOrderedProduction() {
-    const orderedProduction = await WarehouseRepository.getListOfOrderedProduction();
+    const orderedProduction =
+      await WarehouseRepository.getListOfOrderedProduction();
 
     return orderedProduction;
   }
 
   static async getAutoclaveCalendar() {
-    const autoclaveCalendares = await WarehouseRepository.getAutoclaveCalendar();
+    const autoclaveCalendares =
+      await WarehouseRepository.getAutoclaveCalendar();
 
     return autoclaveCalendares;
   }
 
   static async addNewAutoclaveCalendarData(autoclave_calendar_data) {
     const updAutoclaveCalendares =
-      await WarehouseRepository.addNewAutoclaveCalendarData(autoclave_calendar_data);
+      await WarehouseRepository.addNewAutoclaveCalendarData(
+        autoclave_calendar_data,
+      );
 
     return updAutoclaveCalendares;
   }
@@ -41,7 +45,9 @@ class WarehouseService {
 
   static async addNewListOfOrderedProduction({ orderedProduction }) {
     const new_ordered_production =
-      await WarehouseRepository.addNewListOfOrderedProduction(orderedProduction);
+      await WarehouseRepository.addNewListOfOrderedProduction(
+        orderedProduction,
+      );
 
     return new_ordered_production;
   }
@@ -55,15 +61,17 @@ class WarehouseService {
   static async addNewListOfOrderedProductionOEM({ orderedProductionOEM }) {
     const new_ordered_production_OEM =
       await WarehouseRepository.addNewListOfOrderedProductionOEM(
-        orderedProductionOEM
+        orderedProductionOEM,
       );
 
     return new_ordered_production_OEM;
   }
 
-  static async updateListOfOrderedProductionOEM({ upd_ordered_production_oem }) {
+  static async updateListOfOrderedProductionOEM({
+    upd_ordered_production_oem,
+  }) {
     await WarehouseRepository.updateListOfOrderedProductionOEM(
-      upd_ordered_production_oem
+      upd_ordered_production_oem,
     );
 
     return;
@@ -76,33 +84,40 @@ class WarehouseService {
   }
 
   static async updateWarehouseQuantitys({ upd_rem_srock }) {
-    await WarehouseRepository.updateWarehouseQuantitys(upd_rem_srock);
+    const updatedProduct = await WarehouseRepository.updateWarehouseQuantitys(
+      upd_rem_srock,
+    );
 
-    return;
+    return updatedProduct;
   }
 
   static async updateDryMixedWarehouseQuantitys({ upd_rem_srock }) {
-    await WarehouseRepository.updateDryMixedWarehouseQuantitys(upd_rem_srock);
+    const updatedDryMixes =
+      await WarehouseRepository.updateDryMixedWarehouseQuantitys(upd_rem_srock);
 
-    return;
+    return updatedDryMixes;
   }
 
   static async updateAnchorWarehouseQuantitys({ upd_rem_srock }) {
-    await WarehouseRepository.updateAnchorWarehouseQuantitys(upd_rem_srock);
+    const updatedAnchors =
+      await WarehouseRepository.updateAnchorWarehouseQuantitys(upd_rem_srock);
 
-    return;
+    return updatedAnchors;
   }
 
   static async updateToolWarehouseQuantitys({ upd_rem_srock }) {
-    await WarehouseRepository.updateToolWarehouseQuantitys(upd_rem_srock);
+    const updatedTools = await WarehouseRepository.updateToolWarehouseQuantitys(
+      upd_rem_srock,
+    );
 
-    return;
+    return updatedTools;
   }
 
   static async updateRelMatWarehouseQuantitys({ upd_rem_srock }) {
-    await WarehouseRepository.updateRelMatWarehouseQuantitys(upd_rem_srock);
+    const updatedRelMats =
+      await WarehouseRepository.updateRelMatWarehouseQuantitys(upd_rem_srock);
 
-    return;
+    return updatedRelMats;
   }
 
   static async getListOfReservedProducts() {
@@ -113,9 +128,11 @@ class WarehouseService {
   }
 
   static async addNewReservedProducts({ reserved_product }) {
-    await WarehouseRepository.addNewReservedProducts(reserved_product);
+    const reservedProducts = await WarehouseRepository.addNewReservedProducts(
+      reserved_product,
+    );
 
-    return;
+    return reservedProducts;
   }
 
   static async updReservedProducts({ reserved_product }) {
@@ -138,9 +155,12 @@ class WarehouseService {
   }
 
   static async addNewReservedDryMixedProducts({ reserved_product }) {
-    await WarehouseRepository.addNewReservedDryMixedProducts(reserved_product);
+    const reservedDryMixes =
+      await WarehouseRepository.addNewReservedDryMixedProducts(
+        reserved_product,
+      );
 
-    return;
+    return reservedDryMixes;
   }
 
   static async updReservedDryMixedProducts({ reserved_product }) {
@@ -150,7 +170,9 @@ class WarehouseService {
   }
 
   static async deleteReservedDryMixedProducts({ reserved_products_id }) {
-    await WarehouseRepository.deleteReservedDryMixedProducts(reserved_products_id);
+    await WarehouseRepository.deleteReservedDryMixedProducts(
+      reserved_products_id,
+    );
 
     return;
   }
@@ -163,9 +185,10 @@ class WarehouseService {
   }
 
   static async addNewReservedAnchorProducts({ reserved_product }) {
-    await WarehouseRepository.addNewReservedAnchorProducts(reserved_product);
+    const reservedAnchors =
+      await WarehouseRepository.addNewReservedAnchorProducts(reserved_product);
 
-    return;
+    return reservedAnchors;
   }
 
   static async updReservedAnchorProducts({ reserved_product }) {
@@ -175,7 +198,9 @@ class WarehouseService {
   }
 
   static async deleteReservedAnchorProducts({ reserved_products_id }) {
-    await WarehouseRepository.deleteReservedAnchorProducts(reserved_products_id);
+    await WarehouseRepository.deleteReservedAnchorProducts(
+      reserved_products_id,
+    );
 
     return;
   }
@@ -188,9 +213,11 @@ class WarehouseService {
   }
 
   static async addNewReservedToolProducts({ reserved_product }) {
-    await WarehouseRepository.addNewReservedToolProducts(reserved_product);
+    const reservedTools = await WarehouseRepository.addNewReservedToolProducts(
+      reserved_product,
+    );
 
-    return;
+    return reservedTools;
   }
 
   static async updReservedToolProducts({ reserved_product }) {
@@ -213,9 +240,10 @@ class WarehouseService {
   }
 
   static async addNewReservedRelMatProducts({ reserved_product }) {
-    await WarehouseRepository.addNewReservedRelMatProducts(reserved_product);
+    const reservedRelMats =
+      await WarehouseRepository.addNewReservedRelMatProducts(reserved_product);
 
-    return;
+    return reservedRelMats;
   }
 
   static async updReservedRelMatProducts({ reserved_product }) {
@@ -225,7 +253,9 @@ class WarehouseService {
   }
 
   static async deleteReservedRelMatProducts({ reserved_products_id }) {
-    await WarehouseRepository.deleteReservedRelMatProducts(reserved_products_id);
+    await WarehouseRepository.deleteReservedRelMatProducts(
+      reserved_products_id,
+    );
 
     return;
   }
