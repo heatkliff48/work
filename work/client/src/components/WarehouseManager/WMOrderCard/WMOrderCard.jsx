@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useCallback, useState } from 'react';
-import 'react-datepicker/dist/react-datepicker.css';
-import { useProjectContext } from '#components/contexts/Context.js';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
-import WMOCTable from './WMOCTable/WMOCTable';
+import React, { useEffect, useMemo, useCallback, useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import { useProjectContext } from "#components/contexts/Context.js";
+import { useOrderContext } from "#components/contexts/OrderContext.js";
+import WMOCTable from "./WMOCTable/WMOCTable";
 
 const WMOrderCard = React.memo(({ selectedOrder }) => {
   const { orderCartData, setOrderCartData, list_of_orders } = useOrderContext();
@@ -11,8 +11,17 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
   const [ordersStatus, setOrdersStatus] = useState([]);
 
   const filterKeys = useMemo(
-    () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
-    []
+    () => [
+      "id",
+      "order_id",
+      "client_id",
+      "product_id",
+      "createdAt",
+      "updatedAt",
+      "bitrix_id",
+      "bitrix_client_id",
+    ],
+    [],
   );
 
   const filterAndMapData = useCallback(
@@ -20,10 +29,10 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
       Object.entries(data || {})
         .filter(([key]) => !filterKeys.includes(key))
         .map(([key, value]) => {
-          if (!key || key === 'warehouse_id') return null;
+          if (!key || key === "warehouse_id") return null;
 
           let displayValue = value;
-          if (displayValue && typeof displayValue === 'object') {
+          if (displayValue && typeof displayValue === "object") {
             displayValue = JSON.stringify(displayValue);
           }
 
@@ -35,21 +44,21 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
             </div>
           );
         }),
-    [orderCartData]
+    [orderCartData],
   );
 
   useEffect(() => {
-    const storedData = localStorage.getItem('orderCartData')
-      ? JSON.parse(localStorage.getItem('orderCartData'))
+    const storedData = localStorage.getItem("orderCartData")
+      ? JSON.parse(localStorage.getItem("orderCartData"))
       : null;
 
     const updatedOrderCartData = list_of_orders.find(
-      (order) => order.id === storedData?.id
+      (order) => order.id === storedData?.id,
     );
 
     if (storedData) {
       setOrderCartData(storedData);
-      localStorage.setItem('orderCartData', JSON.stringify(storedData));
+      localStorage.setItem("orderCartData", JSON.stringify(storedData));
     }
 
     if (!ordersStatus.includes(updatedOrderCartData?.status))
