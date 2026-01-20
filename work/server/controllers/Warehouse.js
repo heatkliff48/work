@@ -1,5 +1,5 @@
-const { ErrorUtils } = require("../utils/Errors.js");
-const WarehouseService = require("../services/Warehouse.js");
+const { ErrorUtils } = require('../utils/Errors.js');
+const WarehouseService = require('../services/Warehouse.js');
 
 const {
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
@@ -29,8 +29,8 @@ const {
   UPDATE_ANCHOR_QUANTITYS_SOCKET,
   UPDATE_TOOL_QUANTITYS_SOCKET,
   UPDATE_REL_MAT_QUANTITYS_SOCKET,
-} = require("../src/constants/event.js");
-const myEmitter = require("../src/ee.js");
+} = require('../src/constants/event.js');
+const myEmitter = require('../src/ee.js');
 
 class WarehouseController {
   static async getAllWarehouse(req, res) {
@@ -45,8 +45,7 @@ class WarehouseController {
 
   static async getListOfOrderedProduction(req, res) {
     try {
-      const orderedProduction =
-        await WarehouseService.getListOfOrderedProduction();
+      const orderedProduction = await WarehouseService.getListOfOrderedProduction();
 
       return res.status(200).json({ orderedProduction });
     } catch (err) {
@@ -69,14 +68,9 @@ class WarehouseController {
 
     try {
       const updAutoclaveCalendares =
-        await WarehouseService.addNewAutoclaveCalendarData(
-          autoclave_calendar_data,
-        );
+        await WarehouseService.addNewAutoclaveCalendarData(autoclave_calendar_data);
 
-      myEmitter.emit(
-        GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
-        updAutoclaveCalendares,
-      );
+      myEmitter.emit(GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET, updAutoclaveCalendares);
 
       return res.status(200).json(updAutoclaveCalendares);
     } catch (err) {
@@ -198,12 +192,11 @@ class WarehouseController {
     const upd_rem_srock = req.body;
 
     try {
-      await WarehouseService.updateRemainingStock({
+      const updatedCake = await WarehouseService.updateRemainingStock({
         upd_rem_srock,
       });
-
-      myEmitter.emit(UPDATE_REMAINING_STOCK_SOCKET, upd_rem_srock);
-
+console.log('updatedCake Warehouse.js line 198', updatedCake)
+      myEmitter.emit(UPDATE_REMAINING_STOCK_SOCKET, updatedCake);
       return res.status(200).json(upd_rem_srock);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -224,36 +217,36 @@ class WarehouseController {
       } else {
         const { wh_data } = updatedProduct;
 
-        console.log(" ------- ");
-        console.log(" ------- ");
-        console.log(" ------- ");
+        console.log(' ------- ');
+        console.log(' ------- ');
+        console.log(' ------- ');
 
-        console.log(wh_data, "wh_data Warehouse.js line 227");
+        console.log(wh_data, 'wh_data Warehouse.js line 227');
 
-        console.log(" ------- ");
-        console.log(" ------- ");
-        console.log(" ------- ");
+        console.log(' ------- ');
+        console.log(' ------- ');
+        console.log(' ------- ');
 
         for (const [type, data] of Object.entries(wh_data)) {
           if (data && data.length > 0) {
             switch (type) {
-              case "product":
+              case 'product':
                 myEmitter.emit(UPDATE_WAREHOUSE_QUANTITYS_SOCKET, data);
                 continue;
 
-              case "relMat":
+              case 'relMat':
                 myEmitter.emit(UPDATE_REL_MAT_QUANTITYS_SOCKET, data);
                 continue;
 
-              case "tool":
+              case 'tool':
                 myEmitter.emit(UPDATE_TOOL_QUANTITYS_SOCKET, data);
                 continue;
 
-              case "dryMixed":
+              case 'dryMixed':
                 myEmitter.emit(UPDATE_DRY_MIXES_QUANTITYS_SOCKET, data);
                 continue;
 
-              case "anchor":
+              case 'anchor':
                 myEmitter.emit(UPDATE_ANCHOR_QUANTITYS_SOCKET, data);
                 continue;
 
@@ -291,10 +284,9 @@ class WarehouseController {
     const upd_rem_srock = req.body;
 
     try {
-      const updatedAnchors =
-        await WarehouseService.updateAnchorWarehouseQuantitys({
-          upd_rem_srock,
-        });
+      const updatedAnchors = await WarehouseService.updateAnchorWarehouseQuantitys({
+        upd_rem_srock,
+      });
 
       myEmitter.emit(UPDATE_ANCHOR_QUANTITYS_SOCKET, updatedAnchors);
 
@@ -324,10 +316,9 @@ class WarehouseController {
     const upd_rem_srock = req.body;
 
     try {
-      const updatedRelMats =
-        await WarehouseService.updateRelMatWarehouseQuantitys({
-          upd_rem_srock,
-        });
+      const updatedRelMats = await WarehouseService.updateRelMatWarehouseQuantitys({
+        upd_rem_srock,
+      });
 
       myEmitter.emit(UPDATE_REL_MAT_QUANTITYS_SOCKET, updatedRelMats);
 
@@ -356,10 +347,7 @@ class WarehouseController {
         reserved_product,
       });
 
-      myEmitter.emit(
-        GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reservedProduct,
-      );
+      myEmitter.emit(GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET, reservedProduct);
 
       return res.json(reservedProduct).status(200);
     } catch (err) {
@@ -375,10 +363,7 @@ class WarehouseController {
         reserved_product,
       });
 
-      myEmitter.emit(
-        GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reserved_product,
-      );
+      myEmitter.emit(GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET, reserved_product);
 
       return res.status(200);
     } catch (err) {
@@ -417,10 +402,11 @@ class WarehouseController {
     const reserved_product = req.body;
 
     try {
-      const reservedDryMixes =
-        await WarehouseService.addNewReservedDryMixedProducts({
+      const reservedDryMixes = await WarehouseService.addNewReservedDryMixedProducts(
+        {
           reserved_product,
-        });
+        },
+      );
 
       myEmitter.emit(
         GET_NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
@@ -485,10 +471,9 @@ class WarehouseController {
     const reserved_product = req.body;
 
     try {
-      const reservedAnchors =
-        await WarehouseService.addNewReservedAnchorProducts({
-          reserved_product,
-        });
+      const reservedAnchors = await WarehouseService.addNewReservedAnchorProducts({
+        reserved_product,
+      });
 
       myEmitter.emit(
         GET_NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
@@ -557,10 +542,7 @@ class WarehouseController {
         reserved_product,
       });
 
-      myEmitter.emit(
-        GET_NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-        reservedTools,
-      );
+      myEmitter.emit(GET_NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET, reservedTools);
 
       return res.json(reservedTools).status(200);
     } catch (err) {
@@ -620,10 +602,9 @@ class WarehouseController {
     const reserved_product = req.body;
 
     try {
-      const reservedRelMats =
-        await WarehouseService.addNewReservedRelMatProducts({
-          reserved_product,
-        });
+      const reservedRelMats = await WarehouseService.addNewReservedRelMatProducts({
+        reserved_product,
+      });
 
       myEmitter.emit(
         GET_NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,

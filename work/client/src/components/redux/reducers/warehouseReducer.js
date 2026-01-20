@@ -43,7 +43,16 @@ export const warehouseReducer = (warehouse = [], action) => {
 
       const result = warehouse.map((el) => {
         if (el.id == warehouse_id) {
-          return { ...el, free_quantity_remaining, ordered_quantity };
+          const total_quantity = payload?.total_quantity
+            ? payload.total_quantity
+            : el.total_quantity || 0;
+
+          return {
+            ...el,
+            free_quantity_remaining,
+            ordered_quantity,
+            total_quantity,
+          };
         }
 
         return el;

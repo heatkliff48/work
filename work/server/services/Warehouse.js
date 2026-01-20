@@ -78,9 +78,9 @@ class WarehouseService {
   }
 
   static async updateRemainingStock({ upd_rem_srock }) {
-    await WarehouseRepository.updateRemainingStock(upd_rem_srock);
+    const updatedCake =await WarehouseRepository.updateRemainingStock(upd_rem_srock);
 
-    return;
+    return updatedCake;
   }
 
   static async updateWarehouseQuantitys({ upd_rem_srock }) {
