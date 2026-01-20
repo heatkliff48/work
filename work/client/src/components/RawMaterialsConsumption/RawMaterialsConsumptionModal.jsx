@@ -3,9 +3,8 @@ import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { useDispatch } from 'react-redux';
 import {
-  addNewWarehouse,
   updateRawMaterialConsumptionRawMaterialsWarehouse,
-  updListOfOrderedProduction,
+  updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
 import {
   addNewMainRawMatConsumption,
@@ -27,11 +26,7 @@ const RawMaterialsConsumptionModal = React.memo(
       setLotesListCheck,
     } = useRecipeContext();
     const { latestProducts } = useProductsContext();
-    const {
-      raw_materials_warehouse = [],
-      list_of_ordered_production,
-      getWarehouseArticle,
-    } = useWarehouseContext();
+    const { raw_materials_warehouse = [], warehouse_data } = useWarehouseContext();
 
     const { setMainRawMaterialConsumptionMadal } = useModalContext();
     const dispatch = useDispatch();
@@ -394,7 +389,7 @@ const RawMaterialsConsumptionModal = React.memo(
         addNewMainRawMatConsumption({
           ...selectedRow,
           consumed_volume: Number(productionVolume),
-        })
+        }),
       );
 
       const productDetails = latestProducts.find(
@@ -415,6 +410,7 @@ const RawMaterialsConsumptionModal = React.memo(
         ...recipeSnapshot,
       };
 
+      addProductOrder();
 
       dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
       dispatch(addNewLotesList({ new_lotestList, lotesListCheck }));
@@ -423,6 +419,106 @@ const RawMaterialsConsumptionModal = React.memo(
       setMainRawMaterialConsumptionMadal(false);
       toggle();
       setProductionVolume('');
+    };
+
+    const ddmmyyFromISO = (iso) => {
+      if (!iso) return '';
+      const s = String(iso).trim();
+      const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return '';
+      const yyyy = m[1];
+      const mm = m[2];
+      const dd = m[3];
+      const yy = yyyy.slice(2);
+      return `${yy}${mm}${dd}`;
+    };
+
+    const ddmmyyFromWarehouseArticle = (article) => {
+      const a = String(article ?? '');
+      if (a.length < 11) return '';
+      return a.slice(5, 11);
+    };
+
+    const addProductOrder = async () => {
+      const { batch_article, date: prodDate } = selectedRow;
+
+      const product = latestProducts.find(
+        (p) => String(p.article) === String(batch_article),
+      );
+      if (!product) return;
+
+      const widthInArray = Number(product.widthInArray ?? 0) || 0;
+      const needRaw = Number(productionVolume ?? 0) * widthInArray;
+
+      const need = Math.floor(needRaw);
+
+      if (!Number.isFinite(need) || need <= 0) return;
+      const targetDate6 = ddmmyyFromISO(prodDate);
+
+      if (!targetDate6) {
+        console.warn(
+          'Bad selectedRow.date, cannot match warehouse article date:',
+          prodDate,
+        );
+        return;
+      }
+
+      const row = (warehouse_data || []).find((w) => {
+        return (
+          String(w.product_article) == String(batch_article) &&
+          ddmmyyFromWarehouseArticle(w.article) == targetDate6
+        );
+      });
+
+      if (!row) {
+        console.warn('Warehouse row not found for:', { batch_article, targetDate6 });
+        return;
+      }
+
+      const free0 = Number(row.free_quantity_remaining ?? 0) || 0;
+      const ordered0 = Number(row.ordered_quantity ?? 0) || 0;
+      const total0 = Number(row.total_quantity ?? free0 + ordered0) || 0;
+
+      let remainingToDeduct = need;
+
+      let free1 = free0;
+      let ordered1 = ordered0;
+
+      const fromFree = Math.min(free1, remainingToDeduct);
+      free1 -= fromFree;
+      remainingToDeduct -= fromFree;
+
+      if (remainingToDeduct > 0) {
+        const fromOrdered = Math.min(ordered1, remainingToDeduct);
+        ordered1 -= fromOrdered;
+        remainingToDeduct -= fromOrdered;
+      }
+
+      if (remainingToDeduct > 0) {
+        console.warn('Tried to deduct more than available in warehouse row:', {
+          need,
+          free0,
+          ordered0,
+          total0,
+          remainingToDeduct,
+        });
+      }
+
+      const total1 = Math.max(0, free1 + ordered1);
+
+      const updatedRow = {
+        ...row,
+        warehouse_id: row.id,
+        free_quantity_remaining: free1,
+        ordered_quantity: ordered1,
+        total_quantity: total1,
+      };
+
+      console.log(
+        'updatedRow RawMaterialsConsumptionModal.jsx line 519',
+        updatedRow,
+      );
+      dispatch(updateRemainingStock(updatedRow));
     };
 
     const handleRecipeChange = (selectedOption) => {

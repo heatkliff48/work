@@ -74,7 +74,7 @@ class WarehouseRepository {
               residual_arrays,
               filled_autoclaves,
             },
-            { where: { id: data.id }, transaction: t }
+            { where: { id: data.id }, transaction: t },
           );
         } else {
           await AutoclaveCalendares.create(
@@ -86,7 +86,7 @@ class WarehouseRepository {
               residual_arrays,
               filled_autoclaves,
             },
-            { transaction: t }
+            { transaction: t },
           );
         }
       }
@@ -164,7 +164,7 @@ class WarehouseRepository {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewListOfOrderedProduction');
     try {
       const new_ordered_production = await ListOfOrderedProductions.create(
-        ordered_production
+        ordered_production,
       );
 
       return new_ordered_production;
@@ -177,14 +177,14 @@ class WarehouseRepository {
   static async updateListOfOrderedProduction(ordered_production) {
     console.log(
       '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateListOfOrderedProduction----------------------------------',
-      ordered_production
+      ordered_production,
     );
 
     try {
       const { id, quantity_in_warehouse } = ordered_production;
       await ListOfOrderedProductions.update(
         { quantity_in_warehouse },
-        { where: { id } }
+        { where: { id } },
       );
       return;
     } catch (error) {
@@ -198,7 +198,7 @@ class WarehouseRepository {
 
     try {
       const new_ordered_production_oem = await ListOfOrderedProductionOEMs.create(
-        ordered_production_oem
+        ordered_production_oem,
       );
 
       return new_ordered_production_oem;
@@ -229,12 +229,18 @@ class WarehouseRepository {
         upd_rem_srock;
       console.log(
         '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRemainingStock upd_rem_srock',
-        upd_rem_srock
+        upd_rem_srock,
       );
-      await Warehouses.update(
-        { free_quantity_remaining, ordered_quantity },
-        { where: { id: warehouse_id } }
-      );
+
+      const upd = upd_rem_srock.total_quantity
+        ? {
+            total_quantity: upd_rem_srock.total_quantity,
+            free_quantity_remaining,
+            ordered_quantity,
+          }
+        : { free_quantity_remaining, ordered_quantity };
+
+      await Warehouses.update({ ...upd }, { where: { id: warehouse_id } });
 
       return;
     } catch (error) {
@@ -245,7 +251,7 @@ class WarehouseRepository {
 
   static async updateWarehouseQuantitys(upd_rem_srock) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateWarehouseQuantitys');
-
+    console.log('upd_rem_srock Warehouse.js line 248', upd_rem_srock);
     try {
       const { warehouse_id, ordered_quantity, product_article } = upd_rem_srock;
 
@@ -274,7 +280,7 @@ class WarehouseRepository {
             ordered_quantity:
               wh_data_ordered.ordered_quantity - plus_ordered_quantity,
           },
-          { where: { id: wh_data_ordered.id } }
+          { where: { id: wh_data_ordered.id } },
         );
       }
 
@@ -284,7 +290,7 @@ class WarehouseRepository {
           ordered_quantity: new_ordered_quantity,
           free_quantity_remaining: new_free_quantity_remaining,
         },
-        { where: { id: warehouse_id, product_article } }
+        { where: { id: warehouse_id, product_article } },
       );
 
       return;
@@ -335,7 +341,7 @@ class WarehouseRepository {
             ordered_quantity:
               wh_data_ordered.ordered_quantity - plus_ordered_quantity,
           },
-          { where: { id: wh_data_ordered.id } }
+          { where: { id: wh_data_ordered.id } },
         );
       }
 
@@ -345,7 +351,7 @@ class WarehouseRepository {
           ordered_quantity: new_ordered_quantity,
           free_quantity_remaining: new_free_quantity_remaining,
         },
-        { where: { id: warehouse_id, product_article } }
+        { where: { id: warehouse_id, product_article } },
       );
 
       return;
@@ -394,7 +400,7 @@ class WarehouseRepository {
             ordered_quantity:
               wh_data_ordered.ordered_quantity - plus_ordered_quantity,
           },
-          { where: { id: wh_data_ordered.id } }
+          { where: { id: wh_data_ordered.id } },
         );
       }
 
@@ -404,7 +410,7 @@ class WarehouseRepository {
           ordered_quantity: new_ordered_quantity,
           free_quantity_remaining: new_free_quantity_remaining,
         },
-        { where: { id: warehouse_id, product_article } }
+        { where: { id: warehouse_id, product_article } },
       );
 
       return;
@@ -453,7 +459,7 @@ class WarehouseRepository {
             ordered_quantity:
               wh_data_ordered.ordered_quantity - plus_ordered_quantity,
           },
-          { where: { id: wh_data_ordered.id } }
+          { where: { id: wh_data_ordered.id } },
         );
       }
 
@@ -463,7 +469,7 @@ class WarehouseRepository {
           ordered_quantity: new_ordered_quantity,
           free_quantity_remaining: new_free_quantity_remaining,
         },
-        { where: { id: warehouse_id, product_article } }
+        { where: { id: warehouse_id, product_article } },
       );
 
       return;
@@ -512,7 +518,7 @@ class WarehouseRepository {
             ordered_quantity:
               wh_data_ordered.ordered_quantity - plus_ordered_quantity,
           },
-          { where: { id: wh_data_ordered.id } }
+          { where: { id: wh_data_ordered.id } },
         );
       }
 
@@ -522,7 +528,7 @@ class WarehouseRepository {
           ordered_quantity: new_ordered_quantity,
           free_quantity_remaining: new_free_quantity_remaining,
         },
-        { where: { id: warehouse_id, product_article } }
+        { where: { id: warehouse_id, product_article } },
       );
 
       return;
@@ -571,7 +577,7 @@ class WarehouseRepository {
     try {
       await ReservedProducts.update(
         { quantity },
-        { where: { warehouse_id, orders_products_id } }
+        { where: { warehouse_id, orders_products_id } },
       );
 
       return;
@@ -598,7 +604,7 @@ class WarehouseRepository {
       const listOfReservedProducts = await ReservedDryMixes.findAll();
       console.log(
         '>>>>>>>>>>>>>>>>listOfReservedProducts<<<<<<<<<<<<',
-        listOfReservedProducts
+        listOfReservedProducts,
       );
       return listOfReservedProducts;
     } catch (error) {
@@ -619,7 +625,7 @@ class WarehouseRepository {
         {
           warehouse_id: reserved_product.warehouse_id,
         },
-        { where: { id: reserved_product.orders_products_id } }
+        { where: { id: reserved_product.orders_products_id } },
       );
 
       return;
@@ -635,7 +641,7 @@ class WarehouseRepository {
     try {
       await ReservedDryMixes.update(
         { quantity },
-        { where: { warehouse_id, orders_products_id } }
+        { where: { warehouse_id, orders_products_id } },
       );
 
       return;
@@ -681,7 +687,7 @@ class WarehouseRepository {
         {
           warehouse_id: reserved_product.warehouse_id,
         },
-        { where: { id: reserved_product.orders_products_id } }
+        { where: { id: reserved_product.orders_products_id } },
       );
 
       return;
@@ -697,7 +703,7 @@ class WarehouseRepository {
     try {
       await ReservedAnchors.update(
         { quantity },
-        { where: { warehouse_id, orders_products_id } }
+        { where: { warehouse_id, orders_products_id } },
       );
 
       return;
@@ -743,7 +749,7 @@ class WarehouseRepository {
         {
           warehouse_id: reserved_product.warehouse_id,
         },
-        { where: { id: reserved_product.orders_products_id } }
+        { where: { id: reserved_product.orders_products_id } },
       );
 
       return;
@@ -759,7 +765,7 @@ class WarehouseRepository {
     try {
       await ReservedTools.update(
         { quantity },
-        { where: { warehouse_id, orders_products_id } }
+        { where: { warehouse_id, orders_products_id } },
       );
 
       return;
@@ -783,7 +789,7 @@ class WarehouseRepository {
 
   static async getListOfReservedRelatedMaterialsProducts() {
     console.log(
-      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedRelatedMaterialsProducts'
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedRelatedMaterialsProducts',
     );
 
     try {
@@ -807,7 +813,7 @@ class WarehouseRepository {
         {
           warehouse_id: reserved_product.warehouse_id,
         },
-        { where: { id: reserved_product.orders_products_id } }
+        { where: { id: reserved_product.orders_products_id } },
       );
 
       return;
@@ -823,7 +829,7 @@ class WarehouseRepository {
     try {
       await ReservedRelatedMaterials.update(
         { quantity },
-        { where: { warehouse_id, orders_products_id } }
+        { where: { warehouse_id, orders_products_id } },
       );
 
       return;
