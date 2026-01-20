@@ -73,6 +73,7 @@ import {
 
 import '#components/Styles/dashboard.css';
 
+import '#components/Styles/dashboard.css';
 
 
 function Main() {

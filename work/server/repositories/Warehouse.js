@@ -38,6 +38,23 @@ function getModelByType(type) {
   return model;
 }
 
+const MODELS_BY_TYPE = {
+  product: Warehouses,
+  dryMixed: DryMixesWarehouse,
+  relMat: RelatedMaterialsWarehouse,
+  tool: ToolsWarehouse,
+  anchor: AnchorsWarehouse,
+};
+
+// Функция для получения модели по типу
+function getModelByType(type) {
+  const model = MODELS_BY_TYPE[type];
+  if (!model) {
+    throw new Error(`Неизвестный тип склада: ${type}`);
+  }
+  return model;
+}
+
 class WarehouseRepository {
   static async getAllWarehouse() {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAllWarehouse");
@@ -281,12 +298,25 @@ class WarehouseRepository {
         ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRemainingStock upd_rem_srock",
         upd_rem_srock,
       );
-      await Warehouses.update(
-        { free_quantity_remaining, ordered_quantity },
+
+      const upd =
+        upd_rem_srock.total_quantity > 0
+          ? {
+              total_quantity: upd_rem_srock.total_quantity,
+              free_quantity_remaining,
+              ordered_quantity,
+            }
+          : { free_quantity_remaining, ordered_quantity };
+
+      console.log('upd Warehouse.js line 261', upd);
+      const [count, rows] = await Warehouses.update(
+        { ...upd },
         { where: { id: warehouse_id } },
       );
 
-      return;
+      const updatedCake = rows[0];
+
+      return updatedCake;
     } catch (error) {
       console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
       return error;
@@ -294,16 +324,12 @@ class WarehouseRepository {
   }
 
   static async updateWarehouseQuantitys(upd_rem_stock) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateWarehouseQuantitys");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateWarehouseQuantitys');
 
     try {
       if (!Array.isArray(upd_rem_stock)) {
-        const {
-          warehouse_id,
-          total_quantity,
-          ordered_quantity,
-          product_article,
-        } = upd_rem_stock;
+        const { warehouse_id, total_quantity, ordered_quantity, product_article } =
+          upd_rem_stock;
 
         const updatedProduct = await Warehouses.update(
           {
@@ -314,18 +340,6 @@ class WarehouseRepository {
         );
         return updatedProduct;
       }
-      console.log(" ------- ");
-      console.log(" ------- ");
-      console.log(" ------- ");
-      console.log(
-        upd_rem_stock,
-        "upd_rem_stock ><><><><><><><><><><><><><><><><>< Warehouse.js line 300",
-      );
-
-      console.log(" ------- ");
-      console.log(" ------- ");
-      console.log(" ------- ");
-      // return upd_rem_stock;
 
       const transaction = await sequelize.transaction();
 
@@ -333,7 +347,7 @@ class WarehouseRepository {
         const groupedByTypeAndArticle = new Map();
 
         upd_rem_stock.forEach((item) => {
-          const { type = "product", product_article } = item;
+          const { type = 'product', product_article } = item;
           const typeKey = type;
           const articleKey = product_article;
 
@@ -358,7 +372,7 @@ class WarehouseRepository {
           for (const [product_article, incomingItems] of articlesMap) {
             const dbRecords = await Model.findAll({
               where: { product_article },
-              order: [["ordered_quantity", "DESC"]],
+              order: [['ordered_quantity', 'DESC']],
               transaction,
             });
 
@@ -433,17 +447,11 @@ class WarehouseRepository {
             }
 
             for (const item of itemsToRedistribute) {
-              const {
-                source_warehouse_id,
-                deficit,
-                record: sourceRecord,
-              } = item;
+              const { source_warehouse_id, deficit, record: sourceRecord } = item;
               let remainingDeficit = deficit;
 
               const sortedRecords = Array.from(recordsMap.values())
-                .filter(
-                  (r) => r.id !== source_warehouse_id && r.new_ordered > 0,
-                )
+                .filter((r) => r.id !== source_warehouse_id && r.new_ordered > 0)
                 .sort((a, b) => b.new_ordered - a.new_ordered);
 
               for (const targetRecord of sortedRecords) {
@@ -685,7 +693,7 @@ class WarehouseRepository {
 
       const wh_data = await DryMixesWarehouse.findAll({
         where: { product_article: product_article },
-        order: [["ordered_quantity", "DESC"]],
+        order: [['ordered_quantity', 'DESC']],
       });
 
       if (ordered_quantity < 0) {
@@ -693,8 +701,7 @@ class WarehouseRepository {
           {
             free_quantity_remaining:
               wh_data_by_id.free_quantity_remaining + ordered_quantity,
-            total_quantity:
-              wh_data_by_id.free_quantity_remaining + ordered_quantity,
+            total_quantity: wh_data_by_id.free_quantity_remaining + ordered_quantity,
             ordered_quantity: 0,
           },
           { where: { id: warehouse_id } },
@@ -773,12 +780,8 @@ class WarehouseRepository {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock", upd_rem_srock);
 
     try {
-      const {
-        warehouse_id,
-        total_quantity,
-        ordered_quantity,
-        product_article,
-      } = upd_rem_srock;
+      const { warehouse_id, total_quantity, ordered_quantity, product_article } =
+        upd_rem_srock;
 
       const wh_data_by_id = await AnchorsWarehouse.findOne({
         where: { id: warehouse_id },
@@ -786,7 +789,7 @@ class WarehouseRepository {
 
       const wh_data = await AnchorsWarehouse.findAll({
         where: { product_article: product_article },
-        order: [["ordered_quantity", "DESC"]],
+        order: [['ordered_quantity', 'DESC']],
       });
 
       if (ordered_quantity < 0) {
@@ -794,8 +797,7 @@ class WarehouseRepository {
           {
             free_quantity_remaining:
               wh_data_by_id.free_quantity_remaining + ordered_quantity,
-            total_quantity:
-              wh_data_by_id.free_quantity_remaining + ordered_quantity,
+            total_quantity: wh_data_by_id.free_quantity_remaining + ordered_quantity,
             ordered_quantity: 0,
           },
           { where: { id: warehouse_id } },
@@ -878,12 +880,8 @@ class WarehouseRepository {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock", upd_rem_srock);
 
     try {
-      const {
-        warehouse_id,
-        total_quantity,
-        ordered_quantity,
-        product_article,
-      } = upd_rem_srock;
+      const { warehouse_id, total_quantity, ordered_quantity, product_article } =
+        upd_rem_srock;
 
       const wh_data_by_id = await ToolsWarehouse.findOne({
         where: { id: warehouse_id },
@@ -891,7 +889,7 @@ class WarehouseRepository {
 
       const wh_data = await ToolsWarehouse.findAll({
         where: { product_article: product_article },
-        order: [["ordered_quantity", "DESC"]],
+        order: [['ordered_quantity', 'DESC']],
       });
 
       if (ordered_quantity < 0) {
@@ -899,8 +897,7 @@ class WarehouseRepository {
           {
             free_quantity_remaining:
               wh_data_by_id.free_quantity_remaining + ordered_quantity,
-            total_quantity:
-              wh_data_by_id.free_quantity_remaining + ordered_quantity,
+            total_quantity: wh_data_by_id.free_quantity_remaining + ordered_quantity,
             ordered_quantity: 0,
           },
           { where: { id: warehouse_id } },
@@ -979,15 +976,11 @@ class WarehouseRepository {
   }
 
   static async updateRelMatWarehouseQuantitys(upd_rem_srock) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRelMatWarehouseQuantitys");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRelMatWarehouseQuantitys');
 
     try {
-      const {
-        warehouse_id,
-        total_quantity,
-        ordered_quantity,
-        product_article,
-      } = upd_rem_srock;
+      const { warehouse_id, total_quantity, ordered_quantity, product_article } =
+        upd_rem_srock;
 
       const wh_data_by_id = await RelatedMaterialsWarehouse.findOne({
         where: { id: warehouse_id },
@@ -995,7 +988,7 @@ class WarehouseRepository {
 
       const wh_data = await RelatedMaterialsWarehouse.findAll({
         where: { product_article: product_article },
-        order: [["ordered_quantity", "DESC"]],
+        order: [['ordered_quantity', 'DESC']],
       });
 
       if (ordered_quantity < 0) {
@@ -1003,8 +996,7 @@ class WarehouseRepository {
           {
             free_quantity_remaining:
               wh_data_by_id.free_quantity_remaining + ordered_quantity,
-            total_quantity:
-              wh_data_by_id.free_quantity_remaining + ordered_quantity,
+            total_quantity: wh_data_by_id.free_quantity_remaining + ordered_quantity,
             ordered_quantity: 0,
           },
           { where: { id: warehouse_id } },

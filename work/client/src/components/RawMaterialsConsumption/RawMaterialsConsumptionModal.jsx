@@ -485,8 +485,8 @@ const RawMaterialsConsumptionModal = React.memo(
       );
       if (!product) return;
 
-      const widthInArray = Number(product.widthInArray ?? 0) || 0;
-      const needRaw = Number(productionVolume ?? 0) * widthInArray;
+      const widthInArray = Number(product.widthInArray);
+      const needRaw = Number(productionVolume) * widthInArray;
 
       const need = Math.floor(needRaw);
 
@@ -515,7 +515,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const free0 = Number(row.free_quantity_remaining ?? 0) || 0;
       const ordered0 = Number(row.ordered_quantity ?? 0) || 0;
-      const total0 = Number(row.total_quantity ?? free0 + ordered0) || 0;
+      const total0 = Number(row.total_quantity) || 0;
 
       let remainingToDeduct = need;
 
@@ -542,7 +542,7 @@ const RawMaterialsConsumptionModal = React.memo(
         });
       }
 
-      const total1 = Math.max(0, free1 + ordered1);
+      const total1 = total0 - need;
 
       const updatedRow = {
         ...row,
