@@ -42,7 +42,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
     useEffect(() => {
       setAvailableRecipes([]);
-      setSelectedRecipe([]);
+      setSelectedRecipe(null);
       setForm({});
       setWastedMode('default');
       setProductionVolume('');
@@ -88,15 +88,17 @@ const RawMaterialsConsumptionModal = React.memo(
       [],
     );
 
+    const recipeForUI = useMemo(() => selectedRecipe || null, [selectedRecipe]);
+
     const resolvedRecipe = useMemo(() => {
-      if (wastedMode === 'from_actual') {
-        return selectedRow || null;
-      }
+      return wastedMode === 'from_actual'
+        ? selectedRow || null
+        : selectedRecipe || null;
+    }, [wastedMode, selectedRecipe, selectedRow]);
 
-      return selectedRecipe || null;
-    }, [wastedMode, selectedRecipe]);
-
-    const isRecipeLocked = wastedMode !== 'default';
+    const isRecipeLocked = wastedMode === 'from_actual';
+    const hasAnyRecipe =
+      Boolean(selectedRecipe) || (availableRecipes?.length ?? 0) > 0;
 
     const onHeaderFromActual = (e) => {
       setWastedMode((prev) => (e.target.checked ? 'from_actual' : 'default'));
@@ -160,8 +162,8 @@ const RawMaterialsConsumptionModal = React.memo(
     );
 
     const baseByLabel = (label, key) => {
-      if (!resolvedRecipe || !key || !(key in resolvedRecipe)) return '—';
-      const v = resolvedRecipe[key];
+      if (!recipeForUI || !key || !(key in recipeForUI)) return '—';
+      const v = recipeForUI[key];
       return typeof v === 'number' ? v : (v ?? '—');
     };
 
@@ -195,7 +197,7 @@ const RawMaterialsConsumptionModal = React.memo(
     const computeWasted = (key, label) => {
       const mode = wastedMode || 'default';
       const aVal = Number(form[`${key}_actual_reciepe`] || 0);
-      const baseNum = Number(baseByLabel(label, key));
+      const baseNum = Number(recipeForUI?.[key]);
       if (mode === 'manual') {
         const raw = form[`${key}_Wasted`];
         return raw === '' ? '' : Number(raw);
@@ -255,20 +257,56 @@ const RawMaterialsConsumptionModal = React.memo(
       return true;
     };
 
+    // const shouldShowRow = (label, key) => {
+    //   if (ALWAYS_VISIBLE.has(label)) return true;
+
+    //   const base = baseByLabel(label, key);
+    //   const log = logByKey(key);
+    //   const aVal = numOrNull(form[`${key}_actual_reciepe`]);
+    //   const wVal = numOrNull(form[`${key}_Wasted`]);
+    //   const total = computeTotalByActual[`${key}_total`];
+    //   const wastedCalc = computeWasted(key, label);
+
+    //   const hasMeaningfulBase = !isEmptyOrZero(base);
+    //   const hasMeaningfulLog = !isEmptyOrZero(log);
+    //   const hasMeaningfulA = aVal !== null && aVal !== 0;
+    //   const hasMeaningfulW = wVal !== null && wVal !== 0;
+    //   const hasMeaningfulTotal = total !== '' && Number(total) !== 0;
+    //   const hasMeaningfulWasted = wastedCalc !== '' && Number(wastedCalc) !== 0;
+
+    //   return (
+    //     hasMeaningfulBase ||
+    //     hasMeaningfulLog ||
+    //     hasMeaningfulA ||
+    //     hasMeaningfulW ||
+    //     hasMeaningfulTotal ||
+    //     hasMeaningfulWasted
+    //   );
+    // };
+
     const shouldShowRow = (label, key) => {
       if (ALWAYS_VISIBLE.has(label)) return true;
 
-      const base = baseByLabel(label, key);
+      const base = Number(recipeForUI?.[key]);
       const log = logByKey(key);
       const aVal = numOrNull(form[`${key}_actual_reciepe`]);
       const wVal = numOrNull(form[`${key}_Wasted`]);
-      const total = computeTotalByActual[`${key}_total`];
-      const wastedCalc = computeWasted(key, label);
 
       const hasMeaningfulBase = !isEmptyOrZero(base);
       const hasMeaningfulLog = !isEmptyOrZero(log);
       const hasMeaningfulA = aVal !== null && aVal !== 0;
       const hasMeaningfulW = wVal !== null && wVal !== 0;
+
+      const hasAnyRecipeLocal =
+        Boolean(selectedRecipe) || (availableRecipes?.length ?? 0) > 0;
+
+      if (!hasAnyRecipeLocal) {
+        return hasMeaningfulLog || hasMeaningfulA || hasMeaningfulW;
+      }
+
+      const total = computeTotalByActual[`${key}_total`];
+      const wastedCalc = computeWasted(key, label);
+
       const hasMeaningfulTotal = total !== '' && Number(total) !== 0;
       const hasMeaningfulWasted = wastedCalc !== '' && Number(wastedCalc) !== 0;
 
