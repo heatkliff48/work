@@ -45,9 +45,9 @@ const buildDefaultRecipe = (existing) => {
 export default function QuickCheckingModal({
   show,
   onHide,
-  cakeOptions, // [1,2,3] или [{value:1,label:'1'}, ...] — обработаем оба
-  initialRecipe, // может быть: 1) один объект recipe (для всех), 2) объект-мапа { [cakeId]: recipeObj }
-  onSave, // будет получать массив changes: [{cake_id, recipe:{...}}, ...]
+  cakeOptions,
+  initialRecipe,
+  onSave,
 }) {
   const cakes = useMemo(() => {
     if (!Array.isArray(cakeOptions)) return [];
@@ -59,13 +59,10 @@ export default function QuickCheckingModal({
       .filter((v) => Number.isFinite(v));
   }, [cakeOptions]);
 
-  // recipesByCake: { [cakeId]: {reason:boolean,...} }
   const [recipesByCake, setRecipesByCake] = useState({});
-  // changes: [{cake_id, recipe:{ changedKey: newValue, ... }}, ...]
   const [changes, setChanges] = useState([]);
 
   const getInitialForCake = (cakeId) => {
-    // вариант 1: initialRecipe = { 4: {...}, 5:{...} }
     if (
       initialRecipe &&
       typeof initialRecipe === 'object' &&
@@ -74,7 +71,6 @@ export default function QuickCheckingModal({
       if (Object.prototype.hasOwnProperty.call(initialRecipe, cakeId)) {
         return initialRecipe[cakeId];
       }
-      // вариант 2: initialRecipe = "обычный recipe объект" (без ключей cakeId)
       const hasAnyReasonKey = QUICK_CHECKING_REASONS.some((k) =>
         Object.prototype.hasOwnProperty.call(initialRecipe, k)
       );
@@ -83,7 +79,6 @@ export default function QuickCheckingModal({
     return null;
   };
 
-  // инициализация при открытии
   useEffect(() => {
     if (!show) return;
 
@@ -94,7 +89,7 @@ export default function QuickCheckingModal({
 
     setRecipesByCake(init);
     setChanges([]);
-  }, [show, cakes, initialRecipe]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [show, cakes, initialRecipe]);
 
   const upsertChange = (cakeId, key, value) => {
     setChanges((prev) => {
@@ -119,7 +114,6 @@ export default function QuickCheckingModal({
       const current = prev[cakeId] || buildDefaultRecipe(getInitialForCake(cakeId));
       const nextValue = !current[key];
 
-      // фиксируем изменение в changes
       upsertChange(cakeId, key, nextValue);
 
       return {
@@ -132,7 +126,6 @@ export default function QuickCheckingModal({
   const pretty = (key) => key.replaceAll('_', ' ');
 
   const handleSave = () => {
-    // отдаём только изменённые cake
     onSave?.(changes);
     onHide?.();
   };

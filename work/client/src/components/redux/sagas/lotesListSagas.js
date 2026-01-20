@@ -11,8 +11,10 @@ import {
   NEW_LOTES_LIST_CAKES,
   UPDATE_LOTES_LIST,
   UPDATE_LOTES_LIST_CAKES,
+  UPDATE_LOTES_LIST_CAKES_BOOLEAN,
   UPD_LOTES_LIST,
   UPD_LOTES_LIST_CAKES,
+  UPD_LOTES_LIST_CAKES_BOOLEAN,
 } from '../types/lotesListTypes';
 import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
@@ -94,6 +96,18 @@ const updateLotesListCakesRecipe = (lotesListCakes) => {
     });
 };
 
+const updateLotesListCakesBooleanRecipe = (lotesListCakes) => {
+  return url
+    .post('/lotesList/cakes/update/boolean/recipe', lotesListCakes)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 function* getLotesListWorker(action) {
   try {
     const { lotesListBatches } = yield call(getLotesList);
@@ -135,7 +149,6 @@ function* getLotesListCakesWorker(action) {
 function* addNewLotesListCakesWorker(action) {
   try {
     yield call(addNewLotesListCakes, action.payload);
-
   } catch (err) {
     yield put({ type: NEW_LOTES_LIST_CAKES, payload: [] });
   }
@@ -149,6 +162,14 @@ function* updateLotesListCakesRecipeWorker(action) {
   }
 }
 
+function* updateLotesListCakesBooleanRecipeWorker(action) {
+  try {
+    yield call(updateLotesListCakesBooleanRecipe, action.payload);
+  } catch (err) {
+    yield put({ type: UPD_LOTES_LIST_CAKES_BOOLEAN, payload: [] });
+  }
+}
+
 // watchers
 
 function* lotesListWatcher() {
@@ -159,6 +180,10 @@ function* lotesListWatcher() {
   yield takeLatest(GET_FULL_LOTES_LIST_CAKES, getLotesListCakesWorker);
   yield takeLatest(ADD_NEW_LOTES_LIST_CAKES, addNewLotesListCakesWorker);
   yield takeLatest(UPDATE_LOTES_LIST_CAKES, updateLotesListCakesRecipeWorker);
+  yield takeLatest(
+    UPDATE_LOTES_LIST_CAKES_BOOLEAN,
+    updateLotesListCakesBooleanRecipeWorker
+  );
 }
 
 export default lotesListWatcher;

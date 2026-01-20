@@ -74,6 +74,7 @@ module.exports = (sequelize, DataTypes) => {
       mixer_issues: DataTypes.TEXT,
       oiling_issues: DataTypes.TEXT,
       mold_moving_issues: DataTypes.TEXT,
+      form_number: DataTypes.TEXT,
 
       // mixing_time_before_al: DataTypes.TEXT,
       // mixing_time_with_al: DataTypes.TEXT,

@@ -5,6 +5,7 @@ import {
   GET_FULL_LOTES_LIST_CAKES,
   UPDATE_LOTES_LIST,
   UPDATE_LOTES_LIST_CAKES,
+  UPDATE_LOTES_LIST_CAKES_BOOLEAN,
 } from '../types/lotesListTypes';
 
 export const getLotesList = () => {
@@ -43,6 +44,13 @@ export const addNewLotesListCakes = (lotesListBatches) => {
 export const updateLotesListCakesRecipe = (lotesListBatches) => {
   return {
     type: UPDATE_LOTES_LIST_CAKES,
+    payload: lotesListBatches,
+  };
+};
+
+export const updateLotesListCakesBooleanRecipe = (lotesListBatches) => {
+  return {
+    type: UPDATE_LOTES_LIST_CAKES_BOOLEAN,
     payload: lotesListBatches,
   };
 };

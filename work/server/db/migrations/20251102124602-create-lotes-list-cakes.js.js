@@ -75,6 +75,7 @@ module.exports = {
       mixer_issues: { type: Sequelize.TEXT },
       oiling_issues: { type: Sequelize.TEXT },
       mold_moving_issues: { type: Sequelize.TEXT },
+      form_number: { type: Sequelize.TEXT },
 
       // mixing_time_before_al: { type: Sequelize.TEXT },
       // mixing_time_with_al: { type: Sequelize.TEXT },

@@ -125,6 +125,7 @@ const {
   UPDATE_LOTES_LIST_SOCKET,
   ADD_NEW_LOTES_LIST_CAKES_SOCKET,
   UPDATE_LOTES_LIST_CAKES_SOCKET,
+  UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 
@@ -147,7 +148,7 @@ lotesListRouter.get('/batches', async (req, res) => {
 lotesListRouter.post('/batches', async (req, res) => {
   console.log('>>>req.body<<<<<<<<<<<<<<<<<<<<<<<<<<', req.body);
   const { new_lotestList } = req.body;
-  const { quantity_cakes, product, production_date, recipe } = new_lotestList;
+  const { quantity_cakes, product, production_date } = new_lotestList;
 
   try {
     const quantityCakesInt = Math.floor(parseFloat(quantity_cakes));
@@ -277,8 +278,30 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
   try {
-    const payload = Array.isArray(req.body) ? req.body : [req.body];
+    const { id } = req.body;
+    const [count, rows] = await LotesListsCakes.update(
+      { ...req.body },
+      {
+        where: { id },
+        returning: true,
+      }
+    );
 
+    const updatedCake = rows[0];
+
+    myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, updatedCake);
+
+    return res.status(200);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
+  try {
+    const payload = Array.isArray(req.body) ? req.body : [req.body];
+    console.log('payload loteslist.js line 281', payload);
     const normalized = payload
       .map((item) => ({
         cake_id: Number(item?.cake_id),
@@ -319,7 +342,7 @@ lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
       updatedRows.push(updatedCake);
       console.log(updatedRows);
 
-      myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, updatedCake);
+      myEmitter.emit(UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET, updatedCake);
     }
 
     if (updatedRows.length === 0) {

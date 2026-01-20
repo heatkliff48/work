@@ -21,7 +21,6 @@ module.exports = (sequelize, DataTypes) => {
       product: DataTypes.STRING,
       recipe: DataTypes.STRING,
       quantity_cakes: DataTypes.INTEGER,
-      warehouse_id: DataTypes.STRING,
       custom_recipe: DataTypes.BOOLEAN,
       sand_dry: DataTypes.STRING,
       sand_slurry_dry: DataTypes.STRING,
