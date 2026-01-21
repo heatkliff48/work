@@ -738,7 +738,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
   const batchDesigner = useSelector((state) => state.batchDesigner) || [];
   const existingBatchOutside = useSelector((state) => state.batchOutside) || [];
   const list_of_ordered_production = useSelector(
-    (state) => state.listOfOrderedProduction
+    (state) => state.listOfOrderedProduction,
   );
 
   const [selectedCell, setSelectedCell] = useState(null); // { id, article }
@@ -815,7 +815,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
 
   const shipTs = (id) => {
     const o = (list_of_ordered_production || []).find(
-      (x) => String(x.id) === String(id)
+      (x) => String(x.id) === String(id),
     );
     const d =
       o?.date_of_dispatch || o?.date_of_shipping || o?.shipment_date || o?.date;
@@ -824,7 +824,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
 
   const getGroupBySourceId = (id) =>
     (productionBatchDesigner || []).find((g) =>
-      (g.sources || []).some((s) => String(s.id) === String(id))
+      (g.sources || []).some((s) => String(s.id) === String(id)),
     );
 
   const getGroupIds = (id) =>
@@ -832,7 +832,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
 
   const getResidueById = (id) => {
     const r = (batchDesigner || []).find(
-      (b) => String(b.id) === String(id)
+      (b) => String(b.id) === String(id),
     )?.cakes_residue;
     return Number(r) || 0;
   };
@@ -872,7 +872,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
       const residue = Math.max(total - inBatch, 0);
 
       dispatch(
-        updateBatchState({ id, cakes_in_batch: inBatch, cakes_residue: residue })
+        updateBatchState({ id, cakes_in_batch: inBatch, cakes_residue: residue }),
       );
       dispatch(unlockButton({ id, isButtonLocked: residue === 0 }));
     }
@@ -1105,7 +1105,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
 
   const clearAutoclaves = () => {
     const emptyRows = Array.from({ length: initialRowCount }, () =>
-      Array.from({ length: CELLS_PER_AUTOCLAVE }, () => ({ ...EMPTY_CELL }))
+      Array.from({ length: CELLS_PER_AUTOCLAVE }, () => ({ ...EMPTY_CELL })),
     );
 
     setAutoclave(emptyRows);
@@ -1119,7 +1119,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
           id: b.id,
           cakes_in_batch: 0,
           cakes_residue: b.total_cakes,
-        })
+        }),
       );
       dispatch(unlockButton({ id: b.id, isButtonLocked: false }));
     });
@@ -1130,147 +1130,171 @@ function Autoclave({ acData, autoclaveCalendarData }) {
       ? autoclave.flat().filter((cell) => cell?.id !== null).length
       : 0;
 
-    if (filledCount === 0 || filledCount % CELLS_PER_AUTOCLAVE !== 0) {
-      alert('Please fill the autoclave completely');
-      return;
-    }
+    // if (filledCount === 0 || filledCount % CELLS_PER_AUTOCLAVE !== 0) {
+    //   alert('Please fill the autoclave completely');
+    //   return;
+    // }
 
-    const { quantity, date, produced_autoclave } = autoclaveCalendarData;
-    const new_produced_autoclave =
-      Number(produced_autoclave || 0) + filledCount / CELLS_PER_AUTOCLAVE;
+    const isAutoclaveInvalid =
+      filledCount === 0 || filledCount % CELLS_PER_AUTOCLAVE !== 0;
 
-    dispatch(
-      addNewAutoclaveCalendar([
-        { quantity, date, produced_autoclave: new_produced_autoclave },
-      ])
-    );
-
-    const flat = toFlat(autoclave);
-    const idsInOrder = [];
-    for (const c of flat) {
-      if (c?.id == null) continue;
-      if (!idsInOrder.includes(c.id)) idsInOrder.push(c.id);
-    }
-
-    let positionInBatch = 1;
-    const batchPositions = [];
-
-    idsInOrder.forEach((id) => {
-      const product = batchDesigner.find((p) => p.id === id);
-      if (product) {
-        batchPositions.push({ product, positionInBatch });
-        positionInBatch += Number(product.cakes_in_batch || 0);
-      }
-    });
-
-    const mergedNewPositions = batchPositions.reduce((acc, current) => {
-      const lastItem = acc[acc.length - 1];
-      const currentProduct = current.product;
-
-      if (
-        lastItem &&
-        lastItem.product.product_article === currentProduct.product_article &&
-        lastItem.product.id_list_of_ordered_production !== null &&
-        currentProduct.id_list_of_ordered_production !== null
-      ) {
-        lastItem.product.cakes_in_batch += currentProduct.cakes_in_batch;
-        lastItem.product.free_product_package += currentProduct.free_product_package;
-        lastItem.product.total_cakes += currentProduct.total_cakes;
-      } else {
-        acc.push({
-          product: { ...currentProduct },
-          positionInBatch: current.positionInBatch,
-        });
-      }
-      return acc;
-    }, []);
-
-    mergedNewPositions.forEach((newPosition) => {
-      const { product } = newPosition;
-
-      const existingRecord = existingBatchOutside.find(
-        (record) =>
-          record.product_article === product.product_article && record.date === date
+    if (isAutoclaveInvalid) {
+      const override = window.confirm(
+        'Autoclave is not fully filled. Override with password?',
       );
 
-      const quantity_total =
-        newPosition.product.id_list_of_ordered_production !== null
-          ? list_of_ordered_production?.find(
-              (order) => order.id == newPosition.product.id
-            )
-          : 0;
+      if (!override) return;
 
-      const m3InArray = latestProducts?.find(
-        (p) => p.article == product.product_article
-      )?.m3InArray;
-      const volumeBlockOnPallet = latestProducts?.find(
-        (p) => p.article == product.product_article
-      )?.volumeBlockOnPallet;
+      const password = prompt('Enter autoclave password:');
+      if (!password) {
+        alert('Password is required');
+        return;
+      }
 
-      const palletsPerArray = Math.max(
-        1,
-        Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1
+      if (password !== process.env.REACT_APP_PASSWORD_FOR_AUTOCLAVE) {
+        alert('Wrong password');
+        return;
+      }
+
+      const producedDelta = Math.ceil(filledCount / CELLS_PER_AUTOCLAVE);
+
+      const { quantity, date, produced_autoclave } = autoclaveCalendarData;
+      const new_produced_autoclave = Number(produced_autoclave || 0) + producedDelta;
+
+      dispatch(
+        addNewAutoclaveCalendar([
+          { quantity, date, produced_autoclave: new_produced_autoclave },
+        ]),
       );
 
-      if (existingRecord) {
-        const updatedRecord = {
-          ...existingRecord,
-          quantity_pallets:
-            existingRecord.quantity_pallets +
-            product.cakes_in_batch * palletsPerArray,
-          quantity_free:
-            newPosition.product.id_list_of_ordered_production !== null &&
-            newPosition.product.cakes_in_batch &&
-            newPosition.product.total_cakes &&
-            newPosition.product.free_product_package >= 0
-              ? Math.max(
-                  0,
-                  newPosition.product.cakes_in_batch * palletsPerArray -
-                    quantity_total?.quantity
-                )
-              : newPosition.product.id_list_of_ordered_production == null
-              ? newPosition.product.cakes_in_batch * palletsPerArray +
-                (existingRecord?.quantity_free || 0)
-              : 0,
-          position_in_autoclave: newPosition.positionInBatch,
-          id_list_of_ordered_production:
-            newPosition.product.id_list_of_ordered_production !== null
-              ? newPosition.product.id
-              : null,
-        };
-        dispatch(updateBatchOutside(updatedRecord));
-      } else {
-        const newBatchOutside = {
-          product_article: product.product_article,
-          quantity_pallets: product.cakes_in_batch * palletsPerArray,
-          quantity_free:
-            newPosition?.product?.id_list_of_ordered_production !== null &&
-            newPosition?.product?.cakes_in_batch &&
-            newPosition?.product?.total_cakes &&
-            newPosition?.product?.free_product_package >= 0
-              ? Math.max(
-                  0,
-                  newPosition.product.cakes_in_batch * palletsPerArray -
-                    quantity_total?.quantity
-                )
-              : newPosition.product.id_list_of_ordered_production == null
-              ? newPosition.product.cakes_in_batch * palletsPerArray
-              : 0,
-          position_in_autoclave: newPosition.positionInBatch,
-          id_list_of_ordered_production:
-            newPosition.product.id_list_of_ordered_production !== null
-              ? newPosition.product.id
-              : null,
-          date,
-        };
-        dispatch(addNewBatchOutside(newBatchOutside));
+      const flat = toFlat(autoclave);
+      const idsInOrder = [];
+      for (const c of flat) {
+        if (c?.id == null) continue;
+        if (!idsInOrder.includes(c.id)) idsInOrder.push(c.id);
       }
-    });
 
-    setSelectedCell(null);
-    clearAutoclaves();
+      let positionInBatch = 1;
+      const batchPositions = [];
+
+      idsInOrder.forEach((id) => {
+        const product = batchDesigner.find((p) => p.id === id);
+        if (product) {
+          batchPositions.push({ product, positionInBatch });
+          positionInBatch += Number(product.cakes_in_batch || 0);
+        }
+      });
+
+      const mergedNewPositions = batchPositions.reduce((acc, current) => {
+        const lastItem = acc[acc.length - 1];
+        const currentProduct = current.product;
+
+        if (
+          lastItem &&
+          lastItem.product.product_article === currentProduct.product_article &&
+          lastItem.product.id_list_of_ordered_production !== null &&
+          currentProduct.id_list_of_ordered_production !== null
+        ) {
+          lastItem.product.cakes_in_batch += currentProduct.cakes_in_batch;
+          lastItem.product.free_product_package +=
+            currentProduct.free_product_package;
+          lastItem.product.total_cakes += currentProduct.total_cakes;
+        } else {
+          acc.push({
+            product: { ...currentProduct },
+            positionInBatch: current.positionInBatch,
+          });
+        }
+        return acc;
+      }, []);
+
+      mergedNewPositions.forEach((newPosition) => {
+        const { product } = newPosition;
+
+        const existingRecord = existingBatchOutside.find(
+          (record) =>
+            record.product_article === product.product_article &&
+            record.date === date,
+        );
+
+        const quantity_total =
+          newPosition.product.id_list_of_ordered_production !== null
+            ? list_of_ordered_production?.find(
+                (order) => order.id == newPosition.product.id,
+              )
+            : 0;
+
+        const m3InArray = latestProducts?.find(
+          (p) => p.article == product.product_article,
+        )?.m3InArray;
+        const volumeBlockOnPallet = latestProducts?.find(
+          (p) => p.article == product.product_article,
+        )?.volumeBlockOnPallet;
+
+        const palletsPerArray = Math.max(
+          1,
+          Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+        );
+
+        if (existingRecord) {
+          const updatedRecord = {
+            ...existingRecord,
+            quantity_pallets:
+              existingRecord.quantity_pallets +
+              product.cakes_in_batch * palletsPerArray,
+            quantity_free:
+              newPosition.product.id_list_of_ordered_production !== null &&
+              newPosition.product.cakes_in_batch &&
+              newPosition.product.total_cakes &&
+              newPosition.product.free_product_package >= 0
+                ? Math.max(
+                    0,
+                    newPosition.product.cakes_in_batch * palletsPerArray -
+                      quantity_total?.quantity,
+                  )
+                : newPosition.product.id_list_of_ordered_production == null
+                  ? newPosition.product.cakes_in_batch * palletsPerArray +
+                    (existingRecord?.quantity_free || 0)
+                  : 0,
+            position_in_autoclave: newPosition.positionInBatch,
+            id_list_of_ordered_production:
+              newPosition.product.id_list_of_ordered_production !== null
+                ? newPosition.product.id
+                : null,
+          };
+          dispatch(updateBatchOutside(updatedRecord));
+        } else {
+          const newBatchOutside = {
+            product_article: product.product_article,
+            quantity_pallets: product.cakes_in_batch * palletsPerArray,
+            quantity_free:
+              newPosition?.product?.id_list_of_ordered_production !== null &&
+              newPosition?.product?.cakes_in_batch &&
+              newPosition?.product?.total_cakes &&
+              newPosition?.product?.free_product_package >= 0
+                ? Math.max(
+                    0,
+                    newPosition.product.cakes_in_batch * palletsPerArray -
+                      quantity_total?.quantity,
+                  )
+                : newPosition.product.id_list_of_ordered_production == null
+                  ? newPosition.product.cakes_in_batch * palletsPerArray
+                  : 0,
+            position_in_autoclave: newPosition.positionInBatch,
+            id_list_of_ordered_production:
+              newPosition.product.id_list_of_ordered_production !== null
+                ? newPosition.product.id
+                : null,
+            date,
+          };
+          dispatch(addNewBatchOutside(newBatchOutside));
+        }
+      });
+
+      setSelectedCell(null);
+      clearAutoclaves();
+    }
   };
-
   const selectedLabel = useMemo(() => {
     if (!selectedCell?.article) return null;
     return `Выбран массив с article: ${selectedCell.article}`;
@@ -1287,7 +1311,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
               <div
                 key={cellIndex}
                 className={`autoclave-cell ${getClassForAutoclave(
-                  assignColorToId(el?.id)
+                  assignColorToId(el?.id),
                 )}`}
                 onClick={() => {
                   if (!el) return;
