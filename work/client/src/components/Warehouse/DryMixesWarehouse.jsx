@@ -1,19 +1,19 @@
-import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import Table from "../Table/Table";
-import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import ShowProductsTypeWarehouseModal from "./Modal/ProductsTypeWarehouseModal";
-import { useModalContext } from "#components/contexts/ModalContext.js";
-import ListOfReservedAuxilaryModal from "./ListOfReservedProducts/ListOfReservedAuxilaryModal";
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Table from '../Table/Table';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import ShowProductsTypeWarehouseModal from './Modal/ProductsTypeWarehouseModal';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import ListOfReservedAuxilaryModal from './ListOfReservedProducts/ListOfReservedAuxilaryModal';
+import { getDryMixesWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
 
 function Warehouse() {
-  const { COLUMNS_WAREHOUSE_AUX, dry_mixes_warehouse_data } =
-    useWarehouseContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } =
-    useUsersContext();
+  const { COLUMNS_WAREHOUSE_AUX, dry_mixes_warehouse_data } = useWarehouseContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { setWarehouseInfoCurIdModal } = useModalContext();
 
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
   const [modalShow, setModalShow] = useState(false);
@@ -24,8 +24,12 @@ function Warehouse() {
   }, []);
 
   useEffect(() => {
+    dispatch(getDryMixesWarehouse());
+  }, []);
+
+  useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, "Warehouse");
+      const access = checkUserAccess(user, roles, 'Warehouse');
 
       if (JSON.stringify(access) !== JSON.stringify(userAccess)) {
         setUserAccess(access);
@@ -36,14 +40,14 @@ function Warehouse() {
   return (
     <>
       {userAccess?.canWrite && (
-        <ShowProductsTypeWarehouseModal target={1} title={"dry mix"} />
+        <ShowProductsTypeWarehouseModal target={1} title={'dry mix'} />
       )}
 
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE_AUX}
         dataOfTable={dry_mixes_warehouse_data}
         userAccess={userAccess}
-        tableName={"Dry Mixes Warehouse"}
+        tableName={'Dry Mixes Warehouse'}
         handleRowClick={handleRowClick}
       />
       <ListOfReservedAuxilaryModal
