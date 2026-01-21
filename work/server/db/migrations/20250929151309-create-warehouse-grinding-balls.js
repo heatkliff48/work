@@ -15,6 +15,9 @@ module.exports = {
       quantity: {
         type: Sequelize.FLOAT,
       },
+      diameter: {
+        type: Sequelize.FLOAT,
+      },
       quality: {
         type: Sequelize.FLOAT,
       },
