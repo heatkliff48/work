@@ -1,7 +1,7 @@
 import {
   updAccountingDataList,
   updateOrderStatus,
-} from "#components/redux/actions/ordersAction.js";
+} from '#components/redux/actions/ordersAction.js';
 import {
   addNewAnchorReservedProducts,
   addNewDryMixedReservedProducts,
@@ -18,11 +18,11 @@ import {
   updRelMatReservedProducts,
   updReservedProducts,
   updToolReservedProducts,
-} from "#components/redux/actions/warehouseAction.js";
-import { useProductsContext } from "./ProductContext";
-import { createContext, useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { addNewAldabaran } from "#components/redux/actions/aldabaranAction.js";
+} from '#components/redux/actions/warehouseAction.js';
+import { useProductsContext } from './ProductContext';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addNewAldabaran } from '#components/redux/actions/aldabaranAction.js';
 
 const WarehouseContext = createContext();
 
@@ -31,185 +31,185 @@ const WarehouseContextProvider = ({ children }) => {
 
   const COLUMNS_WAREHOUSE = [
     {
-      Header: "Warehouse ID",
-      accessor: "article",
-      sortType: "string",
+      Header: 'Warehouse ID',
+      accessor: 'article',
+      sortType: 'string',
     },
     {
-      Header: "Product ID",
-      accessor: "product_article",
-      sortType: "string",
+      Header: 'Product ID',
+      accessor: 'product_article',
+      sortType: 'string',
     },
     {
-      Header: "Free quantity remaining, pallet",
-      accessor: "free_quantity_remaining",
-      sortType: "number",
+      Header: 'Free quantity remaining, pallet',
+      accessor: 'free_quantity_remaining',
+      sortType: 'number',
     },
     {
-      Header: "Total quantity, pallet",
-      accessor: "total_quantity",
-      sortType: "number",
+      Header: 'Total quantity, pallet',
+      accessor: 'total_quantity',
+      sortType: 'number',
     },
     {
-      Header: "Ordered quantity, pallet",
-      accessor: "ordered_quantity",
-      sortType: "number",
+      Header: 'Ordered quantity, pallet',
+      accessor: 'ordered_quantity',
+      sortType: 'number',
     },
     {
-      Header: "Total m3",
-      accessor: "total_m3",
-      sortType: "number",
+      Header: 'Total m3',
+      accessor: 'total_m3',
+      sortType: 'number',
     },
     {
-      Header: "Warehouse location",
-      accessor: "warehouse_loc",
-      sortType: "string",
+      Header: 'Warehouse location',
+      accessor: 'warehouse_loc',
+      sortType: 'string',
     },
     {
-      Header: "Type",
-      accessor: "type",
-      sortType: "string",
+      Header: 'Type',
+      accessor: 'type',
+      sortType: 'string',
     },
   ];
 
   const COLUMNS_WAREHOUSE_AUX = [
     {
-      Header: "Warehouse ID",
-      accessor: "article",
-      sortType: "string",
+      Header: 'Warehouse ID',
+      accessor: 'article',
+      sortType: 'string',
     },
     {
-      Header: "Product ID",
-      accessor: "product_article",
-      sortType: "string",
+      Header: 'Product ID',
+      accessor: 'product_article',
+      sortType: 'string',
     },
     {
-      Header: "Free quantity remaining, pallet",
-      accessor: "free_quantity_remaining",
-      sortType: "number",
+      Header: 'Free quantity remaining, pallet',
+      accessor: 'free_quantity_remaining',
+      sortType: 'number',
     },
     {
-      Header: "Total quantity, pallet",
-      accessor: "total_quantity",
-      sortType: "number",
+      Header: 'Total quantity, pallet',
+      accessor: 'total_quantity',
+      sortType: 'number',
     },
     {
-      Header: "Ordered quantity, pallet",
-      accessor: "ordered_quantity",
-      sortType: "number",
+      Header: 'Ordered quantity, pallet',
+      accessor: 'ordered_quantity',
+      sortType: 'number',
     },
     {
-      Header: "Warehouse location",
-      accessor: "warehouse_loc",
-      sortType: "string",
+      Header: 'Warehouse location',
+      accessor: 'warehouse_loc',
+      sortType: 'string',
     },
     {
-      Header: "Type",
-      accessor: "type",
-      sortType: "string",
+      Header: 'Type',
+      accessor: 'type',
+      sortType: 'string',
     },
   ];
 
   const COLUMNS_RAW_MATERIALS_WAREHOUSE = [
     {
-      Header: "Material type",
-      accessor: "material_type",
-      sortType: "string",
+      Header: 'Material type',
+      accessor: 'material_type',
+      sortType: 'string',
     },
     {
-      Header: "Remaining quantity, kg",
-      accessor: "remaining_quantity",
-      sortType: "number",
+      Header: 'Remaining quantity, kg',
+      accessor: 'remaining_quantity',
+      sortType: 'number',
     },
     {
-      Header: "Last updated",
-      accessor: "last_updated",
-      sortType: "string",
+      Header: 'Last updated',
+      accessor: 'last_updated',
+      sortType: 'string',
     },
   ];
 
   const COLUMNS_LIST_OF_ORDERED_PRODUCTION = [
     {
-      Header: "Date of shipping",
-      accessor: "shipping_date",
-      sortType: "string",
+      Header: 'Date of shipping',
+      accessor: 'shipping_date',
+      sortType: 'string',
     },
     {
-      Header: "Product article",
-      accessor: "product_article",
-      sortType: "string",
+      Header: 'Product article',
+      accessor: 'product_article',
+      sortType: 'string',
     },
-    { Header: "Order article", accessor: "order_article", sortType: "string" },
-    { Header: "Quantity of pallets", accessor: "quantity", sortType: "number" },
+    { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
+    { Header: 'Quantity of pallets', accessor: 'quantity', sortType: 'number' },
     {
-      Header: "Quantity of cakes",
-      accessor: "quantity_cakes",
-      sortType: "number",
-    },
-    {
-      Header: "Quantity in batch, cakes",
-      accessor: "quantity_in_batch",
-      sortType: "number",
+      Header: 'Quantity of cakes',
+      accessor: 'quantity_cakes',
+      sortType: 'number',
     },
     {
-      Header: "Quantity in warehouse, pallets",
-      accessor: "quantity_in_warehouse",
-      sortType: "number",
+      Header: 'Quantity in batch, cakes',
+      accessor: 'quantity_in_batch',
+      sortType: 'number',
+    },
+    {
+      Header: 'Quantity in warehouse, pallets',
+      accessor: 'quantity_in_warehouse',
+      sortType: 'number',
     },
   ];
 
   const COLUMNS_LIST_OF_ORDERED_PRODUCTION_OEM = [
     {
-      Header: "Date of shipping",
-      accessor: "shipping_date",
-      sortType: "string",
+      Header: 'Date of shipping',
+      accessor: 'shipping_date',
+      sortType: 'string',
     },
     {
-      Header: "Product article",
-      accessor: "product_article",
-      sortType: "string",
+      Header: 'Product article',
+      accessor: 'product_article',
+      sortType: 'string',
     },
-    { Header: "Order article", accessor: "order_article", sortType: "string" },
-    { Header: "Quantity of pallets", accessor: "quantity", sortType: "number" },
-    { Header: "Status", accessor: "status", sortType: "string" },
+    { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
+    { Header: 'Quantity of pallets', accessor: 'quantity', sortType: 'number' },
+    { Header: 'Status', accessor: 'status', sortType: 'string' },
   ];
 
   const COLUMNS_RELATED_MATERIALS_BACKORDER_LIST = [
     {
-      Header: "Date of shipping",
-      accessor: "shipping_date",
-      sortType: "string",
+      Header: 'Date of shipping',
+      accessor: 'shipping_date',
+      sortType: 'string',
     },
     {
-      Header: "Product article",
-      accessor: "product_article",
-      sortType: "string",
+      Header: 'Product article',
+      accessor: 'product_article',
+      sortType: 'string',
     },
-    { Header: "Order article", accessor: "order_article", sortType: "string" },
-    { Header: "Quantity", accessor: "quantity", sortType: "number" },
+    { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
+    { Header: 'Quantity', accessor: 'quantity', sortType: 'number' },
     {
-      Header: "Quantity in warehouse, pallets",
-      accessor: "quantity_in_warehouse",
-      sortType: "number",
+      Header: 'Quantity in warehouse, pallets',
+      accessor: 'quantity_in_warehouse',
+      sortType: 'number',
     },
   ];
 
   const ordered_production_oem_status = [
     {
-      Header: "Not startered",
-      accessor: "not_start",
+      Header: 'Not startered',
+      accessor: 'not_start',
     },
     {
-      Header: "Ordered",
-      accessor: "ordered",
+      Header: 'Ordered',
+      accessor: 'ordered',
     },
     {
-      Header: "Shipped",
-      accessor: "shipped",
+      Header: 'Shipped',
+      accessor: 'shipped',
     },
     {
-      Header: "Done",
-      accessor: "done",
+      Header: 'Done',
+      accessor: 'done',
     },
   ];
 
@@ -270,39 +270,39 @@ const WarehouseContextProvider = ({ children }) => {
 
   useEffect(() => {
     console.log(
-      "list_of_reserved_products WarehouseContext.js line 268",
+      'list_of_reserved_products WarehouseContext.js line 268',
       list_of_reserved_products,
     );
   }, [list_of_reserved_products]);
 
   useEffect(() => {
     console.log(
-      "list_of_dry_mix_reserved_products WarehouseContext.js line 268",
+      'list_of_dry_mix_reserved_products WarehouseContext.js line 268',
       list_of_dry_mix_reserved_products,
     );
   }, [list_of_dry_mix_reserved_products]);
 
   useEffect(() => {
     console.log(
-      "list_of_tool_reserved_products WarehouseContext.js line 268",
+      'list_of_tool_reserved_products WarehouseContext.js line 268',
       list_of_tool_reserved_products,
     );
   }, [list_of_tool_reserved_products]);
 
   useEffect(() => {
-    console.log("warehouse_data WarehouseContext.js line 268", warehouse_data);
+    console.log('warehouse_data WarehouseContext.js line 268', warehouse_data);
   }, [warehouse_data]);
 
   useEffect(() => {
     console.log(
-      "dry_mixes_warehouse_data WarehouseContext.js line 268",
+      'dry_mixes_warehouse_data WarehouseContext.js line 268',
       dry_mixes_warehouse_data,
     );
   }, [dry_mixes_warehouse_data]);
 
   useEffect(() => {
     console.log(
-      "tools_warehouse_data WarehouseContext.js line 268",
+      'tools_warehouse_data WarehouseContext.js line 268',
       tools_warehouse_data,
     );
   }, [tools_warehouse_data]);
@@ -409,23 +409,23 @@ const WarehouseContextProvider = ({ children }) => {
 
         const lProduct = productArr?.find((lp) => lp.id === productId);
 
-        return `${lProduct?.article || "???"}: ${quantity}, `;
+        return `${lProduct?.article || '???'}: ${quantity}, `;
       });
   };
 
   function getProductType(article) {
-    if (article.startsWith("T.")) return "product";
-    if (article.startsWith("X.P")) return "relMat";
-    if (article.startsWith("X.T")) return "tool";
-    if (article.startsWith("X.M")) return "dryMixed";
-    if (article.startsWith("X.F")) return "anchor";
-    return "UNKNOWN";
+    if (article.startsWith('T.')) return 'product';
+    if (article.startsWith('X.P')) return 'relMat';
+    if (article.startsWith('X.T')) return 'tool';
+    if (article.startsWith('X.M')) return 'dryMixed';
+    if (article.startsWith('X.F')) return 'anchor';
+    return 'UNKNOWN';
   }
 
   const getWarehouseArticle = (product) => {
-    let versionNumber = "0001";
+    let versionNumber = '0001';
     const year = new Date().getFullYear().toString().slice(-2);
-    const month = (new Date().getMonth() + 1).toString().padStart(2, "0");
+    const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
     const day = new Date().getDate();
 
     const certificate = product?.certificate?.slice(0, 1);
@@ -502,23 +502,23 @@ const WarehouseContextProvider = ({ children }) => {
           });
 
           switch (type) {
-            case "product":
+            case 'product':
               dispatch(updReservedProducts(obj));
               break;
 
-            case "relMat":
+            case 'relMat':
               dispatch(updRelMatReservedProducts(obj));
               break;
 
-            case "tool":
+            case 'tool':
               dispatch(updToolReservedProducts(obj));
               break;
 
-            case "dryMixed":
+            case 'dryMixed':
               dispatch(updDryMixedReservedProducts(obj));
               break;
 
-            case "anchor":
+            case 'anchor':
               dispatch(updAnchorReservedProducts(obj));
               break;
 
@@ -624,7 +624,7 @@ const WarehouseContextProvider = ({ children }) => {
       );
     }
 
-    const pad = (n) => String(n).padStart(2, "0");
+    const pad = (n) => String(n).padStart(2, '0');
 
     const now = new Date();
     const dateTimeStr =
@@ -646,47 +646,47 @@ const WarehouseContextProvider = ({ children }) => {
 
       const obj = { warehouse_id, orders_products_id, quantity };
 
-      if (article.startsWith("T.")) {
+      if (article.startsWith('T.')) {
         grouped.product.push(obj);
-      } else if (article.startsWith("X.P")) {
+      } else if (article.startsWith('X.P')) {
         grouped.relMat.push(obj);
-      } else if (article.startsWith("X.T")) {
+      } else if (article.startsWith('X.T')) {
         grouped.tool.push(obj);
-      } else if (article.startsWith("X.M")) {
+      } else if (article.startsWith('X.M')) {
         grouped.dryMixed.push(obj);
-      } else if (article.startsWith("X.F")) {
+      } else if (article.startsWith('X.F')) {
         grouped.anchor.push(obj);
       }
     });
 
-    console.log("New reserved to save:", newReserved);
+    console.log('New reserved to save:', newReserved);
 
     Object.entries(grouped).forEach(([key, items]) => {
       console.log(
         key,
         items,
-        "Object.entries(grouped).forEach(([key, items]) =>  WarehouseContext.js line 651",
+        'Object.entries(grouped).forEach(([key, items]) =>  WarehouseContext.js line 651',
       );
 
-      if (typeof items !== "undefined" && items.length > 0) {
+      if (typeof items !== 'undefined' && items.length > 0) {
         switch (key) {
-          case "product":
+          case 'product':
             dispatch(addNewReservedProducts(items));
             break;
 
-          case "relMat":
+          case 'relMat':
             dispatch(addNewRelMatReservedProducts(items));
             break;
 
-          case "tool":
+          case 'tool':
             dispatch(addNewToolReservedProducts(items));
             break;
 
-          case "dryMixed":
+          case 'dryMixed':
             dispatch(addNewDryMixedReservedProducts(items));
             break;
 
-          case "anchor":
+          case 'anchor':
             dispatch(addNewAnchorReservedProducts(items));
             break;
 
@@ -747,9 +747,9 @@ const WarehouseContextProvider = ({ children }) => {
   // Надёжный парсер дат
   const toTime = (d) => {
     if (d == null) return Number.MAX_SAFE_INTEGER; // пустое => в конец
-    if (typeof d === "number") return d; // уже ms
+    if (typeof d === 'number') return d; // уже ms
     if (d instanceof Date) return d.getTime(); // Date -> ms
-    if (typeof d === "string") {
+    if (typeof d === 'string') {
       // 1) пробуем стандартный парсер (ISO и пр.)
       const t = Date.parse(d);
       if (!Number.isNaN(t)) return t;
@@ -995,7 +995,7 @@ const WarehouseContextProvider = ({ children }) => {
         (order) => order.article === order_article,
       );
 
-      console.log(currOrder, "WarehouseContext.js line 873");
+      console.log(currOrder, 'WarehouseContext.js line 873');
 
       if (currOrder?.id && !order_status.includes(currOrder?.status)) {
         dispatch(
