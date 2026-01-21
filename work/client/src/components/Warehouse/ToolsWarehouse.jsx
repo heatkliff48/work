@@ -1,19 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import Table from "../Table/Table";
-import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import ShowProductsTypeWarehouseModal from "./Modal/ProductsTypeWarehouseModal";
-import ListOfReservedAuxilaryModal from "./ListOfReservedProducts/ListOfReservedAuxilaryModal";
-import { useModalContext } from "#components/contexts/ModalContext.js";
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Table from '../Table/Table';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import ShowProductsTypeWarehouseModal from './Modal/ProductsTypeWarehouseModal';
+import ListOfReservedAuxilaryModal from './ListOfReservedProducts/ListOfReservedAuxilaryModal';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { getToolsWarehouse } from '#components/redux/actions/productsTypeWarehouseAction.js';
 
 function Warehouse() {
   const { COLUMNS_WAREHOUSE_AUX, tools_warehouse_data } = useWarehouseContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } =
-    useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { setWarehouseInfoCurIdModal } = useModalContext();
 
   const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const [modalShow, setModalShow] = useState(false);
 
@@ -24,8 +25,12 @@ function Warehouse() {
   }, []);
 
   useEffect(() => {
+    dispatch(getToolsWarehouse());
+  }, []);
+
+  useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, "Warehouse");
+      const access = checkUserAccess(user, roles, 'Warehouse');
 
       if (JSON.stringify(access) !== JSON.stringify(userAccess)) {
         setUserAccess(access);
@@ -36,14 +41,14 @@ function Warehouse() {
   return (
     <>
       {userAccess?.canWrite && (
-        <ShowProductsTypeWarehouseModal target={4} title={"tool"} />
+        <ShowProductsTypeWarehouseModal target={4} title={'tool'} />
       )}
 
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE_AUX}
         dataOfTable={tools_warehouse_data}
         userAccess={userAccess}
-        tableName={"Tools Warehouse"}
+        tableName={'Tools Warehouse'}
         handleRowClick={handleRowClick}
       />
       <ListOfReservedAuxilaryModal
