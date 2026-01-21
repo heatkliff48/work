@@ -15,13 +15,14 @@ module.exports = (sequelize, DataTypes) => {
     {
       supplier: DataTypes.STRING,
       quantity: DataTypes.FLOAT,
+      diameter: DataTypes.FLOAT,
       quality: DataTypes.FLOAT,
       date: DataTypes.STRING,
     },
     {
       sequelize,
       modelName: 'WarehouseGrindingBalls',
-    }
+    },
   );
   return WarehouseGrindingBalls;
 };

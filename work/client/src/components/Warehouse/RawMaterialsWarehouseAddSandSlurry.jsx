@@ -1,15 +1,13 @@
-import { TextSearchFilter } from "#components/Table/filters.js";
-import { Modal, Button, Row, Col } from "react-bootstrap";
-import { useCallback, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { useNavigate } from "react-router-dom";
-import { Container } from "reactstrap";
-import * as warehouseActions from "#components/redux/actions/warehouseRawMaterialsAction.js";
-import { updateRawMaterialsWarehouse } from "#components/redux/actions/warehouseAction.js";
-import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
+import { TextSearchFilter } from '#components/Table/filters.js';
+import { Modal, Button, Row } from 'react-bootstrap';
+import { useCallback, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { useNavigate } from 'react-router-dom';
+import { Container } from 'reactstrap';
+import { updateRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
 
 function RawMaterialsWarehouseAddSandSlurry(props) {
   const [sandSlurryWarehouseInput, setSandSlurryWarehouseInput] = useState({
@@ -20,43 +18,42 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
   const user = useSelector((state) => state.user);
 
   const { roles, checkUserAccess, setUserAccess } = useUsersContext();
-  const { raw_materials_warehouse } = useWarehouseContext();
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const sand_slurry = [
     {
-      Header: "Sand (dry), t/hour",
-      accessor: "sand",
+      Header: 'Sand (dry), t/hour',
+      accessor: 'sand',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Gypsum stone, t/hour",
-      accessor: "gypsum_stone",
+      Header: 'Gypsum stone, t/hour',
+      accessor: 'gypsum_stone',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Water, m3/hour",
-      accessor: "water",
+      Header: 'Water, m3/hour',
+      accessor: 'water',
       Filter: TextSearchFilter,
     },
     {
-      Header: "Grinding balls, t/hour",
-      accessor: "grinding_balls",
+      Header: 'Grinding balls, t/hour',
+      accessor: 'grinding_balls',
       Filter: TextSearchFilter,
     },
     {
-      Header: "AAC scrap, t/hour",
-      accessor: "aac",
+      Header: 'AAC scrap, t/hour',
+      accessor: 'aac',
       Filter: TextSearchFilter,
     },
   ];
 
   const handleRawMaterialWarehouseInputChange = useCallback((e) => {
     let processedValue = e.target.value;
-    if (typeof e.target.value === "string") {
-      processedValue = e.target.value.replace(/(\d+),(\d*)/g, "$1.$2");
+    if (typeof e.target.value === 'string') {
+      processedValue = e.target.value.replace(/(\d+),(\d*)/g, '$1.$2');
     }
 
     setSandSlurryWarehouseInput((prev) => ({
@@ -65,17 +62,17 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     }));
     setErrors((prev) => ({
       ...prev,
-      [e.target.name]: "",
+      [e.target.name]: '',
     }));
   }, []);
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, "Warehouse");
+      const access = checkUserAccess(user, roles, 'Warehouse');
       setUserAccess(access);
 
       if (!access?.canRead) {
-        navigate("/");
+        navigate('/');
       }
     }
   }, [user, roles]);
@@ -113,7 +110,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     if (
       mixingHoursValue === null ||
       mixingHoursValue === undefined ||
-      String(mixingHoursValue).trim() === ""
+      String(mixingHoursValue).trim() === ''
     ) {
       newErrors.mixing_hours = `This field is required`;
     } else {
@@ -129,7 +126,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       if (
         value === null ||
         value === undefined ||
-        String(value).trim() === ""
+        String(value).trim() === ''
       ) {
         newErrors[accessor] = `This field is required`;
         return;
@@ -145,7 +142,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     if (
       portionSizeValue === null ||
       portionSizeValue === undefined ||
-      String(portionSizeValue).trim() === ""
+      String(portionSizeValue).trim() === ''
     ) {
       newErrors.portion_size = `This field is required`;
     } else {
@@ -182,29 +179,29 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       updateRawMaterialsWarehouse({
         materials: [
           {
-            type: "Sand (dry)",
+            type: 'Sand (dry)',
             quantity: parseFloat(sandSlurryWarehouseInput.sand),
           },
           {
-            type: "Gypsum stone",
+            type: 'Gypsum stone',
             quantity: parseFloat(sandSlurryWarehouseInput.gypsum_stone),
           },
           {
-            type: "Grinding Balls",
+            type: 'Grinding Balls',
             quantity: parseFloat(sandSlurryWarehouseInput.grinding_balls),
           },
           {
-            type: "AAC",
+            type: 'AAC',
             quantity: parseFloat(sandSlurryWarehouseInput.aac),
           },
           {
-            type: "water",
+            type: 'water',
             quantity: parseFloat(sandSlurryWarehouseInput.water),
           },
         ],
         mixing_hours: parseFloat(sandSlurryWarehouseInput.mixing_hours),
         portion_size: parseFloat(sandSlurryWarehouseInput.portion_size),
-      })
+      }),
     );
     setSandSlurryWarehouseInput({ portion_size: 100 });
     props.onHide();
@@ -235,7 +232,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
                   htmlFor="mixing_hours"
                 >
-                  Mixing hours
+                  Mill working time
                 </label>
               </div>
               <div className="md:w-2/3">
@@ -244,7 +241,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   id="mixing_hours"
                   name="mixing_hours"
                   type="text"
-                  value={sandSlurryWarehouseInput.mixing_hours || ""}
+                  value={sandSlurryWarehouseInput.mixing_hours || ''}
                   onChange={handleRawMaterialWarehouseInputChange}
                 />
                 {errors.mixing_hours && (
@@ -272,7 +269,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                       id={el.accessor}
                       name={el.accessor}
                       type="text"
-                      value={sandSlurryWarehouseInput[el.accessor] || ""}
+                      value={sandSlurryWarehouseInput[el.accessor] || ''}
                       onChange={handleRawMaterialWarehouseInputChange}
                     />
                     {errors[el.accessor] && (
@@ -300,7 +297,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   id="portion_size"
                   name="portion_size"
                   type="text"
-                  value={sandSlurryWarehouseInput.portion_size || "100"}
+                  value={sandSlurryWarehouseInput.portion_size || '100'}
                   onChange={handleRawMaterialWarehouseInputChange}
                 />
                 {errors.portion_size && (

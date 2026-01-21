@@ -15,6 +15,9 @@ module.exports = {
       quantity: {
         type: Sequelize.FLOAT,
       },
+      type: {
+        type: Sequelize.STRING,
+      },
       quality: {
         type: Sequelize.FLOAT,
       },
