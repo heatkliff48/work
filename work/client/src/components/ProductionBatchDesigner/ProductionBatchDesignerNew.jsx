@@ -902,10 +902,11 @@ function ProductionBatchDesignerNew() {
       { Header: 'ID', accessor: 'id' },
       { Header: 'Product Article', accessor: 'product_article' },
       { Header: 'Ширина, мм', accessor: 'width' },
+      { Header: 'Плотность, кг/м³', accessor: 'density' },
       { Header: 'Количество, паллет', accessor: 'quantity' },
       { Header: 'Продукт + Брак, массивов', accessor: 'product_with_brack' },
       { Header: 'Кол-во, м³', accessor: 'quantity_m3' },
-      { Header: 'Свободная продукция, массив', accessor: 'free_product_cakes' },
+      //{ Header: 'Свободная продукция, массив', accessor: 'free_product_cakes' },
       { Header: 'Свободная продукция, паллет', accessor: 'free_product_package' },
       { Header: 'Итоговое кол-во, массив', accessor: 'total_cakes' },
       { Header: 'Размещено, массив', accessor: 'cakes_in_batch' },
@@ -1216,11 +1217,7 @@ function ProductionBatchDesignerNew() {
     }
 
     setAcData(filledAutoclave);
-  }, [
-    latestProducts,
-    listOfOrderedCakes,
-    emptyAutoclave,
-  ]);
+  }, [latestProducts, listOfOrderedCakes, emptyAutoclave]);
 
   useEffect(() => {
     setProductonBatchDesigner((prev) => {

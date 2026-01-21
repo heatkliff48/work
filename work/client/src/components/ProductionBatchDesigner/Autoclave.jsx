@@ -738,7 +738,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
   const batchDesigner = useSelector((state) => state.batchDesigner) || [];
   const existingBatchOutside = useSelector((state) => state.batchOutside) || [];
   const list_of_ordered_production = useSelector(
-    (state) => state.listOfOrderedProduction,
+    (state) => state.listOfOrderedProduction
   );
 
   const [selectedCell, setSelectedCell] = useState(null); // { id, article }
@@ -815,7 +815,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
 
   const shipTs = (id) => {
     const o = (list_of_ordered_production || []).find(
-      (x) => String(x.id) === String(id),
+      (x) => String(x.id) === String(id)
     );
     const d =
       o?.date_of_dispatch || o?.date_of_shipping || o?.shipment_date || o?.date;
@@ -824,7 +824,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
 
   const getGroupBySourceId = (id) =>
     (productionBatchDesigner || []).find((g) =>
-      (g.sources || []).some((s) => String(s.id) === String(id)),
+      (g.sources || []).some((s) => String(s.id) === String(id))
     );
 
   const getGroupIds = (id) =>
@@ -832,7 +832,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
 
   const getResidueById = (id) => {
     const r = (batchDesigner || []).find(
-      (b) => String(b.id) === String(id),
+      (b) => String(b.id) === String(id)
     )?.cakes_residue;
     return Number(r) || 0;
   };
@@ -872,7 +872,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
       const residue = Math.max(total - inBatch, 0);
 
       dispatch(
-        updateBatchState({ id, cakes_in_batch: inBatch, cakes_residue: residue }),
+        updateBatchState({ id, cakes_in_batch: inBatch, cakes_residue: residue })
       );
       dispatch(unlockButton({ id, isButtonLocked: residue === 0 }));
     }
@@ -1105,7 +1105,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
 
   const clearAutoclaves = () => {
     const emptyRows = Array.from({ length: initialRowCount }, () =>
-      Array.from({ length: CELLS_PER_AUTOCLAVE }, () => ({ ...EMPTY_CELL })),
+      Array.from({ length: CELLS_PER_AUTOCLAVE }, () => ({ ...EMPTY_CELL }))
     );
 
     setAutoclave(emptyRows);
@@ -1119,7 +1119,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
           id: b.id,
           cakes_in_batch: 0,
           cakes_residue: b.total_cakes,
-        }),
+        })
       );
       dispatch(unlockButton({ id: b.id, isButtonLocked: false }));
     });
@@ -1140,7 +1140,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
 
     if (isAutoclaveInvalid) {
       const override = window.confirm(
-        'Autoclave is not fully filled. Override with password?',
+        'Autoclave is not fully filled. Override with password?'
       );
 
       if (!override) return;
@@ -1152,7 +1152,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
       }
 
       if (password !== process.env.REACT_APP_PASSWORD_FOR_AUTOCLAVE) {
-        alert('Wrong password');
+        alert('Wrong password', process.env.REACT_APP_PASSWORD_FOR_AUTOCLAVE);
         return;
       }
 
@@ -1164,7 +1164,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
       dispatch(
         addNewAutoclaveCalendar([
           { quantity, date, produced_autoclave: new_produced_autoclave },
-        ]),
+        ])
       );
 
       const flat = toFlat(autoclave);
@@ -1214,26 +1214,26 @@ function Autoclave({ acData, autoclaveCalendarData }) {
         const existingRecord = existingBatchOutside.find(
           (record) =>
             record.product_article === product.product_article &&
-            record.date === date,
+            record.date === date
         );
 
         const quantity_total =
           newPosition.product.id_list_of_ordered_production !== null
             ? list_of_ordered_production?.find(
-                (order) => order.id == newPosition.product.id,
+                (order) => order.id == newPosition.product.id
               )
             : 0;
 
         const m3InArray = latestProducts?.find(
-          (p) => p.article == product.product_article,
+          (p) => p.article == product.product_article
         )?.m3InArray;
         const volumeBlockOnPallet = latestProducts?.find(
-          (p) => p.article == product.product_article,
+          (p) => p.article == product.product_article
         )?.volumeBlockOnPallet;
 
         const palletsPerArray = Math.max(
           1,
-          Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+          Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1
         );
 
         if (existingRecord) {
@@ -1250,12 +1250,12 @@ function Autoclave({ acData, autoclaveCalendarData }) {
                 ? Math.max(
                     0,
                     newPosition.product.cakes_in_batch * palletsPerArray -
-                      quantity_total?.quantity,
+                      quantity_total?.quantity
                   )
                 : newPosition.product.id_list_of_ordered_production == null
-                  ? newPosition.product.cakes_in_batch * palletsPerArray +
-                    (existingRecord?.quantity_free || 0)
-                  : 0,
+                ? newPosition.product.cakes_in_batch * palletsPerArray +
+                  (existingRecord?.quantity_free || 0)
+                : 0,
             position_in_autoclave: newPosition.positionInBatch,
             id_list_of_ordered_production:
               newPosition.product.id_list_of_ordered_production !== null
@@ -1275,11 +1275,11 @@ function Autoclave({ acData, autoclaveCalendarData }) {
                 ? Math.max(
                     0,
                     newPosition.product.cakes_in_batch * palletsPerArray -
-                      quantity_total?.quantity,
+                      quantity_total?.quantity
                   )
                 : newPosition.product.id_list_of_ordered_production == null
-                  ? newPosition.product.cakes_in_batch * palletsPerArray
-                  : 0,
+                ? newPosition.product.cakes_in_batch * palletsPerArray
+                : 0,
             position_in_autoclave: newPosition.positionInBatch,
             id_list_of_ordered_production:
               newPosition.product.id_list_of_ordered_production !== null
@@ -1311,7 +1311,7 @@ function Autoclave({ acData, autoclaveCalendarData }) {
               <div
                 key={cellIndex}
                 className={`autoclave-cell ${getClassForAutoclave(
-                  assignColorToId(el?.id),
+                  assignColorToId(el?.id)
                 )}`}
                 onClick={() => {
                   if (!el) return;
