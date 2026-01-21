@@ -25,21 +25,26 @@ export const warehouseReducer = (warehouse = [], action) => {
 
     case WAREHOSE_QUANTITYS:
     case WAREHOUSE_QUANTITYS_SOCKET: {
-      const { warehouse_id, total_quantity, ordered_quantity } = payload;
+      if (payload.isArray === false) {
+        const { warehouse_id, total_quantity, ordered_quantity } = payload;
 
-      const result = warehouse.map((el) => {
-        if (el.id == warehouse_id) {
-          return { ...el, total_quantity, ordered_quantity };
-        }
+        const result = warehouse.map((el) => {
+          if (el.id == warehouse_id) {
+            return { ...el, total_quantity, ordered_quantity };
+          }
 
-        return el;
-      });
-      return result;
+          return el;
+        });
+        return result;
+      } else {
+        return payload;
+      }
     }
 
     case REMAINING_STOCK:
     case REMAINING_STOCK_SOCKET: {
-      const { warehouse_id, free_quantity_remaining, ordered_quantity } = payload;
+      const { warehouse_id, free_quantity_remaining, ordered_quantity } =
+        payload;
 
       const result = warehouse.map((el) => {
         if (el.id == warehouse_id) {
@@ -65,7 +70,10 @@ export const warehouseReducer = (warehouse = [], action) => {
   }
 };
 
-export const rawMaterialsWarehouseReducer = (rawMaterialsWarehouse = [], action) => {
+export const rawMaterialsWarehouseReducer = (
+  rawMaterialsWarehouse = [],
+  action,
+) => {
   const { type, payload } = action;
   switch (type) {
     case RAW_MATERIALS_WAREHOUSE: {
