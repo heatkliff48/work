@@ -1,10 +1,10 @@
-import { useProductsContext } from "#components/contexts/ProductContext.js";
-import { useRecipeContext } from "#components/contexts/RecipeContext.js";
-import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
-import { saveMaterialPlan } from "#components/redux/actions/recipeAction.js";
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Select from "react-select";
+import { useProductsContext } from '#components/contexts/ProductContext.js';
+import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { saveMaterialPlan } from '#components/redux/actions/recipeAction.js';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
 
 function RawMaterialsPlan() {
   const { list_of_recipes, recipe_info } = useRecipeContext();
@@ -12,7 +12,7 @@ function RawMaterialsPlan() {
   const { raw_materials_warehouse } = useWarehouseContext();
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_ordered_production = useSelector(
-    (state) => state.listOfOrderedProduction
+    (state) => state.listOfOrderedProduction,
   );
 
   const [productsArray, setProductsArray] = useState([]);
@@ -22,13 +22,13 @@ function RawMaterialsPlan() {
   const dispatch = useDispatch();
 
   const excludedAccessors = [
-    "article",
-    "cake_height",
-    "solids",
-    "volume",
-    "density_recipe",
-    "produced_return_dry",
-    "water_solids",
+    'article',
+    'cake_height',
+    'solids',
+    'volume',
+    'density_recipe',
+    'produced_return_dry',
+    'water_solids',
   ];
 
   const rawMaterials = recipe_info
@@ -36,8 +36,7 @@ function RawMaterialsPlan() {
     .map((item) => {
       const warehouseMaterial = raw_materials_warehouse.find(
         (warehouseItem) =>
-          warehouseItem.material_type ===
-          item.Header.replace(/, kg$/, "").trim()
+          warehouseItem.material_type === item.Header.replace(/, kg$/, '').trim(),
       );
 
       return {
@@ -46,22 +45,6 @@ function RawMaterialsPlan() {
         remaining: warehouseMaterial ? warehouseMaterial.remaining_quantity : 0,
       };
     });
-
-  // const rawMaterials = [
-  //   { name: 'Sand', title: 'sand', remaining: 0 },
-  //   { name: 'Lime Lhoist', title: 'lime_lhoist', remaining: 0 },
-  //   { name: 'Lime Barcelona', title: 'lime_barcelona', remaining: 0 },
-  //   { name: 'Cement', title: 'cement', remaining: 0 },
-  //   { name: 'Gypsum', title: 'gypsum', remaining: 0 },
-  //   { name: 'Alu 1', title: 'alu_1', remaining: 0 },
-  //   { name: 'Alu 2', title: 'alu_2', remaining: 0 },
-  //   { name: 'Return slurry - solids', title: 'return_slurry_solids', remaining: 0 },
-  //   { name: 'Return slurry - water', title: 'return_slurry_water', remaining: 0 },
-  //   { name: 'Water', title: 'water', remaining: 0 },
-  //   { name: 'Water cold', title: 'water_cold', remaining: 0 },
-  //   { name: 'Water hot', title: 'water_hot', remaining: 0 },
-  //   { name: 'Condensate', title: 'condensate', remaining: 0 },
-  // ];
 
   const handleOrderShareChange = (name, value) => {
     setManualOrderShare((prev) => ({
@@ -87,10 +70,7 @@ function RawMaterialsPlan() {
 
   const mathFunc = (mat_num, product) => {
     if (!product.current_recipe) return 0;
-    return (
-      // product.current_recipe?.dry_total *
-      (product.current_recipe[mat_num] * product.quantity).toFixed(2)
-    );
+    return (product.current_recipe[mat_num] * product.quantity).toFixed(2);
   };
 
   const handlerSave = () => {
@@ -104,33 +84,36 @@ function RawMaterialsPlan() {
           ? {
               ...product,
               current_recipe: product.recipeArray.find(
-                (recipe) => recipe.id === selectedOption.value
+                (recipe) => recipe.id === selectedOption.value,
               ),
             }
-          : product
-      )
+          : product,
+      ),
     );
   };
 
   useEffect(() => {
     const result = batchOutside
       .map((batch) => {
-        const orderedProduct = list_of_ordered_production.find(
-          (product) => product.id === batch.id_list_of_ordered_production
+        let orderedProduct;
+
+        orderedProduct = list_of_ordered_production.find(
+          (product) => product.id === batch.id_list_of_ordered_production,
         );
 
-        if (!orderedProduct) return null;
+        if (!orderedProduct) {
+          orderedProduct = { product_article: batch.product_article };
+        }
+
         const productArticle = orderedProduct.product_article;
 
         const productDetails = latestProducts.find(
-          (product) => product.article === productArticle
+          (product) => product.article === productArticle,
         );
 
         const quantity =
           batch.quantity_pallets /
-          Math.floor(
-            productDetails.m3InArray / productDetails.volumeBlockOnPallet
-          );
+          Math.floor(productDetails.m3InArray / productDetails.volumeBlockOnPallet);
 
         if (!productDetails) return null;
 
@@ -147,7 +130,7 @@ function RawMaterialsPlan() {
         }));
 
         const prodDescription = productDetails.description.match(
-          /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/
+          /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/,
         );
 
         return {
@@ -157,19 +140,14 @@ function RawMaterialsPlan() {
           recipeArray,
           recipeOptions,
           current_recipe: recipeArray[0],
-          description: prodDescription ? prodDescription[1] : "",
+          description: prodDescription ? prodDescription[1] : '',
           date: batch.date,
         };
       })
       .filter(Boolean);
 
     setProductsArray(result);
-  }, [
-    batchOutside,
-    list_of_ordered_production,
-    list_of_recipes,
-    latestProducts,
-  ]);
+  }, [batchOutside, list_of_ordered_production, list_of_recipes, latestProducts]);
 
   useEffect(() => {
     const updatedTotals = {};
@@ -290,21 +268,21 @@ function RawMaterialsPlan() {
                       styles={{
                         singleValue: (provided) => ({
                           ...provided,
-                          color: "black", // цвет текста выбранного значения
+                          color: 'black', // цвет текста выбранного значения
                         }),
                         option: (provided, state) => ({
                           ...provided,
-                          color: state.isSelected ? "white" : "black", // выбранная белая, остальные чёрные
+                          color: state.isSelected ? 'white' : 'black', // выбранная белая, остальные чёрные
                           backgroundColor: state.isSelected
-                            ? "#2684FF"
+                            ? '#2684FF'
                             : state.isFocused
-                            ? "#e6f0ff" // подсветка при наведении
-                            : "white",
+                              ? '#e6f0ff' // подсветка при наведении
+                              : 'white',
                         }),
                         control: (provided) => ({
                           ...provided,
-                          backgroundColor: "white",
-                          color: "black",
+                          backgroundColor: 'white',
+                          color: 'black',
                         }),
                       }}
                     />
@@ -345,7 +323,7 @@ function RawMaterialsPlan() {
               <td>
                 <input
                   type="number"
-                  value={manualOrderShare[material.name] || ""}
+                  value={manualOrderShare[material.name] || ''}
                   onChange={(e) =>
                     handleOrderShareChange(material.name, e.target.value)
                   }
