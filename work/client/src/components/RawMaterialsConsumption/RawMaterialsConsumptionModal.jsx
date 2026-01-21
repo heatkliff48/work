@@ -423,12 +423,12 @@ const RawMaterialsConsumptionModal = React.memo(
       }
 
       const body = { materials };
-      dispatch(
-        addNewMainRawMatConsumption({
-          ...selectedRow,
-          consumed_volume: Number(productionVolume),
-        }),
-      );
+      // dispatch(
+      //   addNewMainRawMatConsumption({
+      //     ...selectedRow,
+      //     consumed_volume: Number(productionVolume),
+      //   }),
+      // );
 
       const productDetails = latestProducts.find(
         (product) => product.article === selectedRow?.batch_article,
@@ -450,13 +450,13 @@ const RawMaterialsConsumptionModal = React.memo(
 
       addProductOrder();
 
-      dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
-      dispatch(addNewLotesList({ new_lotestList, lotesListCheck }));
-      if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+      // dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
+      // dispatch(addNewLotesList({ new_lotestList, lotesListCheck }));
+      // if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
 
-      setMainRawMaterialConsumptionMadal(false);
-      toggle();
-      setProductionVolume('');
+      // setMainRawMaterialConsumptionMadal(false);
+      // toggle();
+      // setProductionVolume('');
     };
 
     const ddmmyyFromISO = (iso) => {
@@ -491,6 +491,7 @@ const RawMaterialsConsumptionModal = React.memo(
       const need = Math.floor(needRaw);
 
       if (!Number.isFinite(need) || need <= 0) return;
+      console.log('prodDate RawMaterialsConsumptionModal.jsx line 494', prodDate)
       const targetDate6 = ddmmyyFromISO(prodDate);
 
       if (!targetDate6) {
@@ -502,6 +503,7 @@ const RawMaterialsConsumptionModal = React.memo(
       }
 
       const row = (warehouse_data || []).find((w) => {
+        console.log('warehouse_data.w RawMaterialsConsumptionModal.jsx line 505', w)
         return (
           String(w.product_article) == String(batch_article) &&
           ddmmyyFromWarehouseArticle(w.article) == targetDate6

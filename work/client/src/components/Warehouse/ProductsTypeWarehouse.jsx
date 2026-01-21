@@ -1,6 +1,24 @@
+import {
+  getAnchorsWarehouse,
+  getDryMixesWarehouse,
+  getRelatedMaterialsWarehouse,
+  getToolsWarehouse,
+} from '#components/redux/actions/productsTypeWarehouseAction.js';
+import { getAllWarehouse } from '#components/redux/actions/warehouseAction.js';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 function ProductsTypeWarehouse() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllWarehouse());
+    dispatch(getDryMixesWarehouse());
+    dispatch(getAnchorsWarehouse());
+    dispatch(getToolsWarehouse());
+    dispatch(getRelatedMaterialsWarehouse());
+  }, []);
 
   return (
     <div className="main-container">
