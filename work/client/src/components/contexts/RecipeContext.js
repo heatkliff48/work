@@ -34,7 +34,7 @@ const RecipeContextProvider = ({ children }) => {
       accessor: 'gypsum_dry',
     },
     {
-      Header: 'Return (dry), kg',
+      Header: 'Return slurry (dry), kg',
       accessor: 'return_dry',
     },
     {
@@ -64,10 +64,6 @@ const RecipeContextProvider = ({ children }) => {
     {
       Header: 'Produced amount of return (dry), kg',
       accessor: 'produced_return_dry',
-    },
-    {
-      Header: 'Water total, kg',
-      accessor: 'water_total',
     },
   ];
 

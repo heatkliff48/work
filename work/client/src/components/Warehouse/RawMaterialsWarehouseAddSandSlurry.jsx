@@ -94,8 +94,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       (parseFloat(sandSlurryWarehouseInput.sand) || 0) +
       (parseFloat(sandSlurryWarehouseInput.gypsum_stone) || 0) +
       (parseFloat(sandSlurryWarehouseInput.grinding_balls) || 0) +
-      (parseFloat(sandSlurryWarehouseInput.aac) || 0) +
-      (parseFloat(sandSlurryWarehouseInput.water) || 0);
+      (parseFloat(sandSlurryWarehouseInput.aac) || 0);
 
     const mixingHours = parseFloat(sandSlurryWarehouseInput.mixing_hours) || 0;
     const portionSize = parseFloat(sandSlurryWarehouseInput.portion_size) || 0;
@@ -123,11 +122,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     sand_slurry.forEach(({ accessor }) => {
       const value = sandSlurryWarehouseInput?.[accessor];
 
-      if (
-        value === null ||
-        value === undefined ||
-        String(value).trim() === ''
-      ) {
+      if (value === null || value === undefined || String(value).trim() === '') {
         newErrors[accessor] = `This field is required`;
         return;
       }
@@ -201,7 +196,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
         ],
         mixing_hours: parseFloat(sandSlurryWarehouseInput.mixing_hours),
         portion_size: parseFloat(sandSlurryWarehouseInput.portion_size),
-      }),
+      })
     );
     setSandSlurryWarehouseInput({ portion_size: 100 });
     props.onHide();
@@ -245,9 +240,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   onChange={handleRawMaterialWarehouseInputChange}
                 />
                 {errors.mixing_hours && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.mixing_hours}
-                  </p>
+                  <p className="text-red-500 text-xs mt-1">{errors.mixing_hours}</p>
                 )}
               </div>
             </div>
@@ -301,9 +294,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   onChange={handleRawMaterialWarehouseInputChange}
                 />
                 {errors.portion_size && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.portion_size}
-                  </p>
+                  <p className="text-red-500 text-xs mt-1">{errors.portion_size}</p>
                 )}
               </div>
             </div>
@@ -316,9 +307,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   </label>
                 </div>
                 <div className="md:w-2/3">
-                  <span className="font-bold text-lg text-green-600">
-                    {total}
-                  </span>
+                  <span className="font-bold text-lg text-green-600">{total}</span>
                 </div>
               </div>
             )}
