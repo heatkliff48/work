@@ -147,7 +147,7 @@ lotesListRouter.get('/batches', async (req, res) => {
 
 lotesListRouter.post('/batches', async (req, res) => {
   console.log('>>>req.body<<<<<<<<<<<<<<<<<<<<<<<<<<', req.body);
-  const { new_lotestList } = req.body;
+  const { new_lotestList, lotesListCheck } = req.body;
   const { quantity_cakes, product, production_date } = new_lotestList;
 
   try {
@@ -172,48 +172,62 @@ lotesListRouter.post('/batches', async (req, res) => {
 
     const cake_id_finish = cake_id_start + quantityCakesInt - 1;
 
-    const existingSameCombo = await LotesListsBatches.findOne({
+    const lastBatch = await LotesListsBatches.findOne({
       where: {
         product,
         production_date,
-        // recipe,
       },
-      order: [
-        ['batch_id', 'DESC'],
-        ['sub_batch_id', 'DESC'],
-        ['id', 'DESC'],
-      ],
+      order: [['batch_id', 'DESC']],
     });
 
     let batch_id;
-    if (existingSameCombo?.batch_id) {
-      batch_id = Number(existingSameCombo.batch_id);
+    let sub_batch_id;
+
+    if (lotesListCheck) {
+      batch_id = Number(lastBatch.batch_id) + 1;
+      sub_batch_id = 1;
     } else {
-      const lastBatch = await LotesListsBatches.findOne({
+      const existingSameCombo = await LotesListsBatches.findOne({
         where: {
-          batch_id: { [Op.ne]: null },
+          product,
+          production_date,
         },
         order: [
           ['batch_id', 'DESC'],
+          ['sub_batch_id', 'DESC'],
           ['id', 'DESC'],
         ],
       });
-      batch_id = lastBatch?.batch_id ? Number(lastBatch.batch_id) + 1 : 1;
+
+      if (existingSameCombo?.batch_id) {
+        batch_id = Number(existingSameCombo.batch_id);
+      } else {
+        const lastBatch = await LotesListsBatches.findOne({
+          where: {
+            batch_id: { [Op.ne]: null },
+          },
+          order: [
+            ['batch_id', 'DESC'],
+            ['id', 'DESC'],
+          ],
+        });
+        batch_id = lastBatch?.batch_id ? Number(lastBatch.batch_id) + 1 : 1;
+      }
+
+      const lastSubBatch = await LotesListsBatches.findOne({
+        where: {
+          batch_id,
+        },
+        order: [
+          ['sub_batch_id', 'DESC'],
+          ['id', 'DESC'],
+        ],
+      });
+
+      sub_batch_id = lastSubBatch?.sub_batch_id
+        ? Number(lastSubBatch.sub_batch_id) + 1
+        : 1;
     }
-
-    const lastSubBatch = await LotesListsBatches.findOne({
-      where: {
-        batch_id,
-      },
-      order: [
-        ['sub_batch_id', 'DESC'],
-        ['id', 'DESC'],
-      ],
-    });
-
-    const sub_batch_id = lastSubBatch?.sub_batch_id
-      ? Number(lastSubBatch.sub_batch_id) + 1
-      : 1;
 
     const lotesListBatches = await LotesListsBatches.create({
       cake_id_start,
@@ -247,7 +261,7 @@ lotesListRouter.post('/batches/update/recipe', async (req, res) => {
       {
         where: { batch_id, sub_batch_id },
         returning: true,
-      }
+      },
     );
 
     if (count === 0) {
@@ -284,7 +298,7 @@ lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
       {
         where: { id },
         returning: true,
-      }
+      },
     );
 
     const updatedCake = rows[0];
@@ -313,7 +327,7 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
           x.cake_id > 0 &&
           x.recipe &&
           typeof x.recipe === 'object' &&
-          !Array.isArray(x.recipe)
+          !Array.isArray(x.recipe),
       );
 
     if (normalized.length === 0) {
@@ -333,7 +347,7 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
         {
           where: { id: cake_id },
           returning: true,
-        }
+        },
       );
 
       if (count === 0) continue;
