@@ -446,6 +446,7 @@ const RawMaterialsConsumptionModal = React.memo(
         product: prodDescription[1],
         quantity_cakes: Number(productionVolume),
         custom_recipe: wastedMode !== 'default',
+        recipe: selectedRow?.recipe_article,
         ...recipeSnapshot,
       };
 
