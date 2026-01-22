@@ -122,11 +122,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     sand_slurry.forEach(({ accessor }) => {
       const value = sandSlurryWarehouseInput?.[accessor];
 
-      if (
-        value === null ||
-        value === undefined ||
-        String(value).trim() === ''
-      ) {
+      if (value === null || value === undefined || String(value).trim() === '') {
         newErrors[accessor] = `This field is required`;
         return;
       }
@@ -298,9 +294,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   onChange={handleRawMaterialWarehouseInputChange}
                 />
                 {errors.portion_size && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.portion_size}
-                  </p>
+                  <p className="text-red-500 text-xs mt-1">{errors.portion_size}</p>
                 )}
               </div>
             </div>
