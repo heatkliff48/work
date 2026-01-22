@@ -355,12 +355,25 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
+      if (resolvedRecipe?.produced_return_dry && Number(productionVolume) > 0) {
+        const producedReturn =
+          resolvedRecipe.produced_return_dry * Number(productionVolume);
+
+        if (Number.isFinite(producedReturn) && producedReturn > 0) {
+          materials.push({
+            type: 'Return slurry (dry)',
+            quantity: +producedReturn.toFixed(2),
+          });
+        }
+      }
+
       if (govno) {
         const totalConsumedRaw = materials
           .filter(
             (m) => m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
           )
           .reduce((sum, m) => sum + (Number(m.quantity) || 0), 0);
+
         if (Number.isFinite(totalConsumedRaw) && totalConsumedRaw > 0) {
           const idx = materials.findIndex(
             (m) => m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
@@ -377,18 +390,6 @@ const RawMaterialsConsumptionModal = React.memo(
             materials.push({
               type: 'Return slurry (dry)',
               quantity: +totalConsumedRaw.toFixed(2),
-            });
-          }
-        }
-      } else {
-        if (resolvedRecipe?.produced_return_dry && Number(productionVolume) > 0) {
-          const producedReturn =
-            resolvedRecipe.produced_return_dry * Number(productionVolume);
-
-          if (Number.isFinite(producedReturn) && producedReturn > 0) {
-            materials.push({
-              type: 'Return slurry (dry)',
-              quantity: +producedReturn.toFixed(2),
             });
           }
         }
@@ -775,7 +776,7 @@ const RawMaterialsConsumptionModal = React.memo(
                   onChange={(e) => setGovno(e.target.checked)}
                 />
                 <label className="form-check-label" htmlFor="warehouse-checkbox">
-                  Govvo
+                  Govno
                 </label>
               </div>
               <div className="d-flex align-items-center gap-2">
