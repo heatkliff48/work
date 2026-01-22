@@ -181,7 +181,7 @@ function RenderSection({
             const value =
               isDate && formData[field.key]
                 ? String(formData[field.key]).slice(0, 10)
-                : formData[field.key] ?? '';
+                : (formData[field.key] ?? '');
 
             return (
               <Col key={field.key} xs={12} md={12 / cols} className="mb-1">
@@ -263,13 +263,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
     setBatchData({ ...selectedRecipe });
 
-    const start = Number(selectedRecipe.cake_id_start);
-    const finish = Number(selectedRecipe.cake_id_finish);
-
-    const initialCakeId =
-      Number.isFinite(start) && Number.isFinite(finish) ? start : null;
-
-    setSelectedCakeId(initialCakeId);
+    const start = Number(batchCakeRange.start);
+    setSelectedCakeId(Number.isFinite(start) ? start : null);
   }, [selectedRecipe]);
 
   useEffect(() => {
@@ -282,15 +277,50 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     setCakeData(found ? { ...found } : { id: Number(selectedCakeId) });
   }, [selectedCakeId, lotesListCakes, selectedRecipe]);
 
+  const batchCakeRange = useMemo(() => {
+    const related = Array.isArray(batchData.relatedBatches)
+      ? batchData.relatedBatches
+      : [];
+
+    const fallbackStart = Number(batchData.cake_id_start);
+    const fallbackFinish = Number(batchData.cake_id_finish);
+
+    let minStart = Number.isFinite(fallbackStart) ? fallbackStart : null;
+    let maxFinish = Number.isFinite(fallbackFinish) ? fallbackFinish : null;
+
+    for (const b of related) {
+      const s = Number(b?.cake_id_start);
+      const f = Number(b?.cake_id_finish);
+      if (!Number.isFinite(s) || !Number.isFinite(f)) continue;
+
+      if (minStart == null || s < minStart) minStart = s;
+      if (maxFinish == null || f > maxFinish) maxFinish = f;
+    }
+
+    if (
+      minStart == null ||
+      maxFinish == null ||
+      !Number.isFinite(minStart) ||
+      !Number.isFinite(maxFinish) ||
+      maxFinish < minStart
+    ) {
+      return { start: null, finish: null };
+    }
+
+    return { start: minStart, finish: maxFinish };
+  }, [batchData.relatedBatches, batchData.cake_id_start, batchData.cake_id_finish]);
+
   const cakeOptions = useMemo(() => {
-    const start = Number(batchData.cake_id_start);
-    const finish = Number(batchData.cake_id_finish);
+    const start = Number(batchCakeRange.start);
+    const finish = Number(batchCakeRange.finish);
+
     if (!Number.isFinite(start) || !Number.isFinite(finish) || finish < start)
       return [];
+
     const arr = [];
     for (let i = start; i <= finish; i += 1) arr.push(i);
     return arr;
-  }, [batchData.cake_id_start, batchData.cake_id_finish]);
+  }, [batchCakeRange.start, batchCakeRange.finish]);
 
   const cakeSelectOptions = useMemo(() => {
     return ['all', ...cakeOptions];
@@ -320,16 +350,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       [name]: numericKeys.has(name) ? (value === '' ? '' : Number(value)) : value,
     }));
   };
-
-  // const onSelectCake = (nextCakeIdRaw) => {
-  //   const nextCakeId = Number(nextCakeIdRaw);
-  //   if (!Number.isFinite(nextCakeId)) return;
-
-  //   setSelectedCakeId(nextCakeId);
-
-  //   const found = getCakeFromStore(nextCakeId);
-  //   setCakeData(found ? { ...found } : { id: nextCakeId });
-  // };
 
   const onSelectCake = (nextValue) => {
     if (nextValue === 'all') {
@@ -365,14 +385,22 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       activeSubBatchId: nextSub,
     }));
 
-    const start = Number(nextBatch.cake_id_start);
-    const finish = Number(nextBatch.cake_id_finish);
-    const initialCakeId =
-      Number.isFinite(start) && Number.isFinite(finish) && finish >= start
-        ? start
-        : null;
+    const rangeStart = Number(batchCakeRange.start);
+    const rangeFinish = Number(batchCakeRange.finish);
 
-    setSelectedCakeId(initialCakeId);
+    if (
+      Number.isFinite(rangeStart) &&
+      Number.isFinite(rangeFinish) &&
+      rangeFinish >= rangeStart
+    ) {
+      setSelectedCakeId((prevId) => {
+        const prev = Number(prevId);
+        if (Number.isFinite(prev) && prev >= rangeStart && prev <= rangeFinish) {
+          return prev;
+        }
+        return rangeStart;
+      });
+    }
   };
 
   const buildBatchPayload = () => {
@@ -509,7 +537,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
                         <Form.Select
                           size="sm"
                           style={{ width: 140 }}
-                          value={applyToAllCakes ? 'all' : selectedCakeId ?? ''}
+                          value={applyToAllCakes ? 'all' : (selectedCakeId ?? '')}
                           onChange={(e) => onSelectCake(e.target.value)}
                           disabled={!cakeOptions.length || applyToAllCakes}
                         >

@@ -399,7 +399,7 @@ function LotesList() {
   const COLUMNS_LOTES_LIST = [
     {
       Header: 'Batch ID',
-      accessor: 'id',
+      accessor: 'batch_id',
     },
     {
       Header: 'Cake ID start',
@@ -432,35 +432,39 @@ function LotesList() {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  console.log('lotesListBatches', lotesListBatches);
-  console.log('lotesListCakes', lotesListCakes);
-
   const groupedLotesList = useMemo(() => {
     if (!Array.isArray(lotesListBatches)) return [];
 
     const grouped = {};
 
     lotesListBatches.forEach((item) => {
-      if (!item) return;
+      if (!item || item.batch_id == null) return;
 
-      const key = `${item.product}|${item.production_date}|${item.cake_id}`;
+      const key = String(item.batch_id);
 
-      const finish = Number(item.cake_id_finish) || 0;
+      const start = Number(item.cake_id_start);
+      const finish = Number(item.cake_id_finish);
 
       if (!grouped[key]) {
-        grouped[key] = item;
+        grouped[key] = {
+          ...item,
+          cake_id_start: start,
+          cake_id_finish: finish,
+          quantity_cakes: finish - start + 1,
+        };
         return;
       }
 
-      const storedFinish = Number(grouped[key].cake_id_finish) || 0;
+      grouped[key].cake_id_start = Math.min(grouped[key].cake_id_start, start);
 
-      if (finish > storedFinish) {
-        grouped[key] = item;
-      }
+      grouped[key].cake_id_finish = Math.max(grouped[key].cake_id_finish, finish);
+
+      grouped[key].quantity_cakes =
+        grouped[key].cake_id_finish - grouped[key].cake_id_start + 1;
     });
 
     return Object.values(grouped).sort(
-      (a, b) => Number(b.cake_id_finish) - Number(a.cake_id_finish)
+      (a, b) => Number(b.batch_id) - Number(a.batch_id),
     );
   }, [lotesListBatches]);
 
@@ -480,7 +484,7 @@ function LotesList() {
       (r) =>
         r.product === item.product &&
         r.production_date === item.production_date &&
-        r.cake_id === item.cake_id
+        r.cake_id === item.cake_id,
     );
   };
 
@@ -497,7 +501,7 @@ function LotesList() {
       };
     } else {
       const baseRecipe = list_of_recipes.find(
-        (r) => String(r.article) === String(lotesListItem.recipe)
+        (r) => String(r.article) === String(lotesListItem.recipe),
       );
 
       if (!baseRecipe) {
