@@ -775,7 +775,7 @@ const RawMaterialsConsumptionModal = React.memo(
                   onChange={(e) => setGovno(e.target.checked)}
                 />
                 <label className="form-check-label" htmlFor="warehouse-checkbox">
-                  Govvo
+                  Govno
                 </label>
               </div>
               <div className="d-flex align-items-center gap-2">
