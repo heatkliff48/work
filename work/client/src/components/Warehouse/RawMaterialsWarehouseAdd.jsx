@@ -42,11 +42,19 @@ function RawMaterialsWarehouseAdd(props) {
       accessor: 'quantity',
       Filter: TextSearchFilter,
     },
-    (props?.material_type === 'Aluminum 1' ||
-      props?.material_type === 'Aluminum 2' ||
-      props?.material_type === 'Lime') && {
+    props?.material_type === 'Lime' && {
       Header: 'Type',
-      accessor: 'type',
+      accessor: 'typeLime',
+      Filter: TextSearchFilter,
+    },
+    props?.material_type === 'Aluminum 1' && {
+      Header: 'Type',
+      accessor: 'typeAlum1',
+      Filter: TextSearchFilter,
+    },
+    props?.material_type === 'Aluminum 2' && {
+      Header: 'Type',
+      accessor: 'typeAlum2',
       Filter: TextSearchFilter,
     },
     props?.material_type === 'Cement' && {
@@ -74,6 +82,9 @@ function RawMaterialsWarehouseAdd(props) {
   const initState = {
     typeCement: 'CEM I 52.5 R-SR3',
     typeSand: 'SILICA 0-2 WS',
+    typeLime: 'Lime CK 90Q',
+    typeAlum1: 'Alum 1 - 7040-10/70WB28',
+    typeAlum2: 'Alum 2 - 7100-30/70WB28',
     diameter: 30,
   };
 
@@ -147,6 +158,24 @@ function RawMaterialsWarehouseAdd(props) {
         typeSand: 'SILICA 0-2 WS',
       }));
     }
+    if (props?.material_type === 'Lime') {
+      setRawMaterialWarehouseInput((prev) => ({
+        ...prev,
+        typeLime: initState.typeLime,
+      }));
+    }
+    if (props?.material_type === 'Aluminum 1') {
+      setRawMaterialWarehouseInput((prev) => ({
+        ...prev,
+        typeAlum1: initState.typeAlum1,
+      }));
+    }
+    if (props?.material_type === 'Aluminum 2') {
+      setRawMaterialWarehouseInput((prev) => ({
+        ...prev,
+        typeAlum2: initState.typeAlum2,
+      }));
+    }
     if (props?.material_type === 'Grinding Balls') {
       setRawMaterialWarehouseInput((prev) => ({
         ...prev,
@@ -208,6 +237,24 @@ function RawMaterialsWarehouseAdd(props) {
     if (!rawMaterialWarehouseInput?.date?.trim()) {
       newErrors.supplier = 'Date is required';
     }
+    if (
+      props?.material_type === 'Lime' &&
+      !rawMaterialWarehouseInput?.typeLime
+    ) {
+      newErrors.typeLime = 'Lime type is required';
+    }
+    if (
+      props?.material_type === 'Aluminum 1' &&
+      !rawMaterialWarehouseInput?.typeAlum1
+    ) {
+      newErrors.typeAlum1 = 'Aluminum 1 type is required';
+    }
+    if (
+      props?.material_type === 'Aluminum 2' &&
+      !rawMaterialWarehouseInput?.typeAlum2
+    ) {
+      newErrors.typeAlum2 = 'Aluminum 2 type is required';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -234,14 +281,12 @@ function RawMaterialsWarehouseAdd(props) {
     const addAction = getAddAction(props?.material_type);
 
     const formData =
-      props?.material_type === 'Aluminum 1' ||
-      props?.material_type === 'Aluminum 2' ||
       props?.material_type === 'Lime'
         ? {
             supplier: rawMaterialWarehouseInput?.supplier,
             quantity: rawMaterialWarehouseInput?.quantity * 1000,
             date: rawMaterialWarehouseInput?.date,
-            type: rawMaterialWarehouseInput?.type,
+            type: rawMaterialWarehouseInput?.typeLime,
           }
         : props?.material_type === 'Cement'
           ? {
@@ -264,11 +309,25 @@ function RawMaterialsWarehouseAdd(props) {
                   date: rawMaterialWarehouseInput?.date,
                   diameter: rawMaterialWarehouseInput?.diameter,
                 }
-              : {
-                  supplier: rawMaterialWarehouseInput?.supplier,
-                  quantity: rawMaterialWarehouseInput?.quantity * 1000,
-                  date: rawMaterialWarehouseInput?.date,
-                };
+              : props?.material_type === 'Aluminum 1'
+                ? {
+                    supplier: rawMaterialWarehouseInput?.supplier,
+                    quantity: rawMaterialWarehouseInput?.quantity * 1000,
+                    date: rawMaterialWarehouseInput?.date,
+                    type: rawMaterialWarehouseInput?.typeAlum1,
+                  }
+                : props?.material_type === 'Aluminum 2'
+                  ? {
+                      supplier: rawMaterialWarehouseInput?.supplier,
+                      quantity: rawMaterialWarehouseInput?.quantity * 1000,
+                      date: rawMaterialWarehouseInput?.date,
+                      type: rawMaterialWarehouseInput?.typeAlum2,
+                    }
+                  : {
+                      supplier: rawMaterialWarehouseInput?.supplier,
+                      quantity: rawMaterialWarehouseInput?.quantity * 1000,
+                      date: rawMaterialWarehouseInput?.date,
+                    };
 
     dispatch(addAction(formData));
     setRawMaterialWarehouseInput({ ...initState });
