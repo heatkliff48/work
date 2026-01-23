@@ -22,7 +22,7 @@ const RawMaterialsConsumptionModal = React.memo(
     const {
       list_of_recipes = [],
       main_raw_mat_consumption,
-      lotesListCheck,
+      lotesListBatchesCheck,
       setLotesListCheck,
     } = useRecipeContext();
     const { latestProducts } = useProductsContext();
@@ -453,7 +453,9 @@ const RawMaterialsConsumptionModal = React.memo(
       addProductOrder();
 
       dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
-      dispatch(addNewLotesList({ new_lotestList, lotesListCheck }));
+      dispatch(
+        addNewLotesList({ new_lotestList, new_batch: lotesListBatchesCheck }),
+      );
       if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
 
       setMainRawMaterialConsumptionMadal(false);
@@ -785,7 +787,7 @@ const RawMaterialsConsumptionModal = React.memo(
                   id="warehouse-checkbox"
                   className="form-check-input"
                   type="checkbox"
-                  checked={lotesListCheck}
+                  checked={lotesListBatchesCheck}
                   onChange={(e) => setLotesListCheck(e.target.checked)}
                 />
                 <label className="form-check-label" htmlFor="warehouse-checkbox">

@@ -480,12 +480,9 @@ function LotesList() {
   }, [user, roles, checkUserAccess, userAccess, setUserAccess]);
 
   const getRelatedBatches = (item) => {
-    return lotesListBatches.filter(
-      (r) =>
-        r.product === item.product &&
-        r.production_date === item.production_date &&
-        r.cake_id === item.cake_id,
-    );
+    return lotesListBatches
+      .filter((r) => String(r.batch_id) === String(item.batch_id))
+      .sort((a, b) => Number(a.sub_batch_id) - Number(b.sub_batch_id));
   };
 
   const openModal = (lotesListItem) => {
@@ -514,12 +511,11 @@ function LotesList() {
         ...lotesListItem,
       };
     }
-    console.log('resolvedRecipe LotesList.jsx line 513', resolvedRecipe);
 
     setSelectedLotesRecipe({
       ...resolvedRecipe,
       relatedBatches,
-      activeBatchId: lotesListItem.id,
+      activeSubBatchId: lotesListItem.sub_batch_id,
     });
 
     setLotesListBatchesModal(true);

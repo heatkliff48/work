@@ -263,8 +263,19 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
     setBatchData({ ...selectedRecipe });
 
-    const start = Number(batchCakeRange.start);
-    setSelectedCakeId(Number.isFinite(start) ? start : null);
+    const related = Array.isArray(selectedRecipe.relatedBatches)
+      ? selectedRecipe.relatedBatches
+      : [];
+
+    const starts = related
+      .map((b) => Number(b?.cake_id_start))
+      .filter(Number.isFinite);
+
+    const minStart = starts.length
+      ? Math.min(...starts)
+      : Number(selectedRecipe.cake_id_start);
+
+    setSelectedCakeId(Number.isFinite(minStart) ? minStart : null);
   }, [selectedRecipe]);
 
   useEffect(() => {

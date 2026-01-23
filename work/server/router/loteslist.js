@@ -147,7 +147,7 @@ lotesListRouter.get('/batches', async (req, res) => {
 
 lotesListRouter.post('/batches', async (req, res) => {
   console.log('>>>req.body<<<<<<<<<<<<<<<<<<<<<<<<<<', req.body);
-  const { new_lotestList, lotesListCheck } = req.body;
+  const { new_lotestList, new_batch } = req.body;
   const { quantity_cakes, product, production_date } = new_lotestList;
 
   try {
@@ -183,7 +183,7 @@ lotesListRouter.post('/batches', async (req, res) => {
     let batch_id;
     let sub_batch_id;
 
-    if (lotesListCheck) {
+    if (new_batch) {
       batch_id = Number(lastBatch.batch_id) + 1;
       sub_batch_id = 1;
     } else {
