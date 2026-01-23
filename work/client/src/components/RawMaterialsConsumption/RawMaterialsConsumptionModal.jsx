@@ -70,7 +70,7 @@ const RawMaterialsConsumptionModal = React.memo(
         { label: 'Grinding Balls', key: 'grinding_balls' },
         { label: 'AAC', key: 'aac' },
       ],
-      [],
+      []
     );
 
     const warehouseByType = React.useMemo(() => {
@@ -85,7 +85,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
     const ALWAYS_VISIBLE = useMemo(
       () => new Set(['Aluminum 1', 'Aluminum 2', 'Grinding Balls', 'AAC']),
-      [],
+      []
     );
 
     const recipeForUI = useMemo(() => selectedRecipe || null, [selectedRecipe]);
@@ -122,7 +122,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (product) {
         candidateRecipes = (list_of_recipes || []).filter(
           (r) =>
-            r.density === product.density && r.certificate === product.certificate,
+            r.density === product.density && r.certificate === product.certificate
         );
       }
 
@@ -158,13 +158,13 @@ const RawMaterialsConsumptionModal = React.memo(
 
     const pvNumber = useMemo(
       () => (productionVolume === '' ? 0 : Number(productionVolume) || 0),
-      [productionVolume],
+      [productionVolume]
     );
 
     const baseByLabel = (label, key) => {
       if (!recipeForUI || !key || !(key in recipeForUI)) return '—';
       const v = recipeForUI[key];
-      return typeof v === 'number' ? v : (v ?? '—');
+      return typeof v === 'number' ? v : v ?? '—';
     };
 
     const logByKey = (key) => {
@@ -240,7 +240,7 @@ const RawMaterialsConsumptionModal = React.memo(
             `Уже учтено: ${info.alreadyConsumed}\n` +
             `Текущее: ${info.current}\n\n` +
             `Сверх плана: ${info.diff}\n\n` +
-            `Продолжить?`,
+            `Продолжить?`
         );
       }
 
@@ -250,7 +250,7 @@ const RawMaterialsConsumptionModal = React.memo(
             `План: ${info.planned}\n` +
             `Будет учтено всего: ${info.totalAfterSave}\n\n` +
             `Осталось: ${Math.abs(info.diff)}\n\n` +
-            `Продолжить?`,
+            `Продолжить?`
         );
       }
 
@@ -370,13 +370,13 @@ const RawMaterialsConsumptionModal = React.memo(
       if (govno) {
         const totalConsumedRaw = materials
           .filter(
-            (m) => m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
+            (m) => m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)'
           )
           .reduce((sum, m) => sum + (Number(m.quantity) || 0), 0);
 
         if (Number.isFinite(totalConsumedRaw) && totalConsumedRaw > 0) {
           const idx = materials.findIndex(
-            (m) => m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
+            (m) => m.type === 'Return slurry (dry)' || m.type === 'Return (dry)'
           );
 
           if (idx >= 0) {
@@ -416,7 +416,7 @@ const RawMaterialsConsumptionModal = React.memo(
           shortages
             .map(
               (s) =>
-                `${s.type}: нужно ${s.need}, на складе ${s.have} (не хватает ${s.lack})`,
+                `${s.type}: нужно ${s.need}, на складе ${s.have} (не хватает ${s.lack})`
             )
             .join('\n');
         alert(msg);
@@ -428,15 +428,15 @@ const RawMaterialsConsumptionModal = React.memo(
         addNewMainRawMatConsumption({
           ...selectedRow,
           consumed_volume: Number(productionVolume),
-        }),
+        })
       );
 
       const productDetails = latestProducts.find(
-        (product) => product.article === selectedRow?.batch_article,
+        (product) => product.article === selectedRow?.batch_article
       );
 
       const prodDescription = productDetails.description.match(
-        /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/,
+        /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/
       );
 
       const recipeSnapshot = buildRecipeSnapshot();
@@ -454,7 +454,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
       dispatch(
-        addNewLotesList({ new_lotestList, new_batch: lotesListBatchesCheck }),
+        addNewLotesList({ new_lotestList, new_batch: lotesListBatchesCheck })
       );
       if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
 
@@ -485,7 +485,7 @@ const RawMaterialsConsumptionModal = React.memo(
       const { batch_article, date: prodDate } = selectedRow;
 
       const product = latestProducts.find(
-        (p) => String(p.article) === String(batch_article),
+        (p) => String(p.article) === String(batch_article)
       );
       if (!product) return;
 
@@ -500,7 +500,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (!targetDate6) {
         console.warn(
           'Bad selectedRow.date, cannot match warehouse article date:',
-          prodDate,
+          prodDate
         );
         return;
       }
@@ -558,7 +558,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       console.log(
         'updatedRow RawMaterialsConsumptionModal.jsx line 519',
-        updatedRow,
+        updatedRow
       );
       dispatch(updateRemainingStock(updatedRow));
     };
@@ -741,10 +741,10 @@ const RawMaterialsConsumptionModal = React.memo(
                             placeholder="0"
                             value={
                               wastedMode === 'manual'
-                                ? (form[wKey] ?? '')
+                                ? form[wKey] ?? ''
                                 : wastedVal === ''
-                                  ? ''
-                                  : String(wastedVal)
+                                ? ''
+                                : String(wastedVal)
                             }
                             onChange={handleChange(wKey)}
                             disabled={wastedMode !== 'manual'}
@@ -779,7 +779,7 @@ const RawMaterialsConsumptionModal = React.memo(
                   onChange={(e) => setGovno(e.target.checked)}
                 />
                 <label className="form-check-label" htmlFor="warehouse-checkbox">
-                  Govno
+                  All to return slurry
                 </label>
               </div>
               <div className="d-flex align-items-center gap-2">
@@ -808,7 +808,7 @@ const RawMaterialsConsumptionModal = React.memo(
         </Modal>
       </div>
     );
-  },
+  }
 );
 
 export default RawMaterialsConsumptionModal;
