@@ -258,8 +258,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
       0,
     );
 
-    const sandSlurryQuantity =
-      totalAllMaterials * mixing_hours * portion_size * 10;
+    const sandSlurryQuantity = totalAllMaterials * mixing_hours * portion_size * 10;
 
     const [updatedSandSlurryRows] = await RawMaterialsWarehouse.update(
       {
@@ -363,10 +362,9 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
 rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
   const { materials } = req.body;
 
-  console.log(
-    '======================= materials ======================',
-    materials,
-  );
+  console.log('======================= materials ======================', materials);
+
+  const round2 = (num) => Math.round(num * 100) / 100;
 
   if (!Array.isArray(materials) || materials.length === 0) {
     return res.status(400).json({
@@ -375,10 +373,14 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
   }
 
   const normMaterials = materials
-    .map((m) => ({
-      type: normalizeType(m.type),
-      quantity: Number(m.quantity),
-    }))
+    .map((m) => {
+      const qty = Number(m.quantity);
+
+      return {
+        type: normalizeType(m.type),
+        quantity: round2(qty),
+      };
+    })
     .filter((m) => m.type && Number.isFinite(m.quantity) && m.quantity > 0);
 
   if (normMaterials.length === 0) {
@@ -400,14 +402,12 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
     const now = new Date();
 
     if (onlySandSlurryDry) {
-      const total = normMaterials.reduce((s, m) => s + m.quantity, 0);
+      const total = round2(normMaterials.reduce((s, m) => s + m.quantity, 0));
 
       await RawMaterialsWarehouse.update(
         {
           consumed_quantity: sequelize.literal(`consumed_quantity + ${total}`),
-          remaining_quantity: sequelize.literal(
-            `remaining_quantity - ${total}`,
-          ),
+          remaining_quantity: sequelize.literal(`remaining_quantity - ${total}`),
           last_updated: date,
           updatedAt: now,
         },
@@ -429,7 +429,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
     }
 
     const materialTotals = normMaterials.reduce((acc, m) => {
-      acc[m.type] = (acc[m.type] || 0) + m.quantity;
+      acc[m.type] = round2((acc[m.type] || 0) + m.quantity);
       return acc;
     }, {});
 
@@ -441,9 +441,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       if (materialType === 'Return slurry (dry)') {
         await RawMaterialsWarehouse.update(
           {
-            remaining_quantity: sequelize.literal(
-              `remaining_quantity + ${delta}`,
-            ),
+            remaining_quantity: sequelize.literal(`remaining_quantity + ${delta}`),
             last_updated: date,
             updatedAt: now,
           },
@@ -452,12 +450,8 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       } else {
         await RawMaterialsWarehouse.update(
           {
-            consumed_quantity: sequelize.literal(
-              `consumed_quantity + ${delta}`,
-            ),
-            remaining_quantity: sequelize.literal(
-              `remaining_quantity - ${delta}`,
-            ),
+            consumed_quantity: sequelize.literal(`consumed_quantity + ${delta}`),
+            remaining_quantity: sequelize.literal(`remaining_quantity - ${delta}`),
             last_updated: date,
             updatedAt: now,
           },
@@ -1036,10 +1030,7 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone/delete', async (req, res) => {
       where: { id: gypsum_stone_warehouse_id },
     });
 
-    myEmitter.emit(
-      DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
-      gypsum_stone_warehouse_id,
-    );
+    myEmitter.emit(DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET, gypsum_stone_warehouse_id);
     return res.json(gypsum_stone_warehouse_id).status(200);
   } catch (err) {
     return ErrorUtils.catchError(res, err);
@@ -1288,9 +1279,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
       date: formatDate(date),
     });
 
-    const totalGrindingBallsQuantity = await WarehouseGrindingBalls.sum(
-      'quantity',
-    );
+    const totalGrindingBallsQuantity = await WarehouseGrindingBalls.sum('quantity');
 
     const latestRecord = await WarehouseGrindingBalls.findOne({
       order: [['date', 'DESC']],
@@ -1308,8 +1297,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
 
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity:
-          totalGrindingBallsQuantity - record.consumed_quantity,
+        remaining_quantity: totalGrindingBallsQuantity - record.consumed_quantity,
         last_updated: lastUpdated,
       },
       {
@@ -1319,10 +1307,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
       },
     );
 
-    myEmitter.emit(
-      ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
-      warehouseGrindingBalls,
-    );
+    myEmitter.emit(ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET, warehouseGrindingBalls);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
       where: { material_type: 'Grinding Balls' },
     });
@@ -1352,19 +1337,13 @@ rawMaterialsWarehouseRouter.post('/grinding-balls/update', async (req, res) => {
       return res.status(400).json({ message: 'No valid fields to update' });
     }
 
-    const warehouseGrindingBalls = await WarehouseGrindingBalls.update(
-      updateData,
-      {
-        where: { supplier },
-        returning: true,
-        plain: true,
-      },
-    );
+    const warehouseGrindingBalls = await WarehouseGrindingBalls.update(updateData, {
+      where: { supplier },
+      returning: true,
+      plain: true,
+    });
 
-    myEmitter.emit(
-      UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
-      warehouseGrindingBalls,
-    );
+    myEmitter.emit(UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET, warehouseGrindingBalls);
     return res.json(warehouseGrindingBalls).status(200);
   } catch (err) {
     console.error(err.message);

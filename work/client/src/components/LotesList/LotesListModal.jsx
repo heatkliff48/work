@@ -30,10 +30,19 @@ const SECTIONS = {
   },
 
   mixerBatch: {
-    title: 'Mixer (batch)',
+    title: 'Mixer parameters',
     columns: 2,
     fields: [
-      { label: 'Dosing order', key: 'dosing_order' },
+      {
+        label: 'Dosing order',
+        key: 'dosing_order',
+        type: 'select',
+        options: [
+          { label: 'cement→lime', value: '' },
+          { label: 'cement→lime', value: 'cement->lime' },
+          { label: 'lime→cement', value: 'lime->cement' },
+        ],
+      },
       {
         label: 'Delay before dosing to the mixer',
         key: 'dosing_delay_lime_sec',
@@ -75,7 +84,7 @@ const SECTIONS = {
 
       { label: 'Sand (dry), kg', key: 'sand_dry' },
       { label: 'Return (dry), kg', key: 'return_dry' },
-      { label: 'Water solids', key: 'w_s' },
+      // { label: 'Water solids', key: 'w_s' },
     ],
   },
 
@@ -103,14 +112,17 @@ const SECTIONS = {
       { label: 'Lime', key: 'lime_producer' },
       { label: 'Al paste proportions', key: 'al_paste_proportion' },
 
-      { label: 'Slaking time for lime', key: 'lime_slaking_time_sec' },
+      {
+        label: 'Slaking time for lime',
+        key: 'lime_slaking_time_sec',
+        type: 'time_mmss',
+      },
       { label: 'Lime type', key: 'lime_type' },
     ],
   },
 };
 
 const numericKeys = new Set([
-  'dosing_order',
   'dosing_delay_lime_sec',
   'mixer_speed_rpm',
   'mixing_before_al_sec',
@@ -133,7 +145,6 @@ const numericKeys = new Set([
   'return_slurry_so3',
   'return_slurry_activity',
   'lime_activity',
-  'lime_slaking_time_sec',
 
   'water_solid_ratio',
   'sand_slurry_density',
@@ -141,6 +152,37 @@ const numericKeys = new Set([
   'casting_temp_c',
   'factory_temp_c',
 ]);
+
+const NUMERIC_FORMATS = {
+  dosing_delay_lime_sec: 2,
+  mixer_speed_rpm: 2,
+  mixing_before_al_sec: 2,
+  mixing_after_al_sec: 2,
+  vibrator_time_sec: 2,
+  vibrator_speed_hz: 2,
+
+  water_solid_ratio: 2,
+  lime: 2,
+  sand_slurry_dry: 2,
+  aluminum_paste: 2,
+  cement: 2,
+  gypsum_dry: 2,
+  aluminum_paste_2: 2,
+  sand_dry: 2,
+  return_dry: 2,
+
+  sand_fines: 2,
+  sand_slurry_so3: 2,
+  return_slurry_so3: 2,
+  return_slurry_activity: 2,
+  lime_activity: 2,
+
+  sand_slurry_density: 3,
+  return_slurry_density: 3,
+
+  casting_temp_c: 1,
+  factory_temp_c: 1,
+};
 
 function RenderSection({
   section,
@@ -152,6 +194,16 @@ function RenderSection({
   if (!section) return null;
 
   const cols = columnsOverride ?? section.columns ?? 1;
+
+  const formatMMSS = (input) => {
+    if (input == null) return '';
+
+    const digits = String(input).replace(/\D/g, '').slice(0, 4);
+
+    if (digits.length <= 2) return digits;
+
+    return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+  };
 
   return (
     <div
@@ -183,6 +235,9 @@ function RenderSection({
                 ? String(formData[field.key]).slice(0, 10)
                 : (formData[field.key] ?? '');
 
+            const isNumeric = numericKeys.has(field.key);
+            const precision = NUMERIC_FORMATS[field.key];
+
             return (
               <Col key={field.key} xs={12} md={12 / cols} className="mb-1">
                 <Form.Group as={Row} controlId={field.key}>
@@ -198,15 +253,56 @@ function RenderSection({
                     {field.label}
                   </Form.Label>
                   <Col sm={6}>
-                    <Form.Control
-                      size="sm"
-                      type={field.type || 'text'}
-                      name={field.key}
-                      value={value}
-                      readOnly={!!field.readOnly}
-                      disabled={!!field.readOnly}
-                      onChange={onChange}
-                    />
+                    {field.type === 'time_mmss' ? (
+                      <Form.Control
+                        size="sm"
+                        type="text"
+                        placeholder="mm:ss"
+                        name={field.key}
+                        value={value}
+                        onChange={(e) =>
+                          onChange({
+                            target: {
+                              name: field.key,
+                              value: formatMMSS(e.target.value),
+                            },
+                          })
+                        }
+                      />
+                    ) : field.type === 'select' ? (
+                      <Form.Select
+                        size="sm"
+                        name={field.key}
+                        value={value}
+                        onChange={onChange}
+                      >
+                        {field.options.map((opt) => (
+                          <option
+                            key={opt.value}
+                            value={opt.value}
+                            disabled={opt.value === ''}
+                          >
+                            {opt.label}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    ) : (
+                      <Form.Control
+                        size="sm"
+                        type={isNumeric ? 'number' : field.type || 'text'}
+                        step={
+                          isNumeric && precision != null
+                            ? Number(`0.${'0'.repeat(precision - 1)}1`)
+                            : undefined
+                        }
+                        inputMode={isNumeric ? 'decimal' : undefined}
+                        name={field.key}
+                        value={value}
+                        readOnly={!!field.readOnly}
+                        disabled={!!field.readOnly}
+                        onChange={onChange}
+                      />
+                    )}
                   </Col>
                 </Form.Group>
               </Col>
@@ -346,20 +442,74 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     return map;
   }, [cakeOptions, lotesListCakes, selectedRecipe]);
 
+  const roundTo = (value, digits) => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '';
+    const p = 10 ** digits;
+    return Math.round(n * p) / p;
+  };
+
+  const limitDecimals = (raw, digits) => {
+    if (raw === '' || raw == null) return '';
+
+    let s = String(raw).replace(',', '.');
+
+    s = s.replace(/[^\d.]/g, '');
+    const firstDot = s.indexOf('.');
+    if (firstDot !== -1) {
+      s = s.slice(0, firstDot + 1) + s.slice(firstDot + 1).replace(/\./g, '');
+    }
+
+    if (digits == null) return s;
+
+    const [intPart, fracPart = ''] = s.split('.');
+    if (s.includes('.')) {
+      return `${intPart}.${fracPart.slice(0, digits)}`;
+    }
+    return intPart;
+  };
+
   const handleBatchChange = (e) => {
     const { name, value } = e.target;
-    setBatchData((prev) => ({
-      ...prev,
-      [name]: numericKeys.has(name) ? (value === '' ? '' : Number(value)) : value,
-    }));
+
+    if (!numericKeys.has(name)) {
+      setBatchData((p) => ({ ...p, [name]: value }));
+      return;
+    }
+
+    const precision = NUMERIC_FORMATS[name];
+
+    const limited = value === '' ? '' : limitDecimals(value, precision);
+
+    const next =
+      limited === ''
+        ? ''
+        : precision != null
+          ? roundTo(limited, precision)
+          : Number(limited);
+
+    setBatchData((p) => ({ ...p, [name]: next }));
   };
 
   const handleCakeChange = (e) => {
     const { name, value } = e.target;
-    setCakeData((prev) => ({
-      ...prev,
-      [name]: numericKeys.has(name) ? (value === '' ? '' : Number(value)) : value,
-    }));
+
+    if (!numericKeys.has(name)) {
+      setCakeData((p) => ({ ...p, [name]: value }));
+      return;
+    }
+
+    const precision = NUMERIC_FORMATS[name];
+    const limited = value === '' ? '' : limitDecimals(value, precision);
+
+    const next =
+      limited === ''
+        ? ''
+        : precision != null
+          ? roundTo(limited, precision)
+          : Number(limited);
+
+    setCakeData((p) => ({ ...p, [name]: next }));
   };
 
   const onSelectCake = (nextValue) => {
@@ -462,7 +612,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
   const onSaveQuickChecking = (changes) => {
     dispatch(updateLotesListCakesBooleanRecipe(changes));
-
     setShowQuickChecking(false);
   };
 
@@ -578,8 +727,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
                 <Col md={12}>
                   <RenderSection
                     section={SECTIONS.rawMaterials}
-                    formData={batchData}
-                    onChange={handleBatchChange}
+                    formData={cakeData}
+                    onChange={handleCakeChange}
                   />
                 </Col>
               </Row>
