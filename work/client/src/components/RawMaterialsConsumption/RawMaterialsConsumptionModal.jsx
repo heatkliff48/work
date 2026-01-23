@@ -189,7 +189,7 @@ const RawMaterialsConsumptionModal = React.memo(
       const t = {};
       materialsMap.forEach(({ key }) => {
         const a = Number(form[`${key}_actual_reciepe`] || 0);
-        t[`${key}_total`] = pvNumber ? +(a * pvNumber).toFixed(3) : '';
+        t[`${key}_total`] = pvNumber ? +(a * pvNumber).toFixed(2) : '';
       });
       return t;
     }, [form, pvNumber, materialsMap]);
@@ -203,9 +203,9 @@ const RawMaterialsConsumptionModal = React.memo(
         return raw === '' ? '' : Number(raw);
       }
       if (pvNumber === 0) return '';
-      if (mode === 'from_actual') return +(aVal * pvNumber).toFixed(3);
+      if (mode === 'from_actual') return +(aVal * pvNumber).toFixed(2);
       if (!Number.isFinite(baseNum)) return '';
-      return +(baseNum * pvNumber).toFixed(3);
+      return +(baseNum * pvNumber).toFixed(2);
     };
 
     const getRecipeVolumeInfo = () => {
@@ -256,33 +256,6 @@ const RawMaterialsConsumptionModal = React.memo(
 
       return true;
     };
-
-    // const shouldShowRow = (label, key) => {
-    //   if (ALWAYS_VISIBLE.has(label)) return true;
-
-    //   const base = baseByLabel(label, key);
-    //   const log = logByKey(key);
-    //   const aVal = numOrNull(form[`${key}_actual_reciepe`]);
-    //   const wVal = numOrNull(form[`${key}_Wasted`]);
-    //   const total = computeTotalByActual[`${key}_total`];
-    //   const wastedCalc = computeWasted(key, label);
-
-    //   const hasMeaningfulBase = !isEmptyOrZero(base);
-    //   const hasMeaningfulLog = !isEmptyOrZero(log);
-    //   const hasMeaningfulA = aVal !== null && aVal !== 0;
-    //   const hasMeaningfulW = wVal !== null && wVal !== 0;
-    //   const hasMeaningfulTotal = total !== '' && Number(total) !== 0;
-    //   const hasMeaningfulWasted = wastedCalc !== '' && Number(wastedCalc) !== 0;
-
-    //   return (
-    //     hasMeaningfulBase ||
-    //     hasMeaningfulLog ||
-    //     hasMeaningfulA ||
-    //     hasMeaningfulW ||
-    //     hasMeaningfulTotal ||
-    //     hasMeaningfulWasted
-    //   );
-    // };
 
     const shouldShowRow = (label, key) => {
       if (ALWAYS_VISIBLE.has(label)) return true;
@@ -346,7 +319,7 @@ const RawMaterialsConsumptionModal = React.memo(
           const w = computeWasted(key, label);
           const wasted = w === '' ? null : Number(w);
           if (wasted === null || Number.isNaN(wasted) || wasted <= 0) return null;
-          return { type: label, quantity: +wasted.toFixed(3) };
+          return { type: label, quantity: +wasted.toFixed(2) };
         })
         .filter(Boolean);
 
@@ -403,9 +376,9 @@ const RawMaterialsConsumptionModal = React.memo(
         if (quantity > have) {
           shortages.push({
             type,
-            need: +Number(quantity).toFixed(3),
-            have: +Number(have).toFixed(3),
-            lack: +Number(quantity - have).toFixed(3),
+            need: +Number(quantity).toFixed(2),
+            have: +Number(have).toFixed(2),
+            lack: +Number(quantity - have).toFixed(2),
           });
         }
       }
