@@ -33,11 +33,11 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       accessor: 'gypsum_stone',
       Filter: TextSearchFilter,
     },
-    {
-      Header: 'Water, m3/hour',
-      accessor: 'water',
-      Filter: TextSearchFilter,
-    },
+    // {
+    //   Header: 'Water, m3/hour',
+    //   accessor: 'water',
+    //   Filter: TextSearchFilter,
+    // },
     {
       Header: 'Grinding balls, t/hour',
       accessor: 'grinding_balls',
@@ -83,8 +83,8 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       !sandSlurryWarehouseInput.gypsum_stone ||
       !sandSlurryWarehouseInput.grinding_balls ||
       !sandSlurryWarehouseInput.aac ||
-      !sandSlurryWarehouseInput.water ||
-      !sandSlurryWarehouseInput.mixing_hours ||
+      // !sandSlurryWarehouseInput.water ||
+      // !sandSlurryWarehouseInput.mixing_hours ||
       !sandSlurryWarehouseInput.portion_size
     ) {
       return null;
@@ -96,33 +96,37 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       (parseFloat(sandSlurryWarehouseInput.grinding_balls) || 0) +
       (parseFloat(sandSlurryWarehouseInput.aac) || 0);
 
-    const mixingHours = parseFloat(sandSlurryWarehouseInput.mixing_hours) || 0;
+    // const mixingHours = parseFloat(sandSlurryWarehouseInput.mixing_hours) || 0;
     const portionSize = parseFloat(sandSlurryWarehouseInput.portion_size) || 0;
 
-    return (totalMaterials * mixingHours * portionSize * 10).toFixed(0);
+    return (totalMaterials * portionSize * 10).toFixed(0); // return (totalMaterials * mixingHours * portionSize * 10).toFixed(0);
   }, [sandSlurryWarehouseInput]);
 
   const validateForm = () => {
     const newErrors = {};
 
-    const mixingHoursValue = sandSlurryWarehouseInput?.mixing_hours;
-    if (
-      mixingHoursValue === null ||
-      mixingHoursValue === undefined ||
-      String(mixingHoursValue).trim() === ''
-    ) {
-      newErrors.mixing_hours = `This field is required`;
-    } else {
-      const num = Number(mixingHoursValue);
-      if (isNaN(num) || num <= 0) {
-        newErrors.mixing_hours = `This field must contain a positive number`;
-      }
-    }
+    // const mixingHoursValue = sandSlurryWarehouseInput?.mixing_hours;
+    // if (
+    //   mixingHoursValue === null ||
+    //   mixingHoursValue === undefined ||
+    //   String(mixingHoursValue).trim() === ''
+    // ) {
+    //   newErrors.mixing_hours = `This field is required`;
+    // } else {
+    //   const num = Number(mixingHoursValue);
+    //   if (isNaN(num) || num <= 0) {
+    //     newErrors.mixing_hours = `This field must contain a positive number`;
+    //   }
+    // }
 
     sand_slurry.forEach(({ accessor }) => {
       const value = sandSlurryWarehouseInput?.[accessor];
 
-      if (value === null || value === undefined || String(value).trim() === '') {
+      if (
+        value === null ||
+        value === undefined ||
+        String(value).trim() === ''
+      ) {
         newErrors[accessor] = `This field is required`;
         return;
       }
@@ -189,14 +193,14 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
             type: 'AAC',
             quantity: parseFloat(sandSlurryWarehouseInput.aac),
           },
-          {
-            type: 'water',
-            quantity: parseFloat(sandSlurryWarehouseInput.water),
-          },
+          // {
+          //   type: 'water',
+          //   quantity: parseFloat(sandSlurryWarehouseInput.water),
+          // },
         ],
-        mixing_hours: parseFloat(sandSlurryWarehouseInput.mixing_hours),
+        // mixing_hours: parseFloat(sandSlurryWarehouseInput.mixing_hours),
         portion_size: parseFloat(sandSlurryWarehouseInput.portion_size),
-      })
+      }),
     );
     setSandSlurryWarehouseInput({ portion_size: 100 });
     props.onHide();
@@ -221,7 +225,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
           >
             <h3>Add sand slurry</h3>
 
-            <div className="md:flex md:items-center mb-6 pb-5 border-b border-gray-300">
+            {/* <div className="md:flex md:items-center mb-6 pb-5 border-b border-gray-300">
               <div className="md:w-1/3">
                 <label
                   className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
@@ -243,7 +247,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   <p className="text-red-500 text-xs mt-1">{errors.mixing_hours}</p>
                 )}
               </div>
-            </div>
+            </div> */}
 
             <Row className="mb-4">
               {sand_slurry.map((el) => (
@@ -294,23 +298,27 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   onChange={handleRawMaterialWarehouseInputChange}
                 />
                 {errors.portion_size && (
-                  <p className="text-red-500 text-xs mt-1">{errors.portion_size}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.portion_size}
+                  </p>
                 )}
               </div>
             </div>
 
-            {total && (
-              <div className="md:flex md:items-center mb-6 p-4 bg-gray-100 rounded-lg">
-                <div className="md:w-1/3">
-                  <label className="block text-gray-700 font-bold md:text-right mb-1 md:mb-0 pr-4">
-                    Total, kg
-                  </label>
-                </div>
-                <div className="md:w-2/3">
-                  <span className="font-bold text-lg text-green-600">{total}</span>
-                </div>
+            {/* {total && ( */}
+            <div className="md:flex md:items-center mb-6 p-4 bg-gray-100 rounded-lg">
+              <div className="md:w-1/3">
+                <label className="block text-gray-700 font-bold md:text-right mb-1 md:mb-0 pr-4">
+                  Total, kg
+                </label>
               </div>
-            )}
+              <div className="md:w-2/3">
+                <span className="font-bold text-lg text-green-600">
+                  {total || 0}
+                </span>
+              </div>
+            </div>
+            {/* )} */}
           </form>
         </Container>
       </Modal.Body>
