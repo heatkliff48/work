@@ -106,11 +106,7 @@ const SECTIONS = {
 
       { label: 'Activity of return slurry', key: 'return_slurry_activity' },
       { label: 'Gypsum', key: 'gypsum_type' },
-      { label: 'Al paste types', key: 'al_paste_types' },
-
-      { label: 'Lime activity', key: 'lime_activity' },
-      { label: 'Lime', key: 'lime_producer' },
-      { label: 'Al paste proportions', key: 'al_paste_proportion' },
+      { label: 'Al paste 1 types', key: 'al_paste_types' },
 
       {
         label: 'Slaking time for lime',
@@ -118,6 +114,14 @@ const SECTIONS = {
         type: 'time_mmss',
       },
       { label: 'Lime type', key: 'lime_type' },
+      { label: 'Al paste 1 proportions', key: 'al_paste_proportion' },
+
+      { type: 'spacer', key: '__sp_al_1' },
+      { type: 'spacer', key: '__sp_al_2' },
+      { label: 'Al paste 2 types', key: 'al_paste_types_2' },
+      { type: 'spacer', key: '__sp_al_3' },
+      { type: 'spacer', key: '__sp_al_4' },
+      { label: 'Al paste 2 proportions', key: 'al_paste_proportion_2' },
     ],
   },
 };
@@ -229,6 +233,9 @@ function RenderSection({
       <div style={{ padding: 10 }}>
         <Row>
           {section.fields.map((field) => {
+            if (field.type === 'spacer') {
+              return <Col key={field.key} xs={12} md={12 / cols} className="mb-1" />;
+            }
             const isDate = field.type === 'date';
             const value =
               isDate && formData[field.key]
@@ -512,6 +519,22 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     setCakeData((p) => ({ ...p, [name]: next }));
   };
 
+  // const onSelectCake = (nextValue) => {
+  //   if (nextValue === 'all') {
+  //     setApplyToAllCakes(true);
+  //     return;
+  //   }
+
+  //   const nextCakeId = Number(nextValue);
+  //   if (!Number.isFinite(nextCakeId)) return;
+
+  //   setApplyToAllCakes(false);
+  //   setSelectedCakeId(nextCakeId);
+
+  //   const found = getCakeFromStore(nextCakeId);
+  //   setCakeData(found ? { ...found } : { id: nextCakeId });
+  // };
+
   const onSelectCake = (nextValue) => {
     if (nextValue === 'all') {
       setApplyToAllCakes(true);
@@ -526,6 +549,42 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
     const found = getCakeFromStore(nextCakeId);
     setCakeData(found ? { ...found } : { id: nextCakeId });
+
+    setBatchData((prev) => {
+      const related = Array.isArray(prev.relatedBatches) ? prev.relatedBatches : [];
+
+      const match = related.find((b) => {
+        const s = Number(b?.cake_id_start);
+        const f = Number(b?.cake_id_finish);
+        return (
+          Number.isFinite(s) &&
+          Number.isFinite(f) &&
+          nextCakeId >= s &&
+          nextCakeId <= f
+        );
+      });
+
+      if (!match) return prev;
+
+      const nextSub = Number(match.sub_batch_id);
+      const currentSub = Number(prev.sub_batch_id ?? prev.activeSubBatchId);
+
+      if (
+        Number.isFinite(nextSub) &&
+        Number.isFinite(currentSub) &&
+        nextSub === currentSub
+      ) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        ...match,
+        relatedBatches: related,
+        activeSubBatchId: Number.isFinite(nextSub) ? nextSub : prev.activeSubBatchId,
+        sub_batch_id: Number.isFinite(nextSub) ? nextSub : prev.sub_batch_id,
+      };
+    });
   };
 
   const onSelectSubBatch = (nextSubRaw) => {
@@ -578,9 +637,27 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     return payload;
   };
 
+  // const buildSingleCakePayload = (cake_id) => {
+  //   return {
+  //     ...cakeData,
+  //     id: cake_id,
+  //   };
+  // };
+
+  const UI_ONLY_CAKE_KEYS = new Set(['al_paste_types_2', 'al_paste_proportion_2']);
+
+  const stripUiOnlyKeys = (obj) => {
+    if (!obj || typeof obj !== 'object') return obj;
+    const out = { ...obj };
+    for (const k of UI_ONLY_CAKE_KEYS) delete out[k];
+    return out;
+  };
+
   const buildSingleCakePayload = (cake_id) => {
+    const cleanedCakeData = stripUiOnlyKeys(cakeData);
+
     return {
-      ...cakeData,
+      ...cleanedCakeData,
       id: cake_id,
     };
   };
