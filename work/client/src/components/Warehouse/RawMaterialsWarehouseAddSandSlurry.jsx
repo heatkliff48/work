@@ -33,11 +33,11 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       accessor: 'gypsum_stone',
       Filter: TextSearchFilter,
     },
-    // {
-    //   Header: 'Water, m3/hour',
-    //   accessor: 'water',
-    //   Filter: TextSearchFilter,
-    // },
+    {
+      Header: 'Water, m3/hour',
+      accessor: 'water',
+      Filter: TextSearchFilter,
+    },
     {
       Header: 'Grinding balls, t/hour',
       accessor: 'grinding_balls',

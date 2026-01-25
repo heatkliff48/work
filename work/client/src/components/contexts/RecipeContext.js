@@ -65,6 +65,10 @@ const RecipeContextProvider = ({ children }) => {
       Header: 'Produced amount of return (dry), kg',
       accessor: 'produced_return_dry',
     },
+    {
+      Header: 'Description',
+      accessor: 'description',
+    },
   ];
 
   const COLUMNS_RAW_MAT_CONSUMPTION = [
@@ -128,7 +132,7 @@ const RecipeContextProvider = ({ children }) => {
   const recipeOrders = useSelector((state) => state.recipeOrders);
   const raw_mat_consumption = useSelector((state) => state.rawMatConsumption);
   const main_raw_mat_consumption = useSelector(
-    (state) => state.mainRawMatConsumption
+    (state) => state.mainRawMatConsumption,
   );
 
   return (
