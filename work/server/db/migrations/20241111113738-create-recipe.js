@@ -12,7 +12,7 @@ module.exports = {
       article: {
         type: Sequelize.STRING,
       },
-      
+
       certificate: {
         type: Sequelize.STRING,
       },
@@ -55,7 +55,7 @@ module.exports = {
       density: {
         type: Sequelize.FLOAT,
       },
-      density_recipe:{
+      density_recipe: {
         type: Sequelize.FLOAT,
       },
       produced_return_dry: {
@@ -63,6 +63,9 @@ module.exports = {
       },
       water_total: {
         type: Sequelize.FLOAT,
+      },
+      description: {
+        type: Sequelize.TEXT,
       },
       createdAt: {
         allowNull: false,

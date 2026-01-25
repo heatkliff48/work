@@ -39,6 +39,7 @@ recipeRouter.post('/', async (req, res) => {
     density_recipe,
     produced_return_dry,
     water_total,
+    description,
   } = req.body;
 
   try {
@@ -61,6 +62,7 @@ recipeRouter.post('/', async (req, res) => {
       density_recipe,
       produced_return_dry,
       water_total,
+      description,
     });
 
     myEmitter.emit(ADD_NEW_RECIPE_SOCKET, recipe);
