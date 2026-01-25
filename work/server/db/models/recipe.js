@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       cake_height: DataTypes.FLOAT,
       lime: DataTypes.FLOAT,
       cement: DataTypes.FLOAT,
-      sand_dry: DataTypes.FLOAT,
+      sand_powder_dry: DataTypes.FLOAT,
       sand_slurry_dry: DataTypes.FLOAT,
       gypsum_dry: DataTypes.FLOAT,
       return_dry: DataTypes.FLOAT,

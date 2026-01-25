@@ -29,6 +29,8 @@ function RawMaterialsPlan() {
     'density_recipe',
     'produced_return_dry',
     'water_solids',
+    'description',
+    'sand_dry',
   ];
 
   const rawMaterials = recipe_info
@@ -36,7 +38,8 @@ function RawMaterialsPlan() {
     .map((item) => {
       const warehouseMaterial = raw_materials_warehouse.find(
         (warehouseItem) =>
-          warehouseItem.material_type === item.Header.replace(/, kg$/, '').trim(),
+          warehouseItem.material_type ===
+          item.Header.replace(/, kg$/, '').trim(),
       );
 
       return {
@@ -113,7 +116,9 @@ function RawMaterialsPlan() {
 
         const quantity =
           batch.quantity_pallets /
-          Math.floor(productDetails.m3InArray / productDetails.volumeBlockOnPallet);
+          Math.floor(
+            productDetails.m3InArray / productDetails.volumeBlockOnPallet,
+          );
 
         if (!productDetails) return null;
 
@@ -147,7 +152,12 @@ function RawMaterialsPlan() {
       .filter(Boolean);
 
     setProductsArray(result);
-  }, [batchOutside, list_of_ordered_production, list_of_recipes, latestProducts]);
+  }, [
+    batchOutside,
+    list_of_ordered_production,
+    list_of_recipes,
+    latestProducts,
+  ]);
 
   useEffect(() => {
     const updatedTotals = {};
@@ -291,6 +301,7 @@ function RawMaterialsPlan() {
                   )}
                 </div>
                 <div>Cake amount: {product.quantity}</div>
+                <div>Description: {product?.current_recipe.description}</div>
               </th>
 
               {

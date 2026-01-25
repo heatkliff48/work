@@ -25,7 +25,7 @@ module.exports = {
       cement: {
         type: Sequelize.FLOAT,
       },
-      sand_dry: {
+      sand_powder_dry: {
         type: Sequelize.FLOAT,
       },
       sand_slurry_dry: {

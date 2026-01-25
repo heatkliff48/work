@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-import Table from "#components/Table/Table.jsx";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import RecipeInfoModal from "./RecipeInfoModal";
-import { useRecipeContext } from "#components/contexts/RecipeContext.js";
-import AddNewRecipeModal from "./AddNewRecipeModal";
+import React, { useCallback, useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Table from '#components/Table/Table.jsx';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import RecipeInfoModal from './RecipeInfoModal';
+import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import AddNewRecipeModal from './AddNewRecipeModal';
 
 const ProductsListForRecipes = () => {
   const [modalShow, setModalShow] = useState(false);
@@ -27,13 +27,13 @@ const ProductsListForRecipes = () => {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, "recipe_products");
+      const access = checkUserAccess(user, roles, 'recipe_products');
       setUserAccess(access);
 
-      console.log("access", access);
+      console.log('access', access);
 
       if (!access?.canRead) {
-        navigate("/"); // Перенаправление на главную страницу, если нет прав на чтение
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }
   }, [user, roles]);
@@ -61,8 +61,8 @@ const ProductsListForRecipes = () => {
         dataOfTable={list_of_recipes}
         userAccess={userAccess}
         onClickButton={() => {}}
-        buttonText={""}
-        tableName={"Recipe catalog"}
+        buttonText={''}
+        tableName={'Recipe catalog'}
         handleRowClick={(row) => {
           handlerRecipeInfo(row);
         }}
