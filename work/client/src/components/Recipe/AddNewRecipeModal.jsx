@@ -59,7 +59,7 @@ function AddNewRecipeModal({ show, onHide }) {
   const solidsOddRequerideFields = [
     'lime',
     'cement',
-    'sand_dry',
+    'sand_powder_dry',
     'gypsum_dry',
     'return_dry',
     'aluminum_paste',
@@ -307,7 +307,7 @@ function AddNewRecipeModal({ show, onHide }) {
                         (selectedProduct?.density <= 100 &&
                           el.accessor === 'sand_slurry_dry') ||
                         (selectedProduct?.density > 100 &&
-                          (el.accessor === 'sand_dry' ||
+                          (el.accessor === 'sand_powder_dry' ||
                             el.accessor === 'gypsum_dry'))
                       )
                         return null;
