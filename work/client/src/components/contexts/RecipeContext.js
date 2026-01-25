@@ -22,8 +22,8 @@ const RecipeContextProvider = ({ children }) => {
       accessor: 'cement',
     },
     {
-      Header: 'Sand (dry), kg',
-      accessor: 'sand_dry',
+      Header: 'Sand powder (dry), kg',
+      accessor: 'sand_powder_dry',
     },
     {
       Header: 'Sand slurry (dry), kg',
@@ -69,6 +69,10 @@ const RecipeContextProvider = ({ children }) => {
       Header: 'Description',
       accessor: 'description',
     },
+    // {
+    //   Header: 'Sand powder (dry)',
+    //   accessor: 'sand_powder_dry',
+    // },
   ];
 
   const COLUMNS_RAW_MAT_CONSUMPTION = [
