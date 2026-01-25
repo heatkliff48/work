@@ -65,10 +65,10 @@ function RecipeInfoModal(props) {
       Header: 'Water total, kg',
       accessor: 'water_total',
     },
-    {
-      Header: 'Description',
-      accessor: 'description',
-    },
+    // {
+    //   Header: 'Description',
+    //   accessor: 'description',
+    // },
   ];
 
   const mainFields = recipe_info.filter(
