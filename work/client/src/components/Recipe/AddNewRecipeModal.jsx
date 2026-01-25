@@ -1,6 +1,12 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -62,11 +68,13 @@ function AddNewRecipeModal({ show, onHide }) {
 
   const haveProduct = useMemo(
     () => productOfRecipe?.density ?? false,
-    [productOfRecipe?.density] // --------- пока что через плотность
+    [productOfRecipe?.density], // --------- пока что через плотность
   );
 
   const handlerAddProductRecipe = useCallback((row) => {
-    const product = productsDataList.filter((el) => el.id === row.original.id)[0];
+    const product = productsDataList.filter(
+      (el) => el.id === row.original.id,
+    )[0];
 
     setSelectedProduct(product);
     setProductOfRecipe((prev) => ({
@@ -95,10 +103,10 @@ function AddNewRecipeModal({ show, onHide }) {
     const allFilled =
       selectedProduct?.density > 100
         ? solidsNormalRequerideFields.every(
-            (field) => recipeInput[field] !== '' && recipeInput[field] != null
+            (field) => recipeInput[field] !== '' && recipeInput[field] != null,
           )
         : solidsOddRequerideFields.every(
-            (field) => recipeInput[field] !== '' && recipeInput[field] != null
+            (field) => recipeInput[field] !== '' && recipeInput[field] != null,
           );
 
     if (!allFilled) {
@@ -138,8 +146,8 @@ function AddNewRecipeModal({ show, onHide }) {
     return selectedProduct?.width == 85
       ? ((volume - 5.364) * (solids / volume)).toFixed(0)
       : selectedProduct?.width == 75
-      ? ((volume - 5.31) * (solids / volume)).toFixed(0)
-      : ((volume - 5.4) * (solids / volume)).toFixed(0);
+        ? ((volume - 5.31) * (solids / volume)).toFixed(0)
+        : ((volume - 5.4) * (solids / volume)).toFixed(0);
   }, [volume, solids]);
 
   const water_total = useMemo(() => {
@@ -152,7 +160,7 @@ function AddNewRecipeModal({ show, onHide }) {
 
   useEffect(() => {
     let filtered = latestProducts.filter((el) =>
-      el.placeOfProduction?.includes('Spain')
+      el.placeOfProduction?.includes('Spain'),
     );
     setCProductsDataList(filtered);
   }, [latestProducts]);
@@ -170,8 +178,9 @@ function AddNewRecipeModal({ show, onHide }) {
     const articleId =
       list_of_recipes.length === 0
         ? 1
-        : parseInt(list_of_recipes[list_of_recipes.length - 1].article.slice(-6)) +
-          1;
+        : parseInt(
+            list_of_recipes[list_of_recipes.length - 1].article.slice(-6),
+          ) + 1;
     versionNumber = `0000000${articleId}`.slice(-6);
     const recipe_article = `M.00D${selectedProduct?.density}${selectedProduct?.certificate}${versionNumber}`; //
     return recipe_article;
@@ -193,7 +202,10 @@ function AddNewRecipeModal({ show, onHide }) {
       );
     });
 
-    if (!recipeInput.cake_height || isNaN(parseFloat(recipeInput.cake_height))) {
+    if (
+      !recipeInput.cake_height ||
+      isNaN(parseFloat(recipeInput.cake_height))
+    ) {
       alert('Please fill in the Cake Height field');
       return;
     }
@@ -232,7 +244,7 @@ function AddNewRecipeModal({ show, onHide }) {
         produced_return_dry: producedReturnDry,
         density_recipe,
         water_total,
-      })
+      }),
     );
 
     setProductOfRecipe({});
@@ -291,6 +303,7 @@ function AddNewRecipeModal({ show, onHide }) {
                         el.accessor === 'density_recipe' ||
                         el.accessor === 'water_total' ||
                         el.accessor === 'produced_return_dry' ||
+                        el.accessor === 'description' ||
                         (selectedProduct?.density <= 100 &&
                           el.accessor === 'sand_slurry_dry') ||
                         (selectedProduct?.density > 100 &&
@@ -351,8 +364,20 @@ function AddNewRecipeModal({ show, onHide }) {
                     </h3>
                     <h3>
                       Water total:{' '}
-                      {water_total !== null ? water_total : 'Fill in all fields'}
+                      {water_total !== null
+                        ? water_total
+                        : 'Fill in all fields'}
                     </h3>
+                    <div className="md:w-1/3">
+                      <h3>Description:</h3>
+                    </div>
+                    <AutoResizeTextarea
+                      id="description"
+                      name="description"
+                      value={recipeInput.description || ''}
+                      onChange={(e) => handleRecipeInfoInputChange(e)}
+                      placeholder=""
+                    />
                   </Col>
                 </Row>
               </form>
@@ -385,5 +410,32 @@ function AddNewRecipeModal({ show, onHide }) {
     </div>
   );
 }
+
+const AutoResizeTextarea = ({ value, onChange, ...props }) => {
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'; // Сброс высоты
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Установка новой
+    }
+  }, [value]);
+
+  return (
+    <textarea
+      ref={textareaRef}
+      value={value}
+      onChange={onChange}
+      style={{
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '10px',
+        overflow: 'hidden', // Скрываем scroll при авто-расширении
+        resize: 'none', // Отключаем ручное изменение размера
+      }}
+      {...props}
+    />
+  );
+};
 
 export default AddNewRecipeModal;

@@ -1,15 +1,15 @@
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import React, { useEffect } from "react";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Table from "react-bootstrap/Table";
-import { useRecipeContext } from "#components/contexts/RecipeContext.js";
-import { useDispatch, useSelector } from "react-redux";
-import { deleteRecipe } from "#components/redux/actions/recipeAction.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { useNavigate } from "react-router-dom";
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import React, { useEffect } from 'react';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Table from 'react-bootstrap/Table';
+import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteRecipe } from '#components/redux/actions/recipeAction.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { useNavigate } from 'react-router-dom';
 
 function RecipeInfoModal(props) {
   const { recipe_info } = useRecipeContext();
@@ -33,43 +33,47 @@ function RecipeInfoModal(props) {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, "recipe_products");
+      const access = checkUserAccess(user, roles, 'recipe_products');
       setUserAccess(access);
 
-      console.log("access", access);
+      console.log('access', access);
 
       if (!access?.canRead) {
-        navigate("/");
+        navigate('/');
       }
     }
   }, [user, roles]);
 
   const specialFields = [
     {
-      Header: "Solids, kg",
-      accessor: "solids",
+      Header: 'Solids, kg',
+      accessor: 'solids',
     },
     {
-      Header: "Volume, m3",
-      accessor: "volume",
+      Header: 'Volume, m3',
+      accessor: 'volume',
     },
     {
-      Header: "Density, kg/m3",
-      accessor: "density_recipe",
+      Header: 'Density, kg/m3',
+      accessor: 'density_recipe',
     },
     {
-      Header: "Produced amount of return (dry), kg",
-      accessor: "produced_return_dry",
+      Header: 'Produced amount of return (dry), kg',
+      accessor: 'produced_return_dry',
     },
     {
-      Header: "Water total, kg",
-      accessor: "water_total",
+      Header: 'Water total, kg',
+      accessor: 'water_total',
     },
+    // {
+    //   Header: 'Description',
+    //   accessor: 'description',
+    // },
   ];
 
   const mainFields = recipe_info.filter(
     (field) =>
-      !specialFields.some((special) => special.accessor === field.accessor)
+      !specialFields.some((special) => special.accessor === field.accessor),
   );
 
   return (
@@ -97,7 +101,7 @@ function RecipeInfoModal(props) {
               }}
             >
               <h3 className="mb-4">
-                {props.selectedRecipe?.article || "No recipe selected"}
+                {props.selectedRecipe?.article || 'No recipe selected'}
               </h3>
 
               <Row>
@@ -113,7 +117,7 @@ function RecipeInfoModal(props) {
                                   <strong>{el.Header}</strong>
                                 </td>
                                 <td>
-                                  {props.selectedRecipe[el.accessor] || "Empty"}
+                                  {props.selectedRecipe[el.accessor] || 'Empty'}
                                 </td>
                               </tr>
                             ))}
@@ -140,7 +144,7 @@ function RecipeInfoModal(props) {
                                 <strong>{el.Header}</strong>
                               </td>
                               <td>
-                                {props.selectedRecipe[el.accessor] || "Empty"}
+                                {props.selectedRecipe[el.accessor] || 'Empty'}
                               </td>
                             </tr>
                           ))}

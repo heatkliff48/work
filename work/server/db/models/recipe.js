@@ -31,11 +31,12 @@ module.exports = (sequelize, DataTypes) => {
       density_recipe: DataTypes.FLOAT,
       produced_return_dry: DataTypes.FLOAT,
       water_total: DataTypes.FLOAT,
+      description: DataTypes.TEXT,
     },
     {
       sequelize,
       modelName: 'Recipe',
-    }
+    },
   );
   return Recipe;
 };
