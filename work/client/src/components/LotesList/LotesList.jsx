@@ -117,6 +117,7 @@ function LotesList() {
         ...lotesListItem,
       };
     } else {
+      console.log('list_of_recipes');
       const baseRecipe = list_of_recipes.find(
         (r) => String(r.article) === String(lotesListItem.recipe),
       );

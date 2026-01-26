@@ -36,7 +36,7 @@ module.exports = {
       custom_recipe: {
         type: Sequelize.BOOLEAN,
       },
-      sand_powder_dry: {
+      sand_dry: {
         type: Sequelize.STRING,
       },
       sand_slurry_dry: {
