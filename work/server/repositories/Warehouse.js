@@ -1,4 +1,4 @@
-const { where } = require("sequelize");
+const { where } = require('sequelize');
 const {
   AutoclaveCalendares,
   Warehouses,
@@ -19,7 +19,7 @@ const {
   OrderToolProducts,
   OrderRelMatProducts,
   sequelize,
-} = require("../db/models");
+} = require('../db/models');
 
 const MODELS_BY_TYPE = {
   product: Warehouses,
@@ -39,37 +39,31 @@ function getModelByType(type) {
 }
 class WarehouseRepository {
   static async getAllWarehouse() {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAllWarehouse");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAllWarehouse');
 
     try {
       const warehouse = await Warehouses.findAll();
       return warehouse ?? [];
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async getAutoclaveCalendar() {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAutoclaveCalendar");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAutoclaveCalendar');
 
     try {
       const autoclaveCalendares = await AutoclaveCalendares.findAll();
       return autoclaveCalendares ?? [];
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async addNewAutoclaveCalendarData(map) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>AddNewAutoclaveCalendarData");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>AddNewAutoclaveCalendarData');
     const t = await sequelize.transaction();
     try {
       const autoclaveCalendares = await AutoclaveCalendares.findAll({
@@ -96,7 +90,7 @@ class WarehouseRepository {
               residual_arrays,
               filled_autoclaves,
             },
-            { where: { id: data.id }, transaction: t },
+            { where: { id: data.id }, transaction: t }
           );
         } else {
           await AutoclaveCalendares.create(
@@ -108,7 +102,7 @@ class WarehouseRepository {
               residual_arrays,
               filled_autoclaves,
             },
-            { transaction: t },
+            { transaction: t }
           );
         }
       }
@@ -122,163 +116,136 @@ class WarehouseRepository {
       return updAutoclaveCalendares ?? [];
     } catch (error) {
       await t.rollback();
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       throw error;
     }
   }
 
   static async getListOfOrderedProduction() {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfOrderedProduction");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfOrderedProduction');
 
     try {
       const orderedProduction = await ListOfOrderedProductions.findAll({
         attributes: [
-          "id",
-          "shipping_date",
-          "product_article",
-          "order_article",
-          "quantity",
-          "quantity_in_warehouse",
+          'id',
+          'shipping_date',
+          'product_article',
+          'order_article',
+          'quantity',
+          'quantity_in_warehouse',
         ],
       });
       return orderedProduction ?? [];
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async getListOfReservedProductsOEM() {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedProductsOEM");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedProductsOEM');
 
     try {
       const orderedProductionOEM = await ListOfOrderedProductionOEMs.findAll({
         attributes: [
-          "id",
-          "shipping_date",
-          "product_article",
-          "order_article",
-          "quantity",
-          "status",
+          'id',
+          'shipping_date',
+          'product_article',
+          'order_article',
+          'quantity',
+          'status',
         ],
-        order: [["shipping_date", "ASC"]],
+        order: [['shipping_date', 'ASC']],
       });
       return orderedProductionOEM ?? [];
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async addNewWarehouse(warehouse) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewWarehouse");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewWarehouse');
     try {
       const new_warehouse = await Warehouses.create(warehouse);
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewWarehouse",
-        new_warehouse,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewWarehouse', new_warehouse);
       return new_warehouse;
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async addNewListOfOrderedProduction(ordered_production) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewListOfOrderedProduction");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewListOfOrderedProduction');
     try {
       const new_ordered_production = await ListOfOrderedProductions.create(
-        ordered_production,
+        ordered_production
       );
 
       return new_ordered_production;
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async updateListOfOrderedProduction(ordered_production) {
     console.log(
-      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateListOfOrderedProduction----------------------------------",
-      ordered_production,
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateListOfOrderedProduction----------------------------------',
+      ordered_production
     );
 
     try {
       const { id, quantity_in_warehouse } = ordered_production;
       await ListOfOrderedProductions.update(
         { quantity_in_warehouse },
-        { where: { id } },
+        { where: { id } }
       );
       return;
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async addNewListOfOrderedProductionOEM(ordered_production_oem) {
-    console.log(
-      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewListOfOrderedProductionOEM",
-    );
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewListOfOrderedProductionOEM');
 
     try {
-      const new_ordered_production_oem =
-        await ListOfOrderedProductionOEMs.create(ordered_production_oem);
+      const new_ordered_production_oem = await ListOfOrderedProductionOEMs.create(
+        ordered_production_oem
+      );
 
       return new_ordered_production_oem;
     } catch (err) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>err", err);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>err', err);
       return err;
     }
   }
 
   static async updateListOfOrderedProductionOEM(upd_ordered_production_oem) {
-    console.log(
-      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateListOfOrderedProductionOEM",
-    );
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateListOfOrderedProductionOEM');
 
     try {
       const { id, status } = upd_ordered_production_oem;
       await ListOfOrderedProductionOEMs.update({ status }, { where: { id } });
       return;
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async updateRemainingStock(upd_rem_srock) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRemainingStock");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRemainingStock');
 
     try {
       const { warehouse_id, free_quantity_remaining, ordered_quantity } =
         upd_rem_srock;
       console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRemainingStock upd_rem_srock",
-        upd_rem_srock,
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRemainingStock upd_rem_srock',
+        upd_rem_srock
       );
 
       const upd =
@@ -293,14 +260,14 @@ class WarehouseRepository {
       console.log('upd Warehouse.js line 261', upd);
       const [count, rows] = await Warehouses.update(
         { ...upd },
-        { where: { id: warehouse_id } },
+        { where: { id: warehouse_id }, returning: true }
       );
 
       const updatedCake = rows[0];
 
       return updatedCake;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
@@ -318,7 +285,7 @@ class WarehouseRepository {
             total_quantity,
             ordered_quantity,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id } }
         );
         return updatedProduct;
       }
@@ -385,7 +352,7 @@ class WarehouseRepository {
 
               if (!recordsMap.has(warehouse_id)) {
                 console.warn(
-                  `Entrie with warehouse_id=${warehouse_id} not found for ${product_article}`,
+                  `Entrie with warehouse_id=${warehouse_id} not found for ${product_article}`
                 );
                 continue;
               }
@@ -484,7 +451,7 @@ class WarehouseRepository {
                   sourceRecord.new_free + sourceRecord.new_ordered;
               } else {
                 console.warn(
-                  `Not enough deficit ${deficit} for warehouse_id=${source_warehouse_id}, remaining: ${remainingDeficit}`,
+                  `Not enough deficit ${deficit} for warehouse_id=${source_warehouse_id}, remaining: ${remainingDeficit}`
                 );
               }
             }
@@ -500,7 +467,7 @@ class WarehouseRepository {
                   {
                     where: { id: record.id },
                     transaction,
-                  },
+                  }
                 );
 
                 // allResults.push({
@@ -644,25 +611,19 @@ class WarehouseRepository {
       //   { where: { id: warehouse_id } },
       // );
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async updateDryMixedWarehouseQuantitys(upd_rem_srock) {
-    console.log(
-      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateDryMixedWarehouseQuantitys",
-    );
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateDryMixedWarehouseQuantitys');
 
     try {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock", upd_rem_srock);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
-      const {
-        warehouse_id,
-        total_quantity,
-        ordered_quantity,
-        product_article,
-      } = upd_rem_srock;
+      const { warehouse_id, total_quantity, ordered_quantity, product_article } =
+        upd_rem_srock;
 
       // await DryMixesWarehouse.update(
       //   { total_quantity, ordered_quantity },
@@ -686,7 +647,7 @@ class WarehouseRepository {
             total_quantity: wh_data_by_id.free_quantity_remaining + ordered_quantity,
             ordered_quantity: 0,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id } }
         );
         await DryMixesWarehouse.update(
           {
@@ -694,7 +655,7 @@ class WarehouseRepository {
               wh_data[0].free_quantity_remaining - ordered_quantity,
             ordered_quantity: wh_data[0].ordered_quantity + ordered_quantity,
           },
-          { where: { id: wh_data[0].id } },
+          { where: { id: wh_data[0].id } }
         );
         const updatedDryMixes = await Warehouses.findAll();
         return updatedDryMixes;
@@ -704,7 +665,7 @@ class WarehouseRepository {
             total_quantity,
             ordered_quantity,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id } }
         );
         return updatedDryMixes;
       }
@@ -752,14 +713,14 @@ class WarehouseRepository {
 
       // return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async updateAnchorWarehouseQuantitys(upd_rem_srock) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateAnchorWarehouseQuantitys");
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock", upd_rem_srock);
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateAnchorWarehouseQuantitys');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
     try {
       const { warehouse_id, total_quantity, ordered_quantity, product_article } =
@@ -782,7 +743,7 @@ class WarehouseRepository {
             total_quantity: wh_data_by_id.free_quantity_remaining + ordered_quantity,
             ordered_quantity: 0,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id } }
         );
         await AnchorsWarehouse.update(
           {
@@ -790,7 +751,7 @@ class WarehouseRepository {
               wh_data[0].free_quantity_remaining - ordered_quantity,
             ordered_quantity: wh_data[0].ordered_quantity + ordered_quantity,
           },
-          { where: { id: wh_data[0].id } },
+          { where: { id: wh_data[0].id } }
         );
         const updatedAnchors = await AnchorsWarehouse.findAll();
         return updatedAnchors;
@@ -800,7 +761,7 @@ class WarehouseRepository {
             total_quantity,
             ordered_quantity,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id } }
         );
         return updatedAnchors;
       }
@@ -852,14 +813,14 @@ class WarehouseRepository {
 
       // return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async updateToolWarehouseQuantitys(upd_rem_srock) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateToolWarehouseQuantitys");
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock", upd_rem_srock);
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateToolWarehouseQuantitys');
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
     try {
       const { warehouse_id, total_quantity, ordered_quantity, product_article } =
@@ -882,7 +843,7 @@ class WarehouseRepository {
             total_quantity: wh_data_by_id.free_quantity_remaining + ordered_quantity,
             ordered_quantity: 0,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id } }
         );
         await ToolsWarehouse.update(
           {
@@ -890,7 +851,7 @@ class WarehouseRepository {
               wh_data[0].free_quantity_remaining - ordered_quantity,
             ordered_quantity: wh_data[0].ordered_quantity + ordered_quantity,
           },
-          { where: { id: wh_data[0].id } },
+          { where: { id: wh_data[0].id } }
         );
         const updatedTools = await ToolsWarehouse.findAll();
         return updatedTools;
@@ -900,7 +861,7 @@ class WarehouseRepository {
             total_quantity,
             ordered_quantity,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id } }
         );
         return updatedTools;
       }
@@ -952,7 +913,7 @@ class WarehouseRepository {
 
       // return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
@@ -981,7 +942,7 @@ class WarehouseRepository {
             total_quantity: wh_data_by_id.free_quantity_remaining + ordered_quantity,
             ordered_quantity: 0,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id } }
         );
         await RelatedMaterialsWarehouse.update(
           {
@@ -989,7 +950,7 @@ class WarehouseRepository {
               wh_data[0].free_quantity_remaining - ordered_quantity,
             ordered_quantity: wh_data[0].ordered_quantity + ordered_quantity,
           },
-          { where: { id: wh_data[0].id } },
+          { where: { id: wh_data[0].id } }
         );
         const updatedRelMats = await RelatedMaterialsWarehouse.findAll();
         return updatedRelMats;
@@ -999,7 +960,7 @@ class WarehouseRepository {
             total_quantity,
             ordered_quantity,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id } }
         );
         return updatedRelMats;
       }
@@ -1049,30 +1010,27 @@ class WarehouseRepository {
       //   { where: { id: warehouse_id, product_article } },
       // );
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async getListOfReservedProducts() {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedProducts');
 
     try {
       const listOfReservedProducts = await ReservedProducts.findAll({
-        attributes: ["id", "warehouse_id", "orders_products_id", "quantity"],
+        attributes: ['id', 'warehouse_id', 'orders_products_id', 'quantity'],
       });
       return listOfReservedProducts;
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async addNewReservedProducts(reserved_product) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedProducts');
 
     try {
       // const reservedProducts = await ReservedProducts.bulkCreate(
@@ -1085,54 +1043,52 @@ class WarehouseRepository {
             {
               warehouse_id: reserved_product[i].warehouse_id,
             },
-            { where: { id: reserved_product[i].orders_products_id } },
+            { where: { id: reserved_product[i].orders_products_id } }
           );
         }
         const reservedProducts = await ReservedProducts.findAll();
         return reservedProducts;
       } else {
-        const reservedProducts = await ReservedProducts.create(
-          reserved_product,
-        );
+        const reservedProducts = await ReservedProducts.create(reserved_product);
         await OrdersProducts.update(
           {
             warehouse_id: reserved_product.warehouse_id,
           },
-          { where: { id: reserved_product.orders_products_id } },
+          { where: { id: reserved_product.orders_products_id } }
         );
 
         return reservedProducts;
       }
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async updReservedProducts(reserved_product) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedProducts');
     const { warehouse_id, orders_products_id, quantity } = reserved_product;
     try {
       await ReservedProducts.update(
         { quantity },
-        { where: { warehouse_id, orders_products_id } },
+        { where: { warehouse_id, orders_products_id } }
       );
 
       return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async deleteReservedProducts({ id }) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedProducts');
 
     try {
       await ReservedProducts.destroy({ where: { id } });
       return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
@@ -1141,21 +1097,18 @@ class WarehouseRepository {
     try {
       const listOfReservedProducts = await ReservedDryMixes.findAll();
       console.log(
-        ">>>>>>>>>>>>>>>>listOfReservedProducts<<<<<<<<<<<<",
-        listOfReservedProducts,
+        '>>>>>>>>>>>>>>>>listOfReservedProducts<<<<<<<<<<<<',
+        listOfReservedProducts
       );
       return listOfReservedProducts;
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async addNewReservedDryMixedProducts(reserved_product) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedDryMixedProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedDryMixedProducts');
 
     try {
       // const reservedDryMixes = await ReservedDryMixes.bulkCreate(
@@ -1168,20 +1121,18 @@ class WarehouseRepository {
             {
               warehouse_id: reserved_product[i].warehouse_id,
             },
-            { where: { id: reserved_product[i].orders_products_id } },
+            { where: { id: reserved_product[i].orders_products_id } }
           );
         }
         const reservedDryMixes = await ReservedDryMixes.findAll();
         return reservedDryMixes;
       } else {
-        const reservedDryMixes = await ReservedDryMixes.create(
-          reserved_product,
-        );
+        const reservedDryMixes = await ReservedDryMixes.create(reserved_product);
         await OrderDryMixedProducts.update(
           {
             warehouse_id: reserved_product.warehouse_id,
           },
-          { where: { id: reserved_product.orders_products_id } },
+          { where: { id: reserved_product.orders_products_id } }
         );
         return reservedDryMixes;
       }
@@ -1201,56 +1152,53 @@ class WarehouseRepository {
 
       return reservedDryMixes;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async updReservedDryMixedProducts(reserved_product) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedDryMixedProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedDryMixedProducts');
     const { warehouse_id, orders_products_id, quantity } = reserved_product;
     try {
       await ReservedDryMixes.update(
         { quantity },
-        { where: { warehouse_id, orders_products_id } },
+        { where: { warehouse_id, orders_products_id } }
       );
 
       return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async deleteReservedDryMixedProducts({ id }) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedDryMixedProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedDryMixedProducts');
 
     try {
       await ReservedDryMixes.destroy({ where: { id } });
       return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async getListOfReservedAnchorProducts() {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedProducts');
 
     try {
       const listOfReservedProducts = await ReservedAnchors.findAll();
       return listOfReservedProducts;
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async addNewReservedAnchorProducts(reserved_product) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedAnchorProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedAnchorProducts');
 
     try {
       // const reservedAnchors = await ReservedAnchors.bulkCreate(
@@ -1263,7 +1211,7 @@ class WarehouseRepository {
             {
               warehouse_id: reserved_product[i].warehouse_id,
             },
-            { where: { id: reserved_product[i].orders_products_id } },
+            { where: { id: reserved_product[i].orders_products_id } }
           );
         }
         const reservedAnchors = await ReservedAnchors.findAll();
@@ -1274,7 +1222,7 @@ class WarehouseRepository {
           {
             warehouse_id: reserved_product.warehouse_id,
           },
-          { where: { id: reserved_product.orders_products_id } },
+          { where: { id: reserved_product.orders_products_id } }
         );
         return reservedAnchors;
       }
@@ -1291,56 +1239,53 @@ class WarehouseRepository {
 
       return reservedAnchors;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async updReservedAnchorProducts(reserved_product) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedAnchorProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedAnchorProducts');
     const { warehouse_id, orders_products_id, quantity } = reserved_product;
     try {
       await ReservedAnchors.update(
         { quantity },
-        { where: { warehouse_id, orders_products_id } },
+        { where: { warehouse_id, orders_products_id } }
       );
 
       return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async deleteReservedAnchorProducts({ id }) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedAnchorProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedAnchorProducts');
 
     try {
       await ReservedAnchors.destroy({ where: { id } });
       return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async getListOfReservedToolProducts() {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedToolProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedToolProducts');
 
     try {
       const listOfReservedProducts = await ReservedTools.findAll();
       return listOfReservedProducts;
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async addNewReservedToolProducts(reserved_product) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedToolProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedToolProducts');
 
     try {
       // const reservedTools = await ReservedTools.bulkCreate(reserved_product);
@@ -1351,7 +1296,7 @@ class WarehouseRepository {
             {
               warehouse_id: reserved_product[i].warehouse_id,
             },
-            { where: { id: reserved_product[i].orders_products_id } },
+            { where: { id: reserved_product[i].orders_products_id } }
           );
         }
         const reservedTools = await ReservedTools.findAll();
@@ -1362,7 +1307,7 @@ class WarehouseRepository {
           {
             warehouse_id: reserved_product.warehouse_id,
           },
-          { where: { id: reserved_product.orders_products_id } },
+          { where: { id: reserved_product.orders_products_id } }
         );
         return reservedTools;
       }
@@ -1379,58 +1324,55 @@ class WarehouseRepository {
 
       return reservedTools;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async updReservedToolProducts(reserved_product) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedToolProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedToolProducts');
     const { warehouse_id, orders_products_id, quantity } = reserved_product;
     try {
       await ReservedTools.update(
         { quantity },
-        { where: { warehouse_id, orders_products_id } },
+        { where: { warehouse_id, orders_products_id } }
       );
 
       return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async deleteReservedToolProducts({ id }) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedToolProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedToolProducts');
 
     try {
       await ReservedTools.destroy({ where: { id } });
       return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async getListOfReservedRelatedMaterialsProducts() {
     console.log(
-      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedRelatedMaterialsProducts",
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedRelatedMaterialsProducts'
     );
 
     try {
       const listOfReservedProducts = await ReservedRelatedMaterials.findAll();
       return listOfReservedProducts;
     } catch (error) {
-      console.log(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error",
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async addNewReservedRelMatProducts(reserved_product) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedRelMatProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewReservedRelMatProducts');
 
     try {
       // const reservedRelMats = await ReservedRelatedMaterials.bulkCreate(
@@ -1443,20 +1385,20 @@ class WarehouseRepository {
             {
               warehouse_id: reserved_product[i].warehouse_id,
             },
-            { where: { id: reserved_product[i].orders_products_id } },
+            { where: { id: reserved_product[i].orders_products_id } }
           );
         }
         const reservedRelMats = await ReservedRelatedMaterials.findAll();
         return reservedRelMats;
       } else {
         const reservedRelMats = await ReservedRelatedMaterials.create(
-          reserved_product,
+          reserved_product
         );
         await OrderRelMatProducts.update(
           {
             warehouse_id: reserved_product.warehouse_id,
           },
-          { where: { id: reserved_product.orders_products_id } },
+          { where: { id: reserved_product.orders_products_id } }
         );
         return reservedRelMats;
       }
@@ -1477,35 +1419,35 @@ class WarehouseRepository {
 
       return reservedRelMats;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async updReservedRelMatProducts(reserved_product) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedRelMatProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedRelMatProducts');
     const { warehouse_id, orders_products_id, quantity } = reserved_product;
     try {
       await ReservedRelatedMaterials.update(
         { quantity },
-        { where: { warehouse_id, orders_products_id } },
+        { where: { warehouse_id, orders_products_id } }
       );
 
       return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }
 
   static async deleteReservedRelMatProducts({ id }) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedRelMatProducts");
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteReservedRelMatProducts');
 
     try {
       await ReservedRelatedMaterials.destroy({ where: { id } });
       return;
     } catch (error) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", error);
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;
     }
   }

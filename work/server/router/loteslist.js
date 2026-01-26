@@ -186,7 +186,7 @@ lotesListRouter.post('/batches', async (req, res) => {
     let sub_batch_id;
 
     if (new_batch) {
-      batch_id = Number(lastBatch.batch_id) + 1;
+      batch_id = Number(lastBatch?.batch_id ?? 0) + 1;
       sub_batch_id = 1;
     } else {
       const existingSameCombo = await LotesListsBatches.findOne({
@@ -260,14 +260,13 @@ lotesListRouter.post('/batches/update/recipe', async (req, res) => {
   const { batch_id, sub_batch_id } = req.body;
   const sand_dry = (req.body.sand_dry ?? req.body.sand_powder_dry) || '0';
 
-
   try {
     const [count, rows] = await LotesListsBatches.update(
       { ...req.body, sand_dry },
       {
         where: { batch_id, sub_batch_id },
         returning: true,
-      },
+      }
     );
 
     if (count === 0) {
@@ -304,7 +303,7 @@ lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
       {
         where: { id },
         returning: true,
-      },
+      }
     );
 
     const updatedCake = rows[0];
@@ -333,7 +332,7 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
           x.cake_id > 0 &&
           x.recipe &&
           typeof x.recipe === 'object' &&
-          !Array.isArray(x.recipe),
+          !Array.isArray(x.recipe)
       );
 
     if (normalized.length === 0) {
@@ -353,7 +352,7 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
         {
           where: { id: cake_id },
           returning: true,
-        },
+        }
       );
 
       if (count === 0) continue;
