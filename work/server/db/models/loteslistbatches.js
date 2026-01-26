@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       recipe: DataTypes.STRING,
       quantity_cakes: DataTypes.INTEGER,
       custom_recipe: DataTypes.BOOLEAN,
-      sand_powder_dry: DataTypes.STRING,
+      sand_dry: DataTypes.STRING,
       sand_slurry_dry: DataTypes.STRING,
       lime: DataTypes.STRING,
       cement: DataTypes.STRING,

@@ -97,8 +97,6 @@ const RawMaterialsConsumptionModal = React.memo(
     }, [wastedMode, selectedRecipe, selectedRow]);
 
     const isRecipeLocked = wastedMode === 'from_actual';
-    const hasAnyRecipe =
-      Boolean(selectedRecipe) || (availableRecipes?.length ?? 0) > 0;
 
     const onHeaderFromActual = (e) => {
       setWastedMode((prev) => (e.target.checked ? 'from_actual' : 'default'));
