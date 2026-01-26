@@ -58,7 +58,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
     const materialsMap = useMemo(
       () => [
-        { label: 'Sand', key: 'sand_dry' },
+        { label: 'Sand powder (dry)', key: 'sand_powder_dry' },
         { label: 'Sand slurry (dry)', key: 'sand_slurry_dry' },
         { label: 'Lime', key: 'lime' },
         { label: 'Cement', key: 'cement' },

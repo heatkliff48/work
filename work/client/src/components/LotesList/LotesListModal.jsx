@@ -82,7 +82,7 @@ const SECTIONS = {
       { label: 'Gypsum (dry), kg', key: 'gypsum_dry' },
       { label: 'Aluminum 2', key: 'aluminum_paste_2' },
 
-      { label: 'Sand (dry), kg', key: 'sand_dry' },
+      { label: 'Sand powder (dry), kg', key: 'sand_powder_dry' },
       { label: 'Return (dry), kg', key: 'return_dry' },
       // { label: 'Water solids', key: 'w_s' },
     ],
@@ -140,7 +140,7 @@ const numericKeys = new Set([
   'cement',
   'gypsum_dry',
   'aluminum_paste_2',
-  'sand_dry',
+  'sand_powder_dry',
   'return_dry',
   'w_s',
 
@@ -172,7 +172,7 @@ const NUMERIC_FORMATS = {
   cement: 2,
   gypsum_dry: 2,
   aluminum_paste_2: 2,
-  sand_dry: 2,
+  sand_powder_dry: 2,
   return_dry: 2,
 
   sand_fines: 2,
