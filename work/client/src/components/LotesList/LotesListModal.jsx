@@ -624,19 +624,19 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     }
   };
 
-  const buildBatchPayload = () => {
-    const {
-      relatedBatches,
-      relatedBatchesRecipes,
-      activeSubBatchId,
-      activeBatchId,
-      ...payload
-    } = batchData;
+  // const buildBatchPayload = () => {
+  //   const {
+  //     relatedBatches,
+  //     relatedBatchesRecipes,
+  //     activeSubBatchId,
+  //     activeBatchId,
+  //     ...payload
+  //   } = batchData;
 
-    if (activeSubBatchId != null) payload.sub_batch_id = Number(activeSubBatchId);
+  //   if (activeSubBatchId != null) payload.sub_batch_id = Number(activeSubBatchId);
 
-    return payload;
-  };
+  //   return payload;
+  // };
 
   const resolveActiveBatchIds = () => {
     const related = Array.isArray(batchData.relatedBatches)
@@ -652,6 +652,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
           sub_batch_id: Number(bySub.sub_batch_id),
           cake_id_start: Number(bySub.cake_id_start),
           cake_id_finish: Number(bySub.cake_id_finish),
+          quantity_cakes: Number(bySub.quantity_cakes),
         };
       }
     }
@@ -672,6 +673,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
           sub_batch_id: Number(byCake.sub_batch_id),
           cake_id_start: Number(byCake.cake_id_start),
           cake_id_finish: Number(byCake.cake_id_finish),
+          quantity_cakes: Number(byCake.quantity_cakes),
         };
       }
     }
@@ -681,6 +683,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       sub_batch_id: Number(batchData.sub_batch_id ?? batchData.activeSubBatchId),
       cake_id_start: Number(batchData.cake_id_start),
       cake_id_finish: Number(batchData.cake_id_finish),
+      quantity_cakes: Number(batchData.quantity_cakes),
     };
   };
 
@@ -762,9 +765,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     dispatch(updateLotesListRecipe({ ids, updates }));
 
     const cakePayloads = buildCakePayloads();
-    console.log('ids LotesListModal.jsx line 764', ids);
-    console.log('updates LotesListModal.jsx line 765', updates);
-    console.log('cakePayloads LotesListModal.jsx line 764', cakePayloads);
+
     for (const payload of cakePayloads) {
       dispatch(updateLotesListCakesRecipe({ ids, payload }));
     }
