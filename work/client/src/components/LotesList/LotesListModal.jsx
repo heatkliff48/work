@@ -38,9 +38,9 @@ const SECTIONS = {
         key: 'dosing_order',
         type: 'select',
         options: [
-          { label: 'cement→lime', value: '' },
-          { label: 'cement→lime', value: 'cement->lime' },
-          { label: 'lime→cement', value: 'lime->cement' },
+          { label: 'cem+cal', value: 'cem+cal' },
+          { label: 'cem→cal', value: 'cem->cal' },
+          { label: 'cal→cem', value: 'cal->cem' },
         ],
       },
       {
@@ -165,7 +165,7 @@ const NUMERIC_FORMATS = {
   vibrator_time_sec: 2,
   vibrator_speed_hz: 2,
 
-  water_solid_ratio: 2,
+  water_solid_ratio: 3,
   lime: 2,
   sand_slurry_dry: 2,
   aluminum_paste: 2,
@@ -240,7 +240,7 @@ function RenderSection({
             const value =
               isDate && formData[field.key]
                 ? String(formData[field.key]).slice(0, 10)
-                : (formData[field.key] ?? '');
+                : formData[field.key] ?? '';
 
             const isNumeric = numericKeys.has(field.key);
             const precision = NUMERIC_FORMATS[field.key];
@@ -492,8 +492,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       limited === ''
         ? ''
         : precision != null
-          ? roundTo(limited, precision)
-          : Number(limited);
+        ? roundTo(limited, precision)
+        : Number(limited);
 
     setBatchData((p) => ({ ...p, [name]: next }));
   };
@@ -513,8 +513,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       limited === ''
         ? ''
         : precision != null
-          ? roundTo(limited, precision)
-          : Number(limited);
+        ? roundTo(limited, precision)
+        : Number(limited);
 
     setCakeData((p) => ({ ...p, [name]: next }));
   };
@@ -774,7 +774,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
                         <Form.Select
                           size="sm"
                           style={{ width: 140 }}
-                          value={applyToAllCakes ? 'all' : (selectedCakeId ?? '')}
+                          value={applyToAllCakes ? 'all' : selectedCakeId ?? ''}
                           onChange={(e) => onSelectCake(e.target.value)}
                           disabled={!cakeOptions.length || applyToAllCakes}
                         >
