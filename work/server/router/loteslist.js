@@ -235,8 +235,8 @@ lotesListRouter.post('/batches', async (req, res) => {
       cake_id_finish,
       batch_id,
       sub_batch_id,
-      quantity_cakes: quantityCakesInt,
       ...new_lotestList,
+      quantity_cakes: quantityCakesInt,
       sand_dry,
     });
 
@@ -257,16 +257,17 @@ lotesListRouter.post('/batches', async (req, res) => {
 
 lotesListRouter.post('/batches/update/recipe', async (req, res) => {
   const { ids, updates } = req.body;
-  const { batch_id, sub_batch_id, cake_id_start, cake_id_finish } = ids;
+  const { batch_id, sub_batch_id, cake_id_start, cake_id_finish, quantity_cakes } =
+    ids;
   const sand_dry = (updates.sand_dry ?? updates.sand_powder_dry) || '0';
 
   try {
     const [count, rows] = await LotesListsBatches.update(
-      { ...updates, sand_dry },
+      { ...updates, sand_dry, quantity_cakes },
       {
         where: { batch_id, sub_batch_id, cake_id_start, cake_id_finish },
         returning: true,
-      }
+      },
     );
 
     if (count === 0) {
@@ -306,7 +307,7 @@ lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
       {
         where: { id: cake_id_start },
         returning: true,
-      }
+      },
     );
 
     const updatedCake = rows[0];
@@ -335,7 +336,7 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
           x.cake_id > 0 &&
           x.recipe &&
           typeof x.recipe === 'object' &&
-          !Array.isArray(x.recipe)
+          !Array.isArray(x.recipe),
       );
 
     if (normalized.length === 0) {
@@ -355,7 +356,7 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
         {
           where: { id: cake_id },
           returning: true,
-        }
+        },
       );
 
       if (count === 0) continue;
