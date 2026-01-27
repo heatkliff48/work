@@ -193,7 +193,7 @@ class WarehouseRepository {
   static async updateListOfOrderedProduction(ordered_production) {
     console.log(
       '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateListOfOrderedProduction----------------------------------',
-      ordered_production
+      ordered_production,
     );
 
     try {
@@ -214,7 +214,7 @@ class WarehouseRepository {
 
     try {
       const new_ordered_production_oem = await ListOfOrderedProductionOEMs.create(
-        ordered_production_oem
+        ordered_production_oem,
       );
 
       return new_ordered_production_oem;
@@ -245,7 +245,7 @@ class WarehouseRepository {
         upd_rem_srock;
       console.log(
         '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRemainingStock upd_rem_srock',
-        upd_rem_srock
+        upd_rem_srock,
       );
 
       const upd =
@@ -260,7 +260,7 @@ class WarehouseRepository {
       console.log('upd Warehouse.js line 261', upd);
       const [count, rows] = await Warehouses.update(
         { ...upd },
-        { where: { id: warehouse_id }, returning: true }
+        { where: { id: warehouse_id }, returning: true },
       );
 
       const updatedCake = rows[0];
@@ -1098,7 +1098,7 @@ class WarehouseRepository {
       const listOfReservedProducts = await ReservedDryMixes.findAll();
       console.log(
         '>>>>>>>>>>>>>>>>listOfReservedProducts<<<<<<<<<<<<',
-        listOfReservedProducts
+        listOfReservedProducts,
       );
       return listOfReservedProducts;
     } catch (error) {
@@ -1359,7 +1359,7 @@ class WarehouseRepository {
 
   static async getListOfReservedRelatedMaterialsProducts() {
     console.log(
-      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedRelatedMaterialsProducts'
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getListOfReservedRelatedMaterialsProducts',
     );
 
     try {

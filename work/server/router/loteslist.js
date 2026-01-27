@@ -257,14 +257,15 @@ lotesListRouter.post('/batches', async (req, res) => {
 });
 
 lotesListRouter.post('/batches/update/recipe', async (req, res) => {
-  const { batch_id, sub_batch_id } = req.body;
-  const sand_dry = (req.body.sand_dry ?? req.body.sand_powder_dry) || '0';
+  const { ids, updates } = req.body;
+  const { batch_id, sub_batch_id, cake_id_start, cake_id_finish } = ids;
+  const sand_dry = (updates.sand_dry ?? updates.sand_powder_dry) || '0';
 
   try {
     const [count, rows] = await LotesListsBatches.update(
-      { ...req.body, sand_dry },
+      { ...updates, sand_dry },
       {
-        where: { batch_id, sub_batch_id },
+        where: { batch_id, sub_batch_id, cake_id_start, cake_id_finish },
         returning: true,
       }
     );
@@ -297,17 +298,19 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
   try {
-    const { id } = req.body;
+    // console.log('req.body loteslist.js line 301', req.body);
+    const { ids, payload } = req.body;
+    const { sub_batch_id } = ids;
     const [count, rows] = await LotesListsCakes.update(
-      { ...req.body },
+      { ...payload },
       {
-        where: { id },
+        where: { id: sub_batch_id },
         returning: true,
       }
     );
 
     const updatedCake = rows[0];
-
+    // console.log('updatedCake loteslist.js line 312', updatedCake);
     myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, updatedCake);
 
     return res.status(200);
