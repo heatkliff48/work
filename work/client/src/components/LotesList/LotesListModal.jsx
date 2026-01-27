@@ -637,6 +637,71 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     return payload;
   };
 
+  const resolveActiveBatchIds = () => {
+    const related = Array.isArray(batchData.relatedBatches)
+      ? batchData.relatedBatches
+      : [];
+
+    const wantedSub = Number(batchData.sub_batch_id ?? batchData.activeSubBatchId);
+    if (Number.isFinite(wantedSub)) {
+      const bySub = related.find((b) => Number(b?.sub_batch_id) === wantedSub);
+      if (bySub) {
+        return {
+          batch_id: Number(bySub.batch_id ?? batchData.batch_id),
+          sub_batch_id: Number(bySub.sub_batch_id),
+          cake_id_start: Number(bySub.cake_id_start),
+          cake_id_finish: Number(bySub.cake_id_finish),
+        };
+      }
+    }
+
+    const cakeId = Number(selectedCakeId);
+    if (Number.isFinite(cakeId)) {
+      const byCake = related.find((b) => {
+        const s = Number(b?.cake_id_start);
+        const f = Number(b?.cake_id_finish);
+        return (
+          Number.isFinite(s) && Number.isFinite(f) && cakeId >= s && cakeId <= f
+        );
+      });
+
+      if (byCake) {
+        return {
+          batch_id: Number(byCake.batch_id ?? batchData.batch_id),
+          sub_batch_id: Number(byCake.sub_batch_id),
+          cake_id_start: Number(byCake.cake_id_start),
+          cake_id_finish: Number(byCake.cake_id_finish),
+        };
+      }
+    }
+
+    return {
+      batch_id: Number(batchData.batch_id),
+      sub_batch_id: Number(batchData.sub_batch_id ?? batchData.activeSubBatchId),
+      cake_id_start: Number(batchData.cake_id_start),
+      cake_id_finish: Number(batchData.cake_id_finish),
+    };
+  };
+
+  const buildBatchUpdates = () => {
+    const {
+      relatedBatches,
+      relatedBatchesRecipes,
+      activeSubBatchId,
+      activeBatchId,
+
+      id,
+      batch_id,
+      sub_batch_id,
+      cake_id_start,
+      cake_id_finish,
+
+      ...updates
+    } = batchData;
+
+    return updates;
+  };
+
   // const buildSingleCakePayload = (cake_id) => {
   //   return {
   //     ...cakeData,
@@ -671,16 +736,36 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     return [buildSingleCakePayload(Number(selectedCakeId))];
   };
 
+  // const onSaveAll = async (e) => {
+  //   e.preventDefault();
+
+  //   const batchPayload = buildBatchPayload();
+  //   dispatch(updateLotesListRecipe(batchPayload));
+
+  //   const cakePayloads = buildCakePayloads();
+
+  //   for (const payload of cakePayloads) {
+  //     dispatch(updateLotesListCakesRecipe(payload));
+  //   }
+
+  //   setApplyToAllCakes(false);
+  //   onHide();
+  // };
+
   const onSaveAll = async (e) => {
     e.preventDefault();
 
-    const batchPayload = buildBatchPayload();
-    dispatch(updateLotesListRecipe(batchPayload));
+    const ids = resolveActiveBatchIds();
+    const updates = buildBatchUpdates();
+
+    dispatch(updateLotesListRecipe({ ids, updates }));
 
     const cakePayloads = buildCakePayloads();
-
+    console.log('ids LotesListModal.jsx line 764', ids);
+    console.log('updates LotesListModal.jsx line 765', updates);
+    console.log('cakePayloads LotesListModal.jsx line 764', cakePayloads);
     for (const payload of cakePayloads) {
-      dispatch(updateLotesListCakesRecipe(payload));
+      dispatch(updateLotesListCakesRecipe({ ids, payload }));
     }
 
     setApplyToAllCakes(false);
