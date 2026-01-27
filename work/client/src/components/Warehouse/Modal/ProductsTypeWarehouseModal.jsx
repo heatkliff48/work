@@ -1,21 +1,21 @@
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import React, { useCallback, useState, useMemo } from "react";
-import Select from "react-select";
-import Container from "react-bootstrap/Container";
-import InputField from "#components/InputField/InputField.jsx";
-import Table from "#components/Table/Table.jsx";
-import { useDispatch } from "react-redux";
-import { useProductsTypeJournalContext } from "#components/contexts/ProductsTypeJournalContext.js";
-import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import React, { useCallback, useState, useMemo } from 'react';
+import Select from 'react-select';
+import Container from 'react-bootstrap/Container';
+import InputField from '#components/InputField/InputField.jsx';
+import Table from '#components/Table/Table.jsx';
+import { useDispatch } from 'react-redux';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import {
   addNewAnchorsWarehouse,
   addNewDryMixesWarehouse,
   addNewRelatedMaterialsWarehouse,
   addNewToolsWarehouse,
-} from "#components/redux/actions/productsTypeWarehouseAction.js";
-import "#components/Styles/modals.css";
-import { updateRelatedMaterialsBackorder } from "#components/redux/actions/relatedMaterialsBackorderListAction.js";
+} from '#components/redux/actions/productsTypeWarehouseAction.js';
+import '#components/Styles/modals.css';
+import { updateRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 
 function ProductsTypeWarehouseModal(props) {
   const {
@@ -49,27 +49,31 @@ function ProductsTypeWarehouseModal(props) {
   }, [warehouseData?.product_article]);
 
   const warehouseLocOpt = [
-    { value: "local", label: "Local" },
-    { value: "remote", label: "Remote" },
+    { value: 'local', label: 'Local' },
+    { value: 'remote', label: 'Remote' },
   ];
 
   const type_select = [
     {
-      value: "OK",
-      label: "OK",
+      value: 'OK',
+      label: 'OK',
     },
     {
-      value: "Remnants",
-      label: "Remnants",
+      value: 'Remnants',
+      label: 'Remnants',
+    },
+    {
+      value: 'Sorting',
+      label: 'Sorting',
     },
   ];
 
   const dispatch = useDispatch();
 
   const getWarehouseArticle = (product) => {
-    let versionNumber = "0001";
+    let versionNumber = '0001';
     const year = new Date().getFullYear().toString().slice(-2);
-    const month = (new Date().getMonth() + 1).toString().padStart(2, "0");
+    const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
     const day = new Date().getDate();
 
     const articleId =
@@ -93,9 +97,7 @@ function ProductsTypeWarehouseModal(props) {
 
   const handlerAddProductWarehouse = useCallback(
     (row) => {
-      const product = latestProductsType.find(
-        (el) => el.id === row.original.id
-      );
+      const product = latestProductsType.find((el) => el.id === row.original.id);
       const warehouse_article = getWarehouseArticle(product);
 
       setWarehouseData((prev) => ({
@@ -205,9 +207,7 @@ function ProductsTypeWarehouseModal(props) {
       return {
         ...reservedItem,
         quantity_in_warehouse:
-          reservedItem.quantity_in_warehouse +
-          parseInt(ordered_quantity) +
-          deducted,
+          reservedItem.quantity_in_warehouse + parseInt(ordered_quantity) + deducted,
       };
     });
 
@@ -292,8 +292,8 @@ function ProductsTypeWarehouseModal(props) {
                 <>
                   {COLUMNS_WAREHOUSE_AUX.map((el) => {
                     if (
-                      el.accessor === "article" ||
-                      el.accessor === "product_article"
+                      el.accessor === 'article' ||
+                      el.accessor === 'product_article'
                     )
                       return (
                         <>
@@ -302,18 +302,18 @@ function ProductsTypeWarehouseModal(props) {
                             type="text"
                             id={el.accessor}
                             name={el.accessor}
-                            value={warehouseData[el.accessor] || ""}
+                            value={warehouseData[el.accessor] || ''}
                             key={el.id}
                             readOnly
                           />
                         </>
                       );
                     if (
-                      el.accessor === "free_quantity_remaining" ||
-                      el.accessor === "ordered_quantity"
+                      el.accessor === 'free_quantity_remaining' ||
+                      el.accessor === 'ordered_quantity'
                     )
                       return null;
-                    if (el.accessor === "warehouse_loc")
+                    if (el.accessor === 'warehouse_loc')
                       return (
                         <>
                           <Modal.Body>{el.Header}:</Modal.Body>
@@ -328,7 +328,7 @@ function ProductsTypeWarehouseModal(props) {
                         </>
                       );
 
-                    if (el.accessor === "type")
+                    if (el.accessor === 'type')
                       return (
                         <>
                           <Modal.Body>{el.Header}:</Modal.Body>
@@ -367,7 +367,7 @@ function ProductsTypeWarehouseModal(props) {
                     dataOfTable={latestProductsType}
                     // userAccess={userAccess}
                     onClickButton={() => {}}
-                    buttonText={""}
+                    buttonText={''}
                     tableName={props.title}
                     handleRowClick={(row) => {
                       handlerAddProductWarehouse(row);
