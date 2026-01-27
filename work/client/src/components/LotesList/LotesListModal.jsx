@@ -108,16 +108,17 @@ const SECTIONS = {
       { label: 'Gypsum', key: 'gypsum_type' },
       { label: 'Al paste 1 types', key: 'al_paste_types' },
 
+      { label: 'Lime activity', key: 'lime_activity' },
+      { label: 'Lime', key: 'lime' },
+      { label: 'Al paste 1 proportions', key: 'al_paste_proportion' },
+
       {
         label: 'Slaking time for lime',
         key: 'lime_slaking_time_sec',
         type: 'time_mmss',
       },
       { label: 'Lime type', key: 'lime_type' },
-      { label: 'Al paste 1 proportions', key: 'al_paste_proportion' },
 
-      { type: 'spacer', key: '__sp_al_1' },
-      { type: 'spacer', key: '__sp_al_2' },
       { label: 'Al paste 2 types', key: 'al_paste_types_2' },
       { type: 'spacer', key: '__sp_al_3' },
       { type: 'spacer', key: '__sp_al_4' },
@@ -240,7 +241,7 @@ function RenderSection({
             const value =
               isDate && formData[field.key]
                 ? String(formData[field.key]).slice(0, 10)
-                : formData[field.key] ?? '';
+                : (formData[field.key] ?? '');
 
             const isNumeric = numericKeys.has(field.key);
             const precision = NUMERIC_FORMATS[field.key];
@@ -492,8 +493,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       limited === ''
         ? ''
         : precision != null
-        ? roundTo(limited, precision)
-        : Number(limited);
+          ? roundTo(limited, precision)
+          : Number(limited);
 
     setBatchData((p) => ({ ...p, [name]: next }));
   };
@@ -513,8 +514,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       limited === ''
         ? ''
         : precision != null
-        ? roundTo(limited, precision)
-        : Number(limited);
+          ? roundTo(limited, precision)
+          : Number(limited);
 
     setCakeData((p) => ({ ...p, [name]: next }));
   };
@@ -859,7 +860,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
                         <Form.Select
                           size="sm"
                           style={{ width: 140 }}
-                          value={applyToAllCakes ? 'all' : selectedCakeId ?? ''}
+                          value={applyToAllCakes ? 'all' : (selectedCakeId ?? '')}
                           onChange={(e) => onSelectCake(e.target.value)}
                           disabled={!cakeOptions.length || applyToAllCakes}
                         >
