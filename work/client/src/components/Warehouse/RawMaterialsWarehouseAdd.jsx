@@ -80,7 +80,7 @@ function RawMaterialsWarehouseAdd(props) {
   const initState = {
     typeCement: 'CEM I 52.5 R-SR3',
     typeSand: 'SILICA 0-2 WS',
-    typeLime: 'CK 90Q',
+    typeLime: 'CL 90Q',
     typeAlum1: '7040-10/70WB28',
     typeAlum2: '7100-30/70WB28',
     diameter: 30,
