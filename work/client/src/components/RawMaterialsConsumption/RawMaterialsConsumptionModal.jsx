@@ -395,12 +395,12 @@ const RawMaterialsConsumptionModal = React.memo(
       }
 
       const body = { materials };
-      // dispatch(
-      //   addNewMainRawMatConsumption({
-      //     ...selectedRow,
-      //     consumed_volume: Number(productionVolume),
-      //   }),
-      // );
+      dispatch(
+        addNewMainRawMatConsumption({
+          ...selectedRow,
+          consumed_volume: Number(productionVolume),
+        }),
+      );
 
       const productDetails = latestProducts.find(
         (product) => product.article === selectedRow?.batch_article,
@@ -424,17 +424,17 @@ const RawMaterialsConsumptionModal = React.memo(
         ...recipeSnapshot,
       };
 
-      // addProductOrder();
+      addProductOrder();
 
-      // dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
-      // dispatch(
-      //   addNewLotesList({ new_lotestList, new_batch: lotesListBatchesCheck }),
-      // );
-      // if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+      dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
+      dispatch(
+        addNewLotesList({ new_lotestList, new_batch: lotesListBatchesCheck }),
+      );
+      if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
 
-      // setMainRawMaterialConsumptionMadal(false);
-      // toggle();
-      // setProductionVolume('');
+      setMainRawMaterialConsumptionMadal(false);
+      toggle();
+      setProductionVolume('');
     };
 
     const ddmmyyFromISO = (iso) => {
