@@ -146,7 +146,6 @@ lotesListRouter.get('/batches', async (req, res) => {
 });
 
 lotesListRouter.post('/batches', async (req, res) => {
-  console.log('>>>req.body<<<<<<<<<<<<<<<<<<<<<<<<<<', req.body);
   const { new_lotestList, new_batch } = req.body;
   const { quantity_cakes, product, production_date } = new_lotestList;
   const sand_dry =
@@ -298,13 +297,14 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
   try {
-    // console.log('req.body loteslist.js line 301', req.body);
     const { ids, payload } = req.body;
-    const { sub_batch_id } = ids;
+    console.log('req.body loteslist.js line 302', req.body);
+
+    const { cake_id_start } = ids;
     const [count, rows] = await LotesListsCakes.update(
       { ...payload },
       {
-        where: { id: sub_batch_id },
+        where: { id: cake_id_start },
         returning: true,
       }
     );
