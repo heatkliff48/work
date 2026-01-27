@@ -267,7 +267,7 @@ lotesListRouter.post('/batches/update/recipe', async (req, res) => {
       {
         where: { batch_id, sub_batch_id, cake_id_start, cake_id_finish },
         returning: true,
-      },
+      }
     );
 
     if (count === 0) {
@@ -306,7 +306,7 @@ lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
       {
         where: { id: sub_batch_id },
         returning: true,
-      },
+      }
     );
 
     const updatedCake = rows[0];
@@ -335,7 +335,7 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
           x.cake_id > 0 &&
           x.recipe &&
           typeof x.recipe === 'object' &&
-          !Array.isArray(x.recipe),
+          !Array.isArray(x.recipe)
       );
 
     if (normalized.length === 0) {
@@ -355,7 +355,7 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
         {
           where: { id: cake_id },
           returning: true,
-        },
+        }
       );
 
       if (count === 0) continue;
