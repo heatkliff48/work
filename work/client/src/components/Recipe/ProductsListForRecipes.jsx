@@ -72,6 +72,7 @@ const ProductsListForRecipes = () => {
         onHide={() => setModalShow(false)}
         needDeleteButton={userAccess?.canWrite ?? false}
         selectedRecipe={selectedRecipe}
+        setSelectedRecipe={setSelectedRecipe}
       />
     </div>
   );

@@ -5,11 +5,16 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
+import Form from 'react-bootstrap/Form';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteRecipe } from '#components/redux/actions/recipeAction.js';
+import {
+  deleteRecipe,
+  updateRecipe,
+} from '#components/redux/actions/recipeAction.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 function RecipeInfoModal(props) {
   const { recipe_info } = useRecipeContext();
@@ -17,6 +22,34 @@ function RecipeInfoModal(props) {
     useUsersContext();
 
   const user = useSelector((state) => state.user);
+
+  const [editingField, setEditingField] = useState(null);
+  const [editValue, setEditValue] = useState('');
+
+  const EDITABLE_FIELD = 'description';
+
+  const handleEditClick = (fieldAccessor, currentValue) => {
+    setEditingField(fieldAccessor);
+    setEditValue(currentValue || '');
+  };
+
+  const handleSave = (fieldAccessor) => {
+    const recipe = {
+      id: props.selectedRecipe.id,
+      description: editValue,
+    };
+    dispatch(updateRecipe(recipe));
+    props.setSelectedRecipe({
+      ...props.selectedRecipe,
+      description: editValue,
+    });
+    setEditingField(null);
+  };
+
+  const handleCancel = () => {
+    setEditingField(null);
+    setEditValue('');
+  };
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -108,7 +141,7 @@ function RecipeInfoModal(props) {
                 <Col xs={8}>
                   {mainFields.length > 0 && (
                     <div className="main-recipe-info">
-                      <Table striped bordered hover size="sm">
+                      {/* <Table striped bordered hover size="sm">
                         <tbody>
                           {props.selectedRecipe &&
                             mainFields.map((el, index) => (
@@ -118,6 +151,68 @@ function RecipeInfoModal(props) {
                                 </td>
                                 <td>
                                   {props.selectedRecipe[el.accessor] || 'Empty'}
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </Table> */}
+                      <Table striped bordered hover size="sm">
+                        <tbody>
+                          {props.selectedRecipe &&
+                            mainFields.map((el, index) => (
+                              <tr key={index}>
+                                <td>
+                                  <strong>{el.Header}</strong>
+                                </td>
+                                <td>
+                                  {editingField === el.accessor ? (
+                                    <div className="d-flex gap-2 align-items-center">
+                                      <Form.Control
+                                        size="sm"
+                                        type="text"
+                                        value={editValue}
+                                        onChange={(e) =>
+                                          setEditValue(e.target.value)
+                                        }
+                                        autoFocus
+                                      />
+                                      <Button
+                                        size="sm"
+                                        variant="success"
+                                        onClick={() => handleSave(el.accessor)}
+                                      >
+                                        ✓
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        onClick={handleCancel}
+                                      >
+                                        ✕
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <div className="d-flex justify-content-between align-items-center">
+                                      <span>
+                                        {props.selectedRecipe[el.accessor] ||
+                                          'Empty'}
+                                      </span>
+                                      {el.accessor === EDITABLE_FIELD && (
+                                        <Button
+                                          size="sm"
+                                          variant="outline-primary"
+                                          onClick={() =>
+                                            handleEditClick(
+                                              el.accessor,
+                                              props.selectedRecipe[el.accessor],
+                                            )
+                                          }
+                                        >
+                                          Edit
+                                        </Button>
+                                      )}
+                                    </div>
+                                  )}
                                 </td>
                               </tr>
                             ))}

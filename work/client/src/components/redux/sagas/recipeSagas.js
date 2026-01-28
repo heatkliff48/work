@@ -17,8 +17,13 @@ import {
   RAW_MAT_CONSUMPTION,
   RECIPE_ORDERS_DATA,
   SAVE_MATERIAL_PLAN,
+  UPDATE_NEW_RECIPE,
+  UPDATE_RECIPE,
 } from '../types/recipeTypes';
-import { DELETE_RAW_MAT_CONSUMPTION_SOCKET, NEW_RAW_MAT_CONSUMPTION_SOCKET } from '../types/socketTypes/socket';
+import {
+  DELETE_RAW_MAT_CONSUMPTION_SOCKET,
+  NEW_RAW_MAT_CONSUMPTION_SOCKET,
+} from '../types/socketTypes/socket';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -40,6 +45,18 @@ const getRecipe = () => {
 const addNewRecipe = (recipe) => {
   return url
     .post('/recipe', recipe)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updateRecipe = (recipe) => {
+  return url
+    .post('/recipe/update', recipe)
     .then((res) => {
       return res.data;
     })
@@ -153,6 +170,16 @@ function* addNewRecipeWorker(action) {
   }
 }
 
+function* updateRecipeWorker(action) {
+  try {
+    const { recipe } = yield call(updateRecipe, action.payload);
+
+    yield put({ type: UPDATE_NEW_RECIPE, payload: recipe });
+  } catch (err) {
+    yield put({ type: UPDATE_NEW_RECIPE, payload: [] });
+  }
+}
+
 function* deleteRecipeWorker(action) {
   try {
     const { payload } = action;
@@ -221,6 +248,7 @@ function* deleteRawMatConsumptionWorker(action) {
 function* recipeWatcher() {
   yield takeLatest(GET_FULL_RECIPE, getRecipeWorker);
   yield takeLatest(ADD_NEW_RECIPE, addNewRecipeWorker);
+  yield takeLatest(UPDATE_RECIPE, updateRecipeWorker);
   yield takeLatest(DELETE_RECIPE, deleteRecipeWorker);
 
   yield takeLatest(SAVE_MATERIAL_PLAN, saveMaterialPlanWatcher);

@@ -127,6 +127,7 @@ import {
   NEW_LOTES_LIST_CAKES_SOCKET,
   UPD_LOTES_LIST_CAKES_SOCKET,
   UPD_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
+  UPDATE_NEW_RECIPE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -514,6 +515,13 @@ export const addNewRecipeSocket = (recipe) => {
   };
 };
 
+export const updateRecipeSocket = (recipe) => {
+  return {
+    type: UPDATE_NEW_RECIPE_SOCKET,
+    payload: recipe,
+  };
+};
+
 export const addNewRawMatConsumptionSocket = (rawMatConsumption) => {
   return {
     type: NEW_RAW_MAT_CONSUMPTION_SOCKET,
@@ -612,14 +620,18 @@ export const updateDryMixesJournalSocket = (dryMixesJournal) => {
   };
 };
 
-export const addNewRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
+export const addNewRelatedMaterialsJournalSocket = (
+  relatedMaterialsJournal,
+) => {
   return {
     type: NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
   };
 };
 
-export const updateRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
+export const updateRelatedMaterialsJournalSocket = (
+  relatedMaterialsJournal,
+) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
@@ -668,14 +680,18 @@ export const updateDryMixesWarehouseSocket = (dryMixesWarehouse) => {
   };
 };
 
-export const addNewRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
+export const addNewRelatedMaterialsWarehouseSocket = (
+  relatedMaterialsWarehouse,
+) => {
   return {
     type: NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
     payload: relatedMaterialsWarehouse,
   };
 };
 
-export const updateRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
+export const updateRelatedMaterialsWarehouseSocket = (
+  relatedMaterialsWarehouse,
+) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
     payload: relatedMaterialsWarehouse,
@@ -739,7 +755,7 @@ export const deleteQualityManagementSocket = (qualityManagementDataID) => {
 };
 
 export const addNewRelatedMaterialsBackorderSocket = (
-  relatedMaterialsBackorderList
+  relatedMaterialsBackorderList,
 ) => {
   return {
     type: NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
@@ -748,7 +764,7 @@ export const addNewRelatedMaterialsBackorderSocket = (
 };
 
 export const updateRelatedMaterialsBackorderSocket = (
-  relatedMaterialsBackorderList
+  relatedMaterialsBackorderList,
 ) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
@@ -792,7 +808,7 @@ export const updateListOfOrderedProductionSocket = (upd_ordered_production) => {
 };
 
 export const addNewListOfOrderedProductionOEMSocket = (
-  new_ordered_production_oem
+  new_ordered_production_oem,
 ) => {
   return {
     type: NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
@@ -801,7 +817,7 @@ export const addNewListOfOrderedProductionOEMSocket = (
 };
 
 export const updateListOfOrderedProductionOEMSocket = (
-  upd_ordered_production_oem
+  upd_ordered_production_oem,
 ) => {
   return {
     type: UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
@@ -970,7 +986,9 @@ export const updateWarehouseGrindingBallsSocket = (warehouseGrindingBalls) => {
   };
 };
 
-export const deleteWarehouseGrindingBallsSocket = (grinding_balls_warehouse_id) => {
+export const deleteWarehouseGrindingBallsSocket = (
+  grinding_balls_warehouse_id,
+) => {
   return {
     type: NEED_DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
     payload: grinding_balls_warehouse_id,
