@@ -359,7 +359,9 @@ const ProjectContextProvider = ({ children }) => {
     { key: 'cement_type', value: 'CEM | 52.5 R-SR3' },
     { key: 'al_paste_producer', value: 'AVL Metal Powder' },
     { key: 'al_paste_types', value: '7040-10/70WB28' },
+    { key: 'al_paste_proportion', value: '100' },
     { key: 'al_paste_types_2', value: '7100-30/70WB28' },
+    { key: 'al_paste_proportion_2', value: '00' },
   ];
 
   const navigate = useNavigate();
