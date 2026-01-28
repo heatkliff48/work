@@ -51,10 +51,9 @@ export const lotesListCakesReducer = (lotesListCakes = [], action) => {
       const updatesById = new Map(
         updates.filter((x) => x && x.id != null).map((x) => [x.id, x]),
       );
-      console.log('updatesById lotesListReducer.js line 54', updatesById);
+
       const result = lotesListCakes.map((el) => updatesById.get(el.id) ?? el);
 
-      console.log('result lotesListReducer.js line 57', result);
       return result;
     }
 

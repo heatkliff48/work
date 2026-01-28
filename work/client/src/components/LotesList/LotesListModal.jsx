@@ -336,6 +336,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   const [batchData, setBatchData] = useState({});
   const [selectedCakeId, setSelectedCakeId] = useState(null);
   const [applyToAllCakes, setApplyToAllCakes] = useState(false);
+  const [saveSubBatch, setSaveSubBatch] = useState(false);
 
   // useEffect(() => {
   //   if (user && roles.length > 0) {
@@ -520,22 +521,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     setCakeData((p) => ({ ...p, [name]: next }));
   };
 
-  // const onSelectCake = (nextValue) => {
-  //   if (nextValue === 'all') {
-  //     setApplyToAllCakes(true);
-  //     return;
-  //   }
-
-  //   const nextCakeId = Number(nextValue);
-  //   if (!Number.isFinite(nextCakeId)) return;
-
-  //   setApplyToAllCakes(false);
-  //   setSelectedCakeId(nextCakeId);
-
-  //   const found = getCakeFromStore(nextCakeId);
-  //   setCakeData(found ? { ...found } : { id: nextCakeId });
-  // };
-
   const onSelectCake = (nextValue) => {
     if (nextValue === 'all') {
       setApplyToAllCakes(true);
@@ -624,20 +609,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     }
   };
 
-  // const buildBatchPayload = () => {
-  //   const {
-  //     relatedBatches,
-  //     relatedBatchesRecipes,
-  //     activeSubBatchId,
-  //     activeBatchId,
-  //     ...payload
-  //   } = batchData;
-
-  //   if (activeSubBatchId != null) payload.sub_batch_id = Number(activeSubBatchId);
-
-  //   return payload;
-  // };
-
   const resolveActiveBatchIds = () => {
     const related = Array.isArray(batchData.relatedBatches)
       ? batchData.relatedBatches
@@ -706,13 +677,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     return updates;
   };
 
-  // const buildSingleCakePayload = (cake_id) => {
-  //   return {
-  //     ...cakeData,
-  //     id: cake_id,
-  //   };
-  // };
-
   const UI_ONLY_CAKE_KEYS = new Set(['al_paste_types_2', 'al_paste_proportion_2']);
 
   const stripUiOnlyKeys = (obj) => {
@@ -740,21 +704,19 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     return [buildSingleCakePayload(Number(selectedCakeId))];
   };
 
-  // const onSaveAll = async (e) => {
-  //   e.preventDefault();
+  const buildSubBatchCakePayloads = (ids) => {
+    const start = Number(ids?.cake_id_start);
+    const finish = Number(ids?.cake_id_finish);
 
-  //   const batchPayload = buildBatchPayload();
-  //   dispatch(updateLotesListRecipe(batchPayload));
+    if (!Number.isFinite(start) || !Number.isFinite(finish) || finish < start)
+      return [];
 
-  //   const cakePayloads = buildCakePayloads();
-
-  //   for (const payload of cakePayloads) {
-  //     dispatch(updateLotesListCakesRecipe(payload));
-  //   }
-
-  //   setApplyToAllCakes(false);
-  //   onHide();
-  // };
+    const arr = [];
+    for (let id = start; id <= finish; id += 1) {
+      arr.push(buildSingleCakePayload(id));
+    }
+    return arr;
+  };
 
   const onSaveAll = async (e) => {
     e.preventDefault();
@@ -764,11 +726,11 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
     dispatch(updateLotesListRecipe({ ids, updates }));
 
-    const cakePayloads = buildCakePayloads();
+    const cakePayloads = saveSubBatch
+      ? buildSubBatchCakePayloads(ids)
+      : buildCakePayloads();
 
-    for (const payload of cakePayloads) {
-      dispatch(updateLotesListCakesRecipe({ ids, payload }));
-    }
+    dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
 
     setApplyToAllCakes(false);
     onHide();
@@ -820,6 +782,17 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
                 </Form.Select>
               </>
             )}
+
+          <Form.Check
+            type="checkbox"
+            label="save to all this sub-batch cakes"
+            checked={saveSubBatch}
+            onChange={(e) => {
+              const v = e.target.checked;
+              setSaveSubBatch(v);
+              if (v) setApplyToAllCakes(false);
+            }}
+          />
         </Modal.Title>
 
         <Modal.Body>
