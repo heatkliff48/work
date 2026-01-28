@@ -420,6 +420,7 @@ const RawMaterialsConsumptionModal = React.memo(
         product: prodDescription[1],
         quantity_cakes: Number(productionVolume),
         custom_recipe: wastedMode !== 'default',
+        slurried: govno,
         recipe: selectedRow?.recipe_article,
         ...recipeSnapshot,
       };

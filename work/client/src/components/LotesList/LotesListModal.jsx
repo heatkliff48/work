@@ -17,6 +17,7 @@ import {
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import QuickCheckingModal from './QuickCheckingModal';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { use } from 'react';
 
 const SECTIONS = {
   batchInfo: {
@@ -349,6 +350,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   const [selectedCakeId, setSelectedCakeId] = useState(null);
   const [applyToAllCakes, setApplyToAllCakes] = useState(false);
   const [saveSubBatch, setSaveSubBatch] = useState(false);
+  const [slurried, setSlurried] = useState(false);
 
   // useEffect(() => {
   //   if (user && roles.length > 0) {
@@ -427,6 +429,10 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
     setCakeData(applyRawMaterialDefaults(baseData));
   }, [selectedCakeId, lotesListCakes, selectedRecipe]);
+
+  useEffect(() => {
+    setSlurried(batchData.slurried);
+  }, [batchData]);
 
   const batchCakeRange = useMemo(() => {
     const related = Array.isArray(batchData.relatedBatches)
@@ -760,16 +766,16 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const ids = resolveActiveBatchIds();
     const updates = buildBatchUpdates();
 
-    // dispatch(updateLotesListRecipe({ ids, updates }));
+    dispatch(updateLotesListRecipe({ ids, updates }));
 
     const cakePayloads = saveSubBatch
       ? buildSubBatchCakePayloads(ids)
       : buildCakePayloads();
-    console.log('cakePayloads LotesListModal.jsx line 732', cakePayloads);
-    // dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
 
-    // setApplyToAllCakes(false);
-    // onHide();
+    dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
+
+    setApplyToAllCakes(false);
+    onHide();
   };
 
   const onSaveQuickChecking = (changes) => {
@@ -821,12 +827,23 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
           <Form.Check
             type="checkbox"
-            label="save to all this sub-batch cakes"
+            label="Save to all this sub-batch cakes"
             checked={saveSubBatch}
             onChange={(e) => {
               const v = e.target.checked;
               setSaveSubBatch(v);
               if (v) setApplyToAllCakes(false);
+            }}
+          />
+
+          <Form.Check
+            type="checkbox"
+            label="Slurried"
+            checked={slurried}
+            onChange={(e) => {
+              const v = e.target.checked;
+              setSlurried(v);
+              setBatchData((p) => ({ ...p, slurried: v }));
             }}
           />
         </Modal.Title>
