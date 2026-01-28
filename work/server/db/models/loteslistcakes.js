@@ -56,8 +56,11 @@ module.exports = (sequelize, DataTypes) => {
       al_paste_producer: DataTypes.TEXT,
       al_paste_types: DataTypes.TEXT,
       al_paste_proportion: DataTypes.TEXT,
+      al_paste_types_2: DataTypes.TEXT,
+      al_paste_proportion_2: DataTypes.TEXT,
 
       dosing_order: DataTypes.TEXT,
+      dosing_delay_cem_sec: DataTypes.TEXT,
       dosing_delay_lime_sec: DataTypes.TEXT,
       mixer_speed_rpm: DataTypes.TEXT,
       mixing_before_al_sec: DataTypes.TEXT,
@@ -75,6 +78,8 @@ module.exports = (sequelize, DataTypes) => {
       oiling_issues: DataTypes.TEXT,
       mold_moving_issues: DataTypes.TEXT,
       form_number: DataTypes.TEXT,
+      mold_id: DataTypes.TEXT,
+      flowability: DataTypes.TEXT,
 
       // mixing_time_before_al: DataTypes.TEXT,
       // mixing_time_with_al: DataTypes.TEXT,
@@ -113,7 +118,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'LotesListsCakes',
-    }
+    },
   );
 
   return LotesListsCakes;

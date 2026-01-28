@@ -57,8 +57,11 @@ module.exports = {
       al_paste_producer: { type: Sequelize.TEXT },
       al_paste_types: { type: Sequelize.TEXT },
       al_paste_proportion: { type: Sequelize.TEXT },
+      al_paste_types_2: { type: Sequelize.TEXT },
+      al_paste_proportion_2: { type: Sequelize.TEXT },
 
       dosing_order: { type: Sequelize.TEXT },
+      dosing_delay_cem_sec: { type: Sequelize.TEXT },
       dosing_delay_lime_sec: { type: Sequelize.TEXT },
       mixer_speed_rpm: { type: Sequelize.TEXT },
       mixing_before_al_sec: { type: Sequelize.TEXT },
@@ -76,6 +79,8 @@ module.exports = {
       oiling_issues: { type: Sequelize.TEXT },
       mold_moving_issues: { type: Sequelize.TEXT },
       form_number: { type: Sequelize.TEXT },
+      mold_id: { type: Sequelize.TEXT },
+      flowability: { type: Sequelize.TEXT },
 
       // mixing_time_before_al: { type: Sequelize.TEXT },
       // mixing_time_with_al: { type: Sequelize.TEXT },

@@ -16,6 +16,7 @@ import {
 } from '#components/redux/actions/lotesListAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import QuickCheckingModal from './QuickCheckingModal';
+import { useProjectContext } from '#components/contexts/Context.js';
 
 const SECTIONS = {
   batchInfo: {
@@ -44,7 +45,11 @@ const SECTIONS = {
         ],
       },
       {
-        label: 'Delay before dosing to the mixer',
+        label: 'Delay before mixer cement',
+        key: 'dosing_delay_cem_sec',
+      },
+      {
+        label: 'Delay before mixer cal',
         key: 'dosing_delay_lime_sec',
       },
       { label: 'Mixer speed', key: 'mixer_speed_rpm' },
@@ -67,6 +72,8 @@ const SECTIONS = {
       { label: 'Issues with mixer', key: 'mixer_issues' },
       { label: 'Issues with oiling machine', key: 'oiling_issues' },
       { label: 'Issues with moving the mold', key: 'mold_moving_issues' },
+      { label: 'Mold id', key: 'mold_id' },
+      { label: 'Flowability, cm', key: 'flowability' },
     ],
   },
 
@@ -109,7 +116,7 @@ const SECTIONS = {
       { label: 'Al paste 1 types', key: 'al_paste_types' },
 
       { label: 'Lime activity', key: 'lime_activity' },
-      { label: 'Lime', key: 'lime' },
+      { label: 'Lime', key: 'lime_producer' },
       { label: 'Al paste 1 proportions', key: 'al_paste_proportion' },
 
       {
@@ -128,6 +135,7 @@ const SECTIONS = {
 };
 
 const numericKeys = new Set([
+  'dosing_delay_cem_sec',
   'dosing_delay_lime_sec',
   'mixer_speed_rpm',
   'mixing_before_al_sec',
@@ -143,7 +151,9 @@ const numericKeys = new Set([
   'aluminum_paste_2',
   'sand_dry',
   'return_dry',
-  'w_s',
+  // 'w_s',
+  'mold_id',
+  'flowability',
 
   'sand_fines',
   'sand_slurry_so3',
@@ -159,12 +169,14 @@ const numericKeys = new Set([
 ]);
 
 const NUMERIC_FORMATS = {
+  dosing_delay_cem_sec: 2,
   dosing_delay_lime_sec: 2,
   mixer_speed_rpm: 2,
   mixing_before_al_sec: 2,
   mixing_after_al_sec: 2,
   vibrator_time_sec: 2,
   vibrator_speed_hz: 2,
+  flowability: 1,
 
   water_solid_ratio: 3,
   lime: 2,
@@ -325,7 +337,7 @@ function RenderSection({
 function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { showQuickChecking, setShowQuickChecking } = useModalContext();
-
+  const { DEFAULT_RAW_MATERIAL_VALUES } = useProjectContext();
   const lotesListCakes = useSelector((state) => state.lotesListCakes);
   const user = useSelector((state) => state.user);
 
@@ -363,6 +375,26 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     return fromRecipe || null;
   };
 
+  const RAW_MATERIAL_KEYS = SECTIONS.rawMaterials.fields
+    .filter((f) => f.key && f.type !== 'spacer')
+    .map((f) => f.key);
+
+  const applyRawMaterialDefaults = (data) => {
+    const next = { ...data };
+
+    DEFAULT_RAW_MATERIAL_VALUES.forEach(({ key, value }) => {
+      if (!RAW_MATERIAL_KEYS.includes(key)) return;
+
+      const current = next[key];
+
+      if (current === undefined || current === null || current === '') {
+        next[key] = value;
+      }
+    });
+
+    return next;
+  };
+
   useEffect(() => {
     if (!selectedRecipe) return;
 
@@ -385,12 +417,15 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
   useEffect(() => {
     if (selectedCakeId == null) {
-      setCakeData({});
+      setCakeData(applyRawMaterialDefaults({}));
       return;
     }
 
     const found = getCakeFromStore(selectedCakeId);
-    setCakeData(found ? { ...found } : { id: Number(selectedCakeId) });
+
+    const baseData = found ? { ...found } : { id: Number(selectedCakeId) };
+
+    setCakeData(applyRawMaterialDefaults(baseData));
   }, [selectedCakeId, lotesListCakes, selectedRecipe]);
 
   const batchCakeRange = useMemo(() => {
@@ -674,6 +709,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       ...updates
     } = batchData;
 
+    console.log('batchData LotesListModal.jsx line 678', batchData);
     return updates;
   };
 
@@ -724,16 +760,16 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const ids = resolveActiveBatchIds();
     const updates = buildBatchUpdates();
 
-    dispatch(updateLotesListRecipe({ ids, updates }));
+    // dispatch(updateLotesListRecipe({ ids, updates }));
 
     const cakePayloads = saveSubBatch
       ? buildSubBatchCakePayloads(ids)
       : buildCakePayloads();
+    console.log('cakePayloads LotesListModal.jsx line 732', cakePayloads);
+    // dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
 
-    dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
-
-    setApplyToAllCakes(false);
-    onHide();
+    // setApplyToAllCakes(false);
+    // onHide();
   };
 
   const onSaveQuickChecking = (changes) => {
@@ -810,8 +846,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
                 <Col md={4}>
                   <RenderSection
                     section={SECTIONS.mixerBatch}
-                    formData={batchData}
-                    onChange={handleBatchChange}
+                    formData={cakeData}
+                    onChange={handleCakeChange}
                   />
                 </Col>
 
