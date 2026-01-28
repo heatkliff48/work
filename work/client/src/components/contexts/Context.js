@@ -351,14 +351,17 @@ const ProjectContextProvider = ({ children }) => {
   ];
 
   const DEFAULT_RAW_MATERIAL_VALUES = [
-    { key: 'sand_producer', value: 0 },
-    { key: 'gypsum_producer', value: 0 },
-    { key: 'lime_producer', value: 0 },
-    { key: 'lime_type', value: 0 },
-    { key: 'cement_producer', value: 0 },
-    { key: 'cement_type', value: 0 },
-    { key: 'al_paste_producer', value: 0 },
-    { key: 'al_paste_types', value: 0 },
+    { key: 'sand_producer', value: 'Sibelco' },
+    { key: 'gypsum_producer', value: 'Yemaconsa' },
+    { key: 'lime_producer', value: 'Casa de Pachs' },
+    { key: 'lime_type', value: 'CL90Q' },
+    { key: 'cement_producer', value: 'Cebasa' },
+    { key: 'cement_type', value: 'CEM | 52.5 R-SR3' },
+    { key: 'al_paste_producer', value: 'AVL Metal Powder' },
+    { key: 'al_paste_types', value: '7040-10/70WB28' },
+    { key: 'al_paste_proportion', value: '100' },
+    { key: 'al_paste_types_2', value: '7100-30/70WB28' },
+    { key: 'al_paste_proportion_2', value: '00' },
   ];
 
   const navigate = useNavigate();
