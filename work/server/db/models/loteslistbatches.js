@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       recipe: DataTypes.STRING,
       quantity_cakes: DataTypes.INTEGER,
       custom_recipe: DataTypes.BOOLEAN,
+      slurried: DataTypes.BOOLEAN,
       sand_dry: DataTypes.STRING,
       sand_slurry_dry: DataTypes.STRING,
       lime: DataTypes.STRING,
@@ -39,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'LotesListsBatches',
-    }
+    },
   );
   return LotesListsBatches;
 };
