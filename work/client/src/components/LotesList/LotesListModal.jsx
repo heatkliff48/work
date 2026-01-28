@@ -387,11 +387,11 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     DEFAULT_RAW_MATERIAL_VALUES.forEach(({ key, value }) => {
       if (!RAW_MATERIAL_KEYS.includes(key)) return;
 
-      const current = next[key];
-
-      if (current === undefined || current === null || current === '') {
-        next[key] = value;
+      if (key in data && data[key] !== null && data[key] !== undefined) {
+        return;
       }
+
+      next[key] = value;
     });
 
     return next;
@@ -419,7 +419,9 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
   useEffect(() => {
     if (selectedCakeId == null) {
-      setCakeData(applyRawMaterialDefaults({}));
+      const result = applyRawMaterialDefaults({});
+      setCakeData(result);
+      console.log('result LotesListModal.jsx line 424', result);
       return;
     }
 
@@ -427,6 +429,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
     const baseData = found ? { ...found } : { id: Number(selectedCakeId) };
 
+    console.log('baseData LotesListModal.jsx line 430', baseData);
     setCakeData(applyRawMaterialDefaults(baseData));
   }, [selectedCakeId, lotesListCakes, selectedRecipe]);
 
@@ -719,12 +722,10 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     return updates;
   };
 
-  const UI_ONLY_CAKE_KEYS = new Set(['al_paste_types_2', 'al_paste_proportion_2']);
-
   const stripUiOnlyKeys = (obj) => {
     if (!obj || typeof obj !== 'object') return obj;
     const out = { ...obj };
-    for (const k of UI_ONLY_CAKE_KEYS) delete out[k];
+
     return out;
   };
 
@@ -771,7 +772,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const cakePayloads = saveSubBatch
       ? buildSubBatchCakePayloads(ids)
       : buildCakePayloads();
-
+    console.log('cakePayloads LotesListModal.jsx line 777', cakePayloads);
     dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
 
     setApplyToAllCakes(false);
