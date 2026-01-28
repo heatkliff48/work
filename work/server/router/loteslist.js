@@ -118,7 +118,11 @@
 
 const lotesListRouter = require('express').Router();
 const { Op } = require('sequelize');
-const { LotesListsBatches, LotesListsCakes } = require('../db/models/index.js');
+const {
+  LotesListsBatches,
+  LotesListsCakes,
+  sequelize,
+} = require('../db/models/index.js');
 const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_LOTES_LIST_SOCKET,
@@ -296,28 +300,91 @@ lotesListRouter.get('/cakes', async (req, res) => {
   }
 });
 
+// lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
+//   try {
+//     const { ids, payload } = req.body;
+//     console.log('req.body loteslist.js line 302', req.body);
+
+//     const { cake_id_start } = ids;
+//     const [count, rows] = await LotesListsCakes.update(
+//       { ...payload },
+//       {
+//         where: { id: cake_id_start },
+//         returning: true,
+//       },
+//     );
+
+//     const updatedCake = rows[0];
+//     // console.log('updatedCake loteslist.js line 312', updatedCake);
+//     myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, updatedCake);
+
+//     return res.status(200);
+//   } catch (err) {
+//     console.error(err.message);
+//     return res.status(500).json({ error: err.message });
+//   }
+// });
+
 lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
+  const { ids, payloads } = req.body;
+
+  const batchId = Number(ids?.batch_id);
+  const subBatchId = Number(ids?.sub_batch_id);
+  const start = Number(ids?.cake_id_start);
+  const finish = Number(ids?.cake_id_finish);
+
+  if (![batchId, subBatchId, start, finish].every(Number.isFinite)) {
+    return res.status(400).json({ error: 'Bad ids' });
+  }
+
+  if (!payloads.length) {
+    return res.status(400).json({ error: 'No payloads provided' });
+  }
+
+  const sanitize = (p) => {
+    const out = { ...p };
+    delete out.id;
+    delete out.createdAt;
+    delete out.updatedAt;
+    return out;
+  };
+
+  for (const p of payloads) {
+    const cakeId = Number(p?.id);
+    if (!Number.isFinite(cakeId) || cakeId < start || cakeId > finish) {
+      return res
+        .status(400)
+        .json({ error: `Cake id ${p?.id} is out of range ${start}-${finish}` });
+    }
+  }
+
+  const t = await sequelize.transaction();
   try {
-    const { ids, payload } = req.body;
-    console.log('req.body loteslist.js line 302', req.body);
+    const results = [];
+    for (const p of payloads) {
+      const cakeId = Number(p.id);
+      const updates = sanitize(p);
 
-    const { cake_id_start } = ids;
-    const [count, rows] = await LotesListsCakes.update(
-      { ...payload },
-      {
-        where: { id: cake_id_start },
+      const [count, rows] = await LotesListsCakes.update(updates, {
+        where: { id: cakeId },
         returning: true,
-      },
-    );
+        transaction: t,
+      });
 
-    const updatedCake = rows[0];
-    // console.log('updatedCake loteslist.js line 312', updatedCake);
-    myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, updatedCake);
+      if (!count) {
+        throw new Error(`Cake ${cakeId} not found`);
+      }
+      results.push(rows[0]);
+    }
+
+    await t.commit();
+
+    myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, results);
 
     return res.status(200);
-  } catch (err) {
-    console.error(err.message);
-    return res.status(500).json({ error: err.message });
+  } catch (e) {
+    await t.rollback();
+    return res.status(500).json({ error: e.message });
   }
 });
 
