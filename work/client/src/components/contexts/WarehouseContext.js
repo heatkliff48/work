@@ -70,6 +70,11 @@ const WarehouseContextProvider = ({ children }) => {
       accessor: 'type',
       sortType: 'string',
     },
+    {
+      Header: 'Quantity on sorting',
+      accessor: 'sorting',
+      sortType: 'number',
+    },
   ];
 
   const COLUMNS_WAREHOUSE_AUX = [
@@ -621,7 +626,6 @@ const WarehouseContextProvider = ({ children }) => {
     });
 
     Object.entries(grouped).forEach(([key, items]) => {
-
       if (typeof items !== 'undefined' && items.length > 0) {
         switch (key) {
           case 'product':

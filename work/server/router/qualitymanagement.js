@@ -30,6 +30,7 @@ qualityManagementRouter.post('/', async (req, res) => {
     reserved_quantity_remaining,
     free_quantity_fact,
     production_plan_id,
+    sorting,
   } = req.body;
 
   try {
@@ -42,9 +43,13 @@ qualityManagementRouter.post('/', async (req, res) => {
       reserved_quantity_remaining,
       free_quantity_fact,
       production_plan_id,
+      sorting,
     });
 
-    myEmitter.emit(ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET, qualityManagementData);
+    myEmitter.emit(
+      ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
+      qualityManagementData,
+    );
     return res.json(qualityManagementData).status(200);
   } catch (err) {
     console.error(err.message);
@@ -62,6 +67,7 @@ qualityManagementRouter.post('/update', async (req, res) => {
     reserved_quantity_allocated,
     reserved_quantity_remaining,
     free_quantity_fact,
+    sorting,
   } = req.body;
 
   try {
@@ -74,6 +80,7 @@ qualityManagementRouter.post('/update', async (req, res) => {
         reserved_quantity_allocated,
         reserved_quantity_remaining,
         free_quantity_fact,
+        sorting,
       },
       {
         where: {
@@ -81,10 +88,13 @@ qualityManagementRouter.post('/update', async (req, res) => {
         },
         returning: true,
         plain: true,
-      }
+      },
     );
 
-    myEmitter.emit(UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET, qualityManagementData);
+    myEmitter.emit(
+      UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
+      qualityManagementData,
+    );
     return res.json(qualityManagementData).status(200);
   } catch (err) {
     console.error(err.message);
@@ -95,14 +105,17 @@ qualityManagementRouter.post('/update', async (req, res) => {
 qualityManagementRouter.post('/delete', async (req, res) => {
   console.log(
     '-----------------------------------------------------------',
-    req.body
+    req.body,
   );
   const { qualityManagementDataID } = req.body;
 
   try {
     await QualityManagement.destroy({ where: { id: qualityManagementDataID } });
 
-    myEmitter.emit(DELETE_QUALITY_MANAGEMENT_DATA_SOCKET, qualityManagementDataID);
+    myEmitter.emit(
+      DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
+      qualityManagementDataID,
+    );
     return res.json(qualityManagementDataID).status(200);
   } catch (err) {
     return ErrorUtils.catchError(res, err);

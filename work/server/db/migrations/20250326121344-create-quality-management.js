@@ -33,6 +33,9 @@ module.exports = {
       production_plan_id: {
         type: Sequelize.INTEGER,
       },
+      sorting: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
