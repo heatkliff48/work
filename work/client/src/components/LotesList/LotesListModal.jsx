@@ -17,7 +17,6 @@ import {
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import QuickCheckingModal from './QuickCheckingModal';
 import { useProjectContext } from '#components/contexts/Context.js';
-import { use } from 'react';
 
 const SECTIONS = {
   batchInfo: {
@@ -78,6 +77,13 @@ const SECTIONS = {
     ],
   },
 
+  notes: {
+    title: 'Notes',
+    isNotes: true,
+    columns: 1,
+    fields: [{ label: 'Comment', key: 'note', type: 'textarea', rows: 3 }],
+  },
+
   actualRecipe: {
     title: 'Actual Recepie',
     columns: 3,
@@ -133,6 +139,45 @@ const SECTIONS = {
       { label: 'Al paste 2 proportions', key: 'al_paste_proportion_2' },
     ],
   },
+  fermentationArea: {
+    title: 'Fermentation area',
+    columns: 3,
+    fields: [
+      { label: 'Temperature', key: 'temperature_ferm' },
+      { label: 'Precuring time', key: 'precuring_time' },
+      { label: 'Reaction time', key: 'reaction_time' },
+
+      { label: 'Cake height', key: 'cake_height' },
+      { label: 'Shrinkage', key: 'shrinkage' },
+      { label: 'Plasticity', key: 'plasticity' },
+
+      { label: 'Surface of the cake', key: 'surface_of_the_cake' },
+      { label: 'Issues with the cake', key: 'issues_with_the_cake' },
+      { label: 'Issues with moving the mold', key: 'issues_with_moving_the_mold' },
+
+      { label: 'Issues with position', key: 'issues_with_position' },
+    ],
+  },
+
+  cuttingLine: {
+    title: 'Cutting line (green line)',
+    columns: 3,
+    fields: [
+      { label: 'Cutting temperature', key: 'cutting_temperature' },
+      { label: 'Dimensions', key: 'dimensions', type: 'dimensions_3x3x3' },
+      { label: 'Issues with cake', key: 'issues_with_cake' },
+
+      { label: 'Issues with wires', key: 'issues_with_wires' },
+      { label: 'Issues with cutting line', key: 'issues_with_cutting_line' },
+      { label: 'Tilting table', key: 'tilting_table' },
+
+      { label: 'Separation table', key: 'separation_table' },
+      { label: 'Grid number', key: 'grid_number' },
+      { label: 'Waiting tunnel number', key: 'waiting_tunnel_number' },
+
+      { label: 'Delays before autoclave', key: 'delays_before_autoclave' },
+    ],
+  },
 };
 
 const numericKeys = new Set([
@@ -167,6 +212,17 @@ const numericKeys = new Set([
   'return_slurry_density',
   'casting_temp_c',
   'factory_temp_c',
+
+  'temperature_ferm',
+  'precuring_time',
+  'reaction_time',
+  'cake_height',
+  'shrinkage',
+  'cutting_temperature',
+
+  'plasticity',
+  'grid_number',
+  'waiting_tunnel_number',
 ]);
 
 const NUMERIC_FORMATS = {
@@ -200,6 +256,13 @@ const NUMERIC_FORMATS = {
 
   casting_temp_c: 1,
   factory_temp_c: 1,
+
+  temperature_ferm: 2,
+  precuring_time: 2,
+  reaction_time: 2,
+  cake_height: 2,
+  shrinkage: 2,
+  cutting_temperature: 2,
 };
 
 function RenderSection({
@@ -212,32 +275,50 @@ function RenderSection({
   if (!section) return null;
 
   const cols = columnsOverride ?? section.columns ?? 1;
+  const isNotes = !!section.isNotes;
 
   const formatMMSS = (input) => {
     if (input == null) return '';
 
     const digits = String(input).replace(/\D/g, '').slice(0, 4);
-
     if (digits.length <= 2) return digits;
 
     return `${digits.slice(0, 2)}:${digits.slice(2)}`;
   };
 
+  const formatDimensions3x3x3 = (input) => {
+    if (input == null) return '';
+
+    const digits = String(input).replace(/\D/g, '').slice(0, 9);
+
+    if (digits.length <= 3) return digits;
+
+    if (digits.length <= 6) {
+      return `${digits.slice(0, 3)}x${digits.slice(3)}`;
+    }
+
+    return `${digits.slice(0, 3)}x${digits.slice(3, 6)}x${digits.slice(6)}`;
+  };
+
   return (
     <div
       className="section-container mb-3"
-      style={{ border: '2px solid black', padding: 0 }}
+      style={{
+        border: isNotes ? '2px solid black' : '2px solid black',
+        padding: 0,
+      }}
     >
       <div
         style={{
-          borderBottom: '2px solid black',
+          borderBottom: isNotes ? '2px solid black' : '2px solid black',
           padding: '6px 10px',
           fontWeight: 'bold',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 10,
-          backgroundColor: '#f8f9fa',
+          backgroundColor: isNotes ? '#f5a623' : '#f8f9fa', // 👈 желтая полоса для notes
+          color: '#000',
         }}
       >
         <span>{section.title}</span>
@@ -250,6 +331,7 @@ function RenderSection({
             if (field.type === 'spacer') {
               return <Col key={field.key} xs={12} md={12 / cols} className="mb-1" />;
             }
+
             const isDate = field.type === 'date';
             const value =
               isDate && formData[field.key]
@@ -273,8 +355,25 @@ function RenderSection({
                   >
                     {field.label}
                   </Form.Label>
+
                   <Col sm={6}>
-                    {field.type === 'time_mmss' ? (
+                    {field.type === 'dimensions_3x3x3' ? (
+                      <Form.Control
+                        size="sm"
+                        type="text"
+                        placeholder="600x300x250"
+                        name={field.key}
+                        value={value}
+                        onChange={(e) =>
+                          onChange({
+                            target: {
+                              name: field.key,
+                              value: formatDimensions3x3x3(e.target.value),
+                            },
+                          })
+                        }
+                      />
+                    ) : field.type === 'time_mmss' ? (
                       <Form.Control
                         size="sm"
                         type="text"
@@ -289,6 +388,15 @@ function RenderSection({
                             },
                           })
                         }
+                      />
+                    ) : field.type === 'textarea' ? (
+                      <Form.Control
+                        as="textarea"
+                        rows={field.rows ?? 3}
+                        size="sm"
+                        name={field.key}
+                        value={value}
+                        onChange={onChange}
                       />
                     ) : field.type === 'select' ? (
                       <Form.Select
@@ -381,11 +489,17 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     .filter((f) => f.key && f.type !== 'spacer')
     .map((f) => f.key);
 
+  const MIXER_BATCH_KEYS = SECTIONS.mixerBatch.fields
+    .filter((f) => f.key && f.type !== 'spacer')
+    .map((f) => f.key);
+
+  const DEFAULT_KEYS = [...RAW_MATERIAL_KEYS, ...MIXER_BATCH_KEYS];
+
   const applyRawMaterialDefaults = (data) => {
     const next = { ...data };
 
     DEFAULT_RAW_MATERIAL_VALUES.forEach(({ key, value }) => {
-      if (!RAW_MATERIAL_KEYS.includes(key)) return;
+      if (!DEFAULT_KEYS.includes(key)) return;
 
       if (key in data && data[key] !== null && data[key] !== undefined) {
         return;
@@ -907,6 +1021,16 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
               <Row>
                 <Col md={12}>
                   <RenderSection
+                    section={SECTIONS.notes}
+                    formData={batchData}
+                    onChange={handleBatchChange}
+                  />
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={12}>
+                  <RenderSection
                     section={SECTIONS.actualRecipe}
                     formData={batchData}
                     onChange={handleBatchChange}
@@ -918,6 +1042,21 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
                 <Col md={12}>
                   <RenderSection
                     section={SECTIONS.rawMaterials}
+                    formData={cakeData}
+                    onChange={handleCakeChange}
+                  />
+                </Col>
+                <Col md={6}>
+                  <RenderSection
+                    section={SECTIONS.fermentationArea}
+                    formData={cakeData}
+                    onChange={handleCakeChange}
+                  />
+                </Col>
+
+                <Col md={6}>
+                  <RenderSection
+                    section={SECTIONS.cuttingLine}
                     formData={cakeData}
                     onChange={handleCakeChange}
                   />
