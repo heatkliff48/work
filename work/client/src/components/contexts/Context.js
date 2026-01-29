@@ -351,6 +351,11 @@ const ProjectContextProvider = ({ children }) => {
   ];
 
   const DEFAULT_RAW_MATERIAL_VALUES = [
+    { key: 'dosing_delay_cem_sec', value: 1 },
+    { key: 'dosing_delay_lime_sec', value: 1 },
+    { key: 'mixing_before_al_sec', value: 60 },
+    { key: 'mixing_after_al_sec', value: 30 },
+    { key: 'vibrator_speed_hz', value: 40 },
     { key: 'sand_producer', value: 'Sibelco' },
     { key: 'gypsum_producer', value: 'Yemaconsa' },
     { key: 'lime_producer', value: 'Casa de Pachs' },
