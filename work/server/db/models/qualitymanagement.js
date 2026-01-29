@@ -21,11 +21,12 @@ module.exports = (sequelize, DataTypes) => {
       reserved_quantity_remaining: DataTypes.INTEGER,
       free_quantity_fact: DataTypes.INTEGER,
       production_plan_id: DataTypes.INTEGER,
+      sorting: DataTypes.INTEGER,
     },
     {
       sequelize,
       modelName: 'QualityManagement',
-    }
+    },
   );
   return QualityManagement;
 };

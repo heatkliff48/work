@@ -78,11 +78,11 @@ function QualityManagementAddModal(props) {
     if (!options) return;
 
     const productArticleOption = options.find(
-      (option) => option.value === customBatchSelectInput?.product_article
+      (option) => option.value === customBatchSelectInput?.product_article,
     );
     const selectedOption = productArticleOption || options[0];
     const product = latestProducts.find(
-      (el) => el.article === selectedOption?.value
+      (el) => el.article === selectedOption?.value,
     );
 
     if (!product) return;
@@ -108,14 +108,16 @@ function QualityManagementAddModal(props) {
     if (!options) return null;
 
     const productArticleOption = options.find(
-      (option) => option.value === customBatchSelectInput?.[accessor]
+      (option) => option.value === customBatchSelectInput?.[accessor],
     );
 
     return productArticleOption || options[0];
   };
 
   const handleProductArticleSelectChange = (selectedOption, key) => {
-    const product = latestProducts.find((el) => el.article === selectedOption.value);
+    const product = latestProducts.find(
+      (el) => el.article === selectedOption.value,
+    );
     const warehouse_article = getWarehouseArticle(product);
 
     setCustomBatchSelectInput((prev) => ({
@@ -147,23 +149,28 @@ function QualityManagementAddModal(props) {
   };
 
   const handlerAddProductionPlanEntry = useCallback((row) => {
-    const prodPlanEntry = batchOutside.filter((el) => el.id === row.original.id)[0];
+    const prodPlanEntry = batchOutside.filter(
+      (el) => el.id === row.original.id,
+    )[0];
 
     const reservedProduct =
       list_of_ordered_production?.find(
-        (item) => item.id === prodPlanEntry.id_list_of_ordered_production
+        (item) => item.id === prodPlanEntry.id_list_of_ordered_production,
       ) || [];
 
     // reserved_quantity:сумма всех reservedProduct.quantity - reservedProduct.quantity_in_warehouse по item.article в list_of_ordered_production
     // если это больше total_quantity_plan, то туда записывается total_quantity_plan
 
     const filteredListOfOrderedProduction = list_of_ordered_production?.filter(
-      (item) => item.product_article === prodPlanEntry?.product_article
+      (item) => item.product_article === prodPlanEntry?.product_article,
     );
 
-    const totalDifference = filteredListOfOrderedProduction.reduce((sum, item) => {
-      return sum + (item?.quantity - item?.quantity_in_warehouse);
-    }, 0);
+    const totalDifference = filteredListOfOrderedProduction.reduce(
+      (sum, item) => {
+        return sum + (item?.quantity - item?.quantity_in_warehouse);
+      },
+      0,
+    );
 
     const reserved_quantity =
       totalDifference > prodPlanEntry.quantity_pallets
@@ -171,7 +178,7 @@ function QualityManagementAddModal(props) {
         : totalDifference;
 
     const product = latestProducts.find(
-      (el) => el.article === prodPlanEntry?.product_article
+      (el) => el.article === prodPlanEntry?.product_article,
     );
 
     const warehouse_article = getWarehouseArticle(product);
@@ -188,7 +195,8 @@ function QualityManagementAddModal(props) {
         // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free - 0,
         free_quantity_fact: 0,
         production_plan_id: prodPlanEntry.id,
-      })
+        sorting: 0,
+      }),
     );
     setCustomBatchSelect(false);
     setCustomBatchSelectInput({});
@@ -254,7 +262,8 @@ function QualityManagementAddModal(props) {
         reserved_quantity_remaining: 0,
         free_quantity_fact: 0,
         from_production_plan: false,
-      })
+        sorting: 0,
+      }),
     );
 
     setCustomBatchSelect(false);
@@ -272,7 +281,9 @@ function QualityManagementAddModal(props) {
       dialogClassName="modal-auto-size"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Batch calendar</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Batch calendar
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {customBatchSelect ? (
@@ -300,7 +311,7 @@ function QualityManagementAddModal(props) {
                         {el.accessor === 'product_article' ? (
                           <Select
                             defaultValue={getSelectedProductArticleOption(
-                              el.accessor
+                              el.accessor,
                             )}
                             onChange={(v) => {
                               handleProductArticleSelectChange(v, el.accessor);
@@ -314,7 +325,9 @@ function QualityManagementAddModal(props) {
                             name={el.accessor}
                             type="text"
                             value={customBatchSelectInput[el.accessor] || ''}
-                            onChange={(e) => handleCustomBatchSelectInputChange(e)}
+                            onChange={(e) =>
+                              handleCustomBatchSelectInputChange(e)
+                            }
                           />
                         )}
                       </div>

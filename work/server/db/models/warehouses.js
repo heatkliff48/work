@@ -31,11 +31,12 @@ module.exports = (sequelize, DataTypes) => {
       ordered_quantity: DataTypes.INTEGER,
       warehouse_loc: DataTypes.STRING,
       type: DataTypes.STRING,
+      sorting: DataTypes.INTEGER,
     },
     {
       sequelize,
       modelName: 'Warehouses',
-    }
+    },
   );
   return Warehouses;
 };
