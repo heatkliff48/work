@@ -45,17 +45,17 @@ const SECTIONS = {
         ],
       },
       {
-        label: 'Delay before mixer cement',
+        label: 'Delay before mixer cement, sec',
         key: 'dosing_delay_cem_sec',
       },
       {
-        label: 'Delay before mixer cal',
+        label: 'Delay before mixer cal, sec',
         key: 'dosing_delay_lime_sec',
       },
       { label: 'Mixer speed', key: 'mixer_speed_rpm' },
-      { label: 'Mixing before Al', key: 'mixing_before_al_sec' },
-      { label: 'Mixing after Al', key: 'mixing_after_al_sec' },
-      { label: 'Vibrator working time', key: 'vibrator_time_sec' },
+      { label: 'Mixing before Al, sec', key: 'mixing_before_al_sec' },
+      { label: 'Mixing after Al, sec', key: 'mixing_after_al_sec' },
+      { label: 'Vibrator working time, sec', key: 'vibrator_time_sec' },
       { label: 'Vibrator working speed', key: 'vibrator_speed_hz' },
     ],
   },
@@ -65,10 +65,10 @@ const SECTIONS = {
     columns: 1,
     fields: [
       { label: 'W/S', key: 'water_solid_ratio' },
-      { label: 'Sand slurry density', key: 'sand_slurry_density' },
-      { label: 'Return slurry density', key: 'return_slurry_density' },
-      { label: 'Casting temperature', key: 'casting_temp_c' },
-      { label: 'Temperature in the factory', key: 'factory_temp_c' },
+      { label: 'Sand slurry density, kg/l', key: 'sand_slurry_density' },
+      { label: 'Return slurry density, kg/l', key: 'return_slurry_density' },
+      { label: 'Casting temperature, C', key: 'casting_temp_c' },
+      { label: 'Temperature in the factory, C', key: 'factory_temp_c' },
       { label: 'Issues with mixer', key: 'mixer_issues' },
       { label: 'Issues with oiling machine', key: 'oiling_issues' },
       { label: 'Issues with moving the mold', key: 'mold_moving_issues' },
@@ -90,11 +90,11 @@ const SECTIONS = {
     fields: [
       { label: 'Lime, kg', key: 'lime' },
       { label: 'Sand slurry (dry), kg', key: 'sand_slurry_dry' },
-      { label: 'Aluminum 1', key: 'aluminum_paste' },
+      { label: 'Aluminum 1, kg', key: 'aluminum_paste' },
 
       { label: 'Cement, kg', key: 'cement' },
       { label: 'Gypsum (dry), kg', key: 'gypsum_dry' },
-      { label: 'Aluminum 2', key: 'aluminum_paste_2' },
+      { label: 'Aluminum 2, kg', key: 'aluminum_paste_2' },
 
       { label: 'Sand powder (dry), kg', key: 'sand_dry' },
       { label: 'Return (dry), kg', key: 'return_dry' },
@@ -143,12 +143,12 @@ const SECTIONS = {
     title: 'Fermentation area',
     columns: 3,
     fields: [
-      { label: 'Temperature', key: 'temperature_ferm' },
-      { label: 'Precuring time', key: 'precuring_time' },
-      { label: 'Reaction time', key: 'reaction_time' },
+      { label: 'Temperature, C', key: 'temperature_ferm' },
+      { label: 'Precuring time, min', key: 'precuring_time' },
+      { label: 'Reaction time, min', key: 'reaction_time' },
 
-      { label: 'Cake height', key: 'cake_height' },
-      { label: 'Shrinkage', key: 'shrinkage' },
+      { label: 'Cake height, cm', key: 'cake_height' },
+      { label: 'Shrinkage, cm', key: 'shrinkage' },
       { label: 'Plasticity', key: 'plasticity' },
 
       { label: 'Surface of the cake', key: 'surface_of_the_cake' },
@@ -163,8 +163,8 @@ const SECTIONS = {
     title: 'Cutting line (green line)',
     columns: 3,
     fields: [
-      { label: 'Cutting temperature', key: 'cutting_temperature' },
-      { label: 'Dimensions', key: 'dimensions', type: 'dimensions_3x3x3' },
+      { label: 'Cutting temperature, C', key: 'cutting_temperature' },
+      { label: 'Dimensions, mm', key: 'dimensions', type: 'dimensions_3x3x3' },
       { label: 'Issues with cake', key: 'issues_with_cake' },
 
       { label: 'Issues with wires', key: 'issues_with_wires' },
@@ -336,7 +336,7 @@ function RenderSection({
             const value =
               isDate && formData[field.key]
                 ? String(formData[field.key]).slice(0, 10)
-                : (formData[field.key] ?? '');
+                : formData[field.key] ?? '';
 
             const isNumeric = numericKeys.has(field.key);
             const precision = NUMERIC_FORMATS[field.key];
@@ -652,8 +652,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       limited === ''
         ? ''
         : precision != null
-          ? roundTo(limited, precision)
-          : Number(limited);
+        ? roundTo(limited, precision)
+        : Number(limited);
 
     setBatchData((p) => ({ ...p, [name]: next }));
   };
@@ -673,8 +673,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       limited === ''
         ? ''
         : precision != null
-          ? roundTo(limited, precision)
-          : Number(limited);
+        ? roundTo(limited, precision)
+        : Number(limited);
 
     setCakeData((p) => ({ ...p, [name]: next }));
   };
@@ -1002,7 +1002,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
                         <Form.Select
                           size="sm"
                           style={{ width: 140 }}
-                          value={applyToAllCakes ? 'all' : (selectedCakeId ?? '')}
+                          value={applyToAllCakes ? 'all' : selectedCakeId ?? ''}
                           onChange={(e) => onSelectCake(e.target.value)}
                           disabled={!cakeOptions.length || applyToAllCakes}
                         >
