@@ -177,19 +177,15 @@ lotesListRouter.post('/batches', async (req, res) => {
 
     const cake_id_finish = cake_id_start + quantityCakesInt - 1;
 
-    const lastBatch = await LotesListsBatches.findOne({
-      where: {
-        product,
-        production_date,
-      },
-      order: [['batch_id', 'DESC']],
-    });
-
     let batch_id;
     let sub_batch_id;
 
+    const lastLatestBatch = await LotesListsBatches.findAll({
+      order: [['batch_id', 'DESC']],
+    });
+
     if (new_batch) {
-      batch_id = Number(lastBatch?.batch_id ?? 0) + 1;
+      batch_id = Number(lastLatestBatch?.batch_id ?? 0) + 1;
       sub_batch_id = 1;
     } else {
       const existingSameCombo = await LotesListsBatches.findOne({

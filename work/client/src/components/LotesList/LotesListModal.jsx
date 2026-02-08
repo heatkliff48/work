@@ -317,7 +317,7 @@ function RenderSection({
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 10,
-          backgroundColor: isNotes ? '#f5a623' : '#f8f9fa', // 👈 желтая полоса для notes
+          backgroundColor: isNotes ? '#f5a623' : '#f8f9fa',
           color: '#000',
         }}
       >
