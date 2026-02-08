@@ -177,19 +177,15 @@ lotesListRouter.post('/batches', async (req, res) => {
 
     const cake_id_finish = cake_id_start + quantityCakesInt - 1;
 
-    const lastBatch = await LotesListsBatches.findOne({
-      where: {
-        product,
-        production_date,
-      },
-      order: [['batch_id', 'DESC']],
-    });
-
     let batch_id;
     let sub_batch_id;
 
+    const lastLatestBatch = await LotesListsBatches.findAll({
+      order: [['batch_id', 'DESC']],
+    });
+    console.log('lastLatestBatch loteslist.js line 186', lastLatestBatch);
     if (new_batch) {
-      batch_id = Number(lastBatch?.batch_id ?? 0) + 1;
+      batch_id = Number(lastLatestBatch[0]?.batch_id ?? 0) + 1;
       sub_batch_id = 1;
     } else {
       const existingSameCombo = await LotesListsBatches.findOne({
@@ -234,6 +230,7 @@ lotesListRouter.post('/batches', async (req, res) => {
         : 1;
     }
 
+    console.log('req.body loteslist.js line 232', req.body);
     const lotesListBatches = await LotesListsBatches.create({
       cake_id_start,
       cake_id_finish,
@@ -243,6 +240,8 @@ lotesListRouter.post('/batches', async (req, res) => {
       quantity_cakes: quantityCakesInt,
       sand_dry,
     });
+
+    console.log('lotesListBatches loteslist.js line 246', lotesListBatches);
 
     const lotesListCakesArray = [];
     for (let i = cake_id_start; i <= cake_id_finish; i++) {

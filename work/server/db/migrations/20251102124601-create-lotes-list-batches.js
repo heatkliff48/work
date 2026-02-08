@@ -78,6 +78,9 @@ module.exports = {
       w_s: {
         type: Sequelize.STRING,
       },
+      note: {
+        type: Sequelize.TEXT,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

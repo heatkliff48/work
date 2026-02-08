@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       aac: DataTypes.STRING,
       casting_temperature: DataTypes.STRING,
       w_s: DataTypes.STRING,
+      note: DataTypes.TEXT,
     },
     {
       sequelize,
