@@ -15,6 +15,7 @@ import {
   contactPriceInfoReducer,
 } from './clientsReducer';
 import { dataFetchedReducer } from './dataFetchedReducer';
+import { filesLotesListReducer } from './filesLotesListReducer';
 import { filesOrderReducer } from './filesOrderReducer';
 import { filesProductReducer } from './filesProductReducer';
 import { filesWarehouseReducer } from './filesWarehouseReducer';
@@ -111,6 +112,7 @@ export const rootReducer = combineReducers({
   recipeOrders: recipeOrdersReducer,
   filesWarehouse: filesWarehouseReducer,
   filesOrder: filesOrderReducer,
+  filesLotesList: filesLotesListReducer,
   filesProduct: filesProductReducer,
   stockBalance: stockBalanceReducer,
   dryMixesJournal: dryMixesJournalReducer,

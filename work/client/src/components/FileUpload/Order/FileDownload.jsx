@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import { FileContext } from './FileContext';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useFileContext } from '#components/contexts/FileContext.js';
 
 const FileDownload = () => {
-  const { message, setMessage, filesOrder } = useContext(FileContext);
+  const { message, setMessage, filesOrder } = useFileContext()
   const [selectedFile, setSelectedFile] = useState('');
   const [filteredFiles, setFilteredFiles] = useState(filesOrder);
   const { orderCartData } = useOrderContext();

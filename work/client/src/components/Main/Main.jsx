@@ -74,6 +74,7 @@ import {
 import '#components/Styles/dashboard.css';
 
 import '#components/Styles/dashboard.css';
+import { getFilesLotesList } from '#components/redux/actions/filesLotesListAction.js';
 
 
 function Main() {
@@ -111,6 +112,7 @@ function Main() {
     dispatch(getDryMixedProductsOfOrders());
     dispatch(getDryMixesWarehouse());
     dispatch(getFilesOrder());
+    dispatch(getFilesLotesList());
     dispatch(getFilesProduct());
     dispatch(getFilesWarehouse());
     dispatch(getRelMatProductsOfOrders());

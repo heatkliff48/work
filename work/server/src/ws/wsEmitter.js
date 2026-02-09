@@ -139,6 +139,8 @@ const {
   ADD_NEW_LOTES_LIST_CAKES_SOCKET,
   UPDATE_LOTES_LIST_CAKES_SOCKET,
   UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
+  ADD_NEW_FILES_LOTES_LIST_SOCKET,
+  DELETE_FILES_LOTES_LIST_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -149,7 +151,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_PRODUCT_SOCKET,
           payload: products,
-        })
+        }),
       );
     }
   });
@@ -160,7 +162,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_ALDABARAN_SOCKET,
           payload: currentAldabaran,
-        })
+        }),
       );
     }
   });
@@ -171,7 +173,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_PRODUCT_SOCKET,
           payload: products,
-        })
+        }),
       );
     }
   });
@@ -182,7 +184,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: REPAIR_PRODUCT_SOCKET,
           payload: repProduct,
-        })
+        }),
       );
     }
   });
@@ -193,7 +195,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_ROLE_SOCKET,
           payload: updRoleData,
-        })
+        }),
       );
     }
   });
@@ -204,7 +206,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_ROLE_ACTIVE_SOCKET,
           payload: updActiveRoleData,
-        })
+        }),
       );
     }
   });
@@ -215,7 +217,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_ORDER_SOCKET,
           payload: newOrder,
-        })
+        }),
       );
     }
   });
@@ -226,7 +228,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_DELETE_ORDER_SOCKET,
           payload: order_id,
-        })
+        }),
       );
     }
   });
@@ -237,7 +239,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_DELIVERY_PRICE_SOCKET,
           payload: order,
-        })
+        }),
       );
     }
   });
@@ -248,7 +250,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_DATASHIP_ORDER_SOCKET,
           payload: date,
-        })
+        }),
       );
     }
   });
@@ -259,7 +261,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_DESCRIPTIOM_ORDER_SOCKET,
           payload: desc,
-        })
+        }),
       );
     }
   });
@@ -270,7 +272,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_SECONDARY_CONTACT_ORDER_SOCKET,
           payload: sec_cnt,
-        })
+        }),
       );
     }
   });
@@ -281,7 +283,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_SECONDARY_CONTACT_ORDER_SOCKET,
           payload: sec_cnt,
-        })
+        }),
       );
     }
   });
@@ -292,7 +294,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_STATUS_OF_ORDER_SOCKET,
           payload: order,
-        })
+        }),
       );
     }
   });
@@ -303,7 +305,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
           payload: person_in_charge,
-        })
+        }),
       );
     }
   });
@@ -314,7 +316,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_PRODUCT_OF_ORDER_SOCKET,
           payload: newProductsOfOrder,
-        })
+        }),
       );
     }
   });
@@ -327,10 +329,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
             payload: dry_mixed_product_of_order,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET, (anchor_product_of_order) => {
@@ -339,7 +341,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
           payload: anchor_product_of_order,
-        })
+        }),
       );
     }
   });
@@ -350,7 +352,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
           payload: newToolProductsOfOrder,
-        })
+        }),
       );
     }
   });
@@ -363,10 +365,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
             payload: rel_mat_product_of_order,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(GET_UPDATE_CONTACT_OF_ORDER_SOCKET, (contact_of_order) => {
@@ -375,7 +377,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_UPDATE_CONTACT_OF_ORDER_SOCKET,
           payload: contact_of_order,
-        })
+        }),
       );
     }
   });
@@ -386,7 +388,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_UPDATE_ADRESS_OF_ORDER_SOCKET,
           payload: adress_of_order,
-        })
+        }),
       );
     }
   });
@@ -397,7 +399,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_DELETE_PRODUCT_OF_ORDER_SOCKET,
           payload: product_id,
-        })
+        }),
       );
     }
   });
@@ -408,7 +410,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
           payload: product_id,
-        })
+        }),
       );
     }
   });
@@ -419,7 +421,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
           payload: product_id,
-        })
+        }),
       );
     }
   });
@@ -430,7 +432,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET,
           payload: product_id,
-        })
+        }),
       );
     }
   });
@@ -441,7 +443,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
           payload: product_id,
-        })
+        }),
       );
     }
   });
@@ -452,7 +454,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET,
           payload: upd_prod_info,
-        })
+        }),
       );
     }
   });
@@ -465,10 +467,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
             payload: upd_prod_info,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET, (upd_prod_info) => {
@@ -477,7 +479,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
           payload: upd_prod_info,
-        })
+        }),
       );
     }
   });
@@ -488,7 +490,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
           payload: upd_prod_info,
-        })
+        }),
       );
     }
   });
@@ -499,7 +501,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
           payload: upd_prod_info,
-        })
+        }),
       );
     }
   });
@@ -510,7 +512,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_SOCKET,
           payload: new_warehouse,
-        })
+        }),
       );
     }
   });
@@ -521,7 +523,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_CLIENT_SOCKET,
           payload: client,
-        })
+        }),
       );
     }
   });
@@ -532,7 +534,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_CLIENT_SOCKET,
           payload: client,
-        })
+        }),
       );
     }
   });
@@ -543,7 +545,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
           payload: legalAddress,
-        })
+        }),
       );
     }
   });
@@ -554,7 +556,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_LEGAL_ADDRESS_SOCKET,
           payload: legalAddress,
-        })
+        }),
       );
     }
   });
@@ -565,7 +567,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_CONTACT_INFO_SOCKET,
           payload: contactInfo,
-        })
+        }),
       );
     }
   });
@@ -576,7 +578,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_CONTACT_INFO_SOCKET,
           payload: contactInfo,
-        })
+        }),
       );
     }
   });
@@ -587,7 +589,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: NEED_UPD_CONTACT_PRICE_INFO_SOCKET,
           payload: updClient,
-        })
+        }),
       );
     }
   });
@@ -598,7 +600,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_DELIVERY_ADDRESSES_SOCKET,
           payload: deliveryAddress,
-        })
+        }),
       );
     }
   });
@@ -609,7 +611,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_DELIVERY_ADDRESSES_SOCKET,
           payload: deliveryAddress,
-        })
+        }),
       );
     }
   });
@@ -620,7 +622,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_BATCH_OUTSIDE_SOCKET,
           payload: batchOutside,
-        })
+        }),
       );
     }
   });
@@ -631,7 +633,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_BATCH_OUTSIDE_SOCKET,
           payload: batchOutside,
-        })
+        }),
       );
     }
   });
@@ -642,7 +644,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_BATCH_OUTSIDE_SOCKET,
           payload: batch_id,
-        })
+        }),
       );
     }
   });
@@ -653,7 +655,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
           payload: new_reserved_product,
-        })
+        }),
       );
     }
   });
@@ -666,10 +668,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: new_reserved_product,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -680,10 +682,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: reserved_products_id,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -694,10 +696,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: new_reserved_product,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -708,10 +710,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_UPDATE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: new_reserved_product,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -722,10 +724,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_DELETE_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: reserved_products_id,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -736,10 +738,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: new_reserved_product,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -750,10 +752,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_UPDATE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: new_reserved_product,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -764,10 +766,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: reserved_products_id,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -778,10 +780,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_NEW_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: new_reserved_product,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -792,10 +794,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: new_reserved_product,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -806,10 +808,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: reserved_products_id,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -820,10 +822,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_NEW_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: new_reserved_product,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -834,10 +836,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: new_reserved_product,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -848,10 +850,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
             payload: reserved_products_id,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(UPDATE_REMAINING_STOCK_SOCKET, (updWarehouse) => {
@@ -860,7 +862,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_REMAINING_STOCK_SOCKET,
           payload: updWarehouse,
-        })
+        }),
       );
     }
   });
@@ -871,7 +873,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_QUANTITYS_SOCKET,
           payload: updWarehouse,
-        })
+        }),
       );
     }
   });
@@ -882,7 +884,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_DRY_MIXES_QUANTITYS_SOCKET,
           payload: updDryMixes,
-        })
+        }),
       );
     }
   });
@@ -893,7 +895,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_ANCHOR_QUANTITYS_SOCKET,
           payload: updAnchor,
-        })
+        }),
       );
     }
   });
@@ -904,7 +906,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_TOOL_QUANTITYS_SOCKET,
           payload: updTool,
-        })
+        }),
       );
     }
   });
@@ -915,7 +917,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_REL_MAT_QUANTITYS_SOCKET,
           payload: updRelMat,
-        })
+        }),
       );
     }
   });
@@ -926,7 +928,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
           payload: rawMatConsumption,
-        })
+        }),
       );
     }
   });
@@ -937,7 +939,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
           payload: rawMatConsumption,
-        })
+        }),
       );
     }
   });
@@ -948,7 +950,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_RECIPE_SOCKET,
           payload: recipe,
-        })
+        }),
       );
     }
   });
@@ -959,7 +961,29 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_RECIPE_SOCKET,
           payload: recipe_id,
-        })
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_FILES_LOTES_LIST_SOCKET, (filesWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_FILES_LOTES_LIST_SOCKET,
+          payload: filesWarehouse,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_FILES_LOTES_LIST_SOCKET, (warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_FILES_LOTES_LIST_SOCKET,
+          payload: warehouse_id,
+        }),
       );
     }
   });
@@ -970,7 +994,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_FILES_WAREHOUSE_SOCKET,
           payload: filesWarehouse,
-        })
+        }),
       );
     }
   });
@@ -981,7 +1005,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_FILES_WAREHOUSE_SOCKET,
           payload: warehouse_id,
-        })
+        }),
       );
     }
   });
@@ -992,7 +1016,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_FILES_ORDER_SOCKET,
           payload: filesOrder,
-        })
+        }),
       );
     }
   });
@@ -1003,7 +1027,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_FILES_ORDER_SOCKET,
           payload: order_id,
-        })
+        }),
       );
     }
   });
@@ -1014,7 +1038,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: SAVE_MATERIAL_PLAN_SOCKET,
           payload: recipeOrders,
-        })
+        }),
       );
     }
   });
@@ -1025,7 +1049,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_MATERIAL_PLAN_SOCKET,
           payload: material_plan_id,
-        })
+        }),
       );
     }
   });
@@ -1036,7 +1060,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_FILES_PRODUCT_SOCKET,
           payload: filesProduct,
-        })
+        }),
       );
     }
   });
@@ -1047,7 +1071,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_FILES_PRODUCT_SOCKET,
           payload: product_id,
-        })
+        }),
       );
     }
   });
@@ -1058,7 +1082,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_STOCK_BALANCE_SOCKET,
           payload: newStockBalance,
-        })
+        }),
       );
     }
   });
@@ -1069,7 +1093,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_DRY_MIXES_JOURNAL_SOCKET,
           payload: dryMixesJournal,
-        })
+        }),
       );
     }
   });
@@ -1080,7 +1104,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_DRY_MIXES_JOURNAL_SOCKET,
           payload: dryMixesJournal,
-        })
+        }),
       );
     }
   });
@@ -1093,10 +1117,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: ADD_NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
             payload: relatedMaterialsJournal,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -1107,10 +1131,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
             payload: relatedMaterialsJournal,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(ADD_NEW_ANCHOR_SOCKET, (anchor) => {
@@ -1119,7 +1143,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_ANCHOR_SOCKET,
           payload: anchor,
-        })
+        }),
       );
     }
   });
@@ -1130,7 +1154,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_ANCHOR_SOCKET,
           payload: anchor,
-        })
+        }),
       );
     }
   });
@@ -1141,7 +1165,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_TOOL_SOCKET,
           payload: tool,
-        })
+        }),
       );
     }
   });
@@ -1152,7 +1176,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_TOOL_SOCKET,
           payload: tool,
-        })
+        }),
       );
     }
   });
@@ -1163,7 +1187,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_DRY_MIXES_WAREHOUSE_SOCKET,
           payload: dryMixesWarehouse,
-        })
+        }),
       );
     }
   });
@@ -1174,7 +1198,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_DRY_MIXES_WAREHOUSE_SOCKET,
           payload: dryMixesWarehouse,
-        })
+        }),
       );
     }
   });
@@ -1187,10 +1211,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: ADD_NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
             payload: relatedMaterialsWarehouse,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -1201,10 +1225,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
             payload: relatedMaterialsWarehouse,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(ADD_NEW_ANCHORS_WAREHOUSE_SOCKET, (anchorsWarehouse) => {
@@ -1213,7 +1237,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_ANCHORS_WAREHOUSE_SOCKET,
           payload: anchorsWarehouse,
-        })
+        }),
       );
     }
   });
@@ -1224,7 +1248,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_ANCHORS_WAREHOUSE_SOCKET,
           payload: anchorsWarehouse,
-        })
+        }),
       );
     }
   });
@@ -1235,7 +1259,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_TOOLS_WAREHOUSE_SOCKET,
           payload: toolsWarehouse,
-        })
+        }),
       );
     }
   });
@@ -1246,7 +1270,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_TOOLS_WAREHOUSE_SOCKET,
           payload: toolsWarehouse,
-        })
+        }),
       );
     }
   });
@@ -1257,7 +1281,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
           payload: rawMaterialsWarehouse,
-        })
+        }),
       );
     }
   });
@@ -1268,7 +1292,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET,
           payload: qualityManagementData,
-        })
+        }),
       );
     }
   });
@@ -1279,7 +1303,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_QUALITY_MANAGEMENT_DATA_SOCKET,
           payload: qualityManagementData,
-        })
+        }),
       );
     }
   });
@@ -1290,7 +1314,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
           payload: qualityManagementDataID,
-        })
+        }),
       );
     }
   });
@@ -1303,10 +1327,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET,
             payload: relatedMaterialsBackorderList,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -1317,10 +1341,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: UPDATE_RELATED_MATERIALS_BACKORDER_SOCKET,
             payload: relatedMaterialsBackorderList,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(UPDATE_PRODUCT_CODE_SOCKET, (tool) => {
@@ -1329,7 +1353,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_PRODUCT_CODE_SOCKET,
           payload: tool,
-        })
+        }),
       );
     }
   });
@@ -1340,7 +1364,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_RANDOM_PRODUCTS_OF_ORDER_SOCKET,
           payload: randomProducts,
-        })
+        }),
       );
     }
   });
@@ -1351,7 +1375,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: GET_UPDATE_AUTOCLAVE_CALENDAR_SOCKET,
           payload: updAutoclaveCalendares,
-        })
+        }),
       );
     }
   });
@@ -1364,10 +1388,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: ADD_NEW_LIST_OF_ORDERED_PRODUCTION_SOCKET,
             payload: new_ordered_production,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -1378,10 +1402,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET,
             payload: upd_ordered_production,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -1392,10 +1416,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: ADD_NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
             payload: new_ordered_production_oem,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(
@@ -1406,10 +1430,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: GET_UPDATE_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
             payload: upd_ordered_production_oem,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   myEmitter.on(ADD_NEW_WAREHOUSE_SAND_SOCKET, (warehouseSand) => {
@@ -1418,7 +1442,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_SAND_SOCKET,
           payload: warehouseSand,
-        })
+        }),
       );
     }
   });
@@ -1429,7 +1453,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_SAND_SOCKET,
           payload: warehouseSand,
-        })
+        }),
       );
     }
   });
@@ -1440,7 +1464,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_WAREHOUSE_SAND_SOCKET,
           payload: sand_warehouse_id,
-        })
+        }),
       );
     }
   });
@@ -1452,7 +1476,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_LIME_SOCKET,
           payload: warehouseLime,
-        })
+        }),
       );
     }
   });
@@ -1463,7 +1487,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_LIME_SOCKET,
           payload: warehouseLime,
-        })
+        }),
       );
     }
   });
@@ -1474,7 +1498,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_WAREHOUSE_LIME_SOCKET,
           payload: lime_warehouse_id,
-        })
+        }),
       );
     }
   });
@@ -1486,7 +1510,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_CEMENT_SOCKET,
           payload: warehouseCement,
-        })
+        }),
       );
     }
   });
@@ -1497,7 +1521,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_CEMENT_SOCKET,
           payload: warehouseCement,
-        })
+        }),
       );
     }
   });
@@ -1508,7 +1532,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_WAREHOUSE_CEMENT_SOCKET,
           payload: cement_warehouse_id,
-        })
+        }),
       );
     }
   });
@@ -1520,7 +1544,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_GYPSUM_SOCKET,
           payload: warehouseGypsum,
-        })
+        }),
       );
     }
   });
@@ -1531,7 +1555,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_GYPSUM_SOCKET,
           payload: warehouseGypsum,
-        })
+        }),
       );
     }
   });
@@ -1542,7 +1566,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_WAREHOUSE_GYPSUM_SOCKET,
           payload: gypsum_warehouse_id,
-        })
+        }),
       );
     }
   });
@@ -1554,7 +1578,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET,
           payload: warehouseGypsumStone,
-        })
+        }),
       );
     }
   });
@@ -1565,7 +1589,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
           payload: warehouseGypsumStone,
-        })
+        }),
       );
     }
   });
@@ -1576,7 +1600,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
           payload: gypsum_stone_warehouse_id,
-        })
+        }),
       );
     }
   });
@@ -1588,7 +1612,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET,
           payload: warehouseAluminum1,
-        })
+        }),
       );
     }
   });
@@ -1599,7 +1623,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_ALUMINUM1_SOCKET,
           payload: warehouseAluminum1,
-        })
+        }),
       );
     }
   });
@@ -1610,7 +1634,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_WAREHOUSE_ALUMINUM1_SOCKET,
           payload: aluminum1_warehouse_id,
-        })
+        }),
       );
     }
   });
@@ -1622,7 +1646,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_ALUMINUM2_SOCKET,
           payload: warehouseAluminum2,
-        })
+        }),
       );
     }
   });
@@ -1633,7 +1657,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_ALUMINUM2_SOCKET,
           payload: warehouseAluminum2,
-        })
+        }),
       );
     }
   });
@@ -1644,7 +1668,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_WAREHOUSE_ALUMINUM2_SOCKET,
           payload: aluminum2_warehouse_id,
-        })
+        }),
       );
     }
   });
@@ -1656,7 +1680,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
           payload: warehouseGrindingBalls,
-        })
+        }),
       );
     }
   });
@@ -1667,7 +1691,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
           payload: warehouseGrindingBalls,
-        })
+        }),
       );
     }
   });
@@ -1680,10 +1704,10 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
             payload: grinding_balls_warehouse_id,
-          })
+          }),
         );
       }
-    }
+    },
   );
 
   // AAC
@@ -1693,7 +1717,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_AAC_SOCKET,
           payload: warehouseAAC,
-        })
+        }),
       );
     }
   });
@@ -1704,7 +1728,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_AAC_SOCKET,
           payload: warehouseAAC,
-        })
+        }),
       );
     }
   });
@@ -1715,7 +1739,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_WAREHOUSE_AAC_SOCKET,
           payload: aac_warehouse_id,
-        })
+        }),
       );
     }
   });
@@ -1726,7 +1750,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_LOTES_LIST_SOCKET,
           payload: lotesListBatches,
-        })
+        }),
       );
     }
   });
@@ -1737,7 +1761,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_LOTES_LIST_SOCKET,
           payload: lotesListBatches,
-        })
+        }),
       );
     }
   });
@@ -1748,7 +1772,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_LOTES_LIST_CAKES_SOCKET,
           payload: lotesListBatches,
-        })
+        }),
       );
     }
   });
@@ -1759,7 +1783,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_LOTES_LIST_CAKES_SOCKET,
           payload: lotesListBatches,
-        })
+        }),
       );
     }
   });
@@ -1770,7 +1794,7 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
           payload: lotesListBatches,
-        })
+        }),
       );
     }
   });

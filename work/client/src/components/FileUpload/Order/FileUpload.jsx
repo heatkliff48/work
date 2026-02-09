@@ -1,13 +1,13 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
-import { FileContext } from './FileContext';
 import { addNewFilesOrder } from '#components/redux/actions/filesOrderAction.js';
 import { useDispatch } from 'react-redux';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useFileContext } from '#components/contexts/FileContext.js';
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
-  const { setMessage, refreshFiles } = useContext(FileContext);
+  const { setMessage, refreshFiles } = useFileContext();
   const { orderCartData } = useOrderContext();
 
   const dispatch = useDispatch();
@@ -25,8 +25,9 @@ const FileUpload = () => {
       dispatch(
         addNewFilesOrder({
           order_id: orderCartData?.id,
+          fileType: 'order',
           file_name: file.name,
-        })
+        }),
       );
 
       try {
@@ -37,10 +38,10 @@ const FileUpload = () => {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
-          }
+          },
         );
         setMessage(res.data);
-        refreshFiles(); // Refresh the file list after upload
+        refreshFiles();
       } catch (err) {
         if (err.response) {
           setMessage(err.response.data);

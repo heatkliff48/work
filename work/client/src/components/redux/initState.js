@@ -33,6 +33,7 @@ const initState = {
   filesWarehouse: [],
   filesOrder: [],
   filesProduct: [],
+  filesLotesList: [],
   stockBalance: [],
   dryMixesJournal: [],
   relatedMaterialsJournal: [],

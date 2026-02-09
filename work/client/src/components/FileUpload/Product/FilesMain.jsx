@@ -1,16 +1,17 @@
 import React from 'react';
 import FileUpload from './FileUpload';
 import FileDownload from './FileDownload';
-import { FileProvider } from './FileContext';
+import { FileContextProvider } from '#components/contexts/FileContext.js';
+
 
 const FilesMain = ({ userAccess }) => {
   return (
-    <FileProvider>
+    <FileContextProvider>
       <div>
         {userAccess?.canWrite && <FileUpload />}
         <FileDownload />
       </div>
-    </FileProvider>
+    </FileContextProvider>
   );
 };
 

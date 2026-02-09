@@ -1,19 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useModalContext } from '#components/contexts/ModalContext.js';
+
 import { useFileContext } from '#components/contexts/FileContext.js';
 
-const FileDownload = ({ type }) => {
-  const { message, setMessage, filesWarehouse } = useFileContext();
+const FileDownload = ({ type, lotesList_id }) => {
+  const { message, setMessage, filesLotesList } = useFileContext();
   const [selectedFile, setSelectedFile] = useState('');
-  const [filteredFiles, setFilteredFiles] = useState(filesWarehouse);
-  const { warehouseInfoCurIdModal } = useModalContext();
+  const [filteredFiles, setFilteredFiles] = useState(filesLotesList);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.get(
-        `http://localhost:3001/files/download/${selectedFile}`,
+        `${process.env.REACT_APP_URL}/files/download/${selectedFile}`,
         {
           responseType: 'blob',
         },
@@ -30,12 +29,11 @@ const FileDownload = ({ type }) => {
   };
 
   useEffect(() => {
-    const filteredFiles = filesWarehouse.filter(
-      (el) =>
-        el.warehouse_id === warehouseInfoCurIdModal && el.warehouse_type === type,
+    const filteredFiles = filesLotesList.filter(
+      (el) => el.lotesList_id === lotesList_id,
     );
     setFilteredFiles(filteredFiles);
-  }, [filesWarehouse]);
+  }, [filesLotesList]);
 
   return (
     <div className="fileDownload">

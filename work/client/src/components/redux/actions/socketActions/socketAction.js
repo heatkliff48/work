@@ -127,6 +127,8 @@ import {
   NEW_LOTES_LIST_CAKES_SOCKET,
   UPD_LOTES_LIST_CAKES_SOCKET,
   UPD_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
+  NEW_FILES_LOTES_LIST_SOCKET,
+  NEED_DELETE_FILES_LOTES_LIST_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -539,6 +541,20 @@ export const addNewFilesWarehouseSocket = (filesWarehouse) => {
   return {
     type: NEW_FILES_WAREHOUSE_SOCKET,
     payload: filesWarehouse,
+  };
+};
+
+export const addNewFilesLotesListSocket = (filesLotesList) => {
+  return {
+    type: NEW_FILES_LOTES_LIST_SOCKET,
+    payload: filesLotesList,
+  };
+};
+
+export const deleteFilesLotesListSocket = (lotesList_id) => {
+  return {
+    type: NEED_DELETE_FILES_LOTES_LIST_SOCKET,
+    payload: lotesList_id,
   };
 };
 

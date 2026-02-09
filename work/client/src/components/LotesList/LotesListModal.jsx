@@ -17,6 +17,7 @@ import {
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import QuickCheckingModal from './QuickCheckingModal';
 import { useProjectContext } from '#components/contexts/Context.js';
+import FilesMain from '#components/FileUpload/LotesList/FilesMain.jsx';
 
 const SECTIONS = {
   batchInfo: {
@@ -954,6 +955,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
           <Form.Check
             type="checkbox"
             label="Slurried"
+            disabled
             checked={slurried}
             onChange={(e) => {
               const v = e.target.checked;
@@ -1067,6 +1069,11 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
         </Modal.Body>
 
         <Modal.Footer>
+          <FilesMain
+            // userAccess={userAccess}
+            lotesList_id={batchData.id}
+          />
+
           <Button
             variant="outline-primary"
             onClick={() => setShowQuickChecking(true)}

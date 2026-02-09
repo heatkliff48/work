@@ -1,13 +1,13 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
-import { FileContext } from './FileContext';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { addNewFilesWarehouse } from '#components/redux/actions/filesWarehouseAction.js';
 import { useDispatch } from 'react-redux';
+import { useFileContext } from '#components/contexts/FileContext.js';
 
 const FileUpload = ({ type }) => {
   const [file, setFile] = useState(null);
-  const { setMessage, refreshFiles } = useContext(FileContext);
+  const { setMessage, refreshFiles } = useFileContext();
   const { warehouseInfoCurIdModal } = useModalContext();
 
   const dispatch = useDispatch();
@@ -26,8 +26,9 @@ const FileUpload = ({ type }) => {
         addNewFilesWarehouse({
           warehouse_id: warehouseInfoCurIdModal,
           warehouse_type: type,
+          fileType: 'warehouse',
           file_name: file.name,
-        })
+        }),
       );
 
       try {
@@ -38,7 +39,7 @@ const FileUpload = ({ type }) => {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
-          }
+          },
         );
         setMessage(res.data);
         refreshFiles(); // Refresh the file list after upload
