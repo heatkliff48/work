@@ -79,6 +79,11 @@ const QualityManagementTable = () => {
       accessor: 'free_quantity_fact',
       Filter: TextSearchFilter,
     },
+    {
+      Header: 'Quantity on sorting, pallets',
+      accessor: 'sorting',
+      Filter: TextSearchFilter,
+    },
   ];
 
   useEffect(() => {
@@ -98,6 +103,7 @@ const QualityManagementTable = () => {
         reserved_quantity_allocated,
         reserved_quantity_remaining,
         free_quantity_fact,
+        sorting,
       } = qualityManagementData[0];
       if (reserved_quantity_remaining > 0) {
         dispatch(
@@ -110,6 +116,7 @@ const QualityManagementTable = () => {
             reserved_quantity_allocated: reserved_quantity_allocated + 1,
             reserved_quantity_remaining: reserved_quantity_remaining - 1,
             free_quantity_fact,
+            sorting,
           }),
         );
       } else {
@@ -123,6 +130,7 @@ const QualityManagementTable = () => {
             reserved_quantity_allocated,
             reserved_quantity_remaining: 0,
             free_quantity_fact: free_quantity_fact + 1,
+            sorting,
           }),
         );
       }
@@ -140,6 +148,7 @@ const QualityManagementTable = () => {
         reserved_quantity_allocated,
         reserved_quantity_remaining,
         free_quantity_fact,
+        sorting,
       } = qualityManagementData[0];
       if (
         reserved_quantity_remaining < reserved_quantity &&
@@ -156,6 +165,7 @@ const QualityManagementTable = () => {
             reserved_quantity_allocated: reserved_quantity_allocated - 1,
             reserved_quantity_remaining: reserved_quantity_remaining + 1,
             free_quantity_fact,
+            sorting,
           }),
         );
       } else if (reserved_quantity_remaining == 0 && free_quantity_fact > 0) {
@@ -169,6 +179,69 @@ const QualityManagementTable = () => {
             reserved_quantity_allocated,
             reserved_quantity_remaining: 0,
             free_quantity_fact: free_quantity_fact - 1,
+            sorting,
+          }),
+        );
+      }
+    }
+  };
+
+  const sortingPlusHandler = async () => {
+    if (qualityManagementData) {
+      const {
+        id,
+        batch_id,
+        product_article,
+        total_quantity_plan,
+        reserved_quantity,
+        reserved_quantity_allocated,
+        reserved_quantity_remaining,
+        free_quantity_fact,
+        sorting,
+      } = qualityManagementData[0];
+      if (total_quantity_plan > 0) {
+        dispatch(
+          updateQualityManagement({
+            id: id,
+            batch_id,
+            product_article,
+            total_quantity_plan,
+            reserved_quantity,
+            reserved_quantity_allocated,
+            reserved_quantity_remaining,
+            free_quantity_fact,
+            sorting: sorting + 1,
+          }),
+        );
+      }
+    }
+  };
+
+  const sortingMinusHandler = async () => {
+    if (qualityManagementData) {
+      const {
+        id,
+        batch_id,
+        product_article,
+        total_quantity_plan,
+        reserved_quantity,
+        reserved_quantity_allocated,
+        reserved_quantity_remaining,
+        free_quantity_fact,
+        sorting,
+      } = qualityManagementData[0];
+      if (sorting > 0) {
+        dispatch(
+          updateQualityManagement({
+            id: id,
+            batch_id,
+            product_article,
+            total_quantity_plan,
+            reserved_quantity,
+            reserved_quantity_allocated,
+            reserved_quantity_remaining,
+            free_quantity_fact,
+            sorting: sorting - 1,
           }),
         );
       }
@@ -182,20 +255,14 @@ const QualityManagementTable = () => {
     if (isConfirmed) {
       const {
         id,
-
         batch_id,
-
         product_article,
-
         reserved_quantity_allocated,
-
         reserved_quantity_remaining,
-
         total_quantity_plan,
-
         free_quantity_fact,
-
         production_plan_id,
+        sorting,
       } = qualityManagementData[0];
 
       // 1. Фильтруем резервы для текущего product_article
@@ -318,20 +385,30 @@ const QualityManagementTable = () => {
       await dispatch(
         addNewWarehouse({
           product_article,
-
           article: batch_id,
-
           warehouse_loc: 'local',
-
           free_quantity_remaining: remainingFreeQty,
-
           ordered_quantity: calculatedOrderedQuantity,
-
           total_quantity: calculatedOrderedQuantity + remainingFreeQty,
-
           type: 'OK',
+          sorting: 0,
         }),
       );
+
+      if (sorting > 0) {
+        await dispatch(
+          addNewWarehouse({
+            product_article,
+            article: batch_id,
+            warehouse_loc: 'local',
+            free_quantity_remaining: 0,
+            ordered_quantity: 0,
+            total_quantity: sorting,
+            type: 'Sorting',
+            sorting,
+          }),
+        );
+      }
 
       // Обновляем все затронутые позиции в list_of_ordered_production
 
@@ -452,21 +529,42 @@ const QualityManagementTable = () => {
         handleRowClick={(row) => {}}
       />
       {qualityManagementData.length > 0 && (
-        <div className="d-flex gap-2 mb-2">
-          <Button
-            variant="success"
-            size="lg"
-            onClick={qualityManagementPlusHandler}
-          >
-            <FaPlus style={{ cursor: 'pointer', fontSize: '1.5rem' }} />
-          </Button>
-          <Button
-            variant="danger"
-            size="lg"
-            onClick={qualityManagementMinusHandler}
-          >
-            <FaMinus style={{ cursor: 'pointer', fontSize: '1.5rem' }} />
-          </Button>
+        <div className="d-flex gap-4 flex-wrap">
+          <div className="border rounded p-3 bg-light">
+            <div className="text-center mb-2 fw-bold border-bottom pb-1">
+              OK
+            </div>
+            <div className="d-flex gap-2">
+              <Button
+                variant="success"
+                size="lg"
+                onClick={qualityManagementPlusHandler}
+              >
+                <FaPlus style={{ fontSize: '1.5rem' }} />
+              </Button>
+              <Button
+                variant="danger"
+                size="lg"
+                onClick={qualityManagementMinusHandler}
+              >
+                <FaMinus style={{ fontSize: '1.5rem' }} />
+              </Button>
+            </div>
+          </div>
+
+          <div className="border rounded p-3 bg-light">
+            <div className="text-center mb-2 fw-bold border-bottom pb-1">
+              Sorting
+            </div>
+            <div className="d-flex gap-2">
+              <Button variant="success" size="lg" onClick={sortingPlusHandler}>
+                <FaPlus style={{ fontSize: '1.5rem' }} />
+              </Button>
+              <Button variant="danger" size="lg" onClick={sortingMinusHandler}>
+                <FaMinus style={{ fontSize: '1.5rem' }} />
+              </Button>
+            </div>
+          </div>
         </div>
       )}
       {qualityManagementData.length > 0 && (

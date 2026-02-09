@@ -141,6 +141,7 @@ const {
   UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
   ADD_NEW_FILES_LOTES_LIST_SOCKET,
   DELETE_FILES_LOTES_LIST_SOCKET,
+  UPDATE_RECIPE_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -949,6 +950,17 @@ function registerWsEmitter(map) {
       userConnect.send(
         JSON.stringify({
           type: ADD_NEW_RECIPE_SOCKET,
+          payload: recipe,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_RECIPE_SOCKET, (recipe) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_RECIPE_SOCKET,
           payload: recipe,
         }),
       );

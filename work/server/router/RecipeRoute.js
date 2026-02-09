@@ -3,6 +3,7 @@ const { Recipe } = require('../db/models/index.js');
 const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_RECIPE_SOCKET,
+  UPDATE_RECIPE_SOCKET,
   DELETE_RECIPE_SOCKET,
 } = require('../src/constants/event.js');
 
@@ -66,6 +67,31 @@ recipeRouter.post('/', async (req, res) => {
     });
 
     myEmitter.emit(ADD_NEW_RECIPE_SOCKET, recipe);
+    return res.status(200);
+  } catch (err) {
+    console.error('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', err.message);
+    return res.status(500).json(err);
+  }
+});
+
+recipeRouter.post('/update', async (req, res) => {
+  const { id, description } = req.body;
+
+  try {
+    const recipe = await Recipe.update(
+      {
+        description,
+      },
+      {
+        where: {
+          id,
+        },
+        returning: true,
+        plain: true,
+      },
+    );
+
+    myEmitter.emit(UPDATE_RECIPE_SOCKET, recipe);
     return res.status(200);
   } catch (err) {
     console.error('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', err.message);

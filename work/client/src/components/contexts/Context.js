@@ -358,7 +358,7 @@ const ProjectContextProvider = ({ children }) => {
     { key: 'vibrator_speed_hz', value: 40 },
     { key: 'sand_producer', value: 'Sibelco' },
     { key: 'gypsum_producer', value: 'Yemaconsa' },
-    { key: 'lime_producer', value: 'Casa de Pachs' },
+    { key: 'lime_producer', value: 'Cala de Pachs' },
     { key: 'lime_type', value: 'CL90Q' },
     { key: 'cement_producer', value: 'Cebasa' },
     { key: 'cement_type', value: 'CEM | 52.5 R-SR3' },

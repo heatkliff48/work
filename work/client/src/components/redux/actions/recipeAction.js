@@ -11,6 +11,7 @@ import {
   GET_MAIN_RAW_MAT_CONSUMPTION,
   ADD_NEW_MAIN_RAW_MAT_CONSUMPTION,
   DELETE_MAIN_RAW_MAT_CONSUMPTION,
+  UPDATE_RECIPE,
 } from '../types/recipeTypes';
 
 export const getRecipe = () => {
@@ -22,6 +23,13 @@ export const getRecipe = () => {
 export const addNewRecipe = (recipe) => {
   return {
     type: ADD_NEW_RECIPE,
+    payload: recipe,
+  };
+};
+
+export const updateRecipe = (recipe) => {
+  return {
+    type: UPDATE_RECIPE,
     payload: recipe,
   };
 };
