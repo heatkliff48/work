@@ -37,6 +37,7 @@ const fileUpload = require("./router/fileUpload.js");
 const filesWarehouseRouter = require("./router/FilesWarehouse.js");
 const filesOrderRouter = require("./router/FilesOrder.js");
 const filesProductRouter = require("./router/FilesProduct.js");
+const files = require("./router/Files.js");
 const dryMixesJournalRouter = require("./router/drymixesjournal.js");
 const relatedMaterialsJournalRouter = require("./router/relatedmaterialsjournal.js");
 const anchorRouter = require("./router/anchor.js");
@@ -117,6 +118,7 @@ app.use("/productionBatchLog", productionBatchLogRouter);
 app.use("/batchOutside", batchOutsideRouter); //???
 app.use("/recipe", recipeRouter);
 app.use("/recipe_orders", recipeOrdersRouter);
+app.use("/allfiles", files);
 app.use("/files", fileUpload);
 app.use("/filesWarehouse", filesWarehouseRouter);
 app.use("/filesOrder", filesOrderRouter);

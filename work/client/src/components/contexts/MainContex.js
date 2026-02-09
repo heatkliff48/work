@@ -1,4 +1,5 @@
 import ProjectContextProvider from './Context';
+import { FileContextProvider } from './FileContext';
 import { ModalContextProvider } from './ModalContext';
 import OrderContextProvider from './OrderContext';
 import { ProductsContextProvider } from './ProductContext';
@@ -20,7 +21,9 @@ const MainContextProvider = ({ children }) => {
                 <UsersContextProvider>
                   {/* <ClientsContextProvider> */}
                   <OrderContextProvider>
-                    <WarehouseContextProvider>{children}</WarehouseContextProvider>
+                    <WarehouseContextProvider>
+                      <FileContextProvider>{children}</FileContextProvider>
+                    </WarehouseContextProvider>
                   </OrderContextProvider>
                   {/* </ClientsContextProvider>*/}
                 </UsersContextProvider>

@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import { FileContext } from './FileContext';
+
 import { useProjectContext } from '#components/contexts/Context.js';
+import { useFileContext } from '#components/contexts/FileContext.js';
 
 const FileDownload = () => {
-  const { message, setMessage, filesProduct } = useContext(FileContext);
+  const { message, setMessage, filesProduct } = useFileContext();
   const [selectedFile, setSelectedFile] = useState('');
   const [filteredFiles, setFilteredFiles] = useState(filesProduct);
   const { productCardData } = useProjectContext();
@@ -16,7 +17,7 @@ const FileDownload = () => {
         `http://localhost:3001/files/download/${selectedFile}`,
         {
           responseType: 'blob',
-        }
+        },
       );
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
@@ -31,7 +32,7 @@ const FileDownload = () => {
 
   useEffect(() => {
     const filteredFiles = filesProduct.filter(
-      (el) => el.product_id === productCardData?.id
+      (el) => el.product_id === productCardData?.id,
     );
     setFilteredFiles(filteredFiles);
   }, [filesProduct]);

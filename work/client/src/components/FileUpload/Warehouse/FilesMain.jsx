@@ -1,9 +1,9 @@
-
 import FileUpload from './FileUpload';
 import FileDownload from './FileDownload';
-import { FileProvider } from './FileContext';
+
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useSelector } from 'react-redux';
+import { FileContextProvider } from '#components/contexts/FileContext.js';
 
 const FilesMain = ({ type }) => {
   const { roles, checkUserAccess } = useUsersContext();
@@ -11,7 +11,7 @@ const FilesMain = ({ type }) => {
   const user = useSelector((state) => state.user);
 
   return (
-    <FileProvider>
+    <FileContextProvider>
       <div>
         {checkUserAccess(user, roles, 'Warehouse_modal_upload_file')?.canWrite && (
           <FileUpload type={type} />
@@ -20,7 +20,7 @@ const FilesMain = ({ type }) => {
           <FileDownload type={type} />
         )}
       </div>
-    </FileProvider>
+    </FileContextProvider>
   );
 };
 

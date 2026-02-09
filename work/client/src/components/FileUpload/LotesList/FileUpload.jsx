@@ -1,14 +1,13 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
-import { addNewFilesProduct } from '#components/redux/actions/filesProductAction.js';
 import { useDispatch } from 'react-redux';
-import { useProjectContext } from '#components/contexts/Context.js';
 import { useFileContext } from '#components/contexts/FileContext.js';
+import { addNewFilesLotesList } from '#components/redux/actions/filesLotesListAction.js';
 
-const FileUpload = () => {
+const FileUpload = ({ lotesList_id }) => {
   const [file, setFile] = useState(null);
-  const { setMessage } = useFileContext();
-  const { productCardData } = useProjectContext();
+
+  const { setMessage, refreshFiles } = useFileContext();
 
   const dispatch = useDispatch();
 
@@ -23,9 +22,9 @@ const FileUpload = () => {
       formData.append('myFile', file);
 
       dispatch(
-        addNewFilesProduct({
-          product_id: productCardData?.id,
-          fileType: 'product',
+        addNewFilesLotesList({
+          lotesList_id: lotesList_id,
+          fileType: 'lotesList',
           file_name: file.name,
         }),
       );
@@ -41,7 +40,7 @@ const FileUpload = () => {
           },
         );
         setMessage(res.data);
-        //refreshFiles(); // Refresh the file list after upload
+        refreshFiles();
       } catch (err) {
         if (err.response) {
           setMessage(err.response.data);
