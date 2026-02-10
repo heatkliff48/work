@@ -362,9 +362,10 @@ const RawMaterialsConsumptionModal = React.memo(
         if (Number.isFinite(producedReturn) && producedReturn > 0) {
           result_materials = materials.map((el) => {
             if (el.type == 'Return slurry (dry)') {
-              const producedReturnMinus = Number(
-                el.quantity * Number(productionVolume),
-              );
+              const producedReturnMinus =
+                wastedMode === 'from_actual'
+                  ? el.quantity
+                  : Number(el.quantity * Number(productionVolume));
 
               return {
                 ...el,
