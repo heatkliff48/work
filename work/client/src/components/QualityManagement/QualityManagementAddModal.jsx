@@ -43,6 +43,11 @@ function QualityManagementAddModal(props) {
       accessor: 'position_in_autoclave',
       Filter: TextSearchFilter,
     },
+    {
+      Header: 'Date',
+      accessor: 'date',
+      Filter: TextSearchFilter,
+    },
   ];
 
   const add_batch_dialog = [
