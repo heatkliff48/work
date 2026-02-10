@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Table from '../Table/Table';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
@@ -9,11 +9,13 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useMemo } from 'react';
 import { getAllWarehouse } from '#components/redux/actions/warehouseAction.js';
+import { Switch, FormControlLabel } from '@mui/material';
 
 function Warehouse() {
   const { COLUMNS_WAREHOUSE, warehouse_data } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
   const {
     setWarehouseModal,
     warehouseModal,
@@ -23,6 +25,8 @@ function Warehouse() {
   } = useModalContext();
 
   const user = useSelector((state) => state.user);
+
+  const [hideZeroQuantity, setHideZeroQuantity] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -48,7 +52,7 @@ function Warehouse() {
   const extendedWarehouseData = useMemo(() => {
     if (!warehouse_data || !latestProducts) return warehouse_data || [];
 
-    return warehouse_data.map((item) => {
+    const processedData = warehouse_data.map((item) => {
       const product = latestProducts.find(
         (product) => product.article === item.product_article,
       );
@@ -62,7 +66,14 @@ function Warehouse() {
         total_m3,
       };
     });
-  }, [warehouse_data, latestProducts]);
+
+    // Фильтрация по состоянию радиокнопки
+    if (hideZeroQuantity) {
+      return processedData.filter((item) => item.total_quantity > 0);
+    }
+
+    return processedData;
+  }, [warehouse_data, latestProducts, hideZeroQuantity]);
 
   return (
     <>
@@ -80,6 +91,16 @@ function Warehouse() {
           toggle={() => setWarehouseInfoModal(!warehouseInfoModal)}
         />
       )}
+
+      <FormControlLabel
+        control={
+          <Switch
+            checked={hideZeroQuantity}
+            onChange={(e) => setHideZeroQuantity(e.target.checked)}
+          />
+        }
+        label="Toggle to show empty entries"
+      />
 
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE}
