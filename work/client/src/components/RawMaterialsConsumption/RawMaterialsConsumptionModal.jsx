@@ -325,42 +325,44 @@ const RawMaterialsConsumptionModal = React.memo(
         alert('Нет данных для списания материалов.');
         return;
       }
-
-      if (resolvedRecipe?.produced_return_dry && Number(productionVolume) > 0) {
-        const producedReturn =
-          resolvedRecipe.produced_return_dry * Number(productionVolume);
-
-        if (Number.isFinite(producedReturn) && producedReturn > 0) {
-          materials.push({
-            type: 'Return slurry (dry)',
-            quantity: +producedReturn.toFixed(2),
-          });
-        }
-      }
+      let result_materials = [...materials];
 
       if (govno) {
-        const totalConsumedRaw = materials
+        const totalConsumedRaw = result_materials
           .filter(
             (m) => m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
           )
           .reduce((sum, m) => sum + (Number(m.quantity) || 0), 0);
 
         if (Number.isFinite(totalConsumedRaw) && totalConsumedRaw > 0) {
-          const idx = materials.findIndex(
+          const idx = result_materials.findIndex(
             (m) => m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
           );
 
           if (idx >= 0) {
-            const prev = Number(materials[idx].quantity) || 0;
-            materials[idx] = {
-              ...materials[idx],
-              type: 'Return slurry (dry)',
-              quantity: +(prev + totalConsumedRaw).toFixed(2),
-            };
-          } else {
-            materials.push({
+            result_materials[idx] = {
+              ...result_materials[idx],
               type: 'Return slurry (dry)',
               quantity: +totalConsumedRaw.toFixed(2),
+            };
+          } else {
+            result_materials.push({
+              type: 'Return slurry (dry)',
+              quantity: +totalConsumedRaw.toFixed(2),
+            });
+          }
+        }
+      } else {
+        if (resolvedRecipe?.produced_return_dry && Number(productionVolume) > 0) {
+          const producedReturn =
+            resolvedRecipe.produced_return_dry * Number(productionVolume);
+
+          if (Number.isFinite(producedReturn) && producedReturn > 0) {
+            result_materials = materials.map((el) => {
+              if (el.type == 'Return slurry (dry)') {
+                return { ...el, quantity: producedReturn.toFixed(2) - el.quantity };
+              }
+              return el;
             });
           }
         }
@@ -394,7 +396,8 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
-      const body = { materials };
+      const body = { materials: result_materials };
+
       dispatch(
         addNewMainRawMatConsumption({
           ...selectedRow,
@@ -411,10 +414,7 @@ const RawMaterialsConsumptionModal = React.memo(
       );
 
       const recipeSnapshot = buildRecipeSnapshot();
-      console.log(
-        'selectedRow RawMaterialsConsumptionModal.jsx line 415',
-        selectedRow,
-      );
+
       const new_lotestList = {
         production_date: selectedRow?.date,
         product: prodDescription[1],

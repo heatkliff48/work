@@ -567,7 +567,7 @@ const updateRawMaterialsConsumptionRawMaterialsWarehouse = (
 function* getAllWarehouseWatcher() {
   try {
     const { warehouse } = yield call(getAllWarehouse);
-
+console.log('warehouse warehouseSagas.js line 570', warehouse)
     yield put({ type: ALL_WAREHOUSE, payload: warehouse });
   } catch (err) {
     yield put({ type: ALL_WAREHOUSE, payload: [] });

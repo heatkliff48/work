@@ -183,7 +183,7 @@ lotesListRouter.post('/batches', async (req, res) => {
     const lastLatestBatch = await LotesListsBatches.findAll({
       order: [['batch_id', 'DESC']],
     });
-    console.log('lastLatestBatch loteslist.js line 186', lastLatestBatch);
+
     if (new_batch) {
       batch_id = Number(lastLatestBatch[0]?.batch_id ?? 0) + 1;
       sub_batch_id = 1;
@@ -230,7 +230,6 @@ lotesListRouter.post('/batches', async (req, res) => {
         : 1;
     }
 
-    console.log('req.body loteslist.js line 232', req.body);
     const lotesListBatches = await LotesListsBatches.create({
       cake_id_start,
       cake_id_finish,
@@ -240,8 +239,6 @@ lotesListRouter.post('/batches', async (req, res) => {
       quantity_cakes: quantityCakesInt,
       sand_dry,
     });
-
-    console.log('lotesListBatches loteslist.js line 246', lotesListBatches);
 
     const lotesListCakesArray = [];
     for (let i = cake_id_start; i <= cake_id_finish; i++) {
@@ -390,7 +387,7 @@ lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
 lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
   try {
     const payload = Array.isArray(req.body) ? req.body : [req.body];
-    console.log('payload loteslist.js line 281', payload);
+
     const normalized = payload
       .map((item) => ({
         cake_id: Number(item?.cake_id),
@@ -412,8 +409,6 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
       });
     }
 
-    console.log('normalized', normalized);
-
     const updatedRows = [];
 
     for (const { cake_id, recipe } of normalized) {
@@ -429,7 +424,6 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
 
       const updatedCake = rows[0];
       updatedRows.push(updatedCake);
-      console.log(updatedRows);
 
       myEmitter.emit(UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET, updatedCake);
     }
