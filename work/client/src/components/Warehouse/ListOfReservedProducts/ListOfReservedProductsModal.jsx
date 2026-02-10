@@ -15,6 +15,7 @@ import FilesMain from '#components/FileUpload/Warehouse/FilesMain.jsx';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 import ShowSortingModal from './SortingModal';
+import ShowAddBatchID from './AddBatchID';
 
 const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -171,6 +172,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
             </Button>
           )} */}
           {curr_warehouse.type === 'Sorting' && <ShowSortingModal />}
+          <ShowAddBatchID />
           <FilesMain type={0} />
           <Table>
             <thead>
