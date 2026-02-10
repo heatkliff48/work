@@ -355,13 +355,21 @@ const RawMaterialsConsumptionModal = React.memo(
         selectedRecipe?.produced_return_dry &&
         Number(productionVolume) > 0
       ) {
-        const producedReturn =
-          selectedRecipe.produced_return_dry * Number(productionVolume);
+        const producedReturn = Number(
+          selectedRecipe.produced_return_dry * Number(productionVolume),
+        );
 
         if (Number.isFinite(producedReturn) && producedReturn > 0) {
           result_materials = materials.map((el) => {
             if (el.type == 'Return slurry (dry)') {
-              return { ...el, quantity: producedReturn.toFixed(2) - el.quantity };
+              const producedReturnMinus = Number(
+                el.quantity * Number(productionVolume),
+              );
+
+              return {
+                ...el,
+                quantity: producedReturn.toFixed(2) - producedReturnMinus,
+              };
             }
             return el;
           });
@@ -397,7 +405,7 @@ const RawMaterialsConsumptionModal = React.memo(
       }
 
       const body = { materials: result_materials };
-
+      console.log('body RawMaterialsConsumptionModal.jsx line 407', body);
       dispatch(
         addNewMainRawMatConsumption({
           ...selectedRow,

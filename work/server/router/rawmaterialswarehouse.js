@@ -381,7 +381,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
         quantity: round2(qty),
       };
     })
-    .filter((m) => m.type && Number.isFinite(m.quantity) && m.quantity > 0);
+    .filter((m) => m.type && Number.isFinite(m.quantity));
 
   if (normMaterials.length === 0) {
     return res.status(400).json({ error: 'Нет валидных позиций для списания' });
@@ -390,7 +390,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
   const onlySandSlurryDry = normMaterials.every(
     (m) => m.type === 'Sand slurry (dry)',
   );
-
+  console.log('normMaterials rawmaterialswarehouse.js line 393', normMaterials);
   const t = await sequelize.transaction();
   try {
     const today = new Date();
