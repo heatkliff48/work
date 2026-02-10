@@ -406,8 +406,13 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
 
       await RawMaterialsWarehouse.update(
         {
-          consumed_quantity: sequelize.literal(`consumed_quantity + ${total}`),
-          remaining_quantity: sequelize.literal(`remaining_quantity - ${total}`),
+          consumed_quantity: sequelize.literal(
+            `ROUND(consumed_quantity + ${delta}, 2)`,
+          ),
+          remaining_quantity: sequelize.literal(
+            `ROUND(remaining_quantity - ${delta}, 2)`,
+          ),
+
           last_updated: date,
           updatedAt: now,
         },
@@ -441,7 +446,9 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       if (materialType === 'Return slurry (dry)') {
         await RawMaterialsWarehouse.update(
           {
-            remaining_quantity: sequelize.literal(`remaining_quantity + ${delta}`),
+            remaining_quantity: sequelize.literal(
+              `ROUND(remaining_quantity - ${delta}, 2)`,
+            ),
             last_updated: date,
             updatedAt: now,
           },
@@ -450,8 +457,13 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       } else {
         await RawMaterialsWarehouse.update(
           {
-            consumed_quantity: sequelize.literal(`consumed_quantity + ${delta}`),
-            remaining_quantity: sequelize.literal(`remaining_quantity - ${delta}`),
+            consumed_quantity: sequelize.literal(
+              `ROUND(consumed_quantity + ${delta}, 2)`,
+            ),
+            remaining_quantity: sequelize.literal(
+              `ROUND(remaining_quantity - ${delta}, 2)`,
+            ),
+
             last_updated: date,
             updatedAt: now,
           },
