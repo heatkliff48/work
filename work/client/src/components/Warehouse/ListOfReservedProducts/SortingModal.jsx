@@ -180,9 +180,13 @@ function SortingModal(props) {
       dispatch(
         updateRemainingStock({
           warehouse_id: ok_warehouse_entrie.id,
-          free_quantity_remaining: remainingFreeQty,
+          free_quantity_remaining:
+            ok_warehouse_entrie.free_quantity_remaining + remainingFreeQty,
           ordered_quantity: calculatedOrderedQuantity,
-          total_quantity: calculatedOrderedQuantity + remainingFreeQty,
+          total_quantity:
+            ok_warehouse_entrie.total_quantity +
+            calculatedOrderedQuantity +
+            remainingFreeQty,
         }),
       );
     } else {
