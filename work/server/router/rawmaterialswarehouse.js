@@ -364,7 +364,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
 
   console.log('======================= materials ======================', materials);
 
-  const round2 = (num) => Math.round(num * 100) / 100;
+  const round2 = (num) => (Math.round(num * 100) / 100).toFixed(2);
 
   if (!Array.isArray(materials) || materials.length === 0) {
     return res.status(400).json({
@@ -390,7 +390,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
   const onlySandSlurryDry = normMaterials.every(
     (m) => m.type === 'Sand slurry (dry)',
   );
-  console.log('normMaterials rawmaterialswarehouse.js line 393', normMaterials);
+
   const t = await sequelize.transaction();
   try {
     const today = new Date();
@@ -406,8 +406,13 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
 
       await RawMaterialsWarehouse.update(
         {
-          consumed_quantity: sequelize.literal(`consumed_quantity + ${total}`),
-          remaining_quantity: sequelize.literal(`remaining_quantity - ${total}`),
+          consumed_quantity: sequelize.literal(
+            `ROUND(consumed_quantity + ${delta}, 2)`,
+          ),
+          remaining_quantity: sequelize.literal(
+            `ROUND(remaining_quantity - ${delta}, 2)`,
+          ),
+
           last_updated: date,
           updatedAt: now,
         },
@@ -441,7 +446,9 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       if (materialType === 'Return slurry (dry)') {
         await RawMaterialsWarehouse.update(
           {
-            remaining_quantity: sequelize.literal(`remaining_quantity + ${delta}`),
+            remaining_quantity: sequelize.literal(
+              `ROUND(remaining_quantity - ${delta}, 2)`,
+            ),
             last_updated: date,
             updatedAt: now,
           },
@@ -450,8 +457,13 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       } else {
         await RawMaterialsWarehouse.update(
           {
-            consumed_quantity: sequelize.literal(`consumed_quantity + ${delta}`),
-            remaining_quantity: sequelize.literal(`remaining_quantity - ${delta}`),
+            consumed_quantity: sequelize.literal(
+              `ROUND(consumed_quantity + ${delta}, 2)`,
+            ),
+            remaining_quantity: sequelize.literal(
+              `ROUND(remaining_quantity - ${delta}, 2)`,
+            ),
+
             last_updated: date,
             updatedAt: now,
           },

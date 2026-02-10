@@ -369,7 +369,9 @@ const RawMaterialsConsumptionModal = React.memo(
 
               return {
                 ...el,
-                quantity: producedReturn.toFixed(2) - producedReturnMinus,
+                quantity: (producedReturn.toFixed(2) - producedReturnMinus).toFixed(
+                  2,
+                ),
               };
             }
             return el;
@@ -405,8 +407,12 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
-      const body = { materials: result_materials };
-      console.log('body RawMaterialsConsumptionModal.jsx line 407', body);
+      const fixed_materials = result_materials.map((el) => {
+        return { ...el, quantity: el.quantity.toFixed(2) };
+      });
+
+      const body = { materials: fixed_materials };
+
       dispatch(
         addNewMainRawMatConsumption({
           ...selectedRow,
