@@ -14,6 +14,21 @@ const {
   ADD_NEW_FILES_LOTES_LIST_SOCKET,
 } = require('../src/constants/event.js');
 
+filesRouter.get('/lotesList', async (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>filesRouter post');
+
+  try {
+    const filesLotes = await FilesListeLists.findAll({
+      order: [['id', 'ASC']],
+    });
+
+    return res.status(200).json({ filesLotes });
+  } catch (err) {
+    console.error(err.message);
+    return res.json({ error: 'Internal Server Error' }).status(500);
+  }
+});
+
 filesRouter.post('/', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>filesRouter post');
 

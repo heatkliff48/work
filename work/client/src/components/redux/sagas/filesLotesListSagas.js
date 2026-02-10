@@ -2,8 +2,14 @@ import { put, call, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
-import { ADD_NEW_FILES_LOTES_LIST, DELETE_FILES_LOTES_LIST, FULL_FILES_LOTES_LIST, GET_FULL_FILES_LOTES_LIST, NEED_DELETE_FILES_LOTES_LIST, NEW_FILES_LOTES_LIST } from '../types/filesLotesListTypes';
-
+import {
+  ADD_NEW_FILES_LOTES_LIST,
+  DELETE_FILES_LOTES_LIST,
+  FULL_FILES_LOTES_LIST,
+  GET_FULL_FILES_LOTES_LIST,
+  NEED_DELETE_FILES_LOTES_LIST,
+  NEW_FILES_LOTES_LIST,
+} from '../types/filesLotesListTypes';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -12,7 +18,7 @@ const url = axios.create({
 
 const getFilesLotesList = () => {
   return url
-    .get('/filesLotesList')
+    .get('/allfiles/lotesList')
     .then((res) => {
       return res.data;
     })
