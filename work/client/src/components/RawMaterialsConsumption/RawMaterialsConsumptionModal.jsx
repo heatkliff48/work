@@ -326,7 +326,6 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
       let result_materials = [...materials];
-
       if (govno) {
         const totalConsumedRaw = result_materials
           .filter(
@@ -352,19 +351,20 @@ const RawMaterialsConsumptionModal = React.memo(
             });
           }
         }
-      } else {
-        if (resolvedRecipe?.produced_return_dry && Number(productionVolume) > 0) {
-          const producedReturn =
-            resolvedRecipe.produced_return_dry * Number(productionVolume);
+      } else if (
+        selectedRecipe?.produced_return_dry &&
+        Number(productionVolume) > 0
+      ) {
+        const producedReturn =
+          selectedRecipe.produced_return_dry * Number(productionVolume);
 
-          if (Number.isFinite(producedReturn) && producedReturn > 0) {
-            result_materials = materials.map((el) => {
-              if (el.type == 'Return slurry (dry)') {
-                return { ...el, quantity: producedReturn.toFixed(2) - el.quantity };
-              }
-              return el;
-            });
-          }
+        if (Number.isFinite(producedReturn) && producedReturn > 0) {
+          result_materials = materials.map((el) => {
+            if (el.type == 'Return slurry (dry)') {
+              return { ...el, quantity: producedReturn.toFixed(2) - el.quantity };
+            }
+            return el;
+          });
         }
       }
 

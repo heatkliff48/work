@@ -112,7 +112,7 @@ function Main() {
     dispatch(getDryMixedProductsOfOrders());
     dispatch(getDryMixesWarehouse());
     dispatch(getFilesOrder());
-    // dispatch(getFilesLotesList());
+    dispatch(getFilesLotesList());
     dispatch(getFilesProduct());
     dispatch(getFilesWarehouse());
     dispatch(getRelMatProductsOfOrders());
