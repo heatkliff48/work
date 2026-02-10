@@ -199,7 +199,7 @@ const QualityManagementTable = () => {
         free_quantity_fact,
         sorting,
       } = qualityManagementData[0];
-      if (total_quantity_plan > 0) {
+      if (total_quantity_plan >= 0) {
         dispatch(
           updateQualityManagement({
             id: id,
@@ -301,8 +301,6 @@ const QualityManagementTable = () => {
               reservedItem.quantity,
             );
 
-            console.log('objenewQuantityInWarehousect', newQuantityInWarehouse);
-
             return {
               ...reservedItem,
 
@@ -382,18 +380,20 @@ const QualityManagementTable = () => {
 
       // Добавляем на склад
 
-      await dispatch(
-        addNewWarehouse({
-          product_article,
-          article: batch_id,
-          warehouse_loc: 'local',
-          free_quantity_remaining: remainingFreeQty,
-          ordered_quantity: calculatedOrderedQuantity,
-          total_quantity: calculatedOrderedQuantity + remainingFreeQty,
-          type: 'OK',
-          sorting: 0,
-        }),
-      );
+      if (calculatedOrderedQuantity + remainingFreeQty > 0) {
+        await dispatch(
+          addNewWarehouse({
+            product_article,
+            article: batch_id,
+            warehouse_loc: 'local',
+            free_quantity_remaining: remainingFreeQty,
+            ordered_quantity: calculatedOrderedQuantity,
+            total_quantity: calculatedOrderedQuantity + remainingFreeQty,
+            type: 'OK',
+            sorting: 0,
+          }),
+        );
+      }
 
       if (sorting > 0) {
         await dispatch(

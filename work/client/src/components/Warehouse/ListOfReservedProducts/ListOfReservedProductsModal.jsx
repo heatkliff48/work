@@ -14,6 +14,7 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import FilesMain from '#components/FileUpload/Warehouse/FilesMain.jsx';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
+import ShowSortingModal from './SortingModal';
 
 const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -23,9 +24,13 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
     setFilteredProducts,
   } = useWarehouseContext();
 
-  const { warehouseInfoCurIdModal, reserveProductModal, setReserveProductModal } =
-    useModalContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const {
+    warehouseInfoCurIdModal,
+    reserveProductModal,
+    setReserveProductModal,
+  } = useModalContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
 
   const user = useSelector((state) => state.user);
 
@@ -38,12 +43,12 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
   const dispatch = useDispatch();
 
   const curr_warehouse = warehouse_data.find(
-    (wh) => wh.id === warehouseInfoCurIdModal
+    (wh) => wh.id === warehouseInfoCurIdModal,
   );
 
   const getWarehouse = () => {
     const product = latestProducts.find(
-      (el) => el.article === curr_warehouse.product_article
+      (el) => el.article === curr_warehouse.product_article,
     );
 
     return { ...curr_warehouse, product_id: product.id };
@@ -51,10 +56,12 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
 
   const getOrderArticle = (orders_products_id) => {
     const orderProductMark = productsOfOrders.find(
-      (el) => el.id === orders_products_id
+      (el) => el.id === orders_products_id,
     );
 
-    const order = list_of_orders.find((el) => el.id === orderProductMark?.order_id);
+    const order = list_of_orders.find(
+      (el) => el.id === orderProductMark?.order_id,
+    );
 
     return order?.article;
   };
@@ -63,7 +70,7 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
     const { id, free_quantity_remaining } = curr_warehouse;
 
     const reservedProduct = productsOfOrders.find(
-      (orderedProduct) => orderedProduct.id === el.orders_products_id
+      (orderedProduct) => orderedProduct.id === el.orders_products_id,
     );
     const new_remaining_stock = free_quantity_remaining + el.quantity;
 
@@ -74,13 +81,13 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
       updateOrderStatus({
         order_id: reservedProduct.order_id,
         status: 6,
-      })
+      }),
     );
   };
 
   useEffect(() => {
     const curr_res_prod_list = list_of_reserved_products.filter(
-      (el) => el?.warehouse_id == curr_warehouse.id
+      (el) => el?.warehouse_id == curr_warehouse.id,
     );
 
     setCurrentListOfResProd(curr_res_prod_list);
@@ -92,12 +99,14 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
     const result = productsOfOrders
       .filter((item) => {
         const haveReserve = list_of_reserved_products.find(
-          (el) => el.orders_products_id === item.id
+          (el) => el.orders_products_id === item.id,
         );
         return !haveReserve && item.product_id === wh.product_id;
       })
       .map((product) => {
-        const order = list_of_orders.find((order) => order.id === product.order_id);
+        const order = list_of_orders.find(
+          (order) => order.id === product.order_id,
+        );
         return {
           productsOfOrders_id: product.id,
           order_article: order ? order.article : '',
@@ -138,14 +147,15 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
           <div className="warehouseInfo">
             <span>Product article: {curr_warehouse.product_article}</span>
             <span>
-              Free products, {curr_warehouse?.type == 'OK' ? 'pallet' : 'blocks'}:{' '}
+              Free products,{' '}
+              {curr_warehouse?.type == 'OK' ? 'pallet' : 'blocks'}:{' '}
               {curr_warehouse.free_quantity_remaining}
             </span>
           </div>
           <div className="warehouseInfo">
             <span>Location: {curr_warehouse.warehouse_loc}</span>
           </div>
-          {userAccess?.canWrite && (
+          {/* {userAccess?.canWrite && (
             <Button
               style={{ marginBottom: '10px' }}
               color="primary"
@@ -159,7 +169,8 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
             >
               Reserve product
             </Button>
-          )}
+          )} */}
+          {curr_warehouse.type === 'Sorting' && <ShowSortingModal />}
           <FilesMain type={0} />
           <Table>
             <thead>
