@@ -495,14 +495,15 @@ const QualityManagementTable = () => {
         ) {
           await dispatch(deleteBatchOutside(production_plan_id));
         } else {
-          const batch = batchOutside.find((el) => el.id === production_plan_id);
-          await dispatch(
-            updateBatchOutside({
-              ...batch,
-              quantity_pallets:
-                total_quantity_plan - reserved_quantity_allocated,
-            }),
-          );
+          await dispatch(deleteBatchOutside(production_plan_id));
+          // const batch = batchOutside.find((el) => el.id === production_plan_id);
+          // await dispatch(
+          //   updateBatchOutside({
+          //     ...batch,
+          //     quantity_pallets:
+          //       total_quantity_plan - reserved_quantity_allocated,
+          //   }),
+          // );
         }
       }
     }
