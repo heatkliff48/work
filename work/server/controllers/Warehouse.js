@@ -202,7 +202,7 @@ class WarehouseController {
         upd_rem_srock,
       });
       myEmitter.emit(UPDATE_REMAINING_STOCK_SOCKET, updatedCake);
-      return res.status(200).json(upd_rem_srock);
+      return res.status(200).json(updatedCake);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

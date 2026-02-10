@@ -47,21 +47,25 @@ export const warehouseReducer = (warehouse = [], action) => {
         payload;
 
       const result = warehouse.map((el) => {
-        if (el.id == warehouse_id) {
-          const total_quantity = payload?.total_quantity
-            ? payload.total_quantity
-            : el.total_quantity || 0;
-
-          return {
-            ...el,
-            free_quantity_remaining,
-            ordered_quantity,
-            total_quantity,
-          };
-        }
-
+        if (el.id === payload[1].id) return payload[1];
         return el;
       });
+
+      //   if (el.id == warehouse_id) {
+      //     const total_quantity = payload?.total_quantity
+      //       ? payload.total_quantity
+      //       : el.total_quantity || 0;
+
+      //     return {
+      //       ...el,
+      //       free_quantity_remaining,
+      //       ordered_quantity,
+      //       total_quantity,
+      //     };
+      //   }
+
+      //   return el;
+      // });
       return result;
     }
 
