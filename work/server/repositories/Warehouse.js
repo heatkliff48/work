@@ -279,13 +279,16 @@ class WarehouseRepository {
         free_quantity_remaining,
         ordered_quantity,
         sorting,
+        batch_id,
       } = upd_rem_srock;
       console.log(
         '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRemainingStock upd_rem_srock',
         upd_rem_srock,
       );
 
-      const upd = sorting
+      const upd = batch_id
+        ? { batch_id }
+        : sorting
         ? {
             total_quantity: sorting,
             free_quantity_remaining,

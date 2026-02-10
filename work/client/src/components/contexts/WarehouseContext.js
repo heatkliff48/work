@@ -75,6 +75,11 @@ const WarehouseContextProvider = ({ children }) => {
       accessor: 'sorting',
       sortType: 'number',
     },
+    {
+      Header: 'Batch ID',
+      accessor: 'batch_id',
+      sortType: 'number',
+    },
   ];
 
   const COLUMNS_WAREHOUSE_AUX = [
