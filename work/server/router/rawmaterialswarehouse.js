@@ -364,7 +364,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
 
   console.log('======================= materials ======================', materials);
 
-  const round2 = (num) => Math.round(num * 100) / 100;
+  const round2 = (num) => (Math.round(num * 100) / 100).toFixed(2);
 
   if (!Array.isArray(materials) || materials.length === 0) {
     return res.status(400).json({
@@ -390,7 +390,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
   const onlySandSlurryDry = normMaterials.every(
     (m) => m.type === 'Sand slurry (dry)',
   );
-  console.log('normMaterials rawmaterialswarehouse.js line 393', normMaterials);
+
   const t = await sequelize.transaction();
   try {
     const today = new Date();
