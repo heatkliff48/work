@@ -34,6 +34,9 @@ module.exports = {
       sorting: {
         type: Sequelize.INTEGER,
       },
+      batch_id: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

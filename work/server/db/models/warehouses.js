@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       warehouse_loc: DataTypes.STRING,
       type: DataTypes.STRING,
       sorting: DataTypes.INTEGER,
+      batch_id: DataTypes.INTEGER,
     },
     {
       sequelize,
