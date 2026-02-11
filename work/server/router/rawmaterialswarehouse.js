@@ -11,6 +11,7 @@ const {
   WarehouseGrindingBalls,
   WarehouseAAC,
 } = require('../db/models/index.js');
+const { Sequelize } = require('sequelize');
 
 const myEmitter = require('../src/ee.js');
 const {
@@ -525,10 +526,18 @@ rawMaterialsWarehouseRouter.post('/sand', async (req, res) => {
 
     const totalSandQuantity = await WarehouseSand.sum('quantity');
 
-    const latestRecord = await WarehouseSand.findOne({
-      order: [['date', 'DESC']],
+    const allRecords = await WarehouseSand.findAll({
       attributes: ['date'],
     });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords.sort(
+      (a, b) => parseDate(b.date) - parseDate(a.date),
+    )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -638,10 +647,18 @@ rawMaterialsWarehouseRouter.post('/lime', async (req, res) => {
 
     const totalLimeQuantity = await WarehouseLime.sum('quantity');
 
-    const latestRecord = await WarehouseLime.findOne({
-      order: [['date', 'DESC']],
+    const allRecords = await WarehouseLime.findAll({
       attributes: ['date'],
     });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords.sort(
+      (a, b) => parseDate(b.date) - parseDate(a.date),
+    )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -747,10 +764,18 @@ rawMaterialsWarehouseRouter.post('/cement', async (req, res) => {
 
     const totalCementQuantity = await WarehouseCement.sum('quantity');
 
-    const latestRecord = await WarehouseCement.findOne({
-      order: [['date', 'DESC']],
+    const allRecords = await WarehouseCement.findAll({
       attributes: ['date'],
     });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords.sort(
+      (a, b) => parseDate(b.date) - parseDate(a.date),
+    )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -855,10 +880,18 @@ rawMaterialsWarehouseRouter.post('/gypsum', async (req, res) => {
 
     const totalGypsumQuantity = await WarehouseGypsum.sum('quantity');
 
-    const latestRecord = await WarehouseGypsum.findOne({
-      order: [['date', 'DESC']],
+    const allRecords = await WarehouseGypsum.findAll({
       attributes: ['date'],
     });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords.sort(
+      (a, b) => parseDate(b.date) - parseDate(a.date),
+    )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -963,10 +996,18 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone', async (req, res) => {
 
     const totalGypsumStoneQuantity = await WarehouseGypsumStone.sum('quantity');
 
-    const latestRecord = await WarehouseGypsumStone.findOne({
-      order: [['date', 'DESC']],
+    const allRecords = await WarehouseGypsumStone.findAll({
       attributes: ['date'],
     });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords.sort(
+      (a, b) => parseDate(b.date) - parseDate(a.date),
+    )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -1077,10 +1118,18 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
 
     const totalAluminum1Quantity = await WarehouseAluminum1.sum('quantity');
 
-    const latestRecord = await WarehouseAluminum1.findOne({
-      order: [['date', 'DESC']],
+    const allRecords = await WarehouseAluminum1.findAll({
       attributes: ['date'],
     });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords.sort(
+      (a, b) => parseDate(b.date) - parseDate(a.date),
+    )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -1186,10 +1235,18 @@ rawMaterialsWarehouseRouter.post('/aluminum2', async (req, res) => {
 
     const totalAluminum2Quantity = await WarehouseAluminum2.sum('quantity');
 
-    const latestRecord = await WarehouseAluminum2.findOne({
-      order: [['date', 'DESC']],
+    const allRecords = await WarehouseAluminum2.findAll({
       attributes: ['date'],
     });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords.sort(
+      (a, b) => parseDate(b.date) - parseDate(a.date),
+    )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -1297,10 +1354,18 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
       'quantity',
     );
 
-    const latestRecord = await WarehouseGrindingBalls.findOne({
-      order: [['date', 'DESC']],
+    const allRecords = await WarehouseGrindingBalls.findAll({
       attributes: ['date'],
     });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords.sort(
+      (a, b) => parseDate(b.date) - parseDate(a.date),
+    )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -1420,10 +1485,18 @@ rawMaterialsWarehouseRouter.post('/aac', async (req, res) => {
 
     const totalAACQuantity = await WarehouseAAC.sum('quantity');
 
-    const latestRecord = await WarehouseAAC.findOne({
-      order: [['date', 'DESC']],
+    const allRecords = await WarehouseAAC.findAll({
       attributes: ['date'],
     });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords.sort(
+      (a, b) => parseDate(b.date) - parseDate(a.date),
+    )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
