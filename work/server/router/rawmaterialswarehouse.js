@@ -226,7 +226,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
             remaining_quantity: sequelize.literal(
               `remaining_quantity - ${consumedQuantity}`,
             ),
-            last_updated: date,
+            // last_updated: date,
           },
           {
             where: { material_type: materialType },
