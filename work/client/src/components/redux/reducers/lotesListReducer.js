@@ -4,6 +4,7 @@ import {
   NEW_LOTES_LIST_SOCKET,
   UPD_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
   UPD_LOTES_LIST_CAKES_SOCKET,
+  UPD_LOTES_LIST_NOTE_SOCKET,
   UPD_LOTES_LIST_SOCKET,
 } from '../types/socketTypes/socket';
 
@@ -55,6 +56,15 @@ export const lotesListCakesReducer = (lotesListCakes = [], action) => {
       const result = lotesListCakes.map((el) => updatesById.get(el.id) ?? el);
 
       return result;
+    }
+
+    case UPD_LOTES_LIST_NOTE_SOCKET: {
+      const { id, note } = payload;
+      const updatedLotesList = lotesListCakes.map((el) => {
+        if (el.id === id) return { ...el, note };
+        return el;
+      });
+      return updatedLotesList;
     }
 
     default:

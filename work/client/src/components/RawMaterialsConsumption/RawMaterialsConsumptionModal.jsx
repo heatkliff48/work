@@ -411,7 +411,15 @@ const RawMaterialsConsumptionModal = React.memo(
         return { ...el, quantity: el.quantity.toFixed(2) };
       });
 
-      const body = { materials: fixed_materials };
+      const normMaterials = fixed_materials.filter(
+        (m) => m.type && Number.isFinite(m.quantity),
+      );
+
+      if (normMaterials.length !== 0) {
+        const body = { materials: fixed_materials };
+
+        dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
+      }
 
       dispatch(
         addNewMainRawMatConsumption({
@@ -442,7 +450,6 @@ const RawMaterialsConsumptionModal = React.memo(
 
       addProductOrder();
 
-      dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
       dispatch(
         addNewLotesList({ new_lotestList, new_batch: lotesListBatchesCheck }),
       );

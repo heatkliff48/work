@@ -12,9 +12,11 @@ import {
   UPDATE_LOTES_LIST,
   UPDATE_LOTES_LIST_CAKES,
   UPDATE_LOTES_LIST_CAKES_BOOLEAN,
+  UPDATE_LOTES_LIST_NOTES,
   UPD_LOTES_LIST,
   UPD_LOTES_LIST_CAKES,
   UPD_LOTES_LIST_CAKES_BOOLEAN,
+  UPD_LOTES_LIST_NOTES,
 } from '../types/lotesListTypes';
 import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
@@ -51,6 +53,18 @@ const addNewLotesList = (lotesListBatches) => {
 const updateLotesListRecipe = (lotesListBatches) => {
   return url
     .post('/lotesList/batches/update/recipe', lotesListBatches)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updateLotesListNotes = (lotesListBatches) => {
+  return url
+    .post('/lotesList/batches/update/notes', lotesListBatches)
     .then((res) => {
       return res.data;
     })
@@ -136,6 +150,14 @@ function* updateLotesListRecipeWorker(action) {
   }
 }
 
+function* updateLotesListNotesWorker(action) {
+  try {
+    yield call(updateLotesListNotes, action.payload);
+  } catch (err) {
+    yield put({ type: UPD_LOTES_LIST_NOTES, payload: [] });
+  }
+}
+
 function* getLotesListCakesWorker(action) {
   try {
     const result = yield call(getLotesListCakes);
@@ -176,6 +198,7 @@ function* lotesListWatcher() {
   yield takeLatest(GET_FULL_LOTES_LIST, getLotesListWorker);
   yield takeLatest(ADD_NEW_LOTES_LIST, addNewLotesListWorker);
   yield takeLatest(UPDATE_LOTES_LIST, updateLotesListRecipeWorker);
+  yield takeLatest(UPDATE_LOTES_LIST_NOTES, updateLotesListNotesWorker);
   //-----------------Lotes List Cakes------------------
   yield takeLatest(GET_FULL_LOTES_LIST_CAKES, getLotesListCakesWorker);
   yield takeLatest(ADD_NEW_LOTES_LIST_CAKES, addNewLotesListCakesWorker);

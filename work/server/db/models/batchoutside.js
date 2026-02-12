@@ -19,11 +19,12 @@ module.exports = (sequelize, DataTypes) => {
       position_in_autoclave: DataTypes.INTEGER,
       id_list_of_ordered_production: DataTypes.INTEGER,
       date: DataTypes.STRING,
+      is_prodused: DataTypes.INTEGER,
     },
     {
       sequelize,
       modelName: 'BatchOutside',
-    }
+    },
   );
   return BatchOutside;
 };

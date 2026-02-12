@@ -49,6 +49,7 @@ import ProductionBatchDesignerNew from '#components/ProductionBatchDesigner/Prod
 import RawMaterialsConsumption from '#components/RawMaterialsConsumption/RawMaterialsConsumption.jsx';
 import LotesList from '#components/LotesList/LotesList.jsx';
 import ClientsPriceInfo from '#components/Clients/ClientsPriceInfo/ClientsPriceInfo.jsx';
+import CackeFillUp from '#components/CackeFillUp/CackeFillUp.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -104,6 +105,7 @@ function App() {
             />
 
             <Route path="/orders" element={<OrdersTable />} />
+            <Route path="/cacke_fillup" element={<CackeFillUp />} />
             <Route path="/order_card" element={<OrderCart />} />
 
             <Route path="/products" element={<Products />} />

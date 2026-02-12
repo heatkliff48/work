@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
 
   LotesListsCakes.init(
     {
+      note: DataTypes.TEXT,
       no_alcanza_altura: DataTypes.BOOLEAN,
       marcas_de_medidicion_de_plasticidad: DataTypes.BOOLEAN,
       superficie_irregular: DataTypes.BOOLEAN,

@@ -14,6 +14,7 @@ const PATH_LABELS = {
   '/products_type_journal': 'Products Type Journal',
   '/statistics': 'Statistics',
   '/orders': 'Orders',
+  '/cacke_fillup': 'Cacke FillUp',
   '/accounting': 'Accounting',
   '/clients': 'Clients',
   '/warehouse_products_type': 'Warehouse',

@@ -6,6 +6,9 @@ export const NEW_LOTES_LIST = 'NEW_LOTES_LIST';
 
 export const UPDATE_LOTES_LIST = 'UPDATE_LOTES_LIST';
 export const UPD_LOTES_LIST = 'UPD_LOTES_LIST';
+
+export const UPDATE_LOTES_LIST_NOTES = 'UPDATE_LOTES_LIST_NOTES';
+export const UPD_LOTES_LIST_NOTES = 'UPD_LOTES_LIST_NOTES';
 //-----------------Lotes List Cakes------------------
 export const GET_FULL_LOTES_LIST_CAKES = 'GET_FULL_LOTES_LIST_CAKES';
 export const FULL_LOTES_LIST_CAKES = 'FULL_LOTES_LIST_CAKES';

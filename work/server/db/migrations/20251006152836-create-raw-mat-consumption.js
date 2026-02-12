@@ -18,6 +18,12 @@ module.exports = {
       production_volume: {
         type: Sequelize.INTEGER
       },
+      batch_id: {
+        type: Sequelize.INTEGER
+      },
+      cacke_id_start: {
+        type: Sequelize.INTEGER
+      },
       date: {
         type: Sequelize.STRING
       },

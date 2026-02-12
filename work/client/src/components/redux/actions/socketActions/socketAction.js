@@ -130,6 +130,7 @@ import {
   NEW_FILES_LOTES_LIST_SOCKET,
   NEED_DELETE_FILES_LOTES_LIST_SOCKET,
   UPDATE_NEW_RECIPE_SOCKET,
+  UPD_LOTES_LIST_NOTE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -1042,6 +1043,13 @@ export const addNewLotesListSocket = (lotesListBatches) => {
 export const updateLotesListSocket = (lotesListBatches) => {
   return {
     type: UPD_LOTES_LIST_SOCKET,
+    payload: lotesListBatches,
+  };
+};
+
+export const updateLotesListNoteSocket = (lotesListBatches) => {
+  return {
+    type: UPD_LOTES_LIST_NOTE_SOCKET,
     payload: lotesListBatches,
   };
 };
