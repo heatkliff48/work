@@ -122,14 +122,15 @@ function CackeFillUp() {
     );
   };
 
-  const handleSaveNote = () => {};
+  const handleSaveNote = () => {
+    dispatch(
+      updateLotesListNotes({
+        id: cackeFillUp.id,
+        note: cakeNotes,
+      }),
+    );
+  };
 
-  dispatch(
-    updateLotesListNotes({
-      id: cackeFillUp.id,
-      note: cakeNotes,
-    }),
-  );
   const hasCackeFillUp = cackeFillUp && Object.keys(cackeFillUp).length > 0;
 
   return (
