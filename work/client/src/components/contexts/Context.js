@@ -387,6 +387,7 @@ const ProjectContextProvider = ({ children }) => {
   const [isRepair, setIsRepair] = useState(false);
   const [stayDefault, setStayDefault] = useState(true);
 
+  const [cackeFillUp, setCackeFillUp] = useState({});
   const [currentClient, setCurrentClient] = useState({});
   const [clientsDataList, setClientsDataList] = useState([]);
   const [productCardData, setProductCardData] = useState({});
@@ -471,6 +472,9 @@ const ProjectContextProvider = ({ children }) => {
     }
   }, []);
 
+  const lotesListBatches = useSelector((state) => state.lotesListBatches);
+  const lotesListCakes = useSelector((state) => state.lotesListCakes);
+
   return (
     <ProjectContext.Provider
       value={{
@@ -497,6 +501,8 @@ const ProjectContextProvider = ({ children }) => {
         clients_contact_information_table,
         categoryOptions,
         priceCategoryOptions,
+        cackeFillUp,
+        setCackeFillUp,
         currentClient,
         setCurrentClient,
         currentDelivery,
@@ -524,6 +530,8 @@ const ProjectContextProvider = ({ children }) => {
         previewOperationName,
         setPreviewOperationName,
         getPageTitleByPath,
+        lotesListBatches,
+        lotesListCakes
       }}
     >
       {children}

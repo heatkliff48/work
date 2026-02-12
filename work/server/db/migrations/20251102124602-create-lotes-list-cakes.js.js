@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      note: {
+        type: Sequelize.TEXT,
+      },
       no_alcanza_altura: {
         type: Sequelize.BOOLEAN,
       },
@@ -92,7 +95,7 @@ module.exports = {
       issues_with_the_cake: { type: Sequelize.TEXT },
       issues_with_moving_the_mold: { type: Sequelize.TEXT },
       issues_with_position: { type: Sequelize.TEXT },
-      
+
       cutting_temperature: { type: Sequelize.TEXT },
       dimensions: { type: Sequelize.TEXT },
       issues_with_cake: { type: Sequelize.TEXT },
@@ -103,7 +106,6 @@ module.exports = {
       grid_number: { type: Sequelize.TEXT },
       waiting_tunnel_number: { type: Sequelize.TEXT },
       delays_before_autoclave: { type: Sequelize.TEXT },
-
 
       createdAt: {
         allowNull: false,

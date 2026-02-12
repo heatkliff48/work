@@ -142,6 +142,7 @@ const {
   ADD_NEW_FILES_LOTES_LIST_SOCKET,
   DELETE_FILES_LOTES_LIST_SOCKET,
   UPDATE_RECIPE_SOCKET,
+  UPDATE_LOTES_LIST_NOTE_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -1772,6 +1773,17 @@ function registerWsEmitter(map) {
       userConnect.send(
         JSON.stringify({
           type: UPDATE_LOTES_LIST_SOCKET,
+          payload: lotesListBatches,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_LOTES_LIST_NOTE_SOCKET, (lotesListBatches) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_LOTES_LIST_NOTE_SOCKET,
           payload: lotesListBatches,
         }),
       );

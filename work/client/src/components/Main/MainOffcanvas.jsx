@@ -120,6 +120,16 @@ function MainOffcanvas() {
               </Button>
             )}
 
+            <Button
+              className="custom-menu-button"
+              onClick={() => {
+                navigate('/cacke_fillup');
+                handleClose();
+              }}
+            >
+              Cacke FillUp
+            </Button>
+
             {checkUserAccess(user, roles, 'Warehouse')?.canRead && (
               <Button
                 className="custom-menu-button"
