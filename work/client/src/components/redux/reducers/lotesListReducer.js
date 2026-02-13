@@ -42,7 +42,23 @@ export const lotesListCakesReducer = (lotesListCakes = [], action) => {
     }
 
     case NEW_LOTES_LIST_CAKES_SOCKET: {
-      return [...lotesListCakes, ...payload];
+      const incoming = payload;
+      const incomingMap = incoming.reduce((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+      }, {});
+
+      const updated = lotesListCakes.map((item) =>
+        incomingMap[item.id] ? incomingMap[item.id] : item,
+      );
+
+      incoming.forEach((item) => {
+        if (!updated.some((existing) => existing.id === item.id)) {
+          updated.push(item);
+        }
+      });
+
+      return updated;
     }
 
     case DELETE_LAST_LOTES_LIST_CAKES_SOCKET: {
