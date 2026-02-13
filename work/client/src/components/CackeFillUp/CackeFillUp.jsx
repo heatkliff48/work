@@ -3,7 +3,7 @@ import { Button } from 'reactstrap';
 import CackeFillUpModal from './CackeFillUpModal';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addNewLotesListCakes } from '#components/redux/actions/lotesListAction.js';
 import { updateBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.js';
@@ -18,8 +18,11 @@ function CackeFillUp() {
   const { cackeFillUp, setCackeFillUp, lotesListBatches, lotesListCakes } =
     useProjectContext();
   const { latestProducts } = useProductsContext();
-  const { list_of_recipes, recipeOrders, raw_mat_consumption } = useRecipeContext();
+  const { list_of_recipes, recipeOrders } = useRecipeContext();
 
+  const raw_mat_consumption = useSelector((state) => state.rawMatConsumption);
+
+  const [nextBatchId, setNextBatchId] = useState(0);
   const [allocated, setAllocated] = useState(0);
   const [cakeIds, setCakeIds] = useState([]);
   const [finish, setFinish] = useState(false);
@@ -28,6 +31,7 @@ function CackeFillUp() {
   const [cakeNotes, setCakeNotes] = useState({});
 
   useEffect(() => {
+    setCackeFillUp({});
     setAllocated(0);
     setCakeIds([]);
     setFinish(false);
@@ -44,12 +48,14 @@ function CackeFillUp() {
       );
 
       const total_cacke = batch_in_produce.quantity_pallets / product?.widthInArray;
+
       setCackeFillUp({ ...batch_in_produce, total_cacke });
     }
   }, [batchOutside]);
 
-  const nextBatchId = useMemo(() => {
+  useEffect(() => {
     const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
+
     const maxIdLotes = list.reduce((acc, it) => {
       const v = Number(it?.batch_id);
       return Number.isFinite(v) ? Math.max(acc, v) : acc;
@@ -58,6 +64,7 @@ function CackeFillUp() {
     const listOfRawMat = Array.isArray(raw_mat_consumption)
       ? raw_mat_consumption
       : [];
+
     const maxIdRawMat = listOfRawMat.reduce((acc, it) => {
       const v = Number(it?.batch_id);
       return Number.isFinite(v) ? Math.max(acc, v) : acc;
@@ -65,8 +72,8 @@ function CackeFillUp() {
 
     const maxId = Math.max(maxIdLotes, maxIdRawMat);
 
-    return maxId + 1;
-  }, [lotesListBatches]);
+    setNextBatchId(maxId + 1);
+  }, [lotesListBatches, raw_mat_consumption]);
 
   const lastCakeId = useMemo(() => {
     const list = Array.isArray(lotesListCakes) ? lotesListCakes : [];
@@ -98,10 +105,6 @@ function CackeFillUp() {
 
     setAllocated((prev) => Math.max(0, prev - 1));
   };
-
-  useEffect(() => {
-    console.log('cakeIds CackeFillUp.jsx line 118', cakeIds);
-  }, [cakeIds]);
 
   const handleSave = () => {
     const { id } = cackeFillUp;
@@ -137,7 +140,11 @@ function CackeFillUp() {
     );
 
     setCackeFillUp({});
-
+    setAllocated(0);
+    setCakeIds([]);
+    setFinish(false);
+    setActiveCakeId(null);
+    setCakeNotes({});
     // handleSaveNote();
   };
 
