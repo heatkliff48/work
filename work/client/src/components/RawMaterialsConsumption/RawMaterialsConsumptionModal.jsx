@@ -22,13 +22,15 @@ const RawMaterialsConsumptionModal = React.memo(
     const {
       list_of_recipes = [],
       main_raw_mat_consumption,
-      lotesListBatchesCheck,
-      setLotesListCheck,
+      raw_mat_consumption,
+      // lotesListBatchesCheck,
+      // setLotesListCheck,
     } = useRecipeContext();
     const { latestProducts } = useProductsContext();
-    const { raw_materials_warehouse = [], warehouse_data } = useWarehouseContext();
 
     const { setMainRawMaterialConsumptionMadal } = useModalContext();
+    const { raw_materials_warehouse = [], warehouse_data } = useWarehouseContext();
+
     const dispatch = useDispatch();
 
     const [form, setForm] = useState({});
@@ -47,7 +49,7 @@ const RawMaterialsConsumptionModal = React.memo(
       setWastedMode('default');
       setProductionVolume('');
       setConfirmFlag(false);
-      setLotesListCheck(true);
+      // setLotesListCheck(true);
       setGovno(false);
     }, []);
 
@@ -149,9 +151,49 @@ const RawMaterialsConsumptionModal = React.memo(
       }
     };
 
+    // const handlePvChange = (e) => {
+    //   const v = e.target.value;
+    //   if (v === '' || /^-?\d*\.?\d*$/.test(v)) setProductionVolume(v);
+    // };
+
     const handlePvChange = (e) => {
       const v = e.target.value;
-      if (v === '' || /^-?\d*\.?\d*$/.test(v)) setProductionVolume(v);
+
+      if (!(v === '' || /^-?\d*\.?\d*$/.test(v))) return;
+
+      const currentValue = Number(v || 0);
+
+      const rawRecord = raw_mat_consumption?.find(
+        (r) =>
+          String(r.recipe_article) === String(selectedRow?.recipe_article) &&
+          String(r.batch_article) === String(selectedRow?.batch_article) &&
+          String(r.batch_id) === String(selectedRow?.batch_id),
+      );
+
+      if (!rawRecord) {
+        setProductionVolume(v);
+        return;
+      }
+
+      const limitVolume = Number(rawRecord.production_volume || 0);
+
+      const alreadyUsed = (main_raw_mat_consumption || [])
+        .filter(
+          (r) =>
+            String(r.recipe_article) === String(selectedRow?.recipe_article) &&
+            String(r.batch_article) === String(selectedRow?.batch_article) &&
+            String(r.batch_id) === String(selectedRow?.batch_id),
+        )
+        .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
+
+      const maxAllowed = Math.max(limitVolume - alreadyUsed, 0);
+
+      if (currentValue > maxAllowed) {
+        setProductionVolume(maxAllowed.toString());
+        return;
+      }
+
+      setProductionVolume(v);
     };
 
     const pvNumber = useMemo(
@@ -451,9 +493,32 @@ const RawMaterialsConsumptionModal = React.memo(
       addProductOrder();
 
       dispatch(
-        addNewLotesList({ new_lotestList, new_batch: lotesListBatchesCheck }),
+        addNewLotesList({
+          new_lotestList,
+          new_batch: false,
+        }),
       );
-      if (confirmFlag) dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+
+      const rawRecord = raw_mat_consumption?.find(
+        (r) =>
+          String(r.recipe_article) === String(selectedRow?.recipe_article) &&
+          String(r.batch_article) === String(selectedRow?.batch_article) &&
+          String(r.batch_id) === String(selectedRow?.batch_id),
+      );
+
+      const bd_volume = Number(rawRecord.production_volume || 0);
+
+      const alreadyUsed = (main_raw_mat_consumption || [])
+        .filter(
+          (r) =>
+            String(r.recipe_article) === String(selectedRow?.recipe_article) &&
+            String(r.batch_article) === String(selectedRow?.batch_article) &&
+            String(r.batch_id) === String(selectedRow?.batch_id),
+        )
+        .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
+
+      if (alreadyUsed == bd_volume)
+        dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
 
       setMainRawMaterialConsumptionMadal(false);
       toggle();
@@ -755,7 +820,7 @@ const RawMaterialsConsumptionModal = React.memo(
             </ModalBody>
 
             <ModalFooter className="d-flex justify-content-between">
-              <div className="d-flex align-items-center gap-2">
+              {/* <div className="d-flex align-items-center gap-2">
                 <input
                   id="confirm-checkbox"
                   className="form-check-input"
@@ -766,7 +831,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 <label className="form-check-label" htmlFor="confirm-checkbox">
                   Production batch completed
                 </label>
-              </div>
+              </div> */}
               <div className="d-flex align-items-center gap-2">
                 <input
                   id="warehouse-checkbox"
@@ -779,7 +844,7 @@ const RawMaterialsConsumptionModal = React.memo(
                   All to return slurry
                 </label>
               </div>
-              <div className="d-flex align-items-center gap-2">
+              {/* <div className="d-flex align-items-center gap-2">
                 <input
                   id="warehouse-checkbox"
                   className="form-check-input"
@@ -790,7 +855,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 <label className="form-check-label" htmlFor="warehouse-checkbox">
                   New batch
                 </label>
-              </div>
+              </div> */}
 
               <div className="d-flex gap-2">
                 <button className="btn btn-outline-secondary" onClick={toggle}>
