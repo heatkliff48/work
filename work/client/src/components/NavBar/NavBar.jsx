@@ -196,6 +196,11 @@ export default function NavBar() {
             icon: rawMatCalIcon,
           },
           {
+            title: 'Cacke fillup',
+            path: '/cacke_fillup',
+            icon: technologyPlannerIcon,
+          },
+          {
             title: 'Raw material consumption',
             path: '/raw_material_consumption',
             icon: rawMatConsIcon,
