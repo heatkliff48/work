@@ -131,6 +131,7 @@ import {
   NEED_DELETE_FILES_LOTES_LIST_SOCKET,
   UPDATE_NEW_RECIPE_SOCKET,
   UPD_LOTES_LIST_NOTE_SOCKET,
+  DELETE_LAST_LOTES_LIST_CAKES_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -1036,6 +1037,13 @@ export const deleteWarehouseAACSocket = (aac_warehouse_id) => {
 export const addNewLotesListSocket = (lotesListBatches) => {
   return {
     type: NEW_LOTES_LIST_SOCKET,
+    payload: lotesListBatches,
+  };
+};
+
+export const deleteLotesListSocket = (lotesListBatches) => {
+  return {
+    type: DELETE_LAST_LOTES_LIST_CAKES_SOCKET,
     payload: lotesListBatches,
   };
 };

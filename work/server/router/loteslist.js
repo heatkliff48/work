@@ -1,5 +1,5 @@
 const lotesListRouter = require('express').Router();
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const {
   LotesListsBatches,
   LotesListsCakes,
@@ -13,6 +13,7 @@ const {
   UPDATE_LOTES_LIST_CAKES_SOCKET,
   UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
   UPDATE_LOTES_LIST_NOTE_SOCKET,
+  DELETE_LOTES_LIST_CAKES_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 
@@ -123,13 +124,13 @@ lotesListRouter.post('/batches', async (req, res) => {
       sand_dry,
     });
 
-    const lotesListCakesArray = [];
-    for (let i = cake_id_start; i <= cake_id_finish; i++) {
-      const res = await LotesListsCakes.create({});
-      lotesListCakesArray.push(res);
-    }
+    // const lotesListCakesArray = [];
+    // for (let i = cake_id_start; i <= cake_id_finish; i++) {
+    //   const res = await LotesListsCakes.create({});
+    //   lotesListCakesArray.push(res);
+    // }
 
-    myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, lotesListCakesArray);
+    // myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, lotesListCakesArray);
     myEmitter.emit(ADD_NEW_LOTES_LIST_SOCKET, lotesListBatches);
     return res.status(200).json(lotesListBatches);
   } catch (err) {
@@ -168,13 +169,12 @@ lotesListRouter.post('/batches/update/recipe', async (req, res) => {
 });
 
 lotesListRouter.post('/batches/update/notes', async (req, res) => {
-  const { id, note } = req.body;
-
+  const [noteId, note] = Object.entries(req.body)[0];
   try {
     const [count, rows] = await LotesListsCakes.update(
       { note },
       {
-        where: { id },
+        where: { id: Number(noteId) },
         returning: true,
       },
     );
@@ -334,6 +334,30 @@ lotesListRouter.post('/cakes/update/boolean/recipe', async (req, res) => {
     if (updatedRows.length === 0) {
       return res.status(404).json({ error: 'No records updated' });
     }
+
+    return res.status(200);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+lotesListRouter.post('/cakes/delete', async (req, res) => {
+  try {
+    const { num } = req.body;
+
+    const lastRecords = await LotesListsCakes.findAll({
+      order: [['id', 'DESC']],
+      limit: num,
+    });
+
+    for (const record of lastRecords) {
+      await record.destroy();
+    }
+
+    const lotesListCakesArray = await LotesListsCakes.findAll();
+
+    myEmitter.emit(DELETE_LOTES_LIST_CAKES_SOCKET, lotesListCakesArray);
 
     return res.status(200);
   } catch (err) {

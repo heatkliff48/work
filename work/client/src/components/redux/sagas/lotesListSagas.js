@@ -3,6 +3,8 @@ import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_LOTES_LIST,
   ADD_NEW_LOTES_LIST_CAKES,
+  DELETE_LAST_LOTES_LIST_CAKES,
+  DELETE_LOTES_LIST_CAKES,
   FULL_LOTES_LIST,
   FULL_LOTES_LIST_CAKES,
   GET_FULL_LOTES_LIST,
@@ -122,6 +124,18 @@ const updateLotesListCakesBooleanRecipe = (lotesListCakes) => {
     });
 };
 
+const deleteLotesListCakes = (lotesListCakes) => {
+  return url
+    .post('/lotesList/cakes/delete', lotesListCakes)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 function* getLotesListWorker(action) {
   try {
     const { lotesListBatches } = yield call(getLotesList);
@@ -192,6 +206,14 @@ function* updateLotesListCakesBooleanRecipeWorker(action) {
   }
 }
 
+function* deleteLotesListCakesWorker(action) {
+  try {
+    yield call(deleteLotesListCakes, action.payload);
+  } catch (err) {
+    yield put({ type: DELETE_LOTES_LIST_CAKES, payload: [] });
+  }
+}
+
 // watchers
 
 function* lotesListWatcher() {
@@ -205,8 +227,9 @@ function* lotesListWatcher() {
   yield takeLatest(UPDATE_LOTES_LIST_CAKES, updateLotesListCakesRecipeWorker);
   yield takeLatest(
     UPDATE_LOTES_LIST_CAKES_BOOLEAN,
-    updateLotesListCakesBooleanRecipeWorker
+    updateLotesListCakesBooleanRecipeWorker,
   );
+  yield takeLatest(DELETE_LAST_LOTES_LIST_CAKES, deleteLotesListCakesWorker);
 }
 
 export default lotesListWatcher;

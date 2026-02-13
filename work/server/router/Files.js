@@ -3,7 +3,7 @@ const {
   FilesOrder,
   FilesProduct,
   FilesWarehouse,
-  FilesListeLists,
+  FilesLotesLists,
 } = require('../db/models/index.js');
 const myEmitter = require('../src/ee.js');
 const {
@@ -18,7 +18,7 @@ filesRouter.get('/lotesList', async (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>filesRouter post');
 
   try {
-    const filesLotes = await FilesListeLists.findAll({
+    const filesLotes = await FilesLotesLists.findAll({
       order: [['id', 'ASC']],
     });
 
@@ -74,7 +74,7 @@ filesRouter.post('/', async (req, res) => {
       case 'lotesList':
         const { lotesList_id } = req.body;
 
-        const filesLotesList = await FilesListeLists.create({
+        const filesLotesList = await FilesLotesLists.create({
           lotesList_id,
           file_name,
         });

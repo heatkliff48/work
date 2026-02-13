@@ -1,5 +1,6 @@
 import { FULL_LOTES_LIST, FULL_LOTES_LIST_CAKES } from '../types/lotesListTypes';
 import {
+  DELETE_LAST_LOTES_LIST_CAKES_SOCKET,
   NEW_LOTES_LIST_CAKES_SOCKET,
   NEW_LOTES_LIST_SOCKET,
   UPD_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
@@ -20,7 +21,6 @@ export const lotesListBatchesReducer = (lotesListBatches = [], action) => {
     }
 
     case UPD_LOTES_LIST_SOCKET: {
-      console.log('UPD_LOTES_LIST_SOCKET payload', payload);
       const { id } = payload;
       const updatedLotesList = lotesListBatches.map((el) => {
         if (el.id === id) return payload;
@@ -43,6 +43,10 @@ export const lotesListCakesReducer = (lotesListCakes = [], action) => {
 
     case NEW_LOTES_LIST_CAKES_SOCKET: {
       return [...lotesListCakes, ...payload];
+    }
+
+    case DELETE_LAST_LOTES_LIST_CAKES_SOCKET: {
+      return payload;
     }
 
     case UPD_LOTES_LIST_CAKES_BOOLEAN_SOCKET:

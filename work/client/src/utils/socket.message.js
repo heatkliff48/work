@@ -131,6 +131,7 @@ import {
   deleteFilesLotesListSocket,
   updateRecipeSocket,
   updateLotesListNoteSocket,
+  deleteLotesListSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -307,6 +308,7 @@ import {
   DELETE_FILES_LOTES_LIST_SOCKET,
   UPDATE_RECIPE_SOCKET,
   UPDATE_LOTES_LIST_NOTE_SOCKET,
+  DELETE_LOTES_LIST_CAKES_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -869,6 +871,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_LOTES_LIST_SOCKET:
       dispatch(addNewLotesListSocket(payload));
+      break;
+
+    case DELETE_LOTES_LIST_CAKES_SOCKET:
+      dispatch(deleteLotesListSocket(payload));
       break;
 
     case UPDATE_LOTES_LIST_SOCKET:
