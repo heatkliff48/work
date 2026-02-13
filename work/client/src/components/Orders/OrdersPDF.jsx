@@ -99,7 +99,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfDryMixes?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
             [
               'Ref.:',
@@ -134,7 +136,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfAnchor?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
             [
               'Ref.:',
@@ -169,9 +173,17 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfTools?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
-            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
+            [
+              'Ref.:',
+              'Descripción',
+              'Total, Ud',
+              'PVP neto €/Ud',
+              'Subtotal €',
+            ],
           ],
           body: pdfData.pdfTools?.map((item) => [
             item.ref,
@@ -190,9 +202,17 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfRelMat?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
-            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
+            [
+              'Ref.:',
+              'Descripción',
+              'Total, Ud',
+              'PVP neto €/Ud',
+              'Subtotal €',
+            ],
           ],
           body: pdfData.pdfRelMat?.map((item) => [
             item.ref,
@@ -266,7 +286,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
   useEffect(() => {
     console.log('🔄 Данные заказа обновлены:', orderData);
-    const { deliveryAddress, contactInfo, owner, article, delivery } = orderData;
+    const { deliveryAddress, contactInfo, owner, article, delivery } =
+      orderData;
 
     const today = new Date();
     const nextMonthDate = new Date(today);
@@ -328,7 +349,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
     const pdfProducts = productList?.products?.map((prod) => {
       const product = latestProducts.find(
-        (el) => el.article == prod.product_article
+        (el) => el.article == prod.product_article,
       );
 
       const descripcion = `BAUBLOCK®${
@@ -337,9 +358,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         product?.density
       }kg/m³`;
 
-      const total = (prod.quantity_palet * product?.quantityBlockOnPallet).toFixed(
-        0
-      );
+      const total = (
+        prod.quantity_palet * product?.quantityBlockOnPallet
+      ).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
@@ -369,7 +390,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const totalSacos = (quantity * sacos).toFixed(0);
 
-      const totalKg = (prod.quantity_palet_dry * dryMixes?.pallet_weight).toFixed(0);
+      const totalKg = (
+        prod.quantity_palet_dry * dryMixes?.pallet_weight
+      ).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(2);
 
@@ -433,7 +456,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
     const pdfRelMat = productList?.related_materials?.map((prod) => {
       const pdfRelMat = relatedMaterialsJournal.find(
-        (el) => el.id == prod.rel_mat_id
+        (el) => el.id == prod.rel_mat_id,
       );
 
       const total = prod.total;
@@ -484,11 +507,45 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
     if (doc) doc.save('presupuesto.pdf');
   };
 
+  const sendToBitrix = async () => {
+    try {
+      const doc = await generatePDF();
+
+      if (doc) {
+        const pdfBlob = doc.output('blob');
+        const formData = new FormData();
+        formData.append('file', pdfBlob, 'presupuesto.pdf');
+
+        // // Добавляем дополнительные поля, если нужно
+        // formData.append('title', 'Смета');
+        // formData.append('createdBy', '1'); // ID пользователя
+
+        const response = await fetch(
+          'https://httpbin.org/post', //'https://ваш-портал.bitrix24.ru/rest/1/ВАШ_ТОКЕН/disk.folder.uploadfile?folderId=ВАШ_ID_ПАПКИ',
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+
+        if (response.ok) {
+          alert('PDF has been sent successfully');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error:', error);
+    }
+  };
+
   return (
     <div>
       {pdfUrl && (
         <div>
           <button onClick={downloadPDF}>Скачать PDF</button>
+          <button onClick={sendToBitrix} style={{ marginLeft: '10px' }}>
+            Send to Bitrix24
+          </button>
         </div>
       )}
     </div>
