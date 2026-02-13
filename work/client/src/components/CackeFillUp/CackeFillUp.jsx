@@ -48,38 +48,6 @@ function CackeFillUp() {
     }
   }, [batchOutside]);
 
-  useEffect(() => {
-    if (lotesListCakes && lotesListCakes.length > 0) {
-      const ids = lotesListCakes.map((cake) => cake.id);
-      setCakeIds(ids);
-      setAllocated(ids.length);
-
-      // Заполняем cakeNotes из существующих заметок
-      const notes = {};
-      lotesListCakes.forEach((cake) => {
-        if (cake.note) {
-          notes[cake.id] = cake.note;
-        }
-      });
-      setCakeNotes(notes);
-    } else {
-      setCakeIds([]);
-      setAllocated(0);
-      setCakeNotes({});
-    }
-  }, [lotesListCakes]);
-
-  useEffect(() => {
-    if (lotesListCakes && lotesListCakes.length > 0) {
-      const ids = lotesListCakes.map((cake) => cake.id);
-      setCakeIds(ids);
-      setAllocated(ids.length);
-    } else {
-      setCakeIds([]);
-      setAllocated(0);
-    }
-  }, [lotesListCakes]);
-
   const nextBatchId = useMemo(() => {
     const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
     const maxIdLotes = list.reduce((acc, it) => {
@@ -167,6 +135,8 @@ function CackeFillUp() {
         date: cackeFillUp.date,
       }),
     );
+
+    setCackeFillUp({});
 
     // handleSaveNote();
   };
