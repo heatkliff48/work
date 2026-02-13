@@ -168,31 +168,6 @@ lotesListRouter.post('/batches/update/recipe', async (req, res) => {
   }
 });
 
-lotesListRouter.post('/batches/update/notes', async (req, res) => {
-  const [noteId, note] = Object.entries(req.body)[0];
-  try {
-    const [count, rows] = await LotesListsCakes.update(
-      { note },
-      {
-        where: { id: Number(noteId) },
-        returning: true,
-      },
-    );
-
-    if (count === 0) {
-      return res.status(404).json({ error: 'Record not found' });
-    }
-
-    const updatedLotes = rows[0];
-
-    myEmitter.emit(UPDATE_LOTES_LIST_NOTE_SOCKET, updatedLotes);
-    return res.status(200);
-  } catch (err) {
-    console.error(err.message);
-    return res.status(500).json({ error: err.message });
-  }
-});
-
 lotesListRouter.get('/cakes', async (req, res) => {
   try {
     const lotesListCakes = await LotesListsCakes.findAll({
@@ -207,17 +182,42 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes', async (req, res) => {
   try {
-    const { num } = req.body;
+    const { num: ids, note } = req.body;
 
-    const lotesListCakesArray = [];
-    for (let i = 0; i < num; i++) {
-      const res = await LotesListsCakes.create({});
-      lotesListCakesArray.push(res);
+    if (!Array.isArray(ids)) {
+      return res.status(400).json({ error: 'num must be an array of ids' });
     }
 
-    myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, lotesListCakesArray);
+    if (
+      note !== undefined &&
+      (typeof note !== 'object' || Array.isArray(note) || note === null)
+    ) {
+      return res.status(400).json({ error: 'note must be an object' });
+    }
 
-    return res.status(200);
+    const result = [];
+
+    for (const id of ids) {
+      const numericId = Number(id);
+      if (isNaN(numericId)) continue;
+
+      let record = await LotesListsCakes.findByPk(numericId);
+
+      if (record) {
+        if (note && note[id] !== undefined) {
+          record.note = note[id];
+          await record.save();
+        }
+        result.push(record);
+      } else {
+        const created = await LotesListsCakes.create({});
+        result.push(created);
+      }
+    }
+
+    myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, result);
+
+    return res.status(200).json(result);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json({ error: err.message });
