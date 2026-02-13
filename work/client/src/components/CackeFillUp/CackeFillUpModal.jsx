@@ -279,9 +279,7 @@ function CackeFillUpModal({ show, onHide }) {
                   <Col key={el.id}>
                     <div className="md:flex md:items-center mb-6">
                       <div className="md:w-1/3">
-                        <label
-                          className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
-                        >
+                        <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
                           {el.Header}
                         </label>
                       </div>
@@ -344,13 +342,14 @@ function CackeFillUpModal({ show, onHide }) {
             </Button>
           </>
         ) : (
-          <Button
-            variant="info"
-            className="me-auto"
-            onClick={() => setCustomBatchSelect(true)}
-          >
-            Add custom batch dialog
-          </Button>
+          <></>
+          // <Button
+          //   variant="info"
+          //   className="me-auto"
+          //   onClick={() => setCustomBatchSelect(true)}
+          // >
+          //   Add custom batch dialog
+          // </Button>
         )}
 
         <Button onClick={onHide}>Close</Button>

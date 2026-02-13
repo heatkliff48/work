@@ -6,6 +6,7 @@ import { useProjectContext } from '#components/contexts/Context.js';
 import { useDispatch } from 'react-redux';
 import {
   addNewLotesListCakes,
+  deleteLotesListCakes,
   updateLotesListNotes,
 } from '#components/redux/actions/lotesListAction.js';
 import { updateBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
@@ -21,14 +22,17 @@ function CackeFillUp() {
   const { cackeFillUp, setCackeFillUp, lotesListBatches, lotesListCakes } =
     useProjectContext();
   const { latestProducts } = useProductsContext();
-  const { list_of_recipes, recipeOrders } = useRecipeContext();
+  const { list_of_recipes, recipeOrders, raw_mat_consumption } = useRecipeContext();
 
-  const [allocated, setAllocated] = useState(0);
-  const [cakeIds, setCakeIds] = useState([]);
+  // const [allocated, setAllocated] = useState(0);
+  // const [cakeIds, setCakeIds] = useState([]);
   const [finish, setFinish] = useState(false);
 
   const [activeCakeId, setActiveCakeId] = useState(null);
   const [cakeNotes, setCakeNotes] = useState({});
+
+  const cakes = lotesListCakes || [];
+  const allocated = cakes.length;
 
   useEffect(() => {
     const batch_in_produce = batchOutside.find((el) => el.is_prodused == 1);
@@ -44,30 +48,52 @@ function CackeFillUp() {
   }, [batchOutside]);
 
   useEffect(() => {
-    setAllocated(0);
-    setCakeIds([]);
+    // setAllocated(0);
+    // setCakeIds([]);
     setFinish(false);
     setActiveCakeId(null);
     setCakeNotes({});
   }, []);
 
+  // useEffect(() => {
+  //   if (lotesListCakes && lotesListCakes.length > 0) {
+  //     const ids = lotesListCakes.map((cake) => cake.id);
+  //     setCakeIds(ids);
+  //     setAllocated(ids.length);
+  //   } else {
+  //     setCakeIds([]);
+  //     setAllocated(0);
+  //   }
+  // }, [lotesListCakes]);
+
   const nextBatchId = useMemo(() => {
     const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
-    const maxId = list.reduce((acc, it) => {
+    const maxIdLotes = list.reduce((acc, it) => {
       const v = Number(it?.batch_id);
       return Number.isFinite(v) ? Math.max(acc, v) : acc;
     }, 0);
+
+    const listOfRawMat = Array.isArray(raw_mat_consumption)
+      ? raw_mat_consumption
+      : [];
+    const maxIdRawMat = listOfRawMat.reduce((acc, it) => {
+      const v = Number(it?.batch_id);
+      return Number.isFinite(v) ? Math.max(acc, v) : acc;
+    }, 0);
+
+    const maxId = Math.max(maxIdLotes, maxIdRawMat);
+
     return maxId + 1;
   }, [lotesListBatches]);
 
-  const lastCakeId = useMemo(() => {
-    const list = Array.isArray(lotesListCakes) ? lotesListCakes : [];
-    const maxId = list.reduce((acc, it) => {
-      const v = Number(it?.id);
-      return Number.isFinite(v) ? Math.max(acc, v) : acc;
-    }, 0);
-    return maxId;
-  }, [lotesListCakes]);
+  // const lastCakeId = useMemo(() => {
+  //   const list = Array.isArray(lotesListCakes) ? lotesListCakes : [];
+  //   const maxId = list.reduce((acc, it) => {
+  //     const v = Number(it?.id);
+  //     return Number.isFinite(v) ? Math.max(acc, v) : acc;
+  //   }, 0);
+  //   return maxId;
+  // }, [lotesListCakes]);
 
   const totalCake =
     Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) || 0;
@@ -77,22 +103,29 @@ function CackeFillUp() {
   const handlePlus = () => {
     if (totalCake > 0 && allocated >= totalCake) return;
 
-    const newId = lastCakeId + cakeIds.length + 1;
-    setCakeIds((prev) => [...prev, newId]);
-    setAllocated((prev) => prev + 1);
+    // const newId = lastCakeId + cakeIds.length + 1;
+    // setCakeIds((prev) => [...prev, newId]);
+    // setAllocated((prev) => prev + 1);
+
+    dispatch(addNewLotesListCakes({ num: 1 }));
   };
 
   const handleMinus = () => {
-    setCakeIds((prev) => {
-      if (!prev.length) return prev;
-      return prev.slice(0, -1);
-    });
-    setAllocated((prev) => Math.max(0, prev - 1));
+    // setCakeIds((prev) => {
+    //   if (!prev.length) return prev;
+    //   return prev.slice(0, -1);
+    // });
+    // setAllocated((prev) => Math.max(0, prev - 1));
+
+    dispatch(deleteLotesListCakes({ num: 1 }));
   };
+
+  useEffect(() => {
+    console.log('lotesListCakes CackeFillUp.jsx line 123', lotesListCakes);
+  }, [lotesListCakes]);
 
   const handleSave = () => {
     const { id } = cackeFillUp;
-    dispatch(addNewLotesListCakes({ num: cakeIds.length }));
 
     if (!finish) {
       dispatch(
@@ -103,7 +136,7 @@ function CackeFillUp() {
       );
     }
 
-    const cacke_id_start = cakeIds[cakeIds.length - 1];
+    const cacke_id_start = cakes[cakes.length - 1];
 
     const recipe = recipeOrders.find((recipe) => recipe.id_batch === id);
 
@@ -116,6 +149,7 @@ function CackeFillUp() {
         batch_id: nextBatchId,
         production_volume: allocated,
         recipe_article: recipeDetails?.article,
+        batch_article: cackeFillUp?.product_article,
         cacke_id_start,
         date: cackeFillUp.date,
       }),
@@ -123,12 +157,7 @@ function CackeFillUp() {
   };
 
   const handleSaveNote = () => {
-    dispatch(
-      updateLotesListNotes({
-        id: cackeFillUp.id,
-        note: cakeNotes,
-      }),
-    );
+    dispatch(updateLotesListNotes(cakeNotes));
   };
 
   const hasCackeFillUp = cackeFillUp && Object.keys(cackeFillUp).length > 0;
@@ -206,7 +235,8 @@ function CackeFillUp() {
           <div className="mt-3">
             <div style={{ fontWeight: 600 }}>Cacke id</div>
             <div style={{ marginTop: 8, display: 'grid', gap: 4 }}>
-              {cakeIds.map((id) => {
+              {cakes.map((cake) => {
+                const id = cake.id;
                 const isActive = activeCakeId === id;
 
                 return (

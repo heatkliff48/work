@@ -1,6 +1,7 @@
 import {
   ADD_NEW_LOTES_LIST,
   ADD_NEW_LOTES_LIST_CAKES,
+  DELETE_LAST_LOTES_LIST_CAKES,
   GET_FULL_LOTES_LIST,
   GET_FULL_LOTES_LIST_CAKES,
   UPDATE_LOTES_LIST,
@@ -63,3 +64,11 @@ export const updateLotesListCakesBooleanRecipe = (lotesListBatches) => {
     payload: lotesListBatches,
   };
 };
+
+export const deleteLotesListCakes = (lotesListBatches) => {
+  return {
+    type: DELETE_LAST_LOTES_LIST_CAKES,
+    payload: lotesListBatches,
+  };
+};
+

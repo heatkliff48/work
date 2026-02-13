@@ -174,7 +174,7 @@ const OrderCart = React.memo(() => {
       'bitrix_id',
       'bitrix_client_id',
     ],
-    []
+    [],
   );
 
   const haveShipDate = useMemo(() => {
@@ -202,7 +202,7 @@ const OrderCart = React.memo(() => {
             </div>
           );
         }),
-    [orderCartData]
+    [orderCartData],
   );
 
   const handleDateChange = useCallback(
@@ -220,7 +220,7 @@ const OrderCart = React.memo(() => {
       });
       setFormatDataValue(formattedDate);
     },
-    [dataValue]
+    [dataValue],
   );
 
   const onEditHandler = () => {
@@ -257,7 +257,7 @@ const OrderCart = React.memo(() => {
       addSecondaryContact({
         secondary_contact: secCnt,
         order_id: orderCartData.id,
-      })
+      }),
     );
 
     setIsAddSecCont(false);
@@ -287,10 +287,10 @@ const OrderCart = React.memo(() => {
                   arrayName == 'products'
                     ? product.description
                     : arrayName == 'tools' || arrayName == 'related_materials'
-                    ? `${product?.name}`
-                    : arrayName == 'anchors'
-                    ? `${product?.name} Sacos de ${product?.pallet_weight}kg`
-                    : `${product?.name} BAUBLOCK Sacos de ${product?.pallet_weight}kg`,
+                      ? `${product?.name}`
+                      : arrayName == 'anchors'
+                        ? `${product?.name} Sacos de ${product?.pallet_weight}kg`
+                        : `${product?.name} BAUBLOCK Sacos de ${product?.pallet_weight}kg`,
                 ...orderProduct,
               }
             : { ...orderProduct, product_article: 'Unknown' };
@@ -298,14 +298,14 @@ const OrderCart = React.memo(() => {
 
       return updatedOrderProducts;
     },
-    [orderCartData?.id] // Добавляем зависимость
+    [orderCartData?.id], // Добавляем зависимость
   );
 
   const updatedProductListOrder = useMemo(() => {
     return addProductArticleToOrderList(
       productsOfOrders,
       latestProducts,
-      'products'
+      'products',
     );
   }, [productsOfOrders, latestProducts, addProductArticleToOrderList]);
 
@@ -322,7 +322,7 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       dryMixedProductsOfOrders,
       latestDryMix,
-      'dryMixes'
+      'dryMixes',
     );
   }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
 
@@ -340,7 +340,7 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       anchorProductsOfOrders,
       latestAnchors,
-      'anchors'
+      'anchors',
     );
   }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
 
@@ -370,7 +370,7 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       relMatProductsOfOrders,
       latestRelatedMaterials,
-      'related_materials'
+      'related_materials',
     );
   }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
 
@@ -396,14 +396,14 @@ const OrderCart = React.memo(() => {
         sel_prod.product_article.slice(2, 3) == 'N'
           ? latestProducts.find((el) => el.article === sel_prod.product_article)
           : sel_prod.product_article.slice(2, 3) == 'M'
-          ? latestDryMix.find((el) => el.article === sel_prod.product_article)
-          : sel_prod.product_article.slice(2, 3) == 'P'
-          ? latestRelatedMaterials.find(
-              (el) => el.article === sel_prod.product_article
-            )
-          : sel_prod.product_article.slice(2, 3) == 'F'
-          ? latestAnchors.find((el) => el.article === sel_prod.product_article)
-          : latestTools.find((el) => el.article === sel_prod.product_article);
+            ? latestDryMix.find((el) => el.article === sel_prod.product_article)
+            : sel_prod.product_article.slice(2, 3) == 'P'
+              ? latestRelatedMaterials.find(
+                  (el) => el.article === sel_prod.product_article,
+                )
+              : sel_prod.product_article.slice(2, 3) == 'F'
+                ? latestAnchors.find((el) => el.article === sel_prod.product_article)
+                : latestTools.find((el) => el.article === sel_prod.product_article);
       setSelectedProduct(product);
       setProductOfOrder({ ...sel_prod, product_id: product?.id });
       setProductInfoModalOrder(!productInfoModalOrder);
@@ -451,25 +451,25 @@ const OrderCart = React.memo(() => {
         addDataShipOrder({
           order_id,
           shipping_date: formattedDate,
-        })
+        }),
       );
     } else if (status.accessor === status_list[4].accessor) {
       dispatch(
         addDataShipOrder({
           order_id,
           shipping_date: formatDataValue,
-        })
+        }),
       );
     }
 
     // blocks
     updatedProductListOrder?.forEach((product) => {
       const loc = latestProducts.find(
-        (el) => el.article == product.product_article
+        (el) => el.article == product.product_article,
       )?.placeOfProduction;
 
       const haveProductReserve = list_of_reserved_products.find(
-        (el) => el.orders_products_id == product.id
+        (el) => el.orders_products_id == product.id,
       );
       if (
         status.accessor === status_list[5].accessor &&
@@ -479,14 +479,14 @@ const OrderCart = React.memo(() => {
         const reservedProduct = productsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
-            orderedProduct.product_id === product.product_id
+            orderedProduct.product_id === product.product_id,
         );
 
         let remainingToAllocate = reservedProduct.quantity_palet || 0; // Сколько нужно зарезервировать для этого товара
         const matchingWarehouseProducts =
           warehouse_data?.filter(
             (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article
+              warehouseItem.product_article === product?.product_article,
           ) || []; // Если warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
@@ -494,7 +494,7 @@ const OrderCart = React.memo(() => {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
-              remainingToAllocate
+              remainingToAllocate,
             );
 
             // Обновляем данные склада
@@ -504,7 +504,7 @@ const OrderCart = React.memo(() => {
                 free_quantity_remaining:
                   warehouseItem.free_quantity_remaining - taken,
                 ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              })
+              }),
             );
             remainingToAllocate -= taken;
           }
@@ -519,7 +519,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_palet,
             quantity_in_warehouse,
-          })
+          }),
         );
       } else if (
         status.accessor === status_list[5].accessor &&
@@ -532,7 +532,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_palet,
             status: ordered_production_oem_status[0].accessor,
-          })
+          }),
         );
       }
     });
@@ -541,14 +541,14 @@ const OrderCart = React.memo(() => {
 
     updatedDryMixesListOrder?.forEach((product) => {
       const loc = latestDryMix.find(
-        (el) => el.article == product.product_article
+        (el) => el.article == product.product_article,
       )?.place_of_production;
 
       if (status.accessor === status_list[5].accessor && loc === 'ES') {
         const reservedProduct = dryMixedProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
-            orderedProduct.dry_mixed_id === product.dry_mixed_id
+            orderedProduct.dry_mixed_id === product.dry_mixed_id,
         );
 
         let remainingToAllocate = reservedProduct.quantity_palet_dry || 0; // Сколько нужно зарезервировать для этого товара
@@ -556,7 +556,7 @@ const OrderCart = React.memo(() => {
         const matchingWarehouseProducts =
           dry_mixes_warehouse_data?.filter(
             (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article
+              warehouseItem.product_article === product?.product_article,
           ) || []; // Если dry_mixes_warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
@@ -564,7 +564,7 @@ const OrderCart = React.memo(() => {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
-              remainingToAllocate
+              remainingToAllocate,
             );
 
             // Обновляем данные склада
@@ -574,7 +574,7 @@ const OrderCart = React.memo(() => {
                 free_quantity_remaining:
                   warehouseItem.free_quantity_remaining - taken,
                 ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              })
+              }),
             );
             remainingToAllocate -= taken;
           }
@@ -590,7 +590,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_palet_dry,
             quantity_in_warehouse,
-          })
+          }),
         );
       }
     });
@@ -599,14 +599,14 @@ const OrderCart = React.memo(() => {
 
     updatedAnchorsListOrder?.forEach((product) => {
       const loc = latestAnchors.find(
-        (el) => el.article == product.product_article
+        (el) => el.article == product.product_article,
       )?.place_of_production;
 
       if (status.accessor === status_list[5].accessor && loc === 'ES') {
         const reservedProduct = anchorProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
-            orderedProduct.anchor_id === product.anchor_id
+            orderedProduct.anchor_id === product.anchor_id,
         );
 
         let remainingToAllocate = reservedProduct.quantity_palet_anchor || 0; // Сколько нужно зарезервировать для этого товара
@@ -614,7 +614,7 @@ const OrderCart = React.memo(() => {
         const matchingWarehouseProducts =
           anchors_warehouse_data?.filter(
             (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article
+              warehouseItem.product_article === product?.product_article,
           ) || []; // Если anchors_warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
@@ -622,7 +622,7 @@ const OrderCart = React.memo(() => {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
-              remainingToAllocate
+              remainingToAllocate,
             );
 
             // Обновляем данные склада
@@ -632,7 +632,7 @@ const OrderCart = React.memo(() => {
                 free_quantity_remaining:
                   warehouseItem.free_quantity_remaining - taken,
                 ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              })
+              }),
             );
             remainingToAllocate -= taken;
           }
@@ -648,7 +648,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_palet_anchor,
             quantity_in_warehouse,
-          })
+          }),
         );
       }
     });
@@ -657,14 +657,14 @@ const OrderCart = React.memo(() => {
 
     updatedToolsListOrder?.forEach((product) => {
       const loc = latestTools.find(
-        (el) => el.article == product.product_article
+        (el) => el.article == product.product_article,
       )?.place_of_production;
 
       if (status.accessor === status_list[5].accessor && loc === 'ES') {
         const reservedProduct = toolProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
-            orderedProduct.tool_id === product.tool_id
+            orderedProduct.tool_id === product.tool_id,
         );
 
         let remainingToAllocate = reservedProduct.quantity_ud || 0; // Сколько нужно зарезервировать для этого товара
@@ -672,7 +672,7 @@ const OrderCart = React.memo(() => {
         const matchingWarehouseProducts =
           tools_warehouse_data?.filter(
             (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article
+              warehouseItem.product_article === product?.product_article,
           ) || []; // Если tools_warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
@@ -680,7 +680,7 @@ const OrderCart = React.memo(() => {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
-              remainingToAllocate
+              remainingToAllocate,
             );
 
             // Обновляем данные склада
@@ -690,7 +690,7 @@ const OrderCart = React.memo(() => {
                 free_quantity_remaining:
                   warehouseItem.free_quantity_remaining - taken,
                 ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              })
+              }),
             );
             remainingToAllocate -= taken;
           }
@@ -706,7 +706,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_ud,
             quantity_in_warehouse,
-          })
+          }),
         );
       }
     });
@@ -714,14 +714,14 @@ const OrderCart = React.memo(() => {
     // related material
     updatedRelatedMaterialsListOrder?.forEach((product) => {
       const loc = latestRelatedMaterials.find(
-        (el) => el.article == product.product_article
+        (el) => el.article == product.product_article,
       )?.place_of_production;
 
       if (status.accessor === status_list[5].accessor && loc === 'ES') {
         const reservedProduct = relMatProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
-            orderedProduct.rel_mat_id === product.rel_mat_id
+            orderedProduct.rel_mat_id === product.rel_mat_id,
         );
 
         let remainingToAllocate = reservedProduct.quantity_ud || 0; // Сколько нужно зарезервировать для этого товара
@@ -729,7 +729,7 @@ const OrderCart = React.memo(() => {
         const matchingWarehouseProducts =
           related_materials_warehouse_data?.filter(
             (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article
+              warehouseItem.product_article === product?.product_article,
           ) || []; // Если related_materials_warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
@@ -737,7 +737,7 @@ const OrderCart = React.memo(() => {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
-              remainingToAllocate
+              remainingToAllocate,
             );
 
             // Обновляем данные склада
@@ -747,7 +747,7 @@ const OrderCart = React.memo(() => {
                 free_quantity_remaining:
                   warehouseItem.free_quantity_remaining - taken,
                 ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              })
+              }),
             );
             remainingToAllocate -= taken;
           }
@@ -763,7 +763,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_ud,
             quantity_in_warehouse,
-          })
+          }),
         );
       }
     });
@@ -776,7 +776,7 @@ const OrderCart = React.memo(() => {
         updAccountingDataList({
           orders_article: orderCartData?.article,
           aproved: false,
-        })
+        }),
       );
     }
     if (status.accessor == 10) {
@@ -787,7 +787,7 @@ const OrderCart = React.memo(() => {
       updateOrderStatus({
         order_id,
         status: status.accessor,
-      })
+      }),
     );
   };
 
@@ -825,7 +825,7 @@ const OrderCart = React.memo(() => {
           el?.final_price_tool ||
           el?.final_price_rel_mat ||
           0),
-      0
+      0,
     );
   }, [
     productLists.products,
@@ -840,7 +840,7 @@ const OrderCart = React.memo(() => {
       setVatValue((prev) => ({ ...prev, vat_result: 0 }));
     } else {
       const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
-        2
+        2,
       );
       const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
       const vat_result_del = orderCartData?.delivery
@@ -862,12 +862,12 @@ const OrderCart = React.memo(() => {
       addNewDeliveryPrice({
         order_id: orderCartData.id,
         delivery: orderCartData.delivery,
-      })
+      }),
     );
 
     const prevDelivery = list_of_orders.find((el) => el.id == orderCartData.id);
     const delivery = !prevDelivery?.delivery
-      ? Number(vatValue.vat_result) + orderCartData?.delivery ?? 0
+      ? (Number(vatValue.vat_result) + orderCartData?.delivery ?? 0)
       : Number(vatValue.vat_result) +
         (orderCartData?.delivery - prevDelivery.delivery);
 
@@ -882,7 +882,7 @@ const OrderCart = React.memo(() => {
       : null;
     console.log('storedData', storedData);
     const updatedOrderCartData = list_of_orders.find(
-      (order) => order.id === storedData.id
+      (order) => order.id === storedData.id,
     );
 
     if (storedData) {
@@ -941,7 +941,7 @@ const OrderCart = React.memo(() => {
       updateOrderInCharge({
         order_id,
         person_in_charge: selectedOption.value,
-      })
+      }),
     );
   };
 
@@ -949,7 +949,7 @@ const OrderCart = React.memo(() => {
     const options = personsInChargeList;
     if (!options) return null;
     const personInChargeOption = options.find(
-      (option) => option.value === orderCartData?.person_in_charge
+      (option) => option.value === orderCartData?.person_in_charge,
     );
     // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
     return personInChargeOption || options[0];
@@ -959,17 +959,17 @@ const OrderCart = React.memo(() => {
     const reservedProduct = productsOfOrders.find(
       (orderedProduct) =>
         orderedProduct.order_id === product.order_id &&
-        orderedProduct.product_id === product.product_id
+        orderedProduct.product_id === product.product_id,
     );
 
     if (reservedProduct) {
       const filteredWarehouseID = reservedProducts.filter(
-        (entry) => entry.orders_products_id === reservedProduct.id
+        (entry) => entry.orders_products_id === reservedProduct.id,
       );
       const filteredWarehouse = warehouse_data.filter((entry) =>
         filteredWarehouseID.some(
-          (warehouseIDs) => warehouseIDs.warehouse_id === entry.id
-        )
+          (warehouseIDs) => warehouseIDs.warehouse_id === entry.id,
+        ),
       );
       const articles = {
         product_article: product.product_article,
@@ -983,7 +983,7 @@ const OrderCart = React.memo(() => {
 
   useEffect(() => {
     const result = accountingDataList.find(
-      (el) => el.orders_article == orderCartData?.article
+      (el) => el.orders_article == orderCartData?.article,
     )?.aproved;
 
     setAproveAccounting(result ?? true);
@@ -992,7 +992,7 @@ const OrderCart = React.memo(() => {
   useEffect(() => {
     if (orderCartData?.id) {
       const updatedOrder = list_of_orders.find(
-        (order) => order.id === orderCartData.id
+        (order) => order.id === orderCartData.id,
       );
       if (updatedOrder?.secondaryContact) {
         setOrderCartData((prev) => ({
