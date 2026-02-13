@@ -536,7 +536,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     if (selectedCakeId == null) {
       const result = applyRawMaterialDefaults({});
       setCakeData(result);
-      console.log('result LotesListModal.jsx line 424', result);
       return;
     }
 
@@ -544,7 +543,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
     const baseData = found ? { ...found } : { id: Number(selectedCakeId) };
 
-    console.log('baseData LotesListModal.jsx line 430', baseData);
     setCakeData(applyRawMaterialDefaults(baseData));
   }, [selectedCakeId, lotesListCakes, selectedRecipe]);
 
@@ -1038,8 +1036,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
                 <Col md={12}>
                   <RenderSection
                     section={SECTIONS.notes}
-                    formData={batchData}
-                    onChange={handleBatchChange}
+                    formData={cakeData}
+                    onChange={handleCakeChange}
                   />
                 </Col>
               </Row>
