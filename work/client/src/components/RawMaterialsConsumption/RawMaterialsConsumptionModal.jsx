@@ -164,10 +164,7 @@ const RawMaterialsConsumptionModal = React.memo(
       const currentValue = Number(v || 0);
 
       const rawRecord = raw_mat_consumption?.find(
-        (r) =>
-          String(r.recipe_article) === String(selectedRow?.recipe_article) &&
-          String(r.batch_article) === String(selectedRow?.batch_article) &&
-          String(r.batch_id) === String(selectedRow?.batch_id),
+        (r) => String(r.batch_id) === String(selectedRow?.batch_id),
       );
 
       if (!rawRecord) {
@@ -178,12 +175,7 @@ const RawMaterialsConsumptionModal = React.memo(
       const limitVolume = Number(rawRecord.production_volume || 0);
 
       const alreadyUsed = (main_raw_mat_consumption || [])
-        .filter(
-          (r) =>
-            String(r.recipe_article) === String(selectedRow?.recipe_article) &&
-            String(r.batch_article) === String(selectedRow?.batch_article) &&
-            String(r.batch_id) === String(selectedRow?.batch_id),
-        )
+        .filter((r) => String(r.batch_id) === String(selectedRow?.batch_id))
         .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
       const maxAllowed = Math.max(limitVolume - alreadyUsed, 0);
@@ -253,7 +245,7 @@ const RawMaterialsConsumptionModal = React.memo(
       const current = Number(productionVolume || 0);
 
       const alreadyConsumed = (main_raw_mat_consumption || [])
-        .filter((r) => String(r.recipe_article) === String(recipeArticle))
+        .filter((r) => String(r.batch_id) === String(selectedRow?.batch_id))
         .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
       const totalAfterSave = alreadyConsumed + current;
@@ -405,7 +397,7 @@ const RawMaterialsConsumptionModal = React.memo(
           result_materials = materials.map((el) => {
             if (el.type == 'Return slurry (dry)') {
               const producedReturnMinus =
-                wastedMode === 'from_actual'
+                wastedMode == 'from_actual'
                   ? el.quantity
                   : Number(el.quantity * Number(productionVolume));
 
@@ -500,21 +492,13 @@ const RawMaterialsConsumptionModal = React.memo(
       );
 
       const rawRecord = raw_mat_consumption?.find(
-        (r) =>
-          String(r.recipe_article) === String(selectedRow?.recipe_article) &&
-          String(r.batch_article) === String(selectedRow?.batch_article) &&
-          String(r.batch_id) === String(selectedRow?.batch_id),
+        (r) => String(r.batch_id) === String(selectedRow?.batch_id),
       );
 
       const bd_volume = Number(rawRecord.production_volume || 0);
 
       const alreadyUsed = (main_raw_mat_consumption || [])
-        .filter(
-          (r) =>
-            String(r.recipe_article) === String(selectedRow?.recipe_article) &&
-            String(r.batch_article) === String(selectedRow?.batch_article) &&
-            String(r.batch_id) === String(selectedRow?.batch_id),
-        )
+        .filter((r) => String(r.batch_id) === String(selectedRow?.batch_id))
         .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
       if (alreadyUsed == bd_volume)

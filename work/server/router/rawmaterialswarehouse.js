@@ -408,7 +408,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       await RawMaterialsWarehouse.update(
         {
           consumed_quantity: sequelize.literal(
-            `ROUND(consumed_quantity + ${delta}, 2)`,
+            `ROUND(consumed_quantity + ${delta}::numeric, 2)`,
           ),
           remaining_quantity: sequelize.literal(
             `ROUND(remaining_quantity - ${delta}, 2)`,
