@@ -23,15 +23,15 @@ function RawMaterialsConsumptionModalAdd({ isOpen, toggle, func }) {
     const sumMap = new Map();
 
     main_raw_mat_consumption.forEach((item) => {
-      const key = `${item.recipe_article}|${item.batch_article}|${item.batch_id}`;
+      const key = `${item.batch_id}`;
 
       const currentSum = sumMap.get(key) || 0;
 
-      sumMap.set(key, currentSum + Number(item.production_volume || 0));
+      sumMap.set(key, currentSum + Number(item.consumed_volume || 0));
     });
 
     const filtered = raw_mat_consumption.filter((item) => {
-      const key = `${item.recipe_article}|${item.batch_article}|${item.batch_id}`;
+      const key = `${item.batch_id}`;
 
       const totalFromMain = sumMap.get(key) || 0;
 
