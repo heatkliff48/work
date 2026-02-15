@@ -27,7 +27,7 @@ function RawMaterialsConsumptionModalAdd({ isOpen, toggle, func }) {
 
       const currentSum = sumMap.get(key) || 0;
 
-      sumMap.set(key, currentSum + Number(item.production_volume || 0));
+      sumMap.set(key, currentSum + Number(item.consumed_volume || 0));
     });
 
     const filtered = raw_mat_consumption.filter((item) => {

@@ -221,17 +221,17 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
         const [updatedRows] = await RawMaterialsWarehouse.update(
           {
             consumed_quantity: sequelize.literal(
-              `consumed_quantity + ${consumedQuantity}`,
+              `consumed_quantity + ${consumedQuantity}`
             ),
             remaining_quantity: sequelize.literal(
-              `remaining_quantity - ${consumedQuantity}`,
+              `remaining_quantity - ${consumedQuantity}`
             ),
             // last_updated: date,
           },
           {
             where: { material_type: materialType },
             transaction: t,
-          },
+          }
         );
       } else {
         if (consumedQuantity < 0) {
@@ -248,7 +248,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
             remaining_quantity: -consumedQuantity,
             last_updated: date,
           },
-          { transaction: t },
+          { transaction: t }
         );
         updatedWarehouseRecords.push(newRecord);
       }
@@ -256,7 +256,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
 
     const totalAllMaterials = materials.reduce(
       (sum, m) => sum + Number(m.quantity || 0),
-      0,
+      0
     );
 
     const sandSlurryQuantity = totalAllMaterials * portion_size * 10;
@@ -264,11 +264,11 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
     const [updatedSandSlurryRows] = await RawMaterialsWarehouse.update(
       {
         remaining_quantity: sequelize.literal(
-          `remaining_quantity + ${sandSlurryQuantity}`,
+          `remaining_quantity + ${sandSlurryQuantity}`
         ),
         last_updated: date,
       },
-      { where: { material_type: 'Sand slurry (dry)' }, transaction: t },
+      { where: { material_type: 'Sand slurry (dry)' }, transaction: t }
     );
 
     if (!updatedSandSlurryRows) {
@@ -278,7 +278,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
           remaining_quantity: sandSlurryQuantity,
           last_updated: date,
         },
-        { transaction: t },
+        { transaction: t }
       );
     }
 
@@ -382,14 +382,14 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
         quantity: round2(qty),
       };
     })
-    .filter((m) => m.type && Number.isFinite(m.quantity));
+    .filter((m) => m.type && Number.isFinite(Number(m.quantity)));
 
   if (normMaterials.length === 0) {
     return res.status(400).json({ error: 'Нет валидных позиций для списания' });
   }
 
   const onlySandSlurryDry = normMaterials.every(
-    (m) => m.type === 'Sand slurry (dry)',
+    (m) => m.type === 'Sand slurry (dry)'
   );
 
   const t = await sequelize.transaction();
@@ -408,16 +408,16 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       await RawMaterialsWarehouse.update(
         {
           consumed_quantity: sequelize.literal(
-            `ROUND(consumed_quantity + ${delta}::numeric, 2)`,
+            `ROUND((consumed_quantity + ${delta})::numeric, 2)`
           ),
           remaining_quantity: sequelize.literal(
-            `ROUND(remaining_quantity - ${delta}, 2)`,
+            `ROUND((remaining_quantity - ${delta})::numeric, 2)`
           ),
 
           last_updated: date,
           updatedAt: now,
         },
-        { where: { material_type: 'Sand slurry (dry)' }, transaction: t },
+        { where: { material_type: 'Sand slurry (dry)' }, transaction: t }
       );
 
       await t.commit();
@@ -443,32 +443,32 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
 
     for (const materialType of updatedTypes) {
       const delta = materialTotals[materialType];
-
+      console.log('delta', delta);
       if (materialType === 'Return slurry (dry)') {
         await RawMaterialsWarehouse.update(
           {
             remaining_quantity: sequelize.literal(
-              `ROUND(remaining_quantity - ${delta}, 2)`,
+              `ROUND((remaining_quantity - ${delta})::numeric, 2)`
             ),
             last_updated: date,
             updatedAt: now,
           },
-          { where: { material_type: 'Return slurry (dry)' }, transaction: t },
+          { where: { material_type: 'Return slurry (dry)' }, transaction: t }
         );
       } else {
         await RawMaterialsWarehouse.update(
           {
             consumed_quantity: sequelize.literal(
-              `ROUND(consumed_quantity + ${delta}, 2)`,
+              `ROUND((consumed_quantity + ${delta})::numeric, 2)`
             ),
             remaining_quantity: sequelize.literal(
-              `ROUND(remaining_quantity - ${delta}, 2)`,
+              `ROUND((remaining_quantity - ${delta})::numeric, 2)`
             ),
 
             last_updated: date,
             updatedAt: now,
           },
-          { where: { material_type: materialType }, transaction: t },
+          { where: { material_type: materialType }, transaction: t }
         );
       }
     }
@@ -476,7 +476,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
     await t.commit();
 
     const typesToRead = Array.from(
-      new Set([...updatedTypes, 'Sand slurry (dry)', 'Return slurry (dry)']),
+      new Set([...updatedTypes, 'Sand slurry (dry)', 'Return slurry (dry)'])
     );
 
     const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
@@ -537,7 +537,7 @@ rawMaterialsWarehouseRouter.post('/sand', async (req, res) => {
     };
 
     const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
+      (a, b) => parseDate(b.date) - parseDate(a.date)
     )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -558,7 +558,7 @@ rawMaterialsWarehouseRouter.post('/sand', async (req, res) => {
         where: {
           material_type: 'Sand (dry)',
         },
-      },
+      }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_SAND_SOCKET, warehouseSand);
@@ -587,8 +587,8 @@ rawMaterialsWarehouseRouter.post('/sand/update', async (req, res) => {
 
     const updateData = Object.fromEntries(
       Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
 
     if (Object.keys(updateData).length === 0) {
@@ -658,7 +658,7 @@ rawMaterialsWarehouseRouter.post('/lime', async (req, res) => {
     };
 
     const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
+      (a, b) => parseDate(b.date) - parseDate(a.date)
     )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -679,7 +679,7 @@ rawMaterialsWarehouseRouter.post('/lime', async (req, res) => {
         where: {
           material_type: 'Lime',
         },
-      },
+      }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_LIME_SOCKET, warehouseLime);
@@ -704,8 +704,8 @@ rawMaterialsWarehouseRouter.post('/lime/update', async (req, res) => {
 
     const updateData = Object.fromEntries(
       Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
 
     if (Object.keys(updateData).length === 0) {
@@ -775,7 +775,7 @@ rawMaterialsWarehouseRouter.post('/cement', async (req, res) => {
     };
 
     const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
+      (a, b) => parseDate(b.date) - parseDate(a.date)
     )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -796,7 +796,7 @@ rawMaterialsWarehouseRouter.post('/cement', async (req, res) => {
         where: {
           material_type: 'Cement',
         },
-      },
+      }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_CEMENT_SOCKET, warehouseCement);
@@ -821,8 +821,8 @@ rawMaterialsWarehouseRouter.post('/cement/update', async (req, res) => {
 
     const updateData = Object.fromEntries(
       Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
 
     if (Object.keys(updateData).length === 0) {
@@ -891,7 +891,7 @@ rawMaterialsWarehouseRouter.post('/gypsum', async (req, res) => {
     };
 
     const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
+      (a, b) => parseDate(b.date) - parseDate(a.date)
     )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -912,7 +912,7 @@ rawMaterialsWarehouseRouter.post('/gypsum', async (req, res) => {
         where: {
           material_type: 'Gypsum (dry)',
         },
-      },
+      }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_GYPSUM_SOCKET, warehouseGypsum);
@@ -937,8 +937,8 @@ rawMaterialsWarehouseRouter.post('/gypsum/update', async (req, res) => {
 
     const updateData = Object.fromEntries(
       Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
 
     if (Object.keys(updateData).length === 0) {
@@ -1007,7 +1007,7 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone', async (req, res) => {
     };
 
     const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
+      (a, b) => parseDate(b.date) - parseDate(a.date)
     )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -1028,7 +1028,7 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone', async (req, res) => {
         where: {
           material_type: 'Gypsum stone',
         },
-      },
+      }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_GYPSUM_STONE_SOCKET, warehouseGypsumStone);
@@ -1053,8 +1053,8 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone/update', async (req, res) => {
 
     const updateData = Object.fromEntries(
       Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
 
     if (Object.keys(updateData).length === 0) {
@@ -1126,7 +1126,7 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
     };
 
     const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
+      (a, b) => parseDate(b.date) - parseDate(a.date)
     )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -1147,7 +1147,7 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
         where: {
           material_type: 'Aluminum 1',
         },
-      },
+      }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET, warehouseAluminum1);
@@ -1172,8 +1172,8 @@ rawMaterialsWarehouseRouter.post('/aluminum1/update', async (req, res) => {
 
     const updateData = Object.fromEntries(
       Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
 
     if (Object.keys(updateData).length === 0) {
@@ -1243,7 +1243,7 @@ rawMaterialsWarehouseRouter.post('/aluminum2', async (req, res) => {
     };
 
     const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
+      (a, b) => parseDate(b.date) - parseDate(a.date)
     )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -1264,7 +1264,7 @@ rawMaterialsWarehouseRouter.post('/aluminum2', async (req, res) => {
         where: {
           material_type: 'Aluminum 2',
         },
-      },
+      }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_ALUMINUM2_SOCKET, warehouseAluminum2);
@@ -1289,8 +1289,8 @@ rawMaterialsWarehouseRouter.post('/aluminum2/update', async (req, res) => {
 
     const updateData = Object.fromEntries(
       Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
 
     if (Object.keys(updateData).length === 0) {
@@ -1360,7 +1360,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
     };
 
     const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
+      (a, b) => parseDate(b.date) - parseDate(a.date)
     )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -1381,7 +1381,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
         where: {
           material_type: 'Grinding Balls',
         },
-      },
+      }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET, warehouseGrindingBalls);
@@ -1406,8 +1406,8 @@ rawMaterialsWarehouseRouter.post('/grinding-balls/update', async (req, res) => {
 
     const updateData = Object.fromEntries(
       Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
 
     if (Object.keys(updateData).length === 0) {
@@ -1438,7 +1438,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls/delete', async (req, res) => {
 
     myEmitter.emit(
       DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
-      grinding_balls_warehouse_id,
+      grinding_balls_warehouse_id
     );
     return res.json(grinding_balls_warehouse_id).status(200);
   } catch (err) {
@@ -1481,7 +1481,7 @@ rawMaterialsWarehouseRouter.post('/aac', async (req, res) => {
     };
 
     const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
+      (a, b) => parseDate(b.date) - parseDate(a.date)
     )[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
@@ -1502,7 +1502,7 @@ rawMaterialsWarehouseRouter.post('/aac', async (req, res) => {
         where: {
           material_type: 'AAC',
         },
-      },
+      }
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_AAC_SOCKET, warehouseAAC);
@@ -1527,8 +1527,8 @@ rawMaterialsWarehouseRouter.post('/aac/update', async (req, res) => {
 
     const updateData = Object.fromEntries(
       Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
+        ([_, value]) => value !== undefined && value !== null
+      )
     );
 
     if (Object.keys(updateData).length === 0) {
