@@ -11,6 +11,7 @@ import {
   NEES_DELETE_MATERIAL_PLAN_SOCKET,
   NEW_MATERIAL_PLAN_SOCKET,
   NEW_RAW_MAT_CONSUMPTION_SOCKET,
+  UPDT_RAW_MAT_CONSUMPTION_SOCKET,
 } from '../types/socketTypes/socket';
 
 export const recipeOrdersReducer = (recipeOrders = [], action) => {
@@ -47,6 +48,15 @@ export const rawMatConsumptionReducer = (rawMatConsumption = [], action) => {
       return [...rawMatConsumption, payload];
     }
 
+    case UPDT_RAW_MAT_CONSUMPTION_SOCKET: {
+      console.log(payload, 'payload RecipeOrdersReducer.js line 52');
+      const result = rawMatConsumption.map((el) => {
+        if (el.id === payload[1].id) return payload[1];
+        return el;
+      });
+      return result;
+    }
+
     case DELETE_RAW_MAT_CONSUMPTION_SOCKET: {
       return rawMatConsumption.filter((el) => el.id !== payload);
     }
@@ -56,7 +66,10 @@ export const rawMatConsumptionReducer = (rawMatConsumption = [], action) => {
   }
 };
 
-export const mainRawMatConsumptionReducer = (mainRawMatConsumption = [], action) => {
+export const mainRawMatConsumptionReducer = (
+  mainRawMatConsumption = [],
+  action,
+) => {
   const { type, payload } = action;
 
   switch (type) {

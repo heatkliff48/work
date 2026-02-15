@@ -31,6 +31,7 @@ qualityManagementRouter.post('/', async (req, res) => {
     free_quantity_fact,
     production_plan_id,
     sorting,
+    raw_mat_cons_batch_id,
   } = req.body;
 
   try {
@@ -44,6 +45,7 @@ qualityManagementRouter.post('/', async (req, res) => {
       free_quantity_fact,
       production_plan_id,
       sorting,
+      raw_mat_cons_batch_id,
     });
 
     myEmitter.emit(
@@ -68,6 +70,7 @@ qualityManagementRouter.post('/update', async (req, res) => {
     reserved_quantity_remaining,
     free_quantity_fact,
     sorting,
+    raw_mat_cons_batch_id,
   } = req.body;
 
   try {
@@ -81,6 +84,7 @@ qualityManagementRouter.post('/update', async (req, res) => {
         reserved_quantity_remaining,
         free_quantity_fact,
         sorting,
+        raw_mat_cons_batch_id,
       },
       {
         where: {

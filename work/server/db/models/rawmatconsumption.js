@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       batch_id: DataTypes.INTEGER,
       cacke_id_start: DataTypes.INTEGER,
       date: DataTypes.STRING,
+      used: DataTypes.BOOLEAN,
     },
     {
       sequelize,

@@ -36,6 +36,9 @@ module.exports = {
       sorting: {
         type: Sequelize.INTEGER,
       },
+      raw_mat_cons_batch_id: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("RawMaterialsWarehouses", {
+    await queryInterface.createTable('RawMaterialsWarehouses', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -21,6 +21,9 @@ module.exports = {
       last_updated: {
         type: Sequelize.STRING,
       },
+      used: {
+        type: Sequelize.BOOLEAN,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -32,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("RawMaterialsWarehouses");
+    await queryInterface.dropTable('RawMaterialsWarehouses');
   },
 };
