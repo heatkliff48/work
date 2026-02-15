@@ -72,46 +72,46 @@ lotesListRouter.post('/batches', async (req, res) => {
     //   batch_id = Number(lastLatestBatch[0]?.batch_id ?? 0) + 1;
     //   sub_batch_id = 1;
     // } else {
-    // const existingSameCombo = await LotesListsBatches.findOne({
-    //   where: {
-    //     product,
-    //     production_date,
-    //   },
-    //   order: [
-    //     ['batch_id', 'DESC'],
-    //     ['sub_batch_id', 'DESC'],
-    //     ['id', 'DESC'],
-    //   ],
-    // });
+      // const existingSameCombo = await LotesListsBatches.findOne({
+      //   where: {
+      //     product,
+      //     production_date,
+      //   },
+      //   order: [
+      //     ['batch_id', 'DESC'],
+      //     ['sub_batch_id', 'DESC'],
+      //     ['id', 'DESC'],
+      //   ],
+      // });
 
-    // if (existingSameCombo?.batch_id) {
-    //   batch_id = Number(existingSameCombo.batch_id);
-    // } else {
-    //   const lastBatch = await LotesListsBatches.findOne({
-    //     where: {
-    //       batch_id: { [Op.ne]: null },
-    //     },
-    //     order: [
-    //       ['batch_id', 'DESC'],
-    //       ['id', 'DESC'],
-    //     ],
-    //   });
-    //   batch_id = lastBatch?.batch_id ? Number(lastBatch.batch_id) + 1 : 1;
-    // }
+      // if (existingSameCombo?.batch_id) {
+      //   batch_id = Number(existingSameCombo.batch_id);
+      // } else {
+      //   const lastBatch = await LotesListsBatches.findOne({
+      //     where: {
+      //       batch_id: { [Op.ne]: null },
+      //     },
+      //     order: [
+      //       ['batch_id', 'DESC'],
+      //       ['id', 'DESC'],
+      //     ],
+      //   });
+      //   batch_id = lastBatch?.batch_id ? Number(lastBatch.batch_id) + 1 : 1;
+      // }
 
-    const lastSubBatch = await LotesListsBatches.findOne({
-      where: {
-        batch_id,
-      },
-      order: [
-        ['sub_batch_id', 'DESC'],
-        ['id', 'DESC'],
-      ],
-    });
+      const lastSubBatch = await LotesListsBatches.findOne({
+        where: {
+          batch_id,
+        },
+        order: [
+          ['sub_batch_id', 'DESC'],
+          ['id', 'DESC'],
+        ],
+      });
 
-    sub_batch_id = lastSubBatch?.sub_batch_id
-      ? Number(lastSubBatch.sub_batch_id) + 1
-      : 1;
+      sub_batch_id = lastSubBatch?.sub_batch_id
+        ? Number(lastSubBatch.sub_batch_id) + 1
+        : 1;
     // }
 
     const lotesListBatches = await LotesListsBatches.create({
