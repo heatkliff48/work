@@ -47,7 +47,8 @@ function CackeFillUp() {
         (el) => el.article === batch_in_produce?.product_article,
       );
 
-      const total_cacke = batch_in_produce.quantity_pallets / product?.widthInArray;
+      const total_cacke =
+        batch_in_produce.quantity_pallets / product?.widthInArray;
 
       setCackeFillUp({ ...batch_in_produce, total_cacke });
     }
@@ -85,7 +86,8 @@ function CackeFillUp() {
   }, [lotesListCakes]);
 
   const totalCake =
-    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) || 0;
+    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) ||
+    0;
 
   const batchCalDate = cackeFillUp?.date ?? cackeFillUp?.batch_cal_date ?? '';
 
@@ -106,13 +108,14 @@ function CackeFillUp() {
     setAllocated((prev) => Math.max(0, prev - 1));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const { id } = cackeFillUp;
+    const notes = cakeNotes;
 
-    dispatch(addNewLotesListCakes({ num: cakeIds, note: cakeNotes }));
+    await dispatch(addNewLotesListCakes({ num: cakeIds, note: notes }));
 
     if (!finish) {
-      dispatch(
+      await dispatch(
         updateBatchOutside({
           id,
           is_prodused: 0,
@@ -128,7 +131,7 @@ function CackeFillUp() {
       (rec) => rec.id === recipe?.id_recipe,
     );
 
-    dispatch(
+    await dispatch(
       addNewRawMatConsumption({
         batch_id: nextBatchId,
         production_volume: allocated,
@@ -197,10 +200,18 @@ function CackeFillUp() {
             className="mt-2"
             style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
           >
-            <Button color="success" onClick={handlePlus} style={{ minWidth: 60 }}>
+            <Button
+              color="success"
+              onClick={handlePlus}
+              style={{ minWidth: 60 }}
+            >
               +
             </Button>
-            <Button color="success" onClick={handleMinus} style={{ minWidth: 60 }}>
+            <Button
+              color="success"
+              onClick={handleMinus}
+              style={{ minWidth: 60 }}
+            >
               -
             </Button>
 
@@ -259,7 +270,9 @@ function CackeFillUp() {
                     >
                       <span style={{ opacity: 0.7 }}>#</span>
                       <span>{id}</span>
-                      <span style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}>
+                      <span
+                        style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}
+                      >
                         {isActive ? '▲ note' : '▼ note'}
                       </span>
                     </div>

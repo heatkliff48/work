@@ -72,46 +72,46 @@ lotesListRouter.post('/batches', async (req, res) => {
     //   batch_id = Number(lastLatestBatch[0]?.batch_id ?? 0) + 1;
     //   sub_batch_id = 1;
     // } else {
-      // const existingSameCombo = await LotesListsBatches.findOne({
-      //   where: {
-      //     product,
-      //     production_date,
-      //   },
-      //   order: [
-      //     ['batch_id', 'DESC'],
-      //     ['sub_batch_id', 'DESC'],
-      //     ['id', 'DESC'],
-      //   ],
-      // });
+    // const existingSameCombo = await LotesListsBatches.findOne({
+    //   where: {
+    //     product,
+    //     production_date,
+    //   },
+    //   order: [
+    //     ['batch_id', 'DESC'],
+    //     ['sub_batch_id', 'DESC'],
+    //     ['id', 'DESC'],
+    //   ],
+    // });
 
-      // if (existingSameCombo?.batch_id) {
-      //   batch_id = Number(existingSameCombo.batch_id);
-      // } else {
-      //   const lastBatch = await LotesListsBatches.findOne({
-      //     where: {
-      //       batch_id: { [Op.ne]: null },
-      //     },
-      //     order: [
-      //       ['batch_id', 'DESC'],
-      //       ['id', 'DESC'],
-      //     ],
-      //   });
-      //   batch_id = lastBatch?.batch_id ? Number(lastBatch.batch_id) + 1 : 1;
-      // }
+    // if (existingSameCombo?.batch_id) {
+    //   batch_id = Number(existingSameCombo.batch_id);
+    // } else {
+    //   const lastBatch = await LotesListsBatches.findOne({
+    //     where: {
+    //       batch_id: { [Op.ne]: null },
+    //     },
+    //     order: [
+    //       ['batch_id', 'DESC'],
+    //       ['id', 'DESC'],
+    //     ],
+    //   });
+    //   batch_id = lastBatch?.batch_id ? Number(lastBatch.batch_id) + 1 : 1;
+    // }
 
-      const lastSubBatch = await LotesListsBatches.findOne({
-        where: {
-          batch_id,
-        },
-        order: [
-          ['sub_batch_id', 'DESC'],
-          ['id', 'DESC'],
-        ],
-      });
+    const lastSubBatch = await LotesListsBatches.findOne({
+      where: {
+        batch_id,
+      },
+      order: [
+        ['sub_batch_id', 'DESC'],
+        ['id', 'DESC'],
+      ],
+    });
 
-      sub_batch_id = lastSubBatch?.sub_batch_id
-        ? Number(lastSubBatch.sub_batch_id) + 1
-        : 1;
+    sub_batch_id = lastSubBatch?.sub_batch_id
+      ? Number(lastSubBatch.sub_batch_id) + 1
+      : 1;
     // }
 
     const lotesListBatches = await LotesListsBatches.create({
@@ -141,8 +141,13 @@ lotesListRouter.post('/batches', async (req, res) => {
 
 lotesListRouter.post('/batches/update/recipe', async (req, res) => {
   const { ids, updates } = req.body;
-  const { batch_id, sub_batch_id, cake_id_start, cake_id_finish, quantity_cakes } =
-    ids;
+  const {
+    batch_id,
+    sub_batch_id,
+    cake_id_start,
+    cake_id_finish,
+    quantity_cakes,
+  } = ids;
   const sand_dry = (updates.sand_dry ?? updates.sand_powder_dry) || '0';
 
   try {
@@ -183,6 +188,9 @@ lotesListRouter.get('/cakes', async (req, res) => {
 lotesListRouter.post('/cakes', async (req, res) => {
   try {
     const { num: ids, note } = req.body;
+    console.log(' --- ');
+    console.log(req.body, 'req.body loteslist.js line 186');
+    console.log(' --- ');
 
     if (!Array.isArray(ids)) {
       return res.status(400).json({ error: 'num must be an array of ids' });
@@ -202,7 +210,6 @@ lotesListRouter.post('/cakes', async (req, res) => {
       if (isNaN(numericId)) continue;
 
       let record = await LotesListsCakes.findByPk(numericId);
-
       if (record) {
         if (note && note[id] !== undefined) {
           record.note = note[id];
@@ -210,7 +217,7 @@ lotesListRouter.post('/cakes', async (req, res) => {
         }
         result.push(record);
       } else {
-        const created = await LotesListsCakes.create({});
+        const created = await LotesListsCakes.create({ note: note[id] });
         result.push(created);
       }
     }

@@ -1,26 +1,26 @@
-const clientsRouter = require("express").Router();
-const { Clients } = require("../db/models");
-const { ClientLegalAddresses } = require("../db/models");
-const TokenService = require("../services/Token.js");
-const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
-const { COOKIE_SETTINGS } = require("../constants.js");
-const myEmitter = require("../src/ee.js");
+const clientsRouter = require('express').Router();
+const { Clients } = require('../db/models');
+const { ClientLegalAddresses } = require('../db/models');
+const TokenService = require('../services/Token.js');
+const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
+const { COOKIE_SETTINGS } = require('../constants.js');
+const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_CLIENT_SOCKET,
   UPDATE_CLIENT_SOCKET,
-} = require("../src/constants/event.js");
+} = require('../src/constants/event.js');
 const {
   ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
   UPDATE_LEGAL_ADDRESS_SOCKET,
-} = require("../src/constants/event.js");
+} = require('../src/constants/event.js');
 
-clientsRouter.get("/", async (req, res) => {
+clientsRouter.get('/', async (req, res) => {
   // const fingerprint = req.fingerprint.hash;
   // const { id, username, email } = req.session.user;
 
   try {
     const allClients = await Clients.findAll({
-      order: [["id", "ASC"]],
+      order: [['id', 'ASC']],
     });
 
     // const payload = { id, username, email };
@@ -42,7 +42,7 @@ clientsRouter.get("/", async (req, res) => {
   }
 });
 
-clientsRouter.post("/", async (req, res) => {
+clientsRouter.post('/', async (req, res) => {
   const { c_name, cif_vat, category, price_category } = req.body.client;
 
   try {
@@ -61,7 +61,7 @@ clientsRouter.post("/", async (req, res) => {
   }
 });
 
-clientsRouter.post("/bitrix-new-client", async (req, res) => {
+clientsRouter.post('/bitrix-new-client', async (req, res) => {
   try {
     // Для Bitrix данные могут приходить в разном формате
     // Вариант 1: Если Bitrix отправляет в req.body
@@ -86,7 +86,7 @@ clientsRouter.post("/bitrix-new-client", async (req, res) => {
 
     console.log(
       req.body,
-      "req.body Post Bitrix -------------------- clients.js line 87"
+      'req.body Post Bitrix -------------------- clients.js line 87',
     );
 
     // Проверка обязательных полей
@@ -104,7 +104,9 @@ clientsRouter.post("/bitrix-new-client", async (req, res) => {
       price_category,
       bitrix_id, // Сохраняем ID из Bitrix для связи
     });
-    console.log(client, "clients.js line 107");
+    console.log('---');
+    console.log(client, 'clients.js line 107');
+    console.log('---');
     const legalAddress = await ClientLegalAddresses.create({
       street,
       additional_info,
@@ -118,7 +120,9 @@ clientsRouter.post("/bitrix-new-client", async (req, res) => {
       web_link,
       email,
     });
-    console.log(legalAddress, "clients.js line 121");
+    console.log('---');
+    console.log(legalAddress, 'clients.js line 121');
+    console.log('---');
 
     // Отправляем событие в сокеты (если нужно)
     myEmitter.emit(ADD_NEW_CLIENT_SOCKET, client);
@@ -131,7 +135,7 @@ clientsRouter.post("/bitrix-new-client", async (req, res) => {
       bitrix_id,
     });
   } catch (err) {
-    console.error("Ошибка при добавлении клиента из Bitrix:", err.message);
+    console.error('Ошибка при добавлении клиента из Bitrix:', err.message);
 
     // Обработка уникальных ошибок (например, дубликат CIF/VAT)
     // if (err.name === "SequelizeUniqueConstraintError") {
@@ -142,17 +146,17 @@ clientsRouter.post("/bitrix-new-client", async (req, res) => {
     // }
 
     return res.status(500).json({
-      error: "Внутренняя ошибка сервера",
-      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+      error: 'Внутренняя ошибка сервера',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
 });
 
-clientsRouter.get("/:id", async (req, res) => {
+clientsRouter.get('/:id', async (req, res) => {
   try {
     const lastID = await Clients.findOne({
-      attributes: ["id"],
-      order: [["id", "DESC"]],
+      attributes: ['id'],
+      order: [['id', 'DESC']],
     });
 
     return res.status(200).json({ lastID });
@@ -169,7 +173,7 @@ clientsRouter.get("/:id", async (req, res) => {
   }
 });
 
-clientsRouter.post("/update/:c_id", async (req, res) => {
+clientsRouter.post('/update/:c_id', async (req, res) => {
   const { c_id, c_name, cif_vat, category, price_category } = req.body.client;
 
   try {
@@ -187,7 +191,7 @@ clientsRouter.post("/update/:c_id", async (req, res) => {
         },
         returning: true,
         plain: true,
-      }
+      },
     );
 
     myEmitter.emit(UPDATE_CLIENT_SOCKET, client);
@@ -209,7 +213,7 @@ clientsRouter.post("/update/:c_id", async (req, res) => {
   }
 });
 
-clientsRouter.post("/bitrix-update-client", async (req, res) => {
+clientsRouter.post('/bitrix-update-client', async (req, res) => {
   const {
     c_name,
     cif_vat,
@@ -231,7 +235,7 @@ clientsRouter.post("/bitrix-update-client", async (req, res) => {
 
   console.log(
     req.body,
-    "req.body Update Bitrix -------------------- clients.js line 227"
+    'req.body Update Bitrix -------------------- clients.js line 227',
   );
 
   const oldClient = await Clients.findOne({
@@ -254,9 +258,11 @@ clientsRouter.post("/bitrix-update-client", async (req, res) => {
         },
         returning: true,
         plain: true,
-      }
+      },
     );
-    console.log(client, "clients.js line 259");
+    console.log('---');
+    console.log(client, 'clients.js line 259');
+    console.log('---');
 
     const legalAddress = await ClientLegalAddresses.update(
       {
@@ -276,23 +282,27 @@ clientsRouter.post("/bitrix-update-client", async (req, res) => {
         where: {
           id: oldClient.id,
         },
-      }
+        returning: true,
+        plain: true,
+      },
     );
-    console.log(legalAddress, "clients.js line 281");
+    console.log('---');
+    console.log(legalAddress, 'clients.js line 281');
+    console.log('---');
 
     myEmitter.emit(UPDATE_CLIENT_SOCKET, client);
     myEmitter.emit(UPDATE_LEGAL_ADDRESS_SOCKET, legalAddress);
     return res.status(200).json({
       client: client,
-      id: client.id, // ID в нашей базе
+      id: client[1].id, // ID в нашей базе
       bitrix_id,
     });
   } catch (err) {
-    console.error("Ошибка при обновлении клиента из Bitrix:", err.message);
+    console.error('Ошибка при обновлении клиента из Bitrix:', err.message);
 
     return res.status(500).json({
-      error: "Внутренняя ошибка сервера",
-      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+      error: 'Внутренняя ошибка сервера',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
 });
