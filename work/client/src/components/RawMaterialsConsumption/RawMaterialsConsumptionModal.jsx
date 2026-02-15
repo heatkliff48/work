@@ -74,6 +74,7 @@ const RawMaterialsConsumptionModal = React.memo(
         { label: 'AAC', key: 'aac' },
       ],
       [],
+      [],
     );
 
     useEffect(() => {
@@ -100,6 +101,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
     const ALWAYS_VISIBLE = useMemo(
       () => new Set(['Aluminum 1', 'Aluminum 2', 'Grinding Balls', 'AAC']),
+      [],
       [],
     );
 
@@ -207,11 +209,13 @@ const RawMaterialsConsumptionModal = React.memo(
     const pvNumber = useMemo(
       () => (productionVolume === '' ? 0 : Number(productionVolume) || 0),
       [productionVolume],
+      [productionVolume],
     );
 
     const baseByLabel = (label, key) => {
       if (!recipeForUI || !key || !(key in recipeForUI)) return '—';
       const v = recipeForUI[key];
+      return typeof v === 'number' ? v : (v ?? '—');
       return typeof v === 'number' ? v : (v ?? '—');
     };
 
@@ -289,6 +293,7 @@ const RawMaterialsConsumptionModal = React.memo(
             `Текущее: ${info.current}\n\n` +
             `Сверх плана: ${info.diff}\n\n` +
             `Продолжить?`,
+            `Продолжить?`,
         );
       }
 
@@ -298,6 +303,7 @@ const RawMaterialsConsumptionModal = React.memo(
             `План: ${info.planned}\n` +
             `Будет учтено всего: ${info.totalAfterSave}\n\n` +
             `Осталось: ${Math.abs(info.diff)}\n\n` +
+            `Продолжить?`,
             `Продолжить?`,
         );
       }
@@ -409,6 +415,7 @@ const RawMaterialsConsumptionModal = React.memo(
       ) {
         const producedReturn = Number(
           selectedRecipe.produced_return_dry * Number(productionVolume),
+          selectedRecipe.produced_return_dry * Number(productionVolume),
         );
 
         if (Number.isFinite(Number(producedReturn)) && producedReturn > 0) {
@@ -484,9 +491,11 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const productDetails = latestProducts.find(
         (product) => product.article === selectedRow?.batch_article,
+        (product) => product.article === selectedRow?.batch_article,
       );
 
       const prodDescription = productDetails.description.match(
+        /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/,
         /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/,
       );
 
@@ -553,6 +562,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const product = latestProducts.find(
         (p) => String(p.article) === String(batch_article),
+        (p) => String(p.article) === String(batch_article),
       );
       if (!product) return;
 
@@ -567,6 +577,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (!targetDate6) {
         console.warn(
           'Bad selectedRow.date, cannot match warehouse article date:',
+          prodDate,
           prodDate,
         );
         return;
@@ -628,6 +639,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       console.log(
         'updatedRow RawMaterialsConsumptionModal.jsx line 519',
+        updatedRow,
         updatedRow,
       );
       dispatch(updateRemainingStock(updatedRow));
