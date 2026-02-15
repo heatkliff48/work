@@ -1,16 +1,16 @@
-const clientsContactInfo = require("express").Router();
-const { ContactInfos } = require("../db/models");
-const { Clients } = require("../db/models");
-const TokenService = require("../services/Token.js");
-const { ACCESS_TOKEN_EXPIRATION } = require("../constants.js");
-const { COOKIE_SETTINGS } = require("../constants.js");
-const myEmitter = require("../src/ee.js");
+const clientsContactInfo = require('express').Router();
+const { ContactInfos } = require('../db/models');
+const { Clients } = require('../db/models');
+const TokenService = require('../services/Token.js');
+const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
+const { COOKIE_SETTINGS } = require('../constants.js');
+const myEmitter = require('../src/ee.js');
 const {
   ADD_CONTACT_INFO_SOCKET,
   UPDATE_CONTACT_INFO_SOCKET,
-} = require("../src/constants/event.js");
+} = require('../src/constants/event.js');
 
-clientsContactInfo.post("/", async (req, res) => {
+clientsContactInfo.post('/', async (req, res) => {
   try {
     const {
       currentClientID,
@@ -57,7 +57,7 @@ clientsContactInfo.post("/", async (req, res) => {
   }
 });
 
-clientsContactInfo.post("/bitrix-new-contact-info", async (req, res) => {
+clientsContactInfo.post('/bitrix-new-contact-info', async (req, res) => {
   try {
     const {
       bitrix_id,
@@ -78,7 +78,7 @@ clientsContactInfo.post("/bitrix-new-contact-info", async (req, res) => {
 
     console.log(
       req.body,
-      "req.body Post Bitrix --------------- clientsContactInfo.js line 79"
+      'req.body Post Bitrix --------------- clientsContactInfo.js line 79',
     );
 
     const client = await Clients.findOne({
@@ -104,6 +104,9 @@ clientsContactInfo.post("/bitrix-new-contact-info", async (req, res) => {
       linkedin,
       social,
     });
+    console.log('---');
+    console.log(contactInfo, 'contactInfo clientsContactInfo.js line 108');
+    console.log('---');
 
     myEmitter.emit(ADD_CONTACT_INFO_SOCKET, contactInfo);
     return res.status(200).json({
@@ -113,16 +116,16 @@ clientsContactInfo.post("/bitrix-new-contact-info", async (req, res) => {
       bitrix_client_id,
     });
   } catch (err) {
-    console.error("Ошибка при добавлении клиента из Bitrix:", err.message);
+    console.error('Ошибка при добавлении клиента из Bitrix:', err.message);
 
     return res.status(500).json({
-      error: "Внутренняя ошибка сервера",
-      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+      error: 'Внутренняя ошибка сервера',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
 });
 
-clientsContactInfo.post("/bitrix-update-contact-info", async (req, res) => {
+clientsContactInfo.post('/bitrix-update-contact-info', async (req, res) => {
   try {
     const {
       bitrix_id,
@@ -143,7 +146,7 @@ clientsContactInfo.post("/bitrix-update-contact-info", async (req, res) => {
 
     console.log(
       req.body,
-      "req.body Update Bitrix --------------- clientsContactInfo.js line 141"
+      'req.body Update Bitrix --------------- clientsContactInfo.js line 141',
     );
 
     const contactInfo = await ContactInfos.update(
@@ -168,27 +171,37 @@ clientsContactInfo.post("/bitrix-update-contact-info", async (req, res) => {
         },
         returning: true,
         plain: true,
-      }
+      },
     );
+
+    console.log('---');
+    console.log(contactInfo, 'contactInfo clientsContactInfo.js line 178');
+    console.log('---');
+    console.log('---');
+    console.log(
+      contactInfo.id,
+      'contactInfo.id clientsContactInfo.js line 178',
+    );
+    console.log('---');
 
     myEmitter.emit(UPDATE_CONTACT_INFO_SOCKET, contactInfo);
     return res.status(200).json({
       contact_info: contactInfo,
-      id: contactInfo.id,
+      id: contactInfo[1].id,
       bitrix_id,
       bitrix_client_id,
     });
   } catch (err) {
-    console.error("Ошибка при обновлении клиента из Bitrix:", err.message);
+    console.error('Ошибка при обновлении клиента из Bitrix:', err.message);
 
     return res.status(500).json({
-      error: "Внутренняя ошибка сервера",
-      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+      error: 'Внутренняя ошибка сервера',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
 });
 
-clientsContactInfo.get("/", async (req, res) => {
+clientsContactInfo.get('/', async (req, res) => {
   try {
     const contactInfo = await ContactInfos.findAll();
 
