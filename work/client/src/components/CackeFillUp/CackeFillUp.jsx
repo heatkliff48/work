@@ -47,8 +47,7 @@ function CackeFillUp() {
         (el) => el.article === batch_in_produce?.product_article,
       );
 
-      const total_cacke =
-        batch_in_produce.quantity_pallets / product?.widthInArray;
+      const total_cacke = batch_in_produce.quantity_pallets / product?.widthInArray;
 
       setCackeFillUp({ ...batch_in_produce, total_cacke });
     }
@@ -86,8 +85,7 @@ function CackeFillUp() {
   }, [lotesListCakes]);
 
   const totalCake =
-    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) ||
-    0;
+    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) || 0;
 
   const batchCalDate = cackeFillUp?.date ?? cackeFillUp?.batch_cal_date ?? '';
 
@@ -114,14 +112,14 @@ function CackeFillUp() {
 
     await dispatch(addNewLotesListCakes({ num: cakeIds, note: notes }));
 
-    if (!finish) {
-      await dispatch(
-        updateBatchOutside({
-          id,
-          is_prodused: 0,
-        }),
-      );
-    }
+    const is_prodused = finish ? 2 : 0;
+
+    await dispatch(
+      updateBatchOutside({
+        id,
+        is_prodused,
+      }),
+    );
 
     const cacke_id_start = cakeIds[cakeIds.length - 1];
 
@@ -200,18 +198,10 @@ function CackeFillUp() {
             className="mt-2"
             style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
           >
-            <Button
-              color="success"
-              onClick={handlePlus}
-              style={{ minWidth: 60 }}
-            >
+            <Button color="success" onClick={handlePlus} style={{ minWidth: 60 }}>
               +
             </Button>
-            <Button
-              color="success"
-              onClick={handleMinus}
-              style={{ minWidth: 60 }}
-            >
+            <Button color="success" onClick={handleMinus} style={{ minWidth: 60 }}>
               -
             </Button>
 
@@ -270,9 +260,7 @@ function CackeFillUp() {
                     >
                       <span style={{ opacity: 0.7 }}>#</span>
                       <span>{id}</span>
-                      <span
-                        style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}
-                      >
+                      <span style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}>
                         {isActive ? '▲ note' : '▼ note'}
                       </span>
                     </div>
