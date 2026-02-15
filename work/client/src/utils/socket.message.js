@@ -132,6 +132,7 @@ import {
   updateRecipeSocket,
   updateLotesListNoteSocket,
   deleteLotesListSocket,
+  updateRawMatConsumptionSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -309,6 +310,7 @@ import {
   UPDATE_RECIPE_SOCKET,
   UPDATE_LOTES_LIST_NOTE_SOCKET,
   DELETE_LOTES_LIST_CAKES_SOCKET,
+  UPDATE_RAW_MAT_CONSUMPTION_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -587,6 +589,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET:
       dispatch(addNewRawMatConsumptionSocket(payload));
+      break;
+
+    case UPDATE_RAW_MAT_CONSUMPTION_SOCKET:
+      dispatch(updateRawMatConsumptionSocket(payload));
       break;
 
     case DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET:

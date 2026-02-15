@@ -11,6 +11,7 @@ import { addNewQualityManagement } from '#components/redux/actions/qualityManage
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { updateRawMatConsumption } from '#components/redux/actions/recipeAction.js';
 
 function QualityManagementAddModal(props) {
   const { latestProducts } = useProductsContext();
@@ -97,6 +98,9 @@ function QualityManagementAddModal(props) {
     });
 
     const filtered = raw_mat_consumption.filter((item) => {
+      if (item.used) {
+        return;
+      }
       const key = `${item.batch_id}`;
 
       const totalFromMain = sumMap.get(key) || 0;
@@ -291,6 +295,7 @@ function QualityManagementAddModal(props) {
         sorting: 0,
       }),
     );
+    dispatch(updateRawMatConsumption({ id: rawMatConsEntry?.id, used: true }));
 
     setCustomBatchSelect(false);
     setCustomBatchSelectInput({});

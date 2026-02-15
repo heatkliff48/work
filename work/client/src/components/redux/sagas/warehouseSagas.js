@@ -1,7 +1,7 @@
-import { put, call, takeLatest } from "redux-saga/effects";
-import axios from "axios";
-import showMessage from "../../Utils/showMessage";
-import { errorToText } from "../../Utils/errorToText";
+import { put, call, takeLatest } from 'redux-saga/effects';
+import axios from 'axios';
+import showMessage from '../../Utils/showMessage';
+import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_ORDERED_PRODUCTION,
   ADD_NEW_RESERVED_PRODUCT,
@@ -59,7 +59,7 @@ import {
   UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
   UPDATE_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
-} from "../types/warehouseTypes";
+} from '../types/warehouseTypes';
 import {
   ANCHOR_QUANTITYS_SOCKET,
   DELETE_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
@@ -83,8 +83,8 @@ import {
   UPDATE_LIST_OF_ORDERED_PRODUCTION_SOCKET,
   UPDATE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
-} from "../types/socketTypes/socket";
-import { errorMsgToText } from "#components/Utils/errorMsgToText.js";
+} from '../types/socketTypes/socket';
+import { errorMsgToText } from '#components/Utils/errorMsgToText.js';
 
 const url = axios.create({
   baseURL: process.env.REACT_APP_URL,
@@ -93,473 +93,473 @@ const url = axios.create({
 
 const getAllWarehouse = () => {
   return url
-    .get("/warehouse")
+    .get('/warehouse')
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const addNewWarehouse = (new_warehouse) => {
   return url
-    .post("/warehouse/add", new_warehouse)
+    .post('/warehouse/add', new_warehouse)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updateRemStock = (upd_rem_srock) => {
   return url
-    .post("/warehouse/upd/remaining_stock", upd_rem_srock)
+    .post('/warehouse/upd/remaining_stock', upd_rem_srock)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updateWhQuantitys = (upd_rem_srock) => {
   return url
-    .post("/warehouse/upd/quantitys", upd_rem_srock)
+    .post('/warehouse/upd/quantitys', upd_rem_srock)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updateDryMixedWhQuantitys = (upd_rem_srock) => {
   return url
-    .post("/warehouse/upd/quantitys/drymix", upd_rem_srock)
+    .post('/warehouse/upd/quantitys/drymix', upd_rem_srock)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updateAnchorWhQuantitys = (upd_rem_srock) => {
   return url
-    .post("/warehouse/upd/quantitys/anchor", upd_rem_srock)
+    .post('/warehouse/upd/quantitys/anchor', upd_rem_srock)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updateToolWhQuantitys = (upd_rem_srock) => {
   return url
-    .post("/warehouse/upd/quantitys/tool", upd_rem_srock)
+    .post('/warehouse/upd/quantitys/tool', upd_rem_srock)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updateRelMatWhQuantitys = (upd_rem_srock) => {
   return url
-    .post("/warehouse/upd/quantitys/relmat", upd_rem_srock)
+    .post('/warehouse/upd/quantitys/relmat', upd_rem_srock)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const getListOfReservedProducts = () => {
   return url
-    .get("/warehouse/reserved/product")
+    .get('/warehouse/reserved/product')
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const addNewReservedProduct = (reserved_product) => {
   return url
-    .post("/warehouse/reserved/product/add", reserved_product)
+    .post('/warehouse/reserved/product/add', reserved_product)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updReservedProduct = (reserved_product) => {
   return url
-    .post("/warehouse/reserved/product/upd", reserved_product)
+    .post('/warehouse/reserved/product/upd', reserved_product)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const deleteReservedProduct = (id) => {
   return url
-    .post("/warehouse/reserved/product/delete", { id })
+    .post('/warehouse/reserved/product/delete', { id })
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const getListOfDryMixedReservedProducts = () => {
   return url
-    .get("/warehouse/reserved/drymix")
+    .get('/warehouse/reserved/drymix')
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const addNewDryMixedReservedProduct = (reserved_product) => {
   return url
-    .post("/warehouse/reserved/drymix/add", reserved_product)
+    .post('/warehouse/reserved/drymix/add', reserved_product)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updDryMixedReservedProduct = (reserved_product) => {
   return url
-    .post("/warehouse/reserved/drymix/upd", reserved_product)
+    .post('/warehouse/reserved/drymix/upd', reserved_product)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const deleteDryMixedReservedProduct = (id) => {
   return url
-    .post("/warehouse/reserved/drymix/delete", { id })
+    .post('/warehouse/reserved/drymix/delete', { id })
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const getListOfAnchorReservedProducts = () => {
   return url
-    .get("/warehouse/reserved/anchor")
+    .get('/warehouse/reserved/anchor')
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const addNewAnchorReservedProduct = (reserved_product) => {
   return url
-    .post("/warehouse/reserved/anchor/add", reserved_product)
+    .post('/warehouse/reserved/anchor/add', reserved_product)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updAnchorReservedProduct = (reserved_product) => {
   return url
-    .post("/warehouse/reserved/anchor/upd", reserved_product)
+    .post('/warehouse/reserved/anchor/upd', reserved_product)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const deleteAnchorReservedProduct = (id) => {
   return url
-    .post("/warehouse/reserved/anchor/delete", { id })
+    .post('/warehouse/reserved/anchor/delete', { id })
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const getListOfToolReservedProducts = () => {
   return url
-    .get("/warehouse/reserved/tool")
+    .get('/warehouse/reserved/tool')
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const addNewToolReservedProduct = (reserved_product) => {
   return url
-    .post("/warehouse/reserved/tool/add", reserved_product)
+    .post('/warehouse/reserved/tool/add', reserved_product)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updToolReservedProduct = (reserved_product) => {
   return url
-    .post("/warehouse/reserved/tool/upd", reserved_product)
+    .post('/warehouse/reserved/tool/upd', reserved_product)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const deleteToolReservedProduct = (id) => {
   return url
-    .post("/warehouse/reserved/tool/delete", { id })
+    .post('/warehouse/reserved/tool/delete', { id })
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const getListOfRelMatReservedProducts = () => {
   return url
-    .get("/warehouse/reserved/relmat")
+    .get('/warehouse/reserved/relmat')
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const addNewRelMatReservedProduct = (reserved_product) => {
   return url
-    .post("/warehouse/reserved/relmat/add", reserved_product)
+    .post('/warehouse/reserved/relmat/add', reserved_product)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updRelMatReservedProduct = (reserved_product) => {
   return url
-    .post("/warehouse/reserved/relmat/upd", reserved_product)
+    .post('/warehouse/reserved/relmat/upd', reserved_product)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const deleteRelMatReservedProduct = (id) => {
   return url
-    .post("/warehouse/reserved/relmat/delete", { id })
+    .post('/warehouse/reserved/relmat/delete', { id })
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const getAutoclaveCalendar = () => {
   return url
-    .get("/warehouse/autoclave_calendares")
+    .get('/warehouse/autoclave_calendares')
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const addNewAutoclaveCalendar = (autoclave_calendar_data) => {
   return url
-    .post("/warehouse/autoclave_calendares/add", autoclave_calendar_data)
+    .post('/warehouse/autoclave_calendares/add', autoclave_calendar_data)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const getListOfOrderedProduction = () => {
   return url
-    .get("/warehouse/ordered_production")
+    .get('/warehouse/ordered_production')
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const addNewListOfOrderedProduction = (ordered_production) => {
   return url
-    .post("/warehouse/ordered_production/add", ordered_production)
+    .post('/warehouse/ordered_production/add', ordered_production)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updListOfOrderedProduction = (ordered_production) => {
   return url
-    .post("/warehouse/ordered_production/update", ordered_production)
+    .post('/warehouse/ordered_production/update', ordered_production)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const getListOfOrderedProductionOEM = () => {
   return url
-    .get("/warehouse/ordered_production_oem")
+    .get('/warehouse/ordered_production_oem')
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const addNewListOfOrderedProductionOEM = (ordered_production_oem) => {
   return url
-    .post("/warehouse/ordered_production_oem/add", ordered_production_oem)
+    .post('/warehouse/ordered_production_oem/add', ordered_production_oem)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updListOfOrderedProductionOEM = (ordered_production_oem) => {
   return url
-    .post("/warehouse/ordered_production_oem/update", ordered_production_oem)
+    .post('/warehouse/ordered_production_oem/update', ordered_production_oem)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const getRawMaterialsWarehouse = () => {
   return url
-    .get("/rawMaterialsWarehouse")
+    .get('/rawMaterialsWarehouse')
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
 
 const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
   return url
-    .post("/rawMaterialsWarehouse/update", rawMaterialsWarehouse)
+    .post('/rawMaterialsWarehouse/update', rawMaterialsWarehouse)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      console.log({ err }, "warehouseSagas.js line 544");
-      showMessage(errorToText(err), "error");
-      console.log({ err }, "warehouseSagas.js line 547");
+      console.log({ err }, 'warehouseSagas.js line 544');
+      showMessage(errorToText(err), 'error');
+      console.log({ err }, 'warehouseSagas.js line 547');
       alert(errorMsgToText(err));
       throw err;
     });
 };
 
 const updateRawMaterialsConsumptionRawMaterialsWarehouse = (
-  rawMaterialsWarehouse
+  rawMaterialsWarehouse,
 ) => {
   return url
-    .post("/rawMaterialsWarehouse/raw_mat_con/update", rawMaterialsWarehouse)
+    .post('/rawMaterialsWarehouse/raw_mat_con/update', rawMaterialsWarehouse)
     .then((res) => {
       return res.data;
     })
     .catch((err) => {
-      showMessage(errorToText(err), "error");
+      showMessage(errorToText(err), 'error');
       throw err;
     });
 };
@@ -567,7 +567,7 @@ const updateRawMaterialsConsumptionRawMaterialsWarehouse = (
 function* getAllWarehouseWatcher() {
   try {
     const { warehouse } = yield call(getAllWarehouse);
-console.log('warehouse warehouseSagas.js line 570', warehouse)
+    // console.log('warehouse warehouseSagas.js line 570', warehouse)
     yield put({ type: ALL_WAREHOUSE, payload: warehouse });
   } catch (err) {
     yield put({ type: ALL_WAREHOUSE, payload: [] });
@@ -679,7 +679,7 @@ function* deleteReservedProductWatcher(action) {
 function* getListOfDryMixedReservedProductsWatcher() {
   try {
     const listOfReservedDryMixedProducts = yield call(
-      getListOfDryMixedReservedProducts
+      getListOfDryMixedReservedProducts,
     );
 
     yield put({
@@ -879,11 +879,11 @@ function* getAutoclaveCalendarWatcher() {
 function* addNewAutoclaveCalendarWatcher(action) {
   try {
     const rows = Array.isArray(action.payload) ? action.payload : [];
-    if (rows.length === 0) throw new Error("No data to save");
+    if (rows.length === 0) throw new Error('No data to save');
 
     const new_autoclave_calendar = yield call(
       addNewAutoclaveCalendar,
-      action.payload
+      action.payload,
     );
 
     yield put({
@@ -970,7 +970,7 @@ function* updateNewRawMaterialsWarehouseWorker(action) {
   try {
     const { rawMaterialsWarehouse } = yield call(
       updateRawMaterialsWarehouse,
-      action.payload
+      action.payload,
     );
 
     yield put({
@@ -986,7 +986,7 @@ function* updateRawMaterialsConsumptionRawMaterialsWarehouseWorker(action) {
   try {
     yield call(
       updateRawMaterialsConsumptionRawMaterialsWarehouse,
-      action.payload
+      action.payload,
     );
   } catch (err) {
     yield put({
@@ -1004,92 +1004,92 @@ function* warehouseWatcher() {
   yield takeLatest(UPDATE_WAREHOSE_QUANTITYS, updateWhQuantitysWatcher);
   yield takeLatest(
     UPDATE_DRY_MIXED_WAREHOSE_QUANTITYS,
-    updateDryMixedWhQuantitysWatcher
+    updateDryMixedWhQuantitysWatcher,
   );
   yield takeLatest(
     UPDATE_ANCHOR_WAREHOSE_QUANTITYS,
-    updateAnchorWhQuantitysWatcher
+    updateAnchorWhQuantitysWatcher,
   );
   yield takeLatest(
     UPDATE_TOOL_WAREHOSE_QUANTITYS,
-    updateToolWhQuantitysWatcher
+    updateToolWhQuantitysWatcher,
   );
   yield takeLatest(
     UPDATE_REL_MAT_WAREHOSE_QUANTITYS,
-    updateRelMatWhQuantitysWatcher
+    updateRelMatWhQuantitysWatcher,
   );
 
   yield takeLatest(
     GET_LIST_OF_RESERVED_PRODUCTS,
-    getListOfReservedProductsWatcher
+    getListOfReservedProductsWatcher,
   );
   yield takeLatest(ADD_NEW_RESERVED_PRODUCT, addNewReservedProductWatcher);
   yield takeLatest(UPDATE_RESERVED_PRODUCT, updReservedProductWatcher);
   yield takeLatest(
     GET_DELETE_PRODUCT_FROM_RESERVED_LIST,
-    deleteReservedProductWatcher
+    deleteReservedProductWatcher,
   );
 
   yield takeLatest(
     GET_LIST_OF_DRY_MIXED_RESERVED_PRODUCTS,
-    getListOfDryMixedReservedProductsWatcher
+    getListOfDryMixedReservedProductsWatcher,
   );
   yield takeLatest(
     ADD_NEW_DRY_MIXED_RESERVED_PRODUCT,
-    addNewDryMixedReservedProductWatcher
+    addNewDryMixedReservedProductWatcher,
   );
   yield takeLatest(
     UPDATE_DRY_MIXED_RESERVED_PRODUCT,
-    updDryMixedReservedProductWatcher
+    updDryMixedReservedProductWatcher,
   );
   yield takeLatest(
     GET_DELETE_PRODUCT_FROM_DRY_MIXED_RESERVED_LIST,
-    deleteDryMixedReservedProductWatcher
+    deleteDryMixedReservedProductWatcher,
   );
 
   yield takeLatest(
     GET_LIST_OF_ANCHOR_RESERVED_PRODUCTS,
-    getListOfAnchorReservedProductsWatcher
+    getListOfAnchorReservedProductsWatcher,
   );
   yield takeLatest(
     ADD_NEW_ANCHOR_RESERVED_PRODUCT,
-    addNewAnchorReservedProductWatcher
+    addNewAnchorReservedProductWatcher,
   );
   yield takeLatest(
     UPDATE_ANCHOR_RESERVED_PRODUCT,
-    updAnchorReservedProductWatcher
+    updAnchorReservedProductWatcher,
   );
   yield takeLatest(
     GET_DELETE_PRODUCT_FROM_ANCHOR_RESERVED_LIST,
-    deleteAnchorReservedProductWatcher
+    deleteAnchorReservedProductWatcher,
   );
 
   yield takeLatest(
     GET_LIST_OF_TOOL_RESERVED_PRODUCTS,
-    getListOfToolReservedProductsWatcher
+    getListOfToolReservedProductsWatcher,
   );
   yield takeLatest(
     ADD_NEW_TOOL_RESERVED_PRODUCT,
-    addNewToolReservedProductWatcher
+    addNewToolReservedProductWatcher,
   );
   yield takeLatest(UPDATE_TOOL_RESERVED_PRODUCT, updToolReservedProductWatcher);
   yield takeLatest(
     GET_DELETE_PRODUCT_FROM_TOOL_RESERVED_LIST,
-    deleteToolReservedProductWatcher
+    deleteToolReservedProductWatcher,
   );
 
   yield takeLatest(
     GET_LIST_OF_REL_MAT_PRODUCTS,
-    getListOfRelMatReservedProductsWatcher
+    getListOfRelMatReservedProductsWatcher,
   );
   yield takeLatest(
     ADD_NEW_REL_MAT_RESERVED_PRODUCT,
-    addNewRelMatReservedProductWatcher
+    addNewRelMatReservedProductWatcher,
   );
   yield takeLatest(UPDATE_REL_MAT_PRODUCT, updRelMatReservedProductWatcher);
   yield takeLatest(
     GET_DELETE_PRODUCT_FROM_REL_MAT_LIST,
-    deleteRelMatReservedProductWatcher
+    deleteRelMatReservedProductWatcher,
   );
 
   yield takeLatest(GET_AUTOCLAVE_CALENDAR, getAutoclaveCalendarWatcher);
@@ -1097,33 +1097,33 @@ function* warehouseWatcher() {
 
   yield takeLatest(
     GET_LIST_OF_ORDERED_PRODUCTION,
-    getListOfOrderedProductionWatcher
+    getListOfOrderedProductionWatcher,
   );
   yield takeLatest(
     ADD_NEW_ORDERED_PRODUCTION,
-    addNewListOfOrderedProductionWatcher
+    addNewListOfOrderedProductionWatcher,
   );
   yield takeLatest(UPDATE_ORDERED_PRODUCTION, updListOfOrderedProductionWorker);
   yield takeLatest(
     GET_LIST_OF_ORDERED_PRODUCTION_OEM,
-    getListOfOrderedProductionOEMWatcher
+    getListOfOrderedProductionOEMWatcher,
   );
   yield takeLatest(
     ADD_NEW_ORDERED_PRODUCTION_OEM,
-    addNewListOfOrderedProductionOEMWatcher
+    addNewListOfOrderedProductionOEMWatcher,
   );
   yield takeLatest(
     UPDATE_ORDERED_PRODUCTION_OEM,
-    updListOfOrderedProductionOEMWorker
+    updListOfOrderedProductionOEMWorker,
   );
   yield takeLatest(GET_RAW_MATERIALS_WAREHOUSE, getRawMaterialsWarehouseWorker);
   yield takeLatest(
     UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
-    updateNewRawMaterialsWarehouseWorker
+    updateNewRawMaterialsWarehouseWorker,
   );
   yield takeLatest(
     UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
-    updateRawMaterialsConsumptionRawMaterialsWarehouseWorker
+    updateRawMaterialsConsumptionRawMaterialsWarehouseWorker,
   );
 }
 

@@ -9,14 +9,18 @@ router.post('/delete', RecipeOrdersController.deleteMaterialPlan);
 //--------------------------RAW MAT CONSUMPTION--------------------------
 router.get(
   '/raw_mat_consumption',
-  RecipeOrdersController.getAllRawMatConsumptionOrdersData
+  RecipeOrdersController.getAllRawMatConsumptionOrdersData,
 );
 router.post(
   '/raw_mat_consumption',
-  RecipeOrdersController.addNewRawMatConsumptionOrdersData
+  RecipeOrdersController.addNewRawMatConsumptionOrdersData,
+);
+router.post(
+  '/raw_mat_consumption/update',
+  RecipeOrdersController.updateRawMatConsumptionOrdersData,
 );
 router.post(
   '/raw_mat_consumption/delete',
-  RecipeOrdersController.deleteRawMatConsumptionOrdersData
+  RecipeOrdersController.deleteRawMatConsumptionOrdersData,
 );
 module.exports = router;

@@ -1,11 +1,12 @@
-const RecipeOrdersServices = require("../services/RecipeOrders");
+const RecipeOrdersServices = require('../services/RecipeOrders');
 const {
   SAVE_MATERIAL_PLAN_SOCKET,
   DELETE_MATERIAL_PLAN_SOCKET,
   ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
+  UPDATE_RAW_MAT_CONSUMPTION_SOCKET,
   DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
-} = require("../src/constants/event");
-const myEmitter = require("../src/ee");
+} = require('../src/constants/event');
+const myEmitter = require('../src/ee');
 
 class RecipeOrdersController {
   static async getRecipeOrdersData(req, res) {
@@ -18,17 +19,17 @@ class RecipeOrdersController {
     try {
       const material_plan = req.body;
       const recipeOrders = await RecipeOrdersServices.saveMaterialPlan(
-        material_plan
+        material_plan,
       );
       myEmitter.emit(SAVE_MATERIAL_PLAN_SOCKET, recipeOrders);
 
       return res.status(200);
     } catch (error) {
       console.error(
-        ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..err.message",
-        error.message
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..err.message',
+        error.message,
       );
-      res.json({ error: "Internal Server Error" }).status(500);
+      res.json({ error: 'Internal Server Error' }).status(500);
     }
   }
 
@@ -53,8 +54,8 @@ class RecipeOrdersController {
   static async addNewRawMatConsumptionOrdersData(req, res) {
     const rawMatConsumption = req.body;
 
-   const rawMat =  await RecipeOrdersServices.addNewRawMatConsumptionOrdersData(
-      rawMatConsumption
+    const rawMat = await RecipeOrdersServices.addNewRawMatConsumptionOrdersData(
+      rawMatConsumption,
     );
 
     myEmitter.emit(ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET, rawMat);
@@ -62,10 +63,22 @@ class RecipeOrdersController {
     return res.status(200).json(rawMat);
   }
 
+  static async updateRawMatConsumptionOrdersData(req, res) {
+    const rawMatConsumption = req.body;
+
+    const rawMat = await RecipeOrdersServices.updateRawMatConsumptionOrdersData(
+      rawMatConsumption,
+    );
+
+    myEmitter.emit(UPDATE_RAW_MAT_CONSUMPTION_SOCKET, rawMat);
+
+    return res.status(200).json(rawMat);
+  }
+
   static async deleteRawMatConsumptionOrdersData(req, res) {
     console.log(
-      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionOrdersData",
-      req.body
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionOrdersData',
+      req.body,
     );
     const { id } = req.body;
 
