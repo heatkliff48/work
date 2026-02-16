@@ -5,7 +5,10 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewLotesListCakes } from '#components/redux/actions/lotesListAction.js';
-import { updateBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+import {
+  deleteBatchOutside,
+  updateBatchOutside,
+} from '#components/redux/actions/batchOutsideAction.js';
 import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
@@ -112,14 +115,16 @@ function CackeFillUp() {
 
     await dispatch(addNewLotesListCakes({ num: cakeIds, note: notes }));
 
-    const is_prodused = finish ? 2 : 0;
-
-    await dispatch(
-      updateBatchOutside({
-        id,
-        is_prodused,
-      }),
-    );
+    if (finish) {
+      dispatch(deleteBatchOutside(id));
+    } else {
+      await dispatch(
+        updateBatchOutside({
+          id,
+          is_prodused: 0,
+        }),
+      );
+    }
 
     const cacke_id_start = cakeIds[cakeIds.length - 1];
 
