@@ -46,6 +46,11 @@ function CackeFillUpModal({ show, onHide }) {
       accessor: 'position_in_autoclave',
       Filter: TextSearchFilter,
     },
+    {
+      Header: 'Date',
+      accessor: 'Date',
+      Filter: TextSearchFilter,
+    },
   ];
 
   const add_batch_dialog = [
@@ -75,11 +80,11 @@ function CackeFillUpModal({ show, onHide }) {
     if (!options) return;
 
     const productArticleOption = options.find(
-      (option) => option.value === customBatchSelectInput?.product_article,
+      (option) => option.value === customBatchSelectInput?.product_article
     );
     const selectedOption = productArticleOption || options[0];
     const product = latestProducts.find(
-      (el) => el.article === selectedOption?.value,
+      (el) => el.article === selectedOption?.value
     );
 
     if (!product) return;
@@ -103,7 +108,7 @@ function CackeFillUpModal({ show, onHide }) {
     if (!options) return null;
 
     const productArticleOption = options.find(
-      (option) => option.value === customBatchSelectInput?.[accessor],
+      (option) => option.value === customBatchSelectInput?.[accessor]
     );
 
     return productArticleOption || options[0];
@@ -147,7 +152,7 @@ function CackeFillUpModal({ show, onHide }) {
     const { date } = row.original;
 
     const filteredListOfOrderedProduction = list_of_ordered_production?.filter(
-      (item) => item.product_article === prodPlanEntry?.product_article,
+      (item) => item.product_article === prodPlanEntry?.product_article
     );
 
     const totalDifference = filteredListOfOrderedProduction.reduce((sum, item) => {
@@ -160,7 +165,7 @@ function CackeFillUpModal({ show, onHide }) {
         : totalDifference;
 
     const product = latestProducts.find(
-      (el) => el.article === prodPlanEntry?.product_article,
+      (el) => el.article === prodPlanEntry?.product_article
     );
 
     const warehouse_article = getWarehouseArticle(product);
@@ -182,7 +187,7 @@ function CackeFillUpModal({ show, onHide }) {
       updateBatchOutside({
         id: prodPlanEntry.id,
         is_prodused: 1,
-      }),
+      })
     );
 
     setCustomBatchSelect(false);
@@ -194,7 +199,7 @@ function CackeFillUpModal({ show, onHide }) {
   useEffect(() => {
     if (batchOutside) {
       const result = batchOutside.filter(
-        (el) => el.is_prodused == 0 || el.is_prodused == 0,
+        (el) => el.is_prodused == 0 || el.is_prodused == 0
       );
       setProductionPlanDataList(result);
     }
@@ -243,7 +248,7 @@ function CackeFillUpModal({ show, onHide }) {
 
     console.log(
       'customBatchSelectInput CackeFillUpModal.jsx line 181',
-      customBatchSelectInput,
+      customBatchSelectInput
     );
 
     // setCustomBatchSelect(false);
@@ -287,7 +292,7 @@ function CackeFillUpModal({ show, onHide }) {
                         {el.accessor === 'product_article' ? (
                           <Select
                             defaultValue={getSelectedProductArticleOption(
-                              el.accessor,
+                              el.accessor
                             )}
                             onChange={(v) => {
                               handleProductArticleSelectChange(v, el.accessor);
