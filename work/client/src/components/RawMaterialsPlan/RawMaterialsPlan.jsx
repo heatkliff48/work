@@ -68,7 +68,7 @@ function RawMaterialsPlan() {
   };
 
   const calculateTotalOrder = (need, orderShare) => {
-    return need + need * ((orderShare || 0) / 100);
+    return Math.round((need + need * ((orderShare || 0) / 100)) * 100) / 100;
   };
 
   const mathFunc = (mat_num, product) => {
@@ -131,7 +131,7 @@ function RawMaterialsPlan() {
 
         const recipeOptions = recipeArray.map((recipe) => ({
           value: recipe.id,
-          label: recipe.article,
+          label: recipe.description,
         }));
 
         const prodDescription = productDetails.description.match(
@@ -273,7 +273,7 @@ function RawMaterialsPlan() {
                       options={product.recipeOptions}
                       value={{
                         value: product.current_recipe?.id,
-                        label: product.current_recipe?.article,
+                        label: product.current_recipe?.description,
                       }}
                       styles={{
                         singleValue: (provided) => ({

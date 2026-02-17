@@ -25,7 +25,10 @@ import {
   autoclaveCalendarReducer,
   listOfOrderedProductionReducer,
 } from './listOfOrderedProductionReducer';
-import { lotesListBatchesReducer, lotesListCakesReducer } from './lotesListReducer';
+import {
+  lotesListBatchesReducer,
+  lotesListCakesReducer,
+} from './lotesListReducer';
 import { ordersReducer } from './orderReducer';
 import { pagesReducer } from './pagesReducer';
 import { productionBatchLogReducer } from './productionBatchLogReducer';
@@ -74,8 +77,12 @@ import {
   warehouseGypsumStoneReducer,
   warehouseLimeReducer,
   warehouseSandReducer,
+  warehouseSandSlurryReducer,
 } from './warehouseRawMaterialsReducer';
-import { warehouseReducer, rawMaterialsWarehouseReducer } from './warehouseReducer';
+import {
+  warehouseReducer,
+  rawMaterialsWarehouseReducer,
+} from './warehouseReducer';
 import { combineReducers } from 'redux';
 
 export const rootReducer = combineReducers({
@@ -141,6 +148,7 @@ export const rootReducer = combineReducers({
   warehouseAluminum2: warehouseAluminum2Reducer,
   warehouseGrindingBalls: warehouseGrindingBallsReducer,
   warehouseAAC: warehouseAACReducer,
+  warehouseSandSlurry: warehouseSandSlurryReducer,
   lotesListBatches: lotesListBatchesReducer,
   lotesListCakes: lotesListCakesReducer,
   contactPriceInfo: contactPriceInfoReducer,

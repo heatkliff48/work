@@ -35,6 +35,8 @@ import {
   DELETE_WAREHOUSE_AAC,
   GET_FULL_WAREHOUSE_AAC,
   UPDATE_NEW_WAREHOUSE_AAC,
+  GET_FULL_WAREHOUSE_SAND_SLURRY,
+  ADD_NEW_WAREHOUSE_SAND_SLURRY,
 } from '../types/warehouseRawMaterialsTypes';
 
 // Sand
@@ -286,5 +288,19 @@ export const deleteWarehouseAAC = (aac_warehouse_id) => {
   return {
     type: DELETE_WAREHOUSE_AAC,
     payload: aac_warehouse_id,
+  };
+};
+
+// Sand Slurry
+export const getWarehouseSandSlurry = () => {
+  return {
+    type: GET_FULL_WAREHOUSE_SAND_SLURRY,
+  };
+};
+
+export const addNewWarehouseSandSlurry = (warehouseSandSlurry) => {
+  return {
+    type: ADD_NEW_WAREHOUSE_SAND_SLURRY,
+    payload: warehouseSandSlurry,
   };
 };

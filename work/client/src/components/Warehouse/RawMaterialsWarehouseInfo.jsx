@@ -44,6 +44,8 @@ function RawMaterialsWarehouseInfo(props) {
           return state.warehouseGrindingBalls;
         case 'AAC':
           return state.warehouseAAC;
+        case 'Sand slurry (dry)':
+          return state.warehouseSandSlurry;
         default:
           return state.warehouseSand;
       }
@@ -89,6 +91,44 @@ function RawMaterialsWarehouseInfo(props) {
     },
   ].filter(Boolean);
 
+  const sand_slurry_table = [
+    {
+      Header: 'Sand (dry)',
+      accessor: 'sand',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Gypsum stone',
+      accessor: 'gypsum_stone',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Water',
+      accessor: 'water',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Grinding balls',
+      accessor: 'grinding_balls',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'AAC scrap',
+      accessor: 'aac_scrap',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Portion size',
+      accessor: 'portion_size',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Date',
+      accessor: 'date',
+      Filter: TextSearchFilter,
+    },
+  ].filter(Boolean);
+
   const handleRowClick = useCallback((row) => {
     setSupplierInfo(row.original);
     setUpdateModalShow(!updateModalShow);
@@ -123,17 +163,28 @@ function RawMaterialsWarehouseInfo(props) {
         <Modal.Body className="p-0">
           {' '}
           {/* Убираем padding для полной ширины таблицы */}
-          <Table
-            COLUMN_DATA={raw_material_table}
-            dataOfTable={raw_material_warehouse}
-            userAccess={userAccess}
-            tableName={props?.material_type}
-            handleRowClick={handleRowClick}
-            onClickButton={() => {
-              setAddModalShow(!addModalShow);
-            }}
-            buttonText={`Add new ${props?.material_type.toLowerCase()}`}
-          />
+          {props?.material_type != 'Sand slurry (dry)' && (
+            <Table
+              COLUMN_DATA={raw_material_table}
+              dataOfTable={raw_material_warehouse}
+              userAccess={userAccess}
+              tableName={props?.material_type}
+              handleRowClick={handleRowClick}
+              onClickButton={() => {
+                setAddModalShow(!addModalShow);
+              }}
+              buttonText={`Add new ${props?.material_type.toLowerCase()}`}
+            />
+          )}
+          {props?.material_type === 'Sand slurry (dry)' && (
+            <Table
+              COLUMN_DATA={sand_slurry_table}
+              dataOfTable={raw_material_warehouse}
+              userAccess={userAccess}
+              tableName={props?.material_type}
+              handleRowClick={() => {}}
+            />
+          )}
         </Modal.Body>
       </Modal>
       <RawMaterialsWarehouseAdd

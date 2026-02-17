@@ -145,6 +145,7 @@ const {
   UPDATE_LOTES_LIST_NOTE_SOCKET,
   DELETE_LOTES_LIST_CAKES_SOCKET,
   UPDATE_RAW_MAT_CONSUMPTION_SOCKET,
+  ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -1810,6 +1811,18 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: DELETE_WAREHOUSE_AAC_SOCKET,
           payload: aac_warehouse_id,
+        }),
+      );
+    }
+  });
+
+  // Sand Slurry
+  myEmitter.on(ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET, (warehouseSandSlurry) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
+          payload: warehouseSandSlurry,
         }),
       );
     }

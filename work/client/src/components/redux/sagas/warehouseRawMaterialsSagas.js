@@ -73,6 +73,10 @@ import {
   NEW_WAREHOUSE_AAC,
   UPDATE_WAREHOUSE_AAC,
   UPDATE_NEW_WAREHOUSE_AAC,
+  FULL_WAREHOUSE_SAND_SLURRY,
+  NEW_WAREHOUSE_SAND_SLURRY,
+  GET_FULL_WAREHOUSE_SAND_SLURRY,
+  ADD_NEW_WAREHOUSE_SAND_SLURRY,
 } from '../types/warehouseRawMaterialsTypes';
 import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
@@ -468,7 +472,10 @@ const deleteWarehouseGrindingBalls = (grinding_balls_warehouse_id) => {
 
 const updateWarehouseGrindingBalls = (warehouseGrindingBalls) => {
   return url
-    .post('/rawMaterialsWarehouse/grinding-balls/update', warehouseGrindingBalls)
+    .post(
+      '/rawMaterialsWarehouse/grinding-balls/update',
+      warehouseGrindingBalls,
+    )
     .then((res) => {
       return res.data;
     })
@@ -518,6 +525,31 @@ const deleteWarehouseAAC = (aac_warehouse_id) => {
 const updateWarehouseAAC = (warehouseAAC) => {
   return url
     .post('/rawMaterialsWarehouse/aac/update', warehouseAAC)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+// Sand Slurry API functions
+const getWarehouseSandSlurry = () => {
+  return url
+    .get('/rawMaterialsWarehouse/sand_slurry')
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const addNewWarehouseSandSlurry = (warehouseSandSlurry) => {
+  return url
+    .post('/rawMaterialsWarehouse/sand_slurry', warehouseSandSlurry)
     .then((res) => {
       return res.data;
     })
@@ -615,7 +647,10 @@ function* getWarehouseCementWorker(action) {
 
 function* addNewWarehouseCementWorker(action) {
   try {
-    const { warehouseCement } = yield call(addNewWarehouseCement, action.payload);
+    const { warehouseCement } = yield call(
+      addNewWarehouseCement,
+      action.payload,
+    );
     yield put({ type: NEW_WAREHOUSE_CEMENT, payload: warehouseCement });
   } catch (err) {
     yield put({ type: NEW_WAREHOUSE_CEMENT, payload: [] });
@@ -634,7 +669,10 @@ function* deleteWarehouseCementWorker(action) {
 
 function* updateWarehouseCementWorker(action) {
   try {
-    const { warehouseCement } = yield call(updateWarehouseCement, action.payload);
+    const { warehouseCement } = yield call(
+      updateWarehouseCement,
+      action.payload,
+    );
     yield put({ type: UPDATE_WAREHOUSE_CEMENT, payload: warehouseCement });
   } catch (err) {
     yield put({ type: UPDATE_WAREHOUSE_CEMENT, payload: [] });
@@ -653,7 +691,10 @@ function* getWarehouseGypsumWorker(action) {
 
 function* addNewWarehouseGypsumWorker(action) {
   try {
-    const { warehouseGypsum } = yield call(addNewWarehouseGypsum, action.payload);
+    const { warehouseGypsum } = yield call(
+      addNewWarehouseGypsum,
+      action.payload,
+    );
     yield put({ type: NEW_WAREHOUSE_GYPSUM, payload: warehouseGypsum });
   } catch (err) {
     yield put({ type: NEW_WAREHOUSE_GYPSUM, payload: [] });
@@ -672,7 +713,10 @@ function* deleteWarehouseGypsumWorker(action) {
 
 function* updateWarehouseGypsumWorker(action) {
   try {
-    const { warehouseGypsum } = yield call(updateWarehouseGypsum, action.payload);
+    const { warehouseGypsum } = yield call(
+      updateWarehouseGypsum,
+      action.payload,
+    );
     yield put({ type: UPDATE_WAREHOUSE_GYPSUM, payload: warehouseGypsum });
   } catch (err) {
     yield put({ type: UPDATE_WAREHOUSE_GYPSUM, payload: [] });
@@ -683,7 +727,10 @@ function* updateWarehouseGypsumWorker(action) {
 function* getWarehouseGypsumStoneWorker(action) {
   try {
     const { warehouseGypsumStone } = yield call(getWarehouseGypsumStone);
-    yield put({ type: FULL_WAREHOUSE_GYPSUM_STONE, payload: warehouseGypsumStone });
+    yield put({
+      type: FULL_WAREHOUSE_GYPSUM_STONE,
+      payload: warehouseGypsumStone,
+    });
   } catch (err) {
     yield put({ type: FULL_WAREHOUSE_GYPSUM_STONE, payload: [] });
   }
@@ -693,9 +740,12 @@ function* addNewWarehouseGypsumStoneWorker(action) {
   try {
     const { warehouseGypsumStone } = yield call(
       addNewWarehouseGypsumStone,
-      action.payload
+      action.payload,
     );
-    yield put({ type: NEW_WAREHOUSE_GYPSUM_STONE, payload: warehouseGypsumStone });
+    yield put({
+      type: NEW_WAREHOUSE_GYPSUM_STONE,
+      payload: warehouseGypsumStone,
+    });
   } catch (err) {
     yield put({ type: NEW_WAREHOUSE_GYPSUM_STONE, payload: [] });
   }
@@ -715,7 +765,7 @@ function* updateWarehouseGypsumStoneWorker(action) {
   try {
     const { warehouseGypsumStone } = yield call(
       updateWarehouseGypsumStone,
-      action.payload
+      action.payload,
     );
     yield put({
       type: UPDATE_WAREHOUSE_GYPSUM_STONE,
@@ -740,7 +790,7 @@ function* addNewWarehouseAluminum1Worker(action) {
   try {
     const { warehouseAluminum1 } = yield call(
       addNewWarehouseAluminum1,
-      action.payload
+      action.payload,
     );
     yield put({ type: NEW_WAREHOUSE_ALUMINUM1, payload: warehouseAluminum1 });
   } catch (err) {
@@ -762,9 +812,12 @@ function* updateWarehouseAluminum1Worker(action) {
   try {
     const { warehouseAluminum1 } = yield call(
       updateWarehouseAluminum1,
-      action.payload
+      action.payload,
     );
-    yield put({ type: UPDATE_WAREHOUSE_ALUMINUM1, payload: warehouseAluminum1 });
+    yield put({
+      type: UPDATE_WAREHOUSE_ALUMINUM1,
+      payload: warehouseAluminum1,
+    });
   } catch (err) {
     yield put({ type: UPDATE_WAREHOUSE_ALUMINUM1, payload: [] });
   }
@@ -784,7 +837,7 @@ function* addNewWarehouseAluminum2Worker(action) {
   try {
     const { warehouseAluminum2 } = yield call(
       addNewWarehouseAluminum2,
-      action.payload
+      action.payload,
     );
     yield put({ type: NEW_WAREHOUSE_ALUMINUM2, payload: warehouseAluminum2 });
   } catch (err) {
@@ -806,9 +859,12 @@ function* updateWarehouseAluminum2Worker(action) {
   try {
     const { warehouseAluminum2 } = yield call(
       updateWarehouseAluminum2,
-      action.payload
+      action.payload,
     );
-    yield put({ type: UPDATE_WAREHOUSE_ALUMINUM2, payload: warehouseAluminum2 });
+    yield put({
+      type: UPDATE_WAREHOUSE_ALUMINUM2,
+      payload: warehouseAluminum2,
+    });
   } catch (err) {
     yield put({ type: UPDATE_WAREHOUSE_ALUMINUM2, payload: [] });
   }
@@ -831,7 +887,7 @@ function* addNewWarehouseGrindingBallsWorker(action) {
   try {
     const { warehouseGrindingBalls } = yield call(
       addNewWarehouseGrindingBalls,
-      action.payload
+      action.payload,
     );
     yield put({
       type: NEW_WAREHOUSE_GRINDING_BALLS,
@@ -856,7 +912,7 @@ function* updateWarehouseGrindingBallsWorker(action) {
   try {
     const { warehouseGrindingBalls } = yield call(
       updateWarehouseGrindingBalls,
-      action.payload
+      action.payload,
     );
     yield put({
       type: UPDATE_WAREHOUSE_GRINDING_BALLS,
@@ -905,6 +961,34 @@ function* updateWarehouseAACWorker(action) {
   }
 }
 
+// Sand Slurry Workers
+function* getWarehouseSandSlurryWorker(action) {
+  try {
+    const { warehouseSandSlurry } = yield call(getWarehouseSandSlurry);
+    yield put({
+      type: FULL_WAREHOUSE_SAND_SLURRY,
+      payload: warehouseSandSlurry,
+    });
+  } catch (err) {
+    yield put({ type: FULL_WAREHOUSE_SAND_SLURRY, payload: [] });
+  }
+}
+
+function* addNewWarehouseSandSlurryWorker(action) {
+  try {
+    const { warehouseSandSlurry } = yield call(
+      addNewWarehouseSandSlurry,
+      action.payload,
+    );
+    yield put({
+      type: NEW_WAREHOUSE_SAND_SLURRY,
+      payload: warehouseSandSlurry,
+    });
+  } catch (err) {
+    yield put({ type: NEW_WAREHOUSE_SAND_SLURRY, payload: [] });
+  }
+}
+
 // Watchers
 function* warehouseRawMaterialsWatcher() {
   // Sand
@@ -932,42 +1016,57 @@ function* warehouseRawMaterialsWatcher() {
   yield takeLatest(UPDATE_NEW_WAREHOUSE_GYPSUM, updateWarehouseGypsumWorker);
 
   // Gypsum stone
-  yield takeLatest(GET_FULL_WAREHOUSE_GYPSUM_STONE, getWarehouseGypsumStoneWorker);
-  yield takeLatest(ADD_NEW_WAREHOUSE_GYPSUM_STONE, addNewWarehouseGypsumStoneWorker);
-  yield takeLatest(DELETE_WAREHOUSE_GYPSUM_STONE, deleteWarehouseGypsumStoneWorker);
+  yield takeLatest(
+    GET_FULL_WAREHOUSE_GYPSUM_STONE,
+    getWarehouseGypsumStoneWorker,
+  );
+  yield takeLatest(
+    ADD_NEW_WAREHOUSE_GYPSUM_STONE,
+    addNewWarehouseGypsumStoneWorker,
+  );
+  yield takeLatest(
+    DELETE_WAREHOUSE_GYPSUM_STONE,
+    deleteWarehouseGypsumStoneWorker,
+  );
   yield takeLatest(
     UPDATE_NEW_WAREHOUSE_GYPSUM_STONE,
-    updateWarehouseGypsumStoneWorker
+    updateWarehouseGypsumStoneWorker,
   );
 
   // Aluminum1
   yield takeLatest(GET_FULL_WAREHOUSE_ALUMINUM1, getWarehouseAluminum1Worker);
   yield takeLatest(ADD_NEW_WAREHOUSE_ALUMINUM1, addNewWarehouseAluminum1Worker);
   yield takeLatest(DELETE_WAREHOUSE_ALUMINUM1, deleteWarehouseAluminum1Worker);
-  yield takeLatest(UPDATE_NEW_WAREHOUSE_ALUMINUM1, updateWarehouseAluminum1Worker);
+  yield takeLatest(
+    UPDATE_NEW_WAREHOUSE_ALUMINUM1,
+    updateWarehouseAluminum1Worker,
+  );
 
   // Aluminum2
   yield takeLatest(GET_FULL_WAREHOUSE_ALUMINUM2, getWarehouseAluminum2Worker);
   yield takeLatest(ADD_NEW_WAREHOUSE_ALUMINUM2, addNewWarehouseAluminum2Worker);
   yield takeLatest(DELETE_WAREHOUSE_ALUMINUM2, deleteWarehouseAluminum2Worker);
-  yield takeLatest(UPDATE_NEW_WAREHOUSE_ALUMINUM2, updateWarehouseAluminum2Worker);
+  yield takeLatest(
+    UPDATE_NEW_WAREHOUSE_ALUMINUM2,
+    updateWarehouseAluminum2Worker,
+  );
 
   // Grinding Balls
   yield takeLatest(
     GET_FULL_WAREHOUSE_GRINDING_BALLS,
-    getWarehouseGrindingBallsWorker
+    getWarehouseGrindingBallsWorker,
   );
   yield takeLatest(
     ADD_NEW_WAREHOUSE_GRINDING_BALLS,
-    addNewWarehouseGrindingBallsWorker
+    addNewWarehouseGrindingBallsWorker,
   );
   yield takeLatest(
     DELETE_WAREHOUSE_GRINDING_BALLS,
-    deleteWarehouseGrindingBallsWorker
+    deleteWarehouseGrindingBallsWorker,
   );
   yield takeLatest(
     UPDATE_NEW_WAREHOUSE_GRINDING_BALLS,
-    updateWarehouseGrindingBallsWorker
+    updateWarehouseGrindingBallsWorker,
   );
 
   // AAC
@@ -975,6 +1074,16 @@ function* warehouseRawMaterialsWatcher() {
   yield takeLatest(ADD_NEW_WAREHOUSE_AAC, addNewWarehouseAACWorker);
   yield takeLatest(DELETE_WAREHOUSE_AAC, deleteWarehouseAACWorker);
   yield takeLatest(UPDATE_NEW_WAREHOUSE_AAC, updateWarehouseAACWorker);
+
+  // Sand Slurry
+  yield takeLatest(
+    GET_FULL_WAREHOUSE_SAND_SLURRY,
+    getWarehouseSandSlurryWorker,
+  );
+  yield takeLatest(
+    ADD_NEW_WAREHOUSE_SAND_SLURRY,
+    addNewWarehouseSandSlurryWorker,
+  );
 }
 
 export default warehouseRawMaterialsWatcher;

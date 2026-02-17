@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Table from "../Table/Table";
-import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { getRawMaterialsWarehouse } from "#components/redux/actions/warehouseAction.js";
-import RawMaterialsWarehouseInfo from "./RawMaterialsWarehouseInfo";
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Table from '../Table/Table';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { getRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
+import RawMaterialsWarehouseInfo from './RawMaterialsWarehouseInfo';
 import {
   getWarehouseAAC,
   getWarehouseAluminum1,
@@ -15,8 +15,9 @@ import {
   getWarehouseGypsumStone,
   getWarehouseLime,
   getWarehouseSand,
-} from "#components/redux/actions/warehouseRawMaterialsAction.js";
-import RawMaterialsWarehouseAddSandSlurry from "./RawMaterialsWarehouseAddSandSlurry";
+  getWarehouseSandSlurry,
+} from '#components/redux/actions/warehouseRawMaterialsAction.js';
+import RawMaterialsWarehouseAddSandSlurry from './RawMaterialsWarehouseAddSandSlurry';
 
 function Warehouse() {
   const { COLUMNS_RAW_MATERIALS_WAREHOUSE, raw_materials_warehouse } =
@@ -29,20 +30,19 @@ function Warehouse() {
 
   const [modalShow, setModalShow] = useState(false);
   const [sandSlurryModal, setSandSlurryModal] = useState(false);
-  const [materialType, setMaterialType] = useState("");
+  const [materialType, setMaterialType] = useState('');
 
   const handleRowClick = useCallback((row) => {
-    setMaterialType(row.original.material_type.replace(/, kg$/, "").trim());
+    setMaterialType(row.original.material_type.replace(/, kg$/, '').trim());
     // setWarehouseInfoCurIdModal(row.original.id);
     // setWarehouseInfoModal(!warehouseInfoModal);
-    row.original.material_type !== "Sand slurry (dry), kg" &&
-      row.original.material_type !== "Return slurry (dry), kg" &&
+    row.original.material_type !== 'Return slurry (dry), kg' &&
       setModalShow(true);
   }, []);
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, "Warehouse");
+      const access = checkUserAccess(user, roles, 'Warehouse');
 
       if (JSON.stringify(access) !== JSON.stringify(userAccess)) {
         setUserAccess(access);
@@ -61,6 +61,7 @@ function Warehouse() {
     dispatch(getWarehouseAluminum2());
     dispatch(getWarehouseGrindingBalls());
     dispatch(getWarehouseAAC());
+    dispatch(getWarehouseSandSlurry());
   }, []);
 
   const modifiedData = raw_materials_warehouse.map((item) => ({
@@ -78,12 +79,12 @@ function Warehouse() {
         COLUMN_DATA={COLUMNS_RAW_MATERIALS_WAREHOUSE}
         dataOfTable={modifiedData}
         userAccess={userAccess}
-        tableName={"Raw Materials Warehouse"}
+        tableName={'Raw Materials Warehouse'}
         handleRowClick={handleRowClick}
         onClickButton={() => {
           setSandSlurryModal(!sandSlurryModal);
         }}
-        buttonText={"Add sand slurry (dry)"}
+        buttonText={'Add sand slurry (dry)'}
       />
       <RawMaterialsWarehouseInfo
         show={modalShow}
