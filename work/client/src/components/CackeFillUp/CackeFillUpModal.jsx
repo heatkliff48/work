@@ -194,7 +194,7 @@ function CackeFillUpModal({ show, onHide }) {
   useEffect(() => {
     if (batchOutside) {
       const result = batchOutside.filter(
-        (el) => el.is_prodused == 0 || el.is_prodused == 0,
+        (el) => el.is_prodused == 0 || el.is_prodused == null,
       );
       setProductionPlanDataList(result);
     }
