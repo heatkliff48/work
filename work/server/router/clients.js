@@ -146,7 +146,7 @@ clientsRouter.post('/bitrix-new-client', async (req, res) => {
     // }
 
     return res.status(500).json({
-      error: 'Внутренняя ошибка сервера',
+      error: `Внутренняя ошибка сервера: ${err.message}`,
       details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
@@ -301,7 +301,7 @@ clientsRouter.post('/bitrix-update-client', async (req, res) => {
     console.error('Ошибка при обновлении клиента из Bitrix:', err.message);
 
     return res.status(500).json({
-      error: 'Внутренняя ошибка сервера',
+      error: `Внутренняя ошибка сервера: ${err.message}`,
       details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
