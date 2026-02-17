@@ -133,6 +133,7 @@ import {
   UPD_LOTES_LIST_NOTE_SOCKET,
   DELETE_LAST_LOTES_LIST_CAKES_SOCKET,
   UPDT_RAW_MAT_CONSUMPTION_SOCKET,
+  NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -1039,6 +1040,13 @@ export const deleteWarehouseAACSocket = (aac_warehouse_id) => {
   return {
     type: NEED_DELETE_WAREHOUSE_AAC_SOCKET,
     payload: aac_warehouse_id,
+  };
+};
+
+export const addNewWarehouseSandSlurrySocket = (warehouseSandSlurry) => {
+  return {
+    type: NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
+    payload: warehouseSandSlurry,
   };
 };
 

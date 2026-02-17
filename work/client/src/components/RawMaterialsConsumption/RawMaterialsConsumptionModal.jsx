@@ -161,9 +161,12 @@ const RawMaterialsConsumptionModal = React.memo(
     }, [isOpen, selectedRow, latestProducts, list_of_recipes]);
 
     const handleChange = (key) => (e) => {
-      const v = e.target.value;
-      if (v === '' || /^-?\d*\.?\d*$/.test(v)) {
-        setForm((p) => ({ ...p, [key]: v }));
+      let processedValue = e.target.value;
+      if (typeof e.target.value === 'string') {
+        processedValue = e.target.value.replace(/(\d+),(\d*)/g, '$1.$2');
+      }
+      if (processedValue === '' || /^-?\d*\.?\d*$/.test(processedValue)) {
+        setForm((p) => ({ ...p, [key]: processedValue }));
       }
     };
 
@@ -173,18 +176,22 @@ const RawMaterialsConsumptionModal = React.memo(
     // };
 
     const handlePvChange = (e) => {
-      const v = e.target.value;
+      let processedValue = e.target.value;
+      if (typeof e.target.value === 'string') {
+        processedValue = e.target.value.replace(/(\d+),(\d*)/g, '$1.$2');
+      }
 
-      if (!(v === '' || /^-?\d*\.?\d*$/.test(v))) return;
+      if (!(processedValue === '' || /^-?\d*\.?\d*$/.test(processedValue)))
+        return;
 
-      const currentValue = Number(v || 0);
+      const currentValue = Number(processedValue || 0);
 
       const rawRecord = raw_mat_consumption?.find(
         (r) => String(r.batch_id) === String(selectedRow?.batch_id),
       );
 
       if (!rawRecord) {
-        setProductionVolume(v);
+        setProductionVolume(processedValue);
         return;
       }
 
@@ -201,7 +208,7 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
-      setProductionVolume(v);
+      setProductionVolume(processedValue);
     };
 
     const pvNumber = useMemo(
