@@ -18,6 +18,7 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import QuickCheckingModal from './QuickCheckingModal';
 import { useProjectContext } from '#components/contexts/Context.js';
 import FilesMain from '#components/FileUpload/LotesList/FilesMain.jsx';
+import { updateRawMaterialConsumptionRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
 
 const SECTIONS = {
   batchInfo: {
@@ -455,6 +456,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   const navigate = useNavigate();
 
   const [cakeData, setCakeData] = useState({});
+  const [oldBatchData, setOldBatchData] = useState({});
   const [batchData, setBatchData] = useState({});
   const [selectedCakeId, setSelectedCakeId] = useState(null);
   const [applyToAllCakes, setApplyToAllCakes] = useState(false);
@@ -515,6 +517,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   useEffect(() => {
     if (!selectedRecipe) return;
 
+    setOldBatchData({ ...selectedRecipe });
     setBatchData({ ...selectedRecipe });
 
     const related = Array.isArray(selectedRecipe.relatedBatches)
@@ -742,6 +745,42 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
         sub_batch_id: Number.isFinite(nextSub) ? nextSub : prev.sub_batch_id,
       };
     });
+
+    setOldBatchData((prev) => {
+      const related = Array.isArray(prev.relatedBatches) ? prev.relatedBatches : [];
+
+      const match = related.find((b) => {
+        const s = Number(b?.cake_id_start);
+        const f = Number(b?.cake_id_finish);
+        return (
+          Number.isFinite(s) &&
+          Number.isFinite(f) &&
+          nextCakeId >= s &&
+          nextCakeId <= f
+        );
+      });
+
+      if (!match) return prev;
+
+      const nextSub = Number(match.sub_batch_id);
+      const currentSub = Number(prev.sub_batch_id ?? prev.activeSubBatchId);
+
+      if (
+        Number.isFinite(nextSub) &&
+        Number.isFinite(currentSub) &&
+        nextSub === currentSub
+      ) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        ...match,
+        relatedBatches: related,
+        activeSubBatchId: Number.isFinite(nextSub) ? nextSub : prev.activeSubBatchId,
+        sub_batch_id: Number.isFinite(nextSub) ? nextSub : prev.sub_batch_id,
+      };
+    });
   };
 
   const onSelectSubBatch = (nextSubRaw) => {
@@ -756,6 +795,13 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     if (!nextBatch) return;
 
     setBatchData((prev) => ({
+      ...prev,
+      ...nextBatch,
+      relatedBatches: related,
+      activeSubBatchId: nextSub,
+    }));
+
+    setOldBatchData((prev) => ({
       ...prev,
       ...nextBatch,
       relatedBatches: related,
@@ -845,7 +891,25 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       ...updates
     } = batchData;
 
-    console.log('batchData LotesListModal.jsx line 678', batchData);
+    return updates;
+  };
+
+  const buildOldBatchUpdates = () => {
+    const {
+      relatedBatches,
+      relatedBatchesRecipes,
+      activeSubBatchId,
+      activeBatchId,
+
+      id,
+      batch_id,
+      sub_batch_id,
+      cake_id_start,
+      cake_id_finish,
+
+      ...updates
+    } = oldBatchData;
+
     return updates;
   };
 
@@ -888,18 +952,40 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     return arr;
   };
 
+  const normalizeType = (value) => {
+    return value.slice(0, -4);
+  };
+
+  const rawMatUpdData = (oldData, newData) => {
+    return SECTIONS.actualRecipe.fields.map((f) => {
+      const quantity = Number(newData[f.key]) - Number(oldData[f.key] ?? 0);
+      return {
+        type: normalizeType(f.label),
+        quantity,
+      };
+    });
+  };
+
   const onSaveAll = async (e) => {
     e.preventDefault();
 
     const ids = resolveActiveBatchIds();
     const updates = buildBatchUpdates();
+    const oldData = buildOldBatchUpdates();
+    const rawMatUpdDataResult = rawMatUpdData(oldData, updates);
 
     dispatch(updateLotesListRecipe({ ids, updates }));
+
+    dispatch(
+      updateRawMaterialConsumptionRawMaterialsWarehouse({
+        materials: rawMatUpdDataResult,
+      }),
+    );
 
     const cakePayloads = saveSubBatch
       ? buildSubBatchCakePayloads(ids)
       : buildCakePayloads();
-    console.log('cakePayloads LotesListModal.jsx line 777', cakePayloads);
+
     dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
 
     setApplyToAllCakes(false);
