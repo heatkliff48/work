@@ -8,12 +8,15 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useNavigate } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import { updateRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
+import { addNewWarehouseSandSlurry } from '#components/redux/actions/warehouseRawMaterialsAction.js';
+import DatePicker from 'react-datepicker';
 
 function RawMaterialsWarehouseAddSandSlurry(props) {
   const [sandSlurryWarehouseInput, setSandSlurryWarehouseInput] = useState({
     portion_size: 100,
   });
   const [errors, setErrors] = useState({});
+  const [dateValue, setDateValue] = useState(null);
 
   const user = useSelector((state) => state.user);
 
@@ -49,6 +52,18 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       Filter: TextSearchFilter,
     },
   ];
+
+  const handleDateChange = useCallback((date) => {
+    setSandSlurryWarehouseInput((prev) => ({
+      ...prev,
+      date: date.toString(),
+    }));
+    setDateValue(date);
+    setErrors((prev) => ({
+      ...prev,
+      date: '',
+    }));
+  }, []);
 
   const handleRawMaterialWarehouseInputChange = useCallback((e) => {
     let processedValue = e.target.value;
@@ -174,7 +189,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       return;
     }
 
-    dispatch(
+    await dispatch(
       updateRawMaterialsWarehouse({
         materials: [
           {
@@ -200,6 +215,18 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
         ],
         // mixing_hours: parseFloat(sandSlurryWarehouseInput.mixing_hours),
         portion_size: parseFloat(sandSlurryWarehouseInput.portion_size),
+        date: sandSlurryWarehouseInput.date,
+      }),
+    );
+    await dispatch(
+      addNewWarehouseSandSlurry({
+        sand: sandSlurryWarehouseInput.sand,
+        gypsum_stone: sandSlurryWarehouseInput.gypsum_stone,
+        water: sandSlurryWarehouseInput.water,
+        grinding_balls: sandSlurryWarehouseInput.grinding_balls,
+        aac_scrap: sandSlurryWarehouseInput.aac,
+        portion_size: sandSlurryWarehouseInput.portion_size,
+        date: sandSlurryWarehouseInput.date,
       }),
     );
     setSandSlurryWarehouseInput({ portion_size: 100 });
@@ -303,6 +330,22 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   </p>
                 )}
               </div>
+            </div>
+
+            <div>
+              <label
+                className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                htmlFor="cementType"
+              >
+                Date
+              </label>
+              <DatePicker
+                id="data_pcker"
+                type="text"
+                selected={dateValue}
+                onChange={(date) => handleDateChange(date)}
+                dateFormat="dd.MM.yyyy"
+              />
             </div>
 
             {/* {total && ( */}

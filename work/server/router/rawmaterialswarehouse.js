@@ -10,6 +10,7 @@ const {
   WarehouseAluminum2,
   WarehouseGrindingBalls,
   WarehouseAAC,
+  WarehouseSandSlurry,
 } = require('../db/models/index.js');
 const { Sequelize } = require('sequelize');
 
@@ -43,6 +44,7 @@ const {
   ADD_NEW_WAREHOUSE_AAC_SOCKET,
   UPDATE_WAREHOUSE_AAC_SOCKET,
   DELETE_WAREHOUSE_AAC_SOCKET,
+  ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 const { Op } = require('sequelize');
@@ -122,7 +124,7 @@ rawMaterialsWarehouseRouter.get('/', async (req, res) => {
 */
 
 rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
-  const { materials, portion_size } = req.body;
+  const { materials, portion_size, date } = req.body;
 
   if (!Array.isArray(materials) || !materials.length)
     return res.status(400).json({
@@ -149,11 +151,29 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
     const updatedMaterialTypes = Object.keys(materialConsumption);
     const updatedWarehouseRecords = [];
 
-    const today = new Date();
-    const day = today.getDate().toString().padStart(2, '0');
-    const month = (today.getMonth() + 1).toString().padStart(2, '0');
-    const year = today.getFullYear();
-    const date = `${day}.${month}.${year}`;
+    // const today = new Date();
+    // const day = today.getDate().toString().padStart(2, '0');
+    // const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    // const year = today.getFullYear();
+    // const date = `${day}.${month}.${year}`;
+
+    const allRecords = await WarehouseSandSlurry.findAll({
+      attributes: ['date'],
+    });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords.sort(
+      (a, b) => parseDate(b.date) - parseDate(a.date),
+    )[0];
+
+    // Используем дату из последней записи или текущую дату, если записей нет
+    const lastUpdated = latestRecord
+      ? latestRecord.date
+      : formatDate(new Date());
 
     // Проверка наличия всех материалов перед началом операций
     for (const materialType of updatedMaterialTypes) {
@@ -226,7 +246,10 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
             remaining_quantity: sequelize.literal(
               `remaining_quantity - ${consumedQuantity}`,
             ),
-            // last_updated: date,
+            last_updated:
+              parseDate(lastUpdated) - parseDate(formatDate(date)) > 0
+                ? lastUpdated
+                : formatDate(date),
           },
           {
             where: { material_type: materialType },
@@ -246,7 +269,10 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
             material_type: materialType,
             consumed_quantity: consumedQuantity,
             remaining_quantity: -consumedQuantity,
-            last_updated: date,
+            last_updated:
+              parseDate(lastUpdated) - parseDate(formatDate(date)) > 0
+                ? lastUpdated
+                : formatDate(date),
           },
           { transaction: t },
         );
@@ -266,7 +292,10 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
         remaining_quantity: sequelize.literal(
           `remaining_quantity + ${sandSlurryQuantity}`,
         ),
-        last_updated: date,
+        last_updated:
+          parseDate(lastUpdated) - parseDate(formatDate(date)) > 0
+            ? lastUpdated
+            : formatDate(date),
       },
       { where: { material_type: 'Sand slurry (dry)' }, transaction: t },
     );
@@ -276,7 +305,10 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
         {
           material_type: 'Sand slurry (dry)',
           remaining_quantity: sandSlurryQuantity,
-          last_updated: date,
+          last_updated:
+            parseDate(lastUpdated) - parseDate(formatDate(date)) > 0
+              ? lastUpdated
+              : formatDate(date),
         },
         { transaction: t },
       );
@@ -1577,6 +1609,49 @@ rawMaterialsWarehouseRouter.post('/aac/delete', async (req, res) => {
     return res.json(aac_warehouse_id).status(200);
   } catch (err) {
     return ErrorUtils.catchError(res, err);
+  }
+});
+
+// Sand Slurry
+rawMaterialsWarehouseRouter.get('/sand_slurry', async (req, res) => {
+  try {
+    const warehouseSandSlurry = await WarehouseSandSlurry.findAll({
+      order: [['id', 'ASC']],
+    });
+
+    return res.status(200).json({ warehouseSandSlurry });
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
+  const {
+    sand,
+    gypsum_stone,
+    water,
+    grinding_balls,
+    aac_scrap,
+    portion_size,
+    date,
+  } = req.body;
+
+  try {
+    const warehouseSandSlurry = await WarehouseSandSlurry.create({
+      sand,
+      gypsum_stone,
+      water,
+      grinding_balls,
+      aac_scrap,
+      portion_size,
+      date: formatDate(date),
+    });
+
+    myEmitter.emit(ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET, warehouseSandSlurry);
+    return res.json(warehouseSandSlurry).status(200);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
   }
 });
 

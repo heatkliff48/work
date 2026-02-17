@@ -8,7 +8,8 @@ import {
   FULL_WAREHOUSE_ALUMINUM2,
   FULL_WAREHOUSE_GRINDING_BALLS,
   FULL_WAREHOUSE_AAC,
-} from "../types/warehouseRawMaterialsTypes";
+  FULL_WAREHOUSE_SAND_SLURRY,
+} from '../types/warehouseRawMaterialsTypes';
 import {
   NEED_DELETE_WAREHOUSE_SAND_SOCKET,
   NEED_UPDATE_WAREHOUSE_SAND_SOCKET,
@@ -37,7 +38,8 @@ import {
   NEED_DELETE_WAREHOUSE_AAC_SOCKET,
   NEED_UPDATE_WAREHOUSE_AAC_SOCKET,
   NEW_WAREHOUSE_AAC_SOCKET,
-} from "../types/socketTypes/socket";
+  NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
+} from '../types/socketTypes/socket';
 
 // Sand
 export const warehouseSandReducer = (warehouseSand = [], action) => {
@@ -142,7 +144,7 @@ export const warehouseGypsumReducer = (warehouseGypsum = [], action) => {
 // Gypsum stone
 export const warehouseGypsumStoneReducer = (
   warehouseGypsumStone = [],
-  action
+  action,
 ) => {
   const { type, payload } = action;
   switch (type) {
@@ -219,7 +221,7 @@ export const warehouseAluminum2Reducer = (warehouseAluminum2 = [], action) => {
 // Grinding Balls
 export const warehouseGrindingBallsReducer = (
   warehouseGrindingBalls = [],
-  action
+  action,
 ) => {
   const { type, payload } = action;
   switch (type) {
@@ -267,5 +269,23 @@ export const warehouseAACReducer = (warehouseAAC = [], action) => {
     // }
     default:
       return warehouseAAC;
+  }
+};
+
+// Sand Slurry
+export const warehouseSandSlurryReducer = (
+  warehouseSandSlurry = [],
+  action,
+) => {
+  const { type, payload } = action;
+  switch (type) {
+    case FULL_WAREHOUSE_SAND_SLURRY: {
+      return payload;
+    }
+    case NEW_WAREHOUSE_SAND_SLURRY_SOCKET: {
+      return [...warehouseSandSlurry, payload];
+    }
+    default:
+      return warehouseSandSlurry;
   }
 };

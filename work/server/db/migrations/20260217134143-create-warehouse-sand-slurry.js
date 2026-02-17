@@ -2,33 +2,33 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('RawMatConsumptions', {
+    await queryInterface.createTable('WarehouseSandSlurries', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      recipe_article: {
-        type: Sequelize.STRING,
+      sand: {
+        type: Sequelize.FLOAT,
       },
-      batch_article: {
-        type: Sequelize.STRING,
+      gypsum_stone: {
+        type: Sequelize.FLOAT,
       },
-      production_volume: {
-        type: Sequelize.INTEGER,
+      water: {
+        type: Sequelize.FLOAT,
       },
-      batch_id: {
-        type: Sequelize.INTEGER,
+      grinding_balls: {
+        type: Sequelize.FLOAT,
       },
-      cacke_id_start: {
-        type: Sequelize.INTEGER,
+      aac_scrap: {
+        type: Sequelize.FLOAT,
+      },
+      portion_size: {
+        type: Sequelize.FLOAT,
       },
       date: {
         type: Sequelize.STRING,
-      },
-      used: {
-        type: Sequelize.BOOLEAN,
       },
       createdAt: {
         allowNull: false,
@@ -41,6 +41,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('RawMatConsumptions');
+    await queryInterface.dropTable('WarehouseSandSlurries');
   },
 };

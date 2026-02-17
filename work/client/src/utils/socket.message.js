@@ -133,6 +133,7 @@ import {
   updateLotesListNoteSocket,
   deleteLotesListSocket,
   updateRawMatConsumptionSocket,
+  addNewWarehouseSandSlurrySocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -311,6 +312,7 @@ import {
   UPDATE_LOTES_LIST_NOTE_SOCKET,
   DELETE_LOTES_LIST_CAKES_SOCKET,
   UPDATE_RAW_MAT_CONSUMPTION_SOCKET,
+  ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -873,6 +875,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case DELETE_WAREHOUSE_AAC_SOCKET:
       dispatch(deleteWarehouseAACSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET:
+      dispatch(addNewWarehouseSandSlurrySocket(payload));
       break;
 
     case ADD_NEW_LOTES_LIST_SOCKET:
