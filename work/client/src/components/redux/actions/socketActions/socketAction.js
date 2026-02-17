@@ -132,6 +132,7 @@ import {
   UPDATE_NEW_RECIPE_SOCKET,
   UPD_LOTES_LIST_NOTE_SOCKET,
   DELETE_LAST_LOTES_LIST_CAKES_SOCKET,
+  UPDT_RAW_MAT_CONSUMPTION_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -529,6 +530,13 @@ export const updateRecipeSocket = (recipe) => {
 export const addNewRawMatConsumptionSocket = (rawMatConsumption) => {
   return {
     type: NEW_RAW_MAT_CONSUMPTION_SOCKET,
+    payload: rawMatConsumption,
+  };
+};
+
+export const updateRawMatConsumptionSocket = (rawMatConsumption) => {
+  return {
+    type: UPDT_RAW_MAT_CONSUMPTION_SOCKET,
     payload: rawMatConsumption,
   };
 };

@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addNewQualityManagement } from '#components/redux/actions/qualityManagementAction.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { updateRawMatConsumption } from '#components/redux/actions/recipeAction.js';
 
 function QualityManagementAddModal(props) {
   const { latestProducts } = useProductsContext();
@@ -68,6 +70,48 @@ function QualityManagementAddModal(props) {
     //   accessor: 'reserved_quantity',
     // },
   ];
+
+  // --- RAW MAT CONS
+
+  const {
+    raw_mat_consumption,
+    main_raw_mat_consumption,
+    COLUMNS_RAW_MAT_CONSUMPTION,
+  } = useRecipeContext();
+
+  const [filteredRawMatConsumption, setFilteredRaw_MatConsumption] = useState();
+
+  useEffect(() => {
+    if (!raw_mat_consumption || !main_raw_mat_consumption) {
+      setFilteredRaw_MatConsumption([]);
+      return;
+    }
+
+    const sumMap = new Map();
+
+    main_raw_mat_consumption.forEach((item) => {
+      const key = `${item.batch_id}`;
+
+      const currentSum = sumMap.get(key) || 0;
+
+      sumMap.set(key, currentSum + Number(item.consumed_volume || 0));
+    });
+
+    const filtered = raw_mat_consumption.filter((item) => {
+      if (item.used) {
+        return;
+      }
+      const key = `${item.batch_id}`;
+
+      const totalFromMain = sumMap.get(key) || 0;
+
+      return Number(item.production_volume) !== totalFromMain;
+    });
+
+    setFilteredRaw_MatConsumption(filtered);
+  }, [raw_mat_consumption, main_raw_mat_consumption]);
+
+  // ---
 
   const dispatch = useDispatch();
 
@@ -154,55 +198,105 @@ function QualityManagementAddModal(props) {
   };
 
   const handlerAddProductionPlanEntry = useCallback((row) => {
-    const prodPlanEntry = batchOutside.filter(
+    // const prodPlanEntry = batchOutside.filter(
+    //   (el) => el.id === row.original.id,
+    // )[0];
+
+    // const reservedProduct =
+    //   list_of_ordered_production?.find(
+    //     (item) => item.id === prodPlanEntry.id_list_of_ordered_production,
+    //   ) || [];
+
+    // // reserved_quantity:сумма всех reservedProduct.quantity - reservedProduct.quantity_in_warehouse по item.article в list_of_ordered_production
+    // // если это больше total_quantity_plan, то туда записывается total_quantity_plan
+
+    // const filteredListOfOrderedProduction = list_of_ordered_production?.filter(
+    //   (item) => item.product_article === prodPlanEntry?.product_article,
+    // );
+
+    // const totalDifference = filteredListOfOrderedProduction.reduce(
+    //   (sum, item) => {
+    //     return sum + (item?.quantity - item?.quantity_in_warehouse);
+    //   },
+    //   0,
+    // );
+
+    // const reserved_quantity =
+    //   totalDifference > prodPlanEntry.quantity_pallets
+    //     ? prodPlanEntry.quantity_pallets
+    //     : totalDifference;
+
+    // const product = latestProducts.find(
+    //   (el) => el.article === prodPlanEntry?.product_article,
+    // );
+
+    // const warehouse_article = getWarehouseArticle(product);
+
+    // dispatch(
+    //   addNewQualityManagement({
+    //     batch_id: warehouse_article,
+    //     product_article: prodPlanEntry.product_article,
+    //     total_quantity_plan: prodPlanEntry.quantity_pallets,
+    //     reserved_quantity, // reservedProduct.quantity,
+    //     // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free,
+    //     reserved_quantity_allocated: 0,
+    //     reserved_quantity_remaining: reserved_quantity, // reservedProduct.quantity,
+    //     // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free - 0,
+    //     free_quantity_fact: 0,
+    //     production_plan_id: prodPlanEntry.id,
+    //     sorting: 0,
+    //   }),
+    // );
+
+    console.log(
+      raw_mat_consumption,
+      'raw_mat_consumption QualityManagementAddModal.jsx line 247',
+    );
+
+    const rawMatConsEntry = raw_mat_consumption.filter(
       (el) => el.id === row.original.id,
     )[0];
 
-    const reservedProduct =
-      list_of_ordered_production?.find(
-        (item) => item.id === prodPlanEntry.id_list_of_ordered_production,
-      ) || [];
-
-    // reserved_quantity:сумма всех reservedProduct.quantity - reservedProduct.quantity_in_warehouse по item.article в list_of_ordered_production
-    // если это больше total_quantity_plan, то туда записывается total_quantity_plan
-
-    const filteredListOfOrderedProduction = list_of_ordered_production?.filter(
-      (item) => item.product_article === prodPlanEntry?.product_article,
+    console.log(
+      row.original.id,
+      'row.original.id QualityManagementAddModal.jsx line 253',
     );
 
-    const totalDifference = filteredListOfOrderedProduction.reduce(
-      (sum, item) => {
-        return sum + (item?.quantity - item?.quantity_in_warehouse);
-      },
-      0,
+    console.log(
+      rawMatConsEntry,
+      'rawMatConsEntry QualityManagementAddModal.jsx line 253',
     );
-
-    const reserved_quantity =
-      totalDifference > prodPlanEntry.quantity_pallets
-        ? prodPlanEntry.quantity_pallets
-        : totalDifference;
 
     const product = latestProducts.find(
-      (el) => el.article === prodPlanEntry?.product_article,
+      (el) => el.article === rawMatConsEntry?.batch_article,
     );
 
     const warehouse_article = getWarehouseArticle(product);
 
+    console.log(
+      rawMatConsEntry?.batch_id,
+      'rawMatConsEntry?.batch_id QualityManagementAddModal.jsx line 272',
+    );
+
     dispatch(
       addNewQualityManagement({
         batch_id: warehouse_article,
-        product_article: prodPlanEntry.product_article,
-        total_quantity_plan: prodPlanEntry.quantity_pallets,
-        reserved_quantity, // reservedProduct.quantity,
+        product_article: rawMatConsEntry?.batch_article,
+        total_quantity_plan:
+          rawMatConsEntry.production_volume * product?.widthInArray,
+        reserved_quantity: 0, // reservedProduct.quantity,
         // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free,
         reserved_quantity_allocated: 0,
-        reserved_quantity_remaining: reserved_quantity, // reservedProduct.quantity,
+        reserved_quantity_remaining: 0, // reservedProduct.quantity,
         // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free - 0,
         free_quantity_fact: 0,
-        production_plan_id: prodPlanEntry.id,
+        production_plan_id: null,
+        raw_mat_cons_batch_id: rawMatConsEntry?.batch_id,
         sorting: 0,
       }),
     );
+    dispatch(updateRawMatConsumption({ id: rawMatConsEntry?.id, used: true }));
+
     setCustomBatchSelect(false);
     setCustomBatchSelectInput({});
 
@@ -344,13 +438,21 @@ function QualityManagementAddModal(props) {
           </>
         ) : (
           <>
-            <Table
+            {/* <Table
               COLUMN_DATA={production_plan_table}
               dataOfTable={productionPlanDataList}
               // userAccess={userAccess}
               onClickButton={() => {}}
               buttonText={''}
               tableName={'Batch calendar'}
+              handleRowClick={(row) => {
+                handlerAddProductionPlanEntry(row);
+              }}
+            /> */}
+            <Table
+              COLUMN_DATA={COLUMNS_RAW_MAT_CONSUMPTION}
+              dataOfTable={filteredRawMatConsumption}
+              tableName={'Raw materials consumption'}
               handleRowClick={(row) => {
                 handlerAddProductionPlanEntry(row);
               }}

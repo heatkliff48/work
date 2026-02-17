@@ -119,7 +119,7 @@ clientsContactInfo.post('/bitrix-new-contact-info', async (req, res) => {
     console.error('Ошибка при добавлении клиента из Bitrix:', err.message);
 
     return res.status(500).json({
-      error: 'Внутренняя ошибка сервера',
+      error: `Внутренняя ошибка сервера: ${err.message}`,
       details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
@@ -195,7 +195,7 @@ clientsContactInfo.post('/bitrix-update-contact-info', async (req, res) => {
     console.error('Ошибка при обновлении клиента из Bitrix:', err.message);
 
     return res.status(500).json({
-      error: 'Внутренняя ошибка сервера',
+      error: `Внутренняя ошибка сервера: ${err.message}`,
       details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }

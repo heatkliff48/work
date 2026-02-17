@@ -263,6 +263,7 @@ const QualityManagementTable = () => {
         free_quantity_fact,
         production_plan_id,
         sorting,
+        raw_mat_cons_batch_id,
       } = qualityManagementData[0];
 
       // 1. Фильтруем резервы для текущего product_article
@@ -380,6 +381,11 @@ const QualityManagementTable = () => {
 
       // Добавляем на склад
 
+      console.log(
+        raw_mat_cons_batch_id,
+        'raw_mat_cons_batch_id QualityManagementTable.jsx line 384',
+      );
+
       if (calculatedOrderedQuantity + remainingFreeQty > 0) {
         await dispatch(
           addNewWarehouse({
@@ -391,6 +397,7 @@ const QualityManagementTable = () => {
             total_quantity: calculatedOrderedQuantity + remainingFreeQty,
             type: 'OK',
             sorting: 0,
+            batch_id: raw_mat_cons_batch_id,
           }),
         );
       }
@@ -406,6 +413,7 @@ const QualityManagementTable = () => {
             total_quantity: sorting,
             type: 'Sorting',
             sorting,
+            batch_id: raw_mat_cons_batch_id,
           }),
         );
       }

@@ -9,7 +9,7 @@ class RecipeOrdersServices {
 
   static async saveMaterialPlan(material_plan) {
     const recipeOrders = await RecipeOrdersRepository.saveMaterialPlan(
-      material_plan
+      material_plan,
     );
 
     return recipeOrders;
@@ -24,18 +24,32 @@ class RecipeOrdersServices {
   //--------------------------RAW MAT CONSUMPTION--------------------------
 
   static async getAllRawMatConsumptionOrdersData() {
-    const allRawMatConsumptions = await RecipeOrdersRepository.getAllRawMatConsumptionOrdersData();
+    const allRawMatConsumptions =
+      await RecipeOrdersRepository.getAllRawMatConsumptionOrdersData();
 
     return allRawMatConsumptions;
   }
 
   static async addNewRawMatConsumptionOrdersData(newRawMatConsumption) {
-   const rawMat = await RecipeOrdersRepository.addNewRawMatConsumptionOrdersData(newRawMatConsumption);
+    const rawMat =
+      await RecipeOrdersRepository.addNewRawMatConsumptionOrdersData(
+        newRawMatConsumption,
+      );
+    return rawMat;
+  }
+
+  static async updateRawMatConsumptionOrdersData(newRawMatConsumption) {
+    const rawMat =
+      await RecipeOrdersRepository.updateRawMatConsumptionOrdersData(
+        newRawMatConsumption,
+      );
     return rawMat;
   }
 
   static async deleteRawMatConsumptionOrdersData(rawMatConsumption) {
-    await RecipeOrdersRepository.deleteRawMatConsumptionOrdersData(rawMatConsumption);
+    await RecipeOrdersRepository.deleteRawMatConsumptionOrdersData(
+      rawMatConsumption,
+    );
     return;
   }
 }

@@ -8,7 +8,10 @@ class RecipeOrdersRepository {
 
       return allRecipeOrdersInDB;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -63,7 +66,10 @@ class RecipeOrdersRepository {
 
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>error',
+        error,
+      );
       return error;
     }
   }
@@ -71,35 +77,79 @@ class RecipeOrdersRepository {
   //--------------------------RAW MAT CONSUMPTION--------------------------
 
   static async getAllRawMatConsumptionOrdersData() {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAllRawMatConsumptionOrdersData');
+    console.log(
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAllRawMatConsumptionOrdersData',
+    );
     try {
       const allRawMatConsumptions = await RawMatConsumptions.findAll();
 
       return allRawMatConsumptions;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
 
   static async addNewRawMatConsumptionOrdersData(newRawMatConsumption) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewRawMatConsumptionOrdersData');
+    console.log(
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewRawMatConsumptionOrdersData',
+    );
     try {
       const rawMat = await RawMatConsumptions.create(newRawMatConsumption);
 
       return rawMat;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
+      return error;
+    }
+  }
+
+  static async updateRawMatConsumptionOrdersData(newRawMatConsumption) {
+    console.log(
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRawMatConsumptionOrdersData',
+    );
+
+    const { id, used } = newRawMatConsumption;
+
+    try {
+      const rawMat = await RawMatConsumptions.update(
+        { used },
+        {
+          where: {
+            id: id,
+          },
+          returning: true,
+          plain: true,
+        },
+      );
+
+      return rawMat;
+    } catch (error) {
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
 
   static async deleteRawMatConsumptionOrdersData(rawMatConsumption) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionOrdersData');
+    console.log(
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionOrdersData',
+    );
     try {
       await RawMatConsumptions.destroy({ where: { id: rawMatConsumption } });
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
