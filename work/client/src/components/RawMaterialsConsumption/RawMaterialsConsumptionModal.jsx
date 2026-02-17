@@ -29,8 +29,7 @@ const RawMaterialsConsumptionModal = React.memo(
     const { latestProducts } = useProductsContext();
 
     const { setMainRawMaterialConsumptionMadal } = useModalContext();
-    const { raw_materials_warehouse = [], warehouse_data } =
-      useWarehouseContext();
+    const { raw_materials_warehouse = [], warehouse_data } = useWarehouseContext();
 
     const dispatch = useDispatch();
 
@@ -135,8 +134,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (product) {
         candidateRecipes = (list_of_recipes || []).filter(
           (r) =>
-            r.density === product.density &&
-            r.certificate === product.certificate,
+            r.density === product.density && r.certificate === product.certificate,
         );
       }
 
@@ -149,9 +147,7 @@ const RawMaterialsConsumptionModal = React.memo(
       const fromRowArticle = selectedRow?.recipe_article;
       const matched =
         fromRowArticle &&
-        candidateRecipes.find(
-          (r) => String(r.article) === String(fromRowArticle),
-        );
+        candidateRecipes.find((r) => String(r.article) === String(fromRowArticle));
 
       if (matched) {
         setSelectedRecipe(matched);
@@ -386,15 +382,13 @@ const RawMaterialsConsumptionModal = React.memo(
       if (govno) {
         const totalConsumedRaw = result_materials
           .filter(
-            (m) =>
-              m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
+            (m) => m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
           )
           .reduce((sum, m) => sum + (Number(m.quantity) || 0), 0);
 
         if (Number.isFinite(totalConsumedRaw) && totalConsumedRaw > 0) {
           const idx = result_materials.findIndex(
-            (m) =>
-              m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
+            (m) => m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
           );
 
           if (idx >= 0) {
@@ -421,23 +415,15 @@ const RawMaterialsConsumptionModal = React.memo(
         if (Number.isFinite(Number(producedReturn)) && producedReturn > 0) {
           result_materials = materials.map((el) => {
             if (el.type == 'Return slurry (dry)') {
-              const producedReturnMinus =
-                wastedMode === 'manual'
-                  ? el.quantity
-                  : Number(el.quantity * Number(productionVolume));
-
               return {
                 ...el,
-                quantity: (
-                  producedReturnMinus - producedReturn.toFixed(2)
-                ).toFixed(2),
+                quantity: (el.quantity - producedReturn.toFixed(2)).toFixed(2),
               };
             }
             return el;
           });
         }
       }
-
       const shortages = [];
       for (const { type, quantity } of materials) {
         if (type === 'Return slurry (dry)' || type === 'Return (dry)') continue;
@@ -656,8 +642,7 @@ const RawMaterialsConsumptionModal = React.memo(
         .filter((r) => String(r.batch_id) === String(batch_id))
         .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
-      const total =
-        planned - alreadyConsumed < 0 ? 0 : planned - alreadyConsumed;
+      const total = planned - alreadyConsumed < 0 ? 0 : planned - alreadyConsumed;
       setProductionVolume(total);
     }, [selectedRow, isOpen]);
 
@@ -665,20 +650,14 @@ const RawMaterialsConsumptionModal = React.memo(
       <div>
         <Modal isOpen={isOpen} toggle={toggle} size="xl">
           <ModalHeader toggle={toggle}>
-            <div
-              className="d-flex gap-3 w-100"
-              style={{ alignItems: 'flex-start' }}
-            >
+            <div className="d-flex gap-3 w-100" style={{ alignItems: 'flex-start' }}>
               <div style={{ minWidth: 240 }}>
                 <span className="text-muted d-block" style={{ fontSize: 12 }}>
                   Recipe article:
                 </span>
                 <b className="d-block mb-2">{recipeArticle || '—'}</b>
 
-                <span
-                  className="text-muted d-block mb-1"
-                  style={{ fontSize: 12 }}
-                >
+                <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
                   Production volume:
                 </span>
                 <input
@@ -690,10 +669,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 />
               </div>
               <div style={{ flex: 1, minWidth: 280 }}>
-                <span
-                  className="text-muted d-block mb-1"
-                  style={{ fontSize: 12 }}
-                >
+                <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
                   Recipe:
                 </span>
                 {availableRecipes.length ? (
@@ -771,9 +747,7 @@ const RawMaterialsConsumptionModal = React.memo(
                           checked={wastedMode === 'manual'}
                           onChange={onHeaderManual}
                         />
-                        <label className="form-check-label">
-                          use manual input
-                        </label>
+                        <label className="form-check-label">use manual input</label>
                       </div>
                     </th>
                   </tr>
@@ -867,10 +841,7 @@ const RawMaterialsConsumptionModal = React.memo(
                   checked={govno}
                   onChange={(e) => setGovno(e.target.checked)}
                 />
-                <label
-                  className="form-check-label"
-                  htmlFor="warehouse-checkbox"
-                >
+                <label className="form-check-label" htmlFor="warehouse-checkbox">
                   All to return slurry
                 </label>
               </div>
