@@ -13,6 +13,7 @@ import {
   updateLotesListRecipe,
   updateLotesListCakesRecipe,
   updateLotesListCakesBooleanRecipe,
+  addNewLotesList,
 } from '#components/redux/actions/lotesListAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import QuickCheckingModal from './QuickCheckingModal';
@@ -450,6 +451,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   const { showQuickChecking, setShowQuickChecking } = useModalContext();
   const { DEFAULT_RAW_MATERIAL_VALUES } = useProjectContext();
   const lotesListCakes = useSelector((state) => state.lotesListCakes);
+  const lotesListBatches = useSelector((state) => state.lotesListBatches);
   const user = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
@@ -462,6 +464,13 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
   const [applyToAllCakes, setApplyToAllCakes] = useState(false);
   const [saveSubBatch, setSaveSubBatch] = useState(false);
   const [slurried, setSlurried] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedStart, setSelectedStart] = useState(null);
+  const [selectedFinish, setSelectedFinish] = useState(null);
+  const [applyWholeBatch, setApplyWholeBatch] = useState(false);
+  const [maxCakeId, setMaxCakeId] = useState(null);
+  const [minCakeId, setMinCakeId] = useState(null);
 
   // useEffect(() => {
   //   if (user && roles.length > 0) {
@@ -518,7 +527,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     if (!selectedRecipe) return;
 
     setOldBatchData({ ...selectedRecipe });
-    setBatchData({ ...selectedRecipe });
 
     const related = Array.isArray(selectedRecipe.relatedBatches)
       ? selectedRecipe.relatedBatches
@@ -527,6 +535,12 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const starts = related
       .map((b) => Number(b?.cake_id_start))
       .filter(Number.isFinite);
+
+    const data = related.find(
+      (rel) => rel.sub_batch_id == selectedRecipe.activeSubBatchId,
+    );
+
+    setBatchData({ ...data, relatedBatches: selectedRecipe.relatedBatches });
 
     const minStart = starts.length
       ? Math.min(...starts)
@@ -816,8 +830,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       Number.isFinite(rangeFinish) &&
       rangeFinish >= rangeStart
     ) {
-      setSelectedCakeId((prevId) => {
-        const prev = Number(prevId);
+      setSelectedCakeId(() => {
+        const prev = nextBatch.cake_id_start;
         if (Number.isFinite(prev) && prev >= rangeStart && prev <= rangeFinish) {
           return prev;
         }
@@ -883,10 +897,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       activeBatchId,
 
       id,
-      batch_id,
-      sub_batch_id,
-      cake_id_start,
-      cake_id_finish,
 
       ...updates
     } = batchData;
@@ -958,7 +968,9 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
   const rawMatUpdData = (oldData, newData) => {
     return SECTIONS.actualRecipe.fields.map((f) => {
-      const quantity = Number(newData[f.key]) - Number(oldData[f.key] ?? 0);
+      const quantity =
+        (Number(newData[f.key]) - Number(oldData[f.key] ?? 0)) *
+        newData.quantity_cakes;
       return {
         type: normalizeType(f.label),
         quantity,
@@ -966,15 +978,210 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     });
   };
 
-  const onSaveAll = async (e) => {
-    e.preventDefault();
+  const handleSaveClick = () => {
+    const sameBatch = lotesListBatches.filter(
+      (el) =>
+        el.batch_id === batchData.batch_id &&
+        el.sub_batch_id === batchData.sub_batch_id,
+    );
+
+    if (!sameBatch.length) {
+      return;
+    }
+
+    const minCakeId = Math.min(...sameBatch.map((el) => el.cake_id_start));
+    const maxCakeId = Math.max(...sameBatch.map((el) => el.cake_id_finish));
+
+    setMinCakeId(minCakeId);
+    setMaxCakeId(maxCakeId);
+
+    setSelectedStart(batchData.cake_id_start);
+    setSelectedFinish(batchData.cake_id_finish);
+
+    setIsModalOpen(true);
+    setApplyWholeBatch(false);
+  };
+
+  // const handleConfirm = () => {
+  //   const result = {
+  //     cake_id_start: selectedStart,
+  //     cake_id_finish: selectedFinish,
+  //     applyToWholeBatch: applyWholeBatch,
+  //   };
+
+  //   const ids = resolveActiveBatchIds();
+  //   console.log('ids LotesListModal.jsx line 1009', ids);
+  //   console.log('result LotesListModal.jsx line 1030', result);
+
+  //   // onSaveAll(result)
+  //   // setIsModalOpen(false);
+  //   setApplyWholeBatch(false);
+  // };
+
+  // Вспомогательная функция для очистки объекта подпартии от служебных полей и id
+  const cleanSubBatch = (subBatch) => {
+    const {
+      relatedBatches,
+      relatedBatchesRecipes,
+      activeSubBatchId,
+      activeBatchId,
+      id,
+      ...clean
+    } = subBatch;
+    return clean;
+  };
+
+  const handleConfirm = () => {
+    const allSubBatches = Array.isArray(batchData.relatedBatches)
+      ? [...batchData.relatedBatches]
+      : Array.isArray(oldBatchData.relatedBatches)
+        ? [...oldBatchData.relatedBatches]
+        : batchData.batch_id
+          ? [{ ...batchData }]
+          : [];
+
+    const currentSubId = Number(
+      batchData.sub_batch_id ?? batchData.activeSubBatchId,
+    );
+    const currentSub = allSubBatches.find(
+      (sb) => Number(sb.sub_batch_id) === currentSubId,
+    ) || { ...batchData };
+
+    if (
+      applyWholeBatch ||
+      (selectedStart === currentSub.cake_id_start &&
+        selectedFinish === currentSub.cake_id_finish)
+    ) {
+      onSaveAll();
+      setIsModalOpen(false);
+      return;
+    }
+
+    const newStart = Number(selectedStart);
+    const newFinish = Number(selectedFinish);
+    const a = Number(currentSub.cake_id_start);
+    const b = Number(currentSub.cake_id_finish);
+
+    if (newStart < a || newFinish > b || newStart > newFinish) {
+      alert('Некорректный диапазон');
+      return;
+    }
+
+    const oldSubData = cleanSubBatch(oldBatchData);
+    const newSubData = cleanSubBatch(buildBatchUpdates());
+
+    let leftUpdate = null;
+    let middleUpdate = null;
+    const newParts = [];
+
+    if (newStart > a) {
+      leftUpdate = {
+        ...currentSub,
+        cake_id_finish: newStart - 1,
+        quantity_cakes: newStart - a,
+      };
+      newParts.push({
+        ...newSubData,
+        cake_id_start: newStart,
+        cake_id_finish: newFinish,
+        quantity_cakes: newFinish - newStart + 1,
+      });
+    } else {
+      middleUpdate = {
+        ...currentSub,
+        ...newSubData,
+        cake_id_start: newStart,
+        cake_id_finish: newFinish,
+        quantity_cakes: newFinish - newStart + 1,
+      };
+    }
+
+    if (newFinish < b) {
+      newParts.push({
+        ...oldSubData,
+        cake_id_start: newFinish + 1,
+        cake_id_finish: b,
+        quantity_cakes: b - newFinish,
+      });
+    }
+
+    const sortedAll = [...allSubBatches].sort(
+      (x, y) => x.cake_id_start - y.cake_id_start,
+    );
+    const currentIndex = sortedAll.findIndex(
+      (sb) => Number(sb.sub_batch_id) === currentSubId,
+    );
+    if (currentIndex === -1) return;
+
+    const after = sortedAll.slice(currentIndex + 1);
+    const delta = newParts.length;
+
+    const newPartsWithSubId = newParts.map((part, idx) => ({
+      ...part,
+      sub_batch_id: currentSubId + 1 + idx,
+    }));
+
+    const newAfter = after.map((item) => ({
+      ...item,
+      sub_batch_id: item.sub_batch_id + delta,
+    }));
+
+    // console.log('leftUpdate', leftUpdate);
+    // console.log('middleUpdate', middleUpdate);
+    // console.log('newPartsWithSubId', newPartsWithSubId);
+    // console.log('newAfter', newAfter);
+
+    if (leftUpdate) {
+      dispatch(updateLotesListRecipe([leftUpdate]));
+    }
+    if (middleUpdate) {
+      dispatch(updateLotesListRecipe([middleUpdate]));
+    }
+    if (newPartsWithSubId.length) {
+      dispatch(addNewLotesList({ new_lotestList: newPartsWithSubId }));
+    }
+    if (newAfter.length) {
+      dispatch(updateLotesListRecipe(newAfter));
+    }
+
+    const middlePart = newStart > a ? newPartsWithSubId[0] : middleUpdate;
+
+    if (middlePart) {
+      const cakeIds = [];
+      for (let id = newStart; id <= newFinish; id++) {
+        cakeIds.push(id);
+      }
+      const cakePayloads = cakeIds.map((id) => ({
+        ...cakeData,
+        id,
+      }));
+      dispatch(
+        updateLotesListCakesRecipe({
+          ids: {
+            batch_id: batchData.batch_id,
+            sub_batch_id: middlePart.sub_batch_id,
+            cake_id_start: newStart,
+            cake_id_finish: newFinish,
+            quantity_cakes: middlePart.quantity_cakes,
+          },
+          payloads: cakePayloads,
+        }),
+      );
+    }
+
+    setIsModalOpen(false);
+  };
+
+  const onSaveAll = async () => {
+    // e.preventDefault();
 
     const ids = resolveActiveBatchIds();
+
     const updates = buildBatchUpdates();
     const oldData = buildOldBatchUpdates();
     const rawMatUpdDataResult = rawMatUpdData(oldData, updates);
 
-    dispatch(updateLotesListRecipe({ ids, updates }));
+    dispatch(updateLotesListRecipe([updates]));
 
     dispatch(
       updateRawMaterialConsumptionRawMaterialsWarehouse({
@@ -985,7 +1192,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const cakePayloads = saveSubBatch
       ? buildSubBatchCakePayloads(ids)
       : buildCakePayloads();
-
     dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
 
     setApplyToAllCakes(false);
@@ -1065,7 +1271,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
         <Modal.Body>
           <Container fluid>
-            <Form onSubmit={onSaveAll}>
+            <Form onSubmit={handleSaveClick}>
               <Row>
                 <Col md={4}>
                   <RenderSection
@@ -1180,7 +1386,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
           </Button>
 
           {userAccess?.canWrite && (
-            <Button variant="primary" onClick={onSaveAll}>
+            <Button variant="primary" onClick={handleSaveClick}>
               Save
             </Button>
           )}
@@ -1189,6 +1395,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
           </Button>
         </Modal.Footer>
       </Modal>
+
       <QuickCheckingModal
         show={showQuickChecking}
         onHide={() => setShowQuickChecking(false)}
@@ -1196,6 +1403,73 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
         initialRecipe={quickCheckingInitialByCake}
         onSave={onSaveQuickChecking}
       />
+
+      {isModalOpen && (
+        <Modal show={isModalOpen} onHide={() => setIsModalOpen(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Apply recipe</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Recipe was changed. Apply recipe for:</p>
+            <div>
+              <label>Start:</label>
+              <select
+                value={selectedStart}
+                onChange={(e) => setSelectedStart(Number(e.target.value))}
+              >
+                {Array.from(
+                  { length: maxCakeId - minCakeId + 1 },
+                  (_, i) => minCakeId + i,
+                ).map((id) => (
+                  <option key={id} value={id}>
+                    {id}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label>Finish:</label>
+              <select
+                value={selectedFinish}
+                onChange={(e) => setSelectedFinish(Number(e.target.value))}
+              >
+                {Array.from(
+                  { length: maxCakeId - minCakeId + 1 },
+                  (_, i) => minCakeId + i,
+                ).map((id) => (
+                  <option key={id} value={id}>
+                    {id}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <input
+                type="checkbox"
+                checked={applyWholeBatch}
+                onChange={(e) => setApplyWholeBatch(e.target.checked)}
+              />
+              <label>All batches</label>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                // setApplyWholeBatch(false);
+                setIsModalOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleConfirm}>
+              Confirm
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </>
   );
 }
