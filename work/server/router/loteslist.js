@@ -34,7 +34,33 @@ lotesListRouter.get('/batches', async (req, res) => {
 });
 
 lotesListRouter.post('/batches', async (req, res) => {
-  const { new_lotestList, new_batch } = req.body;
+  const { new_lotestList, new_batch = false } = req.body;
+  console.log('req.body loteslist.js line 38', req.body);
+
+  if (Array.isArray(new_lotestList)) {
+    try {
+      const created = [];
+      for (const item of new_lotestList) {
+        const quantityCakesInt = Math.floor(parseFloat(item.quantity_cakes));
+        const lotesListBatches = await LotesListsBatches.create({
+          cake_id_start: item.cake_id_start,
+          cake_id_finish: item.cake_id_finish,
+          batch_id: item.batch_id,
+          sub_batch_id: item.sub_batch_id,
+          ...item,
+          quantity_cakes: quantityCakesInt,
+          sand_dry: item.sand_dry || item.sand_powder_dry || '0',
+        });
+        created.push(lotesListBatches);
+        myEmitter.emit(ADD_NEW_LOTES_LIST_SOCKET, lotesListBatches);
+      }
+      return res.status(200).json(created);
+    } catch (err) {
+      console.error(err.message);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
   const { quantity_cakes, product, production_date, batch_id } = new_lotestList;
   const sand_dry =
     (new_lotestList.sand_dry ?? new_lotestList.sand_powder_dry) || '0';
@@ -140,33 +166,49 @@ lotesListRouter.post('/batches', async (req, res) => {
 });
 
 lotesListRouter.post('/batches/update/recipe', async (req, res) => {
-  const { ids, updates } = req.body;
-  const {
-    batch_id,
-    sub_batch_id,
-    cake_id_start,
-    cake_id_finish,
-    quantity_cakes,
-  } = ids;
-  const sand_dry = (updates.sand_dry ?? updates.sand_powder_dry) || '0';
+  console.log('req.body loteslist.js line 167', req.body);
+  const updates = req.body;
 
   try {
-    const [count, rows] = await LotesListsBatches.update(
-      { ...updates, sand_dry, quantity_cakes },
-      {
-        where: { batch_id, sub_batch_id, cake_id_start, cake_id_finish },
-        returning: true,
-      },
-    );
-
-    if (count === 0) {
-      return res.status(404).json({ error: 'Record not found' });
+    if (!Array.isArray(updates)) {
+      return res.status(400).json({ error: 'Expected an array of updates' });
     }
 
-    const updatedLotes = rows[0];
+    const results = [];
+    for (const updateData of updates) {
+      const { batch_id, sub_batch_id, cake_id_start, cake_id_finish } = updateData;
+      const sand_dry = (updateData.sand_dry ?? updateData.sand_powder_dry) || '0';
 
-    myEmitter.emit(UPDATE_LOTES_LIST_SOCKET, updatedLotes);
-    return res.status(200);
+      if (updateData?.updatedAt || updateData?.createdAt) {
+        delete updateData.createdAt;
+        delete updateData.updatedAt;
+      }
+
+      const [count, rows] = await LotesListsBatches.update(
+        { ...updateData, sand_dry },
+        {
+          where: { batch_id, sub_batch_id },
+          returning: true,
+        },
+      );
+
+      if (count === 0) {
+        console.warn(
+          `No record found for batch_id=${batch_id}, sub_batch_id=${sub_batch_id}, start=${cake_id_start}, finish=${cake_id_finish}`,
+        );
+        continue;
+      }
+
+      const updatedLotes = rows[0];
+      results.push(updatedLotes);
+      myEmitter.emit(UPDATE_LOTES_LIST_SOCKET, updatedLotes);
+    }
+    console.log('results loteslist.js line 206', results);
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'No records updated' });
+    }
+
+    return res.status(200).json(results);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json({ error: err.message });
