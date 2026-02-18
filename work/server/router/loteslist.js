@@ -35,7 +35,6 @@ lotesListRouter.get('/batches', async (req, res) => {
 
 lotesListRouter.post('/batches', async (req, res) => {
   const { new_lotestList, new_batch = false } = req.body;
-  console.log('req.body loteslist.js line 38', req.body);
 
   if (Array.isArray(new_lotestList)) {
     try {
@@ -166,7 +165,6 @@ lotesListRouter.post('/batches', async (req, res) => {
 });
 
 lotesListRouter.post('/batches/update/recipe', async (req, res) => {
-  console.log('req.body loteslist.js line 167', req.body);
   const updates = req.body;
 
   try {
@@ -177,6 +175,7 @@ lotesListRouter.post('/batches/update/recipe', async (req, res) => {
     const results = [];
     for (const updateData of updates) {
       const { batch_id, sub_batch_id, cake_id_start, cake_id_finish } = updateData;
+
       const sand_dry = (updateData.sand_dry ?? updateData.sand_powder_dry) || '0';
 
       if (updateData?.updatedAt || updateData?.createdAt) {
@@ -184,10 +183,25 @@ lotesListRouter.post('/batches/update/recipe', async (req, res) => {
         delete updateData.updatedAt;
       }
 
+      const { old_sub_batch_id = null, ...updateDataWithoutSubBatchId } = updateData;
+
+      const updatedSubBatchId =
+        old_sub_batch_id !== null ? old_sub_batch_id : sub_batch_id;
+
+      const whereClause = { batch_id };
+
+      if (old_sub_batch_id !== null) {
+        whereClause.sub_batch_id = old_sub_batch_id;
+        whereClause.cake_id_start = cake_id_start;
+        whereClause.cake_id_finish = cake_id_finish;
+      } else {
+        whereClause.sub_batch_id = sub_batch_id;
+      }
+
       const [count, rows] = await LotesListsBatches.update(
-        { ...updateData, sand_dry },
+        { ...updateDataWithoutSubBatchId, sand_dry },
         {
-          where: { batch_id, sub_batch_id },
+          where: whereClause,
           returning: true,
         },
       );

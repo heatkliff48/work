@@ -1002,23 +1002,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     setApplyWholeBatch(false);
   };
 
-  // const handleConfirm = () => {
-  //   const result = {
-  //     cake_id_start: selectedStart,
-  //     cake_id_finish: selectedFinish,
-  //     applyToWholeBatch: applyWholeBatch,
-  //   };
-
-  //   const ids = resolveActiveBatchIds();
-  //   console.log('ids LotesListModal.jsx line 1009', ids);
-  //   console.log('result LotesListModal.jsx line 1030', result);
-
-  //   // onSaveAll(result)
-  //   // setIsModalOpen(false);
-  //   setApplyWholeBatch(false);
-  // };
-
-  // Вспомогательная функция для очистки объекта подпартии от служебных полей и id
   const cleanSubBatch = (subBatch) => {
     const {
       relatedBatches,
@@ -1043,9 +1026,14 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const currentSubId = Number(
       batchData.sub_batch_id ?? batchData.activeSubBatchId,
     );
+
     const currentSub = allSubBatches.find(
       (sb) => Number(sb.sub_batch_id) === currentSubId,
     ) || { ...batchData };
+
+    const updates = buildBatchUpdates();
+    const oldData = buildOldBatchUpdates();
+    const rawMatUpdDataResult = rawMatUpdData(oldData, updates);
 
     if (
       applyWholeBatch ||
@@ -1113,8 +1101,10 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     );
     if (currentIndex === -1) return;
 
-    const after = sortedAll.slice(currentIndex + 1);
+    const after = lotesListBatches.slice(currentIndex + 1);
     const delta = newParts.length;
+
+    console.log('lotesListBatches LotesListModal.jsx line 1107', lotesListBatches);
 
     const newPartsWithSubId = newParts.map((part, idx) => ({
       ...part,
@@ -1123,6 +1113,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
     const newAfter = after.map((item) => ({
       ...item,
+      old_sub_batch_id: item.sub_batch_id,
       sub_batch_id: item.sub_batch_id + delta,
     }));
 
@@ -1155,6 +1146,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
         ...cakeData,
         id,
       }));
+
       dispatch(
         updateLotesListCakesRecipe({
           ids: {
@@ -1169,7 +1161,15 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       );
     }
 
+    dispatch(
+      updateRawMaterialConsumptionRawMaterialsWarehouse({
+        materials: rawMatUpdDataResult,
+      }),
+    );
+
     setIsModalOpen(false);
+    setApplyToAllCakes(false);
+    onHide();
   };
 
   const onSaveAll = async () => {
