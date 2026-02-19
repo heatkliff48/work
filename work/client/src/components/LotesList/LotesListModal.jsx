@@ -509,7 +509,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
   const applyRawMaterialDefaults = (data) => {
     const next = { ...data };
-
     DEFAULT_RAW_MATERIAL_VALUES.forEach(({ key, value }) => {
       if (!DEFAULT_KEYS.includes(key)) return;
 
@@ -519,6 +518,15 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
       next[key] = value;
     });
+
+    const alum1 = Number(batchData.aluminum_paste) || 0;
+    const alum2 = Number(batchData.aluminum_paste_2) || 0;
+    const total = alum1 + alum2;
+
+    if (total > 0) {
+      next.al_paste_proportion = ((alum1 / total) * 100).toFixed(2);
+      next.al_paste_proportion_2 = ((alum2 / total) * 100).toFixed(2);
+    }
 
     return next;
   };
@@ -925,6 +933,21 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
   const stripUiOnlyKeys = (obj) => {
     if (!obj || typeof obj !== 'object') return obj;
+    if (saveSubBatch) {
+      const {
+        mixer_issues,
+        oiling_issues,
+        mold_moving_issues,
+        mold_id,
+        flowability,
+
+        note,
+
+        ...result
+      } = obj;
+
+      return result;
+    }
     const out = { ...obj };
 
     return out;
@@ -978,6 +1001,29 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     });
   };
 
+  const hasActualRecipeChanged = () => {
+    const actualKeys = SECTIONS.actualRecipe.fields.map((f) => f.key);
+
+    for (let key of actualKeys) {
+      const oldVal = oldBatchData[key];
+      const newVal = batchData[key];
+
+      if (numericKeys.has(key)) {
+        const oldNum = oldVal === '' || oldVal == null ? NaN : Number(oldVal);
+        const newNum = newVal === '' || newVal == null ? NaN : Number(newVal);
+
+        if (oldNum !== newNum && !(isNaN(oldNum) && isNaN(newNum))) {
+          return true;
+        }
+      } else {
+        if (oldVal !== newVal) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
   const handleSaveClick = () => {
     const sameBatch = lotesListBatches.filter(
       (el) =>
@@ -997,6 +1043,11 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
     setSelectedStart(batchData.cake_id_start);
     setSelectedFinish(batchData.cake_id_finish);
+
+    if (!hasActualRecipeChanged()) {
+      onSaveAll();
+      return;
+    }
 
     setIsModalOpen(true);
     setApplyWholeBatch(false);
@@ -1104,8 +1155,6 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const after = lotesListBatches.slice(currentIndex + 1);
     const delta = newParts.length;
 
-    console.log('lotesListBatches LotesListModal.jsx line 1107', lotesListBatches);
-
     const newPartsWithSubId = newParts.map((part, idx) => ({
       ...part,
       sub_batch_id: currentSubId + 1 + idx,
@@ -1147,29 +1196,33 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
         id,
       }));
 
-      dispatch(
-        updateLotesListCakesRecipe({
-          ids: {
-            batch_id: batchData.batch_id,
-            sub_batch_id: middlePart.sub_batch_id,
-            cake_id_start: newStart,
-            cake_id_finish: newFinish,
-            quantity_cakes: middlePart.quantity_cakes,
-          },
-          payloads: cakePayloads,
-        }),
-      );
+      // const cakePayloads = saveSubBatch
+      //   ? buildSubBatchCakePayloads(ids)
+      //   : buildCakePayloads();
+
+      // dispatch(
+      //   updateLotesListCakesRecipe({
+      //     ids: {
+      //       batch_id: batchData.batch_id,
+      //       sub_batch_id: middlePart.sub_batch_id,
+      //       cake_id_start: newStart,
+      //       cake_id_finish: newFinish,
+      //       quantity_cakes: middlePart.quantity_cakes,
+      //     },
+      //     payloads: cakePayloads,
+      //   }),
+      // );
     }
 
-    dispatch(
-      updateRawMaterialConsumptionRawMaterialsWarehouse({
-        materials: rawMatUpdDataResult,
-      }),
-    );
+    // dispatch(
+    //   updateRawMaterialConsumptionRawMaterialsWarehouse({
+    //     materials: rawMatUpdDataResult,
+    //   }),
+    // );
 
-    setIsModalOpen(false);
-    setApplyToAllCakes(false);
-    onHide();
+    // setIsModalOpen(false);
+    // setApplyToAllCakes(false);
+    // onHide();
   };
 
   const onSaveAll = async () => {
@@ -1181,21 +1234,22 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const oldData = buildOldBatchUpdates();
     const rawMatUpdDataResult = rawMatUpdData(oldData, updates);
 
-    dispatch(updateLotesListRecipe([updates]));
+    // dispatch(updateLotesListRecipe([updates]));
 
-    dispatch(
-      updateRawMaterialConsumptionRawMaterialsWarehouse({
-        materials: rawMatUpdDataResult,
-      }),
-    );
+    // dispatch(
+    //   updateRawMaterialConsumptionRawMaterialsWarehouse({
+    //     materials: rawMatUpdDataResult,
+    //   }),
+    // );
 
     const cakePayloads = saveSubBatch
       ? buildSubBatchCakePayloads(ids)
       : buildCakePayloads();
-    dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
 
-    setApplyToAllCakes(false);
-    onHide();
+    // dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
+
+    // setApplyToAllCakes(false);
+    // onHide();
   };
 
   const onSaveQuickChecking = (changes) => {

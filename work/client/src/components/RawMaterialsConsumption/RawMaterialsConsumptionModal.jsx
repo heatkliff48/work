@@ -177,8 +177,7 @@ const RawMaterialsConsumptionModal = React.memo(
         processedValue = e.target.value.replace(/(\d+),(\d*)/g, '$1.$2');
       }
 
-      if (!(processedValue === '' || /^-?\d*\.?\d*$/.test(processedValue)))
-        return;
+      if (!(processedValue === '' || /^-?\d*\.?\d*$/.test(processedValue))) return;
 
       const currentValue = Number(processedValue || 0);
 
@@ -293,9 +292,7 @@ const RawMaterialsConsumptionModal = React.memo(
             `Сверх плана: ${info.diff}\n\n` +
             `Продолжить?`,
         );
-      }
-
-      if (info.diff < 0) {
+      } else {
         return window.confirm(
           `ℹ️ Production volume не достигнут\n\n` +
             `План: ${info.planned}\n` +
@@ -304,8 +301,6 @@ const RawMaterialsConsumptionModal = React.memo(
             `Продолжить?`,
         );
       }
-
-      return true;
     };
 
     const shouldShowRow = (label, key) => {
