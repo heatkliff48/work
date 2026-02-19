@@ -1191,38 +1191,38 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       for (let id = newStart; id <= newFinish; id++) {
         cakeIds.push(id);
       }
-      const cakePayloads = cakeIds.map((id) => ({
-        ...cakeData,
-        id,
-      }));
+      // const cakePayloads = cakeIds.map((id) => ({
+      //   ...cakeData,
+      //   id,
+      // }));
 
-      // const cakePayloads = saveSubBatch
-      //   ? buildSubBatchCakePayloads(ids)
-      //   : buildCakePayloads();
+      const cakePayloads = saveSubBatch
+        ? buildSubBatchCakePayloads(cakeIds)
+        : buildCakePayloads();
 
-      // dispatch(
-      //   updateLotesListCakesRecipe({
-      //     ids: {
-      //       batch_id: batchData.batch_id,
-      //       sub_batch_id: middlePart.sub_batch_id,
-      //       cake_id_start: newStart,
-      //       cake_id_finish: newFinish,
-      //       quantity_cakes: middlePart.quantity_cakes,
-      //     },
-      //     payloads: cakePayloads,
-      //   }),
-      // );
+      dispatch(
+        updateLotesListCakesRecipe({
+          ids: {
+            batch_id: batchData.batch_id,
+            sub_batch_id: middlePart.sub_batch_id,
+            cake_id_start: newStart,
+            cake_id_finish: newFinish,
+            quantity_cakes: middlePart.quantity_cakes,
+          },
+          payloads: cakePayloads,
+        }),
+      );
     }
 
-    // dispatch(
-    //   updateRawMaterialConsumptionRawMaterialsWarehouse({
-    //     materials: rawMatUpdDataResult,
-    //   }),
-    // );
+    dispatch(
+      updateRawMaterialConsumptionRawMaterialsWarehouse({
+        materials: rawMatUpdDataResult,
+      }),
+    );
 
-    // setIsModalOpen(false);
-    // setApplyToAllCakes(false);
-    // onHide();
+    setIsModalOpen(false);
+    setApplyToAllCakes(false);
+    onHide();
   };
 
   const onSaveAll = async () => {
@@ -1234,22 +1234,22 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const oldData = buildOldBatchUpdates();
     const rawMatUpdDataResult = rawMatUpdData(oldData, updates);
 
-    // dispatch(updateLotesListRecipe([updates]));
+    dispatch(updateLotesListRecipe([updates]));
 
-    // dispatch(
-    //   updateRawMaterialConsumptionRawMaterialsWarehouse({
-    //     materials: rawMatUpdDataResult,
-    //   }),
-    // );
+    dispatch(
+      updateRawMaterialConsumptionRawMaterialsWarehouse({
+        materials: rawMatUpdDataResult,
+      }),
+    );
 
     const cakePayloads = saveSubBatch
       ? buildSubBatchCakePayloads(ids)
       : buildCakePayloads();
 
-    // dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
+    dispatch(updateLotesListCakesRecipe({ ids, payloads: cakePayloads }));
 
-    // setApplyToAllCakes(false);
-    // onHide();
+    setApplyToAllCakes(false);
+    onHide();
   };
 
   const onSaveQuickChecking = (changes) => {
