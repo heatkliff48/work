@@ -357,6 +357,7 @@ const ProjectContextProvider = ({ children }) => {
     { key: 'mixing_after_al_sec', value: 30 },
     { key: 'vibrator_speed_hz', value: 40 },
     { key: 'sand_producer', value: 'Sibelco' },
+    { key: 'sand_type', value: 'SILICA 0-2 WS' },
     { key: 'gypsum_producer', value: 'Yemaconsa' },
     { key: 'lime_producer', value: 'Cala de Pachs' },
     { key: 'lime_type', value: 'CL90Q' },
@@ -531,7 +532,7 @@ const ProjectContextProvider = ({ children }) => {
         setPreviewOperationName,
         getPageTitleByPath,
         lotesListBatches,
-        lotesListCakes
+        lotesListCakes,
       }}
     >
       {children}
