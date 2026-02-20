@@ -160,6 +160,12 @@ export const ProductsContextProvider = ({ children }) => {
       disableSortBy: true,
     },
     {
+      Header: 'Description',
+      accessor: 'description',
+      Filter: TextSearchFilter,
+      disableSortBy: true,
+    },
+    {
       Header: 'Version',
       accessor: 'version',
       defaultValue: 1,
@@ -389,7 +395,7 @@ export const ProductsContextProvider = ({ children }) => {
         { value: 2, label: 'High' },
       ],
     }),
-    []
+    [],
   );
 
   const latestProducts = useMemo(() => {
@@ -408,16 +414,16 @@ export const ProductsContextProvider = ({ children }) => {
 
     const newlatestProducts = newProductList.map((prod) => {
       const newPlaceOfProduction = selectOptions.placeOfProduction.find(
-        (opt) => opt.value == prod.placeOfProduction
+        (opt) => opt.value == prod.placeOfProduction,
       );
       const newTypeOfPackaging = selectOptions.typeOfPackaging.find(
-        (opt) => opt.value == prod.typeOfPackaging
+        (opt) => opt.value == prod.typeOfPackaging,
       );
       const newPalletSize = selectOptions.palletSize.find(
-        (opt) => opt.value == prod.palletSize
+        (opt) => opt.value == prod.palletSize,
       );
       const newPalletHeight = selectOptions.palletHeight.find(
-        (opt) => opt.value == prod.palletHeight
+        (opt) => opt.value == prod.palletHeight,
       );
 
       return {
@@ -449,7 +455,7 @@ export const ProductsContextProvider = ({ children }) => {
 
     // Ищем соответствие по label или value
     const matchedOption = selectOptions[category].find(
-      (el) => el.label === inputValue || el.value === inputValue
+      (el) => el.label === inputValue || el.value === inputValue,
     );
 
     return matchedOption ? matchedOption.value : null;
