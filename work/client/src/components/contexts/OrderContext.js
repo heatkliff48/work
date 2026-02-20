@@ -1,5 +1,6 @@
 // import { useNavigate } from 'react-router-dom';
 import { DropdownFilter } from '#components/Table/filters';
+import { TextSearchFilter } from '#components/Table/filters.js';
 import {
   addAccountingDataList,
   getOrders,
@@ -54,8 +55,8 @@ const OrderContextProvider = ({ children }) => {
 
   const COLUMNS_ORDER_PRODUCT = [
     {
-      Header: 'Product ID',
-      accessor: 'product_article',
+      Header: 'Description',
+      accessor: 'description',
       disableSortBy: true,
     },
     {
@@ -312,17 +313,17 @@ const OrderContextProvider = ({ children }) => {
   const accountingDataList = useSelector((state) => state.accountingDataList);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
   const dryMixedProductsOfOrders = useSelector(
-    (state) => state.dryMixedProductsOfOrders
+    (state) => state.dryMixedProductsOfOrders,
   );
 
   const anchorProductsOfOrders = useSelector(
-    (state) => state.anchorProductsOfOrders
+    (state) => state.anchorProductsOfOrders,
   );
 
   const toolProductsOfOrders = useSelector((state) => state.toolProductsOfOrders);
 
   const relMatProductsOfOrders = useSelector(
-    (state) => state.relMatProductsOfOrders
+    (state) => state.relMatProductsOfOrders,
   );
 
   const clients = useSelector((state) => state.clients);
@@ -370,7 +371,7 @@ const OrderContextProvider = ({ children }) => {
 
     list_of_orders?.forEach((el) => {
       const haveAproved = accDataList?.find(
-        (acc) => acc.orders_article == el.article
+        (acc) => acc.orders_article == el.article,
       );
 
       if (
@@ -381,7 +382,7 @@ const OrderContextProvider = ({ children }) => {
           updAccountingDataList({
             orders_article: el?.article,
             aproved: false,
-          })
+          }),
         );
       }
     });
@@ -389,7 +390,7 @@ const OrderContextProvider = ({ children }) => {
 
   useEffect(() => {
     const filteredUsersList = usersMainInfo.filter(
-      (user) => user.role === 2 || user.role === 16 || user.role === 17
+      (user) => user.role === 2 || user.role === 16 || user.role === 17,
     );
 
     const tempPersonsInChargeList = [
@@ -429,11 +430,11 @@ const OrderContextProvider = ({ children }) => {
       const client = clients.find((client) => client.id === order?.owner);
       const deliveryAddress = deliveryAddresses.find(
         (address) =>
-          address.id === order?.del_adr_id && address.client_id === order?.owner
+          address.id === order?.del_adr_id && address.client_id === order?.owner,
       );
       const contactInfo = contactInfos.find(
         (contact) =>
-          contact.id === order?.contact_id && contact.client_id === order?.owner
+          contact.id === order?.contact_id && contact.client_id === order?.owner,
       );
 
       const secondaryContact = order?.secondary_contact
@@ -454,11 +455,11 @@ const OrderContextProvider = ({ children }) => {
         delivery: order?.delivery,
       };
 
-console.log('currentOrder OrderContext.js line 458', currentOrder)
+      console.log('currentOrder OrderContext.js line 458', currentOrder);
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
       setOrderCartData(currentOrder);
     },
-    [list_of_orders, clients, deliveryAddresses]
+    [list_of_orders, clients, deliveryAddresses],
   );
 
   useEffect(() => {
@@ -473,7 +474,7 @@ console.log('currentOrder OrderContext.js line 458', currentOrder)
             orders_article: order.article,
             orders_status: order.status,
             aproved: false,
-          })
+          }),
         );
       }
     });
@@ -486,7 +487,7 @@ console.log('currentOrder OrderContext.js line 458', currentOrder)
         const client = clients.find((client) => client.id === order.owner);
         const deliveryAddress = deliveryAddresses.find(
           (address) =>
-            address.id === order.del_adr_id && address.client_id === order.owner
+            address.id === order.del_adr_id && address.client_id === order.owner,
         );
 
         return {
@@ -506,7 +507,7 @@ console.log('currentOrder OrderContext.js line 458', currentOrder)
       });
 
       const uniqueArray = newArray.filter(
-        (obj, index, self) => index === self.findIndex((el) => el.id === obj.id)
+        (obj, index, self) => index === self.findIndex((el) => el.id === obj.id),
       );
 
       setOrdersDataList(uniqueArray);
