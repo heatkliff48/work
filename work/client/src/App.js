@@ -50,6 +50,7 @@ import RawMaterialsConsumption from '#components/RawMaterialsConsumption/RawMate
 import LotesList from '#components/LotesList/LotesList.jsx';
 import ClientsPriceInfo from '#components/Clients/ClientsPriceInfo/ClientsPriceInfo.jsx';
 import CackeFillUp from '#components/CackeFillUp/CackeFillUp.jsx';
+import OrdersToWarehouseTable from '#components/Orders/OrdersToWarehouse/OrdersToWarehouseTable.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -107,6 +108,10 @@ function App() {
             <Route path="/orders" element={<OrdersTable />} />
             <Route path="/cacke_fillup" element={<CackeFillUp />} />
             <Route path="/order_card" element={<OrderCart />} />
+            <Route
+              path="/orders_to_warehouse"
+              element={<OrdersToWarehouseTable />}
+            />
 
             <Route path="/products" element={<Products />} />
             <Route
@@ -117,13 +122,25 @@ function App() {
               path="/production_batch_designer_new"
               element={<ProductionBatchDesignerNew />}
             />
-            <Route path="/autoclave_calendar" element={<AutoclaveCalendare />} />
+            <Route
+              path="/autoclave_calendar"
+              element={<AutoclaveCalendare />}
+            />
 
-            <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
-            <Route path="/quality_management" element={<QualityManagementTable />} />
+            <Route
+              path="/products_type_journal"
+              element={<ProductsTypeJournal />}
+            />
+            <Route
+              path="/quality_management"
+              element={<QualityManagementTable />}
+            />
 
             <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
-            <Route path="/recipe_products" element={<ProductsListForRecipes />} />
+            <Route
+              path="/recipe_products"
+              element={<ProductsListForRecipes />}
+            />
             <Route path="/recipe_orders" element={<RecipeOrders />} />
             <Route
               path="/raw_material_consumption"
@@ -143,7 +160,10 @@ function App() {
             <Route path="/users_info" element={<UsersInfo />} />
 
             <Route path="/warehouse_HCCA_blocks" element={<Warehouse />} />
-            <Route path="/warehouse_dry_mixes" element={<DryMixesWarehouse />} />
+            <Route
+              path="/warehouse_dry_mixes"
+              element={<DryMixesWarehouse />}
+            />
             <Route
               path="/warehouse_related_materials"
               element={<RelatedMaterialsWarehouse />}

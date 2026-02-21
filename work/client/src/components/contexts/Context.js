@@ -436,6 +436,7 @@ const ProjectContextProvider = ({ children }) => {
     '/statistics': 'Statistics',
     '/orders': 'Orders',
     '/order_card': 'Order cart',
+    '/orders_to_warehouse': 'Orders to warehouse',
     '/accounting': 'Accounting',
     '/warehouse_products_type': 'Warehouse',
     '/warehouse_HCCA_blocks': 'HCCA Blocks Warehouse',

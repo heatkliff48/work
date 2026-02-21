@@ -102,7 +102,12 @@ export default function NavBar() {
             icon: userInfoIcon,
             access: 'Users_info',
           },
-          { title: 'Roles', path: '/roles', icon: rolesIcon, access: 'Users_info' },
+          {
+            title: 'Roles',
+            path: '/roles',
+            icon: rolesIcon,
+            access: 'Users_info',
+          },
         ],
       },
       {
@@ -119,14 +124,38 @@ export default function NavBar() {
           { title: 'Statistics', path: '/statistics', icon: statisticsIcon },
         ],
       },
-      { title: 'Clients', path: '/clients', icon: clientsIcon, access: 'Clients' },
+      {
+        title: 'Clients',
+        path: '/clients',
+        icon: clientsIcon,
+        access: 'Clients',
+      },
       {
         title: 'Clients price groups',
         path: '/clients_price_info',
         icon: clientsPriceGroupsIcon,
         access: 'Clients',
       },
-      { title: 'Orders', path: '/orders', icon: ordersIcon, access: 'Orders' },
+      {
+        type: 'group',
+        title: 'Orders catalog',
+        icon: prodCatalogIcon,
+        access: null,
+        children: [
+          {
+            title: 'Orders',
+            path: '/orders',
+            icon: ordersIcon,
+            access: 'Orders',
+          },
+          {
+            title: 'Orders to warehouse',
+            path: '/orders_to_warehouse',
+            icon: ordersIcon,
+          },
+        ],
+      },
+
       {
         type: 'group',
         title: 'Ordered products pipeline',
@@ -233,7 +262,7 @@ export default function NavBar() {
         access: 'accounting',
       },
     ],
-    []
+    [],
   );
 
   const isActive = (path) => location.pathname === path;
@@ -282,7 +311,9 @@ export default function NavBar() {
           {menuItems.map((it) => {
             if (it.type === 'group') {
               if (!canSee(it.access)) return null;
-              const visibleChildren = it.children.filter((c) => canSee(c.access));
+              const visibleChildren = it.children.filter((c) =>
+                canSee(c.access),
+              );
               if (!visibleChildren.length) return null;
               const expanded = openGroups[it.title] ?? isGroupActive(it);
 
@@ -312,7 +343,9 @@ export default function NavBar() {
                     {!collapsed && (
                       <>
                         <span className="bb-group-title">{it.title}</span>
-                        <span className={`bb-chevron ${expanded ? 'open' : ''}`}>
+                        <span
+                          className={`bb-chevron ${expanded ? 'open' : ''}`}
+                        >
                           ▾
                         </span>
                       </>

@@ -30,6 +30,7 @@ import {
   lotesListCakesReducer,
 } from './lotesListReducer';
 import { ordersReducer } from './orderReducer';
+import { orderToWarehouseReducer } from './orderToWarehouseReducer';
 import { pagesReducer } from './pagesReducer';
 import { productionBatchLogReducer } from './productionBatchLogReducer';
 import {
@@ -152,4 +153,5 @@ export const rootReducer = combineReducers({
   lotesListBatches: lotesListBatchesReducer,
   lotesListCakes: lotesListCakesReducer,
   contactPriceInfo: contactPriceInfoReducer,
+  orderToWarehouse: orderToWarehouseReducer,
 });

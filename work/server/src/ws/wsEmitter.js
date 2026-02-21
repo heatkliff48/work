@@ -146,6 +146,9 @@ const {
   DELETE_LOTES_LIST_CAKES_SOCKET,
   UPDATE_RAW_MAT_CONSUMPTION_SOCKET,
   ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
+  ADD_NEW_ORDER_TO_WAREHOUSE_SOCKET,
+  UPDATE_ORDER_TO_WAREHOUSE_SOCKET,
+  DELETE_ORDER_TO_WAREHOUSE_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -1900,6 +1903,39 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
           payload: lotesListBatches,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_ORDER_TO_WAREHOUSE_SOCKET, (orderToWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_ORDER_TO_WAREHOUSE_SOCKET,
+          payload: orderToWarehouse,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_ORDER_TO_WAREHOUSE_SOCKET, (orderToWarehouse) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_ORDER_TO_WAREHOUSE_SOCKET,
+          payload: orderToWarehouse,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_ORDER_TO_WAREHOUSE_SOCKET, (order_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_ORDER_TO_WAREHOUSE_SOCKET,
+          payload: order_id,
         }),
       );
     }

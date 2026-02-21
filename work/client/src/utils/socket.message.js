@@ -134,6 +134,9 @@ import {
   deleteLotesListSocket,
   updateRawMatConsumptionSocket,
   addNewWarehouseSandSlurrySocket,
+  addNewOrderToWarehouseSocket,
+  updateOrderToWarehouseSocket,
+  deleteOrderToWarehouseSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -313,6 +316,9 @@ import {
   DELETE_LOTES_LIST_CAKES_SOCKET,
   UPDATE_RAW_MAT_CONSUMPTION_SOCKET,
   ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
+  ADD_NEW_ORDER_TO_WAREHOUSE_SOCKET,
+  UPDATE_ORDER_TO_WAREHOUSE_SOCKET,
+  DELETE_ORDER_TO_WAREHOUSE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -907,6 +913,18 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET:
       dispatch(updateLotesListCakesBooleanSocket(payload));
+      break;
+
+    case ADD_NEW_ORDER_TO_WAREHOUSE_SOCKET:
+      dispatch(addNewOrderToWarehouseSocket(payload));
+      break;
+
+    case UPDATE_ORDER_TO_WAREHOUSE_SOCKET:
+      dispatch(updateOrderToWarehouseSocket(payload));
+      break;
+
+    case DELETE_ORDER_TO_WAREHOUSE_SOCKET:
+      dispatch(deleteOrderToWarehouseSocket(payload));
       break;
 
     default:
