@@ -134,6 +134,9 @@ import {
   DELETE_LAST_LOTES_LIST_CAKES_SOCKET,
   UPDT_RAW_MAT_CONSUMPTION_SOCKET,
   NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
+  NEW_ORDER_TO_WAREHOUSE_SOCKET,
+  NEED_UPDATE_ORDER_TO_WAREHOUSE_SOCKET,
+  NEED_DELETE_ORDER_TO_WAREHOUSE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -1096,5 +1099,26 @@ export const updateLotesListCakesBooleanSocket = (lotesListCakes) => {
   return {
     type: UPD_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
     payload: lotesListCakes,
+  };
+};
+
+export const addNewOrderToWarehouseSocket = (orderToWarehouse) => {
+  return {
+    type: NEW_ORDER_TO_WAREHOUSE_SOCKET,
+    payload: orderToWarehouse,
+  };
+};
+
+export const updateOrderToWarehouseSocket = (orderToWarehouse) => {
+  return {
+    type: NEED_UPDATE_ORDER_TO_WAREHOUSE_SOCKET,
+    payload: orderToWarehouse,
+  };
+};
+
+export const deleteOrderToWarehouseSocket = (order_id) => {
+  return {
+    type: NEED_DELETE_ORDER_TO_WAREHOUSE_SOCKET,
+    payload: order_id,
   };
 };

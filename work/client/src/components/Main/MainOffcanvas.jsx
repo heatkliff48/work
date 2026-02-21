@@ -26,7 +26,12 @@ function MainOffcanvas() {
         </button>
       </div>
 
-      <Offcanvas show={show} onHide={handleClose} backdrop={true} placement="start">
+      <Offcanvas
+        show={show}
+        onHide={handleClose}
+        backdrop={true}
+        placement="start"
+      >
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>BAUBLOCK ERP</Offcanvas.Title>
         </Offcanvas.Header>
@@ -109,15 +114,36 @@ function MainOffcanvas() {
             )}
 
             {checkUserAccess(user, roles, 'Orders')?.canRead && (
-              <Button
-                className="custom-menu-button"
-                onClick={() => {
-                  navigate('/orders');
-                  handleClose();
-                }}
+              <DropdownButton
+                as={ButtonGroup}
+                title="Admin"
+                bsPrefix="custom-menu-button"
+                variant="custom"
               >
-                Orders
-              </Button>
+                <Dropdown.Item eventKey="1">
+                  <Button
+                    className="custom-menu-button"
+                    onClick={() => {
+                      navigate('/orders');
+                      handleClose();
+                    }}
+                  >
+                    Orders
+                  </Button>
+                </Dropdown.Item>
+
+                <Dropdown.Item eventKey="2">
+                  <Button
+                    className="custom-submenu-button"
+                    onClick={() => {
+                      navigate('/orders_to_warehouse');
+                      handleClose();
+                    }}
+                  >
+                    Orders to warehouse
+                  </Button>
+                </Dropdown.Item>
+              </DropdownButton>
             )}
 
             <Button
@@ -154,7 +180,8 @@ function MainOffcanvas() {
               </Button>
             )}
 
-            {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
+            {checkUserAccess(user, roles, 'production_batch_designer')
+              ?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
                 title="Production planner"
