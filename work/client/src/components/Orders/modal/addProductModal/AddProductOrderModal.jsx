@@ -110,7 +110,7 @@
 
 //   // Число -> строка с 2 знаками; sep="," чтобы в инпуте было по-европейски
 //   function formatFixed(num, sep = ',') {
-//     const fixed = Number(num || 0).toFixed(2);
+//     const fixed = Number(num || 0)?.toFixed(2);
 //     return sep === ',' ? fixed.replace('.', ',') : fixed;
 //   }
 
@@ -170,13 +170,13 @@
 
 //     setProductOfOrder((prev) => ({
 //       ...prev,
-//       quantity_palet: result.toFixed(2),
+//       quantity_palet: result?.toFixed(2),
 //     }));
 //     return result;
 //   }, [productOfOrder.quantity_m2, selectedProduct?.m2]);
 
 //   const quantity_real_value = useMemo(() => {
-//     const result = (quantity_palet_value * (selectedProduct?.m2 || 1)).toFixed(2);
+//     const result = (quantity_palet_value * (selectedProduct?.m2 || 1))?.toFixed(2);
 
 //     setProductOfOrder((prev) => ({
 //       ...prev,
@@ -192,9 +192,9 @@
 
 //     setProductOfOrder((prev) => ({
 //       ...prev,
-//       price_m2: result.toFixed(2),
+//       price_m2: result?.toFixed(2),
 //     }));
-//     return result.toFixed(2);
+//     return result?.toFixed(2);
 //   }, [
 //     selectedProduct?.price,
 //     selectedProduct?.m2,
@@ -241,9 +241,9 @@
 
 //     setProductOfOrder((prev) => ({
 //       ...prev,
-//       final_price: result.toFixed(2),
+//       final_price: result?.toFixed(2),
 //     }));
-//     return result.toFixed(2);
+//     return result?.toFixed(2);
 //   }, [price_m2_value, quantity_real_value, productOfOrder?.discount]);
 
 //   const addProductOrder = async () => {
@@ -407,7 +407,7 @@
 //                       el={el}
 //                       inputValue={{
 //                         ...productOfOrder,
-//                         discount: productOfOrder.discount?.toFixed(2),
+//                         discount: productOfOrder.discount??.toFixed(2),
 //                       }}
 //                       inputValueChange={handleDiscountChange}
 //                     />
@@ -466,6 +466,7 @@ import { useDispatch } from 'react-redux';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import '#components/Styles/modals.css';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { set } from 'date-fns';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -490,7 +491,7 @@ const parseLocalNumber = (str) => {
 
 const formatFixed = (num, decimals = 2, separator = ',') => {
   if (isNaN(num)) return '';
-  const fixed = Number(num).toFixed(decimals);
+  const fixed = Number(num)?.toFixed(decimals);
   return separator === ',' ? fixed.replace('.', ',') : fixed;
 };
 
@@ -557,9 +558,11 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       setProductOfOrder((prev) => ({
         ...prev,
         product_article: row.original.article,
+        product_title: productTitle,
+        description: product?.description,
         product_id: product?.id,
         price_m3: formatFixed(newPriceM3 || 0, 2, ','),
-        discount: discountFromClient.toFixed(2),
+        discount: discountFromClient?.toFixed(2),
       }));
       setHaveChangePriceM3(false);
     },
@@ -574,7 +577,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const handlePriceM3Blur = () => {
     const num = parseLocalNumber(productOfOrder.price_m3);
     if (!isNaN(num)) {
-      setProductOfOrder((prev) => ({ ...prev, price_m3: num.toFixed(2) }));
+      setProductOfOrder((prev) => ({ ...prev, price_m3: num?.toFixed(2) }));
     }
   };
 
@@ -586,7 +589,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const handleDiscountBlur = () => {
     const num = parseLocalNumber(productOfOrder.discount);
     if (!isNaN(num)) {
-      setProductOfOrder((prev) => ({ ...prev, discount: num.toFixed(2) }));
+      setProductOfOrder((prev) => ({ ...prev, discount: num?.toFixed(2) }));
     }
   };
 
@@ -601,10 +604,10 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     if (!isNaN(m2) && selectedProduct) {
       const m2PerPallet =
         selectedProduct.form === 'U-block' ? selectedProduct.m : selectedProduct.m2;
-      const palets = (m2 * m2PerPallet).toFixed(2);
+      const palets = (m2 * m2PerPallet)?.toFixed(2);
       setProductOfOrder((prev) => ({
         ...prev,
-        quantity_m2: m2.toFixed(2),
+        quantity_m2: m2?.toFixed(2),
         quantity_palet: String(palets),
       }));
     }
@@ -625,7 +628,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       setProductOfOrder((prev) => ({
         ...prev,
         quantity_palet: String(palets),
-        quantity_m2: newM2.toFixed(2),
+        quantity_m2: newM2?.toFixed(2),
       }));
     }
   };
@@ -652,6 +655,12 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     const result =
       (selectedProduct.price * selectedProduct.volumeBlockOnPallet) /
       selectedProduct.m2;
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      price_m2: result?.toFixed(2),
+    }));
+
     return formatFixed(result, 2, ',');
   }, [selectedProduct]);
 
@@ -660,6 +669,12 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     const priceM2 = parseLocalNumber(price_m2_value) || 0;
     const discount = discountNum;
     const result = (priceM2 * m2 * (100 - discount)) / 100;
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      final_price: result?.toFixed(2),
+    }));
+
     return formatFixed(result, 2, ',');
   }, [quantityM2Num, price_m2_value, discountNum]);
 
@@ -668,8 +683,13 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     const m2PerPallet =
       selectedProduct.form === 'U-block' ? selectedProduct.m : selectedProduct.m2;
 
-    const palets = (quantityM2Num / m2PerPallet).toFixed(2);
+    const palets = (quantityM2Num / m2PerPallet)?.toFixed(2);
     const real = palets * m2PerPallet;
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      quantity_real: real?.toFixed(2),
+    }));
 
     return formatFixed(real, 2, ',');
   }, [quantityM2Num, selectedProduct]);
@@ -683,13 +703,20 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     const quantityM2 = parseLocalNumber(productOfOrder.quantity_m2) || 0;
     const priceM3 = parseLocalNumber(productOfOrder.price_m3) || 0;
     const discount = parseLocalNumber(productOfOrder.discount) || 0;
+    const quantity_palet = parseLocalNumber(productOfOrder.quantity_palet) || 0;
+    const quantity_real = parseLocalNumber(productOfOrder.quantity_real) || 0;
+    const price_m2 = parseLocalNumber(productOfOrder.price_m2) || 0;
+    const final_price = parseLocalNumber(productOfOrder.final_price) || 0;
 
     const payload = {
       ...productOfOrder,
-      quantity_m2: parseFloat(quantityM2.toFixed(2)),
-      price_m3: parseFloat(priceM3.toFixed(2)),
-      discount: parseFloat(discount.toFixed(2)),
-      quantity_palet: parseInt(productOfOrder.quantity_palet, 10) || 0,
+      quantity_m2: parseFloat(quantityM2?.toFixed(2)),
+      price_m3: parseFloat(priceM3?.toFixed(2)),
+      discount: parseFloat(discount?.toFixed(2)),
+      quantity_palet: parseInt(quantity_palet, 10) || 0,
+      quantity_real: parseInt(quantity_real, 10) || 0,
+      price_m2: parseFloat(price_m2?.toFixed(2)),
+      final_price: parseFloat(final_price?.toFixed(2)),
     };
 
     if (haveOrderClient) {
