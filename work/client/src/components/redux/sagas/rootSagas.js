@@ -7,6 +7,7 @@ import filesProductWatcher from './filesProductSagas';
 import filesWarehouseWatcher from './filesWarehouseSagas';
 import lotesListWatcher from './lotesListSagas';
 import ordersWatcher from './ordersSagas';
+import orderToWarehouseWatcher from './orderToWarehouseSagas';
 import pagesWatcher from './pagesSagas';
 import productionBatchLogWatcher from './productionBatchLogSagas';
 import productsWatcher from './productsSagas';
@@ -48,5 +49,6 @@ export default function* rootSaga() {
     aldabaranWatcher(),
     warehouseRawMaterialsWatcher(),
     lotesListWatcher(),
+    orderToWarehouseWatcher(),
   ]);
 }

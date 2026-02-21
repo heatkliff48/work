@@ -64,6 +64,7 @@ const initState = {
   warehouseSandSlurry: [],
   lotesListBatches: [],
   lotesListCakes: [],
+  orderToWarehouse: [],
 };
 
 export default initState;
