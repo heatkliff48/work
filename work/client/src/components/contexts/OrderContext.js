@@ -56,7 +56,7 @@ const OrderContextProvider = ({ children }) => {
   const COLUMNS_ORDER_PRODUCT = [
     {
       Header: 'Description',
-      accessor: 'description',
+      accessor: 'product_title',
       disableSortBy: true,
     },
     {
