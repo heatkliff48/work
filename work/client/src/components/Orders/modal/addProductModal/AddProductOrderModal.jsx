@@ -574,6 +574,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder((prev) => ({ ...prev, price_m3: limited }));
     setHaveChangePriceM3(true);
   };
+
   const handlePriceM3Blur = () => {
     const num = parseLocalNumber(productOfOrder.price_m3);
     if (!isNaN(num)) {
@@ -586,6 +587,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder((prev) => ({ ...prev, discount: limited }));
     setHaveChangePriceM3(false);
   };
+
   const handleDiscountBlur = () => {
     const num = parseLocalNumber(productOfOrder.discount);
     if (!isNaN(num)) {
@@ -604,7 +606,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     if (!isNaN(m2) && selectedProduct) {
       const m2PerPallet =
         selectedProduct.form === 'U-block' ? selectedProduct.m : selectedProduct.m2;
-      const palets = (m2 * m2PerPallet)?.toFixed(2);
+      const palets = Math.ceil(m2 / m2PerPallet);
       setProductOfOrder((prev) => ({
         ...prev,
         quantity_m2: m2?.toFixed(2),
@@ -624,7 +626,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     if (!isNaN(palets) && selectedProduct) {
       const m2PerPallet =
         selectedProduct.form === 'U-block' ? selectedProduct.m : selectedProduct.m2;
-      const newM2 = palets / m2PerPallet;
+      const newM2 = palets * m2PerPallet;
       setProductOfOrder((prev) => ({
         ...prev,
         quantity_palet: String(palets),
@@ -644,10 +646,6 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const discountNum = useMemo(
     () => parseLocalNumber(productOfOrder.discount) || 0,
     [productOfOrder.discount],
-  );
-  const priceM3Num = useMemo(
-    () => parseLocalNumber(productOfOrder.price_m3) || 0,
-    [productOfOrder.price_m3],
   );
 
   const price_m2_value = useMemo(() => {
@@ -683,8 +681,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     const m2PerPallet =
       selectedProduct.form === 'U-block' ? selectedProduct.m : selectedProduct.m2;
 
-    const palets = (quantityM2Num / m2PerPallet)?.toFixed(2);
-    const real = palets * m2PerPallet;
+    const real = productOfOrder?.quantity_palet * m2PerPallet;
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -692,7 +689,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
 
     return formatFixed(real, 2, ',');
-  }, [quantityM2Num, selectedProduct]);
+  }, [quantityM2Num, selectedProduct, productOfOrder?.quantity_palet]);
 
   const base_price_m3 = useMemo(
     () => Number(selectedProduct?.price || 0),
