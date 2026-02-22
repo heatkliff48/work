@@ -10,6 +10,7 @@ import {
   getUpdateToolProductsInfoOfOrder,
 } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
+import { useProjectContext } from '#components/contexts/Context.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -49,13 +50,49 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder,
     selectedProduct,
     setSelectedProduct,
+    orderCartData,
   } = useOrderContext();
+
+  const { clientPriceInfo } = useProjectContext();
 
   const dispatch = useDispatch();
 
   const handleProductListOrderChange = (e) => {
     setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
+  function extractProductTitle(description) {
+    if (!description) return '';
+    const match = description.match(/BAUBLOCK®\s*(.+?)\s*(?:Medidas|$)/i);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+    return description;
+  }
+
+  useEffect(() => {
+    if (!productOfOrder.product_title) {
+      const title = extractProductTitle(productOfOrder.description);
+      setProductOfOrder((prev) => ({ ...prev, product_title: title }));
+
+      if (!productOfOrder.price_m3) {
+        let discountFromClient = 0;
+        if (clientPriceInfo && title) {
+          const clientPrice = clientPriceInfo.find(
+            (item) =>
+              item.title === title &&
+              item.client_type === orderCartData?.owner?.price_category,
+          );
+          if (clientPrice) {
+            discountFromClient = clientPrice.discont || 0;
+          }
+        }
+
+        const newPriceM3 = selectedProduct?.price * (1 - discountFromClient / 100);
+        setProductOfOrder((prev) => ({ ...prev, price_m3: newPriceM3 }));
+      }
+    }
+  }, []);
 
   const COLUMNS_ORDER = useMemo(() => {
     return selectedProduct.article.slice(2, 3) == 'N'
@@ -305,6 +342,26 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     }
   };
 
+  const handleQuantityM2Change = (e) => {
+    const limited = limitDecimalInput(e.target.value, 2);
+    setProductOfOrder((prev) => ({ ...prev, quantity_m2: limited }));
+  };
+
+  const handleQuantityM2Blur = () => {
+    const m2 = parseLocalNumber(productOfOrder.quantity_m2);
+
+    if (!isNaN(m2) && selectedProduct) {
+      const m2PerPallet =
+        selectedProduct.form === 'U-block' ? selectedProduct.m : selectedProduct.m2;
+      const palets = Math.ceil(m2 / m2PerPallet);
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_m2: m2?.toFixed(2),
+        quantity_palet: String(palets),
+      }));
+    }
+  };
+
   return (
     <div>
       <Modal
@@ -343,7 +400,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                       type="text"
                       id={el.accessor}
                       name={el.accessor}
-                      value={productOfOrder.product_article || ''}
+                      value={productOfOrder.product_title || ''}
                       readOnly
                     />
                   </>
@@ -470,6 +527,24 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                     />
                   </>
                 );
+
+              if (el.accessor === 'quantity_m2') {
+                return (
+                  <InputField
+                    key={el.accessor}
+                    el={el}
+                    uBlockHeader={
+                      selectedProduct?.form === 'U-block'
+                        ? 'Quantity, linear metre'
+                        : ''
+                    }
+                    inputValue={productOfOrder}
+                    inputValueChange={handleQuantityM2Change}
+                    onBlur={handleQuantityM2Blur}
+                    isDisabled={false}
+                  />
+                );
+              }
 
               return (
                 <InputField
