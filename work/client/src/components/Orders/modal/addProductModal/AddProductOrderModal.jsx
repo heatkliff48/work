@@ -691,11 +691,6 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     return formatFixed(real, 2, ',');
   }, [quantityM2Num, selectedProduct, productOfOrder?.quantity_palet]);
 
-  const base_price_m3 = useMemo(
-    () => Number(selectedProduct?.price || 0),
-    [selectedProduct],
-  );
-
   const addProductOrder = async () => {
     const quantityM2 = parseLocalNumber(productOfOrder.quantity_m2) || 0;
     const priceM3 = parseLocalNumber(productOfOrder.price_m3) || 0;
@@ -769,7 +764,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
             <>
               {COLUMNS_ORDER_PRODUCT?.map((el) => {
                 if (el.accessor === 'product_id') return null;
-                if (el.accessor === 'product_article') {
+                if (el.accessor === 'product_title') {
                   return (
                     <React.Fragment key={el.accessor}>
                       <ModalBody>{el.Header}:</ModalBody>
@@ -777,7 +772,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                         type="text"
                         id={el.accessor}
                         name={el.accessor}
-                        value={productOfOrder.product_article || ''}
+                        value={productOfOrder.product_title || ''}
                         readOnly
                       />
                     </React.Fragment>

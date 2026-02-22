@@ -11,6 +11,33 @@ import {
 } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 
+const limitDecimalInput = (value, maxDecimals = 2) => {
+  if (value === '' || value === null || value === undefined) return '';
+  let str = String(value).replace(',', '.');
+  str = str.replace(/[^\d.]/g, '');
+  const parts = str.split('.');
+  if (parts.length > 2) {
+    str = parts[0] + '.' + parts.slice(1).join('');
+  }
+  if (parts.length === 2 && parts[1].length > maxDecimals) {
+    str = parts[0] + '.' + parts[1].slice(0, maxDecimals);
+  }
+  return str;
+};
+
+const parseLocalNumber = (str) => {
+  if (str === '' || str == null) return NaN;
+  const normalized = String(str).replace(',', '.');
+  const num = parseFloat(normalized);
+  return isNaN(num) ? NaN : num;
+};
+
+const formatFixed = (num, decimals = 2, separator = ',') => {
+  if (isNaN(num)) return '';
+  const fixed = Number(num)?.toFixed(decimals);
+  return separator === ',' ? fixed.replace('.', ',') : fixed;
+};
+
 const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   const {
     COLUMNS_ORDER_PRODUCT,
@@ -34,12 +61,12 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     return selectedProduct.article.slice(2, 3) == 'N'
       ? COLUMNS_ORDER_PRODUCT
       : selectedProduct.article.slice(2, 3) == 'M'
-      ? COLUMNS_ORDER_DRY_MIXES
-      : selectedProduct.article.slice(2, 3) == 'P'
-      ? COLUMNS_ORDER_RELATED_MATERIAL
-      : selectedProduct.article.slice(2, 3) == 'F'
-      ? COLUMNS_ORDER_ANCHOR
-      : COLUMNS_ORDER_TOOL;
+        ? COLUMNS_ORDER_DRY_MIXES
+        : selectedProduct.article.slice(2, 3) == 'P'
+          ? COLUMNS_ORDER_RELATED_MATERIAL
+          : selectedProduct.article.slice(2, 3) == 'F'
+            ? COLUMNS_ORDER_ANCHOR
+            : COLUMNS_ORDER_TOOL;
   }, [selectedProduct]);
 
   const pieces_per_pallet = selectedProduct?.pieces_per_unit ?? 0;
@@ -50,7 +77,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
     if (selectedProduct.article.slice(2, 3) == 'N') {
       const result = Math.ceil(
-        productOfOrder?.quantity_m2 / (selectedProduct?.m2 || 1)
+        productOfOrder?.quantity_m2 / (selectedProduct?.m2 || 1),
       );
 
       setProductOfOrder((prev) => ({
@@ -60,7 +87,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       return result;
     } else if (selectedProduct.article.slice(2, 3) == 'M') {
       const result = Math.ceil(
-        productOfOrder?.quantity_ud / (selectedProduct?.units_per_pallet || 1)
+        productOfOrder?.quantity_ud / (selectedProduct?.units_per_pallet || 1),
       );
 
       setProductOfOrder((prev) => ({
@@ -70,7 +97,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       return result;
     } else if (selectedProduct.article.slice(2, 3) == 'F') {
       const result = Math.ceil(
-        productOfOrder?.quantity_ud / (pieces_per_pallet || 1)
+        productOfOrder?.quantity_ud / (pieces_per_pallet || 1),
       );
 
       setProductOfOrder((prev) => ({
@@ -88,7 +115,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const quantity_real_value = useMemo(() => {
     if (selectedProduct.article.slice(2, 3) == 'N') {
-      const result = Math.ceil(quantity_palet_value * (selectedProduct?.m2 || 1));
+      const result = (quantity_palet_value * (selectedProduct?.m2 || 1))?.toFixed(2);
 
       setProductOfOrder((prev) => ({
         ...prev,
@@ -97,7 +124,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       return result;
     } else if (selectedProduct.article.slice(2, 3) == 'M') {
       const result = Math.ceil(
-        quantity_palet_value * (selectedProduct?.units_per_pallet || 1)
+        quantity_palet_value * (selectedProduct?.units_per_pallet || 1),
       );
 
       setProductOfOrder((prev) => ({
@@ -177,30 +204,30 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       selectedProduct.article.slice(2, 3) == 'N'
         ? (price_m2_value * quantity_real_value * (100 - discount)) / 100
         : selectedProduct.article.slice(2, 3) == 'M'
-        ? (selectedProduct?.price_per_unit *
-            quantity_real_value *
-            Math.abs(100 - discount)) /
-          100
-        : selectedProduct.article.slice(2, 3) == 'P'
-        ? (selectedProduct?.price_per_unit *
-            productOfOrder?.quantity_ud *
-            Math.abs(100 - discount)) /
-          100
-        : selectedProduct.article.slice(2, 3) == 'F'
-        ? (selectedProduct?.price_per_unit *
-            quantity_real_value *
-            Math.abs(100 - discount)) /
-          100
-        : (selectedProduct?.price_per_unit *
-            productOfOrder?.quantity_ud *
-            Math.abs(100 - discount)) /
-          100;
+          ? (selectedProduct?.price_per_unit *
+              quantity_real_value *
+              Math.abs(100 - discount)) /
+            100
+          : selectedProduct.article.slice(2, 3) == 'P'
+            ? (selectedProduct?.price_per_unit *
+                productOfOrder?.quantity_ud *
+                Math.abs(100 - discount)) /
+              100
+            : selectedProduct.article.slice(2, 3) == 'F'
+              ? (selectedProduct?.price_per_unit *
+                  quantity_real_value *
+                  Math.abs(100 - discount)) /
+                100
+              : (selectedProduct?.price_per_unit *
+                  productOfOrder?.quantity_ud *
+                  Math.abs(100 - discount)) /
+                100;
 
     setProductOfOrder((prev) => ({
       ...prev,
-      final_price: result,
+      final_price: result.toFixed(2),
     }));
-    return result;
+    return result.toFixed(2);
   }, [
     price_m2_value,
     quantity_real_value,
@@ -223,21 +250,60 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     selectedProduct.article.slice(2, 3) == 'N'
       ? dispatch(getUpdateProductInfoOfOrders(productOfOrder))
       : selectedProduct.article.slice(2, 3) == 'M'
-      ? dispatch(getUpdateDryMixedProductsInfoOfOrder(productOfOrder))
-      : selectedProduct.article.slice(2, 3) == 'P'
-      ? dispatch(getUpdateRelMatProductsInfoOfOrder(productOfOrder))
-      : selectedProduct.article.slice(2, 3) == 'F'
-      ? dispatch(getUpdateAnchorProductsInfoOfOrder(productOfOrder))
-      : dispatch(getUpdateToolProductsInfoOfOrder(productOfOrder));
-
+        ? dispatch(getUpdateDryMixedProductsInfoOfOrder(productOfOrder))
+        : selectedProduct.article.slice(2, 3) == 'P'
+          ? dispatch(getUpdateRelMatProductsInfoOfOrder(productOfOrder))
+          : selectedProduct.article.slice(2, 3) == 'F'
+            ? dispatch(getUpdateAnchorProductsInfoOfOrder(productOfOrder))
+            : dispatch(getUpdateToolProductsInfoOfOrder(productOfOrder));
     setProductOfOrder({});
     setSelectedProduct({});
     toggle();
   };
 
-  // useEffect(() => {
-  //   console.log('productOfOrder', productOfOrder);
-  // }, [productOfOrder]);
+  const handleQuantityPaletChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '');
+    setProductOfOrder((prev) => ({ ...prev, quantity_palet: digits }));
+  };
+
+  const handleQuantityPaletBlur = () => {
+    const palets = parseInt(productOfOrder.quantity_palet, 10);
+
+    if (!isNaN(palets) && selectedProduct) {
+      const m2PerPallet =
+        selectedProduct.form === 'U-block' ? selectedProduct.m : selectedProduct.m2;
+      const newM2 = palets * m2PerPallet;
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_palet: String(palets),
+        quantity_m2: newM2?.toFixed(2),
+      }));
+    }
+  };
+
+  const handlePriceM3Change = (e) => {
+    const limited = limitDecimalInput(e.target.value, 2);
+    setProductOfOrder((prev) => ({ ...prev, price_m3: limited }));
+  };
+
+  const handlePriceM3Blur = () => {
+    const num = parseLocalNumber(productOfOrder.price_m3);
+    if (!isNaN(num)) {
+      setProductOfOrder((prev) => ({ ...prev, price_m3: num?.toFixed(2) }));
+    }
+  };
+
+  const handleDiscountChange = (e) => {
+    const limited = limitDecimalInput(e.target.value, 2);
+    setProductOfOrder((prev) => ({ ...prev, discount: limited }));
+  };
+
+  const handleDiscountBlur = () => {
+    const num = parseLocalNumber(productOfOrder.discount);
+    if (!isNaN(num)) {
+      setProductOfOrder((prev) => ({ ...prev, discount: num?.toFixed(2) }));
+    }
+  };
 
   return (
     <div>
@@ -263,7 +329,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
             {COLUMNS_ORDER?.map((el) => {
               if (el.accessor === 'product_id') return null;
               if (
-                el.accessor === 'product_article' ||
+                el.accessor === 'product_title' ||
                 el.accessor === 'dry_mixed_article' ||
                 el.accessor === 'anchor_article' ||
                 el.accessor === 'tool_article' ||
@@ -283,7 +349,6 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   </>
                 );
               if (
-                el.accessor === 'quantity_palet' ||
                 el.accessor === 'quantity_palet_dry' ||
                 el.accessor === 'quantity_palet_ud'
               )
@@ -299,6 +364,31 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                     />
                   </>
                 );
+              if (el.accessor === 'quantity_palet')
+                return (
+                  <InputField
+                    key={el.accessor}
+                    el={el}
+                    inputValue={productOfOrder}
+                    inputValueChange={handleQuantityPaletChange}
+                    onBlur={handleQuantityPaletBlur}
+                    isDisabled={false}
+                  />
+                );
+
+              if (el.accessor === 'price_m3') {
+                return (
+                  <InputField
+                    key={el.accessor}
+                    el={el}
+                    inputValue={productOfOrder}
+                    inputValueChange={handlePriceM3Change}
+                    onBlur={handlePriceM3Blur}
+                    isDisabled={false}
+                  />
+                );
+              }
+
               if (
                 el.accessor === 'quantity_real' ||
                 el.accessor === 'quantity_real_ud'
@@ -354,6 +444,19 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                     />
                   </>
                 );
+
+              if (el.accessor === 'discount') {
+                return (
+                  <InputField
+                    key={el.accessor}
+                    el={el}
+                    inputValue={productOfOrder}
+                    inputValueChange={handleDiscountChange}
+                    onBlur={handleDiscountBlur}
+                    isDisabled={false}
+                  />
+                );
+              }
               if (el.accessor === 'final_price')
                 return (
                   <>
@@ -367,6 +470,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                     />
                   </>
                 );
+
               return (
                 <InputField
                   key={el.id}
