@@ -131,10 +131,10 @@ function RawMaterialsPlan() {
 
         const recipeOptions = recipeArray.map((recipe) => ({
           value: recipe.id,
-          label: recipe.description,
+          label: recipe?.description,
         }));
 
-        const prodDescription = productDetails.description.match(
+        const prodDescription = productDetails?.description.match(
           /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/,
         );
 
@@ -261,7 +261,7 @@ function RawMaterialsPlan() {
           {productsArray?.map((product, index) => (
             <tr>
               <th key={index} className="product-column">
-                <div>Product: {product.description}</div>
+                <div>Product: {product?.description}</div>
                 <div>Date: {product.date}</div>
                 <div>
                   Recipe:

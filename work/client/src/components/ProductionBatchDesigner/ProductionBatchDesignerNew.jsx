@@ -215,6 +215,8 @@ function ProductionBatchDesignerNew() {
       (prod) => prod.article === prod_data.product_article,
     );
 
+    console.log(prod_data, 'prod_data ProductionBatchDesignerNew.jsx line 219');
+
     const {
       article,
       density,
@@ -246,18 +248,11 @@ function ProductionBatchDesignerNew() {
 
     const total_cakes = Math.ceil(product_with_brack);
 
-    console.log(
-      total_cakes,
-      'total_cakes ProductionBatchDesignerNew.jsx line 253',
-    );
-
     const maxId =
       (batchDesigner.reduce(
         (max, item) => (item.id > max ? item.id : max),
         0,
       ) || 0) + total_cakes;
-
-    console.log(maxId, 'maxId ProductionBatchDesignerNew.jsx line 259');
 
     setAutoclave((prevAutoclave) => {
       const prevRows = Array.isArray(prevAutoclave) ? prevAutoclave : [];
@@ -282,20 +277,43 @@ function ProductionBatchDesignerNew() {
       for (let j = 0; j < total_cakes; j++) {
         const targetIndex = emptyIndices[j];
         flat[targetIndex] = {
-          id: maxId - (total_cakes - 1) + j,
+          id: maxId - (total_cakes - 1),
           density,
           width,
           article,
         };
       }
 
+      // console.log(
+      //   maxId - (total_cakes - 1),
+      //   'maxId - (total_cakes - 1) ProductionBatchDesignerNew.jsx line 292',
+      // );
+
+      // console.log(article, 'article ProductionBatchDesignerNew.jsx line 294');
+
+      // console.log(
+      //   total_cakes,
+      //   'total_cakes ProductionBatchDesignerNew.jsx line 296',
+      // );
+
+      // console.log(
+      //   free_product_package,
+      //   'free_product_package ProductionBatchDesignerNew.jsx line 298',
+      // );
+
+      // console.log(
+      //   free_product_cakes,
+      //   'free_product_cakes ProductionBatchDesignerNew.jsx line 300',
+      // );
+
       dispatch(
         addBatchState({
           id: maxId - (total_cakes - 1),
           id_list_of_ordered_production: null,
+          id_ordered_product_to_warehouse: prod_data.id,
           product_article: article,
-          cakes_in_batch: 0,
-          cakes_residue: total_cakes,
+          cakes_in_batch: total_cakes,
+          cakes_residue: 0,
           total_cakes,
           free_product_package,
           free_product_cakes,
@@ -794,7 +812,7 @@ function ProductionBatchDesignerNew() {
             }
             className="table_button"
           >
-            Add ordered product
+            Add product ordered to warehouse
           </button>
 
           <div style={{ fontWeight: 800, fontSize: '35px' }}>
