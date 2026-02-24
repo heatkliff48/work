@@ -284,28 +284,6 @@ function ProductionBatchDesignerNew() {
         };
       }
 
-      // console.log(
-      //   maxId - (total_cakes - 1),
-      //   'maxId - (total_cakes - 1) ProductionBatchDesignerNew.jsx line 292',
-      // );
-
-      // console.log(article, 'article ProductionBatchDesignerNew.jsx line 294');
-
-      // console.log(
-      //   total_cakes,
-      //   'total_cakes ProductionBatchDesignerNew.jsx line 296',
-      // );
-
-      // console.log(
-      //   free_product_package,
-      //   'free_product_package ProductionBatchDesignerNew.jsx line 298',
-      // );
-
-      // console.log(
-      //   free_product_cakes,
-      //   'free_product_cakes ProductionBatchDesignerNew.jsx line 300',
-      // );
-
       dispatch(
         addBatchState({
           id: maxId - (total_cakes - 1),

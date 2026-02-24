@@ -293,6 +293,8 @@ function QualityManagementAddModal(props) {
         production_plan_id: null,
         raw_mat_cons_batch_id: rawMatConsEntry?.batch_id,
         sorting: 0,
+        id_ordered_product_to_warehouse:
+          rawMatConsEntry?.id_ordered_product_to_warehouse,
       }),
     );
     dispatch(updateRawMatConsumption({ id: rawMatConsEntry?.id, used: true }));

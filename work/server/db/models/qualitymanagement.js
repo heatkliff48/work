@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       production_plan_id: DataTypes.INTEGER,
       sorting: DataTypes.INTEGER,
       raw_mat_cons_batch_id: DataTypes.INTEGER,
+      id_ordered_product_to_warehouse: DataTypes.INTEGER,
     },
     {
       sequelize,
