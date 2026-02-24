@@ -30,6 +30,9 @@ module.exports = {
       used: {
         type: Sequelize.BOOLEAN,
       },
+      id_ordered_product_to_warehouse: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

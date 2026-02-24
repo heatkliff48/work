@@ -23,6 +23,7 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
 
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
@@ -264,7 +265,12 @@ const QualityManagementTable = () => {
         production_plan_id,
         sorting,
         raw_mat_cons_batch_id,
+        id_ordered_product_to_warehouse,
       } = qualityManagementData[0];
+      console.log(
+        id_ordered_product_to_warehouse,
+        'id_ordered_product_to_warehouse QualityManagementTable.jsx line 269',
+      );
 
       // 1. Фильтруем резервы для текущего product_article
 
@@ -400,6 +406,14 @@ const QualityManagementTable = () => {
             batch_id: raw_mat_cons_batch_id,
           }),
         );
+        if (id_ordered_product_to_warehouse) {
+          await dispatch(
+            updateOrderToWarehouse({
+              id: id_ordered_product_to_warehouse,
+              quantity_produced: remainingFreeQty,
+            }),
+          );
+        }
       }
 
       if (sorting > 0) {
@@ -416,6 +430,14 @@ const QualityManagementTable = () => {
             batch_id: raw_mat_cons_batch_id,
           }),
         );
+        if (id_ordered_product_to_warehouse) {
+          await dispatch(
+            updateOrderToWarehouse({
+              id: id_ordered_product_to_warehouse,
+              quantity_produced: remainingFreeQty,
+            }),
+          );
+        }
       }
 
       // Обновляем все затронутые позиции в list_of_ordered_production

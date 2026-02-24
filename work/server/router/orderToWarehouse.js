@@ -49,9 +49,17 @@ orderToWarehouseRouter.post('/update', async (req, res) => {
   const { id, ...data } = req.body;
 
   try {
+    const existingRecord = await OrderToWarehouse.findByPk(id);
+
+    console.log(existingRecord, 'existingRecord orderToWarehouse.js line 54');
+
     const orderToWarehouse = await OrderToWarehouse.update(
       {
         ...data,
+        quantity_produced:
+          data.quantity_produced > existingRecord.quantity_pallets
+            ? existingRecord.quantity_pallets
+            : data.quantity_produced,
       },
       {
         where: {
