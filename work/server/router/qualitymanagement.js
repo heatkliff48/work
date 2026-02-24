@@ -32,6 +32,7 @@ qualityManagementRouter.post('/', async (req, res) => {
     production_plan_id,
     sorting,
     raw_mat_cons_batch_id,
+    id_ordered_product_to_warehouse,
   } = req.body;
 
   try {
@@ -46,6 +47,7 @@ qualityManagementRouter.post('/', async (req, res) => {
       production_plan_id,
       sorting,
       raw_mat_cons_batch_id,
+      id_ordered_product_to_warehouse,
     });
 
     myEmitter.emit(

@@ -1251,6 +1251,8 @@ function Autoclave({ acData, autoclaveCalendarData }) {
             newPosition.product.id_list_of_ordered_production !== null
               ? newPosition.product.id
               : null,
+          id_ordered_product_to_warehouse:
+            newPosition.product.id_ordered_product_to_warehouse ?? null,
         };
         dispatch(updateBatchOutside(updatedRecord));
       } else {
@@ -1276,6 +1278,8 @@ function Autoclave({ acData, autoclaveCalendarData }) {
               ? newPosition.product.id
               : null,
           date,
+          id_ordered_product_to_warehouse:
+            newPosition.product.id_ordered_product_to_warehouse ?? null,
         };
         dispatch(addNewBatchOutside(newBatchOutside));
       }
