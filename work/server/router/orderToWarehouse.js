@@ -58,15 +58,17 @@ orderToWarehouseRouter.post('/update', async (req, res) => {
           data.quantity_produced === null ||
           data.quantity_produced === undefined
             ? existingRecord.quantity_produced
-            : data.quantity_produced > existingRecord.quantity_pallets
+            : data.quantity_produced + existingRecord.quantity_pallets >
+              existingRecord.quantity_pallets
             ? existingRecord.quantity_pallets
-            : data.quantity_produced,
+            : data.quantity_produced + existingRecord.quantity_pallets,
         quantity_allocated:
           data.quantity_allocated === null ||
           data.quantity_allocated === undefined
             ? existingRecord.quantity_allocated
-            : data.quantity_allocated + existingRecord.quantity_allocated >
-              existingRecord.quantity_pallets
+            : data.quantity_allocated == 0 ??
+              data.quantity_allocated + existingRecord.quantity_allocated >
+                existingRecord.quantity_pallets
             ? existingRecord.quantity_pallets
             : data.quantity_allocated + existingRecord.quantity_allocated,
         // : data.quantity_allocated > existingRecord.quantity_pallets
