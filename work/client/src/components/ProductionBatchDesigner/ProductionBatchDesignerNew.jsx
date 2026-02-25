@@ -234,7 +234,8 @@ function ProductionBatchDesignerNew() {
     );
 
     const product_with_brack = (
-      prod_data.quantity_pallets / palletsPerArray +
+      (prod_data.quantity_pallets - prod_data.quantity_allocated) /
+        palletsPerArray +
       Number(normOfBrack || 0)
     ).toFixed(2);
 
@@ -267,17 +268,20 @@ function ProductionBatchDesignerNew() {
         }
       }
 
+      let totalCakes = total_cakes;
+
       if (emptyIndices.length < total_cakes) {
-        alert(
-          `Not enough free slots. Need ${total_cakes} slots, but only ${emptyIndices.length} available.`,
-        );
-        return prevAutoclave;
+        // alert(
+        //   `Not enough free slots. Need ${total_cakes} slots, but only ${emptyIndices.length} available.`,
+        // );
+        // return prevAutoclave;
+        totalCakes = emptyIndices.length;
       }
 
-      for (let j = 0; j < total_cakes; j++) {
+      for (let j = 0; j < totalCakes; j++) {
         const targetIndex = emptyIndices[j];
         flat[targetIndex] = {
-          id: maxId - (total_cakes - 1),
+          id: maxId - (totalCakes - 1),
           density,
           width,
           article,
@@ -286,13 +290,13 @@ function ProductionBatchDesignerNew() {
 
       dispatch(
         addBatchState({
-          id: maxId - (total_cakes - 1),
+          id: maxId - (totalCakes - 1),
           id_list_of_ordered_production: null,
           id_ordered_product_to_warehouse: prod_data.id,
           product_article: article,
-          cakes_in_batch: total_cakes,
+          cakes_in_batch: totalCakes,
           cakes_residue: 0,
-          total_cakes,
+          total_cakes: totalCakes,
           free_product_package,
           free_product_cakes,
         }),
@@ -300,13 +304,14 @@ function ProductionBatchDesignerNew() {
 
       setQuantityPallets((prev) => ({
         ...(prev || {}),
-        [maxId - (total_cakes - 1)]: prod_data.quantity_pallets,
+        [maxId - (totalCakes - 1)]:
+          prod_data.quantity_pallets - prod_data.quantity_allocated,
       }));
 
       setBatchOrderIDs((prev) =>
-        Array.isArray(prev) && prev.includes(maxId - (total_cakes - 1))
+        Array.isArray(prev) && prev.includes(maxId - (totalCakes - 1))
           ? prev
-          : [...(prev || []), maxId - (total_cakes - 1)],
+          : [...(prev || []), maxId - (totalCakes - 1)],
       );
 
       const rows = [];
