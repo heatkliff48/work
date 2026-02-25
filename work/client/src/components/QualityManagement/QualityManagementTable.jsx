@@ -411,6 +411,7 @@ const QualityManagementTable = () => {
             updateOrderToWarehouse({
               id: id_ordered_product_to_warehouse,
               quantity_produced: remainingFreeQty,
+              quantity_allocated: 0,
             }),
           );
         }
@@ -435,6 +436,7 @@ const QualityManagementTable = () => {
             updateOrderToWarehouse({
               id: id_ordered_product_to_warehouse,
               quantity_produced: remainingFreeQty,
+              quantity_allocated: 0,
             }),
           );
         }

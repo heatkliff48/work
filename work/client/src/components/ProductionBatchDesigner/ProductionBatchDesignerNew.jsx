@@ -234,7 +234,9 @@ function ProductionBatchDesignerNew() {
     );
 
     const product_with_brack = (
-      (prod_data.quantity_pallets - prod_data.quantity_allocated) /
+      (prod_data.quantity_pallets -
+        prod_data.quantity_allocated -
+        prod_data.quantity_produced) /
         palletsPerArray +
       Number(normOfBrack || 0)
     ).toFixed(2);
