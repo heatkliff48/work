@@ -166,9 +166,9 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
-    )[0];
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord
@@ -571,9 +571,9 @@ rawMaterialsWarehouseRouter.post('/sand', async (req, res) => {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
-    )[0];
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -692,9 +692,9 @@ rawMaterialsWarehouseRouter.post('/lime', async (req, res) => {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
-    )[0];
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -809,9 +809,9 @@ rawMaterialsWarehouseRouter.post('/cement', async (req, res) => {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
-    )[0];
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -925,9 +925,9 @@ rawMaterialsWarehouseRouter.post('/gypsum', async (req, res) => {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
-    )[0];
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -1041,9 +1041,9 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone', async (req, res) => {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
-    )[0];
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -1163,9 +1163,9 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
-    )[0];
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -1280,9 +1280,9 @@ rawMaterialsWarehouseRouter.post('/aluminum2', async (req, res) => {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
-    )[0];
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -1399,9 +1399,9 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
-    )[0];
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
@@ -1530,9 +1530,9 @@ rawMaterialsWarehouseRouter.post('/aac', async (req, res) => {
       return new Date(`${year}-${month}-${day}`);
     };
 
-    const latestRecord = allRecords.sort(
-      (a, b) => parseDate(b.date) - parseDate(a.date),
-    )[0];
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
     const lastUpdated = latestRecord ? latestRecord.date : new Date();
