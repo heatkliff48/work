@@ -81,32 +81,43 @@ function QualityManagementAddModal(props) {
 
   const [filteredRawMatConsumption, setFilteredRaw_MatConsumption] = useState();
 
+  // useEffect(() => {
+  //   if (!raw_mat_consumption || !main_raw_mat_consumption) {
+  //     setFilteredRaw_MatConsumption([]);
+  //     return;
+  //   }
+
+  //   const sumMap = new Map();
+
+  //   main_raw_mat_consumption.forEach((item) => {
+  //     const key = `${item.batch_id}`;
+
+  //     const currentSum = sumMap.get(key) || 0;
+
+  //     sumMap.set(key, currentSum + Number(item.consumed_volume || 0));
+  //   });
+
+  //   const filtered = raw_mat_consumption.filter((item) => {
+  //     if (item.used) {
+  //       return;
+  //     }
+  //     const key = `${item.batch_id}`;
+
+  //     const totalFromMain = sumMap.get(key) || 0;
+
+  //     return Number(item.production_volume) !== totalFromMain;
+  //   });
+
+  //   setFilteredRaw_MatConsumption(filtered);
+  // }, [raw_mat_consumption, main_raw_mat_consumption]);
+
   useEffect(() => {
-    if (!raw_mat_consumption || !main_raw_mat_consumption) {
+    if (!raw_mat_consumption) {
       setFilteredRaw_MatConsumption([]);
       return;
     }
 
-    const sumMap = new Map();
-
-    main_raw_mat_consumption.forEach((item) => {
-      const key = `${item.batch_id}`;
-
-      const currentSum = sumMap.get(key) || 0;
-
-      sumMap.set(key, currentSum + Number(item.consumed_volume || 0));
-    });
-
-    const filtered = raw_mat_consumption.filter((item) => {
-      if (item.used) {
-        return;
-      }
-      const key = `${item.batch_id}`;
-
-      const totalFromMain = sumMap.get(key) || 0;
-
-      return Number(item.production_volume) !== totalFromMain;
-    });
+    const filtered = raw_mat_consumption.filter((item) => !item.used);
 
     setFilteredRaw_MatConsumption(filtered);
   }, [raw_mat_consumption, main_raw_mat_consumption]);

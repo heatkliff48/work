@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       quantity_pallets: DataTypes.INTEGER,
       quantity_real_m2: DataTypes.FLOAT,
       quantity_produced: DataTypes.INTEGER,
+      quantity_allocated: DataTypes.INTEGER,
     },
     {
       sequelize,
