@@ -24,6 +24,9 @@ module.exports = {
       quantity_produced: {
         type: Sequelize.INTEGER,
       },
+      quantity_allocated: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -3,6 +3,7 @@ import { Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
+import { useState } from 'react';
 
 const AddOrderedProduct = ({
   isOpen,
@@ -33,7 +34,13 @@ const AddOrderedProduct = ({
       Header: 'Produced',
       accessor: 'quantity_produced',
     },
+    {
+      Header: 'Allocated',
+      accessor: 'quantity_allocated',
+    },
   ];
+
+  const [fileterdList, setFilteredList] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -44,6 +51,20 @@ const AddOrderedProduct = ({
   useEffect(() => {
     dispatch(getOrderToWarehouse());
   }, []);
+
+  useEffect(() => {
+    if (!list_of_orders_to_warehouse) {
+      setFilteredList([]);
+      return;
+    }
+
+    const filtered = list_of_orders_to_warehouse.filter(
+      (order) =>
+        order.quantity_pallets > order.quantity_produced &&
+        order.quantity_pallets > order.quantity_allocated,
+    );
+    setFilteredList(filtered);
+  }, [list_of_orders_to_warehouse]);
 
   return (
     <Modal
@@ -62,10 +83,11 @@ const AddOrderedProduct = ({
       <ModalBody>
         <Table
           COLUMN_DATA={COLUMNS_ORDERS_TO_WAREHOUSE}
-          dataOfTable={list_of_orders_to_warehouse}
+          dataOfTable={fileterdList}
           tableName={'Orders to warehouse'}
           handleRowClick={(row) => {
             onClickRow(row.original);
+            toggle();
           }}
         />
       </ModalBody>

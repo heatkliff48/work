@@ -717,6 +717,7 @@ import {
   addNewBatchOutside,
   updateBatchOutside,
 } from '#components/redux/actions/batchOutsideAction.js';
+import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
 import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -1283,6 +1284,12 @@ function Autoclave({ acData, autoclaveCalendarData }) {
         };
         dispatch(addNewBatchOutside(newBatchOutside));
       }
+      dispatch(
+        updateOrderToWarehouse({
+          id: newPosition.product.id_ordered_product_to_warehouse,
+          quantity_allocated: product.cakes_in_batch * palletsPerArray,
+        }),
+      );
     });
 
     setSelectedCell(null);

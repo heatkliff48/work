@@ -48,6 +48,10 @@ function OrdersToWarehouseTable() {
       Header: 'Produced',
       accessor: 'quantity_produced',
     },
+    {
+      Header: 'Allocated',
+      accessor: 'quantity_allocated',
+    },
   ];
 
   const dispatch = useDispatch();

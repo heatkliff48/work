@@ -167,6 +167,7 @@ const AddProductOrderToWarehouseModal = React.memo(({ isOpen, toggle }) => {
       addNewOrderToWarehouse({
         ...payload,
         quantity_produced: 0,
+        quantity_allocated: 0,
       }),
     );
     setProductOfOrder({});
