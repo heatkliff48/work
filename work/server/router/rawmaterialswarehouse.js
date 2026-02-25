@@ -1654,12 +1654,10 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
 
     const insufficientMaterials = [];
 
-    // Проверяем каждый материал
     for (const material of materialsToCheck) {
       if (material.amount > 0) {
-        // Проверяем только если запрашиваемое количество больше 0
         const availableMaterial = await material.model.findOne({
-          order: [['createdAt', 'DESC']], // или другой порядок сортировки
+          order: [['createdAt', 'DESC']],
         });
 
         if (

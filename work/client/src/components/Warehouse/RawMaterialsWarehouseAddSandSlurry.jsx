@@ -166,6 +166,15 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       }
     }
 
+    const dateValue = sandSlurryWarehouseInput?.date;
+    if (
+      dateValue === null ||
+      dateValue === undefined ||
+      String(dateValue).trim() === ''
+    ) {
+      newErrors.date = `This field is required`;
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -346,6 +355,9 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                 onChange={(date) => handleDateChange(date)}
                 dateFormat="dd.MM.yyyy"
               />
+              {errors.date && (
+                <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+              )}
             </div>
 
             {/* {total && ( */}
