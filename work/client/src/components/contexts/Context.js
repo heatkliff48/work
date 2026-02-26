@@ -588,6 +588,8 @@ const ProjectContextProvider = ({ children }) => {
         dimensions_quality,
         compressions_quality,
         roleMap,
+        dimensions_quality,
+        compressions_quality,
       }}
     >
       {children}
