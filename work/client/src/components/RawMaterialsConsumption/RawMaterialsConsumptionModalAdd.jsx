@@ -36,7 +36,7 @@ function RawMaterialsConsumptionModalAdd({ isOpen, toggle, func }) {
         return el;
       })
       ?.filter((item) => {
-        if (!item.used) return false;
+        if (item.consumption_calculated) return false;
 
         const key = `${item.batch_id}`;
 

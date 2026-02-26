@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       cacke_id_start: DataTypes.INTEGER,
       date: DataTypes.STRING,
       used: DataTypes.BOOLEAN,
+      consumption_calculated: DataTypes.BOOLEAN,
       id_ordered_product_to_warehouse: DataTypes.INTEGER,
     },
     {

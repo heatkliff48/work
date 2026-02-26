@@ -148,6 +148,7 @@ function CackeFillUp() {
         date: cackeFillUp.date,
         id_ordered_product_to_warehouse:
           cackeFillUp?.id_ordered_product_to_warehouse ?? null,
+        consumption_calculated: false,
       }),
     );
 
