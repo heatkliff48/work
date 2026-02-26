@@ -10,6 +10,7 @@ import {
   addNewRawMatConsumptionCurrentMolds,
   deleteRawMatConsumption,
   deleteRawMatConsumptionCurrentMolds,
+  updateRawMatConsumption,
 } from '#components/redux/actions/recipeAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
@@ -607,11 +608,17 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const { id, ...newRawMatConsumptionCurrentMold } = selectedRow;
 
-      if (
-        alreadyUsed + Number(productionVolume) == bd_volume ||
-        productionVolume == rawRecord.production_volume
-      ) {
-          dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+      if (productionVolume == rawRecord.production_volume && rawRecord.used) {
+        dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+      }
+
+      if (alreadyUsed + Number(productionVolume) == bd_volume) {
+        dispatch(
+          updateRawMatConsumption({
+            id: selectedRow?.id,
+            consumption_calculated: true,
+          }),
+        );
         if (
           rawMatConsumptionCurrentMolds.find(
             (r) => String(r.batch_id) === String(selectedRow?.batch_id),

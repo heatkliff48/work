@@ -50,9 +50,8 @@ export const rawMatConsumptionReducer = (rawMatConsumption = [], action) => {
     }
 
     case UPDT_RAW_MAT_CONSUMPTION_SOCKET: {
-      console.log(payload, 'payload RecipeOrdersReducer.js line 52');
       const result = rawMatConsumption.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
+        if (el.id === payload.id) return payload;
         return el;
       });
       return result;

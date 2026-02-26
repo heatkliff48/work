@@ -102,11 +102,11 @@ class RecipeOrdersRepository {
   static async updateRawMatConsumptionOrdersData(newRawMatConsumption) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRawMatConsumptionOrdersData');
 
-    const { id, used } = newRawMatConsumption;
+    const { id,  ...upd } = newRawMatConsumption;
 
     try {
-      const rawMat = await RawMatConsumptions.update(
-        { used },
+      const [count, rawMat] = await RawMatConsumptions.update(
+        { ...upd },
         {
           where: {
             id: id,
