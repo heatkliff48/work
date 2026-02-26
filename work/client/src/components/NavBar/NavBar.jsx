@@ -225,7 +225,7 @@ export default function NavBar() {
             icon: rawMatCalIcon,
           },
           {
-            title: 'Cacke fillup',
+            title: 'Cake fillup',
             path: '/cacke_fillup',
             icon: technologyPlannerIcon,
           },

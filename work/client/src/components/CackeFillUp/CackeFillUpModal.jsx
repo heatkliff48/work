@@ -48,7 +48,7 @@ function CackeFillUpModal({ show, onHide }) {
     },
     {
       Header: 'Date',
-      accessor: 'Date',
+      accessor: 'date',
       Filter: TextSearchFilter,
     },
   ];

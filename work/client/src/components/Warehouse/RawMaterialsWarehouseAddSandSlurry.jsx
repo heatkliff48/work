@@ -27,27 +27,27 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
 
   const sand_slurry = [
     {
-      Header: 'Sand (dry), t/hour',
+      Header: 'Sand (dry), tonns total',
       accessor: 'sand',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Gypsum stone, t/hour',
+      Header: 'Gypsum stone, tonns total',
       accessor: 'gypsum_stone',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Water, m3/hour',
+      Header: 'Water, m3 total',
       accessor: 'water',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Grinding balls, t/hour',
+      Header: 'Grinding balls, tonns total',
       accessor: 'grinding_balls',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'AAC scrap, t/hour',
+      Header: 'AAC scrap, tonns total',
       accessor: 'aac',
       Filter: TextSearchFilter,
     },
@@ -137,11 +137,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     sand_slurry.forEach(({ accessor }) => {
       const value = sandSlurryWarehouseInput?.[accessor];
 
-      if (
-        value === null ||
-        value === undefined ||
-        String(value).trim() === ''
-      ) {
+      if (value === null || value === undefined || String(value).trim() === '') {
         newErrors[accessor] = `This field is required`;
         return;
       }
@@ -225,7 +221,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
         // mixing_hours: parseFloat(sandSlurryWarehouseInput.mixing_hours),
         portion_size: parseFloat(sandSlurryWarehouseInput.portion_size),
         date: sandSlurryWarehouseInput.date,
-      }),
+      })
     );
     await dispatch(
       addNewWarehouseSandSlurry({
@@ -236,7 +232,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
         aac_scrap: sandSlurryWarehouseInput.aac,
         portion_size: sandSlurryWarehouseInput.portion_size,
         date: sandSlurryWarehouseInput.date,
-      }),
+      })
     );
     setSandSlurryWarehouseInput({ portion_size: 100 });
     props.onHide();
@@ -334,9 +330,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   onChange={handleRawMaterialWarehouseInputChange}
                 />
                 {errors.portion_size && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.portion_size}
-                  </p>
+                  <p className="text-red-500 text-xs mt-1">{errors.portion_size}</p>
                 )}
               </div>
             </div>
