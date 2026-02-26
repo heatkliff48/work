@@ -1637,6 +1637,49 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
   } = req.body;
 
   try {
+    const materialsToCheck = [
+      { model: WarehouseSand, amount: sand, name: 'sand' },
+      {
+        model: WarehouseGypsumStone,
+        amount: gypsum_stone,
+        name: 'gypsum stone',
+      },
+      {
+        model: WarehouseGrindingBalls,
+        amount: grinding_balls,
+        name: 'grinding balls',
+      },
+      { model: WarehouseAAC, amount: aac_scrap, name: 'aac scrap' },
+    ];
+
+    const insufficientMaterials = [];
+
+    for (const material of materialsToCheck) {
+      if (material.amount > 0) {
+        const availableMaterial = await material.model.findOne({
+          order: [['createdAt', 'DESC']],
+        });
+
+        if (
+          !availableMaterial ||
+          availableMaterial.quantity < material.amount
+        ) {
+          insufficientMaterials.push({
+            material: material.name,
+            requested: material.amount,
+            available: availableMaterial ? availableMaterial.quantity : 0,
+          });
+        }
+      }
+    }
+
+    if (insufficientMaterials.length > 0) {
+      return res.status(400).json({
+        error: 'Insufficient materials',
+        details: insufficientMaterials,
+      });
+    }
+
     const warehouseSandSlurry = await WarehouseSandSlurry.create({
       sand,
       gypsum_stone,
