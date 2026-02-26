@@ -4,11 +4,9 @@ import { useState } from 'react';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import RawMaterialsConsumptionModalAdd from './RawMaterialsConsumptionModalAdd';
 import RawMaterialsConsumptionModal from './RawMaterialsConsumptionModal';
-import { useDispatch } from 'react-redux';
-import { clearMainRawMatConsumption } from '#components/redux/actions/recipeAction.js';
 
 function RawMaterialsConsumption() {
-  const { COLUMNS_MAIN_RAW_MAT_CONSUMPTION, main_raw_mat_consumption } =
+  const { COLUMNS_MAIN_RAW_MAT_CONSUMPTION, rawMatConsumptionCurrentMolds } =
     useRecipeContext();
   const {
     mainRawMaterialConsumptionMadal,
@@ -18,19 +16,15 @@ function RawMaterialsConsumption() {
   } = useModalContext();
 
   const [selectedRow, setSelectedRow] = useState(null);
-  const dispatch = useDispatch();
 
   return (
     <>
       <button onClick={() => setMainRawMaterialConsumptionMadal(true)}>
         Add Raw Materal Consmption
       </button>
-      <button onClick={() => dispatch(clearMainRawMatConsumption([]))}>
-        Clear Raw Materal Consmption
-      </button>
       <Table
         COLUMN_DATA={COLUMNS_MAIN_RAW_MAT_CONSUMPTION}
-        dataOfTable={main_raw_mat_consumption}
+        dataOfTable={rawMatConsumptionCurrentMolds}
         tableName={'Raw materials consumption'}
         handleRowClick={(row) => {
           // setSelectedRow(row.original);

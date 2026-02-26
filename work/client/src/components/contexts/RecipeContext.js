@@ -135,8 +135,8 @@ const RecipeContextProvider = ({ children }) => {
   const list_of_recipes = useSelector((state) => state.recipe);
   const recipeOrders = useSelector((state) => state.recipeOrders);
   const raw_mat_consumption = useSelector((state) => state.rawMatConsumption);
-  const main_raw_mat_consumption = useSelector(
-    (state) => state.mainRawMatConsumption,
+  const rawMatConsumptionCurrentMolds = useSelector(
+    (state) => state.rawMatConsumptionCurrentMolds,
   );
 
   return (
@@ -154,7 +154,7 @@ const RecipeContextProvider = ({ children }) => {
         setSelectedRecipe,
         raw_mat_consumption,
         recipeOrders,
-        main_raw_mat_consumption,
+        rawMatConsumptionCurrentMolds,
         selectedLotesRecipe,
         setSelectedLotesRecipe,
         lotesListBatchesCheck,

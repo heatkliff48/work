@@ -7,8 +7,9 @@ import {
   updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
 import {
-  addNewMainRawMatConsumption,
+  addNewRawMatConsumptionCurrentMolds,
   deleteRawMatConsumption,
+  deleteRawMatConsumptionCurrentMolds,
 } from '#components/redux/actions/recipeAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
@@ -21,7 +22,7 @@ const RawMaterialsConsumptionModal = React.memo(
   ({ isOpen, toggle, selectedRow }) => {
     const {
       list_of_recipes = [],
-      main_raw_mat_consumption,
+      rawMatConsumptionCurrentMolds,
       raw_mat_consumption,
       // lotesListBatchesCheck,
       // setLotesListCheck,
@@ -80,8 +81,8 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const initialForm = {};
       materialsMap.forEach((key) => {
-        initialForm[`${key}_actual_reciepe`] = '0';
-        initialForm[`${key}_Wasted`] = '0';
+        initialForm[`${key}_actual_reciepe`] = null;
+        initialForm[`${key}_Wasted`] = null;
       });
 
       setForm(initialForm);
@@ -120,11 +121,50 @@ const RawMaterialsConsumptionModal = React.memo(
       setWastedMode((prev) => (e.target.checked ? 'manual' : 'default'));
     };
 
+    // useEffect(() => {
+    //   if (!isOpen) return;
+
+    //   const batchArticle = selectedRow?.batch_article;
+
+    //   const product =
+    //     batchArticle &&
+    //     latestProducts?.find((p) => String(p.article) === String(batchArticle));
+
+    //   let candidateRecipes = [];
+
+    //   if (product) {
+    //     candidateRecipes = (list_of_recipes || []).filter(
+    //       (r) =>
+    //         r.density === product.density && r.certificate === product.certificate,
+    //     );
+    //   }
+
+    //   if (!candidateRecipes.length) {
+    //     candidateRecipes = list_of_recipes || [];
+    //   }
+
+    //   if(selectedRow?.recipe_article == "No recipe") {
+    //     candidateRecipes.unshift()
+    //   }
+
+    //   setAvailableRecipes(candidateRecipes);
+
+    //   const fromRowArticle = selectedRow?.recipe_article;
+    //   const matched =
+    //     fromRowArticle &&
+    //     candidateRecipes.find((r) => String(r.article) === String(fromRowArticle));
+
+    //   if (matched) {
+    //     setSelectedRecipe(matched);
+    //   } else {
+    //     setSelectedRecipe(candidateRecipes.length ? candidateRecipes[0] : null);
+    //   }
+    // }, [isOpen, selectedRow, latestProducts, list_of_recipes]);
+
     useEffect(() => {
       if (!isOpen) return;
 
       const batchArticle = selectedRow?.batch_article;
-
       const product =
         batchArticle &&
         latestProducts?.find((p) => String(p.article) === String(batchArticle));
@@ -152,7 +192,11 @@ const RawMaterialsConsumptionModal = React.memo(
       if (matched) {
         setSelectedRecipe(matched);
       } else {
-        setSelectedRecipe(candidateRecipes.length ? candidateRecipes[0] : null);
+        if (selectedRow?.recipe_article === 'No recipe') {
+          setSelectedRecipe(null);
+        } else {
+          setSelectedRecipe(candidateRecipes.length ? candidateRecipes[0] : null);
+        }
       }
     }, [isOpen, selectedRow, latestProducts, list_of_recipes]);
 
@@ -192,7 +236,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const limitVolume = Number(rawRecord.production_volume || 0);
 
-      const alreadyUsed = (main_raw_mat_consumption || [])
+      const alreadyUsed = (rawMatConsumptionCurrentMolds || [])
         .filter((r) => String(r.batch_id) === String(selectedRow?.batch_id))
         .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
@@ -238,31 +282,65 @@ const RawMaterialsConsumptionModal = React.memo(
     const computeTotalByActual = useMemo(() => {
       const t = {};
       materialsMap.forEach(({ key }) => {
-        const a = Number(form[`${key}_actual_reciepe`] || 0);
-        t[`${key}_total`] = pvNumber ? +(a * pvNumber).toFixed(2) : '';
+        const raw = Number(form[`${key}_actual_reciepe`] || 0);
+        const baseNum = Number(recipeForUI?.[key]) || 0;
+        const aVal =
+          raw === '' || raw === null || raw === undefined ? baseNum : Number(raw);
+        t[`${key}_total`] = pvNumber ? +(aVal * pvNumber).toFixed(2) : '';
       });
       return t;
-    }, [form, pvNumber, materialsMap]);
+    }, [form, pvNumber, recipeForUI, materialsMap]);
+
+    // const computeWasted = (key, label) => {
+    //   const mode = wastedMode || 'default';
+    //   const aVal = Number(form[`${key}_actual_reciepe`] || 0);
+    //   const baseNum = Number(recipeForUI?.[key]) || 0;
+    //   if (mode === 'manual') {
+    //     const raw = form[`${key}_Wasted`];
+    //     return raw === '' ? '' : Number(raw);
+    //   }
+
+    //   if (mode === 'from_actual') {
+    //     const raw = form[`${key}_actual_reciepe`];
+    //     const aVal =
+    //       raw === '' || raw === null || raw === undefined ? baseNum : Number(raw);
+    //     return +(aVal * pvNumber).toFixed(2);
+    //   }
+
+    //   if (pvNumber === 0) return 0;
+    //   if (mode === 'from_actual') return +(aVal * pvNumber).toFixed(2);
+    //   if (!Number.isFinite(baseNum)) return '';
+    //   return +(baseNum * pvNumber).toFixed(2);
+    // };
 
     const computeWasted = (key, label) => {
       const mode = wastedMode || 'default';
-      const aVal = Number(form[`${key}_actual_reciepe`] || 0);
-      const baseNum = Number(recipeForUI?.[key]);
+      const baseNum = Number(recipeForUI?.[key]) || 0;
+
       if (mode === 'manual') {
         const raw = form[`${key}_Wasted`];
-        return raw === '' ? '' : Number(raw);
+        if (raw === '' || raw === null || raw === undefined) return null;
+        const num = Number(raw);
+        return Number.isFinite(num) ? num : null;
       }
+
+      if (mode === 'from_actual') {
+        const raw = form[`${key}_actual_reciepe`];
+        if (raw === '' || raw === null || raw === undefined) return null;
+        const aVal = Number(raw);
+        if (!Number.isFinite(aVal)) return null;
+        return pvNumber ? +(aVal * pvNumber).toFixed(2) : 0;
+      }
+
       if (pvNumber === 0) return 0;
-      if (mode === 'from_actual') return +(aVal * pvNumber).toFixed(2);
       if (!Number.isFinite(baseNum)) return '';
       return +(baseNum * pvNumber).toFixed(2);
     };
-
     const getRecipeVolumeInfo = () => {
       const planned = Number(selectedRow?.production_volume || 0);
       const current = Number(productionVolume || 0);
 
-      const alreadyConsumed = (main_raw_mat_consumption || [])
+      const alreadyConsumed = (rawMatConsumptionCurrentMolds || [])
         .filter((r) => String(r.batch_id) === String(selectedRow?.batch_id))
         .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
@@ -362,9 +440,12 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const materials = materialsMap.map(({ label, key }) => {
         const w = computeWasted(key, label);
-        const wasted = w === '' ? 0 : Number(w);
-        if (wasted === null || Number.isNaN(wasted) || wasted <= 0)
-          return { type: label, quantity: 0 };
+
+        if (w === null) return { type: label, quantity: null };
+
+        const wasted = Number(w);
+        if (Number.isNaN(wasted)) return { type: label, quantity: null };
+
         return { type: label, quantity: +wasted.toFixed(2) };
       });
 
@@ -447,6 +528,27 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
+      if (wastedMode === 'from_actual') {
+        const visibleMaterials = materialsMap
+          .map((m) => (shouldShowRow(m.label, m.key) ? m.label : null))
+          .filter(Boolean);
+
+        const null_arr = [];
+        result_materials.forEach((el) => {
+          if (visibleMaterials.includes(el.type) && el.quantity === null) {
+            null_arr.push(el);
+          }
+        });
+
+        if (null_arr.length) {
+          const msg =
+            'Необходимо заполнить все поля количества материалов:\n\n' +
+            null_arr.map((s) => `${s.type}: значение не указано`).join('\n');
+          alert(msg);
+          return;
+        }
+      }
+
       const fixed_materials = result_materials
         .map((el) => {
           return { ...el, quantity: Number(el.quantity).toFixed(2) };
@@ -462,13 +564,6 @@ const RawMaterialsConsumptionModal = React.memo(
         console.log('body', body);
         dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
       }
-
-      dispatch(
-        addNewMainRawMatConsumption({
-          ...selectedRow,
-          consumed_volume: Number(productionVolume),
-        }),
-      );
 
       const productDetails = latestProducts.find(
         (product) => product.article === selectedRow?.batch_article,
@@ -506,12 +601,34 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const bd_volume = Number(rawRecord.production_volume || 0);
 
-      const alreadyUsed = (main_raw_mat_consumption || [])
+      const alreadyUsed = (rawMatConsumptionCurrentMolds || [])
         .filter((r) => String(r.batch_id) === String(selectedRow?.batch_id))
         .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
-      if (alreadyUsed == bd_volume)
-        dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+      const { id, ...newRawMatConsumptionCurrentMold } = selectedRow;
+
+      if (
+        alreadyUsed + Number(productionVolume) == bd_volume ||
+        productionVolume == rawRecord.production_volume
+      ) {
+          dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+        if (
+          rawMatConsumptionCurrentMolds.find(
+            (r) => String(r.batch_id) === String(selectedRow?.batch_id),
+          )
+        ) {
+          dispatch(
+            deleteRawMatConsumptionCurrentMolds({ batch_id: selectedRow?.batch_id }),
+          );
+        }
+      } else {
+        dispatch(
+          addNewRawMatConsumptionCurrentMolds({
+            ...newRawMatConsumptionCurrentMold,
+            consumed_volume: Number(productionVolume),
+          }),
+        );
+      }
 
       setMainRawMaterialConsumptionMadal(false);
       toggle();
@@ -633,7 +750,7 @@ const RawMaterialsConsumptionModal = React.memo(
       const batch_id = selectedRow?.batch_id;
       const planned = Number(selectedRow?.production_volume || 0);
 
-      const alreadyConsumed = (main_raw_mat_consumption || [])
+      const alreadyConsumed = (rawMatConsumptionCurrentMolds || [])
         .filter((r) => String(r.batch_id) === String(batch_id))
         .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
@@ -650,7 +767,11 @@ const RawMaterialsConsumptionModal = React.memo(
                 <span className="text-muted d-block" style={{ fontSize: 12 }}>
                   Recipe article:
                 </span>
-                <b className="d-block mb-2">{recipeArticle || '—'}</b>
+                {recipeArticle ? (
+                  <b className="d-block mb-2">{recipeArticle || '—'}</b>
+                ) : (
+                  <span className="text-muted">No recipes</span>
+                )}
 
                 <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
                   Production volume:
@@ -667,7 +788,8 @@ const RawMaterialsConsumptionModal = React.memo(
                 <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
                   Recipe:
                 </span>
-                {availableRecipes.length ? (
+                {
+                  //availableRecipes.length ? (
                   <Select
                     isDisabled={isRecipeLocked}
                     onChange={handleRecipeChange}
@@ -706,9 +828,10 @@ const RawMaterialsConsumptionModal = React.memo(
                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                     }}
                   />
-                ) : (
-                  <span className="text-muted">No recipes</span>
-                )}
+                  // ) : (
+                  //   <span className="text-muted">No recipes</span>
+                  // )
+                }
               </div>
             </div>
           </ModalHeader>

@@ -23,4 +23,22 @@ router.post(
   '/raw_mat_consumption/delete',
   RecipeOrdersController.deleteRawMatConsumptionOrdersData,
 );
+
+//--------------------------RAW MAT CONSUMPTION CURRENT MOLDS--------------------------
+router.get(
+  '/raw_mat_consumption_current_molds',
+  RecipeOrdersController.getAllRawMatConsumptionCurrentMolds,
+);
+router.post(
+  '/raw_mat_consumption_current_molds',
+  RecipeOrdersController.addNewRawMatConsumptionCurrentMolds,
+);
+router.post(
+  '/raw_mat_consumption_current_molds/update',
+  RecipeOrdersController.updateRawMatConsumptionCurrentMolds,
+);
+router.post(
+  '/raw_mat_consumption_current_molds/delete',
+  RecipeOrdersController.deleteRawMatConsumptionCurrentMolds,
+);
 module.exports = router;

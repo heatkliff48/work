@@ -4,17 +4,21 @@ import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_RAW_MAT_CONSUMPTION,
+  ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
   ADD_NEW_RECIPE,
   DELETE_MATERIAL_PLAN,
   DELETE_RAW_MAT_CONSUMPTION,
+  DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
   DELETE_RECIPE,
   FULL_RECIPE,
   GET_FULL_RECIPE,
   GET_RAW_MAT_CONSUMPTION,
+  GET_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
   GET_RECIPE_ORDERS_DATA,
   NEED_DELETE_RECIPE,
   NEW_RECIPE,
   RAW_MAT_CONSUMPTION,
+  RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
   RECIPE_ORDERS_DATA,
   SAVE_MATERIAL_PLAN,
   UPDATE_NEW_RECIPE,
@@ -22,7 +26,9 @@ import {
   UPDATE_RECIPE,
 } from '../types/recipeTypes';
 import {
+  DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   DELETE_RAW_MAT_CONSUMPTION_SOCKET,
+  NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   NEW_RAW_MAT_CONSUMPTION_SOCKET,
   UPDT_RAW_MAT_CONSUMPTION_SOCKET,
 } from '../types/socketTypes/socket';
@@ -164,6 +170,42 @@ const deleteRawMatConsumption = (rawMatConsumption) => {
     });
 };
 
+const getRawMatConsumptionCurrentMolds = () => {
+  return url
+    .get('/recipe_orders/raw_mat_consumption_current_molds')
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const addNewRawMatConsumptionCurrentMolds = (rawMatConsumption) => {
+  return url
+    .post('/recipe_orders/raw_mat_consumption_current_molds', rawMatConsumption)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const deleteRawMatConsumptionCurrentMolds = (rawMatConsumption) => {
+  return url
+    .post('/recipe_orders/raw_mat_consumption_current_molds/delete', rawMatConsumption)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 function* getRecipeWorker(action) {
   try {
     const { recipe } = yield call(getRecipe);
@@ -265,6 +307,37 @@ function* deleteRawMatConsumptionWorker(action) {
   }
 }
 
+function* getRawMatConsumptionCurrentMoldsWorker(action) {
+  try {
+    const rawMatConsumption = yield call(getRawMatConsumptionCurrentMolds);
+
+    yield put({
+      type: RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
+      payload: rawMatConsumption,
+    });
+  } catch (err) {
+    yield put({ type: RAW_MAT_CONSUMPTION_CURRENT_MOLDS, payload: [] });
+  }
+}
+
+function* addNewRawMatConsumptionCurrentMoldsWorker(action) {
+  try {
+    yield call(addNewRawMatConsumptionCurrentMolds, action.payload);
+  } catch (err) {
+    yield put({ type: NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET, payload: [] });
+  }
+}
+
+function* deleteRawMatConsumptionCurrentMoldsWorker(action) {
+  try {
+    yield call(deleteRawMatConsumptionCurrentMolds, action.payload);
+  } catch (err) {
+    yield put({
+      type: DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+      payload: [],
+    });
+  }
+}
 // watchers
 
 function* recipeWatcher() {
@@ -281,6 +354,19 @@ function* recipeWatcher() {
   yield takeLatest(ADD_NEW_RAW_MAT_CONSUMPTION, addNewRawMatConsumptionWorker);
   yield takeLatest(UPDATE_RAW_MAT_CONSUMPTION, updateRawMatConsumptionWorker);
   yield takeLatest(DELETE_RAW_MAT_CONSUMPTION, deleteRawMatConsumptionWorker);
+
+  yield takeLatest(
+    GET_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
+    getRawMatConsumptionCurrentMoldsWorker,
+  );
+  yield takeLatest(
+    ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
+    addNewRawMatConsumptionCurrentMoldsWorker,
+  );
+  yield takeLatest(
+    DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
+    deleteRawMatConsumptionCurrentMoldsWorker,
+  );
 }
 
 export default recipeWatcher;

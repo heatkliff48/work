@@ -31,8 +31,8 @@ import {
   getToolsWarehouse,
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import {
-  getMainRawMatConsumption,
   getRawMatConsumption,
+  getRawMatConsumptionCurrentMolds,
   getRecipe,
   getRecipeOrdersData,
 } from '#components/redux/actions/recipeAction.js';
@@ -136,7 +136,7 @@ function Main() {
     dispatch(getToolsWarehouse());
     dispatch(getProductCode());
     dispatch(getRawMatConsumption());
-    dispatch(getMainRawMatConsumption());
+    dispatch(getRawMatConsumptionCurrentMolds());
     dispatch(getQualityManagement());
     dispatch(clearBatchState());
     dispatch(getLotesList());
