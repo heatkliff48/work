@@ -8,11 +8,14 @@ import {
   GET_RAW_MAT_CONSUMPTION,
   ADD_NEW_RAW_MAT_CONSUMPTION,
   DELETE_RAW_MAT_CONSUMPTION,
-  GET_MAIN_RAW_MAT_CONSUMPTION,
+  GET_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
   ADD_NEW_MAIN_RAW_MAT_CONSUMPTION,
   DELETE_MAIN_RAW_MAT_CONSUMPTION,
   UPDATE_RECIPE,
   UPDATE_RAW_MAT_CONSUMPTION,
+  ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
+  DESTROY_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
+  DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
 } from '../types/recipeTypes';
 
 export const getRecipe = () => {
@@ -92,29 +95,33 @@ export const deleteRawMatConsumption = (rawMatConsumption) => {
   };
 };
 
-export const getMainRawMatConsumption = () => {
+export const getRawMatConsumptionCurrentMolds = () => {
   return {
-    type: GET_MAIN_RAW_MAT_CONSUMPTION,
+    type: GET_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
   };
 };
 
-export const clearMainRawMatConsumption = (raw) => {
+export const clearRawMatConsumptionCurrentMolds = (raw) => {
   return {
-    type: GET_MAIN_RAW_MAT_CONSUMPTION,
+    type: GET_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
     payload: raw,
   };
 };
 
-export const addNewMainRawMatConsumption = (rawMatConsumption) => {
+export const addNewRawMatConsumptionCurrentMolds = (
+  rawMatConsumptionCurrentMolds,
+) => {
   return {
-    type: ADD_NEW_MAIN_RAW_MAT_CONSUMPTION,
-    payload: rawMatConsumption,
+    type: ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
+    payload: rawMatConsumptionCurrentMolds,
   };
 };
 
-export const deleteMainRawMatConsumption = (rawMatConsumption) => {
+export const deleteRawMatConsumptionCurrentMolds = (
+  rawMatConsumptionCurrentMolds,
+) => {
   return {
-    type: DELETE_MAIN_RAW_MAT_CONSUMPTION,
-    payload: rawMatConsumption,
+    type: DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
+    payload: rawMatConsumptionCurrentMolds,
   };
 };

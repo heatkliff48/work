@@ -1,15 +1,16 @@
 import showMessage from '#components/Utils/showMessage.js';
 import {
-  DELETE_MAIN_RAW_MAT_CONSUMPTION,
-  GET_MAIN_RAW_MAT_CONSUMPTION,
-  ADD_NEW_MAIN_RAW_MAT_CONSUMPTION,
+  NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
   RAW_MAT_CONSUMPTION,
+  RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
   RECIPE_ORDERS_DATA,
 } from '../types/recipeTypes';
 import {
+  DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   DELETE_RAW_MAT_CONSUMPTION_SOCKET,
   NEES_DELETE_MATERIAL_PLAN_SOCKET,
   NEW_MATERIAL_PLAN_SOCKET,
+  NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   NEW_RAW_MAT_CONSUMPTION_SOCKET,
   UPDT_RAW_MAT_CONSUMPTION_SOCKET,
 } from '../types/socketTypes/socket';
@@ -66,26 +67,26 @@ export const rawMatConsumptionReducer = (rawMatConsumption = [], action) => {
   }
 };
 
-export const mainRawMatConsumptionReducer = (
-  mainRawMatConsumption = [],
+export const rawMatConsumptionCurrentMoldsReducer = (
+  rawMatConsumptionCurrentMolds = [],
   action,
 ) => {
   const { type, payload } = action;
 
   switch (type) {
-    case GET_MAIN_RAW_MAT_CONSUMPTION: {
-      return payload ?? mainRawMatConsumption;
+    case RAW_MAT_CONSUMPTION_CURRENT_MOLDS: {
+      return payload ?? rawMatConsumptionCurrentMolds;
     }
 
-    case ADD_NEW_MAIN_RAW_MAT_CONSUMPTION: {
-      return [...mainRawMatConsumption, payload];
+    case NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET: {
+      return [...rawMatConsumptionCurrentMolds, payload];
     }
 
-    case DELETE_MAIN_RAW_MAT_CONSUMPTION: {
-      return mainRawMatConsumption.filter((el) => el.id !== payload);
+    case DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET: {
+      return rawMatConsumptionCurrentMolds.filter((el) => el.batch_id !== payload);
     }
 
     default:
-      return mainRawMatConsumption;
+      return rawMatConsumptionCurrentMolds;
   }
 };

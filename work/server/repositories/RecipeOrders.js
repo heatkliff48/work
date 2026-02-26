@@ -1,4 +1,9 @@
-const { RecipeOrders, RawMatConsumptions, sequelize } = require('../db/models');
+const {
+  RecipeOrders,
+  RawMatConsumptions,
+  RawMatConsumptionsCurrentMolds,
+  sequelize,
+} = require('../db/models');
 
 class RecipeOrdersRepository {
   static async getRecipeOrdersData() {
@@ -8,10 +13,7 @@ class RecipeOrdersRepository {
 
       return allRecipeOrdersInDB;
     } catch (error) {
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
@@ -66,10 +68,7 @@ class RecipeOrdersRepository {
 
       return;
     } catch (error) {
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>error',
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>error', error);
       return error;
     }
   }
@@ -77,43 +76,31 @@ class RecipeOrdersRepository {
   //--------------------------RAW MAT CONSUMPTION--------------------------
 
   static async getAllRawMatConsumptionOrdersData() {
-    console.log(
-      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAllRawMatConsumptionOrdersData',
-    );
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAllRawMatConsumptionOrdersData');
     try {
       const allRawMatConsumptions = await RawMatConsumptions.findAll();
 
       return allRawMatConsumptions;
     } catch (error) {
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async addNewRawMatConsumptionOrdersData(newRawMatConsumption) {
-    console.log(
-      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewRawMatConsumptionOrdersData',
-    );
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewRawMatConsumptionOrdersData');
     try {
       const rawMat = await RawMatConsumptions.create(newRawMatConsumption);
 
       return rawMat;
     } catch (error) {
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async updateRawMatConsumptionOrdersData(newRawMatConsumption) {
-    console.log(
-      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRawMatConsumptionOrdersData',
-    );
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRawMatConsumptionOrdersData');
 
     const { id, used } = newRawMatConsumption;
 
@@ -131,25 +118,83 @@ class RecipeOrdersRepository {
 
       return rawMat;
     } catch (error) {
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
-        error,
-      );
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }
 
   static async deleteRawMatConsumptionOrdersData(rawMatConsumption) {
-    console.log(
-      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionOrdersData',
-    );
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionOrdersData');
     try {
       await RawMatConsumptions.destroy({ where: { id: rawMatConsumption } });
     } catch (error) {
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
-        error,
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  //--------------------------RAW MAT CONSUMPTION CURRENT MOLDS--------------------------
+
+  static async getAllRawMatConsumptionCurrentMolds() {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>getAllRawMatConsumptionCurrentMolds');
+    try {
+      const allRawMatConsumptionsCurrentMolds =
+        await RawMatConsumptionsCurrentMolds.findAll();
+
+      return allRawMatConsumptionsCurrentMolds;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async addNewRawMatConsumptionCurrentMolds(newRawMatConsumption) {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>addNewRawMatConsumptionCurrentMolds');
+
+    try {
+      const rawMatCurrentMolds = await RawMatConsumptionsCurrentMolds.create(
+        newRawMatConsumption,
       );
+
+      return rawMatCurrentMolds;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async updateRawMatConsumptionCurrentMolds(newRawMatConsumption) {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateRawMatConsumptionCurrentMolds');
+
+    const { id, used } = newRawMatConsumption;
+
+    try {
+      const rawMatCurrentMolds = await RawMatConsumptionsCurrentMolds.update(
+        { used },
+        {
+          where: {
+            id: id,
+          },
+          returning: true,
+          plain: true,
+        },
+      );
+
+      return rawMatCurrentMolds;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      return error;
+    }
+  }
+
+  static async deleteRawMatConsumptionCurrentMolds(rawMatConsumption) {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionCurrentMolds');
+    try {
+      await RawMatConsumptionsCurrentMolds.destroy({
+        where: { batch_id: rawMatConsumption },
+      });
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
   }

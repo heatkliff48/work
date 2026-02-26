@@ -52,6 +52,38 @@ class RecipeOrdersServices {
     );
     return;
   }
+
+  //--------------------------RAW MAT CONSUMPTION CURRENT MOLDS--------------------------
+
+  static async getAllRawMatConsumptionCurrentMolds() {
+    const allRawMatConsumptions =
+      await RecipeOrdersRepository.getAllRawMatConsumptionCurrentMolds();
+
+    return allRawMatConsumptions;
+  }
+
+  static async addNewRawMatConsumptionCurrentMolds(newRawMatConsumption) {
+    const rawMat =
+      await RecipeOrdersRepository.addNewRawMatConsumptionCurrentMolds(
+        newRawMatConsumption,
+      );
+    return rawMat;
+  }
+
+  static async updateRawMatConsumptionCurrentMolds(newRawMatConsumption) {
+    const rawMat =
+      await RecipeOrdersRepository.updateRawMatConsumptionCurrentMolds(
+        newRawMatConsumption,
+      );
+    return rawMat;
+  }
+
+  static async deleteRawMatConsumptionCurrentMolds(rawMatConsumption) {
+    await RecipeOrdersRepository.deleteRawMatConsumptionCurrentMolds(
+      rawMatConsumption,
+    );
+    return;
+  }
 }
 
 module.exports = RecipeOrdersServices;

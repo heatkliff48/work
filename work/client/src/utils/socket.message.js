@@ -137,6 +137,8 @@ import {
   addNewOrderToWarehouseSocket,
   updateOrderToWarehouseSocket,
   deleteOrderToWarehouseSocket,
+  addNewRawMatConsumptionCurrentMoldsSocket,
+  deleteRawMatConsumptionCurrentMoldsSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -319,6 +321,8 @@ import {
   ADD_NEW_ORDER_TO_WAREHOUSE_SOCKET,
   UPDATE_ORDER_TO_WAREHOUSE_SOCKET,
   DELETE_ORDER_TO_WAREHOUSE_SOCKET,
+  ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+  DELETE_OLD_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -605,6 +609,18 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET:
       dispatch(deleteRawMatConsumptionSocket(payload));
+      break;
+
+    case ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET:
+      dispatch(addNewRawMatConsumptionCurrentMoldsSocket(payload));
+      break;
+
+    // case UPDATE_RAW_MAT_CONSUMPTION_SOCKET:
+    //   dispatch(updateRawMatConsumptionSocket(payload));
+    //   break;
+
+    case DELETE_OLD_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET:
+      dispatch(deleteRawMatConsumptionCurrentMoldsSocket(payload));
       break;
 
     case DELETE_RECIPE_SOCKET:

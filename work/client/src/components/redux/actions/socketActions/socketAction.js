@@ -137,6 +137,8 @@ import {
   NEW_ORDER_TO_WAREHOUSE_SOCKET,
   NEED_UPDATE_ORDER_TO_WAREHOUSE_SOCKET,
   NEED_DELETE_ORDER_TO_WAREHOUSE_SOCKET,
+  NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+  DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -552,6 +554,28 @@ export const deleteRawMatConsumptionSocket = (rawMatConsumption) => {
   };
 };
 
+export const addNewRawMatConsumptionCurrentMoldsSocket = (rawMatConsumption) => {
+  console.log('NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET', rawMatConsumption);
+  return {
+    type: NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+    payload: rawMatConsumption,
+  };
+};
+
+// export const updateRawMatConsumptionSocket = (rawMatConsumption) => {
+//   return {
+//     type: UPDT_RAW_MAT_CONSUMPTION_SOCKET,
+//     payload: rawMatConsumption,
+//   };
+// };
+
+export const deleteRawMatConsumptionCurrentMoldsSocket = (rawMatConsumption) => {
+  return {
+    type: DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+    payload: rawMatConsumption,
+  };
+};
+
 export const deleteRecipeSocket = (recipe_id) => {
   return {
     type: NEED_DELETE_RECIPE_SOCKET,
@@ -650,18 +674,14 @@ export const updateDryMixesJournalSocket = (dryMixesJournal) => {
   };
 };
 
-export const addNewRelatedMaterialsJournalSocket = (
-  relatedMaterialsJournal,
-) => {
+export const addNewRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
   return {
     type: NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
   };
 };
 
-export const updateRelatedMaterialsJournalSocket = (
-  relatedMaterialsJournal,
-) => {
+export const updateRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
@@ -710,18 +730,14 @@ export const updateDryMixesWarehouseSocket = (dryMixesWarehouse) => {
   };
 };
 
-export const addNewRelatedMaterialsWarehouseSocket = (
-  relatedMaterialsWarehouse,
-) => {
+export const addNewRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
   return {
     type: NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
     payload: relatedMaterialsWarehouse,
   };
 };
 
-export const updateRelatedMaterialsWarehouseSocket = (
-  relatedMaterialsWarehouse,
-) => {
+export const updateRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
     payload: relatedMaterialsWarehouse,
@@ -1016,9 +1032,7 @@ export const updateWarehouseGrindingBallsSocket = (warehouseGrindingBalls) => {
   };
 };
 
-export const deleteWarehouseGrindingBallsSocket = (
-  grinding_balls_warehouse_id,
-) => {
+export const deleteWarehouseGrindingBallsSocket = (grinding_balls_warehouse_id) => {
   return {
     type: NEED_DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
     payload: grinding_balls_warehouse_id,

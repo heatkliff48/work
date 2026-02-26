@@ -5,6 +5,9 @@ const {
   ADD_NEW_RAW_MAT_CONSUMPTION_SOCKET,
   UPDATE_RAW_MAT_CONSUMPTION_SOCKET,
   DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
+  ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+  UPDATE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+  DELETE_OLD_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
 } = require('../src/constants/event');
 const myEmitter = require('../src/ee');
 
@@ -87,6 +90,55 @@ class RecipeOrdersController {
     myEmitter.emit(DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET, id);
 
     return res.status(200).json(id);
+  }
+
+  //--------------------------RAW MAT CONSUMPTION CURRENT MOLDS--------------------------
+
+  static async getAllRawMatConsumptionCurrentMolds(req, res) {
+    const allRawMatConsumptionsCurrentMolds =
+      await RecipeOrdersServices.getAllRawMatConsumptionCurrentMolds();
+
+    return res.status(200).json(allRawMatConsumptionsCurrentMolds);
+  }
+
+  static async addNewRawMatConsumptionCurrentMolds(req, res) {
+    const rawMatConsumption = req.body;
+
+    const rawMatCurMolds =
+      await RecipeOrdersServices.addNewRawMatConsumptionCurrentMolds(
+        rawMatConsumption,
+      );
+
+    myEmitter.emit(ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET, rawMatCurMolds);
+
+    return res.status(200).json(rawMatCurMolds);
+  }
+
+  static async updateRawMatConsumptionCurrentMolds(req, res) {
+    const rawMatConsumption = req.body;
+
+    const rawMatCurMolds =
+      await RecipeOrdersServices.updateRawMatConsumptionCurrentMolds(
+        rawMatConsumption,
+      );
+
+    myEmitter.emit(UPDATE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET, rawMatCurMolds);
+
+    return res.status(200).json(rawMatCurMolds);
+  }
+
+  static async deleteRawMatConsumptionCurrentMolds(req, res) {
+    console.log(
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteRawMatConsumptionCurrentMolds',
+      req.body,
+    );
+    const { batch_id } = req.body;
+
+    await RecipeOrdersServices.deleteRawMatConsumptionCurrentMolds(batch_id);
+
+    myEmitter.emit(DELETE_OLD_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET, batch_id);
+
+    return res.status(200).json(batch_id);
   }
 }
 

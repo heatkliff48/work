@@ -1,5 +1,5 @@
 import {
-  mainRawMatConsumptionReducer,
+  rawMatConsumptionCurrentMoldsReducer,
   rawMatConsumptionReducer,
   recipeOrdersReducer,
 } from './RecipeOrdersReducer';
@@ -25,10 +25,7 @@ import {
   autoclaveCalendarReducer,
   listOfOrderedProductionReducer,
 } from './listOfOrderedProductionReducer';
-import {
-  lotesListBatchesReducer,
-  lotesListCakesReducer,
-} from './lotesListReducer';
+import { lotesListBatchesReducer, lotesListCakesReducer } from './lotesListReducer';
 import { ordersReducer } from './orderReducer';
 import { orderToWarehouseReducer } from './orderToWarehouseReducer';
 import { pagesReducer } from './pagesReducer';
@@ -80,10 +77,7 @@ import {
   warehouseSandReducer,
   warehouseSandSlurryReducer,
 } from './warehouseRawMaterialsReducer';
-import {
-  warehouseReducer,
-  rawMaterialsWarehouseReducer,
-} from './warehouseReducer';
+import { warehouseReducer, rawMaterialsWarehouseReducer } from './warehouseReducer';
 import { combineReducers } from 'redux';
 
 export const rootReducer = combineReducers({
@@ -138,7 +132,7 @@ export const rootReducer = combineReducers({
   productCode: productCodeReducer,
   autoclave_calendar: autoclaveCalendarReducer,
   rawMatConsumption: rawMatConsumptionReducer,
-  mainRawMatConsumption: mainRawMatConsumptionReducer,
+  rawMatConsumptionCurrentMolds: rawMatConsumptionCurrentMoldsReducer,
   rawMaterialsWarehouse: rawMaterialsWarehouseReducer,
   warehouseSand: warehouseSandReducer,
   warehouseLime: warehouseLimeReducer,

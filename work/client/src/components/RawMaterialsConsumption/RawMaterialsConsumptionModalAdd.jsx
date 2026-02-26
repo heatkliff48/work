@@ -7,7 +7,7 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 function RawMaterialsConsumptionModalAdd({ isOpen, toggle, func }) {
   const {
     raw_mat_consumption,
-    main_raw_mat_consumption,
+    rawMatConsumptionCurrentMolds,
     COLUMNS_RAW_MAT_CONSUMPTION,
   } = useRecipeContext();
   const { setRawMaterialConsumptionMadal } = useModalContext();
@@ -15,14 +15,14 @@ function RawMaterialsConsumptionModalAdd({ isOpen, toggle, func }) {
   const [filteredRawMatConsumption, setFilteredRaw_MatConsumption] = useState();
 
   useEffect(() => {
-    if (!raw_mat_consumption || !main_raw_mat_consumption) {
+    if (!raw_mat_consumption || !rawMatConsumptionCurrentMolds) {
       setFilteredRaw_MatConsumption([]);
       return;
     }
 
     const sumMap = new Map();
 
-    main_raw_mat_consumption.forEach((item) => {
+    rawMatConsumptionCurrentMolds.forEach((item) => {
       const key = `${item.batch_id}`;
 
       const currentSum = sumMap.get(key) || 0;
@@ -30,16 +30,23 @@ function RawMaterialsConsumptionModalAdd({ isOpen, toggle, func }) {
       sumMap.set(key, currentSum + Number(item.consumed_volume || 0));
     });
 
-    const filtered = raw_mat_consumption.filter((item) => {
-      const key = `${item.batch_id}`;
+    const filtered = raw_mat_consumption
+      ?.map((el) => {
+        if (!el.recipe_article) return { ...el, recipe_article: 'No recipe' };
+        return el;
+      })
+      ?.filter((item) => {
+        if (!item.used) return false;
 
-      const totalFromMain = sumMap.get(key) || 0;
+        const key = `${item.batch_id}`;
 
-      return Number(item.production_volume) !== totalFromMain;
-    });
+        const totalFromMain = sumMap.get(key) || 0;
+
+        return Number(item.production_volume) !== totalFromMain;
+      });
 
     setFilteredRaw_MatConsumption(filtered);
-  }, [raw_mat_consumption, main_raw_mat_consumption]);
+  }, [raw_mat_consumption, rawMatConsumptionCurrentMolds]);
 
   return (
     <>
