@@ -5,12 +5,22 @@ import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useProjectContext } from '#components/contexts/Context.js';
+import { useDispatch } from 'react-redux';
+import {
+  addNewDimensionsQuality,
+  updateDimensionsQuality,
+} from '#components/redux/actions/productionQualityAction.js';
 
 const DimensionTestModal = ({ show, onHide, selectedBatch }) => {
   const { extractProductTitle, latestProducts } = useProductsContext();
   const { setModalProductionQuality } = useModalContext();
-  const { batch_id = '', date = '' } = selectedBatch || {};
+  const { dimensions_quality } = useProjectContext();
+
+  const { batch_id = '', date = '', quantity = 21 } = selectedBatch || {};
   const [rows, setRows] = useState([]);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (show) {
@@ -21,6 +31,8 @@ const DimensionTestModal = ({ show, onHide, selectedBatch }) => {
       const regex = /(\d+)\s*x\s*(\d+)\s*x\s*(\d+)/;
       const match = product?.description?.match(regex);
       const product_size = match ? `${match[1]}x${match[2]}x${match[3]}` : '';
+
+      const numGroups = Math.ceil((quantity || 21) / 7);
 
       const emptyRow = {
         cake_start: '',
@@ -35,9 +47,73 @@ const DimensionTestModal = ({ show, onHide, selectedBatch }) => {
         angulo: ['', '', '', ''],
       };
 
-      setRows([emptyRow, emptyRow, emptyRow]);
+      const newRows = [];
+      for (let i = 0; i < numGroups; i++) {
+        newRows.push({
+          ...emptyRow,
+          cake_start: (i * 7 + 1).toString(),
+        });
+      }
+
+      if (dimensions_quality?.length > 0 && selectedBatch?.batch_id) {
+        const updatedRows = newRows.map((row) => ({ ...row }));
+
+        dimensions_quality.forEach((record) => {
+          if (String(record.batch_id) !== String(selectedBatch.batch_id)) return;
+
+          const groupIndex = record.sub_lote_id - 1;
+          if (groupIndex < 0 || groupIndex >= numGroups) return;
+
+          const group = updatedRows[groupIndex];
+          group.largo = [
+            record.largo_1 || '',
+            record.largo_2 || '',
+            record.largo_3 || '',
+            record.largo_4 || '',
+          ];
+          group.ancho = [
+            record.ancho_1 || '',
+            record.ancho_2 || '',
+            record.ancho_3 || '',
+            record.ancho_4 || '',
+          ];
+          group.altura = [
+            record.altura_1 || '',
+            record.altura_2 || '',
+            record.altura_3 || '',
+            record.altura_4 || '',
+          ];
+          group.paralelismoMedida = [
+            record.support_face_parallelism_1 || '',
+            record.support_face_parallelism_2 || '',
+            record.support_face_parallelism_3 || '',
+            record.support_face_parallelism_4 || '',
+          ];
+          group.planeidadDiagonal = [
+            record.diagonal_1 || '',
+            record.diagonal_2 || '',
+            record.diagonal_3 || '',
+            record.diagonal_4 || '',
+          ];
+          group.planeidadMedida = [
+            record.flatness_1 || '',
+            record.flatness_2 || '',
+            record.flatness_3 || '',
+            record.flatness_4 || '',
+          ];
+          group.angulo = [
+            record.angle_90_1 || '',
+            record.angle_90_2 || '',
+            record.angle_90_3 || '',
+            record.angle_90_4 || '',
+          ];
+        });
+        setRows(updatedRows);
+      } else {
+        setRows(newRows);
+      }
     }
-  }, [show]);
+  }, [show, selectedBatch, dimensions_quality]);
 
   const average = (arr) => {
     if (!arr || arr.length === 0) return '0.00';
@@ -146,6 +222,88 @@ const DimensionTestModal = ({ show, onHide, selectedBatch }) => {
 
   const handleSave = () => {
     console.log('Saved rows:', rows);
+    const dim_test_arr = [];
+    const filteredData = rows.filter(
+      (el) =>
+        el.altura.length > 0 &&
+        el.ancho.length > 0 &&
+        el.angulo.length > 0 &&
+        el.largo.length > 0 &&
+        el.paralelismoMedida.length > 0 &&
+        el.planeidadDiagonal.length > 0 &&
+        el.planeidadMedida.length > 0,
+    );
+
+    for (let i = 0; i < filteredData.length; i++) {
+      const {
+        altura,
+        ancho,
+        angulo,
+        largo,
+        paralelismoMedida,
+        planeidadDiagonal,
+        planeidadMedida,
+      } = filteredData[i];
+
+      const result = {
+        batch_id,
+        sub_lote_id: i + 1,
+        largo_1: largo[0],
+        largo_2: largo[1],
+        largo_3: largo[2],
+        largo_4: largo[3],
+        ancho_1: ancho[0],
+        ancho_2: ancho[1],
+        ancho_3: ancho[2],
+        ancho_4: ancho[3],
+        altura_1: altura[0],
+        altura_2: altura[1],
+        altura_3: altura[2],
+        altura_4: altura[3],
+        support_face_parallelism_1: paralelismoMedida[0],
+        support_face_parallelism_2: paralelismoMedida[1],
+        support_face_parallelism_3: paralelismoMedida[2],
+        support_face_parallelism_4: paralelismoMedida[3],
+        diagonal_1: planeidadDiagonal[0],
+        diagonal_2: planeidadDiagonal[1],
+        diagonal_3: planeidadDiagonal[2],
+        diagonal_4: planeidadDiagonal[3],
+        flatness_1: planeidadMedida[0],
+        flatness_2: planeidadMedida[1],
+        flatness_3: planeidadMedida[2],
+        flatness_4: planeidadMedida[3],
+        angle_90_1: angulo[0],
+        angle_90_2: angulo[1],
+        angle_90_3: angulo[2],
+        angle_90_4: angulo[3],
+      };
+      dim_test_arr.push(result);
+    }
+
+    const add_arr = [];
+    const upd_arr = [];
+
+    for (const el of dim_test_arr) {
+      const { batch_id, sub_lote_id } = el;
+
+      const need_upd = dimensions_quality.find(
+        (cp) => cp.batch_id == batch_id && cp.sub_lote_id == sub_lote_id,
+      );
+
+      if (need_upd) {
+        upd_arr.push(el);
+      } else {
+        add_arr.push(el);
+      }
+    }
+
+    console.log('upd_arr DimensionsTestModal.jsx line 300', upd_arr);
+    console.log('add_arr DimensionsTestModal.jsx line 301', add_arr);
+    if (upd_arr.length > 0) dispatch(updateDimensionsQuality(upd_arr));
+    if (add_arr.length > 0) dispatch(addNewDimensionsQuality(add_arr));
+
+    // console.log('dim_test_arr DimensionsTestModal.jsx line 210', dim_test_arr);
+
     setModalProductionQuality(false);
     onHide();
   };
@@ -176,8 +334,7 @@ const DimensionTestModal = ({ show, onHide, selectedBatch }) => {
                 <th rowSpan={3}>Angulo de 90°</th>
               </tr>
               <tr>
-                <th colSpan={2}></th>{' '}
-                <th colSpan={2}></th>
+                <th colSpan={2}></th> <th colSpan={2}></th>
                 <th colSpan={2}></th>
                 <th colSpan={3}></th>
                 <th colSpan={2}>Diagonal</th>
@@ -211,11 +368,8 @@ const DimensionTestModal = ({ show, onHide, selectedBatch }) => {
                       type="text"
                       size="sm"
                       value={row.cake_start || ''}
-                      onChange={(e) =>
-                        handleInputChange(rowIndex, 'cake_start', e.target.value)
-                      }
-                      placeholder="ID (cake_start)"
                       className="mb-1"
+                      readOnly
                     />
                     <Form.Control
                       type="text"

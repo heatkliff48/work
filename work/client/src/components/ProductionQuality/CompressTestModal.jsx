@@ -5,20 +5,28 @@ import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useDispatch } from 'react-redux';
+import {
+  addNewCompressionsQuality,
+  updateCompressionsQuality,
+} from '#components/redux/actions/productionQualityAction.js';
+import { useProjectContext } from '#components/contexts/Context.js';
 
 const CompressTestModal = ({ show, onHide, selectedBatch }) => {
   const { extractProductTitle, latestProducts } = useProductsContext();
   const { setModalProductionQuality } = useModalContext();
+  const { compressions_quality } = useProjectContext();
 
+  const dispatch = useDispatch();
   const [rows, setRows] = useState([]);
-  const [averageInfo, setAverageInfo] = useState({
-    cakeId: '',
-    size: '',
-    product: '',
-    aValue: '',
-  });
+  const [averageInfo, setAverageInfo] = useState([]);
 
-  const { batch_id = '', date = '', cakeId = '' } = selectedBatch || {};
+  const {
+    batch_id = '',
+    date = '',
+    cakeId = '',
+    quantity = 21,
+  } = selectedBatch || {};
 
   useEffect(() => {
     if (show) {
@@ -30,6 +38,8 @@ const CompressTestModal = ({ show, onHide, selectedBatch }) => {
       const match = product?.description?.match(regex);
       const product_size = match ? `${match[1]}x${match[2]}x${match[3]}` : '';
 
+      const numGroups = Math.ceil(quantity / 7);
+
       const emptyRow = {
         numero: '',
         largo: '',
@@ -38,21 +48,63 @@ const CompressTestModal = ({ show, onHide, selectedBatch }) => {
         peso_autoclave: '',
         peso_50c: '',
         peso_105c: '',
+        carga_kn: '',
       };
-      setRows(
-        Array.from({ length: 6 }, (_, i) => ({
+
+      const newRows = [];
+      const newAverageInfos = [];
+      for (let g = 0; g < numGroups; g++) {
+        const group = Array.from({ length: 6 }, (_, i) => ({
           ...emptyRow,
           numero: (i + 1).toString(),
-        })),
-      );
-      setAverageInfo({
-        cakeId: cakeId || '',
-        size: product_size || '',
-        product: product_type || '',
-        aValue: '',
-      });
+        }));
+        newRows.push(group);
+
+        newAverageInfos.push({
+          cakeId: (g * 7 + 1).toString(),
+          size: product_size || '',
+          product: product_type || '',
+          aValue: '',
+        });
+      }
+
+      if (compressions_quality && compressions_quality.length > 0) {
+        const updatedRows = newRows.map((group) => group.map((row) => ({ ...row })));
+        const updatedAverageInfos = newAverageInfos.map((info) => ({ ...info }));
+
+        compressions_quality.forEach((record) => {
+          const groupIndex = updatedAverageInfos.findIndex(
+            (info) => info.cakeId === String(record.batch_id),
+          );
+          if (groupIndex === -1) return;
+
+          if (Number(record.sub_lote_id) !== groupIndex + 1) return;
+
+          const rowIndex = updatedRows[groupIndex].findIndex(
+            (row) => row.numero === String(record.dimension_id),
+          );
+          if (rowIndex === -1) return;
+
+          updatedRows[groupIndex][rowIndex] = {
+            ...updatedRows[groupIndex][rowIndex],
+            largo: record.length || '',
+            ancho: record.width || '',
+            alto: record.height || '',
+            peso_autoclave: record.weight_after_autoclave || '',
+            peso_50c: record.weight_after_50c || '',
+            peso_105c: record.weight_after_105c || '',
+            carga_kn: record.load_kn || '',
+          };
+        });
+
+        setRows(updatedRows);
+        setAverageInfo(updatedAverageInfos);
+      } else {
+        setRows(newRows);
+        setAverageInfo(newAverageInfos);
+      }
     }
-  }, [show, cakeId]);
+  }, [show, cakeId, compressions_quality]);
 
   const getHumedadAutoclave = (row) => {
     const pAuto = parseFloat(row.peso_autoclave);
@@ -101,20 +153,32 @@ const CompressTestModal = ({ show, onHide, selectedBatch }) => {
     return ((carga / (largo * ancho)) * 1000).toFixed(2);
   };
 
-  const handleInputChange = (rowIndex, field, value) => {
+  const getCargaKn = (row) => {
+    const carga = parseFloat(row.carga_kn);
+
+    return carga.toFixed(2);
+  };
+
+  const handleInputChange = (groupIndex, rowIndex, field, value) => {
     setRows((prevRows) => {
       const newRows = [...prevRows];
-      newRows[rowIndex] = { ...newRows[rowIndex], [field]: value };
+      const updatedGroup = [...newRows[groupIndex]];
+      updatedGroup[rowIndex] = { ...updatedGroup[rowIndex], [field]: value };
+      newRows[groupIndex] = updatedGroup;
       return newRows;
     });
   };
 
-  const handleAverageInfoChange = (field, value) => {
-    setAverageInfo((prev) => ({ ...prev, [field]: value }));
+  const handleAverageInfoChange = (groupIndex, field, value) => {
+    setAverageInfo((prev) => {
+      const newInfos = [...prev];
+      newInfos[groupIndex] = { ...newInfos[groupIndex], [field]: value };
+      return newInfos;
+    });
   };
 
-  const averageOf = (getter) => {
-    const values = rows
+  const averageOfGroup = (group, getter) => {
+    const values = group
       .map((row) => parseFloat(getter(row)))
       .filter((val) => !isNaN(val));
     if (values.length === 0) return '';
@@ -123,14 +187,73 @@ const CompressTestModal = ({ show, onHide, selectedBatch }) => {
   };
 
   const handleSave = () => {
-    const rowsToSave = rows.map((row) => ({
-      ...row,
-      humedad_autoclave: getHumedadAutoclave(row),
-      humedad_50c: getHumedad50c(row),
-      densidad: getDensidad(row),
-      resistencia: getResistencia(row),
-    }));
-    console.log('Compression test data:', { rows: rowsToSave, averageInfo });
+    const groupsToSave = rows
+      .map((group, gIdx) => ({
+        rows: group.map((row) => ({
+          ...row,
+          humedad_autoclave: getHumedadAutoclave(row),
+          humedad_50c: getHumedad50c(row),
+          densidad: getDensidad(row),
+          resistencia: getResistencia(row),
+          carga_kn: getCargaKn(row),
+        })),
+        averageInfo: averageInfo[gIdx],
+      }))
+      .reduce((acc, el, i) => {
+        const { rows, averageInfo } = el;
+        rows.forEach((item) => {
+          const {
+            alto,
+            ancho,
+            largo,
+            numero,
+            peso_50c,
+            peso_105c,
+            peso_autoclave,
+            carga_kn,
+          } = item;
+          if (!alto && !ancho && !largo) return;
+
+          const obj = {
+            batch_id: averageInfo.cakeId,
+            sub_lote_id: i + 1,
+            dimension_id: numero,
+            weight_after_autoclave: peso_autoclave,
+            weight_after_50c: peso_50c,
+            weight_after_105c: peso_105c,
+            load_kn: carga_kn,
+            length: largo,
+            width: ancho,
+            height: alto,
+          };
+          acc.push(obj);
+        });
+        return acc;
+      }, []);
+
+    const add_arr = [];
+    const upd_arr = [];
+
+    for (const el of groupsToSave) {
+      const { batch_id, sub_lote_id, dimension_id } = el;
+
+      const need_upd = compressions_quality.find(
+        (cp) =>
+          cp.batch_id == batch_id &&
+          cp.sub_lote_id == sub_lote_id &&
+          dimension_id == cp.dimension_id,
+      );
+
+      if (need_upd) {
+        upd_arr.push(el);
+      } else {
+        add_arr.push(el);
+      }
+    }
+
+    if (upd_arr.length > 0) dispatch(updateCompressionsQuality(upd_arr));
+    if (add_arr.length > 0) dispatch(addNewCompressionsQuality(add_arr));
+
     setModalProductionQuality(false);
     onHide();
   };
@@ -171,176 +294,240 @@ const CompressTestModal = ({ show, onHide, selectedBatch }) => {
               </tr>
             </thead>
             <tbody>
-              {rows.map((row, index) => (
-                <tr key={index}>
-                  <td>
-                    {index === 0 ? (
-                      <div>
-                        {date}
-                        <br />
-                        Batch id: {batch_id}
-                      </div>
-                    ) : (
-                      ''
-                    )}
-                  </td>
-                  <td className="text-center">{row.numero}</td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      step="0.01"
-                      size="sm"
-                      value={row.largo}
-                      onChange={(e) =>
-                        handleInputChange(index, 'largo', e.target.value)
-                      }
-                    />
-                  </td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      step="0.01"
-                      size="sm"
-                      value={row.ancho}
-                      onChange={(e) =>
-                        handleInputChange(index, 'ancho', e.target.value)
-                      }
-                    />
-                  </td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      step="0.01"
-                      size="sm"
-                      value={row.alto}
-                      onChange={(e) =>
-                        handleInputChange(index, 'alto', e.target.value)
-                      }
-                    />
-                  </td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      step="0.001"
-                      size="sm"
-                      value={row.peso_autoclave}
-                      onChange={(e) =>
-                        handleInputChange(index, 'peso_autoclave', e.target.value)
-                      }
-                    />
-                  </td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      step="0.001"
-                      size="sm"
-                      value={row.peso_50c}
-                      onChange={(e) =>
-                        handleInputChange(index, 'peso_50c', e.target.value)
-                      }
-                    />
-                  </td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      step="0.001"
-                      size="sm"
-                      value={row.peso_105c}
-                      onChange={(e) =>
-                        handleInputChange(index, 'peso_105c', e.target.value)
-                      }
-                    />
-                  </td>
-                  <td className="text-center align-middle">
-                    {getHumedadAutoclave(row)}
-                  </td>
-                  <td className="text-center align-middle">{getHumedad50c(row)}</td>
-                  <td className="text-center align-middle">{getDensidad(row)}</td>
-                  <td>
-                    <Form.Control
-                      type="number"
-                      step="0.001"
-                      size="sm"
-                      value={row.carga_kn}
-                      onChange={(e) =>
-                        handleInputChange(index, 'carga_kn', e.target.value)
-                      }
-                    />
-                  </td>
-                  <td className="text-center align-middle">{getResistencia(row)}</td>
-                  <td className="text-center text-muted"></td>
-                </tr>
-              ))}
+              {rows.map((group, groupIndex) => (
+                <React.Fragment key={groupIndex}>
+                  {group.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      <td>
+                        {rowIndex === 0 ? (
+                          <div>
+                            {groupIndex === 0 && ( // MODIFIED: только для первой группы показываем дату и batch_id
+                              <>
+                                {date}
+                                <br />
+                                Batch id: {batch_id}
+                                <br />
+                              </>
+                            )}
+                            Cake ID: {averageInfo[groupIndex]?.cakeId}
+                          </div>
+                        ) : (
+                          ''
+                        )}
+                      </td>
+                      <td className="text-center">{row.numero}</td>
+                      <td>
+                        <Form.Control
+                          type="number"
+                          step="0.01"
+                          size="sm"
+                          value={row.largo}
+                          onChange={(e) =>
+                            handleInputChange(
+                              groupIndex,
+                              rowIndex,
+                              'largo',
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <Form.Control
+                          type="number"
+                          step="0.01"
+                          size="sm"
+                          value={row.ancho}
+                          onChange={(e) =>
+                            handleInputChange(
+                              groupIndex,
+                              rowIndex,
+                              'ancho',
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <Form.Control
+                          type="number"
+                          step="0.01"
+                          size="sm"
+                          value={row.alto}
+                          onChange={(e) =>
+                            handleInputChange(
+                              groupIndex,
+                              rowIndex,
+                              'alto',
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <Form.Control
+                          type="number"
+                          step="0.001"
+                          size="sm"
+                          value={row.peso_autoclave}
+                          onChange={(e) =>
+                            handleInputChange(
+                              groupIndex,
+                              rowIndex,
+                              'peso_autoclave',
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <Form.Control
+                          type="number"
+                          step="0.001"
+                          size="sm"
+                          value={row.peso_50c}
+                          onChange={(e) =>
+                            handleInputChange(
+                              groupIndex,
+                              rowIndex,
+                              'peso_50c',
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <Form.Control
+                          type="number"
+                          step="0.001"
+                          size="sm"
+                          value={row.peso_105c}
+                          onChange={(e) =>
+                            handleInputChange(
+                              groupIndex,
+                              rowIndex,
+                              'peso_105c',
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                      <td className="text-center align-middle">
+                        {getHumedadAutoclave(row)}
+                      </td>
+                      <td className="text-center align-middle">
+                        {getHumedad50c(row)}
+                      </td>
+                      <td className="text-center align-middle">
+                        {getDensidad(row)}
+                      </td>
+                      <td>
+                        <Form.Control
+                          type="number"
+                          step="0.001"
+                          size="sm"
+                          value={row.carga_kn}
+                          onChange={(e) =>
+                            handleInputChange(
+                              groupIndex,
+                              rowIndex,
+                              'carga_kn',
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                      <td className="text-center align-middle">
+                        {getResistencia(row)}
+                      </td>
+                      <td className="text-center text-muted"></td>
+                    </tr>
+                  ))}
 
-              <tr>
-                <td>
-                  <div
-                    style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
-                  >
-                    <Form.Control
-                      type="text"
-                      size="sm"
-                      placeholder="Cake ID"
-                      value={averageInfo.cakeId}
-                      readOnly
-                      className="bg-light"
-                    />
-                    <Form.Control
-                      type="text"
-                      size="sm"
-                      placeholder="Size"
-                      value={averageInfo.size}
-                      readOnly
-                      className="bg-light"
-                    />
-                    <Form.Control
-                      type="text"
-                      size="sm"
-                      placeholder="Product"
-                      value={averageInfo.product}
-                      readOnly
-                      className="bg-light"
-                    />
-                  </div>
-                </td>
-                <td className="text-center fw-bold">Average</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td className="text-center align-middle fw-bold">
-                  {averageOf(getHumedadAutoclave)}
-                </td>
-                <td className="text-center align-middle fw-bold">
-                  {averageOf(getHumedad50c)}
-                </td>
-                <td className="text-center align-middle fw-bold">
-                  {averageOf(getDensidad)}
-                </td>
-                <td className="text-center align-middle fw-bold">
-                  {averageOf((row) => row.carga_kn)}{' '}
-                </td>
-                <td className="text-center align-middle fw-bold">
-                  {averageOf(getResistencia)}
-                </td>
-                <td>
-                  <div
-                    style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
-                  >
-                    <Form.Control
-                      type="text"
-                      size="sm"
-                      placeholder="A value"
-                      value={averageInfo.aValue}
-                      onChange={(e) =>
-                        handleAverageInfoChange('aValue', e.target.value)
-                      }
-                    />
-                  </div>
-                </td>
-              </tr>
+                  {/* MODIFIED: строка средних значений для группы */}
+                  <tr>
+                    <td>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '4px',
+                        }}
+                      >
+                        <Form.Control
+                          type="text"
+                          size="sm"
+                          placeholder="Cake ID"
+                          value={averageInfo[groupIndex]?.cakeId}
+                          readOnly
+                          className="bg-light"
+                        />
+                        <Form.Control
+                          type="text"
+                          size="sm"
+                          placeholder="Size"
+                          value={averageInfo[groupIndex]?.size}
+                          readOnly
+                          className="bg-light"
+                        />
+                        <Form.Control
+                          type="text"
+                          size="sm"
+                          placeholder="Product"
+                          value={averageInfo[groupIndex]?.product}
+                          readOnly
+                          className="bg-light"
+                        />
+                      </div>
+                    </td>
+                    <td className="text-center fw-bold">Average</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td className="text-center align-middle fw-bold">
+                      {averageOfGroup(group, getHumedadAutoclave)}
+                    </td>
+                    <td className="text-center align-middle fw-bold">
+                      {averageOfGroup(group, getHumedad50c)}
+                    </td>
+                    <td className="text-center align-middle fw-bold">
+                      {averageOfGroup(group, getDensidad)}
+                    </td>
+                    <td className="text-center align-middle fw-bold">
+                      {averageOfGroup(group, getCargaKn)}
+                    </td>
+                    <td className="text-center align-middle fw-bold">
+                      {averageOfGroup(group, getResistencia)}
+                    </td>
+                    <td>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '4px',
+                        }}
+                      >
+                        <Form.Control
+                          type="text"
+                          size="sm"
+                          placeholder="A value"
+                          value={averageInfo[groupIndex]?.aValue || ''}
+                          onChange={(e) =>
+                            handleAverageInfoChange(
+                              groupIndex,
+                              'aValue',
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                </React.Fragment>
+              ))}
             </tbody>
           </Table>
         </div>

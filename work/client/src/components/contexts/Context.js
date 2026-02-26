@@ -389,6 +389,8 @@ const ProjectContextProvider = ({ children }) => {
   const user = useSelector((state) => state.user);
   const clientPriceInfo = useSelector((state) => state.contactPriceInfo);
   const production_quality = useSelector((state) => state.productionQuality);
+  const dimensions_quality = useSelector((state) => state.qualityDimensions);
+  const compressions_quality = useSelector((state) => state.qualityCompressions);
 
   const [currentContact, setCurrentContact] = useState();
   const [currentDelivery, setCurrentDelivery] = useState();
@@ -552,6 +554,8 @@ const ProjectContextProvider = ({ children }) => {
         lotesListBatches,
         lotesListCakes,
         production_quality,
+        dimensions_quality,
+        compressions_quality,
       }}
     >
       {children}
