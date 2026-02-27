@@ -21,7 +21,10 @@ import {
 } from '#components/redux/actions/batchOutsideAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.js';
+import {
+  addNewRawMatConsumption,
+  deleteRawMatConsumption,
+} from '#components/redux/actions/recipeAction.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
 
@@ -43,6 +46,8 @@ const QualityManagementTable = () => {
   const [qualityManagementDataList, setQualityManagementDataList] = useState(
     [],
   );
+
+  const [consumptionCalculated, setConsumptionCalculated] = useState({});
 
   const COLUMNS_QUALITY_MANAGEMENT = [
     {
@@ -267,10 +272,6 @@ const QualityManagementTable = () => {
         raw_mat_cons_batch_id,
         id_ordered_product_to_warehouse,
       } = qualityManagementData[0];
-      console.log(
-        id_ordered_product_to_warehouse,
-        'id_ordered_product_to_warehouse QualityManagementTable.jsx line 269',
-      );
 
       // 1. Фильтруем резервы для текущего product_article
 
@@ -386,11 +387,6 @@ const QualityManagementTable = () => {
         reserved_quantity_allocated + summReserve;
 
       // Добавляем на склад
-
-      console.log(
-        raw_mat_cons_batch_id,
-        'raw_mat_cons_batch_id QualityManagementTable.jsx line 384',
-      );
 
       if (calculatedOrderedQuantity + remainingFreeQty > 0) {
         await dispatch(
@@ -515,6 +511,14 @@ const QualityManagementTable = () => {
       }
       await dispatch(deleteQualityManagement(id));
 
+      if (consumptionCalculated.consumption_calculated) {
+        await dispatch(
+          deleteRawMatConsumption({
+            id: consumptionCalculated?.id,
+          }),
+        );
+      }
+
       const { widthInArray } = latestProducts.find(
         (el) => el.article == product_article,
       );
@@ -538,6 +542,7 @@ const QualityManagementTable = () => {
           // );
         }
       }
+      setConsumptionCalculated({});
     }
   };
 
@@ -608,7 +613,9 @@ const QualityManagementTable = () => {
         </div>
       )}
       {(!qualityManagementData || qualityManagementData.length === 0) && (
-        <ShowQualityManagementAddModal />
+        <ShowQualityManagementAddModal
+          setConsumptionCalculated={setConsumptionCalculated}
+        />
       )}
     </Fragment>
   );
