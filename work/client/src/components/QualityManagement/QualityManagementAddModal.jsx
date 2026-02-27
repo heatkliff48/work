@@ -259,35 +259,15 @@ function QualityManagementAddModal(props) {
     //   }),
     // );
 
-    console.log(
-      raw_mat_consumption,
-      'raw_mat_consumption QualityManagementAddModal.jsx line 247',
-    );
-
     const rawMatConsEntry = raw_mat_consumption.filter(
       (el) => el.id === row.original.id,
     )[0];
-
-    console.log(
-      row.original.id,
-      'row.original.id QualityManagementAddModal.jsx line 253',
-    );
-
-    console.log(
-      rawMatConsEntry,
-      'rawMatConsEntry QualityManagementAddModal.jsx line 253',
-    );
 
     const product = latestProducts.find(
       (el) => el.article === rawMatConsEntry?.batch_article,
     );
 
     const warehouse_article = getWarehouseArticle(product);
-
-    console.log(
-      rawMatConsEntry?.batch_id,
-      'rawMatConsEntry?.batch_id QualityManagementAddModal.jsx line 272',
-    );
 
     dispatch(
       addNewQualityManagement({
@@ -309,6 +289,11 @@ function QualityManagementAddModal(props) {
       }),
     );
     dispatch(updateRawMatConsumption({ id: rawMatConsEntry?.id, used: true }));
+
+    props.setConsumptionCalculated({
+      id: rawMatConsEntry?.id,
+      consumption_calculated: rawMatConsEntry?.consumption_calculated,
+    });
 
     setCustomBatchSelect(false);
     setCustomBatchSelectInput({});
@@ -503,7 +488,7 @@ function QualityManagementAddModal(props) {
   );
 }
 
-function ShowQualityManagementAddModal() {
+function ShowQualityManagementAddModal({ setConsumptionCalculated }) {
   const [modalShow, setModalShow] = React.useState(false);
 
   return (
@@ -520,6 +505,7 @@ function ShowQualityManagementAddModal() {
       <QualityManagementAddModal
         show={modalShow}
         onHide={() => setModalShow(false)}
+        setConsumptionCalculated={setConsumptionCalculated}
       />
     </>
   );
