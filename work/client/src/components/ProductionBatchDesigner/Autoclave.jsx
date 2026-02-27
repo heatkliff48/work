@@ -1284,12 +1284,14 @@ function Autoclave({ acData, autoclaveCalendarData }) {
         };
         dispatch(addNewBatchOutside(newBatchOutside));
       }
-      dispatch(
-        updateOrderToWarehouse({
-          id: newPosition.product.id_ordered_product_to_warehouse,
-          quantity_allocated: product.cakes_in_batch * palletsPerArray,
-        }),
-      );
+      if (newPosition.product.id_ordered_product_to_warehouse) {
+        dispatch(
+          updateOrderToWarehouse({
+            id: newPosition.product.id_ordered_product_to_warehouse,
+            quantity_allocated: product.cakes_in_batch * palletsPerArray,
+          }),
+        );
+      }
     });
 
     setSelectedCell(null);
