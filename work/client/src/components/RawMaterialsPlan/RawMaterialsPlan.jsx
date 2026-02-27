@@ -162,10 +162,12 @@ function RawMaterialsPlan() {
   useEffect(() => {
     const updatedTotals = {};
     rawMaterials.forEach((material) => {
-      const total = material.remaining - calculateTotal(material);
-      const need = calculateNeed(total);
+      const total =
+        Math.round(material.remaining - calculateTotal(material) * 100) / 100;
+      const need = Math.round(calculateNeed(total) * 100) / 100;
       const orderShare = manualOrderShare[material.name] || 0;
-      const totalOrder = calculateTotalOrder(need, orderShare);
+      const totalOrder =
+        Math.round(calculateTotalOrder(need, orderShare) * 100) / 100;
 
       updatedTotals[material.name] = {
         total,
