@@ -30,6 +30,7 @@ import { ordersReducer } from './orderReducer';
 import { orderToWarehouseReducer } from './orderToWarehouseReducer';
 import { pagesReducer } from './pagesReducer';
 import { productionBatchLogReducer } from './productionBatchLogReducer';
+import { productionQualityReducer } from './productionQualityReducer';
 import {
   anchorProductsOfOrdersReducer,
   dryMixedProductsOfOrdersReducer,
@@ -148,4 +149,5 @@ export const rootReducer = combineReducers({
   lotesListCakes: lotesListCakesReducer,
   contactPriceInfo: contactPriceInfoReducer,
   orderToWarehouse: orderToWarehouseReducer,
+  productionQuality: productionQualityReducer,
 });

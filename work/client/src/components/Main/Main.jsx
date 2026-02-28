@@ -75,7 +75,7 @@ import '#components/Styles/dashboard.css';
 
 import '#components/Styles/dashboard.css';
 import { getFilesLotesList } from '#components/redux/actions/filesLotesListAction.js';
-
+import { getProductionQuality } from '#components/redux/actions/productionQualityAction.js';
 
 function Main() {
   const navigate = useNavigate();
@@ -142,6 +142,7 @@ function Main() {
     dispatch(getLotesList());
     dispatch(getLotesListCakes());
     dispatch(getRawMaterialsWarehouse());
+    dispatch(getProductionQuality());
     setStoredData(null);
   }, [dispatch, setStoredData]);
 

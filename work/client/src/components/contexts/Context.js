@@ -350,6 +350,21 @@ const ProjectContextProvider = ({ children }) => {
     },
   ];
 
+  const PRODUCTION_QUALITY = [
+    {
+      Header: 'Batch Id',
+      accessor: 'batch_id',
+    },
+    {
+      Header: 'Production date',
+      accessor: 'date',
+    },
+    {
+      Header: 'Production type',
+      accessor: 'production_type',
+    },
+  ];
+
   const DEFAULT_RAW_MATERIAL_VALUES = [
     { key: 'dosing_delay_cem_sec', value: 1 },
     { key: 'dosing_delay_lime_sec', value: 1 },
@@ -373,6 +388,7 @@ const ProjectContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const clientPriceInfo = useSelector((state) => state.contactPriceInfo);
+  const production_quality = useSelector((state) => state.productionQuality);
 
   const [currentContact, setCurrentContact] = useState();
   const [currentDelivery, setCurrentDelivery] = useState();
@@ -482,6 +498,7 @@ const ProjectContextProvider = ({ children }) => {
       value={{
         WAREHOUSE_MANAGER_TABLE,
         DEFAULT_RAW_MATERIAL_VALUES,
+        PRODUCTION_QUALITY,
         user,
         clientPriceInfo,
         displayNames,
@@ -534,6 +551,7 @@ const ProjectContextProvider = ({ children }) => {
         getPageTitleByPath,
         lotesListBatches,
         lotesListCakes,
+        production_quality,
       }}
     >
       {children}

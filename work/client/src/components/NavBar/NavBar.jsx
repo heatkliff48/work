@@ -121,6 +121,11 @@ export default function NavBar() {
             path: '/products_type_journal',
             icon: prodCatalogIcon,
           },
+          {
+            title: 'Production quality',
+            path: '/production_quality',
+            icon: prodCatalogIcon,
+          },
           { title: 'Statistics', path: '/statistics', icon: statisticsIcon },
         ],
       },
@@ -311,9 +316,7 @@ export default function NavBar() {
           {menuItems.map((it) => {
             if (it.type === 'group') {
               if (!canSee(it.access)) return null;
-              const visibleChildren = it.children.filter((c) =>
-                canSee(c.access),
-              );
+              const visibleChildren = it.children.filter((c) => canSee(c.access));
               if (!visibleChildren.length) return null;
               const expanded = openGroups[it.title] ?? isGroupActive(it);
 
@@ -343,9 +346,7 @@ export default function NavBar() {
                     {!collapsed && (
                       <>
                         <span className="bb-group-title">{it.title}</span>
-                        <span
-                          className={`bb-chevron ${expanded ? 'open' : ''}`}
-                        >
+                        <span className={`bb-chevron ${expanded ? 'open' : ''}`}>
                           ▾
                         </span>
                       </>

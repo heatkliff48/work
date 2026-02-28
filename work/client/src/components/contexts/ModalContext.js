@@ -16,6 +16,8 @@ export const ModalContextProvider = ({ children }) => {
   const [stockBalanceModal, setStockBalanceModal] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
   const [isModalWindowOpen, setIsModalWindowOpen] = useState(false);
+  const [dimensionTestModal, setDimensionTestModal] = useState(false);
+  const [compressTestModal, setCompressTestModal] = useState(false);
   const [warehouseInfoModal, setWarehouseInfoModal] = useState(false);
   const [reserveProductModal, setReserveProductModal] = useState(false);
   const [previewProductModal, setPreviewProductModal] = useState(false);
@@ -23,8 +25,9 @@ export const ModalContextProvider = ({ children }) => {
   const [lotesListBatchesModal, setLotesListBatchesModal] = useState(false);
   const [toolProductModalOrder, setToolProductModalOrder] = useState(false);
   const [productInfoModalOrder, setProductInfoModalOrder] = useState(false);
-  const [anchorProductModalOrder, setAnchorProductModalOrder] = useState(false);
+  const [modalProductionQuality, setModalProductionQuality] = useState(false);
   const [warehouseInfoCurIdModal, setWarehouseInfoCurIdModal] = useState(null);
+  const [anchorProductModalOrder, setAnchorProductModalOrder] = useState(false);
   const [dryMixedProductModalOrder, setDryMixedProductModalOrder] = useState(false);
   const [rawMaterialConsumptionMadal, setRawMaterialConsumptionMadal] =
     useState(false);
@@ -88,6 +91,12 @@ export const ModalContextProvider = ({ children }) => {
         setMainRawMaterialConsumptionMadal,
         showQuickChecking,
         setShowQuickChecking,
+        modalProductionQuality,
+        setModalProductionQuality,
+        dimensionTestModal,
+        setDimensionTestModal,
+        compressTestModal,
+        setCompressTestModal,
       }}
     >
       {children}

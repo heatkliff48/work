@@ -20,7 +20,13 @@
   padding-bottom: 40px;
 }
 
+.modal-sm-custom {
+  max-width: 400px;
+}
 
+.modal-90w {
+  max-width: 90%;
+}
 
 /* Кнопки внутри Dropdown */
 .custom-submenu-button {
@@ -520,7 +526,7 @@ button:focus {
   width: 50%;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   margin-left: auto;
 }
 
@@ -677,7 +683,7 @@ input[type="checkbox"] {
   width: 60px;
 }
 
-.raw-materials-plan input[type="number"] {
+.raw-materials-plan input[type='number'] {
   width: 100%;
   box-sizing: border-box;
   padding: 0;
@@ -760,6 +766,5 @@ input[type="checkbox"] {
   background: #bf2121;
   transform: scale(1.05);
 }
-
 
 /*============ Clirnts Priice Info =================*/

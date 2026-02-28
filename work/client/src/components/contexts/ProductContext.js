@@ -461,6 +461,15 @@ export const ProductsContextProvider = ({ children }) => {
     return matchedOption ? matchedOption.value : null;
   };
 
+  function extractProductTitle(description) {
+    if (!description) return '';
+    const match = description.match(/BAUBLOCK®\s*(.+?)\s*(?:Medidas|$)/i);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+    return description;
+  }
+
   return (
     <ProductsContext.Provider
       value={{
@@ -470,6 +479,7 @@ export const ProductsContextProvider = ({ children }) => {
         products,
         selectOptions,
         getOptionValue,
+        extractProductTitle,
       }}
     >
       {children}

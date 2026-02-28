@@ -139,6 +139,7 @@ import {
   NEED_DELETE_ORDER_TO_WAREHOUSE_SOCKET,
   NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+  NEW_PRODUCTION_QUALITY_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -159,6 +160,13 @@ export const addNewProductSocket = (products) => {
   return {
     type: NEW_PRODUCT_SOCKET,
     payload: products,
+  };
+};
+
+export const addNewProductionQualitySocket = (products_quantyties) => {
+  return {
+    type: NEW_PRODUCTION_QUALITY_SOCKET,
+    payload: products_quantyties,
   };
 };
 
