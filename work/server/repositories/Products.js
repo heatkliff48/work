@@ -1,5 +1,4 @@
-const { where } = require('sequelize');
-const { Products } = require('../db/models');
+const { Products, ProductionQualities } = require('../db/models');
 
 class ProductsRepository {
   static async getAllProductsData() {
@@ -29,6 +28,16 @@ class ProductsRepository {
     });
 
     return repProduct;
+  }
+
+  static async getAllProductionQuality() {
+    const products = await ProductionQualities.findAll();
+    return products;
+  }
+
+  static async addNewProductionQuality(new_production_quantities) {
+    const product = await ProductionQualities.create(new_production_quantities);
+    return product;
   }
 }
 

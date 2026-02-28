@@ -139,6 +139,7 @@ import {
   deleteOrderToWarehouseSocket,
   addNewRawMatConsumptionCurrentMoldsSocket,
   deleteRawMatConsumptionCurrentMoldsSocket,
+  addNewProductionQualitySocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -323,6 +324,7 @@ import {
   DELETE_ORDER_TO_WAREHOUSE_SOCKET,
   ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   DELETE_OLD_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+  ADD_NEW_PRODUCTION_QUALITY_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -333,6 +335,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
   switch (type) {
     case ADD_NEW_PRODUCT_SOCKET:
       dispatch(addNewProductSocket(payload));
+      break;
+
+    case ADD_NEW_PRODUCTION_QUALITY_SOCKET:
+      dispatch(addNewProductionQualitySocket(payload));
       break;
 
     case UPDATE_PRODUCT_SOCKET:

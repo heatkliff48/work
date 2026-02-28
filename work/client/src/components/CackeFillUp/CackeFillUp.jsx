@@ -12,6 +12,7 @@ import {
 import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { addNewProductionQuality } from '#components/redux/actions/productionQualityAction.js';
 
 function CackeFillUp() {
   const dispatch = useDispatch();
@@ -50,8 +51,7 @@ function CackeFillUp() {
         (el) => el.article === batch_in_produce?.product_article,
       );
 
-      const total_cacke =
-        batch_in_produce.quantity_pallets / product?.widthInArray;
+      const total_cacke = batch_in_produce.quantity_pallets / product?.widthInArray;
 
       console.log(batch_in_produce, 'batch_in_produce CackeFillUp.jsx line 55');
 
@@ -91,8 +91,7 @@ function CackeFillUp() {
   }, [lotesListCakes]);
 
   const totalCake =
-    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) ||
-    0;
+    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) || 0;
 
   const batchCalDate = cackeFillUp?.date ?? cackeFillUp?.batch_cal_date ?? '';
 
@@ -149,6 +148,14 @@ function CackeFillUp() {
         id_ordered_product_to_warehouse:
           cackeFillUp?.id_ordered_product_to_warehouse ?? null,
         consumption_calculated: false,
+      }),
+    );
+
+    dispatch(
+      addNewProductionQuality({
+        batch_id: nextBatchId,
+        date: cackeFillUp.date,
+        product_article: cackeFillUp?.product_article,
       }),
     );
 
@@ -210,18 +217,10 @@ function CackeFillUp() {
             className="mt-2"
             style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
           >
-            <Button
-              color="success"
-              onClick={handlePlus}
-              style={{ minWidth: 60 }}
-            >
+            <Button color="success" onClick={handlePlus} style={{ minWidth: 60 }}>
               +
             </Button>
-            <Button
-              color="success"
-              onClick={handleMinus}
-              style={{ minWidth: 60 }}
-            >
+            <Button color="success" onClick={handleMinus} style={{ minWidth: 60 }}>
               -
             </Button>
 
@@ -280,9 +279,7 @@ function CackeFillUp() {
                     >
                       <span style={{ opacity: 0.7 }}>#</span>
                       <span>{id}</span>
-                      <span
-                        style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}
-                      >
+                      <span style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}>
                         {isActive ? '▲ note' : '▼ note'}
                       </span>
                     </div>

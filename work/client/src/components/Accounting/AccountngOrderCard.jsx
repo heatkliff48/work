@@ -110,7 +110,7 @@ const AccountngOrderCard = React.memo(() => {
 
       return updatedOrderProducts;
     },
-    [orderCartData?.id] // Добавляем зависимость
+    [orderCartData?.id]
   );
 
   const updatedProductListOrder = useMemo(() => {
@@ -236,7 +236,6 @@ const AccountngOrderCard = React.memo(() => {
       ...productLists['related_materials'],
     ];
 
-    // Считаем финальную цену для всех продуктов
     const final_price_product =
       allProducts.reduce(
         (acc, el) =>

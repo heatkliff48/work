@@ -17,6 +17,7 @@ const registerWsEmitter = require('./src/ws/wsEmitter');
 
 const AldabaranRootRouter = require('./router/aldabaran.js');
 const AuthRootRouter = require('./router/Auth.js');
+const ProductionQualitiesRootRouter = require('./router/ProductionQuality.js');
 const ProductRootRouter = require('./router/Product.js');
 const OrdersRootRouter = require('./router/Orders.js');
 const RolesRootRouter = require('./router/Roles.js');
@@ -105,6 +106,7 @@ const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 app.use('/aldabaran', AldabaranRootRouter);
 app.use('/auth', AuthRootRouter);
 app.use('/products', ProductRootRouter);
+app.use('/productionQuality', ProductionQualitiesRootRouter);
 app.use('/roles', RolesRootRouter);
 app.use('/orders', OrdersRootRouter);
 app.use('/clients', clientsRouter);

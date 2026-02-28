@@ -151,6 +151,7 @@ const {
   DELETE_ORDER_TO_WAREHOUSE_SOCKET,
   ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   DELETE_OLD_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+  ADD_NEW_PRODUCTION_QUALITY_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -161,6 +162,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_PRODUCT_SOCKET,
           payload: products,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(ADD_NEW_PRODUCTION_QUALITY_SOCKET, (products_quantyties) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_PRODUCTION_QUALITY_SOCKET,
+          payload: products_quantyties,
         }),
       );
     }

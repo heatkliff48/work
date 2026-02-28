@@ -65,6 +65,7 @@ const initState = {
   lotesListBatches: [],
   lotesListCakes: [],
   orderToWarehouse: [],
+  productionQuality: [],
 };
 
 export default initState;
