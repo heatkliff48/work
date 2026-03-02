@@ -121,10 +121,10 @@ function LotesList() {
         (r) => String(r.article) === String(lotesListItem.recipe),
       );
 
-      if (!baseRecipe) {
-        console.error('Recipe not found:', lotesListItem.recipe);
-        return;
-      }
+      // if (!baseRecipe) {
+      //   console.error('Recipe not found:', lotesListItem.recipe);
+      //   return;
+      // }
 
       resolvedRecipe = {
         ...baseRecipe,
@@ -149,6 +149,7 @@ function LotesList() {
         userAccess={userAccess}
         tableName={'Lotes List'}
         handleRowClick={(row) => {
+          console.log('row.original LotesList.jsx line 152', row.original)
           openModal(row.original);
         }}
       />
