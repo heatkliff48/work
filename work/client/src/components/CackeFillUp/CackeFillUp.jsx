@@ -96,7 +96,7 @@ function CackeFillUp() {
   const batchCalDate = cackeFillUp?.date ?? cackeFillUp?.batch_cal_date ?? '';
 
   const handlePlus = () => {
-    if (totalCake > 0 && allocated >= totalCake) return;
+    // if (totalCake > 0 && allocated >= totalCake) return;
 
     const newId = lastCakeId + cakeIds.length + 1;
     setCakeIds((prev) => [...prev, newId]);
