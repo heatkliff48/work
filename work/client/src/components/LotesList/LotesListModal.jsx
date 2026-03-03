@@ -1144,15 +1144,18 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       });
     }
 
-    const sortedAll = [...allSubBatches].sort(
-      (x, y) => x.cake_id_start - y.cake_id_start,
-    );
+    const sortedAll = [...allSubBatches]
+      .filter((el) => el.batch_id == batchData.batch_id)
+      .sort((x, y) => x.cake_id_start - y.cake_id_start);
+
     const currentIndex = sortedAll.findIndex(
       (sb) => Number(sb.sub_batch_id) === currentSubId,
     );
     if (currentIndex === -1) return;
 
-    const after = lotesListBatches.slice(currentIndex + 1);
+    const after = lotesListBatches
+      .filter((el) => el.batch_id == batchData.batch_id)
+      .slice(currentIndex + 1);
     const delta = newParts.length;
 
     const newPartsWithSubId = newParts.map((part, idx) => ({
@@ -1166,6 +1169,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       sub_batch_id: item.sub_batch_id + delta,
     }));
 
+    // console.log('newParts LotesListModal.jsx line 1156', newParts);
+    // console.log('after LotesListModal.jsx line 1172', after);
     // console.log('leftUpdate', leftUpdate);
     // console.log('middleUpdate', middleUpdate);
     // console.log('newPartsWithSubId', newPartsWithSubId);
