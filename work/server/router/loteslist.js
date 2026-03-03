@@ -217,7 +217,6 @@ lotesListRouter.post('/batches/update/recipe', async (req, res) => {
       results.push(updatedLotes);
       myEmitter.emit(UPDATE_LOTES_LIST_SOCKET, updatedLotes);
     }
-
     if (results.length === 0) {
       return res.status(404).json({ error: 'No records updated' });
     }
@@ -243,6 +242,8 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes', async (req, res) => {
   try {
+    const { num: ids, note } = req.body;
+
     if (!Array.isArray(ids)) {
       return res.status(400).json({ error: 'num must be an array of ids' });
     }
