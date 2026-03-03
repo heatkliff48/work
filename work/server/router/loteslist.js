@@ -217,7 +217,7 @@ lotesListRouter.post('/batches/update/recipe', async (req, res) => {
       results.push(updatedLotes);
       myEmitter.emit(UPDATE_LOTES_LIST_SOCKET, updatedLotes);
     }
-    console.log('results loteslist.js line 206', results);
+
     if (results.length === 0) {
       return res.status(404).json({ error: 'No records updated' });
     }
@@ -243,11 +243,6 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes', async (req, res) => {
   try {
-    const { num: ids, note } = req.body;
-    console.log(' --- ');
-    console.log(req.body, 'req.body loteslist.js line 186');
-    console.log(' --- ');
-
     if (!Array.isArray(ids)) {
       return res.status(400).json({ error: 'num must be an array of ids' });
     }
@@ -288,6 +283,7 @@ lotesListRouter.post('/cakes', async (req, res) => {
 });
 
 lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
+  console.log('req.body loteslist.js line 292', req.body);
   const { ids, payloads } = req.body;
 
   const batchId = Number(ids?.batch_id);
@@ -311,14 +307,14 @@ lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
     return out;
   };
 
-  for (const p of payloads) {
-    const cakeId = Number(p?.id);
-    if (!Number.isFinite(cakeId) || cakeId < start || cakeId > finish) {
-      return res
-        .status(400)
-        .json({ error: `Cake id ${p?.id} is out of range ${start}-${finish}` });
-    }
-  }
+  // for (const p of payloads) {
+  //   const cakeId = Number(p?.id);
+  //   if (!Number.isFinite(cakeId) || cakeId < start || cakeId > finish) {
+  //     return res
+  //       .status(400)
+  //       .json({ error: `Cake id ${p?.id} is out of range ${start}-${finish}` });
+  //   }
+  // }
 
   const t = await sequelize.transaction();
   try {
