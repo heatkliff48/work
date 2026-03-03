@@ -668,7 +668,10 @@ const RawMaterialsConsumptionModal = React.memo(
       );
       if (!product) return;
 
-      const widthInArray = Number(product.widthInArray);
+      const widthInArray = Math.floor(
+        product?.m3InArray / product?.volumeBlockOnPallet,
+      );
+
       const needRaw = Number(productionVolume) * widthInArray;
 
       const need = Math.floor(needRaw);

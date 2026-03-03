@@ -224,7 +224,6 @@ function ProductionBatchDesignerNew() {
       m3InArray,
       volumeBlockOnPallet,
       normOfBrack,
-      widthInArray,
     } = product;
 
     const palletsPerArray = Math.max(

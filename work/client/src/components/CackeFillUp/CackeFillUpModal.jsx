@@ -80,11 +80,11 @@ function CackeFillUpModal({ show, onHide }) {
     if (!options) return;
 
     const productArticleOption = options.find(
-      (option) => option.value === customBatchSelectInput?.product_article
+      (option) => option.value === customBatchSelectInput?.product_article,
     );
     const selectedOption = productArticleOption || options[0];
     const product = latestProducts.find(
-      (el) => el.article === selectedOption?.value
+      (el) => el.article === selectedOption?.value,
     );
 
     if (!product) return;
@@ -108,7 +108,7 @@ function CackeFillUpModal({ show, onHide }) {
     if (!options) return null;
 
     const productArticleOption = options.find(
-      (option) => option.value === customBatchSelectInput?.[accessor]
+      (option) => option.value === customBatchSelectInput?.[accessor],
     );
 
     return productArticleOption || options[0];
@@ -152,7 +152,7 @@ function CackeFillUpModal({ show, onHide }) {
     const { date } = row.original;
 
     const filteredListOfOrderedProduction = list_of_ordered_production?.filter(
-      (item) => item.product_article === prodPlanEntry?.product_article
+      (item) => item.product_article === prodPlanEntry?.product_article,
     );
 
     const totalDifference = filteredListOfOrderedProduction.reduce((sum, item) => {
@@ -165,16 +165,19 @@ function CackeFillUpModal({ show, onHide }) {
         : totalDifference;
 
     const product = latestProducts.find(
-      (el) => el.article === prodPlanEntry?.product_article
+      (el) => el.article === prodPlanEntry?.product_article,
     );
 
     const warehouse_article = getWarehouseArticle(product);
+    const widthInArray = Math.floor(
+      product?.m3InArray / product?.volumeBlockOnPallet,
+    );
 
     setCackeFillUp({
       date: date,
       batch_id: warehouse_article,
       product_article: prodPlanEntry.product_article,
-      total_quantity_plan: prodPlanEntry.quantity_pallets / product?.widthInArray,
+      total_quantity_plan: prodPlanEntry.quantity_pallets / widthInArray,
       reserved_quantity,
       reserved_quantity_allocated: 0,
       reserved_quantity_remaining: reserved_quantity,
@@ -187,7 +190,7 @@ function CackeFillUpModal({ show, onHide }) {
       updateBatchOutside({
         id: prodPlanEntry.id,
         is_prodused: 1,
-      })
+      }),
     );
 
     setCustomBatchSelect(false);
@@ -248,7 +251,7 @@ function CackeFillUpModal({ show, onHide }) {
 
     console.log(
       'customBatchSelectInput CackeFillUpModal.jsx line 181',
-      customBatchSelectInput
+      customBatchSelectInput,
     );
 
     // setCustomBatchSelect(false);
@@ -292,7 +295,7 @@ function CackeFillUpModal({ show, onHide }) {
                         {el.accessor === 'product_article' ? (
                           <Select
                             defaultValue={getSelectedProductArticleOption(
-                              el.accessor
+                              el.accessor,
                             )}
                             onChange={(v) => {
                               handleProductArticleSelectChange(v, el.accessor);

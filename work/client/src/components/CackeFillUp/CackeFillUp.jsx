@@ -51,9 +51,9 @@ function CackeFillUp() {
         (el) => el.article === batch_in_produce?.product_article,
       );
 
-      const total_cacke = batch_in_produce.quantity_pallets / product?.widthInArray;
+      const widthInArray = Math.floor(product?.m3InArray / product?.volumeBlockOnPallet);
 
-      console.log(batch_in_produce, 'batch_in_produce CackeFillUp.jsx line 55');
+      const total_cacke = batch_in_produce.quantity_pallets / widthInArray;
 
       setCackeFillUp({ ...batch_in_produce, total_cacke });
     }
