@@ -175,9 +175,7 @@ function QualityManagementAddModal(props) {
   };
 
   const handleProductArticleSelectChange = (selectedOption, key) => {
-    const product = latestProducts.find(
-      (el) => el.article === selectedOption.value,
-    );
+    const product = latestProducts.find((el) => el.article === selectedOption.value);
     const warehouse_article = getWarehouseArticle(product);
 
     setCustomBatchSelectInput((prev) => ({
@@ -268,13 +266,15 @@ function QualityManagementAddModal(props) {
     );
 
     const warehouse_article = getWarehouseArticle(product);
+    const widthInArray = Math.floor(
+      product?.m3InArray / product?.volumeBlockOnPallet,
+    );
 
     dispatch(
       addNewQualityManagement({
         batch_id: warehouse_article,
         product_article: rawMatConsEntry?.batch_article,
-        total_quantity_plan:
-          rawMatConsEntry.production_volume * product?.widthInArray,
+        total_quantity_plan: rawMatConsEntry.production_volume * widthInArray,
         reserved_quantity: 0, // reservedProduct.quantity,
         // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free,
         reserved_quantity_allocated: 0,
@@ -378,9 +378,7 @@ function QualityManagementAddModal(props) {
       dialogClassName="modal-auto-size"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Batch calendar
-        </Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">Batch calendar</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {customBatchSelect ? (
@@ -422,9 +420,7 @@ function QualityManagementAddModal(props) {
                             name={el.accessor}
                             type="text"
                             value={customBatchSelectInput[el.accessor] || ''}
-                            onChange={(e) =>
-                              handleCustomBatchSelectInputChange(e)
-                            }
+                            onChange={(e) => handleCustomBatchSelectInputChange(e)}
                           />
                         )}
                       </div>

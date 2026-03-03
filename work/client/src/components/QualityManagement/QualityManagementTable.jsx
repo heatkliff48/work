@@ -31,21 +31,15 @@ import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehou
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
 
-  const { autoclave_calendar, list_of_ordered_production } =
-    useWarehouseContext();
+  const { autoclave_calendar, list_of_ordered_production } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
-  const { raw_mat_consumption, list_of_recipes, recipeOrders } =
-    useRecipeContext();
+  const { raw_mat_consumption, list_of_recipes, recipeOrders } = useRecipeContext();
 
   const dispatch = useDispatch();
-  const qualityManagementData = useSelector(
-    (state) => state.qualityManagementData,
-  );
+  const qualityManagementData = useSelector((state) => state.qualityManagementData);
   const batchOutside = useSelector((state) => state.batchOutside);
 
-  const [qualityManagementDataList, setQualityManagementDataList] = useState(
-    [],
-  );
+  const [qualityManagementDataList, setQualityManagementDataList] = useState([]);
 
   const [consumptionCalculated, setConsumptionCalculated] = useState({});
 
@@ -298,9 +292,7 @@ const QualityManagementTable = () => {
         if (remainingFreeQty <= 0) {
           if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
             return reservedItem;
-          } else if (
-            reservedItem.quantity > reservedItem.quantity_in_warehouse
-          ) {
+          } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
             // ИСПРАВЛЕНИЕ: Добавляем к существующему количеству, а не заменяем
 
             const newQuantityInWarehouse = Math.min(
@@ -354,9 +346,7 @@ const QualityManagementTable = () => {
               // Добавляем к существующему количеству: базовое + зарезервированное + новое из свободного
 
               quantity_in_warehouse:
-                baseQuantityInWarehouse +
-                reserved_quantity_allocated +
-                deducted,
+                baseQuantityInWarehouse + reserved_quantity_allocated + deducted,
             }
           : {
               ...reservedItem,
@@ -370,9 +360,7 @@ const QualityManagementTable = () => {
       // Проверки на корректность
 
       if (reserved_quantity_allocated < 0) {
-        alert(
-          'Ошибка: reserved_quantity_allocated не может быть отрицательным.',
-        );
+        alert('Ошибка: reserved_quantity_allocated не может быть отрицательным.');
 
         return;
       }
@@ -383,8 +371,7 @@ const QualityManagementTable = () => {
         return;
       }
 
-      const calculatedOrderedQuantity =
-        reserved_quantity_allocated + summReserve;
+      const calculatedOrderedQuantity = reserved_quantity_allocated + summReserve;
 
       // Добавляем на склад
 
@@ -482,9 +469,7 @@ const QualityManagementTable = () => {
           },
         ];
 
-        const batch = batchOutside.find(
-          (batch) => batch.id === production_plan_id,
-        );
+        const batch = batchOutside.find((batch) => batch.id === production_plan_id);
 
         const recipe = recipeOrders.find(
           (recipe) => recipe.id_batch === production_plan_id,
@@ -500,8 +485,7 @@ const QualityManagementTable = () => {
             batch_article: batch?.product_article || 'Unknown Batch',
             production_volume:
               Math.ceil(
-                (reserved_quantity_allocated + free_quantity_fact) /
-                  palletsPerArray,
+                (reserved_quantity_allocated + free_quantity_fact) / palletsPerArray,
               ) || 0,
             date: batch?.date || 'Unknown Date',
           }),
@@ -519,11 +503,13 @@ const QualityManagementTable = () => {
         );
       }
 
-      const { widthInArray } = latestProducts.find(
+      const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
         (el) => el.article == product_article,
       );
 
       if (production_plan_id) {
+        const widthInArray = m3InArray / volumeBlockOnPallet;
+
         if (
           reserved_quantity_remaining <= 0 ||
           total_quantity_plan - reserved_quantity_allocated <
@@ -569,9 +555,7 @@ const QualityManagementTable = () => {
       {qualityManagementData.length > 0 && (
         <div className="d-flex gap-4 flex-wrap">
           <div className="border rounded p-3 bg-light">
-            <div className="text-center mb-2 fw-bold border-bottom pb-1">
-              OK
-            </div>
+            <div className="text-center mb-2 fw-bold border-bottom pb-1">OK</div>
             <div className="d-flex gap-2">
               <Button
                 variant="success"
