@@ -38,8 +38,8 @@ function Roles() {
       <ModalRole isOpen={modalRoleCard} />
       <div className="roles-container">
         <div className="roles-header">
-          <div className="role-name">Название роли</div>
-          <div className="role-active">Активно</div>
+          <div className="role-name">Role name</div>
+          <div className="role-active">Active</div>
         </div>
         {updatedRoles.map((role) => (
           <div key={role.id} className="role-row">
@@ -55,7 +55,7 @@ function Roles() {
             </div>
           </div>
         ))}
-        <button onClick={handleSaveRoles}>Сохранить</button>
+        <button onClick={handleSaveRoles}>Save</button>
       </div>
     </>
   );

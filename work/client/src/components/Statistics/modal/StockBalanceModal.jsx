@@ -56,8 +56,8 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
     resultArray = resultArray.filter(
       (item) =>
         !stock_balance.some(
-          (stock) => stock.product_article === item.product_article
-        )
+          (stock) => stock.product_article === item.product_article,
+        ),
     );
 
     setFilterData(resultArray);
@@ -104,10 +104,10 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
                 <thead>
                   <tr className="bg-gray-100">
                     <th className="border border-gray-300 px-4 py-2 text-left">
-                      Артикул
+                      Article
                     </th>
                     <th className="border border-gray-300 px-4 py-2 text-left">
-                      Остаток
+                      Surplus
                     </th>
                   </tr>
                 </thead>
@@ -132,7 +132,7 @@ const StockBalanceModal = ({ isOpen, toggle }) => {
               </table>
             )
           ) : (
-            <p className="text-center text-gray-500">Нет данных для отображения</p>
+            <p className="text-center text-gray-500">No data</p>
           )}
         </div>
       </ModalBody>
