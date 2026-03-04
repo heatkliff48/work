@@ -265,7 +265,7 @@
 //           ></iframe>
 //           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
 //             <button style={{ width: '8%' }} onClick={downloadPDF}>
-//               Скачать PDF
+//               Download PDF
 //             </button>
 //             <button
 //               style={{ width: '8%' }}
@@ -341,7 +341,7 @@ const WMOPdf = ({ orderCartData, toggle }) => {
       latestAnchors,
       latestTools,
       latestRelatedMaterials,
-    ]
+    ],
   );
 
   const pdfData = useMemo(() => {
@@ -388,7 +388,7 @@ const WMOPdf = ({ orderCartData, toggle }) => {
             }kg/m³`;
 
         const deltaRow = (wmoctProductDeltaForPdf || []).find(
-          (x) => x.article === article
+          (x) => x.article === article,
         );
 
         const palet = Number(deltaRow?.delta ?? deltaRow?.palet ?? 0) || 0;
@@ -484,7 +484,11 @@ const WMOPdf = ({ orderCartData, toggle }) => {
       doc.text(`DOMICILIO: ${pdfData?.cliente.domicilio}`, 10, yPosition + 12);
       doc.text(`CIF: ${pdfData?.cliente.cif}`, 10, yPosition + 18);
       doc.text(`TELÉFONO: ${pdfData?.cliente.telefono}`, 10, yPosition + 24);
-      doc.text(`S/REFERENCIA: ${pdfData?.cliente?.referencia}`, 10, yPosition + 30);
+      doc.text(
+        `S/REFERENCIA: ${pdfData?.cliente?.referencia}`,
+        10,
+        yPosition + 30,
+      );
       doc.text(`PEDIDO Nº: ${pdfData?.cliente.pedido}`, 10, yPosition + 36);
 
       doc.setFont(undefined, `bold`);
@@ -511,9 +515,13 @@ const WMOPdf = ({ orderCartData, toggle }) => {
       doc.text(
         `AGENCIA TRANSPORTE: ${pdfData?.transporte.agencia}`,
         140,
-        yPosition + 6
+        yPosition + 6,
       );
-      doc.text(`MATRÍCULA: ${pdfData?.transporte.matricula}`, 140, yPosition + 12);
+      doc.text(
+        `MATRÍCULA: ${pdfData?.transporte.matricula}`,
+        140,
+        yPosition + 12,
+      );
 
       doc.setFont(undefined, `bold`);
       doc.text(`PALET`, 140, yPosition + 20);
@@ -572,7 +580,7 @@ const WMOPdf = ({ orderCartData, toggle }) => {
 
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <button style={{ width: '8%' }} onClick={downloadPDF}>
-              Скачать PDF
+              Download PDF
             </button>
             <button
               style={{ width: '8%' }}
