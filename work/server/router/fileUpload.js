@@ -20,21 +20,26 @@ const upload = multer({
   },
 }).single('myFile');
 
-// Check file type
 function checkFileType(file, cb) {
-  const filetypes = /pdf|txt|doc|docx/;
+  const filetypes = /pdf|txt|doc|docx|jpg|jpeg|png|gif|bmp|svg/;
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
   const mimetype =
     file.mimetype === 'application/pdf' ||
     file.mimetype === 'text/plain' ||
     file.mimetype === 'application/msword' ||
     file.mimetype ===
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    file.mimetype === 'image/jpeg' ||
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/gif' ||
+    file.mimetype === 'image/bmp' ||
+    file.mimetype === 'image/svg+xml';
 
   if (mimetype && extname) {
     return cb(null, true);
   } else {
-    cb('Error: PDFs and Text Documents Only!');
+    cb('Error: Only PDFs, Text Documents, and Images are allowed!');
   }
 }
 
@@ -45,7 +50,7 @@ fileUpload.post('/upload', (req, res) => {
   if (!fs.existsSync('./uploads')) {
     fs.mkdirSync('./uploads');
   }
-  
+
   upload(req, res, (err) => {
     if (err) {
       console.error(err.message);

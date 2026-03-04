@@ -58,7 +58,7 @@ const FileUpload = () => {
     <div className="fileUpload">
       <h5>File Upload</h5>
       <form onSubmit={onSubmit}>
-        <input type="file" onChange={onChange} accept=".pdf,.txt,.doc,.docx" />
+        <input type="file" onChange={onChange} accept=".pdf,.txt,.doc,.docx.,jpg,.jpeg,.png,.gif,.bmp,.svg" />
         <button type="submit">Upload</button>
       </form>
     </div>
