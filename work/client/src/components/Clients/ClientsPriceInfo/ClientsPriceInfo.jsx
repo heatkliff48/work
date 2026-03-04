@@ -247,10 +247,13 @@ export default function ClientsPriceInfo() {
         if (!currentCell || !originalCell) return;
 
         // Проверяем, изменились ли price или discount
-        const priceChanged = !valuesAreEqual(currentCell.price, originalCell.price);
+        const priceChanged = !valuesAreEqual(
+          currentCell.price,
+          originalCell.price,
+        );
         const discountChanged = !valuesAreEqual(
           currentCell.discount,
-          originalCell.discount
+          originalCell.discount,
         );
 
         if (priceChanged || discountChanged) {
@@ -295,7 +298,10 @@ export default function ClientsPriceInfo() {
         let newDiscount = 0;
 
         if (basePrice > 0) {
-          newDiscount = Math.max(0, ((basePrice - parsedValue) / basePrice) * 100);
+          newDiscount = Math.max(
+            0,
+            ((basePrice - parsedValue) / basePrice) * 100,
+          );
         }
         entry.discount = formatDisplayValue(newDiscount);
       }
@@ -340,16 +346,16 @@ export default function ClientsPriceInfo() {
   };
 
   useEffect(() => {
-    console.log('Измененные данные:', clientPriceInfo);
+    console.log('Modified data:', clientPriceInfo);
   }, [clientPriceInfo]);
 
   const handleSave = () => {
     if (modifiedData.length === 0) {
-      alert('Нет изменений для сохранения!');
+      alert('No changes to save!');
       return;
     }
 
-    console.log('Измененные данные для сохранения:', modifiedData);
+    console.log('Modified data to save:', modifiedData);
 
     dispatch(updClientPriceInfo(modifiedData));
 
@@ -359,18 +365,18 @@ export default function ClientsPriceInfo() {
 
   const handleReset = () => {
     if (modifiedData.length === 0) {
-      alert('Нет изменений для сброса!');
+      alert('No changes to reset!');
       return;
     }
 
-    if (window.confirm('Вы уверены, что хотите отменить все изменения?')) {
+    if (window.confirm('Are you sure you want to undo all the changes?')) {
       setRowsState(JSON.parse(JSON.stringify(initialData)));
       setModifiedData([]);
     }
   };
 
   if (clientsProducts.length === 0) {
-    return <div>Загрузка продуктов...</div>;
+    return <div>Loading products...</div>;
   }
 
   return (
@@ -383,7 +389,7 @@ export default function ClientsPriceInfo() {
           alignItems: 'center',
         }}
       >
-        <h2>Управление ценами для клиентов</h2>
+        <h2>Price management for clients</h2>
         <div style={{ display: 'flex', gap: '10px' }}>
           <div
             style={{
@@ -394,14 +400,15 @@ export default function ClientsPriceInfo() {
               fontSize: '14px',
             }}
           >
-            Изменений: {modifiedData.length}
+            Changes: {modifiedData.length}
           </div>
           <button
             onClick={handleReset}
             disabled={modifiedData.length === 0}
             style={{
               padding: '10px 20px',
-              backgroundColor: modifiedData.length === 0 ? '#cccccc' : '#f44336',
+              backgroundColor:
+                modifiedData.length === 0 ? '#cccccc' : '#f44336',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
@@ -409,14 +416,15 @@ export default function ClientsPriceInfo() {
               fontSize: '16px',
             }}
           >
-            СБРОС
+            Reset
           </button>
           <button
             onClick={handleSave}
             disabled={modifiedData.length === 0}
             style={{
               padding: '10px 20px',
-              backgroundColor: modifiedData.length === 0 ? '#cccccc' : '#4CAF50',
+              backgroundColor:
+                modifiedData.length === 0 ? '#cccccc' : '#4CAF50',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
@@ -424,12 +432,14 @@ export default function ClientsPriceInfo() {
               fontSize: '16px',
             }}
           >
-            СОХРАНИТЬ
+            Save
           </button>
         </div>
       </div>
 
-      <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 800 }}>
+      <table
+        style={{ borderCollapse: 'collapse', width: '100%', minWidth: 800 }}
+      >
         <thead>
           <tr>
             <th
@@ -520,11 +530,11 @@ export default function ClientsPriceInfo() {
                   // Проверяем, изменилась ли ячейка
                   const isPriceChanged = !valuesAreEqual(
                     cell.price,
-                    originalCell.price
+                    originalCell.price,
                   );
                   const isDiscountChanged = !valuesAreEqual(
                     cell.discount,
-                    originalCell.discount
+                    originalCell.discount,
                   );
 
                   return (
@@ -627,19 +637,21 @@ export default function ClientsPriceInfo() {
       </table>
 
       <div style={{ marginTop: 12, fontSize: 13, color: '#444' }}>
-        <strong>Примечание:</strong>
+        <strong>Note:</strong>
         <ul>
           <li>
-            Редактирование значений в строке <em>Base</em> обновляет эталонные цены
+            Editing values in the <em>Base</em> row updates the reference prices
           </li>
           <li>
-            Для остальных строк при вводе цены автоматически считается скидка
-            относительно эталонной цены, при вводе скидки автоматически
-            пересчитывается цена
+            For other rows, entering a price automatically calculates the
+            discount relative to the reference price, and entering a discount
+            automatically recalculates the price
           </li>
-          <li>Данные из базы загружаются автоматически при наличии записей</li>
-          <li>Измененные ячейки выделены желтым цветом с оранжевой точкой</li>
-          <li>Сохранены будут только измененные записи</li>
+          <li>
+            Data from the database is loaded automatically if records exist
+          </li>
+          <li>Modified cells are highlighted in yellow with an orange dot</li>
+          <li>Only modified records will be saved</li>
         </ul>
       </div>
     </div>

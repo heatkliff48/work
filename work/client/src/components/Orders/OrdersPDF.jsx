@@ -542,7 +542,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
     <div>
       {pdfUrl && (
         <div>
-          <button onClick={downloadPDF}>Скачать PDF</button>
+          <button onClick={downloadPDF}>Download PDF</button>
           <button onClick={sendToBitrix} style={{ marginLeft: '10px' }}>
             Send to Bitrix24
           </button>
