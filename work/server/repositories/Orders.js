@@ -13,7 +13,10 @@ class OrdersRepository {
       const orders = await Orders.findAll();
       return orders;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -24,7 +27,10 @@ class OrdersRepository {
 
       return order;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -32,7 +38,10 @@ class OrdersRepository {
     try {
       await Orders.update({ delivery }, { where: { id: order_id } });
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -43,12 +52,15 @@ class OrdersRepository {
         {
           shipping_date,
         },
-        { where: { id: order_id } }
+        { where: { id: order_id } },
       );
 
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -59,14 +71,17 @@ class OrdersRepository {
         {
           description,
         },
-        { where: { id: order_id } }
+        { where: { id: order_id } },
       );
 
       const order_desc = await Orders.findOne({ where: { id: order_id } });
 
       return order_desc;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -75,23 +90,28 @@ class OrdersRepository {
     try {
       console.log(
         '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.secondary_contact',
-        secondary_contact
+        secondary_contact,
       );
       await Orders.update(
         {
           secondary_contact,
         },
-        { where: { id: order_id } }
+        { where: { id: order_id } },
       );
 
-      const order_newContact = await Orders.findOne({ where: { id: order_id } });
+      const order_newContact = await Orders.findOne({
+        where: { id: order_id },
+      });
       console.log(
         '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.order_newContact',
-        order_newContact
+        order_newContact,
       );
       return order_newContact;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -102,14 +122,19 @@ class OrdersRepository {
         {
           secondary_contact: null,
         },
-        { where: { id: order_id } }
+        { where: { id: order_id } },
       );
 
-      const order_newContact = await Orders.findOne({ where: { id: order_id } });
+      const order_newContact = await Orders.findOne({
+        where: { id: order_id },
+      });
 
       return order_newContact;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -132,7 +157,10 @@ class OrdersRepository {
       });
       return product_list;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -155,7 +183,10 @@ class OrdersRepository {
       });
       return dry_mixed_product_list;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -178,7 +209,10 @@ class OrdersRepository {
       });
       return anchor_product_list;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -199,7 +233,10 @@ class OrdersRepository {
       });
       return tool_product_list;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -220,7 +257,10 @@ class OrdersRepository {
       });
       return rel_mat_product_list;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -245,7 +285,10 @@ class OrdersRepository {
 
       return product_list;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -298,7 +341,10 @@ class OrdersRepository {
       const tid = allOrdrProd[allOrdrProd.length - 1].id;
       return { id: tid, ...product_of_order.toJSON() };
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -306,11 +352,6 @@ class OrdersRepository {
   static async getUpdateDryMixedProductsOfOrder(newDryMixedProductsOfOrder) {
     try {
       const { order_id, productOfOrder } = newDryMixedProductsOfOrder;
-
-      console.log(
-        'productOfOrder ---------------------------------------------------',
-        productOfOrder
-      );
 
       const {
         dry_mixed_id,
@@ -353,7 +394,10 @@ class OrdersRepository {
       const tid = allOrdrProd[allOrdrProd.length - 1].id;
       return { id: tid, ...product_of_order.toJSON() };
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -403,7 +447,10 @@ class OrdersRepository {
       const tid = allOrdrProd[allOrdrProd.length - 1].id;
       return { id: tid, ...product_of_order.toJSON() };
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -440,7 +487,7 @@ class OrdersRepository {
 
       console.log(
         '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>allOrdrProd',
-        allOrdrProd
+        allOrdrProd,
       );
 
       const tid = allOrdrProd[allOrdrProd.length - 1].id;
@@ -448,7 +495,10 @@ class OrdersRepository {
 
       return { id: tid, ...product_of_order.toJSON() };
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -487,7 +537,10 @@ class OrdersRepository {
 
       return { id: tid, ...product_of_order.toJSON() };
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -498,7 +551,10 @@ class OrdersRepository {
 
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -509,7 +565,10 @@ class OrdersRepository {
 
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -520,7 +579,10 @@ class OrdersRepository {
 
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -531,7 +593,10 @@ class OrdersRepository {
 
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -542,7 +607,10 @@ class OrdersRepository {
 
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -576,7 +644,7 @@ class OrdersRepository {
           final_price,
           warehouse_id,
         },
-        { where: { id } }
+        { where: { id } },
       );
 
       const upd_prod_info = await OrdersProducts.findOne({
@@ -598,7 +666,10 @@ class OrdersRepository {
 
       return upd_prod_info;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -631,7 +702,7 @@ class OrdersRepository {
           final_price,
           id,
         },
-        { where: { id } }
+        { where: { id } },
       );
 
       const upd_prod_info = await OrderDryMixedProducts.findOne({
@@ -652,7 +723,10 @@ class OrdersRepository {
 
       return upd_prod_info;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -685,7 +759,7 @@ class OrdersRepository {
           final_price,
           id,
         },
-        { where: { id } }
+        { where: { id } },
       );
 
       const upd_prod_info = await OrderAnchorProducts.findOne({
@@ -706,7 +780,10 @@ class OrdersRepository {
 
       return upd_prod_info;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -735,7 +812,7 @@ class OrdersRepository {
           final_price,
           id,
         },
-        { where: { id } }
+        { where: { id } },
       );
 
       const upd_prod_info = await OrderToolProducts.findOne({
@@ -754,7 +831,10 @@ class OrdersRepository {
 
       return upd_prod_info;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -783,7 +863,7 @@ class OrdersRepository {
           final_price,
           id,
         },
-        { where: { id } }
+        { where: { id } },
       );
 
       const upd_prod_info = await OrderRelMatProducts.findOne({
@@ -802,7 +882,10 @@ class OrdersRepository {
 
       return upd_prod_info;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -812,17 +895,26 @@ class OrdersRepository {
       await Orders.update({ contact_id }, { where: { id: order_id } });
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
 
   static async getUpdateDeliveryAddressOrder({ address_id, order_id }) {
     try {
-      await Orders.update({ del_adr_id: address_id }, { where: { id: order_id } });
+      await Orders.update(
+        { del_adr_id: address_id },
+        { where: { id: order_id } },
+      );
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -832,7 +924,10 @@ class OrdersRepository {
       await Orders.update({ status }, { where: { id: order_id } });
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -842,7 +937,10 @@ class OrdersRepository {
       await Orders.update({ person_in_charge }, { where: { id: order_id } });
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }
@@ -854,7 +952,10 @@ class OrdersRepository {
 
       return;
     } catch (error) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
       return error;
     }
   }

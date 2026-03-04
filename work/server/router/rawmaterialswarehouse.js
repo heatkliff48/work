@@ -128,7 +128,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
 
   if (!Array.isArray(materials) || !materials.length)
     return res.status(400).json({
-      error: 'Поле materials обязательно и должно быть непустым массивом',
+      error: 'The materials field is required and must be a non-empty array.',
     });
 
   if (!portion_size)
@@ -211,10 +211,10 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
     if (shortageMaterials.length > 0) {
       await t.rollback();
       return res.status(400).json({
-        error: 'Недостаточно материалов на складе',
+        error: 'There are not enough materials in the warehouse',
         shortageDetails: shortageMaterials,
-        message: `Недостаточно материалов: ${shortageMaterials
-          .map((s) => `${s.material} (не хватает ${s.shortage})`)
+        message: `Not enough materials: ${shortageMaterials
+          .map((s) => `${s.material} (missing ${s.shortage})`)
           .join(', ')}`,
       });
     }
@@ -234,7 +234,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
         if (currentRecord.remaining_quantity < consumedQuantity) {
           await t.rollback();
           return res.status(400).json({
-            error: `Недостаточно материала "${materialType}" на складе. Доступно: ${currentRecord.remaining_quantity}, требуется: ${consumedQuantity}`,
+            error: `There is not enough "${materialType}" material in stock. Available: ${CurrentRecord.remaining_quantity}, required: ${consumedQuantity}`,
           });
         }
 
@@ -260,7 +260,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
         if (consumedQuantity < 0) {
           await t.rollback();
           return res.status(400).json({
-            error: `Невозможно создать запись для "${materialType}" с отрицательным количеством: ${consumedQuantity}`,
+            error: `It is not possible to create an entry for "${materialType}" with a negative quantity: ${consumedQuantity}`,
           });
         }
 
@@ -385,7 +385,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
       deletedIds,
     });
   } catch (err) {
-    console.log('❌ ОШИБКА, ROLLBACK:', err.message);
+    console.log('❌ ERROR, ROLLBACK:', err.message);
     await t.rollback();
     console.error(err.message);
     return res.status(500).json({ error: err.message });
@@ -404,7 +404,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
 
   if (!Array.isArray(materials) || materials.length === 0) {
     return res.status(400).json({
-      error: 'Поле materials обязательно и должно быть непустым массивом',
+      error: 'The materials field is required and must be a non-empty array.',
     });
   }
 
@@ -420,7 +420,9 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
     .filter((m) => m.type && Number.isFinite(Number(m.quantity)));
 
   if (normMaterials.length === 0) {
-    return res.status(400).json({ error: 'Нет валидных позиций для списания' });
+    return res
+      .status(400)
+      .json({ error: 'There are no valid items to write off' });
   }
 
   const onlySandSlurryDry = normMaterials.every(

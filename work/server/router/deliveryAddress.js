@@ -105,10 +105,10 @@ deliveryAddress.post('/bitrix-new-delivery-address', async (req, res) => {
       bitrix_client_id,
     });
   } catch (err) {
-    console.error('Ошибка при добавлении клиента из Bitrix:', err.message);
+    console.error('Error when adding a client from Bitrix:', err.message);
 
     return res.status(500).json({
-      error: `Внутренняя ошибка сервера: ${err.message}`,
+      error: `Internal server error: ${err.message}`,
       details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
@@ -169,10 +169,10 @@ deliveryAddress.post('/bitrix-update-delivery-address', async (req, res) => {
       bitrix_client_id,
     });
   } catch (err) {
-    console.error('Ошибка при обновлении клиента из Bitrix:', err.message);
+    console.error('Error when adding a client from Bitrix:', err.message);
 
     return res.status(500).json({
-      error: `Внутренняя ошибка сервера: ${err.message}`,
+      error: `Internal server error: ${err.message}`,
       details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
   }
