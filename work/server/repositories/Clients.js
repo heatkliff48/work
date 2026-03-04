@@ -8,7 +8,7 @@ class ClientsRepository {
 
   static async updClientsPriceInfo(updClient) {
     if (!Array.isArray(updClient) || updClient.length === 0) {
-      throw new Error('Не переданы данные для обновления');
+      throw new Error('No update data has been sent');
     }
 
     for (const item of updClient) {

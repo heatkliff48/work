@@ -33,7 +33,7 @@ const MODELS_BY_TYPE = {
 function getModelByType(type) {
   const model = MODELS_BY_TYPE[type];
   if (!model) {
-    throw new Error(`Неизвестный тип склада: ${type}`);
+    throw new Error(`Unknown type of warehouse: ${type}`);
   }
   return model;
 }
@@ -683,8 +683,6 @@ class WarehouseRepository {
     );
 
     try {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
-
       const {
         warehouse_id,
         total_quantity,
@@ -788,7 +786,6 @@ class WarehouseRepository {
 
   static async updateAnchorWarehouseQuantitys(upd_rem_srock) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateAnchorWarehouseQuantitys');
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
     try {
       const {
@@ -893,7 +890,6 @@ class WarehouseRepository {
 
   static async updateToolWarehouseQuantitys(upd_rem_srock) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updateToolWarehouseQuantitys');
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>upd_rem_srock', upd_rem_srock);
 
     try {
       const {
