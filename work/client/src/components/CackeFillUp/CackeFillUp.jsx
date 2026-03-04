@@ -13,26 +13,29 @@ import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { addNewProductionQuality } from '#components/redux/actions/productionQualityAction.js';
+import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
 
 function CackeFillUp() {
   const dispatch = useDispatch();
 
-  const [modalShow, setModalShow] = useState(false);
-  const { batchOutside } = useWarehouseContext();
+  const { batchOutside, autoclave_calendar } = useWarehouseContext();
   const { cackeFillUp, setCackeFillUp, lotesListBatches, lotesListCakes } =
     useProjectContext();
-  const { latestProducts } = useProductsContext();
   const { list_of_recipes, recipeOrders } = useRecipeContext();
+  const { latestProducts } = useProductsContext();
 
   const raw_mat_consumption = useSelector((state) => state.rawMatConsumption);
 
-  const [nextBatchId, setNextBatchId] = useState(0);
-  const [allocated, setAllocated] = useState(0);
-  const [cakeIds, setCakeIds] = useState([]);
+  const [modalShow, setModalShow] = useState(false);
   const [finish, setFinish] = useState(false);
 
-  const [activeCakeId, setActiveCakeId] = useState(null);
+  const [nextBatchId, setNextBatchId] = useState(0);
+  const [allocated, setAllocated] = useState(0);
+
+  const [cakeIds, setCakeIds] = useState([]);
   const [cakeNotes, setCakeNotes] = useState({});
+
+  const [activeCakeId, setActiveCakeId] = useState(null);
 
   useEffect(() => {
     setCackeFillUp({});
@@ -51,9 +54,16 @@ function CackeFillUp() {
         (el) => el.article === batch_in_produce?.product_article,
       );
 
-      const widthInArray = Math.floor(product?.m3InArray / product?.volumeBlockOnPallet);
+      const widthInArray = Math.floor(
+        product?.m3InArray / product?.volumeBlockOnPallet,
+      );
 
-      const total_cacke = batch_in_produce.quantity_pallets / widthInArray;
+      const accd = autoclave_calendar.find(
+        (el) => el.date === batch_in_produce.date,
+      );
+
+      const total_cacke =
+        batch_in_produce.quantity_pallets / widthInArray - accd.total_arrays;
 
       setCackeFillUp({ ...batch_in_produce, total_cacke });
     }
@@ -113,7 +123,13 @@ function CackeFillUp() {
   };
 
   const handleSave = async () => {
-    const { id } = cackeFillUp;
+    const {
+      id,
+      product_article = null,
+      date,
+      id_ordered_product_to_warehouse = null,
+    } = cackeFillUp;
+
     const notes = cakeNotes;
 
     await dispatch(addNewLotesListCakes({ num: cakeIds, note: notes }));
@@ -142,11 +158,10 @@ function CackeFillUp() {
         batch_id: nextBatchId,
         production_volume: allocated,
         recipe_article: recipeDetails?.article,
-        batch_article: cackeFillUp?.product_article,
+        batch_article: product_article,
         cacke_id_start,
-        date: cackeFillUp.date,
-        id_ordered_product_to_warehouse:
-          cackeFillUp?.id_ordered_product_to_warehouse ?? null,
+        date,
+        id_ordered_product_to_warehouse: id_ordered_product_to_warehouse,
         consumption_calculated: false,
       }),
     );
@@ -154,10 +169,37 @@ function CackeFillUp() {
     dispatch(
       addNewProductionQuality({
         batch_id: nextBatchId,
-        date: cackeFillUp.date,
-        product_article: cackeFillUp?.product_article,
+        date,
+        product_article,
       }),
     );
+
+    const accd = autoclave_calendar.find((el) => el.date === date);
+    const result = [];
+    if (!accd) {
+      console.error('Autoclave calendar entry not found for date:', date);
+      return;
+    }
+
+    const total_arrays = (accd?.total_arrays || 0) + allocated;
+
+    if (finish) {
+      const filled_autoclaves = Math.ceil(allocated / 21); // произведено автоклавом
+      const residual_arrays = total_arrays - filled_autoclaves * 21;
+      result.push({
+        ...accd,
+        total_arrays,
+        residual_arrays,
+        filled_autoclaves,
+      });
+    } else {
+      result.push({
+        ...accd,
+        total_arrays,
+      });
+    }
+
+    dispatch(addNewAutoclaveCalendar(result));
 
     setCackeFillUp({});
     setAllocated(0);

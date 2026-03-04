@@ -441,33 +441,32 @@ const QualityManagementTable = () => {
           (el) => el.article == product_article,
         );
 
-        // ИСПРАВЛЕНО: используем === вместо =
-        const accd = autoclave_calendar.find((el) => el.date === date);
+        // const accd = autoclave_calendar.find((el) => el.date === date);
 
-        if (!accd) {
-          console.error('Autoclave calendar entry not found for date:', date);
-          return;
-        }
+        // if (!accd) {
+        //   console.error('Autoclave calendar entry not found for date:', date);
+        //   return;
+        // }
 
         const palletsPerArray = Math.max(
           1,
           Math.floor(m3InArray / volumeBlockOnPallet) || 1,
         );
 
-        const total_arrays =
-          (accd?.total_arrays || 0) + quantity_pallets / palletsPerArray;
+        // const total_arrays =
+        //   (accd?.total_arrays || 0) + quantity_pallets / palletsPerArray;
 
-        const filled_autoclaves = Math.floor(total_arrays / 21);
-        const residual_arrays = total_arrays - filled_autoclaves * 21;
+        // const filled_autoclaves = Math.ceil(total_arrays / 21);
+        // const residual_arrays = total_arrays - filled_autoclaves * 21;
 
-        const result = [
-          {
-            ...accd,
-            total_arrays,
-            residual_arrays,
-            filled_autoclaves,
-          },
-        ];
+        // const result = [
+        //   {
+        //     ...accd,
+        //     total_arrays,
+        //     residual_arrays,
+        //     filled_autoclaves,
+        //   },
+        // ];
 
         const batch = batchOutside.find((batch) => batch.id === production_plan_id);
 
@@ -491,7 +490,7 @@ const QualityManagementTable = () => {
           }),
         );
 
-        await dispatch(addNewAutoclaveCalendar(result));
+        // await dispatch(addNewAutoclaveCalendar(result));
       }
       await dispatch(deleteQualityManagement(id));
 
