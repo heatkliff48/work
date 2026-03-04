@@ -245,7 +245,7 @@ function CackeFillUp() {
             </div>
 
             <div>
-              <div style={{ fontWeight: 600 }}>Total cacke</div>
+              <div style={{ fontWeight: 600 }}>Planned cacke</div>
               <div style={{ marginTop: 6, fontSize: 18 }}>{totalCake}</div>
             </div>
 
