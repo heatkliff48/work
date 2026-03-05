@@ -16,7 +16,8 @@ import './styles.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 
 function UsersInfoModal(props) {
-  const { users_main_info_table, users_additional_info_table } = useProjectContext();
+  const { users_main_info_table, users_additional_info_table } =
+    useProjectContext();
   const [usersInfoInput, setUsersInfoInput] = useState({});
   const [usersMainInfoInput, setUsersMainInfoInput] = useState({});
 
@@ -79,7 +80,7 @@ function UsersInfoModal(props) {
     const options = shiftOptions;
     if (!options) return null;
     const groupOption = options.find(
-      (option) => option.value === usersInfoInput?.[accessor]
+      (option) => option.value === usersInfoInput?.[accessor],
     );
     // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
     return groupOption || options[0];
@@ -89,7 +90,7 @@ function UsersInfoModal(props) {
     const options = roleOptions;
     if (!options) return null;
     const groupOption = options.find(
-      (option) => option.value === usersInfoInput?.[accessor]
+      (option) => option.value === usersInfoInput?.[accessor],
     );
     // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
     return groupOption || options[0];
@@ -222,7 +223,7 @@ function UsersInfoModal(props) {
       </Modal.Body>
       <Modal.Footer>
         <Button form="addClientModel" type="submit">
-          Add Client
+          Add User
         </Button>
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>

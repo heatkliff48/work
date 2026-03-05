@@ -16,7 +16,8 @@ const UsersInfo = () => {
     usersInfoDataList,
     setUsersInfoDataList,
   } = useProjectContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
 
   const user = useSelector((state) => state.user);
   const usersInfo = useSelector((state) => state.usersInfo);
@@ -34,7 +35,7 @@ const UsersInfo = () => {
         if (v[prop])
           acc[v[prop]] = acc[v[prop]] ? { ...acc[v[prop]], ...v } : { ...v };
         return acc;
-      }, {})
+      }, {}),
     );
 
   useEffect(() => {
