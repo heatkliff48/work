@@ -14,8 +14,11 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 const WarehouseAddModal = React.memo(
   ({ isOpen, toggle, COLUMNS_WAREHOUSE }) => {
     const { COLUMNS, latestProducts } = useProductsContext();
-    const { list_of_ordered_production, getWarehouseArticle } =
-      useWarehouseContext();
+    const {
+      list_of_ordered_production,
+      getWarehouseArticle,
+      COLUMNS_WAREHOUSE_ADD_MODAL,
+    } = useWarehouseContext();
     const dispatch = useDispatch();
 
     const [warehouseData, setWarehouseData] = useState([]);
@@ -45,14 +48,25 @@ const WarehouseAddModal = React.memo(
       },
     ];
 
+    function extractProductTitle(description) {
+      if (!description) return '';
+      const match = description.match(/BAUBLOCK®\s*(.+?)\s*(?:Medidas|$)/i);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+      return description;
+    }
+
     const handlerAddProductWarehouse = useCallback(
       (row) => {
         const product = latestProducts.find((el) => el.id === row.original.id);
         const warehouse_article = getWarehouseArticle(product);
+        const description = extractProductTitle(product?.description);
 
         setWarehouseData((prev) => ({
           ...prev,
           product_article: product.article,
+          description,
           article: warehouse_article,
         }));
       },
@@ -110,9 +124,9 @@ const WarehouseAddModal = React.memo(
     };
 
     const addProductOrder = async () => {
-      const { product_article, total_quantity } = warehouseData;
+      const { product_article, quantity_ok, quantity_sorting } = warehouseData;
 
-      const free_quantity_remaining = total_quantity;
+      const free_quantity_remaining = quantity_ok;
       const ordered_quantity = 0;
 
       // 1. Фильтруем резервы для текущего product_article
@@ -170,15 +184,31 @@ const WarehouseAddModal = React.memo(
         };
       });
 
+      const { description, ...dataWithoutDescription } = warehouseData;
+
       dispatch(
         addNewWarehouse({
-          ...warehouseData,
+          ...dataWithoutDescription,
+          sorting: 0,
           free_quantity_remaining: remainingFreeQty,
           ordered_quantity: parseInt(ordered_quantity) + summReserve,
           total_quantity:
             parseInt(ordered_quantity) + summReserve + remainingFreeQty,
+          type: 'OK',
         }),
       );
+      if (quantity_sorting > 0) {
+        dispatch(
+          addNewWarehouse({
+            ...dataWithoutDescription,
+            free_quantity_remaining: 0,
+            ordered_quantity: 0,
+            total_quantity: quantity_sorting,
+            sorting: quantity_sorting,
+            type: 'Sorting',
+          }),
+        );
+      }
       for (const ordered_production of updatedReserves) {
         await dispatch(updListOfOrderedProduction(ordered_production));
       }
@@ -199,9 +229,12 @@ const WarehouseAddModal = React.memo(
           <ModalBody>
             {haveProduct ? (
               <>
-                {COLUMNS_WAREHOUSE.map((el) => {
+                {COLUMNS_WAREHOUSE_ADD_MODAL.map((el) => {
                   if (
-                    el.accessor === 'sorting'
+                    el.accessor === 'sorting' ||
+                    el.accessor === 'total_m3' ||
+                    el.accessor === 'type' ||
+                    el.accessor === 'product_article'
                     // &&
                     // warehouseData.type !== 'Sorting'
                   ) {
@@ -244,20 +277,20 @@ const WarehouseAddModal = React.memo(
                       </>
                     );
 
-                  if (el.accessor === 'type')
-                    return (
-                      <>
-                        <ModalBody>{el.Header}:</ModalBody>
-                        <Select
-                          defaultValue={getSelectedTypeOption(el.accessor)}
-                          onChange={(v) => {
-                            handleSelectTypeChange(v);
-                          }}
-                          options={type_select}
-                          key={el.id}
-                        />
-                      </>
-                    );
+                  // if (el.accessor === 'type')
+                  //   return (
+                  //     <>
+                  //       <ModalBody>{el.Header}:</ModalBody>
+                  //       <Select
+                  //         defaultValue={getSelectedTypeOption(el.accessor)}
+                  //         onChange={(v) => {
+                  //           handleSelectTypeChange(v);
+                  //         }}
+                  //         options={type_select}
+                  //         key={el.id}
+                  //       />
+                  //     </>
+                  //   );
                   return (
                     <InputField
                       key={el.id}

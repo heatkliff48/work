@@ -59,7 +59,7 @@ function Warehouse() {
 
       const m3Value = product?.volumeBlockOnPallet || 0;
       const totalQuantity = item.total_quantity || 0;
-      const total_m3 = m3Value * totalQuantity;
+      const total_m3 = Math.round(m3Value * totalQuantity * 100) / 100;
 
       return {
         ...item,
