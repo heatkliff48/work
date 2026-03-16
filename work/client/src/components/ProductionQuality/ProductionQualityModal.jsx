@@ -6,7 +6,7 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import DimensionTestModal from './DimensionsTestModal';
 import CompressTestModal from './CompressTestModal';
 
-function ProductionQualityModal({ show, onHide, selectedBatch }) {
+function ProductionQualityModal({ show, onHide, selectedBatch, data }) {
   const { batch_id, date } = selectedBatch;
   const {
     dimensionTestModal,

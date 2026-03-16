@@ -7,6 +7,10 @@ const {
   UPDATE_PRODUCT_SOCKET,
   REPAIR_PRODUCT_SOCKET,
   ADD_NEW_PRODUCTION_QUALITY_SOCKET,
+  ADD_NEW_DIMENSIONS_QUALITY_SOCKET,
+  ADD_NEW_COMPRESSIONS_QUALITY_SOCKET,
+  UPDATE_COMPRESSIONS_QUALITY_SOCKET,
+  UPDATE_DIMENSIONS_QUALITY_SOCKET,
 } = require('../src/constants/event.js');
 
 class ProductController {
@@ -61,6 +65,7 @@ class ProductController {
     }
   }
 
+  //PRODUCTION QUALITY
   static async getAllProductionQuality(req, res) {
     try {
       const products_quantyties = await ProductService.getAllProductionQuality();
@@ -79,6 +84,83 @@ class ProductController {
       );
       myEmitter.emit(ADD_NEW_PRODUCTION_QUALITY_SOCKET, new_production_quantyties);
       return res.status(200).json(new_production_quantyties);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  //DIMENSION QUALITY
+  static async getAllDimensionsQuality(req, res) {
+    try {
+      const products_quantyties = await ProductService.getAllDimensionsQuality();
+
+      return res.status(200).json(products_quantyties);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async addNewDimensionsQuality(req, res) {
+    const production_quantyties = req.body;
+    try {
+      const new_production_quantyties = await ProductService.addNewDimensionsQuality(
+        production_quantyties,
+      );
+      myEmitter.emit(ADD_NEW_DIMENSIONS_QUALITY_SOCKET, new_production_quantyties);
+      return res.status(200).json(new_production_quantyties);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async updateDimensionsQuality(req, res) {
+    const production_quantyties = req.body;
+    try {
+      const new_production_quantyties = await ProductService.updateDimensionsQuality(
+        production_quantyties,
+      );
+
+      myEmitter.emit(UPDATE_DIMENSIONS_QUALITY_SOCKET, new_production_quantyties);
+      return res.status(200).json(new_production_quantyties);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  //COMPRESSIONS QUALITY
+  static async getAllCompressionsQuality(req, res) {
+    try {
+      const products_quantyties = await ProductService.getAllCompressionsQuality();
+
+      return res.status(200).json(products_quantyties);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async addNewCompressionsQuality(req, res) {
+    console.log('req.body Product.js line 126', req.body);
+    const production_quantyties = req.body;
+    try {
+      const new_production_quantyties =
+        await ProductService.addNewCompressionsQuality(production_quantyties);
+
+      myEmitter.emit(ADD_NEW_COMPRESSIONS_QUALITY_SOCKET, new_production_quantyties);
+      return res.status(200).json(new_production_quantyties);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async updateCompressionsQuality(req, res) {
+    console.log('req.body Product.js line 126', req.body);
+    const production_quantyties = req.body;
+    try {
+      const upd_production_quantyties =
+        await ProductService.updateCompressionsQuality(production_quantyties);
+
+      myEmitter.emit(UPDATE_COMPRESSIONS_QUALITY_SOCKET, upd_production_quantyties);
+      return res.status(200).json(upd_production_quantyties);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

@@ -140,6 +140,10 @@ import {
   NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   NEW_PRODUCTION_QUALITY_SOCKET,
+  NEW_DIMENSIONS_QUALITY_SOCKET,
+  NEW_COMPRESSIONS_QUALITY_SOCKET,
+  UPD_COMPRESSIONS_QUALITY_SOCKET,
+  UPD_DIMENSIONS_QUALITY_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -163,9 +167,38 @@ export const addNewProductSocket = (products) => {
   };
 };
 
+//PRODUCTION QUALITY
 export const addNewProductionQualitySocket = (products_quantyties) => {
   return {
     type: NEW_PRODUCTION_QUALITY_SOCKET,
+    payload: products_quantyties,
+  };
+};
+
+//DIMENSION QUALITY
+export const addNewDimensionsQualitySocket = (products_quantyties) => {
+  return {
+    type: NEW_DIMENSIONS_QUALITY_SOCKET,
+    payload: products_quantyties,
+  };
+};
+export const updateDimensionsQualitySocket = (products_quantyties) => {
+  return {
+    type: UPD_DIMENSIONS_QUALITY_SOCKET,
+    payload: products_quantyties,
+  };
+};
+
+//COMPRESSIONS QUALITY
+export const addNewCompressionsQualitySocket = (products_quantyties) => {
+  return {
+    type: NEW_COMPRESSIONS_QUALITY_SOCKET,
+    payload: products_quantyties,
+  };
+};
+export const updateCompressionsQualitySocket = (products_quantyties) => {
+  return {
+    type: UPD_COMPRESSIONS_QUALITY_SOCKET,
     payload: products_quantyties,
   };
 };

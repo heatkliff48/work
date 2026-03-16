@@ -75,7 +75,11 @@ import '#components/Styles/dashboard.css';
 
 import '#components/Styles/dashboard.css';
 import { getFilesLotesList } from '#components/redux/actions/filesLotesListAction.js';
-import { getProductionQuality } from '#components/redux/actions/productionQualityAction.js';
+import {
+  getCompressionsQuality,
+  getDimensionsQuality,
+  getProductionQuality,
+} from '#components/redux/actions/productionQualityAction.js';
 
 function Main() {
   const navigate = useNavigate();
@@ -143,6 +147,8 @@ function Main() {
     dispatch(getLotesListCakes());
     dispatch(getRawMaterialsWarehouse());
     dispatch(getProductionQuality());
+    dispatch(getDimensionsQuality());
+    dispatch(getCompressionsQuality());
     setStoredData(null);
   }, [dispatch, setStoredData]);
 

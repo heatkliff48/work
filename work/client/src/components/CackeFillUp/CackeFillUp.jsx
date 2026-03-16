@@ -171,6 +171,7 @@ function CackeFillUp() {
         batch_id: nextBatchId,
         date,
         product_article,
+        quantity: allocated
       }),
     );
 

@@ -140,6 +140,10 @@ import {
   addNewRawMatConsumptionCurrentMoldsSocket,
   deleteRawMatConsumptionCurrentMoldsSocket,
   addNewProductionQualitySocket,
+  addNewDimensionsQualitySocket,
+  addNewCompressionsQualitySocket,
+  updateCompressionsQualitySocket,
+  updateDimensionsQualitySocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -325,6 +329,10 @@ import {
   ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   DELETE_OLD_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   ADD_NEW_PRODUCTION_QUALITY_SOCKET,
+  ADD_NEW_DIMENSIONS_QUALITY_SOCKET,
+  ADD_NEW_COMPRESSIONS_QUALITY_SOCKET,
+  UPDATE_COMPRESSIONS_QUALITY_SOCKET,
+  UPDATE_DIMENSIONS_QUALITY_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -337,8 +345,26 @@ export const createSocketOnMessage = (dispatch) => (event) => {
       dispatch(addNewProductSocket(payload));
       break;
 
+    //PRODUCTION QUALITY
     case ADD_NEW_PRODUCTION_QUALITY_SOCKET:
       dispatch(addNewProductionQualitySocket(payload));
+      break;
+
+    //DIMENSION QUALITY
+    case ADD_NEW_DIMENSIONS_QUALITY_SOCKET:
+      dispatch(addNewDimensionsQualitySocket(payload));
+      break;
+
+    case UPDATE_DIMENSIONS_QUALITY_SOCKET:
+      dispatch(updateDimensionsQualitySocket(payload));
+      break;
+
+    //COMPRESSIONS QUALITY
+    case ADD_NEW_COMPRESSIONS_QUALITY_SOCKET:
+      dispatch(addNewCompressionsQualitySocket(payload));
+      break;
+    case UPDATE_COMPRESSIONS_QUALITY_SOCKET:
+      dispatch(updateCompressionsQualitySocket(payload));
       break;
 
     case UPDATE_PRODUCT_SOCKET:

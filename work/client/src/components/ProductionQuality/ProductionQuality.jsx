@@ -6,7 +6,12 @@ import { useEffect, useState } from 'react';
 import ProductionQualityModal from './ProductionQualityModal';
 
 function ProductionQuality() {
-  const { PRODUCTION_QUALITY, production_quality } = useProjectContext();
+  const {
+    PRODUCTION_QUALITY,
+    production_quality,
+    dimensions_quality,
+    compressions_quality,
+  } = useProjectContext();
   const { extractProductTitle, latestProducts } = useProductsContext();
   const { modalProductionQuality, setModalProductionQuality } = useModalContext();
 
@@ -31,6 +36,21 @@ function ProductionQuality() {
 
     setData(updatedData);
   }, [production_quality, extractProductTitle]);
+
+  useEffect(() => {
+    console.log(
+      'production_quality ProductionQuality.jsx line 40',
+      production_quality,
+    );
+    console.log(
+      'dimensions_quality ProductionQuality.jsx line 41',
+      dimensions_quality,
+    );
+    console.log(
+      'compressions_quality ProductionQuality.jsx line 42',
+      compressions_quality,
+    );
+  }, [production_quality, compressions_quality, dimensions_quality]);
 
   return (
     <div>

@@ -152,6 +152,10 @@ const {
   ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   DELETE_OLD_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
   ADD_NEW_PRODUCTION_QUALITY_SOCKET,
+  ADD_NEW_COMPRESSIONS_QUALITY_SOCKET,
+  ADD_NEW_DIMENSIONS_QUALITY_SOCKET,
+  UPDATE_COMPRESSIONS_QUALITY_SOCKET,
+  UPDATE_DIMENSIONS_QUALITY_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -167,11 +171,58 @@ function registerWsEmitter(map) {
     }
   });
 
+  //PRODUCTION QUALITY
   myEmitter.on(ADD_NEW_PRODUCTION_QUALITY_SOCKET, (products_quantyties) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
         JSON.stringify({
           type: ADD_NEW_PRODUCTION_QUALITY_SOCKET,
+          payload: products_quantyties,
+        }),
+      );
+    }
+  });
+
+  //DIMENSION QUALITY
+  myEmitter.on(ADD_NEW_DIMENSIONS_QUALITY_SOCKET, (products_quantyties) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_DIMENSIONS_QUALITY_SOCKET,
+          payload: products_quantyties,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_DIMENSIONS_QUALITY_SOCKET, (products_quantyties) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_DIMENSIONS_QUALITY_SOCKET,
+          payload: products_quantyties,
+        }),
+      );
+    }
+  });
+
+  //COMPRESSIONS QUALITY
+  myEmitter.on(ADD_NEW_COMPRESSIONS_QUALITY_SOCKET, (products_quantyties) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_COMPRESSIONS_QUALITY_SOCKET,
+          payload: products_quantyties,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_COMPRESSIONS_QUALITY_SOCKET, (products_quantyties) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_COMPRESSIONS_QUALITY_SOCKET,
           payload: products_quantyties,
         }),
       );

@@ -18,6 +18,9 @@ module.exports = {
       product_article: {
         type: Sequelize.STRING,
       },
+      quantity: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

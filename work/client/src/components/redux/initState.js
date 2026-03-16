@@ -66,6 +66,8 @@ const initState = {
   lotesListCakes: [],
   orderToWarehouse: [],
   productionQuality: [],
+  qualityDimensions: [],
+  qualityCompressions: [],
 };
 
 export default initState;
