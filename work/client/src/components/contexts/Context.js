@@ -252,6 +252,33 @@ const ProjectContextProvider = ({ children }) => {
     },
   ];
 
+  const roleOptions = [
+    { value: 1, label: 'Production Manager' },
+    { value: 2, label: 'Head of Sales Department' },
+    { value: 3, label: 'System administrator' },
+    { value: 4, label: 'Chief technologist' },
+    { value: 5, label: 'Mill operators' },
+    { value: 6, label: 'Casting operators' },
+    { value: 7, label: 'Cutting operators' },
+    { value: 8, label: 'Green array operators' },
+    { value: 9, label: 'Autoclave operators' },
+    { value: 10, label: 'White array operators' },
+    { value: 11, label: 'Packaging operators' },
+    { value: 12, label: 'Quality manager' },
+    { value: 13, label: 'Production director' },
+    { value: 14, label: 'Mechanical-electrical technicians' },
+    { value: 15, label: 'Forklift drivers' },
+    { value: 16, label: 'Sales department director' },
+    { value: 17, label: 'Sales department manager' },
+    { value: 18, label: 'Warehouse department director' },
+    { value: 19, label: 'Warehouse department manager' },
+    { value: 20, label: 'Accountant' },
+  ];
+
+  const roleMap = Object.fromEntries(
+    roleOptions.map((role) => [role.value, role.label]),
+  );
+
   const users_info_table = [
     {
       Header: 'E-mail',
@@ -266,6 +293,10 @@ const ProjectContextProvider = ({ children }) => {
     {
       Header: 'Role',
       accessor: 'role',
+      Cell: ({ value }) => {
+        // value - это числовое значение роли из данных
+        return roleMap[value] || value; // Возвращаем название или исходное значение, если не найдено
+      },
       Filter: DropdownFilter,
     },
   ];
@@ -556,6 +587,7 @@ const ProjectContextProvider = ({ children }) => {
         production_quality,
         dimensions_quality,
         compressions_quality,
+        roleMap,
       }}
     >
       {children}

@@ -10,7 +10,8 @@ import { useProjectContext } from '#components/contexts/Context.js';
 
 function PasswordChangeModal(props) {
   const { currentUsersInfo } = useProjectContext();
-  const [usersMainInfoInput, setUsersMainInfoInput] = useState(currentUsersInfo);
+  const [usersMainInfoInput, setUsersMainInfoInput] =
+    useState(currentUsersInfo);
   const [passwordInput, setPasswordInput] = useState('');
 
   const dispatch = useDispatch();
@@ -64,7 +65,7 @@ function PasswordChangeModal(props) {
         </Container>
       </Modal.Body>
       <Modal.Footer>
-        <button form="addClientModel">Add Client</button>
+        <button form="addClientModel">Add User</button>
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>
@@ -85,7 +86,10 @@ function ShowPasswordChangeModal() {
         Change Password
       </Button>
 
-      <PasswordChangeModal show={modalShow} onHide={() => setModalShow(false)} />
+      <PasswordChangeModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+      />
     </>
   );
 }
