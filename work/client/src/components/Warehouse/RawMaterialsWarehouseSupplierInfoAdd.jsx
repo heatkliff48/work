@@ -24,7 +24,7 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
 
   const raw_material_table = [
     {
-      Header: 'Quality',
+      Header: 'Enter % from 0 to 100',
       accessor: 'quality',
       Filter: TextSearchFilter,
     },
@@ -99,6 +99,7 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
       Plastics: warehouseActions.updateWarehousePlastics,
       Pallets: warehouseActions.updateWarehousePallets,
       'Sand powder': warehouseActions.updateWarehouseSandPowder,
+      'Sand slurry (dry)': warehouseActions.updateWarehouseSandSlurry,
     };
 
     return actionMap[materialType] || warehouseActions.updateWarehouseSand;
@@ -116,12 +117,21 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
 
     const updateRawMaterialAction = getUpdateAction(props?.material_type);
 
-    dispatch(
-      updateRawMaterialAction({
-        supplier: props?.supplierInfo.supplier,
-        quality: rawMaterialWarehouseInput?.quality,
-      }),
-    );
+    if (props?.material_type != 'Sand slurry (dry)') {
+      dispatch(
+        updateRawMaterialAction({
+          supplier: props?.supplierInfo.supplier,
+          quality: rawMaterialWarehouseInput?.quality,
+        }),
+      );
+    } else {
+      dispatch(
+        updateRawMaterialAction({
+          id: props?.supplierInfo.id,
+          portion_size: rawMaterialWarehouseInput?.quality,
+        }),
+      );
+    }
     setRawMaterialWarehouseInput({});
     props.onHide();
   };
@@ -138,11 +148,15 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
       <Modal.Body>
         <Container>
           <form
-            id="addClientModel"
+            id="rawMaterialWarehouseQualityChange"
             className="w-full max-w-sm"
             onSubmit={onSubmitForm}
           >
-            <h3>Add quality to {props?.supplierInfo.supplier}</h3>
+            {props?.material_type != 'Sand slurry (dry)' ? (
+              <h3>Add quality to {props?.supplierInfo.supplier}</h3>
+            ) : (
+              <h3>Change residue on the sieve</h3>
+            )}
             <Row>
               {raw_material_table.map((el) =>
                 el.accessor === 'date' ? null : (
@@ -185,9 +199,15 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
         </Container>
       </Modal.Body>
       <Modal.Footer>
-        <Button form="addClientModel" type="submit">
-          Add quality to {props?.supplierInfo.supplier}
-        </Button>
+        {props?.material_type != 'Sand slurry (dry)' ? (
+          <Button form="rawMaterialWarehouseQualityChange" type="submit">
+            Add quality to {props?.supplierInfo.supplier}
+          </Button>
+        ) : (
+          <Button form="rawMaterialWarehouseQualityChange" type="submit">
+            Accept change
+          </Button>
+        )}
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>
