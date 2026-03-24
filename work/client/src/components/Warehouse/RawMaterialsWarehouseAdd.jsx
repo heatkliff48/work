@@ -12,7 +12,9 @@ import DatePicker from 'react-datepicker';
 // import Select from 'react-select';
 
 function RawMaterialsWarehouseAdd(props) {
-  const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState({});
+  const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState(
+    {},
+  );
   const [errors, setErrors] = useState({});
   const [dataValue, setDataValue] = useState(null);
 
@@ -36,7 +38,10 @@ function RawMaterialsWarehouseAdd(props) {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity, t',
+      Header:
+        props?.material_type === 'Pallets'
+          ? 'Quantity, pieces'
+          : 'Quantity, kg',
       accessor: 'quantity',
       Filter: TextSearchFilter,
     },
@@ -193,6 +198,9 @@ function RawMaterialsWarehouseAdd(props) {
       'Aluminum 2': warehouseActions.addNewWarehouseAluminum2,
       'Grinding Balls': warehouseActions.addNewWarehouseGrindingBalls,
       AAC: warehouseActions.addNewWarehouseAAC,
+      Pallets: warehouseActions.addNewWarehousePallets,
+      Plastics: warehouseActions.addNewWarehousePlastics,
+      'Sand powder (dry)': warehouseActions.addNewWarehouseSandPowder,
     };
 
     return actionMap[materialType] || warehouseActions.addNewWarehouseSand;
@@ -235,7 +243,10 @@ function RawMaterialsWarehouseAdd(props) {
     if (!rawMaterialWarehouseInput?.date?.trim()) {
       newErrors.supplier = 'Date is required';
     }
-    if (props?.material_type === 'Lime' && !rawMaterialWarehouseInput?.typeLime) {
+    if (
+      props?.material_type === 'Lime' &&
+      !rawMaterialWarehouseInput?.typeLime
+    ) {
       newErrors.typeLime = 'Lime type is required';
     }
     if (
@@ -273,56 +284,61 @@ function RawMaterialsWarehouseAdd(props) {
       return;
     }
 
+    console.log(
+      props?.material_type,
+      'props?.material_type RawMaterialsWarehouseAdd.jsx line 287',
+    );
+
     const addAction = getAddAction(props?.material_type);
 
     const formData =
       props?.material_type === 'Lime'
         ? {
             supplier: rawMaterialWarehouseInput?.supplier,
-            quantity: rawMaterialWarehouseInput?.quantity * 1000,
+            quantity: rawMaterialWarehouseInput?.quantity,
             date: rawMaterialWarehouseInput?.date,
             type: rawMaterialWarehouseInput?.typeLime,
           }
         : props?.material_type === 'Cement'
-        ? {
-            supplier: rawMaterialWarehouseInput?.supplier,
-            quantity: rawMaterialWarehouseInput?.quantity * 1000,
-            date: rawMaterialWarehouseInput?.date,
-            type: rawMaterialWarehouseInput?.typeCement,
-          }
-        : props?.material_type === 'Sand (dry)'
-        ? {
-            supplier: rawMaterialWarehouseInput?.supplier,
-            quantity: rawMaterialWarehouseInput?.quantity * 1000,
-            date: rawMaterialWarehouseInput?.date,
-            type: rawMaterialWarehouseInput?.typeSand,
-          }
-        : props?.material_type === 'Grinding Balls'
-        ? {
-            supplier: rawMaterialWarehouseInput?.supplier,
-            quantity: rawMaterialWarehouseInput?.quantity * 1000,
-            date: rawMaterialWarehouseInput?.date,
-            diameter: rawMaterialWarehouseInput?.diameter,
-          }
-        : props?.material_type === 'Aluminum 1'
-        ? {
-            supplier: rawMaterialWarehouseInput?.supplier,
-            quantity: rawMaterialWarehouseInput?.quantity * 1000,
-            date: rawMaterialWarehouseInput?.date,
-            type: rawMaterialWarehouseInput?.typeAlum1,
-          }
-        : props?.material_type === 'Aluminum 2'
-        ? {
-            supplier: rawMaterialWarehouseInput?.supplier,
-            quantity: rawMaterialWarehouseInput?.quantity * 1000,
-            date: rawMaterialWarehouseInput?.date,
-            type: rawMaterialWarehouseInput?.typeAlum2,
-          }
-        : {
-            supplier: rawMaterialWarehouseInput?.supplier,
-            quantity: rawMaterialWarehouseInput?.quantity * 1000,
-            date: rawMaterialWarehouseInput?.date,
-          };
+          ? {
+              supplier: rawMaterialWarehouseInput?.supplier,
+              quantity: rawMaterialWarehouseInput?.quantity,
+              date: rawMaterialWarehouseInput?.date,
+              type: rawMaterialWarehouseInput?.typeCement,
+            }
+          : props?.material_type === 'Sand (dry)'
+            ? {
+                supplier: rawMaterialWarehouseInput?.supplier,
+                quantity: rawMaterialWarehouseInput?.quantity,
+                date: rawMaterialWarehouseInput?.date,
+                type: rawMaterialWarehouseInput?.typeSand,
+              }
+            : props?.material_type === 'Grinding Balls'
+              ? {
+                  supplier: rawMaterialWarehouseInput?.supplier,
+                  quantity: rawMaterialWarehouseInput?.quantity,
+                  date: rawMaterialWarehouseInput?.date,
+                  diameter: rawMaterialWarehouseInput?.diameter,
+                }
+              : props?.material_type === 'Aluminum 1'
+                ? {
+                    supplier: rawMaterialWarehouseInput?.supplier,
+                    quantity: rawMaterialWarehouseInput?.quantity,
+                    date: rawMaterialWarehouseInput?.date,
+                    type: rawMaterialWarehouseInput?.typeAlum1,
+                  }
+                : props?.material_type === 'Aluminum 2'
+                  ? {
+                      supplier: rawMaterialWarehouseInput?.supplier,
+                      quantity: rawMaterialWarehouseInput?.quantity,
+                      date: rawMaterialWarehouseInput?.date,
+                      type: rawMaterialWarehouseInput?.typeAlum2,
+                    }
+                  : {
+                      supplier: rawMaterialWarehouseInput?.supplier,
+                      quantity: rawMaterialWarehouseInput?.quantity,
+                      date: rawMaterialWarehouseInput?.date,
+                    };
 
     dispatch(addAction(formData));
     setRawMaterialWarehouseInput({ ...initState });
@@ -383,7 +399,7 @@ function RawMaterialsWarehouseAdd(props) {
                       </div>
                     </div>
                   </Col>
-                )
+                ),
               )}
             </Row>
             {/* {props?.material_type === 'Cement' && (

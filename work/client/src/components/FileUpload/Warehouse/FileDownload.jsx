@@ -13,7 +13,7 @@ const FileDownload = ({ type }) => {
     e.preventDefault();
     try {
       const res = await axios.get(
-        `http://localhost:3001/files/download/${selectedFile}`,
+        `${process.env.REACT_APP_URL}/files/download/${selectedFile}`,
         {
           responseType: 'blob',
         },
@@ -32,7 +32,8 @@ const FileDownload = ({ type }) => {
   useEffect(() => {
     const filteredFiles = filesWarehouse.filter(
       (el) =>
-        el.warehouse_id === warehouseInfoCurIdModal && el.warehouse_type === type,
+        el.warehouse_id === warehouseInfoCurIdModal &&
+        el.warehouse_type === type,
     );
     setFilteredFiles(filteredFiles);
   }, [filesWarehouse]);

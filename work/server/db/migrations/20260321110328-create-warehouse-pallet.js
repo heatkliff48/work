@@ -2,42 +2,42 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('WarehouseAluminum1s', {
+    await queryInterface.createTable('WarehousePallets', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER
       },
       supplier: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING
       },
       quantity: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.FLOAT
       },
       type: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING
       },
       quality: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.FLOAT
       },
       date: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING
       },
       file_name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
-      },
+        type: Sequelize.DATE
+      }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('WarehouseAluminum1s');
-  },
+    await queryInterface.dropTable('WarehousePallets');
+  }
 };

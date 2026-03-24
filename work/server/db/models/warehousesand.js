@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       quality: DataTypes.FLOAT,
       date: DataTypes.STRING,
+      file_name: DataTypes.STRING,
     },
     {
       sequelize,

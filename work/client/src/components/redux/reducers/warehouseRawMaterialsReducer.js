@@ -9,6 +9,9 @@ import {
   FULL_WAREHOUSE_GRINDING_BALLS,
   FULL_WAREHOUSE_AAC,
   FULL_WAREHOUSE_SAND_SLURRY,
+  FULL_WAREHOUSE_PALLETS,
+  FULL_WAREHOUSE_PLASTICS,
+  FULL_WAREHOUSE_SAND_POWDER,
 } from '../types/warehouseRawMaterialsTypes';
 import {
   NEED_DELETE_WAREHOUSE_SAND_SOCKET,
@@ -39,6 +42,16 @@ import {
   NEED_UPDATE_WAREHOUSE_AAC_SOCKET,
   NEW_WAREHOUSE_AAC_SOCKET,
   NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
+  NEED_UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
+  NEW_WAREHOUSE_PALLETS_SOCKET,
+  NEED_UPDATE_WAREHOUSE_PALLETS_SOCKET,
+  NEED_DELETE_WAREHOUSE_PALLETS_SOCKET,
+  NEW_WAREHOUSE_PLASTICS_SOCKET,
+  NEED_UPDATE_WAREHOUSE_PLASTICS_SOCKET,
+  NEED_DELETE_WAREHOUSE_PLASTICS_SOCKET,
+  NEW_WAREHOUSE_SAND_POWDER_SOCKET,
+  NEED_UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
+  NEED_DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
 } from '../types/socketTypes/socket';
 
 // Sand
@@ -56,7 +69,11 @@ export const warehouseSandReducer = (warehouseSand = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_SAND_SOCKET: {
-      return payload;
+      const result = warehouseSand.map((el) => {
+        if (el.id === payload[1]?.id) return payload[1];
+        return el;
+      });
+      return result;
     }
     default:
       return warehouseSand;
@@ -79,7 +96,7 @@ export const warehouseLimeReducer = (warehouseLime = [], action) => {
     }
     case NEED_UPDATE_WAREHOUSE_LIME_SOCKET: {
       const result = warehouseLime.map((el) => {
-        if (el.id === payload[0]?.id) return payload[0];
+        if (el.id === payload[1]?.id) return payload[1];
         return el;
       });
       return result;
@@ -105,7 +122,7 @@ export const warehouseCementReducer = (warehouseCement = [], action) => {
     }
     case NEED_UPDATE_WAREHOUSE_CEMENT_SOCKET: {
       const result = warehouseCement.map((el) => {
-        if (el.id === payload[0]?.id) return payload[0];
+        if (el.id === payload[1]?.id) return payload[1];
         return el;
       });
       return result;
@@ -131,7 +148,7 @@ export const warehouseGypsumReducer = (warehouseGypsum = [], action) => {
     }
     case NEED_UPDATE_WAREHOUSE_GYPSUM_SOCKET: {
       const result = warehouseGypsum.map((el) => {
-        if (el.id === payload[0]?.id) return payload[0];
+        if (el.id === payload[1]?.id) return payload[1];
         return el;
       });
       return result;
@@ -159,7 +176,11 @@ export const warehouseGypsumStoneReducer = (
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET: {
-      return payload;
+      const result = warehouseGypsumStone.map((el) => {
+        if (el.id === payload[1]?.id) return payload[1];
+        return el;
+      });
+      return result;
     }
     default:
       return warehouseGypsumStone;
@@ -182,7 +203,7 @@ export const warehouseAluminum1Reducer = (warehouseAluminum1 = [], action) => {
     }
     case NEED_UPDATE_WAREHOUSE_ALUMINUM1_SOCKET: {
       const result = warehouseAluminum1.map((el) => {
-        if (el.id === payload[0]?.id) return payload[0];
+        if (el.id === payload[1]?.id) return payload[1];
         return el;
       });
       return result;
@@ -208,7 +229,7 @@ export const warehouseAluminum2Reducer = (warehouseAluminum2 = [], action) => {
     }
     case NEED_UPDATE_WAREHOUSE_ALUMINUM2_SOCKET: {
       const result = warehouseAluminum2.map((el) => {
-        if (el.id === payload[0]?.id) return payload[0];
+        if (el.id === payload[1]?.id) return payload[1];
         return el;
       });
       return result;
@@ -236,7 +257,11 @@ export const warehouseGrindingBallsReducer = (
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET: {
-      return payload;
+      const result = warehouseGrindingBalls.map((el) => {
+        if (el.id === payload[1]?.id) return payload[1];
+        return el;
+      });
+      return result;
     }
     default:
       return warehouseGrindingBalls;
@@ -258,15 +283,12 @@ export const warehouseAACReducer = (warehouseAAC = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_AAC_SOCKET: {
-      return payload;
+      const result = warehouseAAC.map((el) => {
+        if (el.id === payload[1]?.id) return payload[1];
+        return el;
+      });
+      return result;
     }
-    // case NEED_UPDATE_WAREHOUSE_AAC_SOCKET: {
-    //   const result = warehouseAAC.map((el) => {
-    //     if (el.id === payload[0]?.id) return payload[0];
-    //     return el;
-    //   });
-    //   return result;
-    // }
     default:
       return warehouseAAC;
   }
@@ -285,7 +307,95 @@ export const warehouseSandSlurryReducer = (
     case NEW_WAREHOUSE_SAND_SLURRY_SOCKET: {
       return [...warehouseSandSlurry, payload];
     }
+    case NEED_UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET: {
+      const result = warehouseSandSlurry.map((el) => {
+        if (el.id === payload[1]?.id) return payload[1];
+        return el;
+      });
+      return result;
+    }
     default:
       return warehouseSandSlurry;
+  }
+};
+
+// Pallets
+export const warehousePalletsReducer = (warehousePallets = [], action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case FULL_WAREHOUSE_PALLETS: {
+      return payload;
+    }
+    case NEW_WAREHOUSE_PALLETS_SOCKET: {
+      return [...warehousePallets, payload];
+    }
+    case NEED_DELETE_WAREHOUSE_PALLETS_SOCKET: {
+      const result = warehousePallets.filter((el) => el.id !== payload);
+      return result;
+    }
+    case NEED_UPDATE_WAREHOUSE_PALLETS_SOCKET: {
+      const result = warehousePallets.map((el) => {
+        if (el.id === payload[1]?.id) return payload[1];
+        return el;
+      });
+      return result;
+    }
+    default:
+      return warehousePallets;
+  }
+};
+
+// Plastics
+export const warehousePlasticsReducer = (warehousePlastics = [], action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case FULL_WAREHOUSE_PLASTICS: {
+      return payload;
+    }
+    case NEW_WAREHOUSE_PLASTICS_SOCKET: {
+      return [...warehousePlastics, payload];
+    }
+    case NEED_DELETE_WAREHOUSE_PLASTICS_SOCKET: {
+      const result = warehousePlastics.filter((el) => el.id !== payload);
+      return result;
+    }
+    case NEED_UPDATE_WAREHOUSE_PLASTICS_SOCKET: {
+      const result = warehousePlastics.map((el) => {
+        if (el.id === payload[1]?.id) return payload[1];
+        return el;
+      });
+      return result;
+    }
+    default:
+      return warehousePlastics;
+  }
+};
+
+// Sand Powder
+export const warehouseSandPowderReducer = (
+  warehouseSandPowder = [],
+  action,
+) => {
+  const { type, payload } = action;
+  switch (type) {
+    case FULL_WAREHOUSE_SAND_POWDER: {
+      return payload;
+    }
+    case NEW_WAREHOUSE_SAND_POWDER_SOCKET: {
+      return [...warehouseSandPowder, payload];
+    }
+    case NEED_DELETE_WAREHOUSE_SAND_POWDER_SOCKET: {
+      const result = warehouseSandPowder.filter((el) => el.id !== payload);
+      return result;
+    }
+    case NEED_UPDATE_WAREHOUSE_SAND_POWDER_SOCKET: {
+      const result = warehouseSandPowder.map((el) => {
+        if (el.id === payload[1]?.id) return payload[1];
+        return el;
+      });
+      return result;
+    }
+    default:
+      return warehouseSandPowder;
   }
 };

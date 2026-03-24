@@ -132,8 +132,23 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          page_name: 'raw_materials_warehouse_add',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          page_name: 'raw_materials_warehouse_add_sand_slurry',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          page_name: 'raw_materials_warehouse_files_actions',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
-      {}
+      {},
     );
   },
 

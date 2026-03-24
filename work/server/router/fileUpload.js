@@ -65,11 +65,64 @@ fileUpload.post('/upload', (req, res) => {
   });
 });
 
+// Dynamic upload
+
+fileUpload.post('/upload/:filePath', (req, res) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>fileUpload upload');
+
+  // Получаем путь из параметра и декодируем (на случай спецсимволов)
+  const folderPath = decodeURIComponent(req.params.filePath);
+
+  // Безопасность: убираем потенциально опасные символы (../ и т.д.)
+  const safePath = folderPath.replace(/[<>:"|?*]|[.]{2,}/g, '');
+
+  // Полный путь к папке
+  const fullPath = path.join('./uploads', safePath);
+
+  // Создаём папку рекурсивно, если не существует
+  if (!fs.existsSync(fullPath)) {
+    fs.mkdirSync(fullPath, { recursive: true });
+  }
+
+  // Настраиваем multer с динамическим destination
+  const dynamicUpload = multer({
+    storage: multer.diskStorage({
+      destination: fullPath,
+      filename: (req, file, cb) => {
+        cb(null, file.originalname);
+      },
+    }),
+    limits: { fileSize: 50000000 }, // 10MB
+  }).single('myFile');
+
+  dynamicUpload(req, res, (err) => {
+    if (err) {
+      console.error(err.message);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    if (!req.file) {
+      return res.status(400).send('No file selected!');
+    }
+
+    return res.status(200).json({
+      message: 'File uploaded',
+      filename: req.file.filename,
+      path: `${safePath}/${req.file.filename}`,
+    });
+  });
+});
+
 // Download endpoint
 fileUpload.get('/download/:filename', (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>fileUpload download/:filename');
 
-  const filePath = path.resolve(__dirname, '..', 'uploads', req.params.filename);
+  const filePath = path.resolve(
+    __dirname,
+    '..',
+    'uploads',
+    req.params.filename,
+  );
   console.log(`Attempting to download file: ${filePath}`);
   res.download(filePath, (err) => {
     if (err) {

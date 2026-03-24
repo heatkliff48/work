@@ -33,7 +33,7 @@ const FileUpload = ({ type }) => {
 
       try {
         const res = await axios.post(
-          'http://localhost:3001/files/upload',
+          `${process.env.REACT_APP_URL}/files/upload`,
           formData,
           {
             headers: {

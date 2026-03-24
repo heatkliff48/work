@@ -25,12 +25,19 @@ import {
   autoclaveCalendarReducer,
   listOfOrderedProductionReducer,
 } from './listOfOrderedProductionReducer';
-import { lotesListBatchesReducer, lotesListCakesReducer } from './lotesListReducer';
+import {
+  lotesListBatchesReducer,
+  lotesListCakesReducer,
+} from './lotesListReducer';
 import { ordersReducer } from './orderReducer';
 import { orderToWarehouseReducer } from './orderToWarehouseReducer';
 import { pagesReducer } from './pagesReducer';
 import { productionBatchLogReducer } from './productionBatchLogReducer';
-import { compressionsQualityReducer, dimensionsQualityReducer, productionQualityReducer } from './productionQualityReducer';
+import {
+  compressionsQualityReducer,
+  dimensionsQualityReducer,
+  productionQualityReducer,
+} from './productionQualityReducer';
 import {
   anchorProductsOfOrdersReducer,
   dryMixedProductsOfOrdersReducer,
@@ -75,10 +82,16 @@ import {
   warehouseGypsumReducer,
   warehouseGypsumStoneReducer,
   warehouseLimeReducer,
+  warehousePalletsReducer,
+  warehousePlasticsReducer,
+  warehouseSandPowderReducer,
   warehouseSandReducer,
   warehouseSandSlurryReducer,
 } from './warehouseRawMaterialsReducer';
-import { warehouseReducer, rawMaterialsWarehouseReducer } from './warehouseReducer';
+import {
+  warehouseReducer,
+  rawMaterialsWarehouseReducer,
+} from './warehouseReducer';
 import { combineReducers } from 'redux';
 
 export const rootReducer = combineReducers({
@@ -145,6 +158,9 @@ export const rootReducer = combineReducers({
   warehouseGrindingBalls: warehouseGrindingBallsReducer,
   warehouseAAC: warehouseAACReducer,
   warehouseSandSlurry: warehouseSandSlurryReducer,
+  warehousePallets: warehousePalletsReducer,
+  warehousePlastics: warehousePlasticsReducer,
+  warehouseSandPowder: warehouseSandPowderReducer,
   lotesListBatches: lotesListBatchesReducer,
   lotesListCakes: lotesListCakesReducer,
   contactPriceInfo: contactPriceInfoReducer,

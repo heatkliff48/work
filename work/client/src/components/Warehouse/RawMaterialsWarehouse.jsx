@@ -14,10 +14,12 @@ import {
   getWarehouseGypsum,
   getWarehouseGypsumStone,
   getWarehouseLime,
+  getWarehousePallets,
+  getWarehousePlastics,
   getWarehouseSand,
+  getWarehouseSandPowder,
   getWarehouseSandSlurry,
 } from '#components/redux/actions/warehouseRawMaterialsAction.js';
-import RawMaterialsWarehouseAddSandSlurry from './RawMaterialsWarehouseAddSandSlurry';
 
 function Warehouse() {
   const { COLUMNS_RAW_MATERIALS_WAREHOUSE, raw_materials_warehouse } =
@@ -29,15 +31,16 @@ function Warehouse() {
   const dispatch = useDispatch();
 
   const [modalShow, setModalShow] = useState(false);
-  const [sandSlurryModal, setSandSlurryModal] = useState(false);
   const [materialType, setMaterialType] = useState('');
 
   const handleRowClick = useCallback((row) => {
-    setMaterialType(row.original.material_type.replace(/, kg$/, '').trim());
+    setMaterialType(row.original.material_type.replace(/, .*$/, '').trim());
     // setWarehouseInfoCurIdModal(row.original.id);
     // setWarehouseInfoModal(!warehouseInfoModal);
     row.original.material_type !== 'Return slurry (dry), kg' &&
       setModalShow(true);
+    const access = checkUserAccess(user, roles, 'raw_materials_warehouse_add');
+    console.log(access);
   }, []);
 
   useEffect(() => {
@@ -62,11 +65,17 @@ function Warehouse() {
     dispatch(getWarehouseGrindingBalls());
     dispatch(getWarehouseAAC());
     dispatch(getWarehouseSandSlurry());
+    dispatch(getWarehousePallets());
+    dispatch(getWarehousePlastics());
+    dispatch(getWarehouseSandPowder());
   }, []);
 
   const modifiedData = raw_materials_warehouse.map((item) => ({
     ...item,
-    material_type: `${item.material_type}, kg`,
+    material_type:
+      item.material_type == 'Pallets'
+        ? `${item.material_type}, pieces`
+        : `${item.material_type}, kg`,
   }));
 
   return (
@@ -81,20 +90,13 @@ function Warehouse() {
         userAccess={userAccess}
         tableName={'Raw Materials Warehouse'}
         handleRowClick={handleRowClick}
-        onClickButton={() => {
-          setSandSlurryModal(!sandSlurryModal);
-        }}
-        buttonText={'Add sand slurry (dry)'}
       />
       <RawMaterialsWarehouseInfo
         show={modalShow}
         onHide={() => setModalShow(false)}
         material_type={materialType}
       />
-      <RawMaterialsWarehouseAddSandSlurry
-        show={sandSlurryModal}
-        onHide={() => setSandSlurryModal(false)}
-      />
+
       {/* <ListOfReservedAuxilaryModal
         show={modalShow}
         onHide={() => setModalShow(false)}

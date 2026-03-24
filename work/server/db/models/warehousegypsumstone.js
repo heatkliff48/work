@@ -17,11 +17,12 @@ module.exports = (sequelize, DataTypes) => {
       quantity: DataTypes.FLOAT,
       quality: DataTypes.FLOAT,
       date: DataTypes.STRING,
+      file_name: DataTypes.STRING,
     },
     {
       sequelize,
       modelName: 'WarehouseGypsumStone',
-    }
+    },
   );
   return WarehouseGypsumStone;
 };
