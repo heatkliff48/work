@@ -172,11 +172,11 @@ function RawMaterialsWarehouseInfo(props) {
       accessor: 'aac_scrap',
       Filter: TextSearchFilter,
     },
-    // {
-    //   Header: 'Portion size',
-    //   accessor: 'portion_size',
-    //   Filter: TextSearchFilter,
-    // },
+    {
+      Header: 'Residue on the sieve',
+      accessor: 'portion_size',
+      Filter: TextSearchFilter,
+    },
     {
       Header: 'Date',
       accessor: 'date',
@@ -274,7 +274,7 @@ function RawMaterialsWarehouseInfo(props) {
                 'raw_materials_warehouse_add_sand_slurry',
               )}
               tableName={props?.material_type}
-              handleRowClick={() => {}}
+              handleRowClick={handleRowClick}
               onClickButton={() => {
                 setSandSlurryModal(!sandSlurryModal);
               }}

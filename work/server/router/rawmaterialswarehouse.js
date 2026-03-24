@@ -1953,12 +1953,12 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/sand_slurry/update', async (req, res) => {
-  const { id, file_name } = req.body;
+  const { id, file_name, portion_size } = req.body;
 
   try {
-    if (file_name != '-1') {
+    if (!file_name) {
       const warehouseSandSlurry = await WarehouseSandSlurry.update(
-        { file_name },
+        { portion_size },
         {
           where: { id },
           returning: true,
@@ -1968,16 +1968,35 @@ rawMaterialsWarehouseRouter.post('/sand_slurry/update', async (req, res) => {
       myEmitter.emit(UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET, warehouseSandSlurry);
       return res.json(warehouseSandSlurry).status(200);
     } else {
-      const warehouseSandSlurry = await WarehouseSandSlurry.update(
-        { file_name: null },
-        {
-          where: { id },
-          returning: true,
-          plain: true,
-        },
-      );
-      myEmitter.emit(UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET, warehouseSandSlurry);
-      return res.json(warehouseSandSlurry).status(200);
+      if (file_name != '-1') {
+        const warehouseSandSlurry = await WarehouseSandSlurry.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(
+          UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
+          warehouseSandSlurry,
+        );
+        return res.json(warehouseSandSlurry).status(200);
+      } else {
+        const warehouseSandSlurry = await WarehouseSandSlurry.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(
+          UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
+          warehouseSandSlurry,
+        );
+        return res.json(warehouseSandSlurry).status(200);
+      }
     }
   } catch (err) {
     console.error(err.message);
