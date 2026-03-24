@@ -11,6 +11,9 @@ const {
   WarehouseGrindingBalls,
   WarehouseAAC,
   WarehouseSandSlurry,
+  WarehousePallet,
+  WarehousePlastic,
+  WarehouseSandPowder,
 } = require('../db/models/index.js');
 const { Sequelize } = require('sequelize');
 
@@ -45,6 +48,16 @@ const {
   UPDATE_WAREHOUSE_AAC_SOCKET,
   DELETE_WAREHOUSE_AAC_SOCKET,
   ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
+  ADD_NEW_WAREHOUSE_PALLETS_SOCKET,
+  UPDATE_WAREHOUSE_PALLETS_SOCKET,
+  DELETE_WAREHOUSE_PALLETS_SOCKET,
+  ADD_NEW_WAREHOUSE_PLASTICS_SOCKET,
+  UPDATE_WAREHOUSE_PLASTICS_SOCKET,
+  DELETE_WAREHOUSE_PLASTICS_SOCKET,
+  ADD_NEW_WAREHOUSE_SAND_POWDER_SOCKET,
+  UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
+  DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 const { Op } = require('sequelize');
@@ -124,16 +137,11 @@ rawMaterialsWarehouseRouter.get('/', async (req, res) => {
 */
 
 rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
-  const { materials, portion_size, date } = req.body;
+  const { materials, date } = req.body;
 
   if (!Array.isArray(materials) || !materials.length)
     return res.status(400).json({
       error: 'The materials field is required and must be a non-empty array.',
-    });
-
-  if (!portion_size)
-    return res.status(400).json({
-      error: 'Portion size is required!',
     });
 
   const t = await sequelize.transaction();
@@ -143,7 +151,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
 
     const materialConsumption = materials.reduce((acc, m) => {
       const type = m.type;
-      const quantity = Number(m.quantity || 0) * 1000;
+      const quantity = Number(m.quantity || 0);
       acc[type] = (acc[type] || 0) + quantity;
       return acc;
     }, {});
@@ -285,7 +293,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
       0,
     );
 
-    const sandSlurryQuantity = totalAllMaterials * portion_size * 10;
+    const sandSlurryQuantity = totalAllMaterials;
 
     const [updatedSandSlurryRows] = await RawMaterialsWarehouse.update(
       {
@@ -615,31 +623,57 @@ rawMaterialsWarehouseRouter.post('/sand', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/sand/update', async (req, res) => {
-  const { supplier, ...updateFields } = req.body;
+  const { id, file_name, supplier, ...updateFields } = req.body;
 
   try {
-    if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseSand = await WarehouseSand.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_SAND_SOCKET, warehouseSand);
+      return res.json(warehouseSand).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseSand = await WarehouseSand.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_SAND_SOCKET, warehouseSand);
+        return res.json(warehouseSand).status(200);
+      } else {
+        const warehouseSand = await WarehouseSand.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_SAND_SOCKET, warehouseSand);
+        return res.json(warehouseSand).status(200);
+      }
     }
-
-    const updateData = Object.fromEntries(
-      Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
-    );
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
-    }
-
-    const warehouseSand = await WarehouseSand.update(updateData, {
-      where: { supplier },
-      returning: true,
-      plain: true,
-    });
-
-    myEmitter.emit(UPDATE_WAREHOUSE_SAND_SOCKET, warehouseSand);
-    return res.json(warehouseSand).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -732,31 +766,57 @@ rawMaterialsWarehouseRouter.post('/lime', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/lime/update', async (req, res) => {
-  const { supplier, ...updateFields } = req.body;
+  const { id, file_name, supplier, ...updateFields } = req.body;
 
   try {
-    if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseLime = await WarehouseLime.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_LIME_SOCKET, warehouseLime);
+      return res.json(warehouseLime).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseLime = await WarehouseLime.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_LIME_SOCKET, warehouseLime);
+        return res.json(warehouseLime).status(200);
+      } else {
+        const warehouseLime = await WarehouseLime.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_LIME_SOCKET, warehouseLime);
+        return res.json(warehouseLime).status(200);
+      }
     }
-
-    const updateData = Object.fromEntries(
-      Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
-    );
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
-    }
-
-    const warehouseLime = await WarehouseLime.update(updateData, {
-      where: { supplier },
-      returning: true,
-      plain: true,
-    });
-
-    myEmitter.emit(UPDATE_WAREHOUSE_LIME_SOCKET, warehouseLime);
-    return res.json(warehouseLime).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -849,31 +909,57 @@ rawMaterialsWarehouseRouter.post('/cement', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/cement/update', async (req, res) => {
-  const { supplier, ...updateFields } = req.body;
+  const { id, file_name, supplier, ...updateFields } = req.body;
 
   try {
-    if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseCement = await WarehouseCement.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_CEMENT_SOCKET, warehouseCement);
+      return res.json(warehouseCement).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseCement = await WarehouseCement.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_CEMENT_SOCKET, warehouseCement);
+        return res.json(warehouseCement).status(200);
+      } else {
+        const warehouseCement = await WarehouseCement.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_CEMENT_SOCKET, warehouseCement);
+        return res.json(warehouseCement).status(200);
+      }
     }
-
-    const updateData = Object.fromEntries(
-      Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
-    );
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
-    }
-
-    const warehouseCement = await WarehouseCement.update(updateData, {
-      where: { supplier },
-      returning: true,
-      plain: true,
-    });
-
-    myEmitter.emit(UPDATE_WAREHOUSE_CEMENT_SOCKET, warehouseCement);
-    return res.json(warehouseCement).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -965,31 +1051,57 @@ rawMaterialsWarehouseRouter.post('/gypsum', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/gypsum/update', async (req, res) => {
-  const { supplier, ...updateFields } = req.body;
+  const { id, file_name, supplier, ...updateFields } = req.body;
 
   try {
-    if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseGypsum = await WarehouseGypsum.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_SOCKET, warehouseGypsum);
+      return res.json(warehouseGypsum).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseGypsum = await WarehouseGypsum.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_SOCKET, warehouseGypsum);
+        return res.json(warehouseGypsum).status(200);
+      } else {
+        const warehouseGypsum = await WarehouseGypsum.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_SOCKET, warehouseGypsum);
+        return res.json(warehouseGypsum).status(200);
+      }
     }
-
-    const updateData = Object.fromEntries(
-      Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
-    );
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
-    }
-
-    const warehouseGypsum = await WarehouseGypsum.update(updateData, {
-      where: { supplier },
-      returning: true,
-      plain: true,
-    });
-
-    myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_SOCKET, warehouseGypsum);
-    return res.json(warehouseGypsum).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -1081,31 +1193,69 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/gypsum-stone/update', async (req, res) => {
-  const { supplier, ...updateFields } = req.body;
+  const { id, file_name, supplier, ...updateFields } = req.body;
 
   try {
-    if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseGypsumStone = await WarehouseGypsumStone.update(
+        updateData,
+        {
+          where: { supplier },
+          returning: true,
+          plain: true,
+        },
+      );
+
+      myEmitter.emit(
+        UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+        warehouseGypsumStone,
+      );
+      return res.json(warehouseGypsumStone).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseGypsumStone = await WarehouseGypsumStone.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(
+          UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+          warehouseGypsumStone,
+        );
+        return res.json(warehouseGypsumStone).status(200);
+      } else {
+        const warehouseGypsumStone = await WarehouseGypsumStone.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(
+          UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
+          warehouseGypsumStone,
+        );
+        return res.json(warehouseGypsumStone).status(200);
+      }
     }
-
-    const updateData = Object.fromEntries(
-      Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
-    );
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
-    }
-
-    const warehouseGypsumStone = await WarehouseGypsumStone.update(updateData, {
-      where: { supplier },
-      returning: true,
-      plain: true,
-    });
-
-    myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET, warehouseGypsumStone);
-    return res.json(warehouseGypsumStone).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -1203,31 +1353,57 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/aluminum1/update', async (req, res) => {
-  const { supplier, ...updateFields } = req.body;
+  const { id, file_name, supplier, ...updateFields } = req.body;
 
   try {
-    if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseAluminum1 = await WarehouseAluminum1.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM1_SOCKET, warehouseAluminum1);
+      return res.json(warehouseAluminum1).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseAluminum1 = await WarehouseAluminum1.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM1_SOCKET, warehouseAluminum1);
+        return res.json(warehouseAluminum1).status(200);
+      } else {
+        const warehouseAluminum1 = await WarehouseAluminum1.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM1_SOCKET, warehouseAluminum1);
+        return res.json(warehouseAluminum1).status(200);
+      }
     }
-
-    const updateData = Object.fromEntries(
-      Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
-    );
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
-    }
-
-    const warehouseAluminum1 = await WarehouseAluminum1.update(updateData, {
-      where: { supplier },
-      returning: true,
-      plain: true,
-    });
-
-    myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM1_SOCKET, warehouseAluminum1);
-    return res.json(warehouseAluminum1).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -1320,31 +1496,57 @@ rawMaterialsWarehouseRouter.post('/aluminum2', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/aluminum2/update', async (req, res) => {
-  const { supplier, ...updateFields } = req.body;
+  const { id, file_name, supplier, ...updateFields } = req.body;
 
   try {
-    if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseAluminum2 = await WarehouseAluminum2.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM2_SOCKET, warehouseAluminum2);
+      return res.json(warehouseAluminum2).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseAluminum2 = await WarehouseAluminum2.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM2_SOCKET, warehouseAluminum2);
+        return res.json(warehouseAluminum2).status(200);
+      } else {
+        const warehouseAluminum2 = await WarehouseAluminum2.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM2_SOCKET, warehouseAluminum2);
+        return res.json(warehouseAluminum2).status(200);
+      }
     }
-
-    const updateData = Object.fromEntries(
-      Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
-    );
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
-    }
-
-    const warehouseAluminum2 = await WarehouseAluminum2.update(updateData, {
-      where: { supplier },
-      returning: true,
-      plain: true,
-    });
-
-    myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM2_SOCKET, warehouseAluminum2);
-    return res.json(warehouseAluminum2).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -1443,37 +1645,69 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/grinding-balls/update', async (req, res) => {
-  const { supplier, ...updateFields } = req.body;
+  const { id, file_name, supplier, ...updateFields } = req.body;
 
   try {
-    if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseGrindingBalls = await WarehouseGrindingBalls.update(
+        updateData,
+        {
+          where: { supplier },
+          returning: true,
+          plain: true,
+        },
+      );
+
+      myEmitter.emit(
+        UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+        warehouseGrindingBalls,
+      );
+      return res.json(warehouseGrindingBalls).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseGrindingBalls = await WarehouseGrindingBalls.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(
+          UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+          warehouseGrindingBalls,
+        );
+        return res.json(warehouseGrindingBalls).status(200);
+      } else {
+        const warehouseGrindingBalls = await WarehouseGrindingBalls.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(
+          UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
+          warehouseGrindingBalls,
+        );
+        return res.json(warehouseGrindingBalls).status(200);
+      }
     }
-
-    const updateData = Object.fromEntries(
-      Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
-    );
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
-    }
-
-    const warehouseGrindingBalls = await WarehouseGrindingBalls.update(
-      updateData,
-      {
-        where: { supplier },
-        returning: true,
-        plain: true,
-      },
-    );
-
-    myEmitter.emit(
-      UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
-      warehouseGrindingBalls,
-    );
-    return res.json(warehouseGrindingBalls).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -1570,31 +1804,57 @@ rawMaterialsWarehouseRouter.post('/aac', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/aac/update', async (req, res) => {
-  const { supplier, ...updateFields } = req.body;
+  const { id, file_name, supplier, ...updateFields } = req.body;
 
   try {
-    if (!supplier) {
-      return res.status(400).json({ message: 'Supplier is required' });
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseAAC = await WarehouseAAC.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_AAC_SOCKET, warehouseAAC);
+      return res.json(warehouseAAC).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseAAC = await WarehouseAAC.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_AAC_SOCKET, warehouseAAC);
+        return res.json(warehouseAAC).status(200);
+      } else {
+        const warehouseAAC = await WarehouseAAC.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_AAC_SOCKET, warehouseAAC);
+        return res.json(warehouseAAC).status(200);
+      }
     }
-
-    const updateData = Object.fromEntries(
-      Object.entries(updateFields).filter(
-        ([_, value]) => value !== undefined && value !== null,
-      ),
-    );
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: 'No valid fields to update' });
-    }
-
-    const warehouseAAC = await WarehouseAAC.update(updateData, {
-      where: { supplier },
-      returning: true,
-      plain: true,
-    });
-
-    myEmitter.emit(UPDATE_WAREHOUSE_AAC_SOCKET, warehouseAAC);
-    return res.json(warehouseAAC).status(200);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
@@ -1628,15 +1888,8 @@ rawMaterialsWarehouseRouter.get('/sand_slurry', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
-  const {
-    sand,
-    gypsum_stone,
-    water,
-    grinding_balls,
-    aac_scrap,
-    portion_size,
-    date,
-  } = req.body;
+  const { sand, gypsum_stone, water, grinding_balls, aac_scrap, date } =
+    req.body;
 
   try {
     const materialsToCheck = [
@@ -1688,7 +1941,6 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
       water,
       grinding_balls,
       aac_scrap,
-      portion_size,
       date: formatDate(date),
     });
 
@@ -1697,6 +1949,477 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
   } catch (err) {
     console.error(err.message);
     return res.status(500).json(err);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/sand_slurry/update', async (req, res) => {
+  const { id, file_name } = req.body;
+
+  try {
+    if (file_name != '-1') {
+      const warehouseSandSlurry = await WarehouseSandSlurry.update(
+        { file_name },
+        {
+          where: { id },
+          returning: true,
+          plain: true,
+        },
+      );
+      myEmitter.emit(UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET, warehouseSandSlurry);
+      return res.json(warehouseSandSlurry).status(200);
+    } else {
+      const warehouseSandSlurry = await WarehouseSandSlurry.update(
+        { file_name: null },
+        {
+          where: { id },
+          returning: true,
+          plain: true,
+        },
+      );
+      myEmitter.emit(UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET, warehouseSandSlurry);
+      return res.json(warehouseSandSlurry).status(200);
+    }
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+// Pallets
+
+rawMaterialsWarehouseRouter.get('/pallets', async (req, res) => {
+  try {
+    const warehousePallets = await WarehousePallet.findAll({
+      order: [['id', 'ASC']],
+    });
+
+    return res.status(200).json({ warehousePallets });
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/pallets', async (req, res) => {
+  const { supplier, quantity, date } = req.body;
+
+  try {
+    const warehousePallets = await WarehousePallet.create({
+      supplier,
+      quantity,
+      date: formatDate(date),
+    });
+
+    const totalPalletsQuantity = await WarehousePallet.sum('quantity');
+
+    const allRecords = await WarehousePallet.findAll({
+      attributes: ['date'],
+    });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
+
+    // Используем дату из последней записи или текущую дату, если записей нет
+    const lastUpdated = latestRecord ? latestRecord.date : new Date();
+
+    const record = await RawMaterialsWarehouse.findOne({
+      where: {
+        material_type: 'Pallets',
+      },
+    });
+
+    await RawMaterialsWarehouse.update(
+      {
+        remaining_quantity: totalPalletsQuantity - record.consumed_quantity,
+        last_updated: lastUpdated,
+      },
+      {
+        where: {
+          material_type: 'Pallets',
+        },
+      },
+    );
+
+    myEmitter.emit(ADD_NEW_WAREHOUSE_PALLETS_SOCKET, warehousePallets);
+    const updatedWarehouse = await RawMaterialsWarehouse.findOne({
+      where: { material_type: 'Pallets' },
+    });
+    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
+    return res.json(warehousePallets).status(200);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/pallets/update', async (req, res) => {
+  const { id, file_name, supplier, ...updateFields } = req.body;
+
+  try {
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehousePallets = await WarehousePallet.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_PALLETS_SOCKET, warehousePallets);
+      return res.json(warehousePallets).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehousePallets = await WarehousePallet.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_PALLETS_SOCKET, warehousePallets);
+        return res.json(warehousePallets).status(200);
+      } else {
+        const warehousePallets = await WarehousePallet.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_PALLETS_SOCKET, warehousePallets);
+        return res.json(warehousePallets).status(200);
+      }
+    }
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/pallets/delete', async (req, res) => {
+  const { pallets_warehouse_id } = req.body;
+
+  try {
+    await WarehouseAAC.destroy({ where: { id: pallets_warehouse_id } });
+
+    myEmitter.emit(DELETE_WAREHOUSE_PALLETS_SOCKET, pallets_warehouse_id);
+    return res.json(pallets_warehouse_id).status(200);
+  } catch (err) {
+    return ErrorUtils.catchError(res, err);
+  }
+});
+
+// Plastics
+
+rawMaterialsWarehouseRouter.get('/plastics', async (req, res) => {
+  try {
+    const warehousePlastics = await WarehousePlastic.findAll({
+      order: [['id', 'ASC']],
+    });
+
+    return res.status(200).json({ warehousePlastics });
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/plastics', async (req, res) => {
+  const { supplier, quantity, date } = req.body;
+
+  try {
+    const warehousePlastics = await WarehousePlastic.create({
+      supplier,
+      quantity,
+      date: formatDate(date),
+    });
+
+    const totalPlasticsQuantity = await WarehousePlastic.sum('quantity');
+
+    const allRecords = await WarehousePlastic.findAll({
+      attributes: ['date'],
+    });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
+
+    // Используем дату из последней записи или текущую дату, если записей нет
+    const lastUpdated = latestRecord ? latestRecord.date : new Date();
+
+    const record = await RawMaterialsWarehouse.findOne({
+      where: {
+        material_type: 'Plastics',
+      },
+    });
+
+    await RawMaterialsWarehouse.update(
+      {
+        remaining_quantity: totalPlasticsQuantity - record.consumed_quantity,
+        last_updated: lastUpdated,
+      },
+      {
+        where: {
+          material_type: 'Plastics',
+        },
+      },
+    );
+
+    myEmitter.emit(ADD_NEW_WAREHOUSE_PLASTICS_SOCKET, warehousePlastics);
+    const updatedWarehouse = await RawMaterialsWarehouse.findOne({
+      where: { material_type: 'Plastics' },
+    });
+    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
+    return res.json(warehousePlastics).status(200);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/plastics/update', async (req, res) => {
+  const { id, file_name, supplier, ...updateFields } = req.body;
+
+  try {
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehousePlastics = await WarehousePlastic.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_PLASTICS_SOCKET, warehousePlastics);
+      return res.json(warehousePlastics).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehousePlastics = await WarehousePlastic.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_PLASTICS_SOCKET, warehousePlastics);
+        return res.json(warehousePlastics).status(200);
+      } else {
+        const warehousePlastics = await WarehousePlastic.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_PLASTICS_SOCKET, warehousePlastics);
+        return res.json(warehousePlastics).status(200);
+      }
+    }
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/plastics/delete', async (req, res) => {
+  const { plastics_warehouse_id } = req.body;
+
+  try {
+    await WarehouseAAC.destroy({ where: { id: plastics_warehouse_id } });
+
+    myEmitter.emit(DELETE_WAREHOUSE_PLASTICS_SOCKET, plastics_warehouse_id);
+    return res.json(plastics_warehouse_id).status(200);
+  } catch (err) {
+    return ErrorUtils.catchError(res, err);
+  }
+});
+
+// Sand Powder
+
+rawMaterialsWarehouseRouter.get('/sand-powder', async (req, res) => {
+  try {
+    const warehouseSandPowder = await WarehouseSandPowder.findAll({
+      order: [['id', 'ASC']],
+    });
+
+    return res.status(200).json({ warehouseSandPowder });
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/sand-powder', async (req, res) => {
+  const { supplier, quantity, date } = req.body;
+
+  try {
+    const warehouseSandPowder = await WarehouseSandPowder.create({
+      supplier,
+      quantity,
+      date: formatDate(date),
+    });
+
+    const totalSandPowderQuantity = await WarehouseSandPowder.sum('quantity');
+
+    const allRecords = await WarehouseSandPowder.findAll({
+      attributes: ['date'],
+    });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
+
+    // Используем дату из последней записи или текущую дату, если записей нет
+    const lastUpdated = latestRecord ? latestRecord.date : new Date();
+
+    const record = await RawMaterialsWarehouse.findOne({
+      where: {
+        material_type: 'Sand powder (dry)',
+      },
+    });
+
+    await RawMaterialsWarehouse.update(
+      {
+        remaining_quantity: totalSandPowderQuantity - record.consumed_quantity,
+        last_updated: lastUpdated,
+      },
+      {
+        where: {
+          material_type: 'Sand powder (dry)',
+        },
+      },
+    );
+
+    myEmitter.emit(ADD_NEW_WAREHOUSE_SAND_POWDER_SOCKET, warehouseSandPowder);
+    const updatedWarehouse = await RawMaterialsWarehouse.findOne({
+      where: { material_type: 'Sand powder (dry)' },
+    });
+    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
+    return res.json(warehouseSandPowder).status(200);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/sand-powder/update', async (req, res) => {
+  const { id, file_name, supplier, ...updateFields } = req.body;
+
+  try {
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseSandPowder = await WarehouseSandPowder.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_SAND_POWDER_SOCKET, warehouseSandPowder);
+      return res.json(warehouseSandPowder).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseSandPowder = await WarehouseSandPowder.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(
+          UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
+          warehouseSandPowder,
+        );
+        return res.json(warehouseSandPowder).status(200);
+      } else {
+        const warehouseSandPowder = await WarehouseSandPowder.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(
+          UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
+          warehouseSandPowder,
+        );
+        return res.json(warehouseSandPowder).status(200);
+      }
+    }
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/sand-powder/delete', async (req, res) => {
+  const { sand_powder_warehouse_id } = req.body;
+
+  try {
+    await WarehouseAAC.destroy({ where: { id: sand_powder_warehouse_id } });
+
+    myEmitter.emit(
+      DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+      sand_powder_warehouse_id,
+    );
+    return res.json(sand_powder_warehouse_id).status(200);
+  } catch (err) {
+    return ErrorUtils.catchError(res, err);
   }
 });
 

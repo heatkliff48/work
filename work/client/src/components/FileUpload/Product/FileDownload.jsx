@@ -14,7 +14,7 @@ const FileDownload = () => {
     e.preventDefault();
     try {
       const res = await axios.get(
-        `http://localhost:3001/files/download/${selectedFile}`,
+        `${process.env.REACT_APP_URL}/files/download/${selectedFile}`,
         {
           responseType: 'blob',
         },

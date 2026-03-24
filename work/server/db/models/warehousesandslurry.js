@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       aac_scrap: DataTypes.FLOAT,
       portion_size: DataTypes.FLOAT,
       date: DataTypes.STRING,
+      file_name: DataTypes.STRING,
     },
     {
       sequelize,

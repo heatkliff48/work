@@ -144,6 +144,16 @@ import {
   addNewCompressionsQualitySocket,
   updateCompressionsQualitySocket,
   updateDimensionsQualitySocket,
+  updateWarehouseSandSlurrySocket,
+  addNewWarehousePalletsSocket,
+  updateWarehousePalletsSocket,
+  deleteWarehousePalletsSocket,
+  updateWarehousePlasticsSocket,
+  deleteWarehousePlasticsSocket,
+  addNewWarehousePlasticsSocket,
+  addNewWarehouseSandPowderSocket,
+  updateWarehouseSandPowderSocket,
+  deleteWarehouseSandPowderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -333,6 +343,16 @@ import {
   ADD_NEW_COMPRESSIONS_QUALITY_SOCKET,
   UPDATE_COMPRESSIONS_QUALITY_SOCKET,
   UPDATE_DIMENSIONS_QUALITY_SOCKET,
+  UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
+  ADD_NEW_WAREHOUSE_PALLETS_SOCKET,
+  UPDATE_WAREHOUSE_PALLETS_SOCKET,
+  DELETE_WAREHOUSE_PALLETS_SOCKET,
+  ADD_NEW_WAREHOUSE_PLASTICS_SOCKET,
+  UPDATE_WAREHOUSE_PLASTICS_SOCKET,
+  DELETE_WAREHOUSE_PLASTICS_SOCKET,
+  ADD_NEW_WAREHOUSE_SAND_POWDER_SOCKET,
+  UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
+  DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -933,6 +953,46 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET:
       dispatch(addNewWarehouseSandSlurrySocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET:
+      dispatch(updateWarehouseSandSlurrySocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_PALLETS_SOCKET:
+      dispatch(addNewWarehousePalletsSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_PALLETS_SOCKET:
+      dispatch(updateWarehousePalletsSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_PALLETS_SOCKET:
+      dispatch(deleteWarehousePalletsSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_PLASTICS_SOCKET:
+      dispatch(addNewWarehousePlasticsSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_PLASTICS_SOCKET:
+      dispatch(updateWarehousePlasticsSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_PLASTICS_SOCKET:
+      dispatch(deleteWarehousePlasticsSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_SAND_POWDER_SOCKET:
+      dispatch(addNewWarehouseSandPowderSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_SAND_POWDER_SOCKET:
+      dispatch(updateWarehouseSandPowderSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_SAND_POWDER_SOCKET:
+      dispatch(deleteWarehouseSandPowderSocket(payload));
       break;
 
     case ADD_NEW_LOTES_LIST_SOCKET:
