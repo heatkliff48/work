@@ -77,6 +77,32 @@ import {
   NEW_WAREHOUSE_SAND_SLURRY,
   GET_FULL_WAREHOUSE_SAND_SLURRY,
   ADD_NEW_WAREHOUSE_SAND_SLURRY,
+  UPDATE_WAREHOUSE_SAND_SLURRY,
+  UPDATE_NEW_WAREHOUSE_SAND_SLURRY,
+  FULL_WAREHOUSE_PALLETS,
+  NEW_WAREHOUSE_PALLETS,
+  GET_FULL_WAREHOUSE_PALLETS,
+  ADD_NEW_WAREHOUSE_PALLETS,
+  DELETE_WAREHOUSE_PALLETS,
+  UPDATE_NEW_WAREHOUSE_PALLETS,
+  NEED_DELETE_WAREHOUSE_PALLETS,
+  UPDATE_WAREHOUSE_PALLETS,
+  FULL_WAREHOUSE_PLASTICS,
+  NEW_WAREHOUSE_PLASTICS,
+  NEED_DELETE_WAREHOUSE_PLASTICS,
+  UPDATE_WAREHOUSE_PLASTICS,
+  GET_FULL_WAREHOUSE_PLASTICS,
+  ADD_NEW_WAREHOUSE_PLASTICS,
+  DELETE_WAREHOUSE_PLASTICS,
+  UPDATE_NEW_WAREHOUSE_PLASTICS,
+  FULL_WAREHOUSE_SAND_POWDER,
+  NEW_WAREHOUSE_SAND_POWDER,
+  NEED_DELETE_WAREHOUSE_SAND_POWDER,
+  UPDATE_WAREHOUSE_SAND_POWDER,
+  GET_FULL_WAREHOUSE_SAND_POWDER,
+  ADD_NEW_WAREHOUSE_SAND_POWDER,
+  DELETE_WAREHOUSE_SAND_POWDER,
+  UPDATE_NEW_WAREHOUSE_SAND_POWDER,
 } from '../types/warehouseRawMaterialsTypes';
 import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
@@ -559,6 +585,167 @@ const addNewWarehouseSandSlurry = (warehouseSandSlurry) => {
     });
 };
 
+const updateWarehouseSandSlurry = (warehouseSandSlurry) => {
+  return url
+    .post('/rawMaterialsWarehouse/sand_slurry/update', warehouseSandSlurry)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+// Plastics API functions
+const getWarehousePlastics = () => {
+  return url
+    .get('/rawMaterialsWarehouse/plastics')
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const addNewWarehousePlastics = (warehousePlastics) => {
+  return url
+    .post('/rawMaterialsWarehouse/plastics', warehousePlastics)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const deleteWarehousePlastics = (plastics_warehouse_id) => {
+  return url
+    .post('/rawMaterialsWarehouse/plastics/delete', { plastics_warehouse_id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updateWarehousePlastics = (warehousePlastics) => {
+  return url
+    .post('/rawMaterialsWarehouse/plastics/update', warehousePlastics)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+// Pallets API functions
+const getWarehousePallets = () => {
+  return url
+    .get('/rawMaterialsWarehouse/pallets')
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const addNewWarehousePallets = (warehousePallets) => {
+  return url
+    .post('/rawMaterialsWarehouse/pallets', warehousePallets)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const deleteWarehousePallets = (pallets_warehouse_id) => {
+  return url
+    .post('/rawMaterialsWarehouse/pallets/delete', { pallets_warehouse_id })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updateWarehousePallets = (warehousePallets) => {
+  return url
+    .post('/rawMaterialsWarehouse/pallets/update', warehousePallets)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+// Sand Powder API functions
+const getWarehouseSandPowder = () => {
+  return url
+    .get('/rawMaterialsWarehouse/sand-powder')
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const addNewWarehouseSandPowder = (warehouseSandPowder) => {
+  return url
+    .post('/rawMaterialsWarehouse/sand-powder', warehouseSandPowder)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const deleteWarehouseSandPowder = (sand_powder_warehouse_id) => {
+  return url
+    .post('/rawMaterialsWarehouse/sand-powder/delete', {
+      sand_powder_warehouse_id,
+    })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updateWarehouseSandPowder = (warehouseSandPowder) => {
+  return url
+    .post('/rawMaterialsWarehouse/sand-powder/update', warehouseSandPowder)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 // Sand Workers
 function* getWarehouseSandWorker(action) {
   try {
@@ -989,6 +1176,162 @@ function* addNewWarehouseSandSlurryWorker(action) {
   }
 }
 
+function* updateWarehouseSandSlurryWorker(action) {
+  try {
+    const { warehouseSandSlurry } = yield call(
+      updateWarehouseSandSlurry,
+      action.payload,
+    );
+    yield put({
+      type: UPDATE_WAREHOUSE_SAND_SLURRY,
+      payload: warehouseSandSlurry,
+    });
+  } catch (err) {
+    yield put({ type: UPDATE_WAREHOUSE_SAND_SLURRY, payload: [] });
+  }
+}
+
+// Pallets Workers
+function* getWarehousePalletsWorker(action) {
+  try {
+    const { warehousePallets } = yield call(getWarehousePallets);
+    yield put({ type: FULL_WAREHOUSE_PALLETS, payload: warehousePallets });
+  } catch (err) {
+    yield put({ type: FULL_WAREHOUSE_PALLETS, payload: [] });
+  }
+}
+
+function* addNewWarehousePalletsWorker(action) {
+  try {
+    const { warehousePallets } = yield call(
+      addNewWarehousePallets,
+      action.payload,
+    );
+    yield put({ type: NEW_WAREHOUSE_PALLETS, payload: warehousePallets });
+  } catch (err) {
+    yield put({ type: NEW_WAREHOUSE_PALLETS, payload: [] });
+  }
+}
+
+function* deleteWarehousePalletsWorker(action) {
+  try {
+    const { payload } = action;
+    yield call(deleteWarehousePallets, payload);
+    yield put({ type: NEED_DELETE_WAREHOUSE_PALLETS, payload });
+  } catch (err) {
+    yield put({ type: NEED_DELETE_WAREHOUSE_PALLETS, payload: [] });
+  }
+}
+
+function* updateWarehousePalletsWorker(action) {
+  try {
+    const { warehousePallets } = yield call(
+      updateWarehousePallets,
+      action.payload,
+    );
+    yield put({ type: UPDATE_WAREHOUSE_PALLETS, payload: warehousePallets });
+  } catch (err) {
+    yield put({ type: UPDATE_WAREHOUSE_PALLETS, payload: [] });
+  }
+}
+
+// Plastics Workers
+function* getWarehousePlasticsWorker(action) {
+  try {
+    const { warehousePlastics } = yield call(getWarehousePlastics);
+    yield put({ type: FULL_WAREHOUSE_PLASTICS, payload: warehousePlastics });
+  } catch (err) {
+    yield put({ type: FULL_WAREHOUSE_PLASTICS, payload: [] });
+  }
+}
+
+function* addNewWarehousePlasticsWorker(action) {
+  try {
+    const { warehousePlastics } = yield call(
+      addNewWarehousePlastics,
+      action.payload,
+    );
+    yield put({ type: NEW_WAREHOUSE_PLASTICS, payload: warehousePlastics });
+  } catch (err) {
+    yield put({ type: NEW_WAREHOUSE_PLASTICS, payload: [] });
+  }
+}
+
+function* deleteWarehousePlasticsWorker(action) {
+  try {
+    const { payload } = action;
+    yield call(deleteWarehousePlastics, payload);
+    yield put({ type: NEED_DELETE_WAREHOUSE_PLASTICS, payload });
+  } catch (err) {
+    yield put({ type: NEED_DELETE_WAREHOUSE_PLASTICS, payload: [] });
+  }
+}
+
+function* updateWarehousePlasticsWorker(action) {
+  try {
+    const { warehousePlastics } = yield call(
+      updateWarehousePlastics,
+      action.payload,
+    );
+    yield put({ type: UPDATE_WAREHOUSE_PLASTICS, payload: warehousePlastics });
+  } catch (err) {
+    yield put({ type: UPDATE_WAREHOUSE_PLASTICS, payload: [] });
+  }
+}
+
+// Sand Powder Workers
+function* getWarehouseSandPowderWorker(action) {
+  try {
+    const { warehouseSandPowder } = yield call(getWarehouseSandPowder);
+    yield put({
+      type: FULL_WAREHOUSE_SAND_POWDER,
+      payload: warehouseSandPowder,
+    });
+  } catch (err) {
+    yield put({ type: FULL_WAREHOUSE_SAND_POWDER, payload: [] });
+  }
+}
+
+function* addNewWarehouseSandPowderWorker(action) {
+  try {
+    const { warehouseSandPowder } = yield call(
+      addNewWarehouseSandPowder,
+      action.payload,
+    );
+    yield put({
+      type: NEW_WAREHOUSE_SAND_POWDER,
+      payload: warehouseSandPowder,
+    });
+  } catch (err) {
+    yield put({ type: NEW_WAREHOUSE_SAND_POWDER, payload: [] });
+  }
+}
+
+function* deleteWarehouseSandPowderWorker(action) {
+  try {
+    const { payload } = action;
+    yield call(deleteWarehouseSandPowder, payload);
+    yield put({ type: NEED_DELETE_WAREHOUSE_SAND_POWDER, payload });
+  } catch (err) {
+    yield put({ type: NEED_DELETE_WAREHOUSE_SAND_POWDER, payload: [] });
+  }
+}
+
+function* updateWarehouseSandPowderWorker(action) {
+  try {
+    const { warehouseSandPowder } = yield call(
+      updateWarehouseSandPowder,
+      action.payload,
+    );
+    yield put({
+      type: UPDATE_WAREHOUSE_SAND_POWDER,
+      payload: warehouseSandPowder,
+    });
+  } catch (err) {
+    yield put({ type: UPDATE_WAREHOUSE_SAND_POWDER, payload: [] });
+  }
+}
+
 // Watchers
 function* warehouseRawMaterialsWatcher() {
   // Sand
@@ -1083,6 +1426,43 @@ function* warehouseRawMaterialsWatcher() {
   yield takeLatest(
     ADD_NEW_WAREHOUSE_SAND_SLURRY,
     addNewWarehouseSandSlurryWorker,
+  );
+  yield takeLatest(
+    UPDATE_NEW_WAREHOUSE_SAND_SLURRY,
+    updateWarehouseSandSlurryWorker,
+  );
+
+  // Pallets
+  yield takeLatest(GET_FULL_WAREHOUSE_PALLETS, getWarehousePalletsWorker);
+  yield takeLatest(ADD_NEW_WAREHOUSE_PALLETS, addNewWarehousePalletsWorker);
+  yield takeLatest(DELETE_WAREHOUSE_PALLETS, deleteWarehousePalletsWorker);
+  yield takeLatest(UPDATE_NEW_WAREHOUSE_PALLETS, updateWarehousePalletsWorker);
+
+  // Plastics
+  yield takeLatest(GET_FULL_WAREHOUSE_PLASTICS, getWarehousePlasticsWorker);
+  yield takeLatest(ADD_NEW_WAREHOUSE_PLASTICS, addNewWarehousePlasticsWorker);
+  yield takeLatest(DELETE_WAREHOUSE_PLASTICS, deleteWarehousePlasticsWorker);
+  yield takeLatest(
+    UPDATE_NEW_WAREHOUSE_PLASTICS,
+    updateWarehousePlasticsWorker,
+  );
+
+  // SandPowder
+  yield takeLatest(
+    GET_FULL_WAREHOUSE_SAND_POWDER,
+    getWarehouseSandPowderWorker,
+  );
+  yield takeLatest(
+    ADD_NEW_WAREHOUSE_SAND_POWDER,
+    addNewWarehouseSandPowderWorker,
+  );
+  yield takeLatest(
+    DELETE_WAREHOUSE_SAND_POWDER,
+    deleteWarehouseSandPowderWorker,
+  );
+  yield takeLatest(
+    UPDATE_NEW_WAREHOUSE_SAND_POWDER,
+    updateWarehouseSandPowderWorker,
   );
 }
 

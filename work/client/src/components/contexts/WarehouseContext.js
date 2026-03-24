@@ -165,7 +165,7 @@ const WarehouseContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Remaining quantity, kg',
+      Header: 'Remaining quantity',
       accessor: 'remaining_quantity',
       sortType: 'number',
     },

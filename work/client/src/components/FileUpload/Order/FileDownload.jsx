@@ -4,7 +4,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useFileContext } from '#components/contexts/FileContext.js';
 
 const FileDownload = () => {
-  const { message, setMessage, filesOrder } = useFileContext()
+  const { message, setMessage, filesOrder } = useFileContext();
   const [selectedFile, setSelectedFile] = useState('');
   const [filteredFiles, setFilteredFiles] = useState(filesOrder);
   const { orderCartData } = useOrderContext();
@@ -13,10 +13,10 @@ const FileDownload = () => {
     e.preventDefault();
     try {
       const res = await axios.get(
-        `http://localhost:3001/files/download/${selectedFile}`,
+        `${process.env.REACT_APP_URL}/files/download/${selectedFile}`,
         {
           responseType: 'blob',
-        }
+        },
       );
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
@@ -31,7 +31,7 @@ const FileDownload = () => {
 
   useEffect(() => {
     const filteredFiles = filesOrder.filter(
-      (el) => el.order_id === orderCartData?.id
+      (el) => el.order_id === orderCartData?.id,
     );
     setFilteredFiles(filteredFiles);
   }, [filesOrder]);

@@ -27,12 +27,12 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
 
   const sand_slurry = [
     {
-      Header: 'Sand (dry), tonns total',
+      Header: 'Sand (dry), kg total',
       accessor: 'sand',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Gypsum stone, tonns total',
+      Header: 'Gypsum stone, kg total',
       accessor: 'gypsum_stone',
       Filter: TextSearchFilter,
     },
@@ -42,12 +42,12 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Grinding balls, tonns total',
+      Header: 'Grinding balls, kg total',
       accessor: 'grinding_balls',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'AAC scrap, tonns total',
+      Header: 'AAC scrap, kg total',
       accessor: 'aac',
       Filter: TextSearchFilter,
     },
@@ -111,10 +111,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       (parseFloat(sandSlurryWarehouseInput.grinding_balls) || 0) +
       (parseFloat(sandSlurryWarehouseInput.aac) || 0);
 
-    // const mixingHours = parseFloat(sandSlurryWarehouseInput.mixing_hours) || 0;
-    const portionSize = parseFloat(sandSlurryWarehouseInput.portion_size) || 0;
-
-    return (totalMaterials * portionSize * 10).toFixed(0); // return (totalMaterials * mixingHours * portionSize * 10).toFixed(0);
+    return totalMaterials.toFixed(0); // return (totalMaterials * mixingHours * portionSize * 10).toFixed(0);
   }, [sandSlurryWarehouseInput]);
 
   const validateForm = () => {
@@ -137,7 +134,11 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     sand_slurry.forEach(({ accessor }) => {
       const value = sandSlurryWarehouseInput?.[accessor];
 
-      if (value === null || value === undefined || String(value).trim() === '') {
+      if (
+        value === null ||
+        value === undefined ||
+        String(value).trim() === ''
+      ) {
         newErrors[accessor] = `This field is required`;
         return;
       }
@@ -148,19 +149,19 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       }
     });
 
-    const portionSizeValue = sandSlurryWarehouseInput?.portion_size;
-    if (
-      portionSizeValue === null ||
-      portionSizeValue === undefined ||
-      String(portionSizeValue).trim() === ''
-    ) {
-      newErrors.portion_size = `This field is required`;
-    } else {
-      const num = Number(portionSizeValue);
-      if (isNaN(num) || num <= 0) {
-        newErrors.portion_size = `This field must contain a positive number`;
-      }
-    }
+    // const portionSizeValue = sandSlurryWarehouseInput?.portion_size;
+    // if (
+    //   portionSizeValue === null ||
+    //   portionSizeValue === undefined ||
+    //   String(portionSizeValue).trim() === ''
+    // ) {
+    //   newErrors.portion_size = `This field is required`;
+    // } else {
+    //   const num = Number(portionSizeValue);
+    //   if (isNaN(num) || num <= 0) {
+    //     newErrors.portion_size = `This field must contain a positive number`;
+    //   }
+    // }
 
     const dateValue = sandSlurryWarehouseInput?.date;
     if (
@@ -219,9 +220,9 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
           // },
         ],
         // mixing_hours: parseFloat(sandSlurryWarehouseInput.mixing_hours),
-        portion_size: parseFloat(sandSlurryWarehouseInput.portion_size),
+        // portion_size: parseFloat(sandSlurryWarehouseInput.portion_size),
         date: sandSlurryWarehouseInput.date,
-      })
+      }),
     );
     await dispatch(
       addNewWarehouseSandSlurry({
@@ -230,9 +231,9 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
         water: sandSlurryWarehouseInput.water,
         grinding_balls: sandSlurryWarehouseInput.grinding_balls,
         aac_scrap: sandSlurryWarehouseInput.aac,
-        portion_size: sandSlurryWarehouseInput.portion_size,
+        // portion_size: sandSlurryWarehouseInput.portion_size,
         date: sandSlurryWarehouseInput.date,
-      })
+      }),
     );
     setSandSlurryWarehouseInput({ portion_size: 100 });
     props.onHide();
@@ -311,7 +312,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
               ))}
             </Row>
 
-            <div className="md:flex md:items-center mb-6 pt-4 border-t border-gray-300">
+            {/* <div className="md:flex md:items-center mb-6 pt-4 border-t border-gray-300">
               <div className="md:w-1/3">
                 <label
                   className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
@@ -330,10 +331,12 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                   onChange={handleRawMaterialWarehouseInputChange}
                 />
                 {errors.portion_size && (
-                  <p className="text-red-500 text-xs mt-1">{errors.portion_size}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.portion_size}
+                  </p>
                 )}
               </div>
-            </div>
+            </div> */}
 
             <div>
               <label

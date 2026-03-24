@@ -37,6 +37,19 @@ import {
   UPDATE_NEW_WAREHOUSE_AAC,
   GET_FULL_WAREHOUSE_SAND_SLURRY,
   ADD_NEW_WAREHOUSE_SAND_SLURRY,
+  UPDATE_NEW_WAREHOUSE_SAND_SLURRY,
+  GET_FULL_WAREHOUSE_PALLETS,
+  ADD_NEW_WAREHOUSE_PALLETS,
+  UPDATE_NEW_WAREHOUSE_PALLETS,
+  DELETE_WAREHOUSE_PALLETS,
+  GET_FULL_WAREHOUSE_PLASTICS,
+  ADD_NEW_WAREHOUSE_PLASTICS,
+  UPDATE_NEW_WAREHOUSE_PLASTICS,
+  DELETE_WAREHOUSE_PLASTICS,
+  GET_FULL_WAREHOUSE_SAND_POWDER,
+  ADD_NEW_WAREHOUSE_SAND_POWDER,
+  UPDATE_NEW_WAREHOUSE_SAND_POWDER,
+  DELETE_WAREHOUSE_SAND_POWDER,
 } from '../types/warehouseRawMaterialsTypes';
 
 // Sand
@@ -302,5 +315,96 @@ export const addNewWarehouseSandSlurry = (warehouseSandSlurry) => {
   return {
     type: ADD_NEW_WAREHOUSE_SAND_SLURRY,
     payload: warehouseSandSlurry,
+  };
+};
+
+export const updateWarehouseSandSlurry = (warehouseSandSlurry) => {
+  return {
+    type: UPDATE_NEW_WAREHOUSE_SAND_SLURRY,
+    payload: warehouseSandSlurry,
+  };
+};
+
+// Pallets
+export const getWarehousePallets = () => {
+  return {
+    type: GET_FULL_WAREHOUSE_PALLETS,
+  };
+};
+
+export const addNewWarehousePallets = (warehousePallets) => {
+  return {
+    type: ADD_NEW_WAREHOUSE_PALLETS,
+    payload: warehousePallets,
+  };
+};
+
+export const updateWarehousePallets = (warehousePallets) => {
+  return {
+    type: UPDATE_NEW_WAREHOUSE_PALLETS,
+    payload: warehousePallets,
+  };
+};
+
+export const deleteWarehousePallets = (pallets_warehouse_id) => {
+  return {
+    type: DELETE_WAREHOUSE_PALLETS,
+    payload: pallets_warehouse_id,
+  };
+};
+
+// Plastics
+export const getWarehousePlastics = () => {
+  return {
+    type: GET_FULL_WAREHOUSE_PLASTICS,
+  };
+};
+
+export const addNewWarehousePlastics = (warehousePlastics) => {
+  return {
+    type: ADD_NEW_WAREHOUSE_PLASTICS,
+    payload: warehousePlastics,
+  };
+};
+
+export const updateWarehousePlastics = (warehousePlastics) => {
+  return {
+    type: UPDATE_NEW_WAREHOUSE_PLASTICS,
+    payload: warehousePlastics,
+  };
+};
+
+export const deleteWarehousePlastics = (plastics_warehouse_id) => {
+  return {
+    type: DELETE_WAREHOUSE_PLASTICS,
+    payload: plastics_warehouse_id,
+  };
+};
+
+// Sand Powder
+export const getWarehouseSandPowder = () => {
+  return {
+    type: GET_FULL_WAREHOUSE_SAND_POWDER,
+  };
+};
+
+export const addNewWarehouseSandPowder = (warehouseSandPowder) => {
+  return {
+    type: ADD_NEW_WAREHOUSE_SAND_POWDER,
+    payload: warehouseSandPowder,
+  };
+};
+
+export const updateWarehouseSandPowder = (warehouseSandPowder) => {
+  return {
+    type: UPDATE_NEW_WAREHOUSE_SAND_POWDER,
+    payload: warehouseSandPowder,
+  };
+};
+
+export const deleteWarehouseSandPowder = (sand_powder_warehouse_id) => {
+  return {
+    type: DELETE_WAREHOUSE_SAND_POWDER,
+    payload: sand_powder_warehouse_id,
   };
 };

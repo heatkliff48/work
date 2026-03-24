@@ -10,7 +10,9 @@ import { Container } from 'reactstrap';
 import * as warehouseActions from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
 function RawMaterialsWarehouseSupplierInfoAdd(props) {
-  const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState({});
+  const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState(
+    {},
+  );
   const [inputError, setInputError] = useState('');
 
   const user = useSelector((state) => state.user);
@@ -94,6 +96,9 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
       'Aluminum 2': warehouseActions.updateWarehouseAluminum2,
       'Grinding Balls': warehouseActions.updateWarehouseGrindingBalls,
       AAC: warehouseActions.updateWarehouseAAC,
+      Plastics: warehouseActions.updateWarehousePlastics,
+      Pallets: warehouseActions.updateWarehousePallets,
+      'Sand powder': warehouseActions.updateWarehouseSandPowder,
     };
 
     return actionMap[materialType] || warehouseActions.updateWarehouseSand;
@@ -115,7 +120,7 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
       updateRawMaterialAction({
         supplier: props?.supplierInfo.supplier,
         quality: rawMaterialWarehouseInput?.quality,
-      })
+      }),
     );
     setRawMaterialWarehouseInput({});
     props.onHide();
@@ -166,12 +171,14 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
                           onChange={handleRawMaterialWarehouseInputChange}
                         />
                         {inputError && el.accessor === 'quality' && (
-                          <p className="text-red-500 text-xs mt-1">{inputError}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {inputError}
+                          </p>
                         )}
                       </div>
                     </div>
                   </Col>
-                )
+                ),
               )}
             </Row>
           </form>

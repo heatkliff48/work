@@ -104,6 +104,22 @@ module.exports = {
           updatedAt: currentDate,
         },
         {
+          material_type: 'Pallets',
+          remaining_quantity: 0,
+          consumed_quantity: 0,
+          last_updated: formatDate(currentDate),
+          createdAt: currentDate,
+          updatedAt: currentDate,
+        },
+        {
+          material_type: 'Plastics',
+          remaining_quantity: 0,
+          consumed_quantity: 0,
+          last_updated: formatDate(currentDate),
+          createdAt: currentDate,
+          updatedAt: currentDate,
+        },
+        {
           material_type: 'Sand powder (dry)',
           remaining_quantity: 0,
           consumed_quantity: 0,

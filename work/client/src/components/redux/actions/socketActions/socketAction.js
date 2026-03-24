@@ -144,6 +144,16 @@ import {
   NEW_COMPRESSIONS_QUALITY_SOCKET,
   UPD_COMPRESSIONS_QUALITY_SOCKET,
   UPD_DIMENSIONS_QUALITY_SOCKET,
+  NEED_UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
+  NEW_WAREHOUSE_PALLETS_SOCKET,
+  NEW_WAREHOUSE_PLASTICS_SOCKET,
+  NEED_UPDATE_WAREHOUSE_PLASTICS_SOCKET,
+  NEED_DELETE_WAREHOUSE_PLASTICS_SOCKET,
+  NEW_WAREHOUSE_SAND_POWDER_SOCKET,
+  NEED_UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
+  NEED_DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  NEED_UPDATE_WAREHOUSE_PALLETS_SOCKET,
+  NEED_DELETE_WAREHOUSE_PALLETS_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -595,8 +605,13 @@ export const deleteRawMatConsumptionSocket = (rawMatConsumption) => {
   };
 };
 
-export const addNewRawMatConsumptionCurrentMoldsSocket = (rawMatConsumption) => {
-  console.log('NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET', rawMatConsumption);
+export const addNewRawMatConsumptionCurrentMoldsSocket = (
+  rawMatConsumption,
+) => {
+  console.log(
+    'NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET',
+    rawMatConsumption,
+  );
   return {
     type: NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
     payload: rawMatConsumption,
@@ -610,7 +625,9 @@ export const addNewRawMatConsumptionCurrentMoldsSocket = (rawMatConsumption) => 
 //   };
 // };
 
-export const deleteRawMatConsumptionCurrentMoldsSocket = (rawMatConsumption) => {
+export const deleteRawMatConsumptionCurrentMoldsSocket = (
+  rawMatConsumption,
+) => {
   return {
     type: DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
     payload: rawMatConsumption,
@@ -715,14 +732,18 @@ export const updateDryMixesJournalSocket = (dryMixesJournal) => {
   };
 };
 
-export const addNewRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
+export const addNewRelatedMaterialsJournalSocket = (
+  relatedMaterialsJournal,
+) => {
   return {
     type: NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
   };
 };
 
-export const updateRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
+export const updateRelatedMaterialsJournalSocket = (
+  relatedMaterialsJournal,
+) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
@@ -771,14 +792,18 @@ export const updateDryMixesWarehouseSocket = (dryMixesWarehouse) => {
   };
 };
 
-export const addNewRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
+export const addNewRelatedMaterialsWarehouseSocket = (
+  relatedMaterialsWarehouse,
+) => {
   return {
     type: NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
     payload: relatedMaterialsWarehouse,
   };
 };
 
-export const updateRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
+export const updateRelatedMaterialsWarehouseSocket = (
+  relatedMaterialsWarehouse,
+) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
     payload: relatedMaterialsWarehouse,
@@ -1073,7 +1098,9 @@ export const updateWarehouseGrindingBallsSocket = (warehouseGrindingBalls) => {
   };
 };
 
-export const deleteWarehouseGrindingBallsSocket = (grinding_balls_warehouse_id) => {
+export const deleteWarehouseGrindingBallsSocket = (
+  grinding_balls_warehouse_id,
+) => {
   return {
     type: NEED_DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
     payload: grinding_balls_warehouse_id,
@@ -1105,6 +1132,76 @@ export const addNewWarehouseSandSlurrySocket = (warehouseSandSlurry) => {
   return {
     type: NEW_WAREHOUSE_SAND_SLURRY_SOCKET,
     payload: warehouseSandSlurry,
+  };
+};
+
+export const updateWarehouseSandSlurrySocket = (warehouseSandSlurry) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
+    payload: warehouseSandSlurry,
+  };
+};
+
+export const addNewWarehousePalletsSocket = (warehousePallets) => {
+  return {
+    type: NEW_WAREHOUSE_PALLETS_SOCKET,
+    payload: warehousePallets,
+  };
+};
+
+export const updateWarehousePalletsSocket = (warehousePallets) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_PALLETS_SOCKET,
+    payload: warehousePallets,
+  };
+};
+
+export const deleteWarehousePalletsSocket = (pallets_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_PALLETS_SOCKET,
+    payload: pallets_warehouse_id,
+  };
+};
+
+export const addNewWarehousePlasticsSocket = (warehousePlastics) => {
+  return {
+    type: NEW_WAREHOUSE_PLASTICS_SOCKET,
+    payload: warehousePlastics,
+  };
+};
+
+export const updateWarehousePlasticsSocket = (warehousePlastics) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_PLASTICS_SOCKET,
+    payload: warehousePlastics,
+  };
+};
+
+export const deleteWarehousePlasticsSocket = (plastics_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_PLASTICS_SOCKET,
+    payload: plastics_warehouse_id,
+  };
+};
+
+export const addNewWarehouseSandPowderSocket = (warehouseSandPowder) => {
+  return {
+    type: NEW_WAREHOUSE_SAND_POWDER_SOCKET,
+    payload: warehouseSandPowder,
+  };
+};
+
+export const updateWarehouseSandPowderSocket = (warehouseSandPowder) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
+    payload: warehouseSandPowder,
+  };
+};
+
+export const deleteWarehouseSandPowderSocket = (sand_powder_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+    payload: sand_powder_warehouse_id,
   };
 };
 

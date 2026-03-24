@@ -10,11 +10,15 @@ import { useNavigate } from 'react-router-dom';
 import RawMaterialsWarehouseAdd from './RawMaterialsWarehouseAdd';
 import RawMaterialsWarehouseSupplierInfoAdd from './RawMaterialsWarehouseSupplierInfoAdd';
 import '#components/Styles/modals.css';
+import FileUpload from '#components/FileUpload/RawMaterialsWarehouse/FileUpload.jsx';
+import FileDownload from '#components/FileUpload/RawMaterialsWarehouse/FileDownload.jsx';
+import RawMaterialsWarehouseAddSandSlurry from './RawMaterialsWarehouseAddSandSlurry';
 
 function RawMaterialsWarehouseInfo(props) {
   const [addModalShow, setAddModalShow] = useState(false);
   const [updateModalShow, setUpdateModalShow] = useState(false);
   const [supplierInfo, setSupplierInfo] = useState(false);
+  const [sandSlurryModal, setSandSlurryModal] = useState(false);
 
   const user = useSelector((state) => state.user);
 
@@ -46,6 +50,12 @@ function RawMaterialsWarehouseInfo(props) {
           return state.warehouseAAC;
         case 'Sand slurry (dry)':
           return state.warehouseSandSlurry;
+        case 'Pallets':
+          return state.warehousePallets;
+        case 'Plastics':
+          return state.warehousePlastics;
+        case 'Sand powder (dry)':
+          return state.warehouseSandPowder;
         default:
           return state.warehouseSand;
       }
@@ -61,7 +71,10 @@ function RawMaterialsWarehouseInfo(props) {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity, kg',
+      Header:
+        props?.material_type === 'Pallets'
+          ? 'Quantity, pieces'
+          : 'Quantity, kg',
       accessor: 'quantity',
       Filter: TextSearchFilter,
     },
@@ -88,6 +101,48 @@ function RawMaterialsWarehouseInfo(props) {
       Header: 'Quality',
       accessor: 'quality',
       Filter: TextSearchFilter,
+    },
+    checkUserAccess(user, roles, 'raw_materials_warehouse_files_actions')
+      ?.canRead && {
+      Header: 'File',
+      accessor: 'file_name',
+      Cell: ({ value, row }) => (
+        <div onClick={(e) => e.stopPropagation()}>
+          {value ? (
+            <>
+              <FileDownload
+                rowData={row.original}
+                material_type={props?.material_type}
+                onClick={(e) => e.stopPropagation()}
+              />
+              {checkUserAccess(
+                user,
+                roles,
+                'raw_materials_warehouse_files_actions',
+              )?.canWrite && (
+                <FileUpload
+                  rowData={row.original}
+                  material_type={props?.material_type}
+                  onClick={(e) => e.stopPropagation()}
+                  deleteCheck={true}
+                />
+              )}
+            </>
+          ) : checkUserAccess(
+              user,
+              roles,
+              'raw_materials_warehouse_files_actions',
+            )?.canWrite ? (
+            <FileUpload
+              rowData={row.original}
+              material_type={props?.material_type}
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <p>No file</p>
+          )}
+        </div>
+      ),
     },
   ].filter(Boolean);
 
@@ -117,15 +172,44 @@ function RawMaterialsWarehouseInfo(props) {
       accessor: 'aac_scrap',
       Filter: TextSearchFilter,
     },
-    {
-      Header: 'Portion size',
-      accessor: 'portion_size',
-      Filter: TextSearchFilter,
-    },
+    // {
+    //   Header: 'Portion size',
+    //   accessor: 'portion_size',
+    //   Filter: TextSearchFilter,
+    // },
     {
       Header: 'Date',
       accessor: 'date',
       Filter: TextSearchFilter,
+    },
+    {
+      Header: 'File',
+      accessor: 'file_name',
+      Cell: ({ value, row }) => (
+        <div onClick={(e) => e.stopPropagation()}>
+          {value ? (
+            <>
+              <FileDownload
+                rowData={row.original}
+                material_type={props?.material_type}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <FileUpload
+                rowData={row.original}
+                material_type={props?.material_type}
+                onClick={(e) => e.stopPropagation()}
+                deleteCheck={true}
+              />
+            </>
+          ) : (
+            <FileUpload
+              rowData={row.original}
+              material_type={props?.material_type}
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
+        </div>
+      ),
     },
   ].filter(Boolean);
 
@@ -167,7 +251,11 @@ function RawMaterialsWarehouseInfo(props) {
             <Table
               COLUMN_DATA={raw_material_table}
               dataOfTable={raw_material_warehouse}
-              userAccess={userAccess}
+              userAccess={checkUserAccess(
+                user,
+                roles,
+                'raw_materials_warehouse_add',
+              )}
               tableName={props?.material_type}
               handleRowClick={handleRowClick}
               onClickButton={() => {
@@ -180,9 +268,17 @@ function RawMaterialsWarehouseInfo(props) {
             <Table
               COLUMN_DATA={sand_slurry_table}
               dataOfTable={raw_material_warehouse}
-              userAccess={userAccess}
+              userAccess={checkUserAccess(
+                user,
+                roles,
+                'raw_materials_warehouse_add_sand_slurry',
+              )}
               tableName={props?.material_type}
               handleRowClick={() => {}}
+              onClickButton={() => {
+                setSandSlurryModal(!sandSlurryModal);
+              }}
+              buttonText={'Add sand slurry (dry)'}
             />
           )}
         </Modal.Body>
@@ -197,6 +293,10 @@ function RawMaterialsWarehouseInfo(props) {
         onHide={() => setUpdateModalShow(false)}
         supplierInfo={supplierInfo}
         material_type={props?.material_type}
+      />
+      <RawMaterialsWarehouseAddSandSlurry
+        show={sandSlurryModal}
+        onHide={() => setSandSlurryModal(false)}
       />
     </>
   );
