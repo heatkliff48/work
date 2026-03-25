@@ -1,0 +1,43 @@
+
+.roles-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.roles-header,
+.role-row {
+  display: flex;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.roles-header {
+  font-weight: bold;
+  background-color: #f0f0f0;
+}
+
+.role-name,
+.role-active {
+  flex: 1;
+}
+
+.role-name {
+  flex: 2;
+}
+
+.role-active {
+  text-align: center;
+}
+
+.role-modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.role-header {
+  align-self: flex-start;
+}

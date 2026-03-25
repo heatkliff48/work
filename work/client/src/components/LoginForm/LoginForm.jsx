@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../redux/actions/userAction';
+import './Login.css';
 
 function LoginForm() {
   const [formInput, setForm] = useState({});
