@@ -7,6 +7,7 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import './offCanvas.css'
 
 function MainOffcanvas() {
   const navigate = useNavigate();

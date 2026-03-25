@@ -5,6 +5,7 @@ import ModalRole from './ModalRole';
 import { updateRoleActive } from '../redux/actions/rolesAction';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
+import './role.css'
 
 function Roles() {
   const { setRoleId } = useProjectContext();

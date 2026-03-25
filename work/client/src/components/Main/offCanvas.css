@@ -1,0 +1,17 @@
+.offcanvas {
+  background: linear-gradient(to bottom, #c7c6c6, #ffffffca);
+}
+
+.offcanvas-header {
+  border-bottom: 1px solid #ddd;
+}
+
+.offcanvas-title {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.offcanvas-body {
+  padding-top: 10px;
+  padding-bottom: 40px;
+}

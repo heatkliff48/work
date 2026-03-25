@@ -223,18 +223,18 @@ const DimensionTestModal = ({ show, onHide, selectedBatch }) => {
   const handleSave = () => {
     console.log('Saved rows:', rows);
     const dim_test_arr = [];
-    const filteredData = rows.filter(
-      (el) =>
-        el.altura.length > 0 &&
-        el.ancho.length > 0 &&
-        el.angulo.length > 0 &&
-        el.largo.length > 0 &&
-        el.paralelismoMedida.length > 0 &&
-        el.planeidadDiagonal.length > 0 &&
-        el.planeidadMedida.length > 0,
-    );
+    // const filteredData = rows.filter(
+    //   (el) =>
+    //     el.altura.length > 0 &&
+    //     el.ancho.length > 0 &&
+    //     el.angulo.length > 0 &&
+    //     el.largo.length > 0 &&
+    //     el.paralelismoMedida.length > 0 &&
+    //     el.planeidadDiagonal.length > 0 &&
+    //     el.planeidadMedida.length > 0,
+    // );
 
-    for (let i = 0; i < filteredData.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
       const {
         altura,
         ancho,
@@ -243,7 +243,7 @@ const DimensionTestModal = ({ show, onHide, selectedBatch }) => {
         paralelismoMedida,
         planeidadDiagonal,
         planeidadMedida,
-      } = filteredData[i];
+      } = rows[i];
 
       const result = {
         batch_id,

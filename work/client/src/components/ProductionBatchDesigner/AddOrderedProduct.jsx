@@ -4,13 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
 import { useState } from 'react';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 
-const AddOrderedProduct = ({
-  isOpen,
-  toggle,
-  data = [],
-  onClickRow = null,
-}) => {
+const AddOrderedProduct = ({ isOpen, toggle, data = [], onClickRow = null }) => {
+  const { latestProducts } = useProductsContext();
   const COLUMNS_ORDERS_TO_WAREHOUSE = [
     {
       Header: 'Ref.',
@@ -21,6 +18,14 @@ const AddOrderedProduct = ({
       Header: 'Description',
       accessor: 'description',
       sortType: 'string',
+    },
+    {
+      Header: 'Product size',
+      accessor: 'product_size',
+    },
+    {
+      Header: 'Product density',
+      accessor: 'density',
     },
     {
       Header: 'Quantity of pallets',
@@ -44,9 +49,7 @@ const AddOrderedProduct = ({
 
   const dispatch = useDispatch();
 
-  const list_of_orders_to_warehouse = useSelector(
-    (state) => state.orderToWarehouse,
-  );
+  const list_of_orders_to_warehouse = useSelector((state) => state.orderToWarehouse);
 
   useEffect(() => {
     dispatch(getOrderToWarehouse());
@@ -63,7 +66,25 @@ const AddOrderedProduct = ({
         order.quantity_pallets > order.quantity_produced &&
         order.quantity_pallets > order.quantity_allocated,
     );
-    setFilteredList(filtered);
+
+    const regex = /(\d+)\s*x\s*(\d+)\s*x\s*(\d+)/;
+    const filteredWithSize = filtered.reduce((acc, el) => {
+      const match = el?.description?.match(regex);
+
+      const product_size = match ? `${match[1]}x${match[2]}x${match[3]}` : '';
+
+      const product = latestProducts.find((p) => p.article == el.product_article);
+
+      const newObj = {
+        ...el,
+        product_size,
+        density: product.density,
+      };
+      acc.push(newObj);
+      return acc;
+    }, []);
+
+    setFilteredList(filteredWithSize);
   }, [list_of_orders_to_warehouse]);
 
   return (
