@@ -25,6 +25,7 @@ function Warehouse() {
   } = useModalContext();
 
   const user = useSelector((state) => state.user);
+  const lotesListBatches = useSelector((state) => state.lotesListBatches);
 
   const [hideZeroQuantity, setHideZeroQuantity] = useState(false);
 
@@ -61,9 +62,15 @@ function Warehouse() {
       const totalQuantity = item.total_quantity || 0;
       const total_m3 = Math.round(m3Value * totalQuantity * 100) / 100;
 
+      const production_date = item?.batch_id
+        ? lotesListBatches.find((batch) => batch?.batch_id == item?.batch_id)
+            ?.production_date
+        : null;
+
       return {
         ...item,
         total_m3,
+        production_date,
       };
     });
 
