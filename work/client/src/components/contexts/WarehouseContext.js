@@ -80,6 +80,10 @@ const WarehouseContextProvider = ({ children }) => {
       accessor: 'batch_id',
       sortType: 'number',
     },
+    {
+      Header: 'Production date',
+      accessor: 'production_date',
+    },
   ];
 
   const COLUMNS_WAREHOUSE_AUX = [
