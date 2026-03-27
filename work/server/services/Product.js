@@ -13,8 +13,8 @@ class ProductService {
     return products;
   }
 
-  static async updateProduct(product) {
-    const products = await ProductsRepository.updateProductData(product);
+  static async updateProduct() {
+    const products = await ProductsRepository.updateProductData();
 
     return products;
   }

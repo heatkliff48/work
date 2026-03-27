@@ -38,10 +38,10 @@ class ProductController {
   }
 
   static async updateProduct(req, res) {
-    const product = req.body;
+    // const product = req.body;
 
     try {
-      const products = await ProductService.updateProduct(product);
+      const products = await ProductService.updateProduct();
 
       myEmitter.emit(UPDATE_PRODUCT_SOCKET, products);
 
@@ -68,7 +68,8 @@ class ProductController {
   //PRODUCTION QUALITY
   static async getAllProductionQuality(req, res) {
     try {
-      const products_quantyties = await ProductService.getAllProductionQuality();
+      const products_quantyties =
+        await ProductService.getAllProductionQuality();
 
       return res.status(200).json(products_quantyties);
     } catch (err) {
@@ -79,10 +80,12 @@ class ProductController {
   static async addNewProductionQuality(req, res) {
     const production_quantyties = req.body;
     try {
-      const new_production_quantyties = await ProductService.addNewProductionQuality(
-        production_quantyties,
+      const new_production_quantyties =
+        await ProductService.addNewProductionQuality(production_quantyties);
+      myEmitter.emit(
+        ADD_NEW_PRODUCTION_QUALITY_SOCKET,
+        new_production_quantyties,
       );
-      myEmitter.emit(ADD_NEW_PRODUCTION_QUALITY_SOCKET, new_production_quantyties);
       return res.status(200).json(new_production_quantyties);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -92,7 +95,8 @@ class ProductController {
   //DIMENSION QUALITY
   static async getAllDimensionsQuality(req, res) {
     try {
-      const products_quantyties = await ProductService.getAllDimensionsQuality();
+      const products_quantyties =
+        await ProductService.getAllDimensionsQuality();
 
       return res.status(200).json(products_quantyties);
     } catch (err) {
@@ -103,10 +107,12 @@ class ProductController {
   static async addNewDimensionsQuality(req, res) {
     const production_quantyties = req.body;
     try {
-      const new_production_quantyties = await ProductService.addNewDimensionsQuality(
-        production_quantyties,
+      const new_production_quantyties =
+        await ProductService.addNewDimensionsQuality(production_quantyties);
+      myEmitter.emit(
+        ADD_NEW_DIMENSIONS_QUALITY_SOCKET,
+        new_production_quantyties,
       );
-      myEmitter.emit(ADD_NEW_DIMENSIONS_QUALITY_SOCKET, new_production_quantyties);
       return res.status(200).json(new_production_quantyties);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -116,11 +122,13 @@ class ProductController {
   static async updateDimensionsQuality(req, res) {
     const production_quantyties = req.body;
     try {
-      const new_production_quantyties = await ProductService.updateDimensionsQuality(
-        production_quantyties,
-      );
+      const new_production_quantyties =
+        await ProductService.updateDimensionsQuality(production_quantyties);
 
-      myEmitter.emit(UPDATE_DIMENSIONS_QUALITY_SOCKET, new_production_quantyties);
+      myEmitter.emit(
+        UPDATE_DIMENSIONS_QUALITY_SOCKET,
+        new_production_quantyties,
+      );
       return res.status(200).json(new_production_quantyties);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -130,7 +138,8 @@ class ProductController {
   //COMPRESSIONS QUALITY
   static async getAllCompressionsQuality(req, res) {
     try {
-      const products_quantyties = await ProductService.getAllCompressionsQuality();
+      const products_quantyties =
+        await ProductService.getAllCompressionsQuality();
 
       return res.status(200).json(products_quantyties);
     } catch (err) {
@@ -145,7 +154,10 @@ class ProductController {
       const new_production_quantyties =
         await ProductService.addNewCompressionsQuality(production_quantyties);
 
-      myEmitter.emit(ADD_NEW_COMPRESSIONS_QUALITY_SOCKET, new_production_quantyties);
+      myEmitter.emit(
+        ADD_NEW_COMPRESSIONS_QUALITY_SOCKET,
+        new_production_quantyties,
+      );
       return res.status(200).json(new_production_quantyties);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
@@ -159,7 +171,10 @@ class ProductController {
       const upd_production_quantyties =
         await ProductService.updateCompressionsQuality(production_quantyties);
 
-      myEmitter.emit(UPDATE_COMPRESSIONS_QUALITY_SOCKET, upd_production_quantyties);
+      myEmitter.emit(
+        UPDATE_COMPRESSIONS_QUALITY_SOCKET,
+        upd_production_quantyties,
+      );
       return res.status(200).json(upd_production_quantyties);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
