@@ -9,6 +9,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import '#components/Styles/modals.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { addNewOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
+import { Switch, FormControlLabel } from '@mui/material';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -42,6 +43,9 @@ const AddProductOrderToWarehouseModal = React.memo(({ isOpen, toggle }) => {
     useOrderContext();
   const { COLUMNS, latestProducts } = useProductsContext();
 
+  const [productOfOrder, setProductOfOrder] = useState({});
+  const [cakeSelector, setCakeSelector] = useState(false);
+
   const COLUMNS_ORDERS_TO_WAREHOUSE = [
     {
       Header: 'Ref.',
@@ -53,17 +57,20 @@ const AddProductOrderToWarehouseModal = React.memo(({ isOpen, toggle }) => {
       accessor: 'description',
       sortType: 'string',
     },
-    {
-      Header: 'Quantity of pallets',
-      accessor: 'quantity_pallets',
-    },
+    cakeSelector
+      ? {
+          Header: 'Quantity of cakes',
+          accessor: 'quantity_cakes',
+        }
+      : {
+          Header: 'Quantity of pallets',
+          accessor: 'quantity_pallets',
+        },
     {
       Header: 'Real quantity, m2',
       accessor: 'quantity_real_m2',
     },
   ];
-
-  const [productOfOrder, setProductOfOrder] = useState({});
 
   const dispatch = useDispatch();
 
@@ -98,6 +105,7 @@ const AddProductOrderToWarehouseModal = React.memo(({ isOpen, toggle }) => {
         ...prev,
         product_article: row.original.article,
         description: description,
+        widthInArray: product?.widthInArray,
       }));
     },
     [latestProducts],
@@ -106,6 +114,16 @@ const AddProductOrderToWarehouseModal = React.memo(({ isOpen, toggle }) => {
   const handleQuantityPaletChange = (e) => {
     const digits = e.target.value.replace(/\D/g, '');
     setProductOfOrder((prev) => ({ ...prev, quantity_pallets: digits }));
+  };
+
+  const handleQuantityCakeChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '');
+    setProductOfOrder((prev) => ({
+      ...prev,
+      quantity_cakes: digits,
+      quantity_pallets:
+        parseInt(digits) * parseInt(productOfOrder.widthInArray),
+    }));
   };
 
   const handleQuantityPaletBlur = () => {
@@ -118,6 +136,7 @@ const AddProductOrderToWarehouseModal = React.memo(({ isOpen, toggle }) => {
         //   :
         selectedProduct.m2;
       const newM2 = pallets * m2PerPallet;
+
       setProductOfOrder((prev) => ({
         ...prev,
         quantity_pallets: String(pallets),
@@ -157,11 +176,6 @@ const AddProductOrderToWarehouseModal = React.memo(({ isOpen, toggle }) => {
       quantity_real_m2: parseFloat(quantityM2.toFixed(2)),
       quantity_pallets: parseInt(productOfOrder.quantity_pallets, 10) || 0,
     };
-
-    console.log(
-      payload,
-      'payload AddProductOrderToWarehouseModal.jsx line 151',
-    );
 
     dispatch(
       addNewOrderToWarehouse({
@@ -262,6 +276,18 @@ const AddProductOrderToWarehouseModal = React.memo(({ isOpen, toggle }) => {
                     />
                   );
                 }
+                if (el.accessor === 'quantity_cakes') {
+                  return (
+                    <InputField
+                      key={el.accessor}
+                      el={el}
+                      inputValue={productOfOrder}
+                      inputValueChange={handleQuantityCakeChange}
+                      onBlur={handleQuantityPaletBlur}
+                      isDisabled={false}
+                    />
+                  );
+                }
 
                 return (
                   <InputField
@@ -293,6 +319,15 @@ const AddProductOrderToWarehouseModal = React.memo(({ isOpen, toggle }) => {
           <></>
         ) : (
           <ModalFooter>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={cakeSelector}
+                  onChange={(e) => setCakeSelector(e.target.checked)}
+                />
+              }
+              label="Use cake quantity"
+            />
             <button onClick={addProductOrder}>Add product</button>
           </ModalFooter>
         )}

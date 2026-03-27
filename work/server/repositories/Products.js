@@ -4,6 +4,7 @@ const {
   QualityDimensions,
   QualityCompressions,
 } = require('../db/models');
+const { sequelize } = require('../db/models');
 
 class ProductsRepository {
   static async getAllProductsData() {
@@ -16,15 +17,35 @@ class ProductsRepository {
     return product;
   }
 
-  static async updateProductData(updProduct) {
+  static async updateProductData() {
+    const updateProducts = await Products.update(
+      {
+        widthInArray: sequelize.literal(`
+        CASE 
+          WHEN width = 50 THEN FLOOR(600 / width)
+          WHEN width = 75 THEN FLOOR(975 / width)
+          WHEN width = 85 THEN FLOOR(1190 / width)
+          WHEN width = 200 THEN FLOOR(1400 / width)
+          WHEN width = 350 THEN FLOOR(1400 / width)
+          ELSE FLOOR(1500 / width)
+        END
+      `),
+      },
+      {
+        where: {}, // обновляем все записи
+        returning: true, // для PostgreSQL, чтобы получить обновленные записи
+      },
+    );
     // const updateProduct = await Products.update(updProduct, {
     //   where: { id: updProduct.id },
     //   returning: true,
     //   plain: true,
     // });
-    const updateProduct = await Products.create(updProduct);
+    // const updateProduct = await Products.create(updProduct);
 
-    return updateProduct;
+    console.log(' _____________----------------------_______________________');
+
+    return updateProducts;
   }
 
   static async repairProductData(repProduct) {

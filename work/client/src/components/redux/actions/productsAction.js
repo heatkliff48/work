@@ -19,14 +19,20 @@ export const addNewProduct = (product) => {
   };
 };
 
-export const updateProduct = (product) => {
-  delete product.id;
-
+export const updateProduct = () => {
   return {
     type: NEED_UPDATE_PRODUCT,
-    payload: product,
   };
 };
+
+// export const updateProduct = (product) => {
+//   delete product.id;
+
+//   return {
+//     type: NEED_UPDATE_PRODUCT,
+//     payload: product,
+//   };
+// };
 
 export const repProduct = (repProduct) => {
   return {
