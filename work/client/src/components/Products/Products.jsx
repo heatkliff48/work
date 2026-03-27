@@ -5,7 +5,7 @@ import './products.css';
 
 import ModalWindow from './modal/ModalWindow';
 import ProductCardModal from './modal/ProductCardModal';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { GlobalFilterInput } from '#components/Table/GlobalFilterInput';
 import { matchSorter } from 'match-sorter';
@@ -14,9 +14,11 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import PreviewProductCardModal from './modal/PreviewProductCardModal';
+import { updateProduct } from '#components/redux/actions/productsAction.js';
 
 function Products() {
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
   const {
     modal,
     setModal,
@@ -24,7 +26,8 @@ function Products() {
     setModalProductCard,
     previewProductModal,
   } = useModalContext();
-  const { TABLE_COLUMNS, COLUMNS, latestProducts, products } = useProductsContext();
+  const { TABLE_COLUMNS, COLUMNS, latestProducts, products } =
+    useProductsContext();
   const { setProductCardData, previewOperationName } = useProjectContext();
 
   const [data, setData] = useState([]);
@@ -40,7 +43,7 @@ function Products() {
       // Let's set up our default Filter UI
       Filter: '',
     }),
-    []
+    [],
   );
 
   function matchSorterFn(rows, id, filterValue) {
@@ -51,11 +54,12 @@ function Products() {
     () => ({
       rankedMatchSorter: matchSorterFn,
     }),
-    []
+    [],
   );
 
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const sortTypes = {
     // Функция сортировки для строковых значений
@@ -91,7 +95,7 @@ function Products() {
     },
     useGlobalFilter,
     useFilters,
-    useSortBy
+    useSortBy,
   );
   const {
     getTableProps,
@@ -157,6 +161,9 @@ function Products() {
           Add product new
         </button>
       )}
+      <button onClick={() => dispatch(updateProduct())}>
+        Fix width in cakes
+      </button>
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}
         <GlobalFilterInput
@@ -172,7 +179,7 @@ function Products() {
                 <tr key={key} {...restProps}>
                   {hG.headers.map((col) => {
                     const { key, ...restProps } = col.getHeaderProps(
-                      col.getSortByToggleProps()
+                      col.getSortByToggleProps(),
                     );
                     return (
                       <th key={key} {...restProps}>
@@ -205,7 +212,11 @@ function Products() {
               prepareRow(row);
               const { key, ...restProps } = row.getRowProps();
               return (
-                <tr key={key} {...restProps} onClick={() => handleRowClick(row)}>
+                <tr
+                  key={key}
+                  {...restProps}
+                  onClick={() => handleRowClick(row)}
+                >
                   {row.cells.map((cell) => {
                     const { key, ...restProps } = cell.getCellProps();
 

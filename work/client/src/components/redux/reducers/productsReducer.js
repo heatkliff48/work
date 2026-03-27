@@ -23,19 +23,16 @@ export const productsReducer = (products = [], action) => {
     }
 
     case UPD_PRODUCT_SOCKET: {
-      const updateProducts = products.map((el) => {
-        if (el.id == payload.id)
-          return payload;
+      const result = products.map((el) => {
+        if (el.id === payload[1]?.id) return payload[1];
         return el;
       });
-
-      return updateProducts;
+      return result;
     }
 
     case REP_PRODUCT_SOCKET: {
       const updateProducts = products.map((el) => {
-        if (el.id == payload.id)
-          return payload;
+        if (el.id == payload.id) return payload;
         return el;
       });
 
