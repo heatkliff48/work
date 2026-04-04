@@ -14,12 +14,16 @@ const sidebars: SidebarsConfig = {
       items: [
         'components/production/ProductionBatchDesigner',
         'components/production/Autoclave',
+        'components/production/QualityManagement',
+        'components/orders/OrderCart',
+        'components/warehouse/Warehouse',
+        'components/warehouse/WarehouseAddModal',
+        'components/clients/Clients',
         // ... другие компоненты
       ],
     },
     // ... другие категории
   ],
-
   // But you can create a sidebar manually
   /*
   tutorialSidebar: [
@@ -32,6 +36,42 @@ const sidebars: SidebarsConfig = {
     },
   ],
    */
+  // tutorialSidebar: [
+  //   'intro',
+  //   {
+  //     type: 'category',
+  //     label: 'Components',
+  //     link: {
+  //       type: 'generated-index',
+  //       title: 'Компоненты системы',
+  //       description: 'Все React компоненты MES системы',
+  //       slug: '/components',
+  //     },
+  //     items: [
+  //       {
+  //         type: 'category',
+  //         label: 'Production',
+  //         items: [
+  //           'components/production/ProductionBatchDesignerNew',
+  //           'components/production/Autoclave',
+  //         ],
+  //       },
+  //       {
+  //         type: 'category',
+  //         label: 'Orders',
+  //         items: ['components/orders/OrderCart'],
+  //       },
+  //       {
+  //         type: 'category',
+  //         label: 'Warehouse',
+  //         items: [
+  //           'components/warehouse/Warehouse',
+  //           'components/warehouse/WarehouseAddModal',
+  //         ],
+  //       },
+  //     ],
+  //   },
+  // ],
 };
 
 export default sidebars;
