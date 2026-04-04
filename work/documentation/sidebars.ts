@@ -19,6 +19,7 @@ const sidebars: SidebarsConfig = {
         'components/warehouse/Warehouse',
         'components/warehouse/WarehouseAddModal',
         'components/clients/Clients',
+        'components/recipe/Recipe',
         // ... другие компоненты
       ],
     },
