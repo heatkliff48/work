@@ -53,6 +53,8 @@ import CackeFillUp from '#components/CackeFillUp/CackeFillUp.jsx';
 import OrdersToWarehouseTable from '#components/Orders/OrdersToWarehouse/OrdersToWarehouseTable.jsx';
 import ProductionQuality from '#components/ProductionQuality/ProductionQuality.jsx';
 
+import '#components/Styles/buttons.css';
+
 function App() {
   const dispatch = useDispatch();
 

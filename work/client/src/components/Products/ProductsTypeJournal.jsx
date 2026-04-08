@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import '#components/Styles/main-pages.css';
 function ProductsTypeJournal() {
   const navigate = useNavigate();
 

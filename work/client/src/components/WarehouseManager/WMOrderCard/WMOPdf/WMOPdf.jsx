@@ -6,6 +6,8 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
+import '#components/Styles/pdf.css';
+
 const loadImage = () => {
   return new Promise((resolve, reject) => {
     const img = new Image();

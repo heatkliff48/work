@@ -27,3 +27,116 @@
   max-width: 95vw;
   width: fit-content;
 }
+
+.modal-sm-custom {
+  max-width: 400px;
+}
+.modal-90w {
+  max-width: 90%;
+}
+.item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.item_content {
+  width: 95%;
+  margin: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-content: center;
+  justify-content: space-around;
+  align-items: center;
+}
+.item_select {
+  width: 50%;
+  padding: 10px;
+}
+.product_card_header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.product_card {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.product_card_btn {
+  width: 10%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+.permissions-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.table-header,
+.table-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #ccc;
+}
+.table-header {
+  font-weight: bold;
+}
+.table-header div,
+.table-row div {
+  flex: 1;
+  text-align: center;
+}
+.table-header div:first-child,
+.table-row div:first-child {
+  flex: 2;
+  text-align: left;
+}
+.order-info-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.client-info,
+.delivery-info {
+  width: 48%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.client-info h4,
+.delivery-info h4 {
+  margin-top: 0;
+}
+.client-info p,
+.delivery-info p {
+  margin-bottom: 0.5rem;
+}
+.product-info {
+  width: 96%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.warehouseModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.warehouseInfo {
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.reserve-button {
+  margin-bottom: 10px;
+}

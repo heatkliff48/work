@@ -32,6 +32,8 @@ import {
   getToolsWarehouse,
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 
+import '#components/Styles/main-pages.css';
+
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
   //   useUsersContext();
@@ -165,35 +167,35 @@ function WarehouseManager() {
         const regularProducts = getProductsByOrder(
           el.id,
           productsOfOrders,
-          latestProducts
+          latestProducts,
         );
         products.push(...regularProducts);
 
         const dryMixProducts = getProductsByOrder(
           el.id,
           dryMixedProductsOfOrders,
-          latestDryMix
+          latestDryMix,
         );
         products.push(...dryMixProducts);
 
         const anchorProducts = getProductsByOrder(
           el.id,
           anchorProductsOfOrders,
-          latestAnchors
+          latestAnchors,
         );
         products.push(...anchorProducts);
 
         const toolProducts = getProductsByOrder(
           el.id,
           toolProductsOfOrders,
-          latestTools
+          latestTools,
         );
         products.push(...toolProducts);
 
         const relMatProducts = getProductsByOrder(
           el.id,
           relMatProductsOfOrders,
-          latestRelatedMaterials
+          latestRelatedMaterials,
         );
         products.push(...relMatProducts);
 
