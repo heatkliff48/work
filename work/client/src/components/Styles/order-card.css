@@ -1,0 +1,140 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  padding: 20px;
+}
+.header-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.owner-info,
+.contact-info,
+.secondary-contact,
+.delivery-address {
+  width: 48%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+.sec-cont-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.description {
+  height: 60%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  position: relative;
+  box-sizing: border-box;
+}
+.input-wrapper {
+  position: relative;
+  height: 200px;
+}
+.input-wrapper textarea {
+  width: 100%;
+  height: 50%;
+  resize: none;
+  padding: 10px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.contact-info {
+  margin-left: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.owner-info > div,
+.contact-info > div,
+.delivery-address > div {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+}
+.owner-info > div > span:first-child,
+.contact-info > div > span:first-child,
+.delivery-address > div > span:first-child {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.product-row:nth-child(even) {
+  background-color: #f2f2f2;
+}
+.product-row td {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+.footer_data {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.footer_button {
+  margin: 30px;
+}
+.footer_button_pdf {
+  width: 95%;
+  margin: 30px;
+}
+.vat_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 4rem;
+}
+.vat {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+.shipping_date {
+  width: 100%;
+  height: 5rem;
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+}
+.status-table {
+  display: flex;
+  flex-direction: column;
+}
+.status-row {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-left: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+.header {
+  width: 50%;
+}

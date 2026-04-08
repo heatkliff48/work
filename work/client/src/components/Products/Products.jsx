@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { BiSortAlt2, BiSortDown, BiSortUp } from 'react-icons/bi';
 import { useTable, useGlobalFilter, useFilters, useSortBy } from 'react-table';
 import './products.css';
+import '#components/Styles/main-pages.css';
 
 import ModalWindow from './modal/ModalWindow';
 import ProductCardModal from './modal/ProductCardModal';

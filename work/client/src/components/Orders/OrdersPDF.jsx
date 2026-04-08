@@ -5,6 +5,8 @@ import image from './headerPDF.jpg';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
+import '#components/Styles/pdf.css';
+
 const loadImage = () => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -99,9 +101,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfDryMixes?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable
-            ? doc.lastAutoTable.finalY + 10
-            : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
           head: [
             [
               'Ref.:',
@@ -136,9 +136,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfAnchor?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable
-            ? doc.lastAutoTable.finalY + 10
-            : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
           head: [
             [
               'Ref.:',
@@ -173,17 +171,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfTools?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable
-            ? doc.lastAutoTable.finalY + 10
-            : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
           head: [
-            [
-              'Ref.:',
-              'Descripción',
-              'Total, Ud',
-              'PVP neto €/Ud',
-              'Subtotal €',
-            ],
+            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
           ],
           body: pdfData.pdfTools?.map((item) => [
             item.ref,
@@ -202,17 +192,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfRelMat?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable
-            ? doc.lastAutoTable.finalY + 10
-            : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
           head: [
-            [
-              'Ref.:',
-              'Descripción',
-              'Total, Ud',
-              'PVP neto €/Ud',
-              'Subtotal €',
-            ],
+            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
           ],
           body: pdfData.pdfRelMat?.map((item) => [
             item.ref,
@@ -286,8 +268,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
   useEffect(() => {
     console.log('🔄 Данные заказа обновлены:', orderData);
-    const { deliveryAddress, contactInfo, owner, article, delivery } =
-      orderData;
+    const { deliveryAddress, contactInfo, owner, article, delivery } = orderData;
 
     const today = new Date();
     const nextMonthDate = new Date(today);
@@ -358,9 +339,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         product?.density
       }kg/m³`;
 
-      const total = (
-        prod.quantity_palet * product?.quantityBlockOnPallet
-      ).toFixed(0);
+      const total = (prod.quantity_palet * product?.quantityBlockOnPallet).toFixed(
+        0,
+      );
 
       const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
@@ -390,9 +371,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const totalSacos = (quantity * sacos).toFixed(0);
 
-      const totalKg = (
-        prod.quantity_palet_dry * dryMixes?.pallet_weight
-      ).toFixed(0);
+      const totalKg = (prod.quantity_palet_dry * dryMixes?.pallet_weight).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(2);
 

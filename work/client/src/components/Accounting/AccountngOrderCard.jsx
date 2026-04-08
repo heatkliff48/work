@@ -9,6 +9,8 @@ import { useProductsTypeJournalContext } from '#components/contexts/ProductsType
 import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 
+import '#components/Styles/order-card.css';
+
 const AccountngOrderCard = React.memo(() => {
   const {
     storedData,
@@ -41,7 +43,7 @@ const AccountngOrderCard = React.memo(() => {
 
   const filterKeys = useMemo(
     () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
-    []
+    [],
   );
 
   const [productLists, setProductLists] = useState({
@@ -88,7 +90,7 @@ const AccountngOrderCard = React.memo(() => {
             </div>
           );
         }),
-    [orderCartData]
+    [orderCartData],
   );
 
   const addProductArticleToOrderList = useCallback(
@@ -110,14 +112,14 @@ const AccountngOrderCard = React.memo(() => {
 
       return updatedOrderProducts;
     },
-    [orderCartData?.id]
+    [orderCartData?.id],
   );
 
   const updatedProductListOrder = useMemo(() => {
     return addProductArticleToOrderList(
       productListOrder,
       latestProducts,
-      'products'
+      'products',
     );
   }, [productListOrder, latestProducts, addProductArticleToOrderList]);
 
@@ -134,7 +136,7 @@ const AccountngOrderCard = React.memo(() => {
     return addProductArticleToOrderList(
       dryMixedProductsOfOrders,
       latestDryMix,
-      'dryMixes'
+      'dryMixes',
     );
   }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
 
@@ -151,7 +153,7 @@ const AccountngOrderCard = React.memo(() => {
     return addProductArticleToOrderList(
       anchorProductsOfOrders,
       latestAnchors,
-      'anchors'
+      'anchors',
     );
   }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
 
@@ -181,7 +183,7 @@ const AccountngOrderCard = React.memo(() => {
     return addProductArticleToOrderList(
       relMatProductsOfOrders,
       latestRelatedMaterials,
-      'related_materials'
+      'related_materials',
     );
   }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
 
@@ -196,11 +198,11 @@ const AccountngOrderCard = React.memo(() => {
 
   const statusChangeHandler = (newStatus) => {
     const status_index = accountingStatusList.findIndex(
-      (el) => el.accessor == status
+      (el) => el.accessor == status,
     );
 
     const new_status_index = accountingStatusList.findIndex(
-      (el) => el.accessor == newStatus
+      (el) => el.accessor == newStatus,
     );
 
     if (new_status_index < status_index || new_status_index - status_index != 1) {
@@ -212,14 +214,14 @@ const AccountngOrderCard = React.memo(() => {
       updAccountingDataList({
         orders_article: orderCartData?.article,
         aproved: true,
-      })
+      }),
     );
     setStoredData(null);
   };
 
   useEffect(() => {
     const updatedOrderCartData = list_of_orders.find(
-      (order) => order.article === storedData.orders_article
+      (order) => order.article === storedData.orders_article,
     );
 
     const accounting_status = getAccountingStatus(updatedOrderCartData?.status);
@@ -245,7 +247,7 @@ const AccountngOrderCard = React.memo(() => {
             el?.final_price_anchor ||
             el?.final_price_tool ||
             el?.final_price_rel_mat),
-        0
+        0,
       ) || 0;
 
     if (!final_price_product || !vatValue.vat_procent) {
@@ -255,7 +257,7 @@ const AccountngOrderCard = React.memo(() => {
       }));
     } else {
       const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
-        2
+        2,
       );
 
       const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
