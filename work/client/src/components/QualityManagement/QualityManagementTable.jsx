@@ -31,15 +31,24 @@ import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehou
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
 
-  const { autoclave_calendar, list_of_ordered_production } = useWarehouseContext();
+  const {
+    autoclave_calendar,
+    list_of_ordered_production,
+    raw_materials_warehouse,
+  } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
-  const { raw_mat_consumption, list_of_recipes, recipeOrders } = useRecipeContext();
+  const { raw_mat_consumption, list_of_recipes, recipeOrders } =
+    useRecipeContext();
 
   const dispatch = useDispatch();
-  const qualityManagementData = useSelector((state) => state.qualityManagementData);
+  const qualityManagementData = useSelector(
+    (state) => state.qualityManagementData,
+  );
   const batchOutside = useSelector((state) => state.batchOutside);
 
-  const [qualityManagementDataList, setQualityManagementDataList] = useState([]);
+  const [qualityManagementDataList, setQualityManagementDataList] = useState(
+    [],
+  );
 
   const [consumptionCalculated, setConsumptionCalculated] = useState({});
 
@@ -292,7 +301,9 @@ const QualityManagementTable = () => {
         if (remainingFreeQty <= 0) {
           if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
             return reservedItem;
-          } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
+          } else if (
+            reservedItem.quantity > reservedItem.quantity_in_warehouse
+          ) {
             // ИСПРАВЛЕНИЕ: Добавляем к существующему количеству, а не заменяем
 
             const newQuantityInWarehouse = Math.min(
@@ -346,7 +357,9 @@ const QualityManagementTable = () => {
               // Добавляем к существующему количеству: базовое + зарезервированное + новое из свободного
 
               quantity_in_warehouse:
-                baseQuantityInWarehouse + reserved_quantity_allocated + deducted,
+                baseQuantityInWarehouse +
+                reserved_quantity_allocated +
+                deducted,
             }
           : {
               ...reservedItem,
@@ -360,7 +373,9 @@ const QualityManagementTable = () => {
       // Проверки на корректность
 
       if (reserved_quantity_allocated < 0) {
-        alert('Ошибка: reserved_quantity_allocated не может быть отрицательным.');
+        alert(
+          'Ошибка: reserved_quantity_allocated не может быть отрицательным.',
+        );
 
         return;
       }
@@ -371,9 +386,59 @@ const QualityManagementTable = () => {
         return;
       }
 
-      const calculatedOrderedQuantity = reserved_quantity_allocated + summReserve;
+      const calculatedOrderedQuantity =
+        reserved_quantity_allocated + summReserve;
 
       // Добавляем на склад
+
+      let totalQuantityForRawMatWarehouse = 0;
+
+      totalQuantityForRawMatWarehouse +=
+        (calculatedOrderedQuantity ?? 0) +
+        (remainingFreeQty ?? 0) +
+        (sorting ?? 0);
+
+      const checkPallets = raw_materials_warehouse.some(
+        (item) =>
+          item.material_type == 'Pallets' &&
+          item.remaining_quantity >= totalQuantityForRawMatWarehouse,
+      );
+
+      console.log(
+        checkPallets,
+        'checkPallets QualityManagementTable.jsx line 407',
+      );
+
+      const checkPlastics = raw_materials_warehouse.some(
+        (item) =>
+          item.material_type == 'Plastics' &&
+          item.remaining_quantity >= totalQuantityForRawMatWarehouse * 450,
+      );
+
+      console.log(
+        checkPlastics,
+        'checkPlastics QualityManagementTable.jsx line 415',
+      );
+
+      if (!checkPallets) {
+        const pallets = raw_materials_warehouse.find(
+          (item) => item.material_type == 'Pallets',
+        ).remaining_quantity;
+        alert(
+          `Not enough pallets in the warehouse. Available: ${pallets}, need: ${totalQuantityForRawMatWarehouse}.`,
+        );
+        return;
+      }
+
+      if (!checkPlastics) {
+        const plastics = raw_materials_warehouse.find(
+          (item) => item.material_type == 'Plastics',
+        ).remaining_quantity;
+        alert(
+          `Not enough plastic in the warehouse. Available: ${plastics}, need: ${totalQuantityForRawMatWarehouse * 450}.`,
+        );
+        return;
+      }
 
       if (calculatedOrderedQuantity + remainingFreeQty > 0) {
         await dispatch(
@@ -468,7 +533,9 @@ const QualityManagementTable = () => {
         //   },
         // ];
 
-        const batch = batchOutside.find((batch) => batch.id === production_plan_id);
+        const batch = batchOutside.find(
+          (batch) => batch.id === production_plan_id,
+        );
 
         const recipe = recipeOrders.find(
           (recipe) => recipe.id_batch === production_plan_id,
@@ -484,7 +551,8 @@ const QualityManagementTable = () => {
             batch_article: batch?.product_article || 'Unknown Batch',
             production_volume:
               Math.ceil(
-                (reserved_quantity_allocated + free_quantity_fact) / palletsPerArray,
+                (reserved_quantity_allocated + free_quantity_fact) /
+                  palletsPerArray,
               ) || 0,
             date: batch?.date || 'Unknown Date',
           }),
@@ -492,7 +560,12 @@ const QualityManagementTable = () => {
 
         // await dispatch(addNewAutoclaveCalendar(result));
       }
-      await dispatch(deleteQualityManagement(id));
+      await dispatch(
+        deleteQualityManagement({
+          id,
+          quantity: totalQuantityForRawMatWarehouse,
+        }),
+      );
 
       if (consumptionCalculated.consumption_calculated) {
         await dispatch(
@@ -554,7 +627,9 @@ const QualityManagementTable = () => {
       {qualityManagementData.length > 0 && (
         <div className="d-flex gap-4 flex-wrap">
           <div className="border rounded p-3 bg-light">
-            <div className="text-center mb-2 fw-bold border-bottom pb-1">OK</div>
+            <div className="text-center mb-2 fw-bold border-bottom pb-1">
+              OK
+            </div>
             <div className="d-flex gap-2">
               <Button
                 variant="success"
