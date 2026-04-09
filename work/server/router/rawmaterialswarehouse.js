@@ -1893,36 +1893,42 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
 
   try {
     const materialsToCheck = [
-      { model: WarehouseSand, amount: sand, name: 'sand' },
+      { model: WarehouseSand, amount: sand, material_type: 'Sand (dry)' },
       {
         model: WarehouseGypsumStone,
         amount: gypsum_stone,
-        name: 'gypsum stone',
+        material_type: 'Gypsum stone',
       },
       {
         model: WarehouseGrindingBalls,
         amount: grinding_balls,
-        name: 'grinding balls',
+        material_type: 'Grinding Balls',
       },
-      { model: WarehouseAAC, amount: aac_scrap, name: 'aac scrap' },
+      { model: WarehouseAAC, amount: aac_scrap, material_type: 'AAC' },
     ];
 
     const insufficientMaterials = [];
 
     for (const material of materialsToCheck) {
       if (material.amount > 0) {
-        const availableMaterial = await material.model.findOne({
-          order: [['createdAt', 'DESC']],
+        // const availableMaterial = await material.model.findOne({
+        //   order: [['createdAt', 'DESC']],
+        // });
+
+        const availableMaterial = await RawMaterialsWarehouse.findOne({
+          where: { material_type: material.material_type },
         });
 
         if (
           !availableMaterial ||
-          availableMaterial.quantity < material.amount
+          availableMaterial.remaining_quantity < material.amount
         ) {
           insufficientMaterials.push({
-            material: material.name,
+            material: material.material_type,
             requested: material.amount,
-            available: availableMaterial ? availableMaterial.quantity : 0,
+            available: availableMaterial
+              ? availableMaterial.remaining_quantity
+              : 0,
           });
         }
       }
