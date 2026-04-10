@@ -146,6 +146,7 @@ qualityManagementRouter.post('/delete', async (req, res) => {
       await RawMaterialsWarehouse.update(
         {
           remaining_quantity: record.remaining_quantity - item.quantity,
+          consumed_quantity: record.consumed_quantity + item.quantity,
           // last_updated: formatDate(new Date()),
         },
         {
