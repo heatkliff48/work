@@ -412,7 +412,7 @@ const QualityManagementTable = () => {
       const checkPlastics = raw_materials_warehouse.some(
         (item) =>
           item.material_type == 'Plastics' &&
-          item.remaining_quantity >= totalQuantityForRawMatWarehouse * 450,
+          item.remaining_quantity >= totalQuantityForRawMatWarehouse * 0.45,
       );
 
       console.log(
@@ -435,7 +435,7 @@ const QualityManagementTable = () => {
           (item) => item.material_type == 'Plastics',
         ).remaining_quantity;
         alert(
-          `Not enough plastic in the warehouse. Available: ${plastics}, need: ${totalQuantityForRawMatWarehouse * 450}.`,
+          `Not enough plastic in the warehouse. Available: ${plastics}, need: ${totalQuantityForRawMatWarehouse * 0.45}.`,
         );
         return;
       }
