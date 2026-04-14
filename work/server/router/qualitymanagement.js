@@ -124,7 +124,7 @@ qualityManagementRouter.post('/delete', async (req, res) => {
 
   const material_types = [
     { material_type: 'Pallets', quantity: quantity },
-    { material_type: 'Plastics', quantity: quantity * 450 },
+    { material_type: 'Plastics', quantity: quantity * 0.45 },
   ];
 
   const t = await sequelize.transaction();
