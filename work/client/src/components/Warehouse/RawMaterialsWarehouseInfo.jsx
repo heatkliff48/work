@@ -1,10 +1,11 @@
 import Table from '../Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import Modal from 'react-bootstrap/Modal';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import Select from 'react-select';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useNavigate } from 'react-router-dom';
 import RawMaterialsWarehouseAdd from './RawMaterialsWarehouseAdd';
@@ -19,6 +20,7 @@ function RawMaterialsWarehouseInfo(props) {
   const [updateModalShow, setUpdateModalShow] = useState(false);
   const [supplierInfo, setSupplierInfo] = useState(false);
   const [sandSlurryModal, setSandSlurryModal] = useState(false);
+  const [selectedType, setSelectedType] = useState(null);
 
   const user = useSelector((state) => state.user);
 
@@ -40,7 +42,7 @@ function RawMaterialsWarehouseInfo(props) {
           return state.warehouseGypsum;
         case 'Gypsum stone':
           return state.warehouseGypsumStone;
-        case 'Aluminum 1':
+        case 'Aluminum':
           return state.warehouseAluminum1;
         case 'Aluminum 2':
           return state.warehouseAluminum2;
@@ -79,7 +81,7 @@ function RawMaterialsWarehouseInfo(props) {
       Filter: TextSearchFilter,
     },
     (props?.material_type === 'Cement' ||
-      props?.material_type === 'Aluminum 1' ||
+      props?.material_type === 'Aluminum' ||
       props?.material_type === 'Aluminum 2' ||
       props?.material_type === 'Lime' ||
       props?.material_type === 'Sand (dry)') && {
@@ -213,6 +215,55 @@ function RawMaterialsWarehouseInfo(props) {
     },
   ].filter(Boolean);
 
+  // Форматирование опций для react-select
+  const typeOptions = useMemo(() => {
+    if (!raw_material_warehouse) return [];
+
+    const uniqueTypes = [
+      ...new Set(raw_material_warehouse.map((item) => item.type)),
+    ];
+
+    return [
+      { value: '', label: 'All types' }, // Опция для отображения всех данных
+      ...uniqueTypes.filter(Boolean).map((type) => ({
+        value: type,
+        label: type,
+      })),
+    ];
+  }, [raw_material_warehouse]);
+
+  // Функция для фильтрации данных
+  const getFilteredData = () => {
+    if (props?.material_type !== 'Aluminum' || !selectedType?.value) {
+      return raw_material_warehouse;
+    }
+    return raw_material_warehouse.filter(
+      (item) => item.type === selectedType.value,
+    );
+  };
+
+  // Функция для расчета сумм
+  const getQuantitiesSum = () => {
+    const filteredData =
+      selectedType?.value && selectedType.value !== ''
+        ? raw_material_warehouse.filter(
+            (item) => item.type === selectedType.value,
+          )
+        : raw_material_warehouse;
+
+    const totalQuantity = filteredData.reduce(
+      (sum, item) => sum + (Number(item.quantity) || 0),
+      0,
+    );
+    const totalConsumed = filteredData.reduce(
+      (sum, item) => sum + (Number(item.consumed_quantity) || 0),
+      0,
+    );
+    const totalAvailable = totalQuantity - totalConsumed;
+
+    return { totalQuantity, totalAvailable };
+  };
+
   const handleRowClick = useCallback((row) => {
     setSupplierInfo(row.original);
     setUpdateModalShow(!updateModalShow);
@@ -247,22 +298,91 @@ function RawMaterialsWarehouseInfo(props) {
         <Modal.Body className="p-0">
           {' '}
           {/* Убираем padding для полной ширины таблицы */}
-          {props?.material_type != 'Sand slurry (dry)' && (
-            <Table
-              COLUMN_DATA={raw_material_table}
-              dataOfTable={raw_material_warehouse}
-              userAccess={checkUserAccess(
-                user,
-                roles,
-                'raw_materials_warehouse_add',
-              )}
-              tableName={props?.material_type}
-              handleRowClick={handleRowClick}
-              onClickButton={() => {
-                setAddModalShow(!addModalShow);
-              }}
-              buttonText={`Add new ${props?.material_type.toLowerCase()}`}
-            />
+          {props?.material_type != 'Sand slurry (dry)' &&
+            props?.material_type != 'Aluminum' && (
+              <Table
+                COLUMN_DATA={raw_material_table}
+                dataOfTable={raw_material_warehouse}
+                userAccess={checkUserAccess(
+                  user,
+                  roles,
+                  'raw_materials_warehouse_add',
+                )}
+                tableName={props?.material_type}
+                handleRowClick={handleRowClick}
+                onClickButton={() => {
+                  setAddModalShow(!addModalShow);
+                }}
+                buttonText={`Add new ${props?.material_type.toLowerCase()}`}
+              />
+            )}
+          {props?.material_type === 'Aluminum' && (
+            <div>
+              {/* Селектор с react-select */}
+              <div
+                style={{
+                  marginBottom: '20px',
+                  display: 'flex',
+                  gap: '20px',
+                  alignItems: 'flex-start',
+                }}
+              >
+                <div style={{ minWidth: '250px' }}>
+                  <label style={{ marginBottom: '8px', display: 'block' }}>
+                    Filter by type:
+                  </label>
+                  <Select
+                    options={typeOptions}
+                    value={selectedType}
+                    onChange={(option) => setSelectedType(option)}
+                    placeholder="Select type..."
+                    isClearable={false}
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        minHeight: '38px',
+                      }),
+                    }}
+                  />
+                </div>
+
+                {/* Отображение сумм */}
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '20px',
+                    alignItems: 'center',
+                    paddingTop: '24px',
+                  }}
+                >
+                  <div>
+                    <strong>Total Quantity:</strong>{' '}
+                    {getQuantitiesSum().totalQuantity}
+                  </div>
+                  <div>
+                    <strong>Total Available:</strong>{' '}
+                    {getQuantitiesSum().totalAvailable}
+                  </div>
+                </div>
+              </div>
+
+              {/* Таблица с отфильтрованными данными */}
+              <Table
+                COLUMN_DATA={raw_material_table}
+                dataOfTable={getFilteredData()}
+                userAccess={checkUserAccess(
+                  user,
+                  roles,
+                  'raw_materials_warehouse_add',
+                )}
+                tableName={props?.material_type}
+                handleRowClick={handleRowClick}
+                onClickButton={() => {
+                  setAddModalShow(!addModalShow);
+                }}
+                buttonText={`Add new ${props?.material_type.toLowerCase()}`}
+              />
+            </div>
           )}
           {props?.material_type === 'Sand slurry (dry)' && (
             <Table

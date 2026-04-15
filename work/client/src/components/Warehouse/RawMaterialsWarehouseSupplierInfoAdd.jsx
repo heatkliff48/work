@@ -92,7 +92,7 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
       Cement: warehouseActions.updateWarehouseCement,
       Gypsum: warehouseActions.updateWarehouseGypsum,
       'Gypsum stone': warehouseActions.updateWarehouseGypsumStone,
-      'Aluminum 1': warehouseActions.updateWarehouseAluminum1,
+      Aluminum: warehouseActions.updateWarehouseAluminum1,
       'Aluminum 2': warehouseActions.updateWarehouseAluminum2,
       'Grinding Balls': warehouseActions.updateWarehouseGrindingBalls,
       AAC: warehouseActions.updateWarehouseAAC,
