@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       supplier: DataTypes.STRING,
       quantity: DataTypes.FLOAT,
+      consumed_quantity: DataTypes.FLOAT,
       type: DataTypes.STRING,
       quality: DataTypes.FLOAT,
       date: DataTypes.STRING,

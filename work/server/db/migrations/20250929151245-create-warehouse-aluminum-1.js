@@ -21,6 +21,9 @@ module.exports = {
       quality: {
         type: Sequelize.FLOAT,
       },
+      consumed_quantity: {
+        type: Sequelize.FLOAT,
+      },
       date: {
         type: Sequelize.STRING,
       },

@@ -1279,6 +1279,7 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
     const warehouseAluminum1 = await WarehouseAluminum1.create({
       supplier,
       quantity,
+      consumed_quantity: 0,
       type,
       date: formatDate(date),
     });
@@ -1303,7 +1304,7 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
 
     const record = await RawMaterialsWarehouse.findOne({
       where: {
-        material_type: 'Aluminum 1',
+        material_type: 'Aluminum',
       },
     });
 
@@ -1314,14 +1315,14 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
       },
       {
         where: {
-          material_type: 'Aluminum 1',
+          material_type: 'Aluminum',
         },
       },
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET, warehouseAluminum1);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'Aluminum 1' },
+      where: { material_type: 'Aluminum' },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseAluminum1).status(200);
