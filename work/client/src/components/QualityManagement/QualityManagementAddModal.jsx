@@ -175,7 +175,9 @@ function QualityManagementAddModal(props) {
   };
 
   const handleProductArticleSelectChange = (selectedOption, key) => {
-    const product = latestProducts.find((el) => el.article === selectedOption.value);
+    const product = latestProducts.find(
+      (el) => el.article === selectedOption.value,
+    );
     const warehouse_article = getWarehouseArticle(product);
 
     setCustomBatchSelectInput((prev) => ({
@@ -275,7 +277,7 @@ function QualityManagementAddModal(props) {
         batch_id: warehouse_article,
         product_article: rawMatConsEntry?.batch_article,
         total_quantity_plan: rawMatConsEntry.production_volume * widthInArray,
-        reserved_quantity: 0, // reservedProduct.quantity,
+        reserved_quantity: rawMatConsEntry.batch_quantity_pallets, // reservedProduct.quantity,
         // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free,
         reserved_quantity_allocated: 0,
         reserved_quantity_remaining: 0, // reservedProduct.quantity,
@@ -286,6 +288,7 @@ function QualityManagementAddModal(props) {
         sorting: 0,
         id_ordered_product_to_warehouse:
           rawMatConsEntry?.id_ordered_product_to_warehouse,
+        date: rawMatConsEntry?.date,
       }),
     );
     dispatch(updateRawMatConsumption({ id: rawMatConsEntry?.id, used: true }));
@@ -378,7 +381,9 @@ function QualityManagementAddModal(props) {
       dialogClassName="modal-auto-size"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Batch calendar</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Batch calendar
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {customBatchSelect ? (
@@ -420,7 +425,9 @@ function QualityManagementAddModal(props) {
                             name={el.accessor}
                             type="text"
                             value={customBatchSelectInput[el.accessor] || ''}
-                            onChange={(e) => handleCustomBatchSelectInputChange(e)}
+                            onChange={(e) =>
+                              handleCustomBatchSelectInputChange(e)
+                            }
                           />
                         )}
                       </div>

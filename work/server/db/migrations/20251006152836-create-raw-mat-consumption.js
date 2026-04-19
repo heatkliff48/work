@@ -36,6 +36,9 @@ module.exports = {
       id_ordered_product_to_warehouse: {
         type: Sequelize.INTEGER,
       },
+      batch_quantity_pallets: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
