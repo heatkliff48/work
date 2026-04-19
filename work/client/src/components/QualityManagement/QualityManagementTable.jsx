@@ -53,11 +53,11 @@ const QualityManagementTable = () => {
   const [consumptionCalculated, setConsumptionCalculated] = useState({});
 
   const COLUMNS_QUALITY_MANAGEMENT = [
-    {
-      Header: 'Batch ID',
-      accessor: 'batch_id',
-      Filter: TextSearchFilter,
-    },
+    // {
+    //   Header: 'Batch ID',
+    //   accessor: 'batch_id',
+    //   Filter: TextSearchFilter,
+    // },
     {
       Header: 'Prodcut article',
       accessor: 'product_article',
