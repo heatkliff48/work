@@ -27,6 +27,7 @@ import {
 } from '#components/redux/actions/recipeAction.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
+import { Form } from 'react-bootstrap'; // Добавлен импорт Form
 
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
@@ -52,6 +53,9 @@ const QualityManagementTable = () => {
 
   const [consumptionCalculated, setConsumptionCalculated] = useState({});
 
+  const [totalQtyInput, setTotalQtyInput] = useState('');
+  const [sortingInput, setSortingInput] = useState('');
+
   const COLUMNS_QUALITY_MANAGEMENT = [
     // {
     //   Header: 'Batch ID',
@@ -64,23 +68,13 @@ const QualityManagementTable = () => {
       Filter: TextSearchFilter,
     },
     {
+      Header: 'Date',
+      accessor: 'date',
+      Filter: TextSearchFilter,
+    },
+    {
       Header: 'Total Qty in batch, plan, pallets',
       accessor: 'total_quantity_plan',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Reserved Qty in batch, pallets',
-      accessor: 'reserved_quantity',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Reserved Qty in batch, allocated, pallets',
-      accessor: 'reserved_quantity_allocated',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Reserved Qty in batch, remaining, pallets',
-      accessor: 'reserved_quantity_remaining',
       Filter: TextSearchFilter,
     },
     {
@@ -93,6 +87,22 @@ const QualityManagementTable = () => {
       accessor: 'sorting',
       Filter: TextSearchFilter,
     },
+    {
+      Header: 'Reserved Qty in batch, allocated, pallets',
+      accessor: 'reserved_quantity_allocated',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Reserved Qty in batch, pallets',
+      accessor: 'reserved_quantity',
+      Filter: TextSearchFilter,
+    },
+
+    {
+      Header: 'Reserved Qty in batch, remaining, pallets',
+      accessor: 'reserved_quantity_remaining',
+      Filter: TextSearchFilter,
+    },
   ];
 
   useEffect(() => {
@@ -101,55 +111,80 @@ const QualityManagementTable = () => {
     }
   }, [qualityManagementData]);
 
-  const qualityManagementPlusHandler = async () => {
-    if (qualityManagementData) {
-      const {
-        id,
+  // Обработчик для поля Total Qty in batch, fact, pallets
+  const handleTotalQtyChange = (e) => {
+    const value = e.target.value;
+    setTotalQtyInput(value);
+
+    if (value === '' || !qualityManagementData.length) return;
+
+    const X = parseFloat(value);
+    if (isNaN(X) || X < 0) return;
+
+    const currentData = qualityManagementData[0];
+    const {
+      id,
+      batch_id,
+      product_article,
+      total_quantity_plan,
+      reserved_quantity,
+      sorting,
+    } = currentData;
+
+    let newReservedQuantityAllocated;
+    let newReservedQuantityRemaining;
+    let newFreeQuantityFact;
+
+    if (X - reserved_quantity >= 0) {
+      newReservedQuantityAllocated = reserved_quantity;
+      newReservedQuantityRemaining = 0;
+      newFreeQuantityFact = X - reserved_quantity;
+    } else {
+      newReservedQuantityAllocated = X;
+      newReservedQuantityRemaining = reserved_quantity - X;
+      newFreeQuantityFact = 0;
+    }
+
+    dispatch(
+      updateQualityManagement({
+        id: id,
         batch_id,
         product_article,
         total_quantity_plan,
         reserved_quantity,
-        reserved_quantity_allocated,
-        reserved_quantity_remaining,
-        free_quantity_fact,
+        reserved_quantity_allocated: newReservedQuantityAllocated,
+        reserved_quantity_remaining: newReservedQuantityRemaining,
+        free_quantity_fact: newFreeQuantityFact,
         sorting,
-      } = qualityManagementData[0];
-      if (reserved_quantity_remaining > 0) {
-        dispatch(
-          updateQualityManagement({
-            id: id,
-            batch_id,
-            product_article,
-            total_quantity_plan,
-            reserved_quantity,
-            reserved_quantity_allocated: reserved_quantity_allocated + 1,
-            reserved_quantity_remaining: reserved_quantity_remaining - 1,
-            free_quantity_fact,
-            sorting,
-          }),
-        );
-      } else {
-        dispatch(
-          updateQualityManagement({
-            id: id,
-            batch_id,
-            product_article,
-            total_quantity_plan,
-            reserved_quantity,
-            reserved_quantity_allocated,
-            reserved_quantity_remaining: 0,
-            free_quantity_fact: free_quantity_fact + 1,
-            sorting,
-          }),
-        );
-      }
-    }
+      }),
+    );
   };
 
-  const qualityManagementMinusHandler = async () => {
-    if (qualityManagementData) {
-      const {
-        id,
+  // Обработчик для поля Quantity on sorting, pallets
+  const handleSortingChange = (e) => {
+    const value = e.target.value;
+    setSortingInput(value);
+
+    if (value === '' || !qualityManagementData.length) return;
+
+    const sortingValue = parseFloat(value);
+    if (isNaN(sortingValue) || sortingValue < 0) return;
+
+    const currentData = qualityManagementData[0];
+    const {
+      id,
+      batch_id,
+      product_article,
+      total_quantity_plan,
+      reserved_quantity,
+      reserved_quantity_allocated,
+      reserved_quantity_remaining,
+      free_quantity_fact,
+    } = currentData;
+
+    dispatch(
+      updateQualityManagement({
+        id: id,
         batch_id,
         product_article,
         total_quantity_plan,
@@ -157,105 +192,182 @@ const QualityManagementTable = () => {
         reserved_quantity_allocated,
         reserved_quantity_remaining,
         free_quantity_fact,
-        sorting,
-      } = qualityManagementData[0];
-      if (
-        reserved_quantity_remaining < reserved_quantity &&
-        reserved_quantity_allocated > 0 &&
-        free_quantity_fact == 0
-      ) {
-        dispatch(
-          updateQualityManagement({
-            id: id,
-            batch_id,
-            product_article,
-            total_quantity_plan,
-            reserved_quantity,
-            reserved_quantity_allocated: reserved_quantity_allocated - 1,
-            reserved_quantity_remaining: reserved_quantity_remaining + 1,
-            free_quantity_fact,
-            sorting,
-          }),
-        );
-      } else if (reserved_quantity_remaining == 0 && free_quantity_fact > 0) {
-        dispatch(
-          updateQualityManagement({
-            id: id,
-            batch_id,
-            product_article,
-            total_quantity_plan,
-            reserved_quantity,
-            reserved_quantity_allocated,
-            reserved_quantity_remaining: 0,
-            free_quantity_fact: free_quantity_fact - 1,
-            sorting,
-          }),
-        );
-      }
-    }
+        sorting: sortingValue,
+      }),
+    );
   };
 
-  const sortingPlusHandler = async () => {
-    if (qualityManagementData) {
-      const {
-        id,
-        batch_id,
-        product_article,
-        total_quantity_plan,
-        reserved_quantity,
-        reserved_quantity_allocated,
-        reserved_quantity_remaining,
-        free_quantity_fact,
-        sorting,
-      } = qualityManagementData[0];
-      if (total_quantity_plan >= 0) {
-        dispatch(
-          updateQualityManagement({
-            id: id,
-            batch_id,
-            product_article,
-            total_quantity_plan,
-            reserved_quantity,
-            reserved_quantity_allocated,
-            reserved_quantity_remaining,
-            free_quantity_fact,
-            sorting: sorting + 1,
-          }),
-        );
-      }
+  // Сброс полей ввода при изменении данных (например, при выборе новой партии)
+  useEffect(() => {
+    if (qualityManagementData.length > 0) {
+      const currentData = qualityManagementData[0];
+      // Инициализируем поля текущими значениями из данных
+      const totalQty =
+        currentData.reserved_quantity_allocated +
+        currentData.free_quantity_fact;
+      setTotalQtyInput(totalQty.toString());
+      setSortingInput(currentData.sorting.toString());
+    } else {
+      setTotalQtyInput('');
+      setSortingInput('');
     }
-  };
+  }, [qualityManagementData]);
 
-  const sortingMinusHandler = async () => {
-    if (qualityManagementData) {
-      const {
-        id,
-        batch_id,
-        product_article,
-        total_quantity_plan,
-        reserved_quantity,
-        reserved_quantity_allocated,
-        reserved_quantity_remaining,
-        free_quantity_fact,
-        sorting,
-      } = qualityManagementData[0];
-      if (sorting > 0) {
-        dispatch(
-          updateQualityManagement({
-            id: id,
-            batch_id,
-            product_article,
-            total_quantity_plan,
-            reserved_quantity,
-            reserved_quantity_allocated,
-            reserved_quantity_remaining,
-            free_quantity_fact,
-            sorting: sorting - 1,
-          }),
-        );
-      }
-    }
-  };
+  // const qualityManagementPlusHandler = async () => {
+  //   if (qualityManagementData) {
+  //     const {
+  //       id,
+  //       batch_id,
+  //       product_article,
+  //       total_quantity_plan,
+  //       reserved_quantity,
+  //       reserved_quantity_allocated,
+  //       reserved_quantity_remaining,
+  //       free_quantity_fact,
+  //       sorting,
+  //     } = qualityManagementData[0];
+  //     if (reserved_quantity_remaining > 0) {
+  //       dispatch(
+  //         updateQualityManagement({
+  //           id: id,
+  //           batch_id,
+  //           product_article,
+  //           total_quantity_plan,
+  //           reserved_quantity,
+  //           reserved_quantity_allocated: reserved_quantity_allocated + 1,
+  //           reserved_quantity_remaining: reserved_quantity_remaining - 1,
+  //           free_quantity_fact,
+  //           sorting,
+  //         }),
+  //       );
+  //     } else {
+  //       dispatch(
+  //         updateQualityManagement({
+  //           id: id,
+  //           batch_id,
+  //           product_article,
+  //           total_quantity_plan,
+  //           reserved_quantity,
+  //           reserved_quantity_allocated,
+  //           reserved_quantity_remaining: 0,
+  //           free_quantity_fact: free_quantity_fact + 1,
+  //           sorting,
+  //         }),
+  //       );
+  //     }
+  //   }
+  // };
+
+  // const qualityManagementMinusHandler = async () => {
+  //   if (qualityManagementData) {
+  //     const {
+  //       id,
+  //       batch_id,
+  //       product_article,
+  //       total_quantity_plan,
+  //       reserved_quantity,
+  //       reserved_quantity_allocated,
+  //       reserved_quantity_remaining,
+  //       free_quantity_fact,
+  //       sorting,
+  //     } = qualityManagementData[0];
+  //     if (
+  //       reserved_quantity_remaining < reserved_quantity &&
+  //       reserved_quantity_allocated > 0 &&
+  //       free_quantity_fact == 0
+  //     ) {
+  //       dispatch(
+  //         updateQualityManagement({
+  //           id: id,
+  //           batch_id,
+  //           product_article,
+  //           total_quantity_plan,
+  //           reserved_quantity,
+  //           reserved_quantity_allocated: reserved_quantity_allocated - 1,
+  //           reserved_quantity_remaining: reserved_quantity_remaining + 1,
+  //           free_quantity_fact,
+  //           sorting,
+  //         }),
+  //       );
+  //     } else if (reserved_quantity_remaining == 0 && free_quantity_fact > 0) {
+  //       dispatch(
+  //         updateQualityManagement({
+  //           id: id,
+  //           batch_id,
+  //           product_article,
+  //           total_quantity_plan,
+  //           reserved_quantity,
+  //           reserved_quantity_allocated,
+  //           reserved_quantity_remaining: 0,
+  //           free_quantity_fact: free_quantity_fact - 1,
+  //           sorting,
+  //         }),
+  //       );
+  //     }
+  //   }
+  // };
+
+  // const sortingPlusHandler = async () => {
+  //   if (qualityManagementData) {
+  //     const {
+  //       id,
+  //       batch_id,
+  //       product_article,
+  //       total_quantity_plan,
+  //       reserved_quantity,
+  //       reserved_quantity_allocated,
+  //       reserved_quantity_remaining,
+  //       free_quantity_fact,
+  //       sorting,
+  //     } = qualityManagementData[0];
+  //     if (total_quantity_plan >= 0) {
+  //       dispatch(
+  //         updateQualityManagement({
+  //           id: id,
+  //           batch_id,
+  //           product_article,
+  //           total_quantity_plan,
+  //           reserved_quantity,
+  //           reserved_quantity_allocated,
+  //           reserved_quantity_remaining,
+  //           free_quantity_fact,
+  //           sorting: sorting + 1,
+  //         }),
+  //       );
+  //     }
+  //   }
+  // };
+
+  // const sortingMinusHandler = async () => {
+  //   if (qualityManagementData) {
+  //     const {
+  //       id,
+  //       batch_id,
+  //       product_article,
+  //       total_quantity_plan,
+  //       reserved_quantity,
+  //       reserved_quantity_allocated,
+  //       reserved_quantity_remaining,
+  //       free_quantity_fact,
+  //       sorting,
+  //     } = qualityManagementData[0];
+  //     if (sorting > 0) {
+  //       dispatch(
+  //         updateQualityManagement({
+  //           id: id,
+  //           batch_id,
+  //           product_article,
+  //           total_quantity_plan,
+  //           reserved_quantity,
+  //           reserved_quantity_allocated,
+  //           reserved_quantity_remaining,
+  //           free_quantity_fact,
+  //           sorting: sorting - 1,
+  //         }),
+  //       );
+  //     }
+  //   }
+  // };
 
   const finishBatchHandler = async () => {
     const isConfirmed = window.confirm(
@@ -625,8 +737,43 @@ const QualityManagementTable = () => {
         handleRowClick={(row) => {}}
       />
       {qualityManagementData.length > 0 && (
-        <div className="d-flex gap-4 flex-wrap">
+        <div className="d-flex gap-4 flex-wrap align-items-end">
+          {/* Поле ввода для Total Qty in batch, fact, pallets */}
           <div className="border rounded p-3 bg-light">
+            <Form.Label htmlFor="totalQtyInput" className="fw-bold">
+              Total Qty in batch, fact, pallets
+            </Form.Label>
+            <Form.Control
+              id="totalQtyInput"
+              type="number"
+              min="0"
+              step="1"
+              value={totalQtyInput}
+              onChange={handleTotalQtyChange}
+              placeholder="Enter total qty"
+              style={{ width: '200px' }}
+            />
+          </div>
+
+          {/* Поле ввода для Quantity on sorting, pallets */}
+          <div className="border rounded p-3 bg-light">
+            <Form.Label htmlFor="sortingInput" className="fw-bold">
+              Quantity on sorting, pallets
+            </Form.Label>
+            <Form.Control
+              id="sortingInput"
+              type="number"
+              min="0"
+              step="1"
+              value={sortingInput}
+              onChange={handleSortingChange}
+              placeholder="Enter sorting qty"
+              style={{ width: '200px' }}
+            />
+          </div>
+
+          {/* Закомментированные кнопки - оставлены для возможного возврата */}
+          {/* <div className="border rounded p-3 bg-light">
             <div className="text-center mb-2 fw-bold border-bottom pb-1">
               OK
             </div>
@@ -660,7 +807,7 @@ const QualityManagementTable = () => {
                 <FaMinus style={{ fontSize: '1.5rem' }} />
               </Button>
             </div>
-          </div>
+          </div> */}
         </div>
       )}
       {qualityManagementData.length > 0 && (
