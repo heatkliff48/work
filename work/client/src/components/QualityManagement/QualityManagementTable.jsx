@@ -27,7 +27,8 @@ import {
 } from '#components/redux/actions/recipeAction.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
-import { Form } from 'react-bootstrap'; // Добавлен импорт Form
+import { Form } from 'react-bootstrap';
+import DatePicker from 'react-datepicker';
 
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
@@ -36,6 +37,7 @@ const QualityManagementTable = () => {
     autoclave_calendar,
     list_of_ordered_production,
     raw_materials_warehouse,
+    warehouse_data,
   } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
   const { raw_mat_consumption, list_of_recipes, recipeOrders } =
@@ -52,18 +54,16 @@ const QualityManagementTable = () => {
   );
 
   const [consumptionCalculated, setConsumptionCalculated] = useState({});
+  const [dateValue, setDateValue] = useState(null);
+  const [filteredList, setFilteredList] = useState([]);
+  const [filteredRawMatConsumption, setFilteredRaw_MatConsumption] = useState();
 
-  const [totalQtyInput, setTotalQtyInput] = useState('');
-  const [sortingInput, setSortingInput] = useState('');
+  // Состояние для хранения значений полей ввода для каждой записи
+  const [inputValues, setInputValues] = useState({});
 
   const COLUMNS_QUALITY_MANAGEMENT = [
-    // {
-    //   Header: 'Batch ID',
-    //   accessor: 'batch_id',
-    //   Filter: TextSearchFilter,
-    // },
     {
-      Header: 'Prodcut article',
+      Header: 'Produсt article',
       accessor: 'product_article',
       Filter: TextSearchFilter,
     },
@@ -97,7 +97,6 @@ const QualityManagementTable = () => {
       accessor: 'reserved_quantity',
       Filter: TextSearchFilter,
     },
-
     {
       Header: 'Reserved Qty in batch, remaining, pallets',
       accessor: 'reserved_quantity_remaining',
@@ -105,23 +104,92 @@ const QualityManagementTable = () => {
     },
   ];
 
+  // Для артикула склада
+  const getWarehouseArticle = (product) => {
+    let versionNumber = '0001';
+    let incVersion = 1;
+    const type = 0;
+    const articleId =
+      warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
+
+    versionNumber = `0000000${articleId}`.slice(-6);
+
+    const date = dateValue ? new Date(dateValue) : new Date();
+
+    const year = date.getFullYear().toString().slice(-2);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+
+    const certificate = product?.certificate.slice(0, 1);
+    const density = product?.density.toString().slice(0, 1);
+
+    const warehouseArticle = `S${type}0${certificate}${density}${year}${month}${day}${versionNumber}`;
+
+    return warehouseArticle;
+  };
+
   useEffect(() => {
     if (qualityManagementData) {
       setQualityManagementDataList(qualityManagementData);
+      // Сначала находим density для заданного article
+      const targetProduct = latestProducts.find(
+        (product) =>
+          product.article === qualityManagementData[0]?.product_article,
+      );
+      const targetDensity = targetProduct?.density;
+
+      // Создаем список всех article с такой же density
+      const filterList = latestProducts
+        .filter((product) => product.density === targetDensity)
+        .map((product) => product.article);
+
+      // Фильтруем данные таблицы
+      const filteredRawMatConsumption = raw_mat_consumption.filter((item) =>
+        filterList.includes(item.batch_article),
+      );
+      const filtered = filteredRawMatConsumption.filter((item) => !item.used);
+      setFilteredRaw_MatConsumption(filtered);
+
+      // Инициализируем значения полей ввода для каждой записи
+      const initialInputValues = {};
+      qualityManagementData.forEach((item) => {
+        const totalQty =
+          item.reserved_quantity_allocated + item.free_quantity_fact;
+        initialInputValues[item.id] = {
+          totalQty: totalQty.toString(),
+          sorting: item.sorting.toString(),
+        };
+      });
+      setInputValues(initialInputValues);
+    } else {
+      const filtered = raw_mat_consumption.filter((item) => !item.used);
+      setFilteredRaw_MatConsumption(filtered);
+      console.log(filtered, 'filtered QualityManagementTable.jsx line 167');
     }
   }, [qualityManagementData]);
 
-  // Обработчик для поля Total Qty in batch, fact, pallets
-  const handleTotalQtyChange = (e) => {
+  // Обработчик для поля Total Qty in batch, fact, pallets для конкретной записи
+  const handleTotalQtyChange = (recordId, e) => {
     const value = e.target.value;
-    setTotalQtyInput(value);
+
+    setInputValues((prev) => ({
+      ...prev,
+      [recordId]: {
+        ...prev[recordId],
+        totalQty: value,
+      },
+    }));
 
     if (value === '' || !qualityManagementData.length) return;
 
     const X = parseFloat(value);
     if (isNaN(X) || X < 0) return;
 
-    const currentData = qualityManagementData[0];
+    const currentData = qualityManagementData.find(
+      (item) => item.id === recordId,
+    );
+    if (!currentData) return;
+
     const {
       id,
       batch_id,
@@ -155,22 +223,35 @@ const QualityManagementTable = () => {
         reserved_quantity_allocated: newReservedQuantityAllocated,
         reserved_quantity_remaining: newReservedQuantityRemaining,
         free_quantity_fact: newFreeQuantityFact,
-        sorting,
+        sorting: inputValues[recordId]?.sorting
+          ? parseFloat(inputValues[recordId].sorting)
+          : sorting,
       }),
     );
   };
 
-  // Обработчик для поля Quantity on sorting, pallets
-  const handleSortingChange = (e) => {
+  // Обработчик для поля Quantity on sorting, pallets для конкретной записи
+  const handleSortingChange = (recordId, e) => {
     const value = e.target.value;
-    setSortingInput(value);
+
+    setInputValues((prev) => ({
+      ...prev,
+      [recordId]: {
+        ...prev[recordId],
+        sorting: value,
+      },
+    }));
 
     if (value === '' || !qualityManagementData.length) return;
 
     const sortingValue = parseFloat(value);
     if (isNaN(sortingValue) || sortingValue < 0) return;
 
-    const currentData = qualityManagementData[0];
+    const currentData = qualityManagementData.find(
+      (item) => item.id === recordId,
+    );
+    if (!currentData) return;
+
     const {
       id,
       batch_id,
@@ -197,456 +278,209 @@ const QualityManagementTable = () => {
     );
   };
 
-  // Сброс полей ввода при изменении данных (например, при выборе новой партии)
-  useEffect(() => {
-    if (qualityManagementData.length > 0) {
-      const currentData = qualityManagementData[0];
-      // Инициализируем поля текущими значениями из данных
-      const totalQty =
-        currentData.reserved_quantity_allocated +
-        currentData.free_quantity_fact;
-      setTotalQtyInput(totalQty.toString());
-      setSortingInput(currentData.sorting.toString());
-    } else {
-      setTotalQtyInput('');
-      setSortingInput('');
-    }
-  }, [qualityManagementData]);
+  // Обработка одной записи (вызывается в цикле)
+  const processSingleBatch = async (currentData) => {
+    const {
+      id,
+      batch_id,
+      product_article,
+      reserved_quantity_allocated,
+      reserved_quantity_remaining,
+      total_quantity_plan,
+      free_quantity_fact,
+      production_plan_id,
+      sorting,
+      raw_mat_cons_batch_id,
+      id_ordered_product_to_warehouse,
+    } = currentData;
 
-  // const qualityManagementPlusHandler = async () => {
-  //   if (qualityManagementData) {
-  //     const {
-  //       id,
-  //       batch_id,
-  //       product_article,
-  //       total_quantity_plan,
-  //       reserved_quantity,
-  //       reserved_quantity_allocated,
-  //       reserved_quantity_remaining,
-  //       free_quantity_fact,
-  //       sorting,
-  //     } = qualityManagementData[0];
-  //     if (reserved_quantity_remaining > 0) {
-  //       dispatch(
-  //         updateQualityManagement({
-  //           id: id,
-  //           batch_id,
-  //           product_article,
-  //           total_quantity_plan,
-  //           reserved_quantity,
-  //           reserved_quantity_allocated: reserved_quantity_allocated + 1,
-  //           reserved_quantity_remaining: reserved_quantity_remaining - 1,
-  //           free_quantity_fact,
-  //           sorting,
-  //         }),
-  //       );
-  //     } else {
-  //       dispatch(
-  //         updateQualityManagement({
-  //           id: id,
-  //           batch_id,
-  //           product_article,
-  //           total_quantity_plan,
-  //           reserved_quantity,
-  //           reserved_quantity_allocated,
-  //           reserved_quantity_remaining: 0,
-  //           free_quantity_fact: free_quantity_fact + 1,
-  //           sorting,
-  //         }),
-  //       );
-  //     }
-  //   }
-  // };
+    // 1. Фильтруем резервы для текущего product_article
+    const reservedProducts =
+      list_of_ordered_production?.filter(
+        (item) => item.product_article === product_article,
+      ) || [];
 
-  // const qualityManagementMinusHandler = async () => {
-  //   if (qualityManagementData) {
-  //     const {
-  //       id,
-  //       batch_id,
-  //       product_article,
-  //       total_quantity_plan,
-  //       reserved_quantity,
-  //       reserved_quantity_allocated,
-  //       reserved_quantity_remaining,
-  //       free_quantity_fact,
-  //       sorting,
-  //     } = qualityManagementData[0];
-  //     if (
-  //       reserved_quantity_remaining < reserved_quantity &&
-  //       reserved_quantity_allocated > 0 &&
-  //       free_quantity_fact == 0
-  //     ) {
-  //       dispatch(
-  //         updateQualityManagement({
-  //           id: id,
-  //           batch_id,
-  //           product_article,
-  //           total_quantity_plan,
-  //           reserved_quantity,
-  //           reserved_quantity_allocated: reserved_quantity_allocated - 1,
-  //           reserved_quantity_remaining: reserved_quantity_remaining + 1,
-  //           free_quantity_fact,
-  //           sorting,
-  //         }),
-  //       );
-  //     } else if (reserved_quantity_remaining == 0 && free_quantity_fact > 0) {
-  //       dispatch(
-  //         updateQualityManagement({
-  //           id: id,
-  //           batch_id,
-  //           product_article,
-  //           total_quantity_plan,
-  //           reserved_quantity,
-  //           reserved_quantity_allocated,
-  //           reserved_quantity_remaining: 0,
-  //           free_quantity_fact: free_quantity_fact - 1,
-  //           sorting,
-  //         }),
-  //       );
-  //     }
-  //   }
-  // };
+    // 2. Сколько осталось "свободного" количества
+    let remainingFreeQty = free_quantity_fact;
+    let summReserve = 0;
 
-  // const sortingPlusHandler = async () => {
-  //   if (qualityManagementData) {
-  //     const {
-  //       id,
-  //       batch_id,
-  //       product_article,
-  //       total_quantity_plan,
-  //       reserved_quantity,
-  //       reserved_quantity_allocated,
-  //       reserved_quantity_remaining,
-  //       free_quantity_fact,
-  //       sorting,
-  //     } = qualityManagementData[0];
-  //     if (total_quantity_plan >= 0) {
-  //       dispatch(
-  //         updateQualityManagement({
-  //           id: id,
-  //           batch_id,
-  //           product_article,
-  //           total_quantity_plan,
-  //           reserved_quantity,
-  //           reserved_quantity_allocated,
-  //           reserved_quantity_remaining,
-  //           free_quantity_fact,
-  //           sorting: sorting + 1,
-  //         }),
-  //       );
-  //     }
-  //   }
-  // };
+    // 3. Обходим каждый резерв и корректируем остатки
+    const updatedReserves = reservedProducts.map((reservedItem) => {
+      if (reservedItem.product_article !== product_article) {
+        return reservedItem;
+      }
 
-  // const sortingMinusHandler = async () => {
-  //   if (qualityManagementData) {
-  //     const {
-  //       id,
-  //       batch_id,
-  //       product_article,
-  //       total_quantity_plan,
-  //       reserved_quantity,
-  //       reserved_quantity_allocated,
-  //       reserved_quantity_remaining,
-  //       free_quantity_fact,
-  //       sorting,
-  //     } = qualityManagementData[0];
-  //     if (sorting > 0) {
-  //       dispatch(
-  //         updateQualityManagement({
-  //           id: id,
-  //           batch_id,
-  //           product_article,
-  //           total_quantity_plan,
-  //           reserved_quantity,
-  //           reserved_quantity_allocated,
-  //           reserved_quantity_remaining,
-  //           free_quantity_fact,
-  //           sorting: sorting - 1,
-  //         }),
-  //       );
-  //     }
-  //   }
-  // };
-
-  const finishBatchHandler = async () => {
-    const isConfirmed = window.confirm(
-      `Are you sure?\nPress 'OK' to confirm or 'Cancel' to exit.`,
-    );
-    if (isConfirmed) {
-      const {
-        id,
-        batch_id,
-        product_article,
-        reserved_quantity_allocated,
-        reserved_quantity_remaining,
-        total_quantity_plan,
-        free_quantity_fact,
-        production_plan_id,
-        sorting,
-        raw_mat_cons_batch_id,
-        id_ordered_product_to_warehouse,
-      } = qualityManagementData[0];
-
-      // 1. Фильтруем резервы для текущего product_article
-
-      const reservedProducts =
-        list_of_ordered_production?.filter(
-          (item) => item.product_article === product_article,
-        ) || [];
-
-      // 2. Сколько осталось "свободного" количества
-
-      let remainingFreeQty = free_quantity_fact;
-
-      let summReserve = 0;
-
-      // 3. Обходим каждый резерв и корректируем остатки
-
-      const updatedReserves = reservedProducts.map((reservedItem) => {
-        if (reservedItem.product_article !== product_article) {
-          return reservedItem; // Не трогаем резервы других товаров
+      if (remainingFreeQty <= 0) {
+        if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
+          return reservedItem;
+        } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
+          const newQuantityInWarehouse = Math.min(
+            reservedItem.quantity_in_warehouse + reserved_quantity_allocated,
+            reservedItem.quantity,
+          );
+          return {
+            ...reservedItem,
+            quantity_in_warehouse: newQuantityInWarehouse,
+          };
         }
+      }
 
-        // Если новый товар уже "исчерпан" и кол-во паллет совпадает с кол-вом зарезервированных
+      const deducted = production_plan_id
+        ? Math.min(
+            Math.max(
+              0,
+              reservedItem.quantity -
+                reservedItem.quantity_in_warehouse -
+                reserved_quantity_allocated,
+            ),
+            remainingFreeQty,
+          )
+        : Math.min(
+            reservedItem.quantity - reservedItem.quantity_in_warehouse,
+            remainingFreeQty,
+          );
 
-        if (remainingFreeQty <= 0) {
-          if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
-            return reservedItem;
-          } else if (
-            reservedItem.quantity > reservedItem.quantity_in_warehouse
-          ) {
-            // ИСПРАВЛЕНИЕ: Добавляем к существующему количеству, а не заменяем
+      remainingFreeQty -= deducted;
+      summReserve += deducted;
 
-            const newQuantityInWarehouse = Math.min(
-              reservedItem.quantity_in_warehouse + reserved_quantity_allocated,
+      const baseQuantityInWarehouse = reservedItem.quantity_in_warehouse;
 
-              reservedItem.quantity,
-            );
-
-            return {
-              ...reservedItem,
-
-              quantity_in_warehouse: newQuantityInWarehouse,
-            };
+      return production_plan_id
+        ? {
+            ...reservedItem,
+            quantity_in_warehouse:
+              baseQuantityInWarehouse + reserved_quantity_allocated + deducted,
           }
-        }
+        : {
+            ...reservedItem,
+            quantity_in_warehouse: baseQuantityInWarehouse + deducted,
+          };
+    });
 
-        // Сколько можно зарезервировать из нового товара для этого резерва
-
-        const deducted = production_plan_id
-          ? Math.min(
-              Math.max(
-                0,
-
-                reservedItem.quantity -
-                  reservedItem.quantity_in_warehouse -
-                  reserved_quantity_allocated,
-              ), // Сколько нужно для этого резерва
-
-              remainingFreeQty, // Сколько доступно в новом товаре
-            )
-          : Math.min(
-              reservedItem.quantity - reservedItem.quantity_in_warehouse, // Сколько нужно для этого резерва
-
-              remainingFreeQty, // Сколько доступно в новом товаре
-            );
-
-        // Уменьшаем остаток нового товара
-
-        remainingFreeQty -= deducted;
-
-        summReserve += deducted;
-
-        // ИСПРАВЛЕНИЕ: Правильное суммирование количества на складе
-
-        const baseQuantityInWarehouse = reservedItem.quantity_in_warehouse;
-
-        return production_plan_id
-          ? {
-              ...reservedItem,
-
-              // Добавляем к существующему количеству: базовое + зарезервированное + новое из свободного
-
-              quantity_in_warehouse:
-                baseQuantityInWarehouse +
-                reserved_quantity_allocated +
-                deducted,
-            }
-          : {
-              ...reservedItem,
-
-              // Добавляем к существующему количеству только новое из свободного
-
-              quantity_in_warehouse: baseQuantityInWarehouse + deducted,
-            };
-      });
-
-      // Проверки на корректность
-
-      if (reserved_quantity_allocated < 0) {
-        alert(
-          'Ошибка: reserved_quantity_allocated не может быть отрицательным.',
-        );
-
-        return;
-      }
-
-      if (summReserve < 0) {
-        alert('Ошибка: summReserve не может быть отрицательным.');
-
-        return;
-      }
-
-      const calculatedOrderedQuantity =
-        reserved_quantity_allocated + summReserve;
-
-      // Добавляем на склад
-
-      let totalQuantityForRawMatWarehouse = 0;
-
-      totalQuantityForRawMatWarehouse +=
-        (calculatedOrderedQuantity ?? 0) +
-        (remainingFreeQty ?? 0) +
-        (sorting ?? 0);
-
-      const checkPallets = raw_materials_warehouse.some(
-        (item) =>
-          item.material_type == 'Pallets' &&
-          item.remaining_quantity >= totalQuantityForRawMatWarehouse,
+    // Проверки на корректность
+    if (reserved_quantity_allocated < 0) {
+      throw new Error(
+        `Ошибка в записи ${id}: reserved_quantity_allocated не может быть отрицательным.`,
       );
+    }
 
-      console.log(
-        checkPallets,
-        'checkPallets QualityManagementTable.jsx line 407',
+    if (summReserve < 0) {
+      throw new Error(
+        `Ошибка в записи ${id}: summReserve не может быть отрицательным.`,
       );
+    }
 
-      const checkPlastics = raw_materials_warehouse.some(
-        (item) =>
-          item.material_type == 'Plastics' &&
-          item.remaining_quantity >= totalQuantityForRawMatWarehouse * 0.45,
+    const calculatedOrderedQuantity = reserved_quantity_allocated + summReserve;
+
+    // Добавляем на склад
+    let totalQuantityForRawMatWarehouse = 0;
+    totalQuantityForRawMatWarehouse +=
+      (calculatedOrderedQuantity ?? 0) +
+      (remainingFreeQty ?? 0) +
+      (sorting ?? 0);
+
+    const checkPallets = raw_materials_warehouse.some(
+      (item) =>
+        item.material_type == 'Pallets' &&
+        item.remaining_quantity >= totalQuantityForRawMatWarehouse,
+    );
+
+    const checkPlastics = raw_materials_warehouse.some(
+      (item) =>
+        item.material_type == 'Plastics' &&
+        item.remaining_quantity >= totalQuantityForRawMatWarehouse * 0.45,
+    );
+
+    if (!checkPallets) {
+      const pallets =
+        raw_materials_warehouse.find((item) => item.material_type == 'Pallets')
+          ?.remaining_quantity || 0;
+      throw new Error(
+        `Not enough pallets in the warehouse for batch ${batch_id}. Available: ${pallets}, need: ${totalQuantityForRawMatWarehouse}.`,
       );
+    }
 
-      console.log(
-        checkPlastics,
-        'checkPlastics QualityManagementTable.jsx line 415',
+    if (!checkPlastics) {
+      const plastics =
+        raw_materials_warehouse.find((item) => item.material_type == 'Plastics')
+          ?.remaining_quantity || 0;
+      throw new Error(
+        `Not enough plastic in the warehouse for batch ${batch_id}. Available: ${plastics}, need: ${totalQuantityForRawMatWarehouse * 0.45}.`,
       );
+    }
 
-      if (!checkPallets) {
-        const pallets = raw_materials_warehouse.find(
-          (item) => item.material_type == 'Pallets',
-        ).remaining_quantity;
-        alert(
-          `Not enough pallets in the warehouse. Available: ${pallets}, need: ${totalQuantityForRawMatWarehouse}.`,
-        );
-        return;
-      }
+    const product = latestProducts.find((el) => el.article == product_article);
+    const warehouse_article = getWarehouseArticle(product);
 
-      if (!checkPlastics) {
-        const plastics = raw_materials_warehouse.find(
-          (item) => item.material_type == 'Plastics',
-        ).remaining_quantity;
-        alert(
-          `Not enough plastic in the warehouse. Available: ${plastics}, need: ${totalQuantityForRawMatWarehouse * 0.45}.`,
-        );
-        return;
-      }
-
-      if (calculatedOrderedQuantity + remainingFreeQty > 0) {
+    if (calculatedOrderedQuantity + remainingFreeQty > 0) {
+      await dispatch(
+        addNewWarehouse({
+          product_article,
+          article: warehouse_article,
+          warehouse_loc: 'local',
+          free_quantity_remaining: remainingFreeQty,
+          ordered_quantity: calculatedOrderedQuantity,
+          total_quantity: calculatedOrderedQuantity + remainingFreeQty,
+          type: 'OK',
+          sorting: 0,
+          batch_id: raw_mat_cons_batch_id,
+        }),
+      );
+      if (id_ordered_product_to_warehouse) {
         await dispatch(
-          addNewWarehouse({
-            product_article,
-            article: batch_id,
-            warehouse_loc: 'local',
-            free_quantity_remaining: remainingFreeQty,
-            ordered_quantity: calculatedOrderedQuantity,
-            total_quantity: calculatedOrderedQuantity + remainingFreeQty,
-            type: 'OK',
-            sorting: 0,
-            batch_id: raw_mat_cons_batch_id,
+          updateOrderToWarehouse({
+            id: id_ordered_product_to_warehouse,
+            quantity_produced: remainingFreeQty,
+            quantity_allocated: 0,
           }),
         );
-        if (id_ordered_product_to_warehouse) {
-          await dispatch(
-            updateOrderToWarehouse({
-              id: id_ordered_product_to_warehouse,
-              quantity_produced: remainingFreeQty,
-              quantity_allocated: 0,
-            }),
-          );
-        }
       }
+    }
 
-      if (sorting > 0) {
+    if (sorting > 0) {
+      await dispatch(
+        addNewWarehouse({
+          product_article,
+          article: warehouse_article,
+          warehouse_loc: 'local',
+          free_quantity_remaining: 0,
+          ordered_quantity: 0,
+          total_quantity: sorting,
+          type: 'Sorting',
+          sorting,
+          batch_id: raw_mat_cons_batch_id,
+        }),
+      );
+      if (id_ordered_product_to_warehouse) {
         await dispatch(
-          addNewWarehouse({
-            product_article,
-            article: batch_id,
-            warehouse_loc: 'local',
-            free_quantity_remaining: 0,
-            ordered_quantity: 0,
-            total_quantity: sorting,
-            type: 'Sorting',
-            sorting,
-            batch_id: raw_mat_cons_batch_id,
+          updateOrderToWarehouse({
+            id: id_ordered_product_to_warehouse,
+            quantity_produced: remainingFreeQty,
+            quantity_allocated: 0,
           }),
         );
-        if (id_ordered_product_to_warehouse) {
-          await dispatch(
-            updateOrderToWarehouse({
-              id: id_ordered_product_to_warehouse,
-              quantity_produced: remainingFreeQty,
-              quantity_allocated: 0,
-            }),
-          );
-        }
       }
+    }
 
-      // Обновляем все затронутые позиции в list_of_ordered_production
+    // Обновляем все затронутые позиции в list_of_ordered_production
+    for (const ordered_production of updatedReserves) {
+      await dispatch(updListOfOrderedProduction(ordered_production));
+    }
 
-      for (const ordered_production of updatedReserves) {
-        await dispatch(updListOfOrderedProduction(ordered_production));
-      }
+    if (production_plan_id) {
+      const batch = batchOutside.find(
+        (batch) => batch.id === production_plan_id,
+      );
 
-      if (production_plan_id) {
-        // Остальная логика с autoclave_calendar...
-        const { date, quantity_pallets } = batchOutside?.find(
-          (el) => el.id === production_plan_id,
-        );
+      const productData = latestProducts.find(
+        (el) => el.article == product_article,
+      );
 
-        const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
-          (el) => el.article == product_article,
-        );
-
-        // const accd = autoclave_calendar.find((el) => el.date === date);
-
-        // if (!accd) {
-        //   console.error('Autoclave calendar entry not found for date:', date);
-        //   return;
-        // }
-
+      if (productData) {
+        const { m3InArray, volumeBlockOnPallet } = productData;
         const palletsPerArray = Math.max(
           1,
           Math.floor(m3InArray / volumeBlockOnPallet) || 1,
-        );
-
-        // const total_arrays =
-        //   (accd?.total_arrays || 0) + quantity_pallets / palletsPerArray;
-
-        // const filled_autoclaves = Math.ceil(total_arrays / 21);
-        // const residual_arrays = total_arrays - filled_autoclaves * 21;
-
-        // const result = [
-        //   {
-        //     ...accd,
-        //     total_arrays,
-        //     residual_arrays,
-        //     filled_autoclaves,
-        //   },
-        // ];
-
-        const batch = batchOutside.find(
-          (batch) => batch.id === production_plan_id,
         );
 
         const recipe = recipeOrders.find(
@@ -657,7 +491,7 @@ const QualityManagementTable = () => {
           (rec) => rec.id === recipe?.id_recipe,
         );
 
-        dispatch(
+        await dispatch(
           addNewRawMatConsumption({
             recipe_article: recipeDetails?.article || 'Unknown Recipe',
             batch_article: batch?.product_article || 'Unknown Batch',
@@ -669,29 +503,23 @@ const QualityManagementTable = () => {
             date: batch?.date || 'Unknown Date',
           }),
         );
-
-        // await dispatch(addNewAutoclaveCalendar(result));
       }
-      await dispatch(
-        deleteQualityManagement({
-          id,
-          quantity: totalQuantityForRawMatWarehouse,
-        }),
-      );
+    }
 
-      if (consumptionCalculated.consumption_calculated) {
-        await dispatch(
-          deleteRawMatConsumption({
-            id: consumptionCalculated?.id,
-          }),
-        );
-      }
+    await dispatch(
+      deleteQualityManagement({
+        id,
+        quantity: totalQuantityForRawMatWarehouse,
+      }),
+    );
 
-      const { m3InArray, volumeBlockOnPallet } = latestProducts.find(
+    if (production_plan_id) {
+      const productData = latestProducts.find(
         (el) => el.article == product_article,
       );
 
-      if (production_plan_id) {
+      if (productData) {
+        const { m3InArray, volumeBlockOnPallet } = productData;
         const widthInArray = m3InArray / volumeBlockOnPallet;
 
         if (
@@ -702,30 +530,82 @@ const QualityManagementTable = () => {
           await dispatch(deleteBatchOutside(production_plan_id));
         } else {
           await dispatch(deleteBatchOutside(production_plan_id));
-          // const batch = batchOutside.find((el) => el.id === production_plan_id);
-          // await dispatch(
-          //   updateBatchOutside({
-          //     ...batch,
-          //     quantity_pallets:
-          //       total_quantity_plan - reserved_quantity_allocated,
-          //   }),
-          // );
         }
       }
-      setConsumptionCalculated({});
     }
+
+    return { success: true, id, batch_id };
   };
 
-  // useEffect(() => {
-  //   if (user && roles.length > 0) {
-  //     const access = checkUserAccess(user, roles, 'batch_outside');
-  //     setUserAccess(access);
+  // Основной обработчик для всех записей
+  const finishAllBatchesHandler = async () => {
+    if (!qualityManagementDataList.length) {
+      alert('No batches to process');
+      return;
+    }
 
-  //     if (!access.canRead) {
-  //       navigate('/');
-  //     }
-  //   }
-  // }, [user, roles]);
+    if (!dateValue) {
+      alert('No date selected.');
+      return;
+    }
+
+    const isConfirmed = window.confirm(
+      `Are you sure you want to finish ALL ${qualityManagementDataList.length} batch(es)?\nPress 'OK' to confirm or 'Cancel' to exit.`,
+    );
+
+    if (!isConfirmed) return;
+
+    const errors = [];
+    const processedBatches = [];
+
+    // Обрабатываем каждую запись последовательно
+    for (const record of qualityManagementDataList) {
+      try {
+        const result = await processSingleBatch(record);
+        processedBatches.push(result);
+      } catch (error) {
+        console.error(`Error processing batch ${record.batch_id}:`, error);
+        errors.push({
+          batch_id: record.batch_id,
+          error: error.message,
+        });
+      }
+    }
+
+    // Очищаем состояние inputValues для обработанных записей
+    if (processedBatches.length > 0) {
+      setInputValues((prev) => {
+        const newValues = { ...prev };
+        processedBatches.forEach(({ id }) => {
+          delete newValues[id];
+        });
+        return newValues;
+      });
+    }
+
+    // Удаляем consumptionCalculated если нужно
+    if (consumptionCalculated.consumption_calculated) {
+      await dispatch(
+        deleteRawMatConsumption({
+          id: consumptionCalculated?.id,
+        }),
+      );
+      setConsumptionCalculated({});
+    }
+
+    // Показываем итоговое сообщение
+    if (errors.length > 0) {
+      const errorMessages = errors
+        .map((e) => `- ${e.batch_id}: ${e.error}`)
+        .join('\n');
+      alert(
+        `Processed ${processedBatches.length} batch(es) successfully.\n` +
+          `Failed to process ${errors.length} batch(es):\n${errorMessages}`,
+      );
+    } else {
+      alert(`Successfully processed all ${processedBatches.length} batch(es)!`);
+    }
+  };
 
   return (
     <Fragment>
@@ -736,92 +616,80 @@ const QualityManagementTable = () => {
         userAccess={userAccess}
         handleRowClick={(row) => {}}
       />
-      {qualityManagementData.length > 0 && (
-        <div className="d-flex gap-4 flex-wrap align-items-end">
-          {/* Поле ввода для Total Qty in batch, fact, pallets */}
-          <div className="border rounded p-3 bg-light">
-            <Form.Label htmlFor="totalQtyInput" className="fw-bold">
-              Total Qty in batch, fact, pallets
-            </Form.Label>
-            <Form.Control
-              id="totalQtyInput"
-              type="number"
-              min="0"
-              step="1"
-              value={totalQtyInput}
-              onChange={handleTotalQtyChange}
-              placeholder="Enter total qty"
-              style={{ width: '200px' }}
-            />
-          </div>
 
-          {/* Поле ввода для Quantity on sorting, pallets */}
-          <div className="border rounded p-3 bg-light">
-            <Form.Label htmlFor="sortingInput" className="fw-bold">
-              Quantity on sorting, pallets
-            </Form.Label>
-            <Form.Control
-              id="sortingInput"
-              type="number"
-              min="0"
-              step="1"
-              value={sortingInput}
-              onChange={handleSortingChange}
-              placeholder="Enter sorting qty"
-              style={{ width: '200px' }}
-            />
-          </div>
+      {/* Отображаем поля ввода для каждой записи */}
+      {qualityManagementDataList.map((record) => (
+        <div key={record.id} className="mb-4 p-3 border rounded">
+          <h5 className="mb-3">Batch: {record.product_article}</h5>
 
-          {/* Закомментированные кнопки - оставлены для возможного возврата */}
-          {/* <div className="border rounded p-3 bg-light">
-            <div className="text-center mb-2 fw-bold border-bottom pb-1">
-              OK
-            </div>
-            <div className="d-flex gap-2">
-              <Button
-                variant="success"
-                size="lg"
-                onClick={qualityManagementPlusHandler}
+          <div className="d-flex gap-4 flex-wrap align-items-end">
+            {/* Поле ввода для Total Qty in batch, fact, pallets */}
+            <div className="border rounded p-3 bg-light">
+              <Form.Label
+                htmlFor={`totalQtyInput-${record.id}`}
+                className="fw-bold"
               >
-                <FaPlus style={{ fontSize: '1.5rem' }} />
-              </Button>
-              <Button
-                variant="danger"
-                size="lg"
-                onClick={qualityManagementMinusHandler}
+                Total Qty in batch, fact, pallets
+              </Form.Label>
+              <Form.Control
+                id={`totalQtyInput-${record.id}`}
+                type="number"
+                min="0"
+                step="1"
+                value={inputValues[record.id]?.totalQty || ''}
+                onChange={(e) => handleTotalQtyChange(record.id, e)}
+                placeholder="Enter total qty"
+                style={{ width: '200px' }}
+              />
+            </div>
+
+            {/* Поле ввода для Quantity on sorting, pallets */}
+            <div className="border rounded p-3 bg-light">
+              <Form.Label
+                htmlFor={`sortingInput-${record.id}`}
+                className="fw-bold"
               >
-                <FaMinus style={{ fontSize: '1.5rem' }} />
-              </Button>
+                Quantity on sorting, pallets
+              </Form.Label>
+              <Form.Control
+                id={`sortingInput-${record.id}`}
+                type="number"
+                min="0"
+                step="1"
+                value={inputValues[record.id]?.sorting || ''}
+                onChange={(e) => handleSortingChange(record.id, e)}
+                placeholder="Enter sorting qty"
+                style={{ width: '200px' }}
+              />
             </div>
           </div>
-
-          <div className="border rounded p-3 bg-light">
-            <div className="text-center mb-2 fw-bold border-bottom pb-1">
-              Sorting
-            </div>
-            <div className="d-flex gap-2">
-              <Button variant="success" size="lg" onClick={sortingPlusHandler}>
-                <FaPlus style={{ fontSize: '1.5rem' }} />
-              </Button>
-              <Button variant="danger" size="lg" onClick={sortingMinusHandler}>
-                <FaMinus style={{ fontSize: '1.5rem' }} />
-              </Button>
-            </div>
-          </div> */}
         </div>
-      )}
-      {qualityManagementData.length > 0 && (
-        <div className="d-flex gap-2 mb-2">
-          <Button variant="warning" size="lg" onClick={finishBatchHandler}>
-            Finish batch above
+      ))}
+
+      {/* Одна кнопка для завершения всех записей */}
+      {qualityManagementDataList.length > 0 && (
+        <div className="d-flex gap-2 mb-4">
+          <DatePicker
+            id="data_pcker"
+            type="text"
+            selected={dateValue}
+            onChange={(date) => setDateValue(date)}
+            dateFormat="dd.MM.yyyy"
+          />
+          <Button variant="warning" size="lg" onClick={finishAllBatchesHandler}>
+            Finish ALL batches ({qualityManagementDataList.length})
           </Button>
         </div>
       )}
-      {(!qualityManagementData || qualityManagementData.length === 0) && (
-        <ShowQualityManagementAddModal
-          setConsumptionCalculated={setConsumptionCalculated}
-        />
-      )}
+
+      <ShowQualityManagementAddModal
+        setConsumptionCalculated={setConsumptionCalculated}
+        filteredRawMatConsumption={
+          qualityManagementDataList.length > 0
+            ? filteredRawMatConsumption
+            : null
+        }
+      />
     </Fragment>
   );
 };

@@ -133,17 +133,8 @@ function CackeFillUp() {
 
     const notes = cakeNotes;
 
-    const batchCalendarQuantity = batchOutside.find(
+    const { quantity_pallets, quantity_free } = batchOutside.find(
       (el) => el.id == id,
-    )?.quantity_pallets;
-
-    console.log(
-      batchOutside.find((el) => el.id == id),
-      ' CackeFillUp.jsx line 140',
-    );
-    console.log(
-      batchCalendarQuantity,
-      'batchCalendarQuantity CackeFillUp.jsx line 138',
     );
 
     await dispatch(addNewLotesListCakes({ num: cakeIds, note: notes }));
@@ -177,7 +168,7 @@ function CackeFillUp() {
         date,
         id_ordered_product_to_warehouse: id_ordered_product_to_warehouse,
         consumption_calculated: false,
-        batch_quantity_pallets: batchCalendarQuantity || 0,
+        batch_quantity_pallets: quantity_pallets - quantity_free || 0,
       }),
     );
 
