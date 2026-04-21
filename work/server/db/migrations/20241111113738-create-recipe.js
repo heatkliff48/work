@@ -40,8 +40,14 @@ module.exports = {
       aluminum_paste: {
         type: Sequelize.FLOAT,
       },
+      aluminum_type: {
+        type: Sequelize.STRING,
+      },
       aluminum_paste_2: {
         type: Sequelize.FLOAT,
+      },
+      aluminum_2_type: {
+        type: Sequelize.STRING,
       },
       water_solids: {
         type: Sequelize.FLOAT,
