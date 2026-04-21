@@ -105,26 +105,39 @@ const QualityManagementTable = () => {
   ];
 
   // Для артикула склада
-  const getWarehouseArticle = (product) => {
-    let versionNumber = '0001';
-    let incVersion = 1;
+  const getWarehouseArticle = (product, count) => {
     const type = 0;
-    const articleId =
-      warehouse_data.length === 0 ? 1 : warehouse_data.length + incVersion++;
-
-    versionNumber = `0000000${articleId}`.slice(-6);
+    const certificate = product?.certificate?.slice(0, 1) || '';
+    const density = product?.density?.toString().slice(0, 1) || '';
 
     const date = dateValue ? new Date(dateValue) : new Date();
-
     const year = date.getFullYear().toString().slice(-2);
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
 
-    const certificate = product?.certificate.slice(0, 1);
-    const density = product?.density.toString().slice(0, 1);
+    const dateStr = `${year}${month}${day}`;
 
-    const warehouseArticle = `S${type}0${certificate}${density}${year}${month}${day}${versionNumber}`;
+    // Ищем все артикулы, содержащие эту дату
+    const matchingArticles = warehouse_data.filter(
+      (item) => item.article && item.article.includes(dateStr),
+    );
 
+    let nextNumber = 1;
+
+    if (matchingArticles.length > 0) {
+      // Извлекаем числовую часть (последние 6 цифр) и находим максимальное значение
+      const numbers = matchingArticles.map((item) => {
+        const numStr = item.article.slice(-6);
+        return parseInt(numStr, 10);
+      });
+
+      nextNumber = Math.max(...numbers) + 1 + count;
+    }
+
+    // Форматируем число с ведущими нулями (6 цифр)
+    const versionNumber = nextNumber.toString().padStart(6, '0');
+
+    const warehouseArticle = `S${type}0${certificate}${density}${dateStr}${versionNumber}`;
     return warehouseArticle;
   };
 
@@ -279,7 +292,7 @@ const QualityManagementTable = () => {
   };
 
   // Обработка одной записи (вызывается в цикле)
-  const processSingleBatch = async (currentData) => {
+  const processSingleBatch = async (currentData, count) => {
     const {
       id,
       batch_id,
@@ -410,7 +423,7 @@ const QualityManagementTable = () => {
     }
 
     const product = latestProducts.find((el) => el.article == product_article);
-    const warehouse_article = getWarehouseArticle(product);
+    const warehouse_article = getWarehouseArticle(product, count);
 
     if (calculatedOrderedQuantity + remainingFreeQty > 0) {
       await dispatch(
@@ -558,11 +571,14 @@ const QualityManagementTable = () => {
     const errors = [];
     const processedBatches = [];
 
+    let count = 0;
+
     // Обрабатываем каждую запись последовательно
     for (const record of qualityManagementDataList) {
       try {
-        const result = await processSingleBatch(record);
+        const result = await processSingleBatch(record, count);
         processedBatches.push(result);
+        count += 1;
       } catch (error) {
         console.error(`Error processing batch ${record.batch_id}:`, error);
         errors.push({
