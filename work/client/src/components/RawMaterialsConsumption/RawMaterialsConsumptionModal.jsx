@@ -31,7 +31,8 @@ const RawMaterialsConsumptionModal = React.memo(
     const { latestProducts } = useProductsContext();
 
     const { setMainRawMaterialConsumptionMadal } = useModalContext();
-    const { raw_materials_warehouse = [], warehouse_data } = useWarehouseContext();
+    const { raw_materials_warehouse = [], warehouse_data } =
+      useWarehouseContext();
 
     const dispatch = useDispatch();
 
@@ -175,7 +176,8 @@ const RawMaterialsConsumptionModal = React.memo(
       if (product) {
         candidateRecipes = (list_of_recipes || []).filter(
           (r) =>
-            r.density === product.density && r.certificate === product.certificate,
+            r.density === product.density &&
+            r.certificate === product.certificate,
         );
       }
 
@@ -188,7 +190,9 @@ const RawMaterialsConsumptionModal = React.memo(
       const fromRowArticle = selectedRow?.recipe_article;
       const matched =
         fromRowArticle &&
-        candidateRecipes.find((r) => String(r.article) === String(fromRowArticle));
+        candidateRecipes.find(
+          (r) => String(r.article) === String(fromRowArticle),
+        );
 
       if (matched) {
         setSelectedRecipe(matched);
@@ -196,7 +200,9 @@ const RawMaterialsConsumptionModal = React.memo(
         if (selectedRow?.recipe_article === 'No recipe') {
           setSelectedRecipe(null);
         } else {
-          setSelectedRecipe(candidateRecipes.length ? candidateRecipes[0] : null);
+          setSelectedRecipe(
+            candidateRecipes.length ? candidateRecipes[0] : null,
+          );
         }
       }
     }, [isOpen, selectedRow, latestProducts, list_of_recipes]);
@@ -222,7 +228,8 @@ const RawMaterialsConsumptionModal = React.memo(
         processedValue = e.target.value.replace(/(\d+),(\d*)/g, '$1.$2');
       }
 
-      if (!(processedValue === '' || /^-?\d*\.?\d*$/.test(processedValue))) return;
+      if (!(processedValue === '' || /^-?\d*\.?\d*$/.test(processedValue)))
+        return;
 
       const currentValue = Number(processedValue || 0);
 
@@ -286,7 +293,9 @@ const RawMaterialsConsumptionModal = React.memo(
         const raw = Number(form[`${key}_actual_reciepe`] || 0);
         const baseNum = Number(recipeForUI?.[key]) || 0;
         const aVal =
-          raw === '' || raw === null || raw === undefined ? baseNum : Number(raw);
+          raw === '' || raw === null || raw === undefined
+            ? baseNum
+            : Number(raw);
         t[`${key}_total`] = pvNumber ? +(aVal * pvNumber).toFixed(2) : '';
       });
       return t;
@@ -459,13 +468,15 @@ const RawMaterialsConsumptionModal = React.memo(
       if (govno) {
         const totalConsumedRaw = result_materials
           .filter(
-            (m) => m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
+            (m) =>
+              m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
           )
           .reduce((sum, m) => sum + (Number(m.quantity) || 0), 0);
 
         if (Number.isFinite(totalConsumedRaw) && totalConsumedRaw > 0) {
           const idx = result_materials.findIndex(
-            (m) => m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
+            (m) =>
+              m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
           );
 
           if (idx >= 0) {
@@ -625,7 +636,9 @@ const RawMaterialsConsumptionModal = React.memo(
           )
         ) {
           dispatch(
-            deleteRawMatConsumptionCurrentMolds({ batch_id: selectedRow?.batch_id }),
+            deleteRawMatConsumptionCurrentMolds({
+              batch_id: selectedRow?.batch_id,
+            }),
           );
         }
       } else {
@@ -764,7 +777,8 @@ const RawMaterialsConsumptionModal = React.memo(
         .filter((r) => String(r.batch_id) === String(batch_id))
         .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
-      const total = planned - alreadyConsumed < 0 ? 0 : planned - alreadyConsumed;
+      const total =
+        planned - alreadyConsumed < 0 ? 0 : planned - alreadyConsumed;
       setProductionVolume(total);
     }, [selectedRow, isOpen]);
 
@@ -772,7 +786,10 @@ const RawMaterialsConsumptionModal = React.memo(
       <div>
         <Modal isOpen={isOpen} toggle={toggle} size="xl">
           <ModalHeader toggle={toggle}>
-            <div className="d-flex gap-3 w-100" style={{ alignItems: 'flex-start' }}>
+            <div
+              className="d-flex gap-3 w-100"
+              style={{ alignItems: 'flex-start' }}
+            >
               <div style={{ minWidth: 240 }}>
                 <span className="text-muted d-block" style={{ fontSize: 12 }}>
                   Recipe article:
@@ -783,7 +800,10 @@ const RawMaterialsConsumptionModal = React.memo(
                   <span className="text-muted">No recipes</span>
                 )}
 
-                <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
+                <span
+                  className="text-muted d-block mb-1"
+                  style={{ fontSize: 12 }}
+                >
                   Production volume:
                 </span>
                 <input
@@ -795,7 +815,10 @@ const RawMaterialsConsumptionModal = React.memo(
                 />
               </div>
               <div style={{ flex: 1, minWidth: 280 }}>
-                <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
+                <span
+                  className="text-muted d-block mb-1"
+                  style={{ fontSize: 12 }}
+                >
                   Recipe:
                 </span>
                 {
@@ -875,7 +898,9 @@ const RawMaterialsConsumptionModal = React.memo(
                           checked={wastedMode === 'manual'}
                           onChange={onHeaderManual}
                         />
-                        <label className="form-check-label">use manual input</label>
+                        <label className="form-check-label">
+                          use manual input
+                        </label>
                       </div>
                     </th>
                   </tr>
@@ -903,6 +928,8 @@ const RawMaterialsConsumptionModal = React.memo(
                       <tr key={key}>
                         <td>
                           <div className="fw-semibold">{label}</div>
+                          {/* {key === 'aluminum_paste' && <p>Hallo</p>}
+                          {key === 'aluminum_paste_2' && <p>Hallo 2</p>} */}
                           <div className="text-muted-small">
                             base: {isEmptyOrZero(base) ? '' : base}
                           </div>
@@ -969,7 +996,10 @@ const RawMaterialsConsumptionModal = React.memo(
                   checked={govno}
                   onChange={(e) => setGovno(e.target.checked)}
                 />
-                <label className="form-check-label" htmlFor="warehouse-checkbox">
+                <label
+                  className="form-check-label"
+                  htmlFor="warehouse-checkbox"
+                >
                   All to return slurry
                 </label>
               </div>
