@@ -111,16 +111,29 @@ function QualityManagementAddModal(props) {
   //   setFilteredRaw_MatConsumption(filtered);
   // }, [raw_mat_consumption, main_raw_mat_consumption]);
 
-  useEffect(() => {
-    if (!raw_mat_consumption || !main_raw_mat_consumption) {
-      setFilteredRaw_MatConsumption([]);
-      return;
-    }
+  // useEffect(() => {
+  //   if (!raw_mat_consumption) {
+  //     setFilteredRaw_MatConsumption([]);
+  //     return;
+  //   }
 
-    const filtered = raw_mat_consumption?.filter((item) => !item.used);
+  //   if (props?.filteredList) {
+  //     console.log(
+  //       props?.filteredList,
+  //       'filterList QualityManagementAddModal.jsx line 132',
+  //     );
 
-    setFilteredRaw_MatConsumption(filtered);
-  }, [raw_mat_consumption, main_raw_mat_consumption]);
+  //     // Фильтруем данные таблицы
+  //     const filteredRawMatConsumption = raw_mat_consumption.filter((item) =>
+  //       props?.filteredList.includes(item.batch_article),
+  //     );
+  //     const filtered = filteredRawMatConsumption.filter((item) => !item.used);
+  //     setFilteredRaw_MatConsumption(filtered);
+  //   } else {
+  //     const filtered = raw_mat_consumption.filter((item) => !item.used);
+  //     setFilteredRaw_MatConsumption(filtered);
+  //   }
+  // }, [raw_mat_consumption, main_raw_mat_consumption]);
 
   // ---
 
@@ -175,7 +188,9 @@ function QualityManagementAddModal(props) {
   };
 
   const handleProductArticleSelectChange = (selectedOption, key) => {
-    const product = latestProducts.find((el) => el.article === selectedOption.value);
+    const product = latestProducts.find(
+      (el) => el.article === selectedOption.value,
+    );
     const warehouse_article = getWarehouseArticle(product);
 
     setCustomBatchSelectInput((prev) => ({
@@ -379,7 +394,9 @@ function QualityManagementAddModal(props) {
       dialogClassName="modal-auto-size"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Batch calendar</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Batch calendar
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {customBatchSelect ? (
@@ -421,7 +438,9 @@ function QualityManagementAddModal(props) {
                             name={el.accessor}
                             type="text"
                             value={customBatchSelectInput[el.accessor] || ''}
-                            onChange={(e) => handleCustomBatchSelectInputChange(e)}
+                            onChange={(e) =>
+                              handleCustomBatchSelectInputChange(e)
+                            }
                           />
                         )}
                       </div>
@@ -446,7 +465,10 @@ function QualityManagementAddModal(props) {
             /> */}
             <Table
               COLUMN_DATA={COLUMNS_RAW_MAT_CONSUMPTION}
-              dataOfTable={filteredRawMatConsumption}
+              dataOfTable={
+                props?.filteredRawMatConsumption ??
+                raw_mat_consumption.filter((item) => !item.used)
+              }
               tableName={'Raw materials consumption'}
               handleRowClick={(row) => {
                 handlerAddProductionPlanEntry(row);
@@ -485,7 +507,10 @@ function QualityManagementAddModal(props) {
   );
 }
 
-function ShowQualityManagementAddModal({ setConsumptionCalculated }) {
+function ShowQualityManagementAddModal({
+  setConsumptionCalculated,
+  filteredRawMatConsumption = [],
+}) {
   const [modalShow, setModalShow] = React.useState(false);
 
   return (
@@ -503,6 +528,7 @@ function ShowQualityManagementAddModal({ setConsumptionCalculated }) {
         show={modalShow}
         onHide={() => setModalShow(false)}
         setConsumptionCalculated={setConsumptionCalculated}
+        filteredRawMatConsumption={filteredRawMatConsumption}
       />
     </>
   );

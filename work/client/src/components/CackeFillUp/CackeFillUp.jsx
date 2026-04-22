@@ -107,7 +107,8 @@ function CackeFillUp() {
   }, [lotesListCakes]);
 
   const totalCake =
-    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) || 0;
+    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) ||
+    0;
 
   const batchCalDate = cackeFillUp?.date ?? cackeFillUp?.batch_cal_date ?? '';
 
@@ -138,9 +139,9 @@ function CackeFillUp() {
 
     const notes = cakeNotes;
 
-    const batchCalendarQuantity = batchOutside.find(
+    const { quantity_pallets, quantity_free } = batchOutside.find(
       (el) => el.id == id,
-    )?.quantity_pallets;
+    );
 
     await dispatch(addNewLotesListCakes({ num: cakeIds, note: notes }));
 
@@ -173,7 +174,7 @@ function CackeFillUp() {
         date,
         id_ordered_product_to_warehouse: id_ordered_product_to_warehouse,
         consumption_calculated: false,
-        batch_quantity_pallets: batchCalendarQuantity || 0,
+        batch_quantity_pallets: quantity_pallets - quantity_free || 0,
       }),
     );
 
@@ -304,10 +305,18 @@ function CackeFillUp() {
             className="mt-2"
             style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
           >
-            <Button color="success" onClick={handlePlus} style={{ minWidth: 60 }}>
+            <Button
+              color="success"
+              onClick={handlePlus}
+              style={{ minWidth: 60 }}
+            >
               +
             </Button>
-            <Button color="success" onClick={handleMinus} style={{ minWidth: 60 }}>
+            <Button
+              color="success"
+              onClick={handleMinus}
+              style={{ minWidth: 60 }}
+            >
               -
             </Button>
 
@@ -366,7 +375,9 @@ function CackeFillUp() {
                     >
                       <span style={{ opacity: 0.7 }}>#</span>
                       <span>{id}</span>
-                      <span style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}>
+                      <span
+                        style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}
+                      >
                         {isActive ? '▲ note' : '▼ note'}
                       </span>
                     </div>
