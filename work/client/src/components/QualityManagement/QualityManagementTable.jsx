@@ -63,7 +63,15 @@ const QualityManagementTable = () => {
   // Состояние для хранения значений полей ввода для каждой записи
   const [inputValues, setInputValues] = useState({});
 
+  const [totalQtyInput, setTotalQtyInput] = useState('');
+  const [sortingInput, setSortingInput] = useState('');
+
   const COLUMNS_QUALITY_MANAGEMENT = [
+    // {
+    //   Header: 'Batch ID',
+    //   accessor: 'batch_id',
+    //   Filter: TextSearchFilter,
+    // },
     {
       Header: 'Produсt article',
       accessor: 'product_article',
@@ -99,6 +107,7 @@ const QualityManagementTable = () => {
       accessor: 'reserved_quantity',
       Filter: TextSearchFilter,
     },
+
     {
       Header: 'Reserved Qty in batch, remaining, pallets',
       accessor: 'reserved_quantity_remaining',
@@ -679,7 +688,7 @@ const QualityManagementTable = () => {
                 style={{ width: '200px' }}
               />
             </div>
-          </div>
+          </div> */}
         </div>
       ))}
 
