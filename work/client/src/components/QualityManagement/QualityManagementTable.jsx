@@ -7,6 +7,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ShowQualityManagementAddModal from './QualityManagementAddModal';
 import {
+  addNewQualityManagement,
   deleteQualityManagement,
   updateQualityManagement,
 } from '#components/redux/actions/qualityManagementAction.js';
@@ -29,6 +30,7 @@ import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
 import { Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
+import ModalTable from './ModalTable';
 
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
@@ -56,7 +58,7 @@ const QualityManagementTable = () => {
   const [consumptionCalculated, setConsumptionCalculated] = useState({});
   const [dateValue, setDateValue] = useState(null);
   const [filteredList, setFilteredList] = useState([]);
-  const [filteredRawMatConsumption, setFilteredRaw_MatConsumption] = useState();
+  const [relatedProductsModal, setRelatedProductsModal] = useState(false);
 
   // Состояние для хранения значений полей ввода для каждой записи
   const [inputValues, setInputValues] = useState({});
@@ -103,6 +105,24 @@ const QualityManagementTable = () => {
       Filter: TextSearchFilter,
     },
   ];
+
+  const addProductHandler = (prod_data) => {
+    const { article } = prod_data;
+
+    dispatch(
+      addNewQualityManagement({
+        batch_id: null,
+        product_article: article,
+        total_quantity_plan: 0,
+        reserved_quantity: 0,
+        reserved_quantity_allocated: 0,
+        reserved_quantity_remaining: 0,
+        free_quantity_fact: 0,
+        from_production_plan: false,
+        sorting: 0,
+      }),
+    );
+  };
 
   // Для артикула склада
   const getWarehouseArticle = (product, count) => {
@@ -152,16 +172,11 @@ const QualityManagementTable = () => {
       const targetDensity = targetProduct?.density;
 
       // Создаем список всех article с такой же density
-      const filterList = latestProducts
-        .filter((product) => product.density === targetDensity)
-        .map((product) => product.article);
-
-      // Фильтруем данные таблицы
-      const filteredRawMatConsumption = raw_mat_consumption.filter((item) =>
-        filterList.includes(item.batch_article),
+      const filterList = latestProducts.filter(
+        (product) => product.density === targetDensity,
       );
-      const filtered = filteredRawMatConsumption.filter((item) => !item.used);
-      setFilteredRaw_MatConsumption(filtered);
+
+      setFilteredList(filterList);
 
       // Инициализируем значения полей ввода для каждой записи
       const initialInputValues = {};
@@ -174,10 +189,6 @@ const QualityManagementTable = () => {
         };
       });
       setInputValues(initialInputValues);
-    } else {
-      const filtered = raw_mat_consumption.filter((item) => !item.used);
-      setFilteredRaw_MatConsumption(filtered);
-      console.log(filtered, 'filtered QualityManagementTable.jsx line 167');
     }
   }, [qualityManagementData]);
 
@@ -338,20 +349,15 @@ const QualityManagementTable = () => {
         }
       }
 
-      const deducted = production_plan_id
-        ? Math.min(
-            Math.max(
-              0,
-              reservedItem.quantity -
-                reservedItem.quantity_in_warehouse -
-                reserved_quantity_allocated,
-            ),
-            remainingFreeQty,
-          )
-        : Math.min(
-            reservedItem.quantity - reservedItem.quantity_in_warehouse,
-            remainingFreeQty,
-          );
+      const deducted = Math.min(
+        Math.max(
+          0,
+          reservedItem.quantity -
+            reservedItem.quantity_in_warehouse -
+            reserved_quantity_allocated,
+        ),
+        remainingFreeQty,
+      );
 
       remainingFreeQty -= deducted;
       summReserve += deducted;
@@ -550,7 +556,6 @@ const QualityManagementTable = () => {
     return { success: true, id, batch_id };
   };
 
-  // Основной обработчик для всех записей
   const finishAllBatchesHandler = async () => {
     if (!qualityManagementDataList.length) {
       alert('No batches to process');
@@ -573,7 +578,6 @@ const QualityManagementTable = () => {
 
     let count = 0;
 
-    // Обрабатываем каждую запись последовательно
     for (const record of qualityManagementDataList) {
       try {
         const result = await processSingleBatch(record, count);
@@ -588,7 +592,6 @@ const QualityManagementTable = () => {
       }
     }
 
-    // Очищаем состояние inputValues для обработанных записей
     if (processedBatches.length > 0) {
       setInputValues((prev) => {
         const newValues = { ...prev };
@@ -599,7 +602,6 @@ const QualityManagementTable = () => {
       });
     }
 
-    // Удаляем consumptionCalculated если нужно
     if (consumptionCalculated.consumption_calculated) {
       await dispatch(
         deleteRawMatConsumption({
@@ -609,7 +611,6 @@ const QualityManagementTable = () => {
       setConsumptionCalculated({});
     }
 
-    // Показываем итоговое сообщение
     if (errors.length > 0) {
       const errorMessages = errors
         .map((e) => `- ${e.batch_id}: ${e.error}`)
@@ -698,14 +699,29 @@ const QualityManagementTable = () => {
         </div>
       )}
 
-      <ShowQualityManagementAddModal
-        setConsumptionCalculated={setConsumptionCalculated}
-        filteredRawMatConsumption={
-          qualityManagementDataList.length > 0
-            ? filteredRawMatConsumption
-            : null
-        }
-      />
+      {(!qualityManagementData || qualityManagementData.length === 0) && (
+        <ShowQualityManagementAddModal
+          setConsumptionCalculated={setConsumptionCalculated}
+        />
+      )}
+      {qualityManagementDataList.length > 0 && (
+        <div>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setRelatedProductsModal(true);
+            }}
+          >
+            Start new batch
+          </Button>
+          <ModalTable
+            isOpen={relatedProductsModal}
+            toggle={() => setRelatedProductsModal(!relatedProductsModal)}
+            data={filteredList}
+            onClickRow={addProductHandler}
+          />
+        </div>
+      )}
     </Fragment>
   );
 };
