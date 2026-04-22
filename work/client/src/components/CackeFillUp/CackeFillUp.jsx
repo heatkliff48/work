@@ -36,6 +36,7 @@ function CackeFillUp() {
   const [cakeNotes, setCakeNotes] = useState({});
 
   const [activeCakeId, setActiveCakeId] = useState(null);
+  const [currentProduct, setCurrentProduct] = useState(null);
 
   useEffect(() => {
     setCackeFillUp({});
@@ -44,6 +45,7 @@ function CackeFillUp() {
     setFinish(false);
     setActiveCakeId(null);
     setCakeNotes({});
+    setCurrentProduct(null);
   }, []);
 
   useEffect(() => {
@@ -53,6 +55,8 @@ function CackeFillUp() {
       const product = latestProducts.find(
         (el) => el.article === batch_in_produce?.product_article,
       );
+
+      setCurrentProduct(product);
 
       const widthInArray = Math.floor(
         product?.m3InArray / product?.volumeBlockOnPallet,
@@ -66,6 +70,8 @@ function CackeFillUp() {
         batch_in_produce.quantity_pallets / widthInArray - accd.total_arrays;
 
       setCackeFillUp({ ...batch_in_produce, total_cacke });
+    } else {
+      setCurrentProduct(null);
     }
   }, [batchOutside]);
 
@@ -101,8 +107,7 @@ function CackeFillUp() {
   }, [lotesListCakes]);
 
   const totalCake =
-    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) ||
-    0;
+    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) || 0;
 
   const batchCalDate = cackeFillUp?.date ?? cackeFillUp?.batch_cal_date ?? '';
 
@@ -136,15 +141,6 @@ function CackeFillUp() {
     const batchCalendarQuantity = batchOutside.find(
       (el) => el.id == id,
     )?.quantity_pallets;
-
-    console.log(
-      batchOutside.find((el) => el.id == id),
-      ' CackeFillUp.jsx line 140',
-    );
-    console.log(
-      batchCalendarQuantity,
-      'batchCalendarQuantity CackeFillUp.jsx line 138',
-    );
 
     await dispatch(addNewLotesListCakes({ num: cakeIds, note: notes }));
 
@@ -200,7 +196,7 @@ function CackeFillUp() {
     const total_arrays = (accd?.total_arrays || 0) + allocated;
 
     if (finish) {
-      const filled_autoclaves = Math.ceil(allocated / 21); // произведено автоклавом
+      const filled_autoclaves = Math.ceil(allocated / 21);
       const residual_arrays = total_arrays - filled_autoclaves * 21;
       result.push({
         ...accd,
@@ -243,6 +239,39 @@ function CackeFillUp() {
       {hasCackeFillUp && (
         <div className="mt-3" style={{ maxWidth: 900 }}>
           <div
+            className="cacke-fill-up-product"
+            style={{
+              width: '50%',
+              border: '1px solid #dee2e6',
+              borderRadius: '8px',
+              padding: '16px',
+              marginBottom: '20px',
+              backgroundColor: '#f8f9fa',
+              display: 'flex',
+              gap: '32px',
+              flexWrap: 'wrap',
+              justifyContent: 'space-evenly',
+            }}
+          >
+            <div>
+              <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#6c757d' }}>
+                Product article
+              </div>
+              <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                {currentProduct?.article || '—'}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#6c757d' }}>
+                Product Mark
+              </div>
+              <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                {currentProduct?.tradingMark || '—'}
+              </div>
+            </div>
+          </div>
+
+          <div
             style={{
               display: 'grid',
               gridTemplateColumns: '1.2fr 1.2fr 1.6fr 1.2fr',
@@ -275,18 +304,10 @@ function CackeFillUp() {
             className="mt-2"
             style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
           >
-            <Button
-              color="success"
-              onClick={handlePlus}
-              style={{ minWidth: 60 }}
-            >
+            <Button color="success" onClick={handlePlus} style={{ minWidth: 60 }}>
               +
             </Button>
-            <Button
-              color="success"
-              onClick={handleMinus}
-              style={{ minWidth: 60 }}
-            >
+            <Button color="success" onClick={handleMinus} style={{ minWidth: 60 }}>
               -
             </Button>
 
@@ -345,9 +366,7 @@ function CackeFillUp() {
                     >
                       <span style={{ opacity: 0.7 }}>#</span>
                       <span>{id}</span>
-                      <span
-                        style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}
-                      >
+                      <span style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}>
                         {isActive ? '▲ note' : '▼ note'}
                       </span>
                     </div>
