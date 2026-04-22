@@ -688,7 +688,7 @@ const QualityManagementTable = () => {
                 style={{ width: '200px' }}
               />
             </div>
-          </div> */}
+          </div>
         </div>
       ))}
 
