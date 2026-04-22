@@ -53,10 +53,10 @@ function QualityManagementAddModal(props) {
   ];
 
   const add_batch_dialog = [
-    {
-      Header: 'Batch ID',
-      accessor: 'batch_id',
-    },
+    // {
+    //   Header: 'Batch ID',
+    //   accessor: 'batch_id',
+    // },
     {
       Header: 'Product article',
       accessor: 'product_article',
@@ -111,29 +111,29 @@ function QualityManagementAddModal(props) {
   //   setFilteredRaw_MatConsumption(filtered);
   // }, [raw_mat_consumption, main_raw_mat_consumption]);
 
-  // useEffect(() => {
-  //   if (!raw_mat_consumption) {
-  //     setFilteredRaw_MatConsumption([]);
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!raw_mat_consumption) {
+      setFilteredRaw_MatConsumption([]);
+      return;
+    }
 
-  //   if (props?.filteredList) {
-  //     console.log(
-  //       props?.filteredList,
-  //       'filterList QualityManagementAddModal.jsx line 132',
-  //     );
+    if (props?.filteredList) {
+      console.log(
+        props?.filteredList,
+        'filterList QualityManagementAddModal.jsx line 132',
+      );
 
-  //     // Фильтруем данные таблицы
-  //     const filteredRawMatConsumption = raw_mat_consumption.filter((item) =>
-  //       props?.filteredList.includes(item.batch_article),
-  //     );
-  //     const filtered = filteredRawMatConsumption.filter((item) => !item.used);
-  //     setFilteredRaw_MatConsumption(filtered);
-  //   } else {
-  //     const filtered = raw_mat_consumption.filter((item) => !item.used);
-  //     setFilteredRaw_MatConsumption(filtered);
-  //   }
-  // }, [raw_mat_consumption, main_raw_mat_consumption]);
+      // Фильтруем данные таблицы
+      const filteredRawMatConsumption = raw_mat_consumption.filter((item) =>
+        props?.filteredList.includes(item.batch_article),
+      );
+      const filtered = filteredRawMatConsumption.filter((item) => !item.used);
+      setFilteredRaw_MatConsumption(filtered);
+    } else {
+      const filtered = raw_mat_consumption.filter((item) => !item.used);
+      setFilteredRaw_MatConsumption(filtered);
+    }
+  }, [raw_mat_consumption, main_raw_mat_consumption]);
 
   // ---
 
@@ -507,10 +507,7 @@ function QualityManagementAddModal(props) {
   );
 }
 
-function ShowQualityManagementAddModal({
-  setConsumptionCalculated,
-  filteredRawMatConsumption = [],
-}) {
+function ShowQualityManagementAddModal({ setConsumptionCalculated }) {
   const [modalShow, setModalShow] = React.useState(false);
 
   return (
@@ -528,7 +525,6 @@ function ShowQualityManagementAddModal({
         show={modalShow}
         onHide={() => setModalShow(false)}
         setConsumptionCalculated={setConsumptionCalculated}
-        filteredRawMatConsumption={filteredRawMatConsumption}
       />
     </>
   );
