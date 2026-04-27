@@ -62,9 +62,7 @@ const QualityManagementTable = () => {
 
   // Состояние для хранения значений полей ввода для каждой записи
   const [inputValues, setInputValues] = useState({});
-
-  const [totalQtyInput, setTotalQtyInput] = useState('');
-  const [sortingInput, setSortingInput] = useState('');
+  const [batchID, setBatchID] = useState(null);
 
   const COLUMNS_QUALITY_MANAGEMENT = [
     // {
@@ -179,6 +177,10 @@ const QualityManagementTable = () => {
           product.article === qualityManagementData[0]?.product_article,
       );
       const targetDensity = targetProduct?.density;
+
+      if (!batchID) {
+        setBatchID(qualityManagementData[0]?.raw_mat_cons_batch_id);
+      }
 
       // Создаем список всех article с такой же density
       const filterList = latestProducts.filter(
@@ -373,16 +375,18 @@ const QualityManagementTable = () => {
 
       const baseQuantityInWarehouse = reservedItem.quantity_in_warehouse;
 
-      return production_plan_id
-        ? {
-            ...reservedItem,
-            quantity_in_warehouse:
-              baseQuantityInWarehouse + reserved_quantity_allocated + deducted,
-          }
-        : {
-            ...reservedItem,
-            quantity_in_warehouse: baseQuantityInWarehouse + deducted,
-          };
+      // return production_plan_id
+      //   ? {
+      //       ...reservedItem,
+      //       quantity_in_warehouse:
+      //         baseQuantityInWarehouse + reserved_quantity_allocated + deducted,
+      //     }
+      //   : {
+      return {
+        ...reservedItem,
+        quantity_in_warehouse:
+          baseQuantityInWarehouse + reserved_quantity_allocated + deducted,
+      };
     });
 
     // Проверки на корректность
@@ -451,7 +455,7 @@ const QualityManagementTable = () => {
           total_quantity: calculatedOrderedQuantity + remainingFreeQty,
           type: 'OK',
           sorting: 0,
-          batch_id: raw_mat_cons_batch_id,
+          batch_id: raw_mat_cons_batch_id || batchID,
         }),
       );
       if (id_ordered_product_to_warehouse) {
@@ -476,7 +480,7 @@ const QualityManagementTable = () => {
           total_quantity: sorting,
           type: 'Sorting',
           sorting,
-          batch_id: raw_mat_cons_batch_id,
+          batch_id: raw_mat_cons_batch_id || batchID,
         }),
       );
       if (id_ordered_product_to_warehouse) {
@@ -610,6 +614,8 @@ const QualityManagementTable = () => {
         return newValues;
       });
     }
+
+    setBatchID(null);
 
     if (consumptionCalculated.consumption_calculated) {
       await dispatch(
