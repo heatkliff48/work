@@ -18,7 +18,6 @@ module.exports = (sequelize, DataTypes) => {
       consumed_quantity: DataTypes.FLOAT,
       last_updated: DataTypes.STRING,
       used: DataTypes.BOOLEAN,
-      isNeedCheck: DataTypes.BOOLEAN,
     },
     {
       sequelize,

@@ -103,23 +103,6 @@ export const rawMaterialsWarehouseReducer = (rawMaterialsWarehouse = [], action)
       return result;
     }
 
-    case NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET: {
-      console.log('payload warehouseReducer.js line 111', payload);
-      console.log(
-        'rawMaterialsWarehouse warehouseReducer.js line 108',
-        rawMaterialsWarehouse,
-      );
-
-      const result = rawMaterialsWarehouse.map((el) => {
-        if (el.id === payload.id) {
-          return { ...el, isNeedCheck: payload.isNeedCheck };
-        }
-        return el;
-      });
-
-      return result;
-    }
-
     default:
       return rawMaterialsWarehouse;
   }

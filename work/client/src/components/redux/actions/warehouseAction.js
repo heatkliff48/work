@@ -38,7 +38,6 @@ import {
   GET_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
-  UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE_STATUS,
 } from '../types/warehouseTypes';
 
 export const getAllWarehouse = () => {
@@ -297,16 +296,11 @@ export const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
   };
 };
 
-export const updateRawMaterialConsumptionRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
+export const updateRawMaterialConsumptionRawMaterialsWarehouse = (
+  rawMaterialsWarehouse,
+) => {
   return {
     type: UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
-    payload: rawMaterialsWarehouse,
-  };
-};
-
-export const updateRawMaterialConsumptionRawMaterialsWarehouseStatus = (rawMaterialsWarehouse) => {
-  return {
-    type: UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE_STATUS,
     payload: rawMaterialsWarehouse,
   };
 };

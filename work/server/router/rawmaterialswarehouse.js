@@ -399,25 +399,6 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
   }
 });
 
-rawMaterialsWarehouseRouter.patch('/raw_mat_con/update/status', async (req, res) => {
-  const { isNeedCheck, id } = req.body;
-  const t = await sequelize.transaction();
-  try {
-    const [count, upd_data] = await RawMaterialsWarehouse.update(
-      { isNeedCheck },
-      { where: { id }, returning: true, plain: true, transaction: t },
-    );
-    await t.commit();
-    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET, upd_data);
-
-    return res.status(200);
-  } catch (error) {
-    await t.rollback();
-    console.error('❌ ROLLBACK /raw_mat_con/update:', err);
-    return res.status(500).json({ error: err.message });
-  }
-});
-
 rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
   const { materials } = req.body;
 
@@ -1877,7 +1858,8 @@ rawMaterialsWarehouseRouter.get('/sand_slurry', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
-  const { sand, gypsum_stone, water, grinding_balls, aac_scrap, date } = req.body;
+  const { sand, gypsum_stone, water, grinding_balls, aac_scrap, date, isNeedCheck } =
+    req.body;
 
   try {
     const materialsToCheck = [
@@ -1931,6 +1913,7 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
       grinding_balls,
       aac_scrap,
       date: formatDate(date),
+      isNeedCheck,
     });
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET, warehouseSandSlurry);
@@ -1942,12 +1925,12 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/sand_slurry/update', async (req, res) => {
-  const { id, file_name, portion_size } = req.body;
+  const { id, file_name, portion_size, isNeedCheck = true } = req.body;
 
   try {
     if (!file_name) {
       const warehouseSandSlurry = await WarehouseSandSlurry.update(
-        { portion_size },
+        { portion_size, isNeedCheck },
         {
           where: { id },
           returning: true,

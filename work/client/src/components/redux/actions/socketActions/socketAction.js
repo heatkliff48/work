@@ -846,13 +846,6 @@ export const updateRawMaterialsWarehouseSocket = (rawMaterialsWarehouse) => {
   };
 };
 
-export const updateRawMaterialsWarehouseStatusSocket = (rawMaterialsWarehouse) => {
-  return {
-    type: NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
-    payload: rawMaterialsWarehouse,
-  };
-};
-
 export const addNewQualityManagementSocket = (qualityManagementData) => {
   return {
     type: NEW_QUALITY_MANAGEMENT_DATA_SOCKET,

@@ -166,7 +166,6 @@ const {
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_PALLETS_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
-  UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -1430,20 +1429,6 @@ function registerWsEmitter(map) {
       );
     }
   });
-
-  myEmitter.on(
-    UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
-    (rawMaterialsWarehouse) => {
-      for (let [id, userConnect] of map) {
-        userConnect.send(
-          JSON.stringify({
-            type: UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
-            payload: rawMaterialsWarehouse,
-          }),
-        );
-      }
-    },
-  );
 
   myEmitter.on(ADD_NEW_QUALITY_MANAGEMENT_DATA_SOCKET, (qualityManagementData) => {
     for (let [id, userConnect] of map) {
