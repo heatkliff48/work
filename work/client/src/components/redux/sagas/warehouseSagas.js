@@ -59,6 +59,8 @@ import {
   UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
   UPDATE_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
+  UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE_STATUS,
+  UPDATE_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE_STATUS,
 } from '../types/warehouseTypes';
 import {
   ANCHOR_QUANTITYS_SOCKET,
@@ -564,6 +566,20 @@ const updateRawMaterialsConsumptionRawMaterialsWarehouse = (
     });
 };
 
+const updateRawMaterialsConsumptionRawMaterialsWarehouseStatus = (
+  rawMaterialsWarehouse,
+) => {
+  return url
+    .patch('/rawMaterialsWarehouse/raw_mat_con/update/status', rawMaterialsWarehouse)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 function* getAllWarehouseWatcher() {
   try {
     const { warehouse } = yield call(getAllWarehouse);
@@ -984,13 +1000,24 @@ function* updateNewRawMaterialsWarehouseWorker(action) {
 
 function* updateRawMaterialsConsumptionRawMaterialsWarehouseWorker(action) {
   try {
+    yield call(updateRawMaterialsConsumptionRawMaterialsWarehouse, action.payload);
+  } catch (err) {
+    yield put({
+      type: UPDATE_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
+      payload: [],
+    });
+  }
+}
+
+function* updateRawMaterialsConsumptionRawMaterialsWarehouseStatusWorker(action) {
+  try {
     yield call(
-      updateRawMaterialsConsumptionRawMaterialsWarehouse,
+      updateRawMaterialsConsumptionRawMaterialsWarehouseStatus,
       action.payload,
     );
   } catch (err) {
     yield put({
-      type: UPDATE_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
+      type: UPDATE_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE_STATUS,
       payload: [],
     });
   }
@@ -1006,23 +1033,14 @@ function* warehouseWatcher() {
     UPDATE_DRY_MIXED_WAREHOSE_QUANTITYS,
     updateDryMixedWhQuantitysWatcher,
   );
-  yield takeLatest(
-    UPDATE_ANCHOR_WAREHOSE_QUANTITYS,
-    updateAnchorWhQuantitysWatcher,
-  );
-  yield takeLatest(
-    UPDATE_TOOL_WAREHOSE_QUANTITYS,
-    updateToolWhQuantitysWatcher,
-  );
+  yield takeLatest(UPDATE_ANCHOR_WAREHOSE_QUANTITYS, updateAnchorWhQuantitysWatcher);
+  yield takeLatest(UPDATE_TOOL_WAREHOSE_QUANTITYS, updateToolWhQuantitysWatcher);
   yield takeLatest(
     UPDATE_REL_MAT_WAREHOSE_QUANTITYS,
     updateRelMatWhQuantitysWatcher,
   );
 
-  yield takeLatest(
-    GET_LIST_OF_RESERVED_PRODUCTS,
-    getListOfReservedProductsWatcher,
-  );
+  yield takeLatest(GET_LIST_OF_RESERVED_PRODUCTS, getListOfReservedProductsWatcher);
   yield takeLatest(ADD_NEW_RESERVED_PRODUCT, addNewReservedProductWatcher);
   yield takeLatest(UPDATE_RESERVED_PRODUCT, updReservedProductWatcher);
   yield takeLatest(
@@ -1055,10 +1073,7 @@ function* warehouseWatcher() {
     ADD_NEW_ANCHOR_RESERVED_PRODUCT,
     addNewAnchorReservedProductWatcher,
   );
-  yield takeLatest(
-    UPDATE_ANCHOR_RESERVED_PRODUCT,
-    updAnchorReservedProductWatcher,
-  );
+  yield takeLatest(UPDATE_ANCHOR_RESERVED_PRODUCT, updAnchorReservedProductWatcher);
   yield takeLatest(
     GET_DELETE_PRODUCT_FROM_ANCHOR_RESERVED_LIST,
     deleteAnchorReservedProductWatcher,
@@ -1068,10 +1083,7 @@ function* warehouseWatcher() {
     GET_LIST_OF_TOOL_RESERVED_PRODUCTS,
     getListOfToolReservedProductsWatcher,
   );
-  yield takeLatest(
-    ADD_NEW_TOOL_RESERVED_PRODUCT,
-    addNewToolReservedProductWatcher,
-  );
+  yield takeLatest(ADD_NEW_TOOL_RESERVED_PRODUCT, addNewToolReservedProductWatcher);
   yield takeLatest(UPDATE_TOOL_RESERVED_PRODUCT, updToolReservedProductWatcher);
   yield takeLatest(
     GET_DELETE_PRODUCT_FROM_TOOL_RESERVED_LIST,
@@ -1099,10 +1111,7 @@ function* warehouseWatcher() {
     GET_LIST_OF_ORDERED_PRODUCTION,
     getListOfOrderedProductionWatcher,
   );
-  yield takeLatest(
-    ADD_NEW_ORDERED_PRODUCTION,
-    addNewListOfOrderedProductionWatcher,
-  );
+  yield takeLatest(ADD_NEW_ORDERED_PRODUCTION, addNewListOfOrderedProductionWatcher);
   yield takeLatest(UPDATE_ORDERED_PRODUCTION, updListOfOrderedProductionWorker);
   yield takeLatest(
     GET_LIST_OF_ORDERED_PRODUCTION_OEM,
@@ -1124,6 +1133,10 @@ function* warehouseWatcher() {
   yield takeLatest(
     UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
     updateRawMaterialsConsumptionRawMaterialsWarehouseWorker,
+  );
+  yield takeLatest(
+    UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE_STATUS,
+    updateRawMaterialsConsumptionRawMaterialsWarehouseStatusWorker,
   );
 }
 

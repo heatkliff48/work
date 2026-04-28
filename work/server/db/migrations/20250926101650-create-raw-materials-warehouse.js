@@ -24,6 +24,9 @@ module.exports = {
       used: {
         type: Sequelize.BOOLEAN,
       },
+      isNeedCheck: {
+        type: Sequelize.BOOLEAN,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

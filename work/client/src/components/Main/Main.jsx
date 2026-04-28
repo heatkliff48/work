@@ -188,6 +188,14 @@ function Main() {
         >
           Batch Plan
         </button>
+
+        <button
+          className="bb-action-btn"
+          onClick={() => navigate('/task_board')}
+          type="button"
+        >
+          Task Board
+        </button>
       </div>
     </>
   );

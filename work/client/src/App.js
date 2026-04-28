@@ -54,6 +54,7 @@ import OrdersToWarehouseTable from '#components/Orders/OrdersToWarehouse/OrdersT
 import ProductionQuality from '#components/ProductionQuality/ProductionQuality.jsx';
 
 import '#components/Styles/buttons.css';
+import TaskBoard from '#components/TaskBoard/TaskBoard.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -170,6 +171,7 @@ function App() {
             <Route path="/warehouse_manager" element={<WarehouseManager />} />
 
             <Route path="/lotes_list" element={<LotesList />} />
+            <Route path="/task_board" element={<TaskBoard />} />
 
             {/* всё неизвестное — на sign-in */}
             <Route path="*" element={<Navigate to="/sign-in" />} />

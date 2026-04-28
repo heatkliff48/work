@@ -58,6 +58,7 @@ const {
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
+  UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 const { Op } = require('sequelize');
@@ -179,9 +180,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
       .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
 
     // Используем дату из последней записи или текущую дату, если записей нет
-    const lastUpdated = latestRecord
-      ? latestRecord.date
-      : formatDate(new Date());
+    const lastUpdated = latestRecord ? latestRecord.date : formatDate(new Date());
 
     // Проверка наличия всех материалов перед началом операций
     for (const materialType of updatedMaterialTypes) {
@@ -242,7 +241,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
         if (currentRecord.remaining_quantity < consumedQuantity) {
           await t.rollback();
           return res.status(400).json({
-            error: `There is not enough "${materialType}" material in stock. Available: ${CurrentRecord.remaining_quantity}, required: ${consumedQuantity}`,
+            error: `There is not enough "${materialType}" material in stock. Available: ${currentRecord.remaining_quantity}, required: ${consumedQuantity}`,
           });
         }
 
@@ -400,13 +399,29 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
   }
 });
 
+rawMaterialsWarehouseRouter.patch('/raw_mat_con/update/status', async (req, res) => {
+  const { isNeedCheck, id } = req.body;
+  const t = await sequelize.transaction();
+  try {
+    const [count, upd_data] = await RawMaterialsWarehouse.update(
+      { isNeedCheck },
+      { where: { id }, returning: true, plain: true, transaction: t },
+    );
+    await t.commit();
+    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET, upd_data);
+
+    return res.status(200);
+  } catch (error) {
+    await t.rollback();
+    console.error('❌ ROLLBACK /raw_mat_con/update:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
   const { materials } = req.body;
 
-  console.log(
-    '======================= materials ======================',
-    materials,
-  );
+  console.log('======================= materials ======================', materials);
 
   const round2 = (num) => Math.round(num * 100) / 100;
 
@@ -428,9 +443,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
     .filter((m) => m.type && Number.isFinite(Number(m.quantity)));
 
   if (normMaterials.length === 0) {
-    return res
-      .status(400)
-      .json({ error: 'There are no valid items to write off' });
+    return res.status(400).json({ error: 'There are no valid items to write off' });
   }
 
   const onlySandSlurryDry = normMaterials.every(
@@ -1211,19 +1224,13 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone/update', async (req, res) => {
         return res.status(400).json({ message: 'No valid fields to update' });
       }
 
-      const warehouseGypsumStone = await WarehouseGypsumStone.update(
-        updateData,
-        {
-          where: { supplier },
-          returning: true,
-          plain: true,
-        },
-      );
+      const warehouseGypsumStone = await WarehouseGypsumStone.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
 
-      myEmitter.emit(
-        UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
-        warehouseGypsumStone,
-      );
+      myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET, warehouseGypsumStone);
       return res.json(warehouseGypsumStone).status(200);
     } else {
       if (file_name != '-1') {
@@ -1235,10 +1242,7 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone/update', async (req, res) => {
             plain: true,
           },
         );
-        myEmitter.emit(
-          UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
-          warehouseGypsumStone,
-        );
+        myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET, warehouseGypsumStone);
         return res.json(warehouseGypsumStone).status(200);
       } else {
         const warehouseGypsumStone = await WarehouseGypsumStone.update(
@@ -1249,10 +1253,7 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone/update', async (req, res) => {
             plain: true,
           },
         );
-        myEmitter.emit(
-          UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET,
-          warehouseGypsumStone,
-        );
+        myEmitter.emit(UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET, warehouseGypsumStone);
         return res.json(warehouseGypsumStone).status(200);
       }
     }
@@ -1270,10 +1271,7 @@ rawMaterialsWarehouseRouter.post('/gypsum-stone/delete', async (req, res) => {
       where: { id: gypsum_stone_warehouse_id },
     });
 
-    myEmitter.emit(
-      DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
-      gypsum_stone_warehouse_id,
-    );
+    myEmitter.emit(DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET, gypsum_stone_warehouse_id);
     return res.json(gypsum_stone_warehouse_id).status(200);
   } catch (err) {
     return ErrorUtils.catchError(res, err);
@@ -1590,9 +1588,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
       date: formatDate(date),
     });
 
-    const totalGrindingBallsQuantity = await WarehouseGrindingBalls.sum(
-      'quantity',
-    );
+    const totalGrindingBallsQuantity = await WarehouseGrindingBalls.sum('quantity');
 
     const allRecords = await WarehouseGrindingBalls.findAll({
       attributes: ['date'],
@@ -1618,8 +1614,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
 
     await RawMaterialsWarehouse.update(
       {
-        remaining_quantity:
-          totalGrindingBallsQuantity - record.consumed_quantity,
+        remaining_quantity: totalGrindingBallsQuantity - record.consumed_quantity,
         last_updated: lastUpdated,
       },
       {
@@ -1629,10 +1624,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls', async (req, res) => {
       },
     );
 
-    myEmitter.emit(
-      ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET,
-      warehouseGrindingBalls,
-    );
+    myEmitter.emit(ADD_NEW_WAREHOUSE_GRINDING_BALLS_SOCKET, warehouseGrindingBalls);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
       where: { material_type: 'Grinding Balls' },
     });
@@ -1672,10 +1664,7 @@ rawMaterialsWarehouseRouter.post('/grinding-balls/update', async (req, res) => {
         },
       );
 
-      myEmitter.emit(
-        UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET,
-        warehouseGrindingBalls,
-      );
+      myEmitter.emit(UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET, warehouseGrindingBalls);
       return res.json(warehouseGrindingBalls).status(200);
     } else {
       if (file_name != '-1') {
@@ -1888,8 +1877,7 @@ rawMaterialsWarehouseRouter.get('/sand_slurry', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
-  const { sand, gypsum_stone, water, grinding_balls, aac_scrap, date } =
-    req.body;
+  const { sand, gypsum_stone, water, grinding_balls, aac_scrap, date } = req.body;
 
   try {
     const materialsToCheck = [
@@ -1919,16 +1907,11 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
           where: { material_type: material.material_type },
         });
 
-        if (
-          !availableMaterial ||
-          availableMaterial.remaining_quantity < material.amount
-        ) {
+        if (!availableMaterial || availableMaterial.quantity < material.amount) {
           insufficientMaterials.push({
             material: material.material_type,
             requested: material.amount,
-            available: availableMaterial
-              ? availableMaterial.remaining_quantity
-              : 0,
+            available: availableMaterial ? availableMaterial.remaining_quantity : 0,
           });
         }
       }
@@ -1983,10 +1966,7 @@ rawMaterialsWarehouseRouter.post('/sand_slurry/update', async (req, res) => {
             plain: true,
           },
         );
-        myEmitter.emit(
-          UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
-          warehouseSandSlurry,
-        );
+        myEmitter.emit(UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET, warehouseSandSlurry);
         return res.json(warehouseSandSlurry).status(200);
       } else {
         const warehouseSandSlurry = await WarehouseSandSlurry.update(
@@ -1997,10 +1977,7 @@ rawMaterialsWarehouseRouter.post('/sand_slurry/update', async (req, res) => {
             plain: true,
           },
         );
-        myEmitter.emit(
-          UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
-          warehouseSandSlurry,
-        );
+        myEmitter.emit(UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET, warehouseSandSlurry);
         return res.json(warehouseSandSlurry).status(200);
       }
     }
@@ -2405,10 +2382,7 @@ rawMaterialsWarehouseRouter.post('/sand-powder/update', async (req, res) => {
             plain: true,
           },
         );
-        myEmitter.emit(
-          UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
-          warehouseSandPowder,
-        );
+        myEmitter.emit(UPDATE_WAREHOUSE_SAND_POWDER_SOCKET, warehouseSandPowder);
         return res.json(warehouseSandPowder).status(200);
       } else {
         const warehouseSandPowder = await WarehouseSandPowder.update(
@@ -2419,10 +2393,7 @@ rawMaterialsWarehouseRouter.post('/sand-powder/update', async (req, res) => {
             plain: true,
           },
         );
-        myEmitter.emit(
-          UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
-          warehouseSandPowder,
-        );
+        myEmitter.emit(UPDATE_WAREHOUSE_SAND_POWDER_SOCKET, warehouseSandPowder);
         return res.json(warehouseSandPowder).status(200);
       }
     }
@@ -2438,10 +2409,7 @@ rawMaterialsWarehouseRouter.post('/sand-powder/delete', async (req, res) => {
   try {
     await WarehouseAAC.destroy({ where: { id: sand_powder_warehouse_id } });
 
-    myEmitter.emit(
-      DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
-      sand_powder_warehouse_id,
-    );
+    myEmitter.emit(DELETE_WAREHOUSE_SAND_POWDER_SOCKET, sand_powder_warehouse_id);
     return res.json(sand_powder_warehouse_id).status(200);
   } catch (err) {
     return ErrorUtils.catchError(res, err);

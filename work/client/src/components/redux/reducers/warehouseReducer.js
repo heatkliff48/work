@@ -1,6 +1,7 @@
 import showMessage from '#components/Utils/showMessage.js';
 import {
   NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+  NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
   NEW_WAREHOUSE_SOCKET,
   REMAINING_STOCK_SOCKET,
   WAREHOUSE_QUANTITYS_SOCKET,
@@ -43,8 +44,7 @@ export const warehouseReducer = (warehouse = [], action) => {
 
     case REMAINING_STOCK:
     case REMAINING_STOCK_SOCKET: {
-      const { warehouse_id, free_quantity_remaining, ordered_quantity } =
-        payload;
+      const { warehouse_id, free_quantity_remaining, ordered_quantity } = payload;
 
       const result = warehouse.map((el) => {
         if (el.id === payload[1].id) return payload[1];
@@ -74,10 +74,7 @@ export const warehouseReducer = (warehouse = [], action) => {
   }
 };
 
-export const rawMaterialsWarehouseReducer = (
-  rawMaterialsWarehouse = [],
-  action,
-) => {
+export const rawMaterialsWarehouseReducer = (rawMaterialsWarehouse = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case RAW_MATERIALS_WAREHOUSE: {
@@ -101,6 +98,23 @@ export const rawMaterialsWarehouseReducer = (
         } else {
           result.push(updatedItem);
         }
+      });
+
+      return result;
+    }
+
+    case NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET: {
+      console.log('payload warehouseReducer.js line 111', payload);
+      console.log(
+        'rawMaterialsWarehouse warehouseReducer.js line 108',
+        rawMaterialsWarehouse,
+      );
+
+      const result = rawMaterialsWarehouse.map((el) => {
+        if (el.id === payload.id) {
+          return { ...el, isNeedCheck: payload.isNeedCheck };
+        }
+        return el;
       });
 
       return result;
