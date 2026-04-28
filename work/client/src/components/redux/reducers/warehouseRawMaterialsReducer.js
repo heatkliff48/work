@@ -53,6 +53,7 @@ import {
   NEED_UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   NEED_DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
 } from '../types/socketTypes/socket';
+import showMessage from '#components/Utils/showMessage.js';
 
 // Sand
 export const warehouseSandReducer = (warehouseSand = [], action) => {
@@ -159,10 +160,7 @@ export const warehouseGypsumReducer = (warehouseGypsum = [], action) => {
 };
 
 // Gypsum stone
-export const warehouseGypsumStoneReducer = (
-  warehouseGypsumStone = [],
-  action,
-) => {
+export const warehouseGypsumStoneReducer = (warehouseGypsumStone = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case FULL_WAREHOUSE_GYPSUM_STONE: {
@@ -295,16 +293,16 @@ export const warehouseAACReducer = (warehouseAAC = [], action) => {
 };
 
 // Sand Slurry
-export const warehouseSandSlurryReducer = (
-  warehouseSandSlurry = [],
-  action,
-) => {
+export const warehouseSandSlurryReducer = (warehouseSandSlurry = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case FULL_WAREHOUSE_SAND_SLURRY: {
       return payload;
     }
     case NEW_WAREHOUSE_SAND_SLURRY_SOCKET: {
+      if (payload?.isNeedCheck) {
+        showMessage('You have a new task!', 'info');
+      }
       return [...warehouseSandSlurry, payload];
     }
     case NEED_UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET: {
@@ -372,10 +370,7 @@ export const warehousePlasticsReducer = (warehousePlastics = [], action) => {
 };
 
 // Sand Powder
-export const warehouseSandPowderReducer = (
-  warehouseSandPowder = [],
-  action,
-) => {
+export const warehouseSandPowderReducer = (warehouseSandPowder = [], action) => {
   const { type, payload } = action;
   switch (type) {
     case FULL_WAREHOUSE_SAND_POWDER: {

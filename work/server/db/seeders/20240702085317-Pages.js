@@ -147,6 +147,11 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          page_name: 'TaskBoard',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {},
     );

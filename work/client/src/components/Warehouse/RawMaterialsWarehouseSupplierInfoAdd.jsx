@@ -10,9 +10,7 @@ import { Container } from 'reactstrap';
 import * as warehouseActions from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
 function RawMaterialsWarehouseSupplierInfoAdd(props) {
-  const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState(
-    {},
-  );
+  const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState({});
   const [inputError, setInputError] = useState('');
 
   const user = useSelector((state) => state.user);
@@ -125,10 +123,13 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
         }),
       );
     } else {
+      const isNeedCheck = props?.supplierInfo.isNeedCheck ? false : true;
+
       dispatch(
         updateRawMaterialAction({
           id: props?.supplierInfo.id,
           portion_size: rawMaterialWarehouseInput?.quality,
+          isNeedCheck,
         }),
       );
     }
@@ -185,9 +186,7 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
                           onChange={handleRawMaterialWarehouseInputChange}
                         />
                         {inputError && el.accessor === 'quality' && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {inputError}
-                          </p>
+                          <p className="text-red-500 text-xs mt-1">{inputError}</p>
                         )}
                       </div>
                     </div>
