@@ -107,8 +107,7 @@ function CackeFillUp() {
   }, [lotesListCakes]);
 
   const totalCake =
-    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) ||
-    0;
+    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) || 0;
 
   const batchCalDate = cackeFillUp?.date ?? cackeFillUp?.batch_cal_date ?? '';
 
@@ -199,11 +198,16 @@ function CackeFillUp() {
     if (finish) {
       const filled_autoclaves = Math.ceil(allocated / 21);
       const residual_arrays = total_arrays - filled_autoclaves * 21;
+      const produced_autoclave =
+        accd.produced_autoclave <= filled_autoclaves
+          ? filled_autoclaves
+          : accd.produced_autoclave;
       result.push({
         ...accd,
         total_arrays,
         residual_arrays,
         filled_autoclaves,
+        produced_autoclave,
       });
     } else {
       result.push({
@@ -305,18 +309,10 @@ function CackeFillUp() {
             className="mt-2"
             style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
           >
-            <Button
-              color="success"
-              onClick={handlePlus}
-              style={{ minWidth: 60 }}
-            >
+            <Button color="success" onClick={handlePlus} style={{ minWidth: 60 }}>
               +
             </Button>
-            <Button
-              color="success"
-              onClick={handleMinus}
-              style={{ minWidth: 60 }}
-            >
+            <Button color="success" onClick={handleMinus} style={{ minWidth: 60 }}>
               -
             </Button>
 
@@ -375,9 +371,7 @@ function CackeFillUp() {
                     >
                       <span style={{ opacity: 0.7 }}>#</span>
                       <span>{id}</span>
-                      <span
-                        style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}
-                      >
+                      <span style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}>
                         {isActive ? '▲ note' : '▼ note'}
                       </span>
                     </div>
