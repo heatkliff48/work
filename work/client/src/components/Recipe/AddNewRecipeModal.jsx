@@ -335,6 +335,8 @@ function AddNewRecipeModal({ show, onHide }) {
                         el.accessor === 'water_total' ||
                         el.accessor === 'produced_return_dry' ||
                         el.accessor === 'description' ||
+                        el.accessor === 'aluminum_type' ||
+                        el.accessor === 'aluminum_2_type' ||
                         (selectedProduct?.density <= 100 &&
                           el.accessor === 'sand_slurry_dry') ||
                         (selectedProduct?.density > 100 &&
