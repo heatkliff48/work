@@ -54,6 +54,7 @@ const productCodeRouter = require('./router/productCode.js');
 const orderRandomProductsRouter = require('./router/orderRandom.js');
 const lotesListRouter = require('./router/loteslist.js');
 const orderToWarehouseRouter = require('./router/orderToWarehouse.js');
+const greenLineMonitoringRouter = require('./router/greenLineMonitoring.js');
 
 const app = express();
 const map = new Map();
@@ -142,6 +143,7 @@ app.use('/productCode', productCodeRouter);
 app.use('/orderRandom', orderRandomProductsRouter);
 app.use('/lotesList', lotesListRouter);
 app.use('/orderToWarehouse', orderToWarehouseRouter);
+app.use('/greenLineMonitoring', greenLineMonitoringRouter);
 
 // Обработка WebSocket соединений
 server.on('upgrade', function (req, socket, head) {
