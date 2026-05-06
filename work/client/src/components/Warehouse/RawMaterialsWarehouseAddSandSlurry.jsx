@@ -134,11 +134,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
     sand_slurry.forEach(({ accessor }) => {
       const value = sandSlurryWarehouseInput?.[accessor];
 
-      if (
-        value === null ||
-        value === undefined ||
-        String(value).trim() === ''
-      ) {
+      if (value === null || value === undefined || String(value).trim() === '') {
         newErrors[accessor] = `This field is required`;
         return;
       }
@@ -233,6 +229,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
         aac_scrap: sandSlurryWarehouseInput.aac,
         // portion_size: sandSlurryWarehouseInput.portion_size,
         date: sandSlurryWarehouseInput.date,
+        isNeedCheck: true,
       }),
     );
     setSandSlurryWarehouseInput({ portion_size: 100 });

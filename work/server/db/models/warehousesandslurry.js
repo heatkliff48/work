@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       portion_size: DataTypes.FLOAT,
       date: DataTypes.STRING,
       file_name: DataTypes.STRING,
+      isNeedCheck: DataTypes.BOOLEAN,
     },
     {
       sequelize,
