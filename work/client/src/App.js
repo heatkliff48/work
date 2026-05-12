@@ -55,6 +55,7 @@ import ProductionQuality from '#components/ProductionQuality/ProductionQuality.j
 
 import '#components/Styles/buttons.css';
 import TaskBoard from '#components/TaskBoard/TaskBoard.jsx';
+import GreenLineMonitoring from '#components/GreenLineMonitoring/GreenLineMonitoring.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -127,13 +128,25 @@ function App() {
               path="/production_batch_designer_new"
               element={<ProductionBatchDesignerNew />}
             />
-            <Route path="/autoclave_calendar" element={<AutoclaveCalendare />} />
+            <Route
+              path="/autoclave_calendar"
+              element={<AutoclaveCalendare />}
+            />
 
-            <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
-            <Route path="/quality_management" element={<QualityManagementTable />} />
+            <Route
+              path="/products_type_journal"
+              element={<ProductsTypeJournal />}
+            />
+            <Route
+              path="/quality_management"
+              element={<QualityManagementTable />}
+            />
 
             <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
-            <Route path="/recipe_products" element={<ProductsListForRecipes />} />
+            <Route
+              path="/recipe_products"
+              element={<ProductsListForRecipes />}
+            />
             <Route path="/recipe_orders" element={<RecipeOrders />} />
             <Route
               path="/raw_material_consumption"
@@ -153,7 +166,10 @@ function App() {
             <Route path="/users_info" element={<UsersInfo />} />
 
             <Route path="/warehouse_HCCA_blocks" element={<Warehouse />} />
-            <Route path="/warehouse_dry_mixes" element={<DryMixesWarehouse />} />
+            <Route
+              path="/warehouse_dry_mixes"
+              element={<DryMixesWarehouse />}
+            />
             <Route
               path="/warehouse_related_materials"
               element={<RelatedMaterialsWarehouse />}
@@ -172,6 +188,10 @@ function App() {
 
             <Route path="/lotes_list" element={<LotesList />} />
             <Route path="/task_board" element={<TaskBoard />} />
+            <Route
+              path="/green_line_monitoring"
+              element={<GreenLineMonitoring />}
+            />
 
             {/* всё неизвестное — на sign-in */}
             <Route path="*" element={<Navigate to="/sign-in" />} />
