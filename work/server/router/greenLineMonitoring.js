@@ -1,6 +1,6 @@
 const greenLineMonitoringRouter = require('express').Router();
 const { GreenLineMonitoring } = require('../db/models');
-const { Op, fn, col, literal } = require('sequelize');
+const { Op, fn, col, literal, Sequelize } = require('sequelize');
 
 greenLineMonitoringRouter.get('/', async (req, res) => {
   try {
@@ -118,16 +118,17 @@ greenLineMonitoringRouter.get('/data/by-date', async (req, res) => {
       });
     }
 
-    // Создаем диапазон для выбранной даты
-    const startDate = new Date(`${date}T00:00:00.000Z`);
-    const endDate = new Date(`${date}T23:59:59.999Z`);
-
-    // Получаем все данные за указанную дату
+    // Решение 1: Используем функции Sequelize для работы с датами (рекомендуется)
     const sensorData = await GreenLineMonitoring.findAll({
       where: {
-        timestamp: {
-          [Op.between]: [startDate, endDate],
-        },
+        [Op.and]: [
+          // Используем Sequelize.fn для извлечения только даты из timestamp
+          Sequelize.where(
+            Sequelize.fn('DATE', Sequelize.col('timestamp')),
+            '=',
+            date,
+          ),
+        ],
       },
       order: [
         ['sensor_id', 'ASC'],
@@ -135,6 +136,8 @@ greenLineMonitoringRouter.get('/data/by-date', async (req, res) => {
       ],
       raw: true,
     });
+
+    console.log(`Found ${sensorData.length} records for date ${date}`);
 
     // Группируем данные по sensor_id и форматируем timestamp
     const groupedData = sensorData.reduce((acc, record) => {
