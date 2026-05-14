@@ -24,7 +24,7 @@ function CackeFillUp() {
   const { list_of_recipes, recipeOrders } = useRecipeContext();
   const { latestProducts } = useProductsContext();
 
-  const raw_mat_consumption = useSelector((state) => state.rawMatConsumption);
+  const raw_mat_consumption = useSelector((state) => state?.rawMatConsumption);
 
   const [modalShow, setModalShow] = useState(false);
   const [finish, setFinish] = useState(false);
@@ -186,33 +186,63 @@ function CackeFillUp() {
       }),
     );
 
+    // const accd = autoclave_calendar.find((el) => el.date === date);
+    // const result = [];
+    // if (!accd) {
+    //   console.error('Autoclave calendar entry not found for date:', date);
+    //   return;
+    // }
+
+    // const total_arrays = (accd?.total_arrays || 0) + allocated;
+
+    // if (finish) {
+    //   const filled_autoclaves = Math.ceil(allocated / 21);
+    //   const residual_arrays = total_arrays - filled_autoclaves * 21;
+    //   const produced_autoclave =
+    //     accd.produced_autoclave <= filled_autoclaves
+    //       ? filled_autoclaves
+    //       : accd.produced_autoclave;
+    //   result.push({
+    //     ...accd,
+    //     total_arrays,
+    //     residual_arrays,
+    //     filled_autoclaves,
+    //     produced_autoclave,
+    //   });
+    // } else {
+    //   result.push({
+    //     ...accd,
+    //     total_arrays,
+    //   });
+    // }
+
     const accd = autoclave_calendar.find((el) => el.date === date);
-    const result = [];
     if (!accd) {
       console.error('Autoclave calendar entry not found for date:', date);
       return;
     }
 
-    const total_arrays = (accd?.total_arrays || 0) + allocated;
+    const prevTotalArrays = accd.total_arrays || 0;
+    const newTotalArrays = prevTotalArrays + allocated;
+
+    const result = [];
 
     if (finish) {
-      const filled_autoclaves = Math.ceil(allocated / 21);
-      const residual_arrays = total_arrays - filled_autoclaves * 21;
-      const produced_autoclave =
-        accd.produced_autoclave <= filled_autoclaves
-          ? filled_autoclaves
-          : accd.produced_autoclave;
+      const totalAutoclaves = Math.ceil(newTotalArrays / 21);
+
+      const residual = newTotalArrays % 21;
+
       result.push({
         ...accd,
-        total_arrays,
-        residual_arrays,
-        filled_autoclaves,
-        produced_autoclave,
+        total_arrays: newTotalArrays,
+        filled_autoclaves: totalAutoclaves,
+        produced_autoclave: totalAutoclaves,
+        residual_arrays: residual,
       });
     } else {
       result.push({
         ...accd,
-        total_arrays,
+        total_arrays: newTotalArrays,
       });
     }
 
