@@ -29,51 +29,6 @@ function OrdersToWarehouseTable() {
   const { roles, checkUserAccess, userAccess, setUserAccess } =
     useUsersContext();
 
-  const COLUMNS_ORDERS_TO_WAREHOUSE = [
-    {
-      Header: 'Ref.',
-      accessor: 'product_article',
-      disableSortBy: true,
-    },
-    {
-      Header: 'Description',
-      accessor: 'description',
-      sortType: 'string',
-    },
-    {
-      Header: 'Quantity of pallets',
-      accessor: 'quantity_pallets',
-    },
-    {
-      Header: 'Real quantity, m2',
-      accessor: 'quantity_real_m2',
-    },
-    {
-      Header: 'Produced',
-      accessor: 'quantity_produced',
-    },
-    {
-      Header: 'Allocated',
-      accessor: 'quantity_allocated',
-    },
-    {
-      Header: 'Actions', // Новая колонка с кнопкой удаления
-      accessor: 'actions',
-      disableSortBy: true,
-      Cell: ({ row }) => (
-        <Button
-          variant="danger"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleDeleteOrder(row.original);
-          }}
-        >
-          Delete
-        </Button>
-      ),
-    },
-  ];
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -82,6 +37,61 @@ function OrdersToWarehouseTable() {
   );
 
   const user = useSelector((state) => state.user);
+
+  const getColumns = () => {
+    const COLUMNS_ORDERS_TO_WAREHOUSE = [
+      {
+        Header: 'Ref.',
+        accessor: 'product_article',
+        disableSortBy: true,
+      },
+      {
+        Header: 'Description',
+        accessor: 'description',
+        sortType: 'string',
+      },
+      {
+        Header: 'Quantity of pallets',
+        accessor: 'quantity_pallets',
+      },
+      {
+        Header: 'Real quantity, m2',
+        accessor: 'quantity_real_m2',
+      },
+      {
+        Header: 'Produced',
+        accessor: 'quantity_produced',
+      },
+      {
+        Header: 'Allocated',
+        accessor: 'quantity_allocated',
+      },
+    ];
+
+    // Проверяем права доступа
+    const access = checkUserAccess(user, roles, 'order_to_warehouse_delete');
+
+    if (access?.canRead || access?.canWrite) {
+      COLUMNS_ORDERS_TO_WAREHOUSE.push({
+        Header: 'Actions',
+        accessor: 'actions',
+        disableSortBy: true,
+        Cell: ({ row }) => (
+          <Button
+            variant="danger"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteOrder(row.original);
+            }}
+          >
+            Delete
+          </Button>
+        ),
+      });
+    }
+
+    return COLUMNS_ORDERS_TO_WAREHOUSE;
+  };
 
   const handleDeleteOrder = (order) => {
     dispatch(deleteOrderToWarehouse(order.id));
@@ -115,7 +125,7 @@ function OrdersToWarehouseTable() {
         />
       )}
       <Table
-        COLUMN_DATA={COLUMNS_ORDERS_TO_WAREHOUSE}
+        COLUMN_DATA={getColumns()}
         dataOfTable={list_of_orders_to_warehouse}
         userAccess={userAccess}
         onClickButton={() => {
