@@ -8,8 +8,12 @@ import AddClientOrderModal from '#components/Orders/modal/AddClientOrderModal';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
+import {
+  deleteOrderToWarehouse,
+  getOrderToWarehouse,
+} from '#components/redux/actions/orderToWarehouseAction.js';
 import AddProductOrderToWarehouseModal from './AddProductOrderToWarehouseModal';
+import Button from 'react-bootstrap/Button';
 
 function OrdersToWarehouseTable() {
   const {
@@ -52,6 +56,22 @@ function OrdersToWarehouseTable() {
       Header: 'Allocated',
       accessor: 'quantity_allocated',
     },
+    {
+      Header: 'Actions', // Новая колонка с кнопкой удаления
+      accessor: 'actions',
+      disableSortBy: true,
+      Cell: ({ row }) => (
+        <Button
+          variant="danger"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteOrder(row.original);
+          }}
+        >
+          Delete
+        </Button>
+      ),
+    },
   ];
 
   const dispatch = useDispatch();
@@ -62,6 +82,10 @@ function OrdersToWarehouseTable() {
   );
 
   const user = useSelector((state) => state.user);
+
+  const handleDeleteOrder = (order) => {
+    dispatch(deleteOrderToWarehouse(order.id));
+  };
 
   useEffect(() => {
     if (user && roles.length > 0) {
