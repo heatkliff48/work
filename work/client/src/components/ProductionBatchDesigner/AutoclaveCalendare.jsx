@@ -34,7 +34,7 @@ export default function ProductionPlannerCalendar({
   const [openDayISO, setOpenDayISO] = useState(null);
   const [internalMap, setInternalMap] = useState(() => Object.create(null));
   const [currentMonth, setCurrentMonth] = useState(
-    initialMonth ? startOfMonth(initialMonth) : startOfMonth(new Date())
+    initialMonth ? startOfMonth(initialMonth) : startOfMonth(new Date()),
   );
 
   const batchOutside = useSelector((state) => state.batchOutside);
@@ -54,7 +54,7 @@ export default function ProductionPlannerCalendar({
 
   const monthLabel = useMemo(
     () => format(currentMonth, 'LLLL yyyy', { locale: ru }),
-    [currentMonth]
+    [currentMonth],
   );
 
   const days = useMemo(() => {
@@ -289,7 +289,7 @@ export default function ProductionPlannerCalendar({
               '→',
               to,
               'осталось',
-              need
+              need,
             );
             break;
           }
@@ -306,7 +306,7 @@ export default function ProductionPlannerCalendar({
               '→',
               to,
               'осталось',
-              need
+              need,
             );
             break;
           }
@@ -341,6 +341,9 @@ export default function ProductionPlannerCalendar({
   }
 
   const nextHandler = (planQtyNum, doneNum, dayISO) => {
+    const surplus = doneNum - planQtyNum;
+    if (surplus <= 0) return;
+
     const arr = Object.entries(map)
       .map(([date, obj]) => {
         const existing = autoclave_calendar.find((i) => i.date === date);
@@ -348,7 +351,7 @@ export default function ProductionPlannerCalendar({
           date,
           scheduled_autoclaves: Number(obj?.scheduled_autoclaves) || 0,
           produced_autoclave: Number(
-            existing?.produced_autoclave ?? obj?.produced_autoclave ?? 0
+            existing?.produced_autoclave ?? obj?.produced_autoclave ?? 0,
           ),
         };
       })
@@ -379,13 +382,13 @@ export default function ProductionPlannerCalendar({
     if (qvErr) {
       window.alert(
         `Не получится перенести партию: на ${qvErr.at} выполнено ${qvErr.actual}, ` +
-          `а впереди требуется минимум ${qvErr.needAtLeast} (из-за плана на ${qvErr.becauseOfDate}).`
+          `а впереди требуется минимум ${qvErr.needAtLeast} (из-за плана на ${qvErr.becauseOfDate}).`,
       );
       return;
     }
 
     const violating = before.find(
-      (d) => d.scheduled_autoclaves > planQtyNum && d.produced_autoclave < doneNum
+      (d) => d.scheduled_autoclaves > planQtyNum && d.produced_autoclave < doneNum,
     );
     if (violating) {
       window.alert(`Нельзя продолжить: ${violating.date}`);
@@ -394,7 +397,7 @@ export default function ProductionPlannerCalendar({
 
     const beforeDates = new Set(before.map((r) => r.date));
     const rightBatchOutside = (batchOutside ?? []).filter((item) =>
-      beforeDates.has(item?.date)
+      beforeDates.has(item?.date),
     );
 
     const { redistributed, transfers } = shiftForwardOneStepWithPlan(before);
@@ -471,24 +474,21 @@ export default function ProductionPlannerCalendar({
               >
                 <div style={styles.dayNumber}>
                   {format(day, 'd', { locale: ru })}
-                  {
-
-                    isPastBtn && fill_ac !== done && (
-                      <div
-                        style={styles.btnNext}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          nextHandler(qty, done, iso);
-                        }}
-                      >
-                        <img
-                          src={next3}
-                          alt="next3"
-                          style={{ width: '30px', height: '30px' }}
-                        />
-                      </div>
-                    )
-                  }
+                  {isPastBtn && done > qty && (
+                    <div
+                      style={styles.btnNext}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        nextHandler(qty, done, iso);
+                      }}
+                    >
+                      <img
+                        src={next3}
+                        alt="next3"
+                        style={{ width: '30px', height: '30px' }}
+                      />
+                    </div>
+                  )}
                 </div>
                 {(() => {
                   const scheduled = toNum(qty);
@@ -501,8 +501,12 @@ export default function ProductionPlannerCalendar({
                   const showProducedAutoclave =
                     fill_ac > 0 && batchOutsideForDay.length === 0;
 
+                  // const producedMode =
+                  //   showProducedAutoclave && filled === scheduled && filled > 0;
                   const producedMode =
-                    showProducedAutoclave && filled === scheduled && filled > 0;
+                    fill_ac > 0 &&
+                    batchOutsideForDay.length === 0 &&
+                    done > scheduled;
                   const showInitialZero = scheduled === 0 && filled === 0;
 
                   if (showInitialZero) {

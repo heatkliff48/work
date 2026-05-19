@@ -158,8 +158,6 @@ function Main() {
   const [isTaskBoardVisible, setIsTaskBoardVisible] = useState(false);
   const [taskBoardData, setTaskBoardData] = useState(0);
 
-  console.log('warehouse_sand_slurry Main.jsx line 161', warehouse_sand_slurry);
-
   useEffect(() => {
     const userAccess = checkUserAccess(user, roles, 'TaskBoard');
 
