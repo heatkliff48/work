@@ -75,7 +75,7 @@ function Warehouse() {
     });
 
     // Фильтрация по состоянию радиокнопки
-    if (hideZeroQuantity) {
+    if (!hideZeroQuantity) {
       return processedData.filter((item) => item.total_quantity > 0);
     }
 
