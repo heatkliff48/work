@@ -447,10 +447,10 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       await RawMaterialsWarehouse.update(
         {
           consumed_quantity: sequelize.literal(
-            `ROUND((consumed_quantity + ${delta})::numeric, 2)`,
+            `ROUND((consumed_quantity + ${total})::numeric, 2)`,
           ),
           remaining_quantity: sequelize.literal(
-            `ROUND((remaining_quantity - ${delta})::numeric, 2)`,
+            `ROUND((remaining_quantity - ${total})::numeric, 2)`,
           ),
 
           last_updated: date,
@@ -466,11 +466,9 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       });
 
       myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
-
-      return res.status(200).json({
-        updatedRecords: allUpdatedRecords,
-        deletedIds: [],
-      });
+      return res
+        .status(200)
+        .json({ updatedRecords: allUpdatedRecords, deletedIds: [] });
     }
 
     const materialTotals = normMaterials.reduce((acc, m) => {
@@ -479,10 +477,47 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
     }, {});
 
     const updatedTypes = Object.keys(materialTotals);
+    const deletedIds = [];
+
+    const writeOffFromDetailTable = async (model, subtype, amount) => {
+      let remaining = amount;
+
+      const records = await model.findAll({
+        where: { type: subtype },
+        order: sequelize.literal(`to_date(date, 'DD.MM.YYYY') ASC`),
+        transaction: t,
+      });
+
+      for (const rec of records) {
+        if (remaining <= 0) break;
+        const available = rec.quantity - rec.consumed_quantity;
+        if (available <= 0) continue;
+        const toWrite = Math.min(available, remaining);
+        const newConsumed = rec.consumed_quantity + toWrite;
+
+        await rec.update({ consumed_quantity: newConsumed }, { transaction: t });
+
+        remaining -= toWrite;
+      }
+      if (remaining > 0) {
+        throw new Error(
+          `Недостаточно алюминия типа ${subtype} на складе. Не хватает ${remaining}`,
+        );
+      }
+    };
+
+    const aluminumSpent = { Aluminum: 0 };
 
     for (const materialType of updatedTypes) {
       const delta = materialTotals[materialType];
-      console.log('delta', delta);
+
+      if (materialType.startsWith('Aluminum|')) {
+        const [, subtype] = materialType.split('|');
+        await writeOffFromDetailTable(WarehouseAluminum1, subtype, delta);
+        aluminumSpent.Aluminum += delta;
+        continue;
+      }
+
       if (materialType === 'Return slurry (dry)') {
         await RawMaterialsWarehouse.update(
           {
@@ -503,7 +538,6 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
             remaining_quantity: sequelize.literal(
               `ROUND((remaining_quantity - ${delta})::numeric, 2)`,
             ),
-
             last_updated: date,
             updatedAt: now,
           },
@@ -512,10 +546,40 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       }
     }
 
+    for (const [alumType, totalSpent] of Object.entries(aluminumSpent)) {
+      if (totalSpent === 0) continue;
+      let model;
+      if (alumType === 'Aluminum') model = WarehouseAluminum1;
+      else continue;
+
+      const [result] = await sequelize.query(
+        `SELECT COALESCE(SUM(quantity), 0) - COALESCE(SUM(consumed_quantity), 0) as total_available
+         FROM "${model.tableName}"
+         WHERE "type" IS NOT NULL`,
+        { transaction: t, type: sequelize.QueryTypes.SELECT },
+      );
+      const totalAvailable = Number(result.total_available) || 0;
+
+      await RawMaterialsWarehouse.update(
+        {
+          remaining_quantity: totalAvailable,
+          consumed_quantity: sequelize.literal(`consumed_quantity + ${totalSpent}`),
+          last_updated: date,
+          updatedAt: now,
+        },
+        { where: { material_type: alumType }, transaction: t },
+      );
+    }
+
     await t.commit();
 
     const typesToRead = Array.from(
-      new Set([...updatedTypes, 'Sand slurry (dry)', 'Return slurry (dry)']),
+      new Set([
+        ...updatedTypes.filter((t) => !t.includes('|')),
+        'Sand slurry (dry)',
+        'Return slurry (dry)',
+        'Aluminum',
+      ]),
     );
 
     const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
@@ -524,7 +588,6 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
 
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
 
-    const deletedIds = [];
     return res.status(200).json({
       updatedRecords: allUpdatedRecords,
       deletedIds,
@@ -1279,6 +1342,7 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
     const warehouseAluminum1 = await WarehouseAluminum1.create({
       supplier,
       quantity,
+      consumed_quantity: 0,
       type,
       date: formatDate(date),
     });
@@ -1303,7 +1367,7 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
 
     const record = await RawMaterialsWarehouse.findOne({
       where: {
-        material_type: 'Aluminum 1',
+        material_type: 'Aluminum',
       },
     });
 
@@ -1314,14 +1378,14 @@ rawMaterialsWarehouseRouter.post('/aluminum1', async (req, res) => {
       },
       {
         where: {
-          material_type: 'Aluminum 1',
+          material_type: 'Aluminum',
         },
       },
     );
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET, warehouseAluminum1);
     const updatedWarehouse = await RawMaterialsWarehouse.findOne({
-      where: { material_type: 'Aluminum 1' },
+      where: { material_type: 'Aluminum' },
     });
     myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
     return res.json(warehouseAluminum1).status(200);

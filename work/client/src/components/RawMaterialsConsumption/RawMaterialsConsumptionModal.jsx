@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   updateRawMaterialConsumptionRawMaterialsWarehouse,
   updateRemainingStock,
@@ -36,13 +36,17 @@ const RawMaterialsConsumptionModal = React.memo(
     const dispatch = useDispatch();
 
     const [form, setForm] = useState({});
-    const [wastedMode, setWastedMode] = useState('default');
-    const [confirmFlag, setConfirmFlag] = useState(false);
-    const [govno, setGovno] = useState(false);
-    const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [availableRecipes, setAvailableRecipes] = useState([]);
-    const [productionVolume, setProductionVolume] = useState('');
+    const [govno, setGovno] = useState(false);
+    const [confirmFlag, setConfirmFlag] = useState(false);
     const [recipeArticle, setRecipeArticle] = useState('');
+    const [wastedMode, setWastedMode] = useState('default');
+    const [productionVolume, setProductionVolume] = useState('');
+    const [selectedRecipe, setSelectedRecipe] = useState(null);
+    const [selectedAlu1Type, setSelectedAlu1Type] = useState(null);
+    const [selectedAlu2Type, setSelectedAlu2Type] = useState(null);
+
+    const warehouseAluminum1 = useSelector((state) => state.warehouseAluminum1);
 
     useEffect(() => {
       setAvailableRecipes([]);
@@ -77,6 +81,14 @@ const RawMaterialsConsumptionModal = React.memo(
       [],
     );
 
+    const aluminum1TypeOptions = useMemo(() => {
+      if (!warehouseAluminum1) return [];
+      const uniqueTypes = [
+        ...new Set(warehouseAluminum1.map((item) => item.type).filter(Boolean)),
+      ];
+      return uniqueTypes.map((type) => ({ value: type, label: type }));
+    }, [warehouseAluminum1]);
+
     useEffect(() => {
       if (!isOpen) return;
 
@@ -89,15 +101,58 @@ const RawMaterialsConsumptionModal = React.memo(
       setForm(initialForm);
     }, [isOpen]);
 
+    // const warehouseByType = React.useMemo(() => {
+    //   const map = new Map();
+    //   (raw_materials_warehouse || []).forEach((row) => {
+    //     const type = String(row?.material_type ?? '').trim();
+    //     const qty = Number(row?.remaining_quantity ?? 0) || 0;
+    //     if (type) map.set(type, qty);
+    //   });
+    //   return map;
+    // }, [raw_materials_warehouse]);
+
     const warehouseByType = React.useMemo(() => {
       const map = new Map();
+
+      // 1. Обычные материалы (кроме алюминия) из raw_materials_warehouse
       (raw_materials_warehouse || []).forEach((row) => {
-        const type = String(row?.material_type ?? '').trim();
+        const materialType = String(row?.material_type ?? '').trim();
+        if (materialType === 'Aluminum') return; // пропускаем – обработаем отдельно
         const qty = Number(row?.remaining_quantity ?? 0) || 0;
-        if (type) map.set(type, qty);
+        if (materialType && qty) {
+          map.set(materialType, (map.get(materialType) || 0) + qty);
+        }
       });
+
+      // 2. Алюминий с разбивкой по типам
+      const processAluminum = (data, baseName) => {
+        if (!data || !Array.isArray(data)) return;
+        data.forEach((item) => {
+          const subtype = item?.type ? String(item.type).trim() : null;
+          const available =
+            (Number(item?.quantity) || 0) - (Number(item?.consumed_quantity) || 0);
+          if (subtype && available > 0) {
+            const key = `${baseName}|${subtype}`;
+            map.set(key, (map.get(key) || 0) + available);
+          }
+        });
+      };
+
+      processAluminum(warehouseAluminum1, 'Aluminum');
+      const totalAlu = (warehouseAluminum1 || []).reduce((sum, item) => {
+        return (
+          sum +
+          (Number(item?.quantity) || 0) -
+          (Number(item?.consumed_quantity) || 0)
+        );
+      }, 0);
+      if (totalAlu > 0) {
+        map.set('Aluminum', totalAlu);
+        map.set('Aluminum 1', totalAlu);
+      }
+
       return map;
-    }, [raw_materials_warehouse]);
+    }, [raw_materials_warehouse, warehouseAluminum1]);
 
     const ALWAYS_VISIBLE = useMemo(
       () => new Set(['Aluminum 1', 'Aluminum 2', 'Grinding Balls', 'AAC']),
@@ -441,13 +496,19 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const materials = materialsMap.map(({ label, key }) => {
         const w = computeWasted(key, label);
-
         if (w === null) return { type: label, quantity: null };
 
         const wasted = Number(w);
         if (Number.isNaN(wasted)) return { type: label, quantity: null };
 
-        return { type: label, quantity: +wasted.toFixed(2) };
+        let actualType = label;
+        if (label === 'Aluminum 1' && selectedAlu1Type?.value) {
+          actualType = `Aluminum|${selectedAlu1Type.value}`;
+        } else if (label === 'Aluminum 2' && selectedAlu2Type?.value) {
+          actualType = `Aluminum|${selectedAlu2Type.value}`;
+        }
+
+        return { type: actualType, quantity: +wasted.toFixed(2) };
       });
 
       if (!materials.length) {
@@ -501,20 +562,67 @@ const RawMaterialsConsumptionModal = React.memo(
           });
         }
       }
-      const shortages = [];
-      for (const { type, quantity } of materials) {
-        if (type === 'Return slurry (dry)' || type === 'Return (dry)') continue;
 
-        const have = warehouseByType.get(type) ?? 0;
+      const shortages = [];
+      if (
+        (materials.some((m) => m.type === 'Aluminum 1') &&
+          !selectedAlu1Type?.value) ||
+        (materials.some((m) => m.type === 'Aluminum 2') && !selectedAlu2Type?.value)
+      ) {
+        alert(
+          'Для алюминия необходимо выбрать тип (7040-10/70WB28, 8040-10/70WB28 и т.д.)',
+        );
+        return;
+      }
+
+      for (const { type, quantity } of materials) {
+        if (type.includes('Return')) continue;
+
+        let have;
+        if (type.startsWith('Aluminum|') && selectedAlu1Type?.value) {
+          console.log(
+            'warehouseByType.get(type) RawMaterialsConsumptionModal.jsx line 587',
+            warehouseByType.get(type),
+          );
+          have = warehouseByType.get(type) ?? 0;
+        } else if (type.startsWith('Aluminum 2|') && selectedAlu2Type?.value) {
+          have = warehouseByType.get(type) ?? 0;
+        } else {
+          have = warehouseByType.get(type) ?? 0;
+        }
+
         if (quantity > have) {
           shortages.push({
             type,
-            need: +Number(quantity).toFixed(2),
-            have: +Number(have).toFixed(2),
-            lack: +Number(quantity - have).toFixed(2),
+            need: +quantity.toFixed(2),
+            have: +have.toFixed(2),
+            lack: +(quantity - have).toFixed(2),
           });
         }
       }
+
+      // const shortages = [];
+      // for (const { type, quantity } of materials) {
+      //   if (type === 'Return slurry (dry)' || type === 'Return (dry)') continue;
+
+      //   let have;
+      //   if (type === 'Aluminum 1' && selectedAlu1Type?.value) {
+      //     have = warehouseByType.get(`Aluminum 1 (${selectedAlu1Type.value})`) ?? 0;
+      //   } else if (type === 'Aluminum 2' && selectedAlu2Type?.value) {
+      //     have = warehouseByType.get(`Aluminum 2 (${selectedAlu2Type.value})`) ?? 0;
+      //   } else {
+      //     have = warehouseByType.get(type) ?? 0;
+      //   }
+
+      //   if (quantity > have) {
+      //     shortages.push({
+      //       type,
+      //       need: +Number(quantity).toFixed(2),
+      //       have: +Number(have).toFixed(2),
+      //       lack: +Number(quantity - have).toFixed(2),
+      //     });
+      //   }
+      // }
 
       if (shortages.length) {
         const msg =
@@ -552,7 +660,10 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const fixed_materials = result_materials
         .map((el) => {
-          return { ...el, quantity: Number(el.quantity).toFixed(2) };
+          return {
+            ...el,
+            quantity: Number(el.quantity).toFixed(2),
+          };
         })
         .filter((el) => el.quantity != 0);
 
@@ -584,8 +695,15 @@ const RawMaterialsConsumptionModal = React.memo(
         slurried: govno,
         recipe: selectedRow?.recipe_article,
         batch_id: selectedRow?.batch_id,
+        aluminum_type: selectedAlu1Type?.value || null,
+        aluminum_2_type: selectedAlu2Type?.value || null,
         ...recipeSnapshot,
       };
+
+      console.log(
+        'new_lotestList RawMaterialsConsumptionModal.jsx line 703',
+        new_lotestList,
+      );
 
       addProductOrder();
 
@@ -625,7 +743,9 @@ const RawMaterialsConsumptionModal = React.memo(
           )
         ) {
           dispatch(
-            deleteRawMatConsumptionCurrentMolds({ batch_id: selectedRow?.batch_id }),
+            deleteRawMatConsumptionCurrentMolds({
+              batch_id: selectedRow?.batch_id,
+            }),
           );
         }
       } else {
@@ -640,6 +760,8 @@ const RawMaterialsConsumptionModal = React.memo(
       setMainRawMaterialConsumptionMadal(false);
       toggle();
       setProductionVolume('');
+      setSelectedAlu1Type(null);
+      setSelectedAlu2Type(null);
     };
 
     const ddmmyyFromISO = (iso) => {
@@ -903,6 +1025,44 @@ const RawMaterialsConsumptionModal = React.memo(
                       <tr key={key}>
                         <td>
                           <div className="fw-semibold">{label}</div>
+                          {key === 'aluminum_paste' && (
+                            <div style={{ marginTop: '4px', minWidth: '150px' }}>
+                              <Select
+                                options={aluminum1TypeOptions}
+                                value={selectedAlu1Type}
+                                onChange={setSelectedAlu1Type}
+                                placeholder="Select type..."
+                                isClearable
+                                styles={{
+                                  control: (base) => ({
+                                    ...base,
+                                    minHeight: '32px',
+                                  }),
+                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                }}
+                                menuPortalTarget={document.body}
+                              />
+                            </div>
+                          )}
+                          {key === 'aluminum_paste_2' && (
+                            <div style={{ marginTop: '4px', minWidth: '150px' }}>
+                              <Select
+                                options={aluminum1TypeOptions}
+                                value={selectedAlu2Type}
+                                onChange={setSelectedAlu2Type}
+                                placeholder="Select type..."
+                                isClearable
+                                styles={{
+                                  control: (base) => ({
+                                    ...base,
+                                    minHeight: '32px',
+                                  }),
+                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                }}
+                                menuPortalTarget={document.body}
+                              />
+                            </div>
+                          )}
                           <div className="text-muted-small">
                             base: {isEmptyOrZero(base) ? '' : base}
                           </div>

@@ -38,8 +38,16 @@ const RecipeContextProvider = ({ children }) => {
       accessor: 'return_dry',
     },
     {
+      Header: 'Aluminum 1 type',
+      accessor: 'aluminum_type',
+    },
+    {
       Header: 'Aluminum 1',
       accessor: 'aluminum_paste',
+    },
+    {
+      Header: 'Aluminum 2 type',
+      accessor: 'aluminum_2_type',
     },
     {
       Header: 'Aluminum 2',

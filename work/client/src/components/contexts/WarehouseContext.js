@@ -1136,3 +1136,150 @@ export default WarehouseContextProvider;
 
 const useWarehouseContext = () => useContext(WarehouseContext);
 export { useWarehouseContext };
+
+/*
+rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
+  const { materials } = req.body;
+
+  console.log(
+    '======================= materials ======================',
+    materials,
+  );
+
+  const round2 = (num) => Math.round(num * 100) / 100;
+
+  if (!Array.isArray(materials) || materials.length === 0) {
+    return res.status(400).json({
+      error: 'The materials field is required and must be a non-empty array.',
+    });
+  }
+
+  const normMaterials = materials
+    .map((m) => {
+      const qty = Number(m.quantity);
+
+      return {
+        type: normalizeType(m.type),
+        quantity: round2(qty),
+      };
+    })
+    .filter((m) => m.type && Number.isFinite(Number(m.quantity)));
+
+  if (normMaterials.length === 0) {
+    return res
+      .status(400)
+      .json({ error: 'There are no valid items to write off' });
+  }
+
+  const onlySandSlurryDry = normMaterials.every(
+    (m) => m.type === 'Sand slurry (dry)',
+  );
+
+  const t = await sequelize.transaction();
+  try {
+    const today = new Date();
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const year = today.getFullYear();
+    const date = `${day}.${month}.${year}`;
+
+    const now = new Date();
+
+    if (onlySandSlurryDry) {
+      const total = round2(normMaterials.reduce((s, m) => s + m.quantity, 0));
+
+      await RawMaterialsWarehouse.update(
+        {
+          consumed_quantity: sequelize.literal(
+            `ROUND((consumed_quantity + ${delta})::numeric, 2)`,
+          ),
+          remaining_quantity: sequelize.literal(
+            `ROUND((remaining_quantity - ${delta})::numeric, 2)`,
+          ),
+
+          last_updated: date,
+          updatedAt: now,
+        },
+        { where: { material_type: 'Sand slurry (dry)' }, transaction: t },
+      );
+
+      await t.commit();
+
+      const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
+        where: { material_type: { [Op.in]: ['Sand slurry (dry)'] } },
+      });
+
+      myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
+
+      return res.status(200).json({
+        updatedRecords: allUpdatedRecords,
+        deletedIds: [],
+      });
+    }
+
+    const materialTotals = normMaterials.reduce((acc, m) => {
+      acc[m.type] = round2((acc[m.type] || 0) + m.quantity);
+      return acc;
+    }, {});
+
+    const updatedTypes = Object.keys(materialTotals);
+
+    for (const materialType of updatedTypes) {
+      const delta = materialTotals[materialType];
+      console.log('delta', delta);
+      if (materialType === 'Return slurry (dry)') {
+        await RawMaterialsWarehouse.update(
+          {
+            remaining_quantity: sequelize.literal(
+              `ROUND((remaining_quantity - ${delta})::numeric, 2)`,
+            ),
+            last_updated: date,
+            updatedAt: now,
+          },
+          { where: { material_type: 'Return slurry (dry)' }, transaction: t },
+        );
+      } else {
+        await RawMaterialsWarehouse.update(
+          {
+            consumed_quantity: sequelize.literal(
+              `ROUND((consumed_quantity + ${delta})::numeric, 2)`,
+            ),
+            remaining_quantity: sequelize.literal(
+              `ROUND((remaining_quantity - ${delta})::numeric, 2)`,
+            ),
+
+            last_updated: date,
+            updatedAt: now,
+          },
+          { where: { material_type: materialType }, transaction: t },
+        );
+      }
+    }
+
+    await t.commit();
+
+    const typesToRead = Array.from(
+      new Set([...updatedTypes, 'Sand slurry (dry)', 'Return slurry (dry)']),
+    );
+
+    const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
+      where: { material_type: { [Op.in]: typesToRead } },
+    });
+
+    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
+
+    const deletedIds = [];
+    return res.status(200).json({
+      updatedRecords: allUpdatedRecords,
+      deletedIds,
+    });
+  } catch (err) {
+    try {
+      if (!t.finished) await t.rollback();
+    } catch (rbErr) {
+      console.error('Rollback failed:', rbErr);
+    }
+    console.error('❌ ROLLBACK /raw_mat_con/update:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});*/

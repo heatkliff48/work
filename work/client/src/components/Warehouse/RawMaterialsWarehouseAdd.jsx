@@ -50,7 +50,7 @@ function RawMaterialsWarehouseAdd(props) {
       accessor: 'typeLime',
       Filter: TextSearchFilter,
     },
-    props?.material_type === 'Aluminum 1' && {
+    props?.material_type === 'Aluminum' && {
       Header: 'Type',
       accessor: 'typeAlum1',
       Filter: TextSearchFilter,
@@ -167,7 +167,7 @@ function RawMaterialsWarehouseAdd(props) {
         typeLime: initState.typeLime,
       }));
     }
-    if (props?.material_type === 'Aluminum 1') {
+    if (props?.material_type === 'Aluminum') {
       setRawMaterialWarehouseInput((prev) => ({
         ...prev,
         typeAlum1: initState.typeAlum1,
@@ -194,7 +194,7 @@ function RawMaterialsWarehouseAdd(props) {
       Cement: warehouseActions.addNewWarehouseCement,
       'Gypsum (dry)': warehouseActions.addNewWarehouseGypsum,
       'Gypsum stone': warehouseActions.addNewWarehouseGypsumStone,
-      'Aluminum 1': warehouseActions.addNewWarehouseAluminum1,
+      Aluminum: warehouseActions.addNewWarehouseAluminum1,
       'Aluminum 2': warehouseActions.addNewWarehouseAluminum2,
       'Grinding Balls': warehouseActions.addNewWarehouseGrindingBalls,
       AAC: warehouseActions.addNewWarehouseAAC,
@@ -250,10 +250,10 @@ function RawMaterialsWarehouseAdd(props) {
       newErrors.typeLime = 'Lime type is required';
     }
     if (
-      props?.material_type === 'Aluminum 1' &&
+      props?.material_type === 'Aluminum' &&
       !rawMaterialWarehouseInput?.typeAlum1
     ) {
-      newErrors.typeAlum1 = 'Aluminum 1 type is required';
+      newErrors.typeAlum1 = 'Aluminum type is required';
     }
     if (
       props?.material_type === 'Aluminum 2' &&
@@ -320,7 +320,7 @@ function RawMaterialsWarehouseAdd(props) {
                   date: rawMaterialWarehouseInput?.date,
                   diameter: rawMaterialWarehouseInput?.diameter,
                 }
-              : props?.material_type === 'Aluminum 1'
+              : props?.material_type === 'Aluminum'
                 ? {
                     supplier: rawMaterialWarehouseInput?.supplier,
                     quantity: rawMaterialWarehouseInput?.quantity,
