@@ -6,13 +6,15 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 
+import '#components/Styles/raw-materials-plan.css';
+
 function RawMaterialsPlan() {
   const { list_of_recipes, recipe_info } = useRecipeContext();
   const { latestProducts } = useProductsContext();
   const { raw_materials_warehouse } = useWarehouseContext();
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_ordered_production = useSelector(
-    (state) => state.listOfOrderedProduction
+    (state) => state.listOfOrderedProduction,
   );
 
   const [productsArray, setProductsArray] = useState([]);
@@ -38,7 +40,7 @@ function RawMaterialsPlan() {
     .map((item) => {
       const warehouseMaterial = raw_materials_warehouse.find(
         (warehouseItem) =>
-          warehouseItem.material_type === item.Header.replace(/, kg$/, '').trim()
+          warehouseItem.material_type === item.Header.replace(/, kg$/, '').trim(),
       );
 
       return {
@@ -86,11 +88,11 @@ function RawMaterialsPlan() {
           ? {
               ...product,
               current_recipe: product.recipeArray.find(
-                (recipe) => recipe.id === selectedOption.value
+                (recipe) => recipe.id === selectedOption.value,
               ),
             }
-          : product
-      )
+          : product,
+      ),
     );
   };
 
@@ -100,7 +102,7 @@ function RawMaterialsPlan() {
         let orderedProduct;
 
         orderedProduct = list_of_ordered_production.find(
-          (product) => product.id === batch.id_list_of_ordered_production
+          (product) => product.id === batch.id_list_of_ordered_production,
         );
 
         if (!orderedProduct) {
@@ -110,7 +112,7 @@ function RawMaterialsPlan() {
         const productArticle = orderedProduct.product_article;
 
         const productDetails = latestProducts.find(
-          (product) => product.article === productArticle
+          (product) => product.article === productArticle,
         );
 
         const quantity =
@@ -132,7 +134,7 @@ function RawMaterialsPlan() {
         }));
 
         const prodDescription = productDetails?.description.match(
-          /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/
+          /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/,
         );
 
         return {
@@ -280,8 +282,8 @@ function RawMaterialsPlan() {
                           backgroundColor: state.isSelected
                             ? '#2684FF'
                             : state.isFocused
-                            ? '#e6f0ff' // подсветка при наведении
-                            : 'white',
+                              ? '#e6f0ff' // подсветка при наведении
+                              : 'white',
                         }),
                         control: (provided) => ({
                           ...provided,

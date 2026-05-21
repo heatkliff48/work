@@ -80,6 +80,8 @@ import {
   getDimensionsQuality,
   getProductionQuality,
 } from '#components/redux/actions/productionQualityAction.js';
+import '#components/Styles/Main.css';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 function Main() {
   const navigate = useNavigate();
@@ -87,6 +89,7 @@ function Main() {
   const user = useSelector((state) => state.user);
   const { setStoredData } = useOrderContext();
   const { roles, checkUserAccess } = useUsersContext();
+  const { warehouse_sand_slurry } = useWarehouseContext();
 
   useEffect(() => {
     if (!user || !localStorage.getItem('user')) {
@@ -152,6 +155,22 @@ function Main() {
     setStoredData(null);
   }, [dispatch, setStoredData]);
 
+  const [isTaskBoardVisible, setIsTaskBoardVisible] = useState(false);
+  const [taskBoardData, setTaskBoardData] = useState(0);
+
+  useEffect(() => {
+    const userAccess = checkUserAccess(user, roles, 'TaskBoard');
+
+    if (!userAccess?.canRead || user.role !== 3) {
+      setIsTaskBoardVisible(false);
+    }
+
+    setIsTaskBoardVisible(true);
+
+    const tasks = warehouse_sand_slurry.filter((el) => el.isNeedCheck).length;
+    setTaskBoardData(tasks);
+  }, [user, roles, warehouse_sand_slurry]);
+
   return (
     <>
       <div className="bb-section-title">Quick Actions</div>
@@ -188,6 +207,17 @@ function Main() {
         >
           Batch Plan
         </button>
+
+        {isTaskBoardVisible && (
+          <button
+            className="bb-action-btn"
+            onClick={() => navigate('/task_board')}
+            type="button"
+          >
+            Task Board
+            {taskBoardData > 0 && <span className="badge">{taskBoardData}</span>}
+          </button>
+        )}
       </div>
     </>
   );

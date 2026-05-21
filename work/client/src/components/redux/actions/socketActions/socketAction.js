@@ -154,6 +154,7 @@ import {
   NEED_DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
   NEED_UPDATE_WAREHOUSE_PALLETS_SOCKET,
   NEED_DELETE_WAREHOUSE_PALLETS_SOCKET,
+  NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {

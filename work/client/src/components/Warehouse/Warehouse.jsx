@@ -10,6 +10,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useMemo } from 'react';
 import { getAllWarehouse } from '#components/redux/actions/warehouseAction.js';
 import { Switch, FormControlLabel } from '@mui/material';
+import WarehouseSummaryModal from './Modal/WarehouseSummaryModal';
 
 function Warehouse() {
   const { COLUMNS_WAREHOUSE, warehouse_data } = useWarehouseContext();
@@ -28,6 +29,7 @@ function Warehouse() {
   const lotesListBatches = useSelector((state) => state.lotesListBatches);
 
   const [hideZeroQuantity, setHideZeroQuantity] = useState(false);
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -75,7 +77,7 @@ function Warehouse() {
     });
 
     // Фильтрация по состоянию радиокнопки
-    if (hideZeroQuantity) {
+    if (!hideZeroQuantity) {
       return processedData.filter((item) => item.total_quantity > 0);
     }
 
@@ -99,6 +101,11 @@ function Warehouse() {
         />
       )}
 
+      <WarehouseSummaryModal
+        isOpen={showSummaryModal}
+        toggle={() => setShowSummaryModal(!showSummaryModal)}
+      />
+
       <FormControlLabel
         control={
           <Switch
@@ -108,6 +115,13 @@ function Warehouse() {
         }
         label="Toggle to show empty entries"
       />
+
+      <button
+        className="btn btn-info mb-3"
+        onClick={() => setShowSummaryModal(true)}
+      >
+        Show summary
+      </button>
 
       <Table
         COLUMN_DATA={COLUMNS_WAREHOUSE}

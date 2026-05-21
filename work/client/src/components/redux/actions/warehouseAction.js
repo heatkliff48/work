@@ -296,7 +296,9 @@ export const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
   };
 };
 
-export const updateRawMaterialConsumptionRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
+export const updateRawMaterialConsumptionRawMaterialsWarehouse = (
+  rawMaterialsWarehouse,
+) => {
   return {
     type: UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
     payload: rawMaterialsWarehouse,

@@ -58,6 +58,7 @@ const {
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
+  UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 const { Op } = require('sequelize');
@@ -240,7 +241,7 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
         if (currentRecord.remaining_quantity < consumedQuantity) {
           await t.rollback();
           return res.status(400).json({
-            error: `There is not enough "${materialType}" material in stock. Available: ${CurrentRecord.remaining_quantity}, required: ${consumedQuantity}`,
+            error: `There is not enough "${materialType}" material in stock. Available: ${currentRecord.remaining_quantity}, required: ${consumedQuantity}`,
           });
         }
 
@@ -1921,7 +1922,8 @@ rawMaterialsWarehouseRouter.get('/sand_slurry', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
-  const { sand, gypsum_stone, water, grinding_balls, aac_scrap, date } = req.body;
+  const { sand, gypsum_stone, water, grinding_balls, aac_scrap, date, isNeedCheck } =
+    req.body;
 
   try {
     const materialsToCheck = [
@@ -1951,10 +1953,7 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
           where: { material_type: material.material_type },
         });
 
-        if (
-          !availableMaterial ||
-          availableMaterial.remaining_quantity < material.amount
-        ) {
+        if (!availableMaterial || availableMaterial.quantity < material.amount) {
           insufficientMaterials.push({
             material: material.material_type,
             requested: material.amount,
@@ -1978,6 +1977,7 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
       grinding_balls,
       aac_scrap,
       date: formatDate(date),
+      isNeedCheck,
     });
 
     myEmitter.emit(ADD_NEW_WAREHOUSE_SAND_SLURRY_SOCKET, warehouseSandSlurry);
@@ -1989,12 +1989,12 @@ rawMaterialsWarehouseRouter.post('/sand_slurry', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/sand_slurry/update', async (req, res) => {
-  const { id, file_name, portion_size } = req.body;
+  const { id, file_name, portion_size, isNeedCheck = true } = req.body;
 
   try {
     if (!file_name) {
       const warehouseSandSlurry = await WarehouseSandSlurry.update(
-        { portion_size },
+        { portion_size, isNeedCheck },
         {
           where: { id },
           returning: true,

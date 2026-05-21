@@ -8,6 +8,8 @@ import { getAllWarehouse } from '#components/redux/actions/warehouseAction.js';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import '#components/Styles/main-pages.css';
+
 function ProductsTypeWarehouse() {
   const navigate = useNavigate();
   const dispatch = useDispatch();

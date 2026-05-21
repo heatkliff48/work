@@ -316,6 +316,8 @@ const WarehouseContextProvider = ({ children }) => {
     (state) => state.rawMaterialsWarehouse,
   );
 
+  const warehouse_sand_slurry = useSelector((state) => state.warehouseSandSlurry);
+
   const reservedMap = {
     product: list_of_reserved_products,
     dryMixed: list_of_dry_mix_reserved_products,
@@ -1122,6 +1124,7 @@ const WarehouseContextProvider = ({ children }) => {
         setWmoctProductDeltaForPdf,
         warehouseMap,
         batchOutside,
+        warehouse_sand_slurry,
       }}
     >
       {children}

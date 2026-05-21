@@ -1,0 +1,47 @@
+.autoclave-container {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 15px;
+}
+.autoclave-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 2px solid black;
+  padding: 5px;
+}
+.autoclave-cell {
+  padding: 10px;
+  margin: 2px;
+  text-align: center;
+  width: 120px;
+  height: 40px;
+  border: 1px solid gray;
+}
+.autoclave-buttons-container {
+  margin-top: 20px;
+  text-align: center;
+}
+.autoclave-buttons-container button {
+  padding: 10px 20px;
+  margin: 5px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+}
+.autoclave-buttons-container button:hover {
+  background-color: #45a049;
+}
+.cell-white { background-color: white; color: black; }
+.cell-red { background-color: red; color: white; }
+.cell-green { background-color: green; color: white; }
+.cell-orange { background-color: orange; color: white; }
+.cell-black { background-color: black; color: white; }
+.cell-yellow { background-color: yellow; color: black; }
+.cell-gray { background-color: gray; color: white; }
+.cell-purple { background-color: purple; color: white; }
+.cell-blue { background-color: blue; color: white; }
+.cell-pink { background-color: pink; color: white; }

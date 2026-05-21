@@ -33,6 +33,9 @@ module.exports = {
       file_name: {
         type: Sequelize.STRING,
       },
+      isNeedCheck: {
+        type: Sequelize.BOOLEAN,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

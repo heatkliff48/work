@@ -7,7 +7,7 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import './offCanvas.css'
+import './offCanvas.css';
 
 function MainOffcanvas() {
   const navigate = useNavigate();
@@ -286,6 +286,16 @@ function MainOffcanvas() {
                 Accounting
               </Button>
             )}
+
+            <Button
+              className="custom-menu-button"
+              onClick={() => {
+                navigate('/green_line_monitoring');
+                handleClose();
+              }}
+            >
+              Accounting
+            </Button>
           </ButtonGroup>
         </Offcanvas.Body>
       </Offcanvas>

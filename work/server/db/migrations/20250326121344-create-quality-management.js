@@ -42,6 +42,9 @@ module.exports = {
       id_ordered_product_to_warehouse: {
         type: Sequelize.INTEGER,
       },
+      date: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
