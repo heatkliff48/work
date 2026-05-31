@@ -17,8 +17,10 @@ import {
   UPDATE_USERS_MAIN_INFO,
 } from '../types/usersInfoTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
@@ -128,7 +130,10 @@ function* updateUsersInfoWorker(action) {
 
 function* getAllUsersMainInfoWorker(action) {
   try {
-    const { allUsersMainInfo } = yield call(getAllUsersMainInfo, action.payload);
+    const { allUsersMainInfo } = yield call(
+      getAllUsersMainInfo,
+      action.payload,
+    );
 
     yield put({ type: ALL_USERS_MAIN_INFO, payload: allUsersMainInfo });
   } catch (err) {

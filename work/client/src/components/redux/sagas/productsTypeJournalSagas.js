@@ -33,8 +33,10 @@ import {
   UPDATE_TOOL,
 } from '../types/productsTypeJournalTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
@@ -218,7 +220,10 @@ function* getDryMixesJournalWorker() {
 
 function* addNewDryMixesJournalWorker(action) {
   try {
-    const { dryMixesJournal } = yield call(addNewDryMixesJournal, action.payload);
+    const { dryMixesJournal } = yield call(
+      addNewDryMixesJournal,
+      action.payload,
+    );
 
     yield put({ type: NEW_DRY_MIXES_JOURNAL, payload: dryMixesJournal });
   } catch (err) {
@@ -228,7 +233,10 @@ function* addNewDryMixesJournalWorker(action) {
 
 function* updateNewDryMixesJournalWorker(action) {
   try {
-    const { dryMixesJournal } = yield call(updateDryMixesJournal, action.payload);
+    const { dryMixesJournal } = yield call(
+      updateDryMixesJournal,
+      action.payload,
+    );
 
     yield put({ type: UPDATE_DRY_MIXES_JOURNAL, payload: dryMixesJournal });
   } catch (err) {
@@ -253,7 +261,7 @@ function* addNewRelatedMaterialsJournalWorker(action) {
   try {
     const { relatedMaterialsJournal } = yield call(
       addNewRelatedMaterialsJournal,
-      action.payload
+      action.payload,
     );
 
     yield put({
@@ -269,7 +277,7 @@ function* updateNewRelatedMaterialsJournalWorker(action) {
   try {
     const { relatedMaterialsJournal } = yield call(
       updateRelatedMaterialsJournal,
-      action.payload
+      action.payload,
     );
 
     yield put({
@@ -366,18 +374,21 @@ function* updateNewProductCodeWorker(action) {
 function* productsTypeJournalWatcher() {
   yield takeLatest(GET_FULL_DRY_MIXES_JOURNAL, getDryMixesJournalWorker);
   yield takeLatest(ADD_NEW_DRY_MIXES_JOURNAL, addNewDryMixesJournalWorker);
-  yield takeLatest(UPDATE_NEW_DRY_MIXES_JOURNAL, updateNewDryMixesJournalWorker);
+  yield takeLatest(
+    UPDATE_NEW_DRY_MIXES_JOURNAL,
+    updateNewDryMixesJournalWorker,
+  );
   yield takeLatest(
     GET_FULL_RELATED_MATERIALS_JOURNAL,
-    getRelatedMaterialsJournalWorker
+    getRelatedMaterialsJournalWorker,
   );
   yield takeLatest(
     ADD_NEW_RELATED_MATERIALS_JOURNAL,
-    addNewRelatedMaterialsJournalWorker
+    addNewRelatedMaterialsJournalWorker,
   );
   yield takeLatest(
     UPDATE_NEW_RELATED_MATERIALS_JOURNAL,
-    updateNewRelatedMaterialsJournalWorker
+    updateNewRelatedMaterialsJournalWorker,
   );
   yield takeLatest(GET_FULL_ANCHOR, getAnchorWorker);
   yield takeLatest(ADD_NEW_ANCHOR, addNewAnchorWorker);

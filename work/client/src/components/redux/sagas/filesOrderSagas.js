@@ -11,8 +11,10 @@ import {
   NEW_FILES_ORDER,
 } from '../types/filesOrderTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 

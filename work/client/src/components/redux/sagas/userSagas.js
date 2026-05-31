@@ -15,8 +15,10 @@ import { errorToText } from '../../Utils/errorToText';
 
 // let accessTokenFront;
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 

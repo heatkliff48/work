@@ -74,8 +74,10 @@ import {
   RANDOM_PRODUCTS_OF_ORDER,
 } from '../types/ordersTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
@@ -611,7 +613,10 @@ function* getRelMatProductsOfOrderWatcher(action) {
   try {
     const rel_mat_product_list = yield call(getRelMatProductsOfOrder);
 
-    yield put({ type: REL_MAT_PRODUCTS_OF_ORDER, payload: rel_mat_product_list });
+    yield put({
+      type: REL_MAT_PRODUCTS_OF_ORDER,
+      payload: rel_mat_product_list,
+    });
   } catch (err) {
     console.error(err);
     yield put({ type: REL_MAT_PRODUCTS_OF_ORDER, payload: [] });
@@ -620,7 +625,10 @@ function* getRelMatProductsOfOrderWatcher(action) {
 
 function* getCurrentProductsOfOrderWatcher(action) {
   try {
-    const { product_list } = yield call(getCurrentProductsOfOrder, action.payload);
+    const { product_list } = yield call(
+      getCurrentProductsOfOrder,
+      action.payload,
+    );
 
     yield put({ type: CURRENT_PRODUCTS_OF_ORDER, payload: product_list });
   } catch (err) {
@@ -649,7 +657,10 @@ function* getUpdateDryMixedProductsInfoOfOrderWatcher(action) {
   try {
     const { payload } = action;
 
-    const upd_prod_info = yield call(getUpdateDryMixedProductsInfoOfOrder, payload);
+    const upd_prod_info = yield call(
+      getUpdateDryMixedProductsInfoOfOrder,
+      payload,
+    );
 
     yield put({
       type: UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER,
@@ -665,7 +676,10 @@ function* getUpdateAnchorProductsInfoOfOrderWatcher(action) {
   try {
     const { payload } = action;
 
-    const upd_prod_info = yield call(getUpdateAnchorProductsInfoOfOrder, payload);
+    const upd_prod_info = yield call(
+      getUpdateAnchorProductsInfoOfOrder,
+      payload,
+    );
 
     yield put({
       type: UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER,
@@ -697,7 +711,10 @@ function* getUpdateRelMatProductsInfoOfOrderWatcher(action) {
   try {
     const { payload } = action;
 
-    const upd_prod_info = yield call(getUpdateRelMatProductsInfoOfOrder, payload);
+    const upd_prod_info = yield call(
+      getUpdateRelMatProductsInfoOfOrder,
+      payload,
+    );
 
     yield put({
       type: UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
@@ -904,68 +921,89 @@ function* ordersWatcher() {
   yield takeLatest(ADD_ORDER_DESCRIPTION, addDescriptionOrderWatcher);
   yield takeLatest(ADD_SECONDARY_CONTACT, addSecondaryContactWatcher);
   yield takeLatest(DELETE_SECONDARY_CONTACT, deleteSecondaryContactWatcher);
-  yield takeLatest(GET_CURRENT_PRODUCTS_OF_ORDER, getCurrentProductsOfOrderWatcher);
+  yield takeLatest(
+    GET_CURRENT_PRODUCTS_OF_ORDER,
+    getCurrentProductsOfOrderWatcher,
+  );
   yield takeLatest(GET_PRODUCTS_OF_ORDER, getProductsOfOrderWatcher);
   yield takeLatest(
     GET_DRY_MIXED_PRODUCTS_OF_ORDER,
-    getDryMixedProductsOfOrderWatcher
+    getDryMixedProductsOfOrderWatcher,
   );
-  yield takeLatest(GET_ANCHOR_PRODUCTS_OF_ORDER, getAnchorProductsOfOrderWatcher);
+  yield takeLatest(
+    GET_ANCHOR_PRODUCTS_OF_ORDER,
+    getAnchorProductsOfOrderWatcher,
+  );
   yield takeLatest(GET_TOOL_PRODUCTS_OF_ORDER, getToolProductsOfOrderWatcher);
-  yield takeLatest(GET_REL_MAT_PRODUCTS_OF_ORDER, getRelMatProductsOfOrderWatcher);
-  yield takeLatest(GET_UPDATE_PRODUCTS_OF_ORDER, getUpdateProductsOfOrderWatcher);
+  yield takeLatest(
+    GET_REL_MAT_PRODUCTS_OF_ORDER,
+    getRelMatProductsOfOrderWatcher,
+  );
+  yield takeLatest(
+    GET_UPDATE_PRODUCTS_OF_ORDER,
+    getUpdateProductsOfOrderWatcher,
+  );
   yield takeLatest(
     GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
-    getUpdateDryMixedProductsOfOrderWatcher
+    getUpdateDryMixedProductsOfOrderWatcher,
   );
   yield takeLatest(
     GET_UPDATE_ANCHOR_PRODUCTS_OF_ORDER,
-    getUpdateAnchorProductsOfOrderWatcher
+    getUpdateAnchorProductsOfOrderWatcher,
   );
   yield takeLatest(
     GET_UPDATE_TOOL_PRODUCTS_OF_ORDER,
-    getUpdateToolProductsOfOrderWatcher
+    getUpdateToolProductsOfOrderWatcher,
   );
   yield takeLatest(
     GET_UPDATE_REL_MAT_PRODUCTS_OF_ORDER,
-    getUpdateRelMatProductsOfOrderWatcher
+    getUpdateRelMatProductsOfOrderWatcher,
   );
   yield takeLatest(
     GET_UPDATE_PRODUCT_INFO_OF_ORDER,
-    getUpdateProductInfoOfOrderWatcher
+    getUpdateProductInfoOfOrderWatcher,
   );
   yield takeLatest(
     GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER,
-    getUpdateDryMixedProductsInfoOfOrderWatcher
+    getUpdateDryMixedProductsInfoOfOrderWatcher,
   );
   yield takeLatest(
     GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER,
-    getUpdateAnchorProductsInfoOfOrderWatcher
+    getUpdateAnchorProductsInfoOfOrderWatcher,
   );
   yield takeLatest(
     GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER,
-    getUpdateToolProductsInfoOfOrderWatcher
+    getUpdateToolProductsInfoOfOrderWatcher,
   );
   yield takeLatest(
     GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
-    getUpdateRelMatProductsInfoOfOrderWatcher
+    getUpdateRelMatProductsInfoOfOrderWatcher,
   );
   yield takeLatest(GET_DELETE_PRODUCT_OF_ORDER, getDeleteProductOfOrderWatcher);
   yield takeLatest(
     GET_DELETE_DRY_MIXED_OF_ORDER,
-    getDeleteDryMixedProductOfOrderWatcher
+    getDeleteDryMixedProductOfOrderWatcher,
   );
-  yield takeLatest(GET_DELETE_ANCHOR_OF_ORDER, getDeleteAnchorProductOfOrderWatcher);
-  yield takeLatest(GET_DELETE_TOOL_OF_ORDER, getDeleteToolProductOfOrderWatcher);
+  yield takeLatest(
+    GET_DELETE_ANCHOR_OF_ORDER,
+    getDeleteAnchorProductOfOrderWatcher,
+  );
+  yield takeLatest(
+    GET_DELETE_TOOL_OF_ORDER,
+    getDeleteToolProductOfOrderWatcher,
+  );
   yield takeLatest(
     GET_DELETE_REL_MAT_OF_ORDER,
-    getDeleteRelMatProductOfOrderWatcher
+    getDeleteRelMatProductOfOrderWatcher,
   );
   yield takeLatest(GET_DELETE_ORDER, getDeleteOrderWatcher);
   yield takeLatest(UPDATE_CONTACT_OF_ORDER, updateContactOfOrderWorker);
   yield takeLatest(UPDATE_DELIVERY_OF_ORDER, updateDeliveryOfOrderWorker);
   yield takeLatest(UPDATE_STATUS_OF_ORDER, updateStatusOfOrderWorker);
-  yield takeLatest(UPDATE_PERSON_IN_CHARGE_OF_ORDER, updateInChargeOfOrderWorker);
+  yield takeLatest(
+    UPDATE_PERSON_IN_CHARGE_OF_ORDER,
+    updateInChargeOfOrderWorker,
+  );
   yield takeLatest(ADD_RANDOM_PRODUCTS_OF_ORDER, addOrderRandomProductsWorker);
 }
 

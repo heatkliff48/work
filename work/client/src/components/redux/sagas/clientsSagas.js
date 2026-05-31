@@ -27,8 +27,10 @@ import {
   NEED_UPDATE_CLIENT_PRICE_INFO,
 } from '../types/clientsTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
@@ -250,7 +252,10 @@ function* getAllDeliveryAddressesWorker(action) {
 
 function* addNewDeliveryAddressWorker(action) {
   try {
-    const { deliveryAddress } = yield call(addNewDeliveryAddress, action.payload);
+    const { deliveryAddress } = yield call(
+      addNewDeliveryAddress,
+      action.payload,
+    );
 
     yield put({ type: NEW_DELIVERY_ADDRESSES, payload: deliveryAddress });
   } catch (err) {

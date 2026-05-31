@@ -11,8 +11,10 @@ import {
   NEW_FILES_WAREHOUSE,
 } from '../types/filesWarehouseTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 

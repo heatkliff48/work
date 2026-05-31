@@ -4,8 +4,10 @@ import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
 import { ALL_PAGES, GET_ALL_PAGES } from '../types/rolesTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 

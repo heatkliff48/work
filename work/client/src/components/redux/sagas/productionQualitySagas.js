@@ -19,8 +19,10 @@ import {
   UPDATE_DIMENSIONS_QUALITY,
 } from '../types/productionQualityTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
@@ -205,9 +207,18 @@ function* productionQualityWatcher() {
   yield takeLatest(ADD_NEW_DIMENSIONS_QUALITY, addNewDimensionsQualityWatcher);
   yield takeLatest(UPDATE_DIMENSIONS_QUALITY, updateDimensionsQualityWatcher);
   //COMPRESSIONS QUALITY
-  yield takeLatest(GET_ALL_COMPRESSIONS_QUALITY, getAllCompressionsQualityWatcher);
-  yield takeLatest(ADD_NEW_COMPRESSIONS_QUALITY, addNewCompressionsQualityWatcher);
-  yield takeLatest(UPDATE_COMPRESSIONS_QUALITY, updateCompressionsQualityWatcher);
+  yield takeLatest(
+    GET_ALL_COMPRESSIONS_QUALITY,
+    getAllCompressionsQualityWatcher,
+  );
+  yield takeLatest(
+    ADD_NEW_COMPRESSIONS_QUALITY,
+    addNewCompressionsQualityWatcher,
+  );
+  yield takeLatest(
+    UPDATE_COMPRESSIONS_QUALITY,
+    updateCompressionsQualityWatcher,
+  );
 }
 
 export default productionQualityWatcher;

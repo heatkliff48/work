@@ -33,8 +33,10 @@ import {
   UPDT_RAW_MAT_CONSUMPTION_SOCKET,
 } from '../types/socketTypes/socket';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
@@ -196,7 +198,10 @@ const addNewRawMatConsumptionCurrentMolds = (rawMatConsumption) => {
 
 const deleteRawMatConsumptionCurrentMolds = (rawMatConsumption) => {
   return url
-    .post('/recipe_orders/raw_mat_consumption_current_molds/delete', rawMatConsumption)
+    .post(
+      '/recipe_orders/raw_mat_consumption_current_molds/delete',
+      rawMatConsumption,
+    )
     .then((res) => {
       return res.data;
     })
@@ -324,7 +329,10 @@ function* addNewRawMatConsumptionCurrentMoldsWorker(action) {
   try {
     yield call(addNewRawMatConsumptionCurrentMolds, action.payload);
   } catch (err) {
-    yield put({ type: NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET, payload: [] });
+    yield put({
+      type: NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
+      payload: [],
+    });
   }
 }
 

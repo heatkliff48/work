@@ -2,8 +2,10 @@ import axios from 'axios';
 import { DELETE_JWT_TOKEN, SET_JWT_TOKEN } from '../types/jwtTypes';
 
 let refreshTimeoutId = null;
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 

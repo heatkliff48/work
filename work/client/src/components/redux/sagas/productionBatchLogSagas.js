@@ -12,8 +12,10 @@ import {
   NEED_UPDATE_PRODUCTION_BATCH_LOG,
 } from '../types/productionBatchLogTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
@@ -71,7 +73,7 @@ function* addNewProductionBatchLogWorker(action) {
   try {
     const { productionBatchLog } = yield call(
       addNewProductionBatchLog,
-      action.payload
+      action.payload,
     );
 
     yield put({ type: NEW_PRODUCTION_BATCH_LOG, payload: productionBatchLog });
@@ -84,10 +86,13 @@ function* updateProductionBatchLogWorker(action) {
   try {
     const { productionBatchLog } = yield call(
       updateProductionBatchLog,
-      action.payload
+      action.payload,
     );
 
-    yield put({ type: UPDATE_PRODUCTION_BATCH_LOG, payload: productionBatchLog });
+    yield put({
+      type: UPDATE_PRODUCTION_BATCH_LOG,
+      payload: productionBatchLog,
+    });
   } catch (err) {
     yield put({ type: UPDATE_PRODUCTION_BATCH_LOG, payload: [] });
   }
@@ -96,9 +101,18 @@ function* updateProductionBatchLogWorker(action) {
 // watchers
 
 function* productionBatchLogWatcher() {
-  yield takeLatest(GET_ALL_PRODUCTION_BATCH_LOGS, getAllProductionBatchLogsWorker);
-  yield takeLatest(ADD_NEW_PRODUCTION_BATCH_LOG, addNewProductionBatchLogWorker);
-  yield takeLatest(NEED_UPDATE_PRODUCTION_BATCH_LOG, updateProductionBatchLogWorker);
+  yield takeLatest(
+    GET_ALL_PRODUCTION_BATCH_LOGS,
+    getAllProductionBatchLogsWorker,
+  );
+  yield takeLatest(
+    ADD_NEW_PRODUCTION_BATCH_LOG,
+    addNewProductionBatchLogWorker,
+  );
+  yield takeLatest(
+    NEED_UPDATE_PRODUCTION_BATCH_LOG,
+    updateProductionBatchLogWorker,
+  );
 }
 
 export default productionBatchLogWatcher;
