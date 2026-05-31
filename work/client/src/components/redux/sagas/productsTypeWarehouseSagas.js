@@ -29,8 +29,10 @@ import {
   UPDATE_TOOLS_WAREHOUSE,
 } from '../types/productsTypeWarehouseTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
@@ -192,7 +194,7 @@ function* addNewDryMixesWarehouseWorker(action) {
   try {
     const { dryMixesWarehouse } = yield call(
       addNewDryMixesWarehouse,
-      action.payload
+      action.payload,
     );
 
     yield put({ type: NEW_DRY_MIXES_WAREHOUSE, payload: dryMixesWarehouse });
@@ -205,7 +207,7 @@ function* updateNewDryMixesWarehouseWorker(action) {
   try {
     const { dryMixesWarehouse } = yield call(
       updateDryMixesWarehouse,
-      action.payload
+      action.payload,
     );
 
     yield put({ type: UPDATE_DRY_MIXES_WAREHOUSE, payload: dryMixesWarehouse });
@@ -216,7 +218,9 @@ function* updateNewDryMixesWarehouseWorker(action) {
 
 function* getRelatedMaterialsWarehouseWorker() {
   try {
-    const { relatedMaterialsWarehouse } = yield call(getRelatedMaterialsWarehouse);
+    const { relatedMaterialsWarehouse } = yield call(
+      getRelatedMaterialsWarehouse,
+    );
 
     yield put({
       type: FULL_RELATED_MATERIALS_WAREHOUSE,
@@ -231,7 +235,7 @@ function* addNewRelatedMaterialsWarehouseWorker(action) {
   try {
     const { relatedMaterialsWarehouse } = yield call(
       addNewRelatedMaterialsWarehouse,
-      action.payload
+      action.payload,
     );
 
     yield put({
@@ -247,7 +251,7 @@ function* updateNewRelatedMaterialsWarehouseWorker(action) {
   try {
     const { relatedMaterialsWarehouse } = yield call(
       updateRelatedMaterialsWarehouse,
-      action.payload
+      action.payload,
     );
 
     yield put({
@@ -271,7 +275,10 @@ function* getAnchorsWarehouseWorker() {
 
 function* addNewAnchorsWarehouseWorker(action) {
   try {
-    const { anchorsWarehouse } = yield call(addNewAnchorsWarehouse, action.payload);
+    const { anchorsWarehouse } = yield call(
+      addNewAnchorsWarehouse,
+      action.payload,
+    );
 
     yield put({ type: NEW_ANCHORS_WAREHOUSE, payload: anchorsWarehouse });
   } catch (err) {
@@ -281,7 +288,10 @@ function* addNewAnchorsWarehouseWorker(action) {
 
 function* updateNewAnchorsWarehouseWorker(action) {
   try {
-    const { anchorsWarehouse } = yield call(updateAnchorsWarehouse, action.payload);
+    const { anchorsWarehouse } = yield call(
+      updateAnchorsWarehouse,
+      action.payload,
+    );
 
     yield put({ type: UPDATE_ANCHORS_WAREHOUSE, payload: anchorsWarehouse });
   } catch (err) {
@@ -324,22 +334,28 @@ function* updateNewToolsWarehouseWorker(action) {
 function* productsTypeWarehouseWatcher() {
   yield takeLatest(GET_FULL_DRY_MIXES_WAREHOUSE, getDryMixesWarehouseWorker);
   yield takeLatest(ADD_NEW_DRY_MIXES_WAREHOUSE, addNewDryMixesWarehouseWorker);
-  yield takeLatest(UPDATE_NEW_DRY_MIXES_WAREHOUSE, updateNewDryMixesWarehouseWorker);
+  yield takeLatest(
+    UPDATE_NEW_DRY_MIXES_WAREHOUSE,
+    updateNewDryMixesWarehouseWorker,
+  );
   yield takeLatest(
     GET_FULL_RELATED_MATERIALS_WAREHOUSE,
-    getRelatedMaterialsWarehouseWorker
+    getRelatedMaterialsWarehouseWorker,
   );
   yield takeLatest(
     ADD_NEW_RELATED_MATERIALS_WAREHOUSE,
-    addNewRelatedMaterialsWarehouseWorker
+    addNewRelatedMaterialsWarehouseWorker,
   );
   yield takeLatest(
     UPDATE_NEW_RELATED_MATERIALS_WAREHOUSE,
-    updateNewRelatedMaterialsWarehouseWorker
+    updateNewRelatedMaterialsWarehouseWorker,
   );
   yield takeLatest(GET_FULL_ANCHORS_WAREHOUSE, getAnchorsWarehouseWorker);
   yield takeLatest(ADD_NEW_ANCHORS_WAREHOUSE, addNewAnchorsWarehouseWorker);
-  yield takeLatest(UPDATE_NEW_ANCHORS_WAREHOUSE, updateNewAnchorsWarehouseWorker);
+  yield takeLatest(
+    UPDATE_NEW_ANCHORS_WAREHOUSE,
+    updateNewAnchorsWarehouseWorker,
+  );
   yield takeLatest(GET_FULL_TOOLS_WAREHOUSE, getToolsWarehouseWorker);
   yield takeLatest(ADD_NEW_TOOLS_WAREHOUSE, addNewToolsWarehouseWorker);
   yield takeLatest(UPDATE_NEW_TOOLS_WAREHOUSE, updateNewToolsWarehouseWorker);

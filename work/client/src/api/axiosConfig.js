@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { getApiUrl } from '#utils/getApiUrl.js';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_URL || 'http://localhost:3001', // fallback URL
+  baseURL: getApiUrl() || 'http://localhost:3001', // fallback URL
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

@@ -11,8 +11,10 @@ import {
   UPDATE_ROLE_ACTIVE,
 } from '../types/rolesTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 

@@ -11,8 +11,10 @@ import {
   UPDATE_RELATED_MATERIALS_BACKORDER,
 } from '../types/relatedMaterialsBackorderListTypes';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
@@ -42,7 +44,10 @@ const addNewRelatedMaterialsBackorder = (relatedMaterialsBackorderList) => {
 
 const updateRelatedMaterialsBackorder = (relatedMaterialsBackorderList) => {
   return url
-    .post('/relatedMaterialsBackorderList/update', relatedMaterialsBackorderList)
+    .post(
+      '/relatedMaterialsBackorderList/update',
+      relatedMaterialsBackorderList,
+    )
     .then((res) => {
       return res.data;
     })
@@ -55,7 +60,7 @@ const updateRelatedMaterialsBackorder = (relatedMaterialsBackorderList) => {
 function* getRelatedMaterialsBackorderListWorker() {
   try {
     const { relatedMaterialsBackorderList } = yield call(
-      getRelatedMaterialsBackorder
+      getRelatedMaterialsBackorder,
     );
 
     yield put({
@@ -71,7 +76,7 @@ function* addNewRelatedMaterialsBackorderListWorker(action) {
   try {
     const { relatedMaterialsBackorderList } = yield call(
       addNewRelatedMaterialsBackorder,
-      action.payload
+      action.payload,
     );
 
     yield put({
@@ -87,7 +92,7 @@ function* updateNewRelatedMaterialsBackorderListWorker(action) {
   try {
     const { relatedMaterialsBackorderList } = yield call(
       updateRelatedMaterialsBackorder,
-      action.payload
+      action.payload,
     );
 
     yield put({
@@ -104,15 +109,15 @@ function* updateNewRelatedMaterialsBackorderListWorker(action) {
 function* relatedMaterialsBackorderListWatcher() {
   yield takeLatest(
     GET_FULL_RELATED_MATERIALS_BACKORDER,
-    getRelatedMaterialsBackorderListWorker
+    getRelatedMaterialsBackorderListWorker,
   );
   yield takeLatest(
     ADD_NEW_RELATED_MATERIALS_BACKORDER,
-    addNewRelatedMaterialsBackorderListWorker
+    addNewRelatedMaterialsBackorderListWorker,
   );
   yield takeLatest(
     UPDATE_NEW_RELATED_MATERIALS_BACKORDER,
-    updateNewRelatedMaterialsBackorderListWorker
+    updateNewRelatedMaterialsBackorderListWorker,
   );
 }
 

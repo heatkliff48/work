@@ -9,8 +9,10 @@ import {
 } from '../types/aldabaranTypes';
 import { NEW_ALDABARAN_SOCKET } from '../types/socketTypes/socket';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 

@@ -13,8 +13,10 @@ import {
 import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
@@ -83,10 +85,13 @@ function* addNewQualityManagementWorker(action) {
   try {
     const { qualityManagementData } = yield call(
       addNewQualityManagement,
-      action.payload
+      action.payload,
     );
 
-    yield put({ type: NEW_QUALITY_MANAGEMENT_DATA, payload: qualityManagementData });
+    yield put({
+      type: NEW_QUALITY_MANAGEMENT_DATA,
+      payload: qualityManagementData,
+    });
   } catch (err) {
     yield put({ type: NEW_QUALITY_MANAGEMENT_DATA, payload: [] });
   }
@@ -108,10 +113,13 @@ function* updateQualityManagementWorker(action) {
   try {
     const { qualityManagement } = yield call(
       updateQualityManagement,
-      action.payload
+      action.payload,
     );
 
-    yield put({ type: UPDATE_QUALITY_MANAGEMENT_DATA, payload: qualityManagement });
+    yield put({
+      type: UPDATE_QUALITY_MANAGEMENT_DATA,
+      payload: qualityManagement,
+    });
   } catch (err) {
     yield put({ type: UPDATE_QUALITY_MANAGEMENT_DATA, payload: [] });
   }
@@ -120,12 +128,21 @@ function* updateQualityManagementWorker(action) {
 // watchers
 
 function* qualityManagementWatcher() {
-  yield takeLatest(GET_FULL_QUALITY_MANAGEMENT_DATA, getQualityManagementWorker);
-  yield takeLatest(ADD_NEW_QUALITY_MANAGEMENT_DATA, addNewQualityManagementWorker);
-  yield takeLatest(DELETE_QUALITY_MANAGEMENT_DATA, deleteQualityManagementWorker);
+  yield takeLatest(
+    GET_FULL_QUALITY_MANAGEMENT_DATA,
+    getQualityManagementWorker,
+  );
+  yield takeLatest(
+    ADD_NEW_QUALITY_MANAGEMENT_DATA,
+    addNewQualityManagementWorker,
+  );
+  yield takeLatest(
+    DELETE_QUALITY_MANAGEMENT_DATA,
+    deleteQualityManagementWorker,
+  );
   yield takeLatest(
     UPDATE_NEW_QUALITY_MANAGEMENT_DATA,
-    updateQualityManagementWorker
+    updateQualityManagementWorker,
   );
 }
 

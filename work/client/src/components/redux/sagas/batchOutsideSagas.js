@@ -13,8 +13,10 @@ import {
 import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
 
+import { getApiUrl } from '#utils/getApiUrl.js';
+
 const url = axios.create({
-  baseURL: process.env.REACT_APP_URL,
+  baseURL: getApiUrl(),
   withCredentials: true,
 });
 
