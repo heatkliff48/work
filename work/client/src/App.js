@@ -55,12 +55,13 @@ import ProductionQuality from '#components/ProductionQuality/ProductionQuality.j
 import '#components/Styles/buttons.css';
 import TaskBoard from '#components/TaskBoard/TaskBoard.jsx';
 import GreenLineMonitoring from '#components/GreenLineMonitoring/GreenLineMonitoring.jsx';
+import { getWebSocketUrl } from '#utils/getApiUrl.js';
 
 function App() {
   const dispatch = useDispatch();
 
   // WS_URL_AUTO_REPLACE_START
-  const url = process.env.REACT_APP_URL_SOCKET;
+  const url = getWebSocketUrl();
   // WS_URL_AUTO_REPLACE_END
 
   // const navigate = useNavigate();

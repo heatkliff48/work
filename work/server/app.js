@@ -71,7 +71,25 @@ const sessionParser = session({
   },
 });
 
-app.use(cors({ credentials: true, origin: process.env.ORIGIN.split(',') }));
+app.use(
+  cors({
+    credentials: true,
+    origin: (origin, callback) => {
+      const allowedOrigins = process.env.ORIGIN.split(',');
+
+      // Добавляем проверку для Tailscale
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        /\.ts\.net:\d+$/.test(origin)
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+  }),
+);
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.json());
