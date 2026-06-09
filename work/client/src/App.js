@@ -3,7 +3,6 @@ import Accounting from '#components/Accounting/Accounting.jsx';
 import BatchOutside from '#components/BatchOutside/BatchOutside.jsx';
 import OrderCart from '#components/Orders/OrderCart.jsx';
 import OrdersTable from '#components/Orders/OrdersTable.jsx';
-import ProductionBatchDesigner from '#components/ProductionBatchDesigner/ProductionBatchDesigner.jsx';
 import RawMaterialsPlan from '#components/RawMaterialsPlan/RawMaterialsPlan.jsx';
 import RecipeOrders from '#components/RawMaterialsPlan/RecipeOrders.jsx';
 import ProductsListForRecipes from '#components/Recipe/ProductsListForRecipes.jsx';
@@ -123,10 +122,6 @@ function App() {
 
             <Route path="/production_quality" element={<ProductionQuality />} />
             <Route path="/products" element={<Products />} />
-            <Route
-              path="/production_batch_designer"
-              element={<ProductionBatchDesigner />}
-            />
             <Route
               path="/production_batch_designer_new"
               element={<ProductionBatchDesignerNew />}
