@@ -55,6 +55,8 @@ import ProductionQuality from '#components/ProductionQuality/ProductionQuality.j
 import '#components/Styles/buttons.css';
 import TaskBoard from '#components/TaskBoard/TaskBoard.jsx';
 import GreenLineMonitoring from '#components/GreenLineMonitoring/GreenLineMonitoring.jsx';
+import TemperatureDataMonitoring from '#components/GreenLineMonitoring/TemperatureDataMonitoring.jsx';
+
 import { getWebSocketUrl } from '#utils/getApiUrl.js';
 
 function App() {
@@ -187,6 +189,10 @@ function App() {
             <Route
               path="/green_line_monitoring"
               element={<GreenLineMonitoring />}
+            />
+            <Route
+              path="/temperature_data_monitoring"
+              element={<TemperatureDataMonitoring />}
             />
 
             {/* всё неизвестное — на sign-in */}
