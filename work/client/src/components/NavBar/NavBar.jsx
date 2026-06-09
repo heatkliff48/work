@@ -267,10 +267,24 @@ export default function NavBar() {
         access: 'accounting',
       },
       {
+        type: 'group',
         title: 'Green Line Monitoring',
-        path: '/green_line_monitoring',
-        icon: batchCalendarIcon,
-        access: null,
+        icon: technologyPlannerIcon,
+        access: 'recipe_products',
+        children: [
+          {
+            title: 'Height Data Monitoring',
+            path: '/green_line_monitoring',
+            icon: batchCalendarIcon,
+            access: null,
+          },
+          {
+            title: 'Temperature Data Monitoring',
+            path: '/temperature_data_monitoring',
+            icon: batchCalendarIcon,
+            access: null,
+          },
+        ],
       },
     ],
     [],
