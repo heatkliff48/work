@@ -8,13 +8,15 @@ export const getApiUrl = () => {
   }
 
   // Локальная разработка
-  const localUrl =
-    process.env.REACT_APP_LOCAL_URL || 'http://192.168.0.101:3001';
+  const localUrl = process.env.REACT_APP_URL || 'http://localhost:3001';
   return localUrl;
 };
 
 export const getWebSocketUrl = (path = '') => {
   const hostname = window.location.hostname;
+  if (hostname == 'localhost') {
+    return process.env.REACT_APP_URL_SOCKET;
+  }
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 
   let port;
