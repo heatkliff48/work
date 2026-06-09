@@ -301,7 +301,6 @@ const OrderContextProvider = ({ children }) => {
   const [orderCartData, setOrderCartData] = useState({});
   const [productOfOrder, setProductOfOrder] = useState({});
   const [quantityPallets, setQuantityPallets] = useState({});
-  const [autoclave, setAutoclave] = useState([]);
   const [batchOrderIDs, setBatchOrderIDs] = useState([]);
   const [ordersDataList, setOrdersDataList] = useState([]);
   const [personsInChargeList, setPersonsInChargeList] = useState([]);
@@ -546,8 +545,6 @@ const OrderContextProvider = ({ children }) => {
         setIsOrderReady,
         selectedProduct,
         setSelectedProduct,
-        autoclave,
-        setAutoclave,
         quantityPallets,
         setQuantityPallets,
         personsInChargeList,

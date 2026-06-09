@@ -1,3 +1,4 @@
+import { AutoclaveContextProvider } from './AutoclaveContext';
 import ProjectContextProvider from './Context';
 import { FileContextProvider } from './FileContext';
 import { ModalContextProvider } from './ModalContext';
@@ -21,9 +22,11 @@ const MainContextProvider = ({ children }) => {
                 <UsersContextProvider>
                   {/* <ClientsContextProvider> */}
                   <OrderContextProvider>
-                    <WarehouseContextProvider>
-                      <FileContextProvider>{children}</FileContextProvider>
-                    </WarehouseContextProvider>
+                    <AutoclaveContextProvider>
+                      <WarehouseContextProvider>
+                        <FileContextProvider>{children}</FileContextProvider>
+                      </WarehouseContextProvider>
+                    </AutoclaveContextProvider>
                   </OrderContextProvider>
                   {/* </ClientsContextProvider>*/}
                 </UsersContextProvider>
