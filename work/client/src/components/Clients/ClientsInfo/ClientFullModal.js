@@ -1,22 +1,22 @@
-import Button from "react-bootstrap/Button";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
-import Modal from "react-bootstrap/Modal";
-import Row from "react-bootstrap/Row";
-import "./styles.css";
-import "#components/Styles/modals.css";
+import Button from 'react-bootstrap/Button';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
+import Modal from 'react-bootstrap/Modal';
+import Row from 'react-bootstrap/Row';
+import './styles.css';
+import '#components/Styles/modals.css';
 
-import ClientsAddress from "../ClientsAddress/ClientsAddress";
-import DeliveryAddress from "../DeliveryAddress/DeliveryAddress";
-import ShowDeliveryAddressModal from "../DeliveryAddress/DeliveryAddressModal";
-import ClientsContactInfo from "../ClientsContactInfo/ClientsContactInfo";
-import ShowClientsContactInfoModal from "../ClientsContactInfo/ClientsContactInfoModal";
-import ShowClientsEditModal from "./ClientsInfoEditModal";
-import { useProjectContext } from "#components/contexts/Context.js";
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { useUsersContext } from "#components/contexts/UserContext.js";
+import ClientsAddress from '../ClientsAddress/ClientsAddress';
+import DeliveryAddress from '../DeliveryAddress/DeliveryAddress';
+import ShowDeliveryAddressModal from '../DeliveryAddress/DeliveryAddressModal';
+import ClientsContactInfo from '../ClientsContactInfo/ClientsContactInfo';
+import ShowClientsContactInfoModal from '../ClientsContactInfo/ClientsContactInfoModal';
+import ShowClientsEditModal from './ClientsInfoEditModal';
+import { useProjectContext } from '#components/contexts/Context.js';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useUsersContext } from '#components/contexts/UserContext.js';
 
 function MydModalWithGrid({ show, onHide }) {
   const clients = useSelector((state) => state.clients);
@@ -38,11 +38,11 @@ function MydModalWithGrid({ show, onHide }) {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, "Clients");
+      const access = checkUserAccess(user, roles, 'Clients');
       setUserAccess(access);
 
       if (!access?.canRead) {
-        navigate("/"); // Перенаправление на главную страницу, если нет прав на чтение
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }
   }, [user, roles]);
@@ -75,9 +75,9 @@ function MydModalWithGrid({ show, onHide }) {
                 <p>CIF/VAT: {currentClient?.cif_vat}</p>
                 <p>Category: {currentClient?.category}</p>
                 <p>
-                  Price category:{" "}
+                  Price category:{' '}
                   {priceCategoryOptions.find(
-                    (option) => option.value == currentClient.price_category
+                    (option) => option.value == currentClient.price_category,
                   )?.label || currentClient.price_category}
                 </p>
               </div>
@@ -89,14 +89,14 @@ function MydModalWithGrid({ show, onHide }) {
               <ClientsAddress />
             </Col>
             <Col xs={6} md={4}>
-              {userAccess?.canWrite && <ShowClientsEditModal />}
+              {/* {userAccess?.canWrite && <ShowClientsEditModal />} */}
             </Col>
           </Row>
 
-          {userAccess?.canWrite && <ShowDeliveryAddressModal />}
+          {/* {userAccess?.canWrite && <ShowDeliveryAddressModal />} */}
           <DeliveryAddress />
 
-          {userAccess?.canWrite && <ShowClientsContactInfoModal />}
+          {/* {userAccess?.canWrite && <ShowClientsContactInfoModal />} */}
           <ClientsContactInfo />
         </Container>
       </Modal.Body>
