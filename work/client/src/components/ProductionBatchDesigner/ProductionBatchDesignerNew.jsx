@@ -42,7 +42,8 @@ function ProductionBatchDesignerNew() {
 
   const didInitAutoclaveRef = useRef(false);
 
-  const [orderedProductBatchModal, setOrderedProductBatchModal] = useState(false);
+  const [orderedProductBatchModal, setOrderedProductBatchModal] =
+    useState(false);
 
   const formatISO = (s) => {
     if (!s) return '—';
@@ -67,7 +68,9 @@ function ProductionBatchDesignerNew() {
         done: Number(x.produced_autoclave ?? 0),
       }))
       .map((x) => ({ ...x, value: x.qty - x.done }))
-      .filter((x) => x.value > 0 && typeof x.date === 'string' && x.date >= today)
+      .filter(
+        (x) => x.value > 0 && typeof x.date === 'string' && x.date >= today,
+      )
       .sort((a, b) => a.date.localeCompare(b.date))[0];
 
     if (nearest && nearest.value > 0) {
@@ -140,12 +143,20 @@ function ProductionBatchDesignerNew() {
   };
 
   const addProductHandler = (prod_data) => {
-    const { article, density, width, m3InArray, volumeBlockOnPallet, normOfBrack } =
-      prod_data;
+    const {
+      article,
+      density,
+      width,
+      m3InArray,
+      volumeBlockOnPallet,
+      normOfBrack,
+    } = prod_data;
 
     const maxId =
-      (batchDesigner.reduce((max, item) => (item.id > max ? item.id : max), 0) ||
-        0) + 1;
+      (batchDesigner.reduce(
+        (max, item) => (item.id > max ? item.id : max),
+        0,
+      ) || 0) + 1;
 
     setAutoclaveFromContext((prevAutoclave) => {
       const prevRows = Array.isArray(prevAutoclave) ? prevAutoclave : [];
@@ -163,7 +174,8 @@ function ProductionBatchDesignerNew() {
 
       const palletsPerArray = Math.max(
         1,
-        Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+        Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) ||
+          1,
       );
 
       const product_with_brack = (
@@ -173,7 +185,9 @@ function ProductionBatchDesignerNew() {
       const free_product_cakes = (
         Math.ceil(product_with_brack) - product_with_brack
       ).toFixed(2);
-      const free_product_package = Math.floor(free_product_cakes * palletsPerArray);
+      const free_product_package = Math.floor(
+        free_product_cakes * palletsPerArray,
+      );
       const total_cakes = Math.ceil(product_with_brack);
 
       dispatch(
@@ -212,12 +226,19 @@ function ProductionBatchDesignerNew() {
 
     console.log(prod_data, 'prod_data ProductionBatchDesignerNew.jsx line 219');
 
-    const { article, density, width, m3InArray, volumeBlockOnPallet, normOfBrack } =
-      product;
+    const {
+      article,
+      density,
+      width,
+      m3InArray,
+      volumeBlockOnPallet,
+      normOfBrack,
+    } = product;
 
     const palletsPerArray = Math.max(
       1,
-      Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+      Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) ||
+        1,
     );
 
     const product_with_brack = (
@@ -232,13 +253,17 @@ function ProductionBatchDesignerNew() {
       Math.ceil(product_with_brack) - product_with_brack
     ).toFixed(2);
 
-    const free_product_package = Math.floor(free_product_cakes * palletsPerArray);
+    const free_product_package = Math.floor(
+      free_product_cakes * palletsPerArray,
+    );
 
     const total_cakes = Math.ceil(product_with_brack);
 
     const maxId =
-      (batchDesigner.reduce((max, item) => (item.id > max ? item.id : max), 0) ||
-        0) + total_cakes;
+      (batchDesigner.reduce(
+        (max, item) => (item.id > max ? item.id : max),
+        0,
+      ) || 0) + total_cakes;
 
     setAutoclaveFromContext((prevAutoclave) => {
       const prevRows = Array.isArray(prevAutoclave) ? prevAutoclave : [];
@@ -310,12 +335,15 @@ function ProductionBatchDesignerNew() {
 
   const addCakesData = useCallback(
     (prodBatchData) => {
-      const { id, product_with_brack, article, palletsPerArray } = prodBatchData;
+      const { id, product_with_brack, article, palletsPerArray } =
+        prodBatchData;
 
       const free_product_cakes = (
         Math.ceil(product_with_brack) - product_with_brack
       ).toFixed(2);
-      const free_product_package = Math.floor(free_product_cakes * palletsPerArray);
+      const free_product_package = Math.floor(
+        free_product_cakes * palletsPerArray,
+      );
       const total_cakes = Math.ceil(product_with_brack);
 
       const cakes_in_batch = 0;
@@ -361,7 +389,8 @@ function ProductionBatchDesignerNew() {
       const { m3InArray, volumeBlockOnPallet } = product;
       const palletsPerArray = Math.max(
         1,
-        Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+        Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) ||
+          1,
       );
 
       return (
@@ -392,7 +421,9 @@ function ProductionBatchDesignerNew() {
           quantity_cakes,
           quantity_in_batch,
         }) => {
-          const product = latestProducts.find((el) => el.article == product_article);
+          const product = latestProducts.find(
+            (el) => el.article == product_article,
+          );
           if (!product) return;
 
           const {
@@ -408,12 +439,14 @@ function ProductionBatchDesignerNew() {
 
           const palletsPerArray = Math.max(
             1,
-            Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) ||
-              1,
+            Math.floor(
+              Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1),
+            ) || 1,
           );
 
           const rightQuantity =
-            quantity - (quantity_in_warehouse + quantity_in_batch * palletsPerArray);
+            quantity -
+            (quantity_in_warehouse + quantity_in_batch * palletsPerArray);
 
           const quantity_m3 = (
             rightQuantity * Number(volumeBlockOnPallet || 0)
@@ -484,7 +517,8 @@ function ProductionBatchDesignerNew() {
           (Number(item.cakes_in_batch) || 0);
 
         acc[key].cakes_residue =
-          (Number(acc[key].cakes_residue) || 0) + (Number(item.cakes_residue) || 0);
+          (Number(acc[key].cakes_residue) || 0) +
+          (Number(item.cakes_residue) || 0);
 
         acc[key].sources.push({
           id: item.id,
@@ -515,7 +549,9 @@ function ProductionBatchDesignerNew() {
 
     const filledAutoclave = [];
     for (let i = 0; i < updatedAutoclaveData.length; i += CELLS_PER_AUTOCLAVE) {
-      filledAutoclave.push(updatedAutoclaveData.slice(i, i + CELLS_PER_AUTOCLAVE));
+      filledAutoclave.push(
+        updatedAutoclaveData.slice(i, i + CELLS_PER_AUTOCLAVE),
+      );
     }
 
     setAcData(filledAutoclave);
@@ -582,7 +618,9 @@ function ProductionBatchDesignerNew() {
 
       const { product_article } = groupRow;
 
-      const product = latestProducts?.find((p) => p.article === product_article);
+      const product = latestProducts?.find(
+        (p) => p.article === product_article,
+      );
       if (!product) return;
       const { density, width } = product;
 
@@ -618,7 +656,9 @@ function ProductionBatchDesignerNew() {
 
       const buildEmptyRows = (rowsCount) =>
         Array.from({ length: rowsCount }, () =>
-          Array.from({ length: CELLS_PER_AUTOCLAVE }, () => ({ ...EMPTY_CELL })),
+          Array.from({ length: CELLS_PER_AUTOCLAVE }, () => ({
+            ...EMPTY_CELL,
+          })),
         );
 
       setAutoclaveFromContext((prev) => {
@@ -684,7 +724,9 @@ function ProductionBatchDesignerNew() {
           if (after.length >= plan.length) {
             placeToIndices(after.slice(0, plan.length), plan);
           } else {
-            const combined = after.concat(emptyIdx.filter((i) => i <= lastSame));
+            const combined = after.concat(
+              emptyIdx.filter((i) => i <= lastSame),
+            );
             placeToIndices(combined.slice(0, plan.length), plan);
           }
         } else {
@@ -739,10 +781,14 @@ function ProductionBatchDesignerNew() {
         </tr>,
       );
 
-      if (productionBatchDesigner[index + 1]?.product_article !== currentArticle) {
+      if (
+        productionBatchDesigner[index + 1]?.product_article !== currentArticle
+      ) {
         rows.push(
           <tr key={`calc-${currentArticle}`} className="calculation-row">
-            <td colSpan="14">Здесь будут расчеты для артикула: {currentArticle}</td>
+            <td colSpan="14">
+              Здесь будут расчеты для артикула: {currentArticle}
+            </td>
           </tr>,
         );
       }
@@ -772,7 +818,7 @@ function ProductionBatchDesignerNew() {
   }, [autoclaveCalendarData, setAutoclaveCalendarData]);
 
   return (
-    <div style={{ display: 'flex', paddingBottom: '110px', }}>
+    <div style={{ display: 'flex', paddingBottom: '110px' }}>
       {productBatchModal && (
         <ModalTable
           isOpen={productBatchModal}
@@ -809,7 +855,9 @@ function ProductionBatchDesignerNew() {
           </button>
 
           <button
-            onClick={() => setOrderedProductBatchModal(!orderedProductBatchModal)}
+            onClick={() =>
+              setOrderedProductBatchModal(!orderedProductBatchModal)
+            }
             className="table_button"
           >
             Add product ordered to warehouse
@@ -843,7 +891,9 @@ function ProductionBatchDesignerNew() {
       >
         <Autoclave />
       </div>
-      <ProductionBatchFooter />
+      {!productBatchModal && !orderedProductBatchModal && (
+        <ProductionBatchFooter />
+      )}
     </div>
   );
 }
