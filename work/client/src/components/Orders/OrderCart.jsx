@@ -846,7 +846,7 @@ const OrderCart = React.memo(() => {
       );
       const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
       const vat_result_del = orderCartData?.delivery
-        ? vat_result + orderCartData?.delivery
+        ? Number(vat_result + orderCartData?.delivery).toFixed(2)
         : 0;
 
       setVatValue((prev) => ({
@@ -874,7 +874,7 @@ const OrderCart = React.memo(() => {
         (orderCartData?.delivery - prevDelivery.delivery);
 
     setVatValue((prev) => {
-      return { ...prev, vat_result_del: delivery };
+      return { ...prev, vat_result_del: delivery.toFixed(2) };
     });
   };
 
@@ -882,7 +882,7 @@ const OrderCart = React.memo(() => {
     const storedData = localStorage.getItem('orderCartData')
       ? JSON.parse(localStorage.getItem('orderCartData'))
       : null;
-    console.log('storedData', storedData);
+
     const updatedOrderCartData = list_of_orders.find(
       (order) => order.id === storedData.id,
     );
@@ -1268,40 +1268,42 @@ const OrderCart = React.memo(() => {
                 </div>
               </div>
               <div className="vat_procent">
-                <div>
-                  <p>Delivery price</p>
-                  <input
-                    type="text"
-                    id="delivery"
-                    name="delivery"
-                    value={orderCartData.delivery ?? 0}
-                    onChange={(e) => {
-                      setOrderCartData((prev) => ({
-                        ...prev,
-                        delivery: Number(e.target.value),
-                      }));
-                    }}
-                    readOnly={orderCartData?.status < 3 ? false : true}
-                    disabled={
-                      !checkUserAccess(user, roles, 'orders_save_delivery_price')
-                        ?.canWrite
-                    }
-                  />
-                  {checkUserAccess(user, roles, 'orders_description_edit')
-                    ?.canWrite && (
-                    <button
-                      style={{
-                        padding: '4px 10px',
-                        marginLeft: '20px',
+                {orderCartData.status >= 4 && (
+                  <div>
+                    <p>Delivery price</p>
+                    <input
+                      type="text"
+                      id="delivery"
+                      name="delivery"
+                      value={orderCartData.delivery ?? 0}
+                      onChange={(e) => {
+                        setOrderCartData((prev) => ({
+                          ...prev,
+                          delivery: Number(e.target.value),
+                        }));
                       }}
-                      onClick={() => {
-                        deliveryFunc();
-                      }}
-                    >
-                      Save
-                    </button>
-                  )}
-                </div>
+                      readOnly={orderCartData?.status < 5 ? false : true}
+                      disabled={
+                        !checkUserAccess(user, roles, 'orders_save_delivery_price')
+                          ?.canWrite
+                      }
+                    />
+                    {checkUserAccess(user, roles, 'orders_description_edit')
+                      ?.canWrite && (
+                      <button
+                        style={{
+                          padding: '4px 10px',
+                          marginLeft: '20px',
+                        }}
+                        onClick={() => {
+                          deliveryFunc();
+                        }}
+                      >
+                        Save
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="vat_result">
                 <p>Result</p>

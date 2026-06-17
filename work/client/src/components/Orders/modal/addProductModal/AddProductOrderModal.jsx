@@ -663,10 +663,10 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   }, [selectedProduct]);
 
   const final_price_value = useMemo(() => {
+    const priceM3 = parseLocalNumber(productOfOrder.price_m3) || 0;
     const m2 = quantityM2Num;
-    const priceM2 = parseLocalNumber(price_m2_value) || 0;
     const discount = discountNum;
-    const result = (priceM2 * m2 * (100 - discount)) / 100;
+    const result = (priceM3 * m2 * (100 - discount)) / 100;
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -674,7 +674,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
 
     return formatFixed(result, 2, ',');
-  }, [quantityM2Num, price_m2_value, discountNum]);
+  }, [quantityM2Num, discountNum, productOfOrder.price_m3]);
 
   const quantity_real_value = useMemo(() => {
     if (!selectedProduct) return '0,00';

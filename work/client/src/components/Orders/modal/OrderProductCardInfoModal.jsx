@@ -237,9 +237,10 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
+    const price_m3 = productOfOrder.price_m3
     const result =
       selectedProduct.article.slice(2, 3) == 'N'
-        ? (price_m2_value * quantity_real_value * (100 - discount)) / 100
+        ? (price_m3 * quantity_real_value * (100 - discount)) / 100
         : selectedProduct.article.slice(2, 3) == 'M'
           ? (selectedProduct?.price_per_unit *
               quantity_real_value *
@@ -266,7 +267,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     }));
     return result.toFixed(2);
   }, [
-    price_m2_value,
+    productOfOrder.price_m3,
     quantity_real_value,
     productOfOrder?.discount,
     selectedProduct?.price_per_unit,
