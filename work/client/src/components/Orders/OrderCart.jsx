@@ -838,44 +838,48 @@ const OrderCart = React.memo(() => {
   ]);
 
   useEffect(() => {
-    if (!final_price_product || !vatValue.vat_procent) {
-      setVatValue((prev) => ({ ...prev, vat_result: 0 }));
-    } else {
-      const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
-        2,
-      );
-      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
-      const vat_result_del = orderCartData?.delivery
-        ? Number(vat_result + orderCartData?.delivery).toFixed(2)
-        : 0;
+    console.log('orderCartData OrderCart.jsx line 841', orderCartData);
+    const delivery = Number(orderCartData?.delivery || 0);
+    const vatPercent = Number(vatValue.vat_procent || 0);
 
+    if (!final_price_product || !vatPercent) {
       setVatValue((prev) => ({
         ...prev,
-        vat_euro_origin: final_price_product,
-        vat_result,
-        vat_euro,
-        vat_result_del,
+        vat_euro_origin: 0,
+        vat_result: 0,
+        vat_euro: 0,
+        vat_result_del: delivery,
       }));
+      return;
     }
-  }, [final_price_product, vatValue.vat_procent]);
+
+    const vat_euro = ((vatPercent * final_price_product) / 100).toFixed(2);
+    const vat_result = (final_price_product + Number(vat_euro)).toFixed(2);
+    const vat_result_del = (Number(vat_result) + delivery).toFixed(2);
+
+    setVatValue((prev) => ({
+      ...prev,
+      vat_euro_origin: final_price_product,
+      vat_result,
+      vat_euro,
+      vat_result_del,
+    }));
+  }, [final_price_product, vatValue.vat_procent, orderCartData?.delivery]);
 
   const deliveryFunc = async () => {
+    const delivery = Number(orderCartData?.delivery || 0);
+
     dispatch(
       addNewDeliveryPrice({
         order_id: orderCartData.id,
-        delivery: orderCartData.delivery,
+        delivery,
       }),
     );
 
-    const prevDelivery = list_of_orders.find((el) => el.id == orderCartData.id);
-    const delivery = !prevDelivery?.delivery
-      ? (Number(vatValue.vat_result) + orderCartData?.delivery ?? 0)
-      : Number(vatValue.vat_result) +
-        (orderCartData?.delivery - prevDelivery.delivery);
-
-    setVatValue((prev) => {
-      return { ...prev, vat_result_del: delivery.toFixed(2) };
-    });
+    setVatValue((prev) => ({
+      ...prev,
+      vat_result_del: (Number(prev.vat_result || 0) + delivery).toFixed(2),
+    }));
   };
 
   useEffect(() => {
@@ -895,6 +899,13 @@ const OrderCart = React.memo(() => {
       setOrderCartData((prev) => ({
         ...prev,
         shipping_date: updatedOrderCartData.shipping_date,
+      }));
+    }
+
+    if (!storedData?.delivery && updatedOrderCartData?.delivery) {
+      setOrderCartData((prev) => ({
+        ...prev,
+        delivery: updatedOrderCartData.delivery,
       }));
     }
 
@@ -1268,42 +1279,40 @@ const OrderCart = React.memo(() => {
                 </div>
               </div>
               <div className="vat_procent">
-                {orderCartData.status >= 4 && (
-                  <div>
-                    <p>Delivery price</p>
-                    <input
-                      type="text"
-                      id="delivery"
-                      name="delivery"
-                      value={orderCartData.delivery ?? 0}
-                      onChange={(e) => {
-                        setOrderCartData((prev) => ({
-                          ...prev,
-                          delivery: Number(e.target.value),
-                        }));
+                <div>
+                  <p>Delivery price</p>
+                  <input
+                    type="text"
+                    id="delivery"
+                    name="delivery"
+                    value={orderCartData.delivery ?? 0}
+                    onChange={(e) => {
+                      setOrderCartData((prev) => ({
+                        ...prev,
+                        delivery: Number(e.target.value),
+                      }));
+                    }}
+                    readOnly={orderCartData?.status < 3 ? false : true}
+                    disabled={
+                      !checkUserAccess(user, roles, 'orders_save_delivery_price')
+                        ?.canWrite
+                    }
+                  />
+                  {checkUserAccess(user, roles, 'orders_description_edit')
+                    ?.canWrite && (
+                    <button
+                      style={{
+                        padding: '4px 10px',
+                        marginLeft: '20px',
                       }}
-                      readOnly={orderCartData?.status < 5 ? false : true}
-                      disabled={
-                        !checkUserAccess(user, roles, 'orders_save_delivery_price')
-                          ?.canWrite
-                      }
-                    />
-                    {checkUserAccess(user, roles, 'orders_description_edit')
-                      ?.canWrite && (
-                      <button
-                        style={{
-                          padding: '4px 10px',
-                          marginLeft: '20px',
-                        }}
-                        onClick={() => {
-                          deliveryFunc();
-                        }}
-                      >
-                        Save
-                      </button>
-                    )}
-                  </div>
-                )}
+                      onClick={() => {
+                        deliveryFunc();
+                      }}
+                    >
+                      Save
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="vat_result">
                 <p>Result</p>

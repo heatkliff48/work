@@ -1,6 +1,4 @@
-import {
-  ORDERS_LIST,
-} from '../types/ordersTypes';
+import { ORDERS_LIST } from '../types/ordersTypes';
 import {
   DATASHIP_ORDER_SOCKET,
   DELETE_ORDER_SOCKET,
@@ -31,6 +29,8 @@ export const ordersReducer = (orders = [], action) => {
     case NEW_DELIVERY_PRICE_SOCKET: {
       const { order_id, delivery } = payload;
 
+      console.log('payload orderReducer.js line 32', payload);
+
       const result = orders.map((order) => {
         if (order.id === order_id) {
           return { ...order, delivery };
@@ -38,6 +38,7 @@ export const ordersReducer = (orders = [], action) => {
         return order;
       });
 
+      console.log('result orderReducer.js line 42', result);
       return result;
     }
 
