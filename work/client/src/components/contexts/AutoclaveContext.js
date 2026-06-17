@@ -597,7 +597,6 @@ export const AutoclaveContextProvider = ({ children }) => {
     syncFromAutoclave(autoclave);
   }, [autoclave, initialRowCount, syncFromAutoclave]);
 
-  console.log('autoclave AutoclaveContext.js line 529', autoclave); // Значение контекста
   const value = useMemo(
     () => ({
       autoclave,
