@@ -43,11 +43,13 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       // Смещаем начало текста на высоту изображения + отступ
       let yPosition = 10 + imgHeight + 10; // 10 мм отступ после картинки
 
+      console.log('pdfData OrdersPDF.jsx line 46', pdfData);
+
       // Основные данные заказа
       doc.setFontSize(10);
       doc.text(`Ref.: ${pdfData.ref}`, 10, yPosition);
       doc.text(`Cliente: ${pdfData.client}`, 10, yPosition + 10);
-      doc.text(`CIF: ${pdfData.cif_vat}`, 10, yPosition + 20);
+      doc.text(`CIF: ${pdfData?.cif_vat ?? pdfData?.cif}`, 10, yPosition + 20);
       doc.text(`Dirección: ${pdfData.address}`, 10, yPosition + 30);
 
       doc.text(`Contacto: ${pdfData.contact}`, 120, yPosition);
@@ -454,7 +456,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
     setPdfData({
       ref: article || '',
       client: owner?.c_name || '',
-      cif: `${owner?.cif_vat ?? owner?.tin}` || '',
+      cif: `${owner?.cif_vat ?? owner?.tin ?? owner?.cif}` || '',
       address:
         `${deliveryAddress?.street} ${deliveryAddress?.additional_info}, ${deliveryAddress?.project_name}` ||
         '',
