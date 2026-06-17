@@ -49,6 +49,11 @@ export const AutoclaveContextProvider = ({ children }) => {
   const [selectedCell, setSelectedCell] = useState(null);
   const [initialRowCount, setInitialRowCount] = useState(0);
   const [autoclaveCalendarData, setAutoclaveCalendarData] = useState(null);
+  const autoclave_calendar = useSelector((state) => state.autoclave_calendar);
+
+  useEffect(() => {
+    setAutoclaveCalendarData(autoclave_calendar);
+  }, [autoclave_calendar]);
 
   // ---------- Вспомогательные функции (копируем из старого Autoclave) ----------
   const toFlat = useCallback((rows) => {
