@@ -1,0 +1,628 @@
+/* =====================================================================
+   Clients module — view styles (BAUBLOCK ERP design reference)
+   Только внешний вид. Логика данных не затрагивается.
+   ===================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
+
+:root {
+  --cl-red: #bc1212;
+  --cl-red-hover: #a50f0f;
+  --cl-red-soft: #fbe9e9;
+  --cl-bg: #fafafb;
+  --cl-card: #ffffff;
+  --cl-border: #e4e6eb;
+  --cl-border-2: #dee1e6;
+  --cl-border-3: #eef0f3;
+  --cl-divider: #f0f1f4;
+  --cl-text: #171a1f;
+  --cl-text-2: #565d6d;
+  --cl-text-3: #3a3f4b;
+  --cl-muted: #9aa0ac;
+  --cl-shadow-card: 0 1px 2px rgba(20, 23, 33, 0.04), 0 6px 18px rgba(20, 23, 33, 0.03);
+  --cl-shadow-drawer: -12px 0 40px rgba(20, 23, 33, 0.18);
+  --cl-mono: 'Roboto Mono', monospace;
+}
+
+/* ---------- page shell ---------- */
+.cl-page {
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--cl-text);
+  padding: 26px 36px 48px;
+}
+
+.cl-page__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.cl-page__eyebrow {
+  font-size: 13px;
+  color: var(--cl-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.cl-page__title {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--cl-text);
+}
+.cl-page__stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.cl-stat {
+  text-align: right;
+}
+.cl-stat__num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--cl-text);
+  line-height: 1;
+}
+.cl-stat__label {
+  font-size: 11.5px;
+  color: var(--cl-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-top: 3px;
+}
+.cl-stat__divider {
+  width: 1px;
+  height: 34px;
+  background: var(--cl-border);
+}
+
+/* ---------- toolbar ---------- */
+.cl-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.cl-search {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+}
+.cl-search__ic {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.cl-search__input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--cl-border-2);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 14px 0 38px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--cl-text);
+  outline: none;
+}
+.cl-search__input:focus {
+  border-color: var(--cl-red);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+.cl-select {
+  height: 42px;
+  border: 1px solid var(--cl-border-2);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--cl-text);
+  cursor: pointer;
+  outline: none;
+  min-width: 170px;
+}
+.cl-select:focus {
+  border-color: var(--cl-red);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+.cl-toolbar__spacer {
+  flex: 1;
+}
+
+/* ---------- buttons ---------- */
+.cl-btn {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  border: 0;
+  transition: background 0.12s, border-color 0.12s;
+}
+.cl-btn--primary {
+  background: var(--cl-red);
+  color: #fff;
+}
+.cl-btn--primary:hover {
+  background: var(--cl-red-hover);
+}
+.cl-btn--ghost {
+  background: #fff;
+  color: var(--cl-text-3);
+  border: 1px solid var(--cl-border-2);
+  font-weight: 600;
+}
+.cl-btn--ghost:hover {
+  background: #f6f7fa;
+}
+.cl-btn--new {
+  flex: 0 0 auto;
+}
+
+/* ---------- avatars / pills / mono ---------- */
+.cl-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  flex: 0 0 auto;
+}
+.cl-avatar--lg {
+  width: 52px;
+  height: 52px;
+  flex-basis: 52px;
+  border-radius: 13px;
+  font-size: 18px;
+}
+.cl-avatar--xl {
+  width: 62px;
+  height: 62px;
+  flex-basis: 62px;
+  border-radius: 50%;
+  font-size: 21px;
+}
+.cl-avatar--xl.cl-avatar--pin {
+  border-radius: 14px;
+  background: var(--cl-red-soft);
+  color: var(--cl-red);
+}
+.cl-avatar--round {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+}
+.cl-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cl-text-3);
+  white-space: nowrap;
+}
+.cl-pill--active {
+  margin-top: 7px;
+  background: #e9f6ed;
+  color: #16753a;
+  font-weight: 700;
+}
+.cl-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.cl-mono {
+  font-family: var(--cl-mono);
+}
+.cl-muted {
+  color: var(--cl-muted);
+  font-size: 12.5px;
+}
+.cl-min0 {
+  min-width: 0;
+}
+
+/* =====================================================================
+   DRAWER (client card)
+   ===================================================================== */
+.cl-drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+.cl-drawer-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(23, 26, 31, 0.42);
+  backdrop-filter: blur(1px);
+}
+.cl-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 511px;
+  max-width: 94vw;
+  background: #fff;
+  box-shadow: var(--cl-shadow-drawer);
+  display: flex;
+  flex-direction: column;
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  animation: cl-slide-in 0.22s ease;
+}
+@keyframes cl-slide-in {
+  from { transform: translateX(24px); opacity: 0.4; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.cl-drawer__head {
+  padding: 22px 24px 20px;
+  border-bottom: 1px solid var(--cl-border-3);
+  position: relative;
+}
+.cl-iconbtn {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: #f3f4f6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cl-iconbtn:hover {
+  background: #e7e9ee;
+}
+.cl-drawer__close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+}
+.cl-drawer__ident {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 44px;
+}
+.cl-drawer__name {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--cl-text);
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cl-drawer__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+.cl-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 18px;
+}
+.cl-actions .cl-btn {
+  flex: 1;
+}
+
+.cl-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 24px 32px;
+}
+
+.cl-section-label {
+  padding: 18px 0 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--cl-muted);
+}
+.cl-section-label--inline {
+  padding: 0;
+}
+.cl-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+  padding-bottom: 8px;
+}
+.cl-field-label {
+  font-size: 11.5px;
+  color: var(--cl-muted);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.cl-field-value {
+  font-size: 14px;
+  color: var(--cl-text);
+  font-weight: 600;
+  line-height: 1.5;
+}
+.cl-card-soft {
+  border: 1px solid var(--cl-border-3);
+  border-radius: 11px;
+  padding: 15px 16px;
+  background: #fcfcfd;
+}
+.cl-card-soft--row {
+  display: flex;
+  gap: 12px;
+}
+.cl-pin-ic {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+/* legal address inside soft card */
+.cl-addr__street {
+  font-size: 14px;
+  color: var(--cl-text);
+  font-weight: 600;
+  line-height: 1.5;
+}
+.cl-addr__line {
+  font-size: 13.5px;
+  color: var(--cl-text-2);
+  line-height: 1.6;
+  margin-top: 1px;
+}
+.cl-addr__contacts {
+  display: flex;
+  gap: 22px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.cl-addr__contact {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--cl-text-3);
+  text-decoration: none;
+}
+.cl-addr__contact:hover {
+  color: var(--cl-red);
+}
+.cl-addr__extra {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--cl-muted);
+}
+.cl-addr__web {
+  color: var(--cl-red);
+  text-decoration: none;
+}
+
+/* item cards (contacts / projects) */
+.cl-cardlist {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.cl-itemcard {
+  border: 1px solid var(--cl-border-3);
+  border-radius: 11px;
+  padding: 13px 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  background: #fff;
+  transition: border-color 0.12s, background 0.12s;
+}
+.cl-itemcard:hover {
+  border-color: #f0c2c2;
+  background: #fdf6f6;
+}
+.cl-itemcard__pin {
+  flex: 0 0 auto;
+}
+.cl-itemcard__main {
+  flex: 1;
+}
+.cl-itemcard__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cl-text);
+}
+.cl-itemcard__sub {
+  font-size: 12.5px;
+  color: var(--cl-muted);
+  font-weight: 500;
+  margin-top: 1px;
+}
+.cl-itemcard__right {
+  text-align: right;
+}
+.cl-itemcard__right-top {
+  font-size: 12.5px;
+  color: var(--cl-text-3);
+}
+.cl-itemcard__right-bot {
+  font-size: 12px;
+  color: var(--cl-muted);
+}
+.cl-chev {
+  flex: 0 0 auto;
+  margin-left: 2px;
+}
+.cl-empty {
+  padding: 14px 4px;
+  font-size: 13px;
+  color: var(--cl-muted);
+}
+
+/* =====================================================================
+   SUB-PANEL (contact / project detail)
+   ===================================================================== */
+.cl-sub-root {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+}
+.cl-sub-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(23, 26, 31, 0.32);
+}
+.cl-sub {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 480px;
+  max-width: 94vw;
+  background: #fff;
+  box-shadow: -12px 0 40px rgba(20, 23, 33, 0.22);
+  display: flex;
+  flex-direction: column;
+  animation: cl-slide-in 0.2s ease;
+}
+.cl-sub__head {
+  height: 60px;
+  flex: 0 0 60px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--cl-border-3);
+}
+.cl-sub__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+.cl-sub__hero {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.cl-sub__title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--cl-text);
+  letter-spacing: -0.3px;
+}
+.cl-sub__subtitle {
+  font-size: 13.5px;
+  color: var(--cl-text-2);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.cl-sub__cta {
+  display: flex;
+  gap: 9px;
+  margin-top: 18px;
+}
+.cl-sub__cta--mt {
+  margin-top: 20px;
+}
+.cl-sub__cta .cl-btn {
+  flex: 1;
+  height: 40px;
+}
+
+/* details list */
+.cl-detail-list {
+  border: 1px solid var(--cl-border-3);
+  border-radius: 11px;
+  overflow: hidden;
+}
+.cl-detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 15px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.cl-detail-row:last-child {
+  border-bottom: 0;
+}
+.cl-detail-key {
+  font-size: 13px;
+  color: var(--cl-muted);
+  font-weight: 600;
+}
+.cl-detail-val {
+  font-size: 13.5px;
+  color: var(--cl-text);
+  font-weight: 600;
+  text-align: right;
+}
+.cl-break {
+  word-break: break-all;
+}
+
+/* responsive */
+@media (max-width: 560px) {
+  .cl-page { padding: 18px 16px 36px; }
+  .cl-drawer, .cl-sub { width: 100vw; max-width: 100vw; }
+}
+
+/* =====================================================================
+   TABLE CELL RENDERERS (clients_info_table)
+   ===================================================================== */
+.cl-avatar--sm {
+  width: 36px;
+  height: 36px;
+  flex-basis: 36px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+.cl-cell-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cl-cell-name__title {
+  font-weight: 700;
+  color: #171a1f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cl-cell-mono {
+  font-size: 13px;
+  color: #3a3f4b;
+}
+/* пилюля категории внутри ячейки — чуть крупнее, как в эталоне */
+.tbl td .cl-pill {
+  font-size: 12.5px;
+  padding: 4px 10px;
+}
+.tbl td .cl-pill .cl-dot {
+  width: 7px;
+  height: 7px;
+}

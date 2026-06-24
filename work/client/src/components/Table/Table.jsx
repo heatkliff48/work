@@ -12,6 +12,10 @@ function Table({
   buttonText = '',
   tableName = 'Table',
   handleRowClick,
+  // вид-опции (необязательные, ничего не меняют в данных):
+  variant = 'default', // 'default' | 'card'
+  hideTitle = false,
+  renderToolbar, // (api) => JSX
 }) {
   const columns = useMemo(() => {
     return Array.isArray(COLUMN_DATA) ? COLUMN_DATA : [];
@@ -43,9 +47,7 @@ function Table({
     string: (rowA, rowB, columnId, desc) => {
       const a = rowA.values[columnId];
       const b = rowB.values[columnId];
-
       const comparison = a.localeCompare(b, 'en');
-
       return desc ? -comparison : comparison;
     },
   };
@@ -75,24 +77,43 @@ function Table({
   } = tableInstance;
 
   const haveButton = buttonText.trim() == '';
+  const isCard = variant === 'card';
+
+  const toolbar = renderToolbar
+    ? renderToolbar({
+        globalFilter: state.globalFilter,
+        setGlobalFilter,
+        preGlobalFilteredRows,
+        rows,
+      })
+    : null;
 
   return (
     <>
-      <h1>{tableName}</h1>
-      <div className="table-wrapper">
-        <GlobalFilterInput
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          setGlobalFilter={setGlobalFilter}
-          globalFilter={state.globalFilter}
-        />
-        <div>
-          {userAccess?.canWrite && !haveButton && (
+      {!hideTitle && (
+        <h1 className={isCard ? 'tbl-title' : undefined}>{tableName}</h1>
+      )}
+
+      {toolbar}
+
+      <div className={isCard ? 'tbl-card' : 'table-wrapper'}>
+        {!renderToolbar && (
+          <GlobalFilterInput
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            setGlobalFilter={setGlobalFilter}
+            globalFilter={state.globalFilter}
+          />
+        )}
+
+        {userAccess?.canWrite && !haveButton && (
+          <div>
             <button onClick={onClickButton} className="table_button">
               {buttonText}
             </button>
-          )}
-        </div>
-        <table {...getTableProps()}>
+          </div>
+        )}
+
+        <table {...getTableProps()} className={isCard ? 'tbl' : undefined}>
           <thead>
             {headerGroups.map((hG) => {
               const { key, ...restProps } = hG.getHeaderGroupProps();
@@ -104,21 +125,25 @@ function Table({
                     );
                     return (
                       <th key={key} {...restProps}>
-                        {col.render('Header')}
-                        {col.canSort && (
-                          <span>
-                            {col.isSorted ? (
-                              col.isSortedDesc ? (
-                                <BiSortUp />
+                        <span className="tbl-th-inner">
+                          {col.render('Header')}
+                          {col.canSort && (
+                            <span className="tbl-sort">
+                              {col.isSorted ? (
+                                col.isSortedDesc ? (
+                                  <BiSortUp />
+                                ) : (
+                                  <BiSortDown />
+                                )
                               ) : (
-                                <BiSortDown />
-                              )
-                            ) : (
-                              <BiSortAlt2 />
-                            )}
-                          </span>
+                                <BiSortAlt2 />
+                              )}
+                            </span>
+                          )}
+                        </span>
+                        {!isCard && (
+                          <div>{col.canFilter ? col.render('Filter') : null}</div>
                         )}
-                        <div>{col.canFilter ? col.render('Filter') : null}</div>
                       </th>
                     );
                   })}
@@ -131,10 +156,14 @@ function Table({
               prepareRow(row);
               const { key, ...restProps } = row.getRowProps();
               return (
-                <tr key={key} {...restProps} onClick={() => handleRowClick(row)}>
+                <tr
+                  key={key}
+                  {...restProps}
+                  className={handleRowClick ? 'tbl-row--click' : undefined}
+                  onClick={() => handleRowClick && handleRowClick(row)}
+                >
                   {row.cells.map((cell) => {
                     const { key, ...restProps } = cell.getCellProps();
-
                     return (
                       <td key={key} {...restProps}>
                         {cell.render('Cell')}
@@ -146,6 +175,15 @@ function Table({
             })}
           </tbody>
         </table>
+
+        {isCard && rows.length === 0 && (
+          <div className="tbl-empty">
+            <div className="tbl-empty__title">No clients match your search</div>
+            <div className="tbl-empty__sub">
+              Try a different name, CIF/VAT or category.
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
