@@ -2,6 +2,11 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { DropdownFilter, TextSearchFilter } from '#components/Table/filters.js';
+import {
+  ClientNameCell,
+  MonoCell,
+  CategoryPillCell,
+} from '#components/Clients/ClientsInfo/clientsCells.jsx';
 
 const ProjectContext = createContext();
 
@@ -59,15 +64,18 @@ const ProjectContextProvider = ({ children }) => {
       Header: 'Client`s Name',
       accessor: 'c_name',
       Filter: TextSearchFilter,
+      Cell: ClientNameCell,
     },
     {
       Header: 'CIF/VAT',
       accessor: 'cif_vat',
+      Cell: MonoCell,
     },
     {
       Header: 'Category',
       accessor: 'category',
       Filter: DropdownFilter,
+      Cell: CategoryPillCell,
     },
     {
       Header: 'Price category',
