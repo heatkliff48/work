@@ -13,15 +13,19 @@ function Table({
   tableName = 'Table',
   handleRowClick,
 }) {
-  const columns = useMemo(() => COLUMN_DATA, []);
-  const data = useMemo(() => dataOfTable, [dataOfTable]);
+  const columns = useMemo(() => {
+    return Array.isArray(COLUMN_DATA) ? COLUMN_DATA : [];
+  }, [COLUMN_DATA]);
+
+  const data = useMemo(() => {
+    return Array.isArray(dataOfTable) ? dataOfTable : [];
+  }, [dataOfTable]);
 
   const defaultColumn = useMemo(
     () => ({
-      // Let's set up our default Filter UI
       Filter: '',
     }),
-    []
+    [],
   );
 
   function matchSorterFn(rows, id, filterValue) {
@@ -32,21 +36,16 @@ function Table({
     () => ({
       rankedMatchSorter: matchSorterFn,
     }),
-    []
+    [],
   );
 
   const sortTypes = {
-    // Функция сортировки для строковых значений
     string: (rowA, rowB, columnId, desc) => {
       const a = rowA.values[columnId];
       const b = rowB.values[columnId];
 
-      // Используем метод localeCompare для сравнения строк
-      // с учетом локали (в данном случае 'en' - английский язык)
       const comparison = a.localeCompare(b, 'en');
 
-      // Если desc (сортировка по убыванию) равно true,
-      // инвертируем результат сравнения
       return desc ? -comparison : comparison;
     },
   };
@@ -61,7 +60,7 @@ function Table({
     },
     useGlobalFilter,
     useFilters,
-    useSortBy
+    useSortBy,
   );
 
   const {
@@ -81,7 +80,6 @@ function Table({
     <>
       <h1>{tableName}</h1>
       <div className="table-wrapper">
-        {/* к разметке надо привыкнуть :) */}
         <GlobalFilterInput
           preGlobalFilteredRows={preGlobalFilteredRows}
           setGlobalFilter={setGlobalFilter}
@@ -102,12 +100,11 @@ function Table({
                 <tr key={key} {...restProps}>
                   {hG.headers.map((col) => {
                     const { key, ...restProps } = col.getHeaderProps(
-                      col.getSortByToggleProps()
+                      col.getSortByToggleProps(),
                     );
                     return (
                       <th key={key} {...restProps}>
                         {col.render('Header')}
-                        {/* если колонка является сортируемой, рендерим рядом с заголовком соответствующую иконку в зависимости от того, включена ли сортировка, а также на основе порядка сортировки */}
                         {col.canSort && (
                           <span>
                             {col.isSorted ? (
@@ -121,7 +118,6 @@ function Table({
                             )}
                           </span>
                         )}
-                        {/* Render the columns filter UI */}
                         <div>{col.canFilter ? col.render('Filter') : null}</div>
                       </th>
                     );

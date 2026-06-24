@@ -6,7 +6,14 @@ import {
   getOrders,
   updAccountingDataList,
 } from '#components/redux/actions/ordersAction.js';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 const OrderContext = createContext();
@@ -291,6 +298,20 @@ const OrderContextProvider = ({ children }) => {
     },
   ];
 
+  const filterKeysOrder = useMemo(
+    () => [
+      'id',
+      'order_id',
+      'client_id',
+      'product_id',
+      'createdAt',
+      'updatedAt',
+      'bitrix_id',
+      'bitrix_client_id',
+    ],
+    [],
+  );
+
   const dispatch = useDispatch();
   const [newOrder, setNewOrder] = useState();
   const [currentOrder, setCurrentOrder] = useState();
@@ -454,7 +475,6 @@ const OrderContextProvider = ({ children }) => {
         delivery: order?.delivery,
       };
 
-      console.log('currentOrder OrderContext.js line 458', currentOrder);
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
       setOrderCartData(currentOrder);
     },
@@ -566,6 +586,7 @@ const OrderContextProvider = ({ children }) => {
         setRandomOrderCheck,
         randomFillComplete,
         setRandomFillComplete,
+        filterKeysOrder,
       }}
     >
       {children}

@@ -75,6 +75,7 @@ const OrderCart = React.memo(() => {
     toolProductsOfOrders,
     relMatProductsOfOrders,
     deliveryAddresses,
+    filterKeysOrder,
   } = useOrderContext();
 
   const {
@@ -164,29 +165,14 @@ const OrderCart = React.memo(() => {
     }
   };
 
-  const filterKeys = useMemo(
-    () => [
-      'id',
-      'order_id',
-      'dry_mixed_id',
-      'client_id',
-      'product_id',
-      'createdAt',
-      'updatedAt',
-      'bitrix_id',
-      'bitrix_client_id',
-    ],
-    [],
-  );
-
   const haveShipDate = useMemo(() => {
     return orderCartData?.shipping_date ?? false;
   }, [orderCartData]);
 
   const filterAndMapData = useCallback(
-    (data, filterKeys) =>
+    (data, filterKeysOrder) =>
       Object.entries(data || {})
-        .filter(([key]) => !filterKeys?.includes(key))
+        .filter(([key]) => !filterKeysOrder?.includes(key))
         .map(([key, value]) => {
           if (!key || key === 'warehouse_id') return null;
 
@@ -1106,7 +1092,7 @@ const OrderCart = React.memo(() => {
         <div className="header-container">
           <div className="owner-info">
             <h4>Client Information</h4>
-            {filterAndMapData(orderCartData?.owner, filterKeys)}
+            {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
 
             <div className="description">
               <h4>Description</h4>
@@ -1145,7 +1131,7 @@ const OrderCart = React.memo(() => {
           <div className="contact-info">
             <div className="contact-text">
               <h4>Contact Person</h4>
-              {filterAndMapData(orderCartData?.contactInfo, filterKeys)}
+              {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
             </div>
             {userAccess?.canWrite && orderCartData?.status < 3 && (
               <ShowOrderContactEditModal />
@@ -1154,7 +1140,7 @@ const OrderCart = React.memo(() => {
 
           <div className="delivery-address">
             <h4>Delivery Address</h4>
-            {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
+            {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
             {userAccess?.canWrite && orderCartData?.status < 3 && (
               <ShowOrderDeliveryEditModal />
             )}
@@ -1174,7 +1160,7 @@ const OrderCart = React.memo(() => {
               )}
             </div>
             {haveSecondaryContact ? (
-              filterAndMapData(orderCartData?.secondaryContact, filterKeys)
+              filterAndMapData(orderCartData?.secondaryContact, filterKeysOrder)
             ) : isAddSecCont ? (
               <>
                 <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
@@ -1202,7 +1188,7 @@ const OrderCart = React.memo(() => {
           productListOrder={updatedProductListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
-          filterKeys={filterKeys}
+          filterKeys={filterKeysOrder}
           productHandler={productHandler}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
@@ -1211,7 +1197,7 @@ const OrderCart = React.memo(() => {
           productListOrder={updatedDryMixesListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
-          filterKeys={filterKeys}
+          filterKeys={filterKeysOrder}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
         />
@@ -1219,7 +1205,7 @@ const OrderCart = React.memo(() => {
           productListOrder={updatedAnchorsListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
-          filterKeys={filterKeys}
+          filterKeys={filterKeysOrder}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
         />
@@ -1227,7 +1213,7 @@ const OrderCart = React.memo(() => {
           productListOrder={updatedToolsListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
-          filterKeys={filterKeys}
+          filterKeys={filterKeysOrder}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
         />
@@ -1235,7 +1221,7 @@ const OrderCart = React.memo(() => {
           productListOrder={updatedRelatedMaterialsListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
-          filterKeys={filterKeys}
+          filterKeys={filterKeysOrder}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
         />

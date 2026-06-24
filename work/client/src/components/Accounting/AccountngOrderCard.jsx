@@ -24,6 +24,7 @@ const AccountngOrderCard = React.memo(() => {
     anchorProductsOfOrders,
     toolProductsOfOrders,
     relMatProductsOfOrders,
+    filterKeysOrder,
   } = useOrderContext();
   const { displayNames } = useProjectContext();
   const { latestProducts } = useProductsContext();
@@ -40,11 +41,6 @@ const AccountngOrderCard = React.memo(() => {
   });
 
   const [status, setStatus] = useState();
-
-  const filterKeys = useMemo(
-    () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
-    [],
-  );
 
   const [productLists, setProductLists] = useState({
     products: [],
@@ -77,9 +73,9 @@ const AccountngOrderCard = React.memo(() => {
   };
 
   const filterAndMapData = useCallback(
-    (data, filterKeys) =>
+    (data, filterKeysOrder) =>
       Object.entries(data || {})
-        .filter(([key]) => !filterKeys.includes(key))
+        .filter(([key]) => !filterKeysOrder.includes(key))
         .map(([key, value]) => {
           if (!key || key == 'warehouse_id') return <></>;
           return (
@@ -284,19 +280,19 @@ const AccountngOrderCard = React.memo(() => {
         <div className="header-container">
           <div className="owner-info">
             <h4>Client Information</h4>
-            {filterAndMapData(orderCartData?.owner, filterKeys)}
+            {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
           </div>
 
           <div className="contact-info">
             <div className="contact-text">
               <h4>Contact Person</h4>
-              {filterAndMapData(orderCartData?.contactInfo, filterKeys)}
+              {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
             </div>
           </div>
 
           <div className="delivery-address">
             <h4>Delivery Address</h4>
-            {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
+            {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
           </div>
         </div>
         <table className="product-table">
@@ -309,7 +305,7 @@ const AccountngOrderCard = React.memo(() => {
             {Array.isArray(updatedProductListOrder) &&
               updatedProductListOrder?.map((product) => (
                 <tr key={product?.id || Math.random()} className="product-row">
-                  <td>{filterAndMapData(product, filterKeys)}</td>
+                  <td>{filterAndMapData(product, filterKeysOrder)}</td>
                 </tr>
               ))}
           </tbody>
@@ -324,7 +320,7 @@ const AccountngOrderCard = React.memo(() => {
             {Array.isArray(updatedDryMixesListOrder) &&
               updatedDryMixesListOrder?.map((product) => (
                 <tr key={product?.id || Math.random()} className="product-row">
-                  <td>{filterAndMapData(product, filterKeys)}</td>
+                  <td>{filterAndMapData(product, filterKeysOrder)}</td>
                 </tr>
               ))}
           </tbody>
@@ -339,7 +335,7 @@ const AccountngOrderCard = React.memo(() => {
             {Array.isArray(updatedAnchorsListOrder) &&
               updatedAnchorsListOrder?.map((product) => (
                 <tr key={product?.id || Math.random()} className="product-row">
-                  <td>{filterAndMapData(product, filterKeys)}</td>
+                  <td>{filterAndMapData(product, filterKeysOrder)}</td>
                 </tr>
               ))}
           </tbody>
@@ -354,7 +350,7 @@ const AccountngOrderCard = React.memo(() => {
             {Array.isArray(updatedToolsListOrder) &&
               updatedToolsListOrder?.map((product) => (
                 <tr key={product?.id || Math.random()} className="product-row">
-                  <td>{filterAndMapData(product, filterKeys)}</td>
+                  <td>{filterAndMapData(product, filterKeysOrder)}</td>
                 </tr>
               ))}
           </tbody>
@@ -369,7 +365,7 @@ const AccountngOrderCard = React.memo(() => {
             {Array.isArray(updatedRelatedMaterialsListOrder) &&
               updatedRelatedMaterialsListOrder?.map((product) => (
                 <tr key={product?.id || Math.random()} className="product-row">
-                  <td>{filterAndMapData(product, filterKeys)}</td>
+                  <td>{filterAndMapData(product, filterKeysOrder)}</td>
                 </tr>
               ))}
           </tbody>

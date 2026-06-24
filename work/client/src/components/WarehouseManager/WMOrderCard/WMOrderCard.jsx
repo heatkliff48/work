@@ -7,29 +7,15 @@ import WMOCTable from './WMOCTable/WMOCTable';
 import '#components/Styles/order-card.css';
 
 const WMOrderCard = React.memo(({ selectedOrder }) => {
-  const { orderCartData, setOrderCartData, list_of_orders } = useOrderContext();
+  const { orderCartData, setOrderCartData, list_of_orders, filterKeysOrder } = useOrderContext();
 
   const { displayNames } = useProjectContext();
   const [ordersStatus, setOrdersStatus] = useState([]);
 
-  const filterKeys = useMemo(
-    () => [
-      'id',
-      'order_id',
-      'client_id',
-      'product_id',
-      'createdAt',
-      'updatedAt',
-      'bitrix_id',
-      'bitrix_client_id',
-    ],
-    [],
-  );
-
   const filterAndMapData = useCallback(
-    (data, filterKeys) =>
+    (data, filterKeysOrder) =>
       Object.entries(data || {})
-        .filter(([key]) => !filterKeys.includes(key))
+        .filter(([key]) => !filterKeysOrder.includes(key))
         .map(([key, value]) => {
           if (!key || key === 'warehouse_id') return null;
 
@@ -74,19 +60,19 @@ const WMOrderCard = React.memo(({ selectedOrder }) => {
       <div className="header-container">
         <div className="owner-info">
           <h4>Client Information</h4>
-          {filterAndMapData(orderCartData?.owner, filterKeys)}
+          {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
         </div>
 
         <div className="contact-info">
           <div className="contact-text">
             <h4>Contact Person</h4>
-            {filterAndMapData(orderCartData?.contactInfo, filterKeys)}
+            {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
           </div>
         </div>
 
         <div className="delivery-address">
           <h4>Delivery Address</h4>
-          {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
+          {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
         </div>
       </div>
 

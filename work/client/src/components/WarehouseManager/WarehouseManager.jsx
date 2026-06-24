@@ -33,6 +33,8 @@ import {
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 
 import '#components/Styles/main-pages.css';
+import WMModalTrailer from './WMModal/WMModalTrailer';
+import WMModalTrailerModal from './WMModal/WMModalTrailerModal';
 
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
@@ -58,21 +60,18 @@ function WarehouseManager() {
     relMatProductsOfOrders,
   } = useOrderContext();
 
-  const { setWmoctPdfModal } = useModalContext();
+  const {
+    setWmoctPdfModal,
+    wmmodalTrailer,
+    setwmmodalTrailer,
+    wmmodalTrailerModal,
+    setwmmodalTrailerModal,
+  } = useModalContext();
 
   const [warehouseMdata, setWarehouseMdata] = useState([]);
+  const [trailer_order, setTrailerOrder] = useState(null);
+
   const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   if (user && roles.length > 0) {
-  //     const access = checkUserAccess(user, roles, 'Orders');
-  //     setUserAccess(access);
-
-  //     if (!access?.canRead) {
-  //       navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
-  //     }
-  //   }
-  // }, [user, roles]);
 
   useEffect(() => {
     setWmoctPdfModal(false);
@@ -100,63 +99,7 @@ function WarehouseManager() {
     dispatch(getRelatedMaterialsWarehouse());
   }, []);
 
-  // useEffect(() => {
-  //   const result = list_of_orders
-  //     .filter((el) => el.status === 8)
-  //     .reduce((acc, el) => {
-  //       const del_adr = deliveryAddresses?.find((del) => del?.id == el?.del_adr_id);
-
-  //       const products = [
-  //         ...getProductsByOrder(el.id, productsOfOrders, latestProducts),
-  //         ...getProductsByOrder(el.id, dryMixedProductsOfOrders, latestDryMix),
-  //         ...getProductsByOrder(el.id, anchorProductsOfOrders, latestAnchors),
-  //         ...getProductsByOrder(el.id, toolProductsOfOrders, latestTools),
-  //         ...getProductsByOrder(
-  //           el.id,
-  //           relMatProductsOfOrders,
-  //           latestRelatedMaterials
-  //         ),
-  //       ];
-
-  //       const normalizedProducts = (products || [])
-  //         .map((s) => String(s).trim())
-  //         .map((s) => s.replace(/,\s*$/, ' '))
-  //         .filter(Boolean);
-
-  //       const obj = {
-  //         order_id: el.id,
-  //         orders_article: el.article,
-  //         projects_name: del_adr?.project_name || '',
-  //         production_date: el.shipping_date || '',
-  //         orders_products: normalizedProducts || [],
-  //       };
-
-  //       acc.push(obj);
-  //       return acc;
-  //     }, []);
-
-  //   setWarehouseMdata(result);
-  //   setWmoctProductShippedBD([]);
-  // }, [
-  //   list_of_orders,
-  //   deliveryAddresses,
-
-  //   productsOfOrders,
-  //   dryMixedProductsOfOrders,
-  //   anchorProductsOfOrders,
-  //   toolProductsOfOrders,
-  //   relMatProductsOfOrders,
-
-  //   latestProducts,
-  //   latestDryMix,
-  //   latestAnchors,
-  //   latestTools,
-  //   latestRelatedMaterials,
-  // ]);
-
   useEffect(() => {
-    console.log('====== НАЧАЛО ФОРМИРОВАНИЯ ДАННЫХ ======');
-
     const result = list_of_orders
       .filter((el) => el.status === 8)
       .reduce((acc, el) => {
@@ -213,14 +156,14 @@ function WarehouseManager() {
           order_id: el.id,
           orders_article: el.article,
           projects_name: del_adr?.project_name || '',
-          production_date: el.shipping_date || '',
+          // production_date: el.shipping_date || '',
           orders_products: normalizedProducts,
         };
         acc.push(obj);
 
         return acc;
       }, []);
-    console.log('result WarehouseManager.jsx line 221', result);
+
     setWarehouseMdata(result);
     setWmoctProductShippedBD([]);
   }, [
@@ -240,9 +183,14 @@ function WarehouseManager() {
 
   return (
     <>
-      {selectedOrder ? (
-        <WMOrderCard selectedOrder={selectedOrder} />
-      ) : (
+      {selectedOrder && <WMOrderCard selectedOrder={selectedOrder} />}
+      {wmmodalTrailer && <WMModalTrailer setTrailerOrder={setTrailerOrder} />}
+      {wmmodalTrailerModal && <WMModalTrailerModal trailer_order={trailer_order} />}
+
+      <div>
+        <button onClick={() => setwmmodalTrailer(!wmmodalTrailer)}>
+          Plan nuevo trailer
+        </button>
         <Table
           COLUMN_DATA={WAREHOUSE_MANAGER_TABLE}
           dataOfTable={warehouseMdata}
@@ -256,7 +204,7 @@ function WarehouseManager() {
             setSelectedOrder(row.original);
           }}
         />
-      )}
+      </div>
     </>
   );
 }
