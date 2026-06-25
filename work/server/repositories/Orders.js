@@ -945,6 +945,132 @@ class OrdersRepository {
     }
   }
 
+  static async addChildOrder({
+    article,
+    owner,
+    del_adr_id,
+    contact_id,
+    secondary_contact,
+    person_in_charge,
+    shipping_date,
+    main_order,
+    products,
+    dryMixes,
+    anchors,
+    tools,
+    relMats,
+  }) {
+    try {
+      const childOrder = await Orders.create({
+        article,
+        owner,
+        del_adr_id,
+        contact_id,
+        secondary_contact: secondary_contact || null,
+        person_in_charge: person_in_charge || 0,
+        shipping_date,
+        status: 4,
+        main_order,
+      });
+
+      const order_id = childOrder.id;
+
+      if (products && products.length > 0) {
+        await Promise.all(
+          products.map((p) =>
+            OrdersProducts.create({
+              order_id,
+              product_id: p.product_id,
+              quantity_palet: p.quantity_palet,
+              quantity_m2: p.quantity_m2 || 0,
+              quantity_real: p.quantity_real || 0,
+              price_m2: p.price_m2 || 0,
+              price_m3: p.price_m3 || 0,
+              discount: p.discount || 0,
+              final_price: p.final_price || 0,
+            }),
+          ),
+        );
+      }
+
+      if (dryMixes && dryMixes.length > 0) {
+        await Promise.all(
+          dryMixes.map((p) =>
+            OrderDryMixedProducts.create({
+              order_id,
+              dry_mixed_id: p.dry_mixed_id,
+              quantity_palet_dry: p.quantity_palet_dry,
+              quantity_ud: p.quantity_ud || 0,
+              quantity_real_ud: p.quantity_real_ud || 0,
+              total: p.total || 0,
+              discount: p.discount || 0,
+              pvp: p.pvp || 0,
+              final_price: p.final_price || 0,
+            }),
+          ),
+        );
+      }
+
+      if (anchors && anchors.length > 0) {
+        await Promise.all(
+          anchors.map((p) =>
+            OrderAnchorProducts.create({
+              order_id,
+              anchor_id: p.anchor_id,
+              quantity_palet_anchor: p.quantity_palet_anchor,
+              quantity_ud: p.quantity_ud || 0,
+              quantity_real_ud: p.quantity_real_ud || 0,
+              total: p.total || 0,
+              discount: p.discount || 0,
+              pvp: p.pvp || 0,
+              final_price: p.final_price || 0,
+            }),
+          ),
+        );
+      }
+
+      if (tools && tools.length > 0) {
+        await Promise.all(
+          tools.map((p) =>
+            OrderToolProducts.create({
+              order_id,
+              tool_id: p.tool_id,
+              quantity_ud: p.quantity_ud,
+              total: p.total || 0,
+              discount: p.discount || 0,
+              pvp: p.pvp || 0,
+              final_price: p.final_price || 0,
+            }),
+          ),
+        );
+      }
+
+      if (relMats && relMats.length > 0) {
+        await Promise.all(
+          relMats.map((p) =>
+            OrderRelMatProducts.create({
+              order_id,
+              rel_mat_id: p.rel_mat_id,
+              quantity_ud: p.quantity_ud,
+              total: p.total || 0,
+              discount: p.discount || 0,
+              pvp: p.pvp || 0,
+              final_price: p.final_price || 0,
+            }),
+          ),
+        );
+      }
+
+      return childOrder;
+    } catch (error) {
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
+      return error;
+    }
+  }
+
   static async getDeleteOrder({ order_id }) {
     try {
       await OrdersProducts.destroy({ where: { order_id } });

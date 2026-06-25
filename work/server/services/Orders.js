@@ -46,13 +46,17 @@ class OrdersService {
   }
 
   static async addSecondaryContact(sec_cnt) {
-    const order_newContact = await OrdersRepository.addSecondaryContact(sec_cnt);
+    const order_newContact = await OrdersRepository.addSecondaryContact(
+      sec_cnt,
+    );
 
     return order_newContact;
   }
 
   static async deleteSecondaryContact(sec_cnt) {
-    const order_newContact = await OrdersRepository.deleteSecondaryContact(sec_cnt);
+    const order_newContact = await OrdersRepository.deleteSecondaryContact(
+      sec_cnt,
+    );
 
     return order_newContact;
   }
@@ -71,7 +75,8 @@ class OrdersService {
   }
 
   static async getAnchorProductsOfOrder() {
-    const anchor_product_list = await OrdersRepository.getAnchorProductsOfOrder();
+    const anchor_product_list =
+      await OrdersRepository.getAnchorProductsOfOrder();
 
     return anchor_product_list;
   }
@@ -83,7 +88,8 @@ class OrdersService {
   }
 
   static async getRelMatProductsOfOrder() {
-    const rel_mat_product_list = await OrdersRepository.getRelMatProductsOfOrder();
+    const rel_mat_product_list =
+      await OrdersRepository.getRelMatProductsOfOrder();
 
     return rel_mat_product_list;
   }
@@ -98,7 +104,7 @@ class OrdersService {
 
   static async getUpdateProductsOfOrder(newProductsOfOrder) {
     const product_of_order = await OrdersRepository.getUpdateProductsOfOrder(
-      newProductsOfOrder
+      newProductsOfOrder,
     );
 
     return product_of_order;
@@ -107,7 +113,7 @@ class OrdersService {
   static async getUpdateDryMixedProductsOfOrder(newDryMixedProductsOfOrder) {
     const dry_mixed_product_of_order =
       await OrdersRepository.getUpdateDryMixedProductsOfOrder(
-        newDryMixedProductsOfOrder
+        newDryMixedProductsOfOrder,
       );
 
     return dry_mixed_product_of_order;
@@ -116,7 +122,7 @@ class OrdersService {
   static async getUpdateAnchorProductsOfOrder(newAnchorProductsOfOrder) {
     const anchor_product_of_order =
       await OrdersRepository.getUpdateAnchorProductsOfOrder(
-        newAnchorProductsOfOrder
+        newAnchorProductsOfOrder,
       );
 
     return anchor_product_of_order;
@@ -124,7 +130,9 @@ class OrdersService {
 
   static async getUpdateToolProductsOfOrder(newToolProductsOfOrder) {
     const tool_product_of_order =
-      await OrdersRepository.getUpdateToolProductsOfOrder(newToolProductsOfOrder);
+      await OrdersRepository.getUpdateToolProductsOfOrder(
+        newToolProductsOfOrder,
+      );
 
     return tool_product_of_order;
   }
@@ -132,7 +140,7 @@ class OrdersService {
   static async getUpdateRelMatProductsOfOrder(newRelMatProductsOfOrder) {
     const rel_mat_product_of_order =
       await OrdersRepository.getUpdateRelMatProductsOfOrder(
-        newRelMatProductsOfOrder
+        newRelMatProductsOfOrder,
       );
 
     return rel_mat_product_of_order;
@@ -180,7 +188,7 @@ class OrdersService {
 
   static async getUpdateProductInfoOfOrder({ productOfOrder }) {
     const upd_prod_info = await OrdersRepository.getUpdateProductInfoOfOrder(
-      productOfOrder
+      productOfOrder,
     );
 
     return upd_prod_info;
@@ -188,31 +196,30 @@ class OrdersService {
 
   static async getUpdateDryMixedProductsInfoOfOrder({ productOfOrder }) {
     const upd_prod_info =
-      await OrdersRepository.getUpdateDryMixedProductsInfoOfOrder(productOfOrder);
+      await OrdersRepository.getUpdateDryMixedProductsInfoOfOrder(
+        productOfOrder,
+      );
 
     return upd_prod_info;
   }
 
   static async getUpdateAnchorProductsInfoOfOrder({ productOfOrder }) {
-    const upd_prod_info = await OrdersRepository.getUpdateAnchorProductsInfoOfOrder(
-      productOfOrder
-    );
+    const upd_prod_info =
+      await OrdersRepository.getUpdateAnchorProductsInfoOfOrder(productOfOrder);
 
     return upd_prod_info;
   }
 
   static async getUpdateToolProductsInfoOfOrder({ productOfOrder }) {
-    const upd_prod_info = await OrdersRepository.getUpdateToolProductsInfoOfOrder(
-      productOfOrder
-    );
+    const upd_prod_info =
+      await OrdersRepository.getUpdateToolProductsInfoOfOrder(productOfOrder);
 
     return upd_prod_info;
   }
 
   static async getUpdateRelMatProductsInfoOfOrder({ productOfOrder }) {
-    const upd_prod_info = await OrdersRepository.getUpdateRelMatProductsInfoOfOrder(
-      productOfOrder
-    );
+    const upd_prod_info =
+      await OrdersRepository.getUpdateRelMatProductsInfoOfOrder(productOfOrder);
 
     return upd_prod_info;
   }
@@ -224,7 +231,10 @@ class OrdersService {
   }
 
   static async getUpdateDeliveryAddressOrder({ address_id, order_id }) {
-    await OrdersRepository.getUpdateDeliveryAddressOrder({ address_id, order_id });
+    await OrdersRepository.getUpdateDeliveryAddressOrder({
+      address_id,
+      order_id,
+    });
 
     return;
   }
@@ -236,7 +246,10 @@ class OrdersService {
   }
 
   static async getUpdateInChargeOrder({ person_in_charge, order_id }) {
-    await OrdersRepository.getUpdateInChargeOrder({ person_in_charge, order_id });
+    await OrdersRepository.getUpdateInChargeOrder({
+      person_in_charge,
+      order_id,
+    });
 
     return;
   }
@@ -247,6 +260,11 @@ class OrdersService {
     });
 
     return;
+  }
+
+  static async addChildOrder(data) {
+    const childOrder = await OrdersRepository.addChildOrder(data);
+    return childOrder;
   }
 }
 

@@ -1,5 +1,6 @@
 import { ORDERS_LIST } from '../types/ordersTypes';
 import {
+  CHILD_ORDER_SOCKET,
   DATASHIP_ORDER_SOCKET,
   DELETE_ORDER_SOCKET,
   DESCRIPTIOM_ORDER_SOCKET,
@@ -23,6 +24,10 @@ export const ordersReducer = (orders = [], action) => {
     case NEW_ORDER_SOCKET: {
       // if (orders.find((order) => order.id === payload.id)) return orders;
 
+      return [...orders, payload];
+    }
+
+    case CHILD_ORDER_SOCKET: {
       return [...orders, payload];
     }
 
