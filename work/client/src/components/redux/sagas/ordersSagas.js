@@ -72,6 +72,7 @@ import {
   UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
   ADD_RANDOM_PRODUCTS_OF_ORDER,
   RANDOM_PRODUCTS_OF_ORDER,
+  ADD_CHILD_ORDER,
 } from '../types/ordersTypes';
 
 import { getApiUrl } from '#utils/getApiUrl.js';
@@ -480,6 +481,18 @@ const updateInChargeOfOrder = (orderInCharge) => {
 const addOrderRandomProducts = ({ order_id, order_article }) => {
   return url
     .post('/orderRandom/add_random', { order_id, order_article })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const addChildOrderApi = (childOrder) => {
+  return url
+    .post('/orders/child/add', childOrder)
     .then((res) => {
       return res.data;
     })
@@ -913,6 +926,14 @@ function* addOrderRandomProductsWorker(action) {
   }
 }
 
+function* addChildOrderWatcher(action) {
+  try {
+    yield call(addChildOrderApi, action.payload);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 function* ordersWatcher() {
   yield takeLatest(GET_ORDERS_LIST, getOrdersListWatcher);
   yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
@@ -1005,6 +1026,7 @@ function* ordersWatcher() {
     updateInChargeOfOrderWorker,
   );
   yield takeLatest(ADD_RANDOM_PRODUCTS_OF_ORDER, addOrderRandomProductsWorker);
+  yield takeLatest(ADD_CHILD_ORDER, addChildOrderWatcher);
 }
 
 export default ordersWatcher;

@@ -56,6 +56,7 @@ import {
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 import RelatedMaterialJournalTableOrder from './product_table_order/RelatedMaterialJournalTableOrder.jsx';
+import LiberarModal from './modal/LiberarModal.jsx';
 
 import '#components/Styles/order-card.css';
 
@@ -86,7 +87,8 @@ const OrderCart = React.memo(() => {
   } = useModalContext();
   const { displayNames, user } = useProjectContext();
 
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
   const { latestProducts } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
@@ -115,6 +117,7 @@ const OrderCart = React.memo(() => {
   const [isAddSecCont, setIsAddSecCont] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
+  const [liberarModalShow, setLiberarModalShow] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState([]);
   const [orderStatusAccess, setOrderStatusAccess] = useState({
     canRead: true,
@@ -234,7 +237,9 @@ const OrderCart = React.memo(() => {
     const currentDate = new Date();
     const shippingDateString = orderCartData?.shipping_date;
 
-    const shippingDate = new Date(shippingDateString.split('.').reverse().join('-'));
+    const shippingDate = new Date(
+      shippingDateString.split('.').reverse().join('-'),
+    );
 
     const timeDiff = shippingDate.getTime() - currentDate.getTime();
     const daysUntil = Math.ceil(timeDiff / (1000 * 3600 * 24));
@@ -267,7 +272,12 @@ const OrderCart = React.memo(() => {
 
   const addProductArticleToOrderList = useCallback(
     (productsOfOrders, productsTable, arrayName) => {
-      if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
+      if (
+        !productsOfOrders ||
+        !productsTable ||
+        !arrayName ||
+        !orderCartData?.id
+      )
         return [];
 
       const updatedOrderProducts = productsOfOrders
@@ -279,7 +289,9 @@ const OrderCart = React.memo(() => {
           //   (el) => el.client_id == orderCartData.owner.id
           // );
 
-          const product = productsTable.find((p) => p.id === orderProduct?.[id]);
+          const product = productsTable.find(
+            (p) => p.id === orderProduct?.[id],
+          );
 
           return product
             ? {
@@ -356,7 +368,11 @@ const OrderCart = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools');
+    return addProductArticleToOrderList(
+      toolProductsOfOrders,
+      latestTools,
+      'tools',
+    );
   }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
 
   useEffect(() => {
@@ -374,7 +390,11 @@ const OrderCart = React.memo(() => {
       latestRelatedMaterials,
       'related_materials',
     );
-  }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
+  }, [
+    relMatProductsOfOrders,
+    latestRelatedMaterials,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedRelatedMaterialsListOrder.length > 0) {
@@ -404,8 +424,12 @@ const OrderCart = React.memo(() => {
                   (el) => el.article === sel_prod.product_article,
                 )
               : sel_prod.product_article.slice(2, 3) == 'F'
-                ? latestAnchors.find((el) => el.article === sel_prod.product_article)
-                : latestTools.find((el) => el.article === sel_prod.product_article);
+                ? latestAnchors.find(
+                    (el) => el.article === sel_prod.product_article,
+                  )
+                : latestTools.find(
+                    (el) => el.article === sel_prod.product_article,
+                  );
       setSelectedProduct(product);
       setProductOfOrder({ ...sel_prod, product_id: product?.id });
       setProductInfoModalOrder(!productInfoModalOrder);
@@ -432,7 +456,11 @@ const OrderCart = React.memo(() => {
         ? orderCartData?.shipping_date
         : formatDataValue;
 
-    if (!bypass && status.accessor > status_list[3].accessor && !hasShippingDate) {
+    if (
+      !bypass &&
+      status.accessor > status_list[3].accessor &&
+      !hasShippingDate
+    ) {
       alert('Please select the shipping date.');
       return;
     } else if (bypass) {
@@ -493,7 +521,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate,
@@ -563,7 +594,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate,
@@ -621,7 +655,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate,
@@ -679,7 +716,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate,
@@ -736,7 +776,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate,
@@ -794,7 +837,9 @@ const OrderCart = React.memo(() => {
   };
 
   const deleteHandler = (product) => {
-    const res_prod = list_of_reserved_products.find((el) => el.id === product.id);
+    const res_prod = list_of_reserved_products.find(
+      (el) => el.id === product.id,
+    );
     if (res_prod) alert('Этот продукт зарервировван на складе');
     if (product?.product_article.charAt(0) === 'T') {
       dispatch(getDeleteProductOfOrder(product?.id));
@@ -1083,6 +1128,15 @@ const OrderCart = React.memo(() => {
           toggle={() => setWarehouseInfoModal(!warehouseInfoModal)}
         />
       )}
+      {liberarModalShow && (
+        <LiberarModal
+          show={liberarModalShow}
+          onHide={() => setLiberarModalShow(false)}
+          orderCartData={orderCartData}
+          productLists={productLists}
+          onSuccess={() => navigate('/orders')}
+        />
+      )}
       {reserveModalShow && (
         <ListOfOrderedProductionReserveModal
           show={reserveModalShow}
@@ -1177,7 +1231,10 @@ const OrderCart = React.memo(() => {
               filterAndMapData(orderCartData?.secondaryContact, filterKeys)
             ) : isAddSecCont ? (
               <>
-                <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
+                <ClientsContactInfo
+                  clickFunk={addSecCntFunc}
+                  fullContact={true}
+                />
               </>
             ) : (
               <button onClick={() => addSecondaryContactHandler()}>
@@ -1194,6 +1251,11 @@ const OrderCart = React.memo(() => {
               }}
             >
               Delete Order
+            </Button>
+          )}
+          {orderCartData.main_order == null && orderCartData?.status == 4 && (
+            <Button variant="warning" onClick={() => setLiberarModalShow(true)}>
+              Liberar
             </Button>
           )}
         </div>
@@ -1294,8 +1356,11 @@ const OrderCart = React.memo(() => {
                     }}
                     readOnly={orderCartData?.status < 3 ? false : true}
                     disabled={
-                      !checkUserAccess(user, roles, 'orders_save_delivery_price')
-                        ?.canWrite
+                      !checkUserAccess(
+                        user,
+                        roles,
+                        'orders_save_delivery_price',
+                      )?.canWrite
                     }
                   />
                   {checkUserAccess(user, roles, 'orders_description_edit')
@@ -1329,8 +1394,8 @@ const OrderCart = React.memo(() => {
               {orderCartData.status >= 4 ? (
                 haveShipDate ? (
                   <p>
-                    Shipping date: {haveShipDate} ({handleDayBeforShipping()} days
-                    before shipment)
+                    Shipping date: {haveShipDate} ({handleDayBeforShipping()}{' '}
+                    days before shipment)
                   </p>
                 ) : (
                   <div>
@@ -1351,7 +1416,9 @@ const OrderCart = React.memo(() => {
               <div className="footer_button">
                 <p>Person in charge</p>
                 <Select
-                  defaultValue={getSelectedOption(orderCartData?.person_in_charge)}
+                  defaultValue={getSelectedOption(
+                    orderCartData?.person_in_charge,
+                  )}
                   onChange={(v) => {
                     handleSelectChange(v);
                   }}
@@ -1373,7 +1440,10 @@ const OrderCart = React.memo(() => {
           {orderStatusAccess?.canRead && (
             <div className="status-table">
               {!aproveAccounting && (
-                <div className="status-row" style={{ backgroundColor: 'yellow' }}>
+                <div
+                  className="status-row"
+                  style={{ backgroundColor: 'yellow' }}
+                >
                   Awaiting accounting approval
                 </div>
               )}
