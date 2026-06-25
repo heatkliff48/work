@@ -4,6 +4,7 @@ import {
   addNewFilesOrderSocket,
   addNewFilesProductSocket,
   addNewFilesWarehouseSocket,
+  addChildOrderSocket,
   addNewOrderSocket,
   addNewProductSocket,
   addNewRelatedMaterialsJournalSocket,
@@ -181,6 +182,7 @@ import {
   ADD_DELIVERY_ADDRESSES_SOCKET,
   ADD_NEW_BATCH_OUTSIDE_SOCKET,
   ADD_NEW_CLIENT_SOCKET,
+  ADD_CHILD_ORDER_SOCKET,
   ADD_NEW_ORDER_SOCKET,
   ADD_NEW_PRODUCT_SOCKET,
   UPDATE_BATCH_OUTSIDE_SOCKET,
@@ -407,6 +409,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_ORDER_SOCKET:
       dispatch(addNewOrderSocket(payload));
+      break;
+
+    case ADD_CHILD_ORDER_SOCKET:
+      dispatch(addChildOrderSocket(payload));
       break;
 
     case GET_DELETE_ORDER_SOCKET:

@@ -340,7 +340,9 @@ const OrderContextProvider = ({ children }) => {
     (state) => state.anchorProductsOfOrders,
   );
 
-  const toolProductsOfOrders = useSelector((state) => state.toolProductsOfOrders);
+  const toolProductsOfOrders = useSelector(
+    (state) => state.toolProductsOfOrders,
+  );
 
   const relMatProductsOfOrders = useSelector(
     (state) => state.relMatProductsOfOrders,
@@ -450,11 +452,13 @@ const OrderContextProvider = ({ children }) => {
       const client = clients.find((client) => client.id === order?.owner);
       const deliveryAddress = deliveryAddresses.find(
         (address) =>
-          address.id === order?.del_adr_id && address.client_id === order?.owner,
+          address.id === order?.del_adr_id &&
+          address.client_id === order?.owner,
       );
       const contactInfo = contactInfos.find(
         (contact) =>
-          contact.id === order?.contact_id && contact.client_id === order?.owner,
+          contact.id === order?.contact_id &&
+          contact.client_id === order?.owner,
       );
 
       const secondaryContact = order?.secondary_contact
@@ -473,6 +477,7 @@ const OrderContextProvider = ({ children }) => {
         shipping_date: order?.shipping_date,
         person_in_charge: order?.person_in_charge,
         delivery: order?.delivery,
+        main_order: order?.main_order ?? null,
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
@@ -506,7 +511,8 @@ const OrderContextProvider = ({ children }) => {
         const client = clients.find((client) => client.id === order.owner);
         const deliveryAddress = deliveryAddresses.find(
           (address) =>
-            address.id === order.del_adr_id && address.client_id === order.owner,
+            address.id === order.del_adr_id &&
+            address.client_id === order.owner,
         );
 
         return {
@@ -514,7 +520,8 @@ const OrderContextProvider = ({ children }) => {
           article,
           description: order?.description,
           status:
-            status_list?.find((stat) => stat.accessor == status)?.Header || status,
+            status_list?.find((stat) => stat.accessor == status)?.Header ||
+            status,
           owner: client ? client.c_name : '',
           project_name: deliveryAddress ? deliveryAddress.project_name : '',
           shipping_date,
@@ -526,7 +533,8 @@ const OrderContextProvider = ({ children }) => {
       });
 
       const uniqueArray = newArray.filter(
-        (obj, index, self) => index === self.findIndex((el) => el.id === obj.id),
+        (obj, index, self) =>
+          index === self.findIndex((el) => el.id === obj.id),
       );
 
       setOrdersDataList(uniqueArray);

@@ -37,6 +37,7 @@ import {
   GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER,
   GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
   ADD_RANDOM_PRODUCTS_OF_ORDER,
+  ADD_CHILD_ORDER,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -49,6 +50,13 @@ export const addNewOrder = (order) => {
   return {
     type: ADD_NEW_ORDER,
     payload: order,
+  };
+};
+
+export const addChildOrder = (childOrder) => {
+  return {
+    type: ADD_CHILD_ORDER,
+    payload: childOrder,
   };
 };
 
@@ -155,7 +163,9 @@ export const getDryMixedProductsOfOrders = () => {
   };
 };
 
-export const getUpdateDryMixedProductOfOrders = (newDryMixedProductsOfOrder) => {
+export const getUpdateDryMixedProductOfOrders = (
+  newDryMixedProductsOfOrder,
+) => {
   return {
     type: GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
     payload: newDryMixedProductsOfOrder,

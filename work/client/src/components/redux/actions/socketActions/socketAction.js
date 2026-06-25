@@ -8,6 +8,7 @@ import {
   NEW_FILES_ORDER_SOCKET,
   NEW_FILES_WAREHOUSE_SOCKET,
   NEW_ORDER_SOCKET,
+  CHILD_ORDER_SOCKET,
   NEW_PRODUCT_SOCKET,
   NEW_RECIPE_SOCKET,
   NEW_WAREHOUSE_SOCKET,
@@ -233,6 +234,13 @@ export const addNewOrderSocket = (newOrder) => {
   return {
     type: NEW_ORDER_SOCKET,
     payload: newOrder,
+  };
+};
+
+export const addChildOrderSocket = (childOrder) => {
+  return {
+    type: CHILD_ORDER_SOCKET,
+    payload: childOrder,
   };
 };
 

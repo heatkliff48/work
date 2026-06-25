@@ -20,51 +20,64 @@ router.post('/delete', OrdersController.getDeleteOrder);
 router.post('/delete/product', OrdersController.getDeleteProductOfOrder);
 router.post(
   '/delete/dry_mixed_products',
-  OrdersController.getDeleteDryMixedProductOfOrder
+  OrdersController.getDeleteDryMixedProductOfOrder,
 );
 router.post(
   '/delete/anchor_product',
-  OrdersController.getDeleteAnchorProductOfOrder
+  OrdersController.getDeleteAnchorProductOfOrder,
 );
-router.post('/delete/tool_product', OrdersController.getDeleteToolProductOfOrder);
+router.post(
+  '/delete/tool_product',
+  OrdersController.getDeleteToolProductOfOrder,
+);
 router.post(
   '/delete/rel_mat_product',
-  OrdersController.getDeleteRelMatProductOfOrder
+  OrdersController.getDeleteRelMatProductOfOrder,
 );
 router.post('/products/add', OrdersController.getUpdateProductsOfOrder);
 router.post(
   '/dry_mixed_products/add',
-  OrdersController.getUpdateDryMixedProductsOfOrder
+  OrdersController.getUpdateDryMixedProductsOfOrder,
 );
-router.post('/anchor_products/add', OrdersController.getUpdateAnchorProductsOfOrder);
-router.post('/tool_products/add', OrdersController.getUpdateToolProductsOfOrder);
+router.post(
+  '/anchor_products/add',
+  OrdersController.getUpdateAnchorProductsOfOrder,
+);
+router.post(
+  '/tool_products/add',
+  OrdersController.getUpdateToolProductsOfOrder,
+);
 router.post(
   '/rel_mat_products/add',
-  OrdersController.getUpdateRelMatProductsOfOrder
+  OrdersController.getUpdateRelMatProductsOfOrder,
 );
-router.post('/product/update/info', OrdersController.getUpdateProductInfoOfOrder);
+router.post(
+  '/product/update/info',
+  OrdersController.getUpdateProductInfoOfOrder,
+);
 router.post(
   '/dry_mixed_products/update/info',
-  OrdersController.getUpdateDryMixedProductsInfoOfOrder
+  OrdersController.getUpdateDryMixedProductsInfoOfOrder,
 );
 router.post(
   '/anchor_products/update/info',
-  OrdersController.getUpdateAnchorProductsInfoOfOrder
+  OrdersController.getUpdateAnchorProductsInfoOfOrder,
 );
 router.post(
   '/tool_products/update/info',
-  OrdersController.getUpdateToolProductsInfoOfOrder
+  OrdersController.getUpdateToolProductsInfoOfOrder,
 );
 router.post(
   '/rel_mat_products/update/info',
-  OrdersController.getUpdateRelMatProductsInfoOfOrder
+  OrdersController.getUpdateRelMatProductsInfoOfOrder,
 );
 router.post('/update/contact', OrdersController.getUpdateContactInfoOfOrder);
 router.post(
   '/update/delivery_address',
-  OrdersController.getUpdateDeliveryAddressOrder
+  OrdersController.getUpdateDeliveryAddressOrder,
 );
 router.post('/update/status', OrdersController.getUpdateStatusOrder);
 router.post('/update/in_charge', OrdersController.getUpdateInChargeOrder);
+router.post('/child/add', OrdersController.addChildOrder);
 
 module.exports = router;
