@@ -167,6 +167,7 @@ const {
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_PALLETS_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -1504,6 +1505,28 @@ function registerWsEmitter(map) {
       }
     },
   );
+
+  myEmitter.on(ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET, (wh_trailer) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+          payload: wh_trailer,
+        }),
+      );
+    }
+  });
+
+  // myEmitter.on(DELETE_QUALITY_MANAGEMENT_DATA_SOCKET, (qualityManagementDataID) => {
+  //   for (let [id, userConnect] of map) {
+  //     userConnect.send(
+  //       JSON.stringify({
+  //         type: DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
+  //         payload: qualityManagementDataID,
+  //       }),
+  //     );
+  //   }
+  // });
 
   myEmitter.on(
     ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET,

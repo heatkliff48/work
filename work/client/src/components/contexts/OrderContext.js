@@ -11,6 +11,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -297,6 +298,20 @@ const OrderContextProvider = ({ children }) => {
     },
   ];
 
+  const filterKeysOrder = useMemo(
+    () => [
+      'id',
+      'order_id',
+      'client_id',
+      'product_id',
+      'createdAt',
+      'updatedAt',
+      'bitrix_id',
+      'bitrix_client_id',
+    ],
+    [],
+  );
+
   const dispatch = useDispatch();
   const [newOrder, setNewOrder] = useState();
   const [currentOrder, setCurrentOrder] = useState();
@@ -465,7 +480,6 @@ const OrderContextProvider = ({ children }) => {
         main_order: order?.main_order ?? null,
       };
 
-      console.log('currentOrder OrderContext.js line 458', currentOrder);
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
       setOrderCartData(currentOrder);
     },
@@ -580,6 +594,7 @@ const OrderContextProvider = ({ children }) => {
         setRandomOrderCheck,
         randomFillComplete,
         setRandomFillComplete,
+        filterKeysOrder,
       }}
     >
       {children}

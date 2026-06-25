@@ -71,6 +71,7 @@ const initState = {
   productionQuality: [],
   qualityDimensions: [],
   qualityCompressions: [],
+  orderDispatch: [],
 };
 
 export default initState;
