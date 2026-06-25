@@ -7,6 +7,7 @@ import WMOCTable from './WMOCTable/WMOCTable';
 import '#components/Styles/order-card.css';
 
 const WMOrderCard = React.memo(({ selectedOrder }) => {
+  console.log('selectedOrder WMOrderCard.jsx line 10', selectedOrder)
   const { orderCartData, setOrderCartData, list_of_orders, filterKeysOrder } = useOrderContext();
 
   const { displayNames } = useProjectContext();

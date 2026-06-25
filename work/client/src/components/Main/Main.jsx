@@ -50,6 +50,7 @@ import {
   getListOfReservedProducts,
   getListOfToolReservedProducts,
   getRawMaterialsWarehouse,
+  getWarehouseManagerTrailer,
 } from '#components/redux/actions/warehouseAction.js';
 import { getFilesWarehouse } from '#components/redux/actions/filesWarehouseAction.js';
 import { getFilesProduct } from '#components/redux/actions/filesProductAction.js';
@@ -152,6 +153,7 @@ function Main() {
     dispatch(getProductionQuality());
     dispatch(getDimensionsQuality());
     dispatch(getCompressionsQuality());
+    dispatch(getWarehouseManagerTrailer());
     setStoredData(null);
   }, [dispatch, setStoredData]);
 

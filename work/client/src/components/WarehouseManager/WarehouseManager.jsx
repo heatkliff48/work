@@ -1,13 +1,9 @@
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-// import { useUsersContext } from '#components/contexts/UserContext.js';
 import Table from '../Table/Table';
 import { useEffect, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
 import WMOrderCard from './WMOrderCard/WMOrderCard';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useDispatch } from 'react-redux';
 import {
@@ -39,33 +35,21 @@ import WMModalTrailerModal from './WMModal/WMModalTrailerModal';
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
   //   useUsersContext();
-  const { WAREHOUSE_MANAGER_TABLE } = useProjectContext();
-  const { latestProducts } = useProductsContext();
-  const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
-    useProductsTypeJournalContext();
+  const { WAREHOUSE_MANAGER_TRAILER_TABLE } = useProjectContext();
   const {
     setWmoctProductShippedBD,
     selectedOrder,
     setSelectedOrder,
-    getProductsByOrder,
+    order_dispatch_data,
   } = useWarehouseContext();
-  const {
-    list_of_orders,
-    deliveryAddresses,
-    productsOfOrders,
-    getCurrentOrderInfoHandler,
-    dryMixedProductsOfOrders,
-    anchorProductsOfOrders,
-    toolProductsOfOrders,
-    relMatProductsOfOrders,
-  } = useOrderContext();
+  const { list_of_orders, deliveryAddresses, getCurrentOrderInfoHandler } =
+    useOrderContext();
 
   const {
     setWmoctPdfModal,
     wmmodalTrailer,
     setwmmodalTrailer,
     wmmodalTrailerModal,
-    setwmmodalTrailerModal,
   } = useModalContext();
 
   const [warehouseMdata, setWarehouseMdata] = useState([]);
@@ -100,86 +84,60 @@ function WarehouseManager() {
   }, []);
 
   useEffect(() => {
-    const result = list_of_orders
-      .filter((el) => el.status === 8)
-      .reduce((acc, el) => {
-        const del_adr = deliveryAddresses?.find((del) => del?.id == el?.del_adr_id);
+    if (!order_dispatch_data || order_dispatch_data.length === 0) {
+      setWarehouseMdata([]);
+      setWmoctProductShippedBD([]);
+      return;
+    }
 
-        const products = [];
-
-        const regularProducts = getProductsByOrder(
-          el.id,
-          productsOfOrders,
-          latestProducts,
-        );
-        products.push(...regularProducts);
-
-        const dryMixProducts = getProductsByOrder(
-          el.id,
-          dryMixedProductsOfOrders,
-          latestDryMix,
-        );
-        products.push(...dryMixProducts);
-
-        const anchorProducts = getProductsByOrder(
-          el.id,
-          anchorProductsOfOrders,
-          latestAnchors,
-        );
-        products.push(...anchorProducts);
-
-        const toolProducts = getProductsByOrder(
-          el.id,
-          toolProductsOfOrders,
-          latestTools,
-        );
-        products.push(...toolProducts);
-
-        const relMatProducts = getProductsByOrder(
-          el.id,
-          relMatProductsOfOrders,
-          latestRelatedMaterials,
-        );
-        products.push(...relMatProducts);
-
-        const normalizedProducts = products
-          .map((product) => {
-            if (!product) {
-              return '';
-            }
-            const trimmed = product.trim().replace(/,\s*$/, ' ');
-            return trimmed;
-          })
-          .filter((product) => product && product.length > 0);
-
-        const obj = {
-          order_id: el.id,
-          orders_article: el.article,
-          projects_name: del_adr?.project_name || '',
-          // production_date: el.shipping_date || '',
-          orders_products: normalizedProducts,
+    const groupedByOrder = order_dispatch_data.reduce((acc, item) => {
+      const orderId = item.orderId;
+      if (!acc[orderId]) {
+        acc[orderId] = {
+          orderId,
+          fecha: item.fecha,
+          products: {},
+          trailerDates: [],
         };
-        acc.push(obj);
+      }
 
-        return acc;
-      }, []);
+      const article = item.article;
+      const quantity = Number(item.quantity) || 0;
+      if (!acc[orderId].products[article]) {
+        acc[orderId].products[article] = 0;
+      }
+      acc[orderId].products[article] += quantity;
+
+      if (item.fecha && !acc[orderId].trailerDates.includes(item.fecha)) {
+        acc[orderId].trailerDates.push(item.fecha);
+      }
+
+      return acc;
+    }, {});
+
+    const result = Object.values(groupedByOrder).map((group) => {
+      const order = list_of_orders.find((o) => o.id === group.orderId);
+      const del = deliveryAddresses.find((d) => d.id === order?.del_adr_id);
+
+      const orders_products = Object.entries(group.products).map(
+        ([article, totalQuantity]) => `${article}: ${totalQuantity}, `,
+      );
+
+      const sortedDates = group.trailerDates.sort();
+      const fecha = sortedDates[0] || '';
+
+      return {
+        order_id: group.orderId,
+        orders_article: order?.article || '',
+        projects_name: del?.project_name || '',
+        fecha,
+        orders_products: orders_products,
+      };
+    });
 
     setWarehouseMdata(result);
     setWmoctProductShippedBD([]);
-  }, [
-    list_of_orders,
-    deliveryAddresses,
-    productsOfOrders,
-    dryMixedProductsOfOrders,
-    anchorProductsOfOrders,
-    toolProductsOfOrders,
-    relMatProductsOfOrders,
-    latestProducts,
-    latestDryMix,
-    latestAnchors,
-    latestTools,
-    latestRelatedMaterials,
-  ]);
+  }, [order_dispatch_data, list_of_orders, deliveryAddresses]);
 
   return (
     <>
@@ -192,7 +150,7 @@ function WarehouseManager() {
           Plan nuevo trailer
         </button>
         <Table
-          COLUMN_DATA={WAREHOUSE_MANAGER_TABLE}
+          COLUMN_DATA={WAREHOUSE_MANAGER_TRAILER_TABLE}
           dataOfTable={warehouseMdata}
           // userAccess={userAccess}
           onClickButton={() => {}}

@@ -80,9 +80,10 @@ function WMModalTrailer({ setTrailerOrder }) {
         const obj = {
           orders_article: order.article,
           projects_name: del_adr?.project_name,
-          production_date: order?.shipping_date,
-          remaining_quantity_of_pallets,
+          fecha: order?.shipping_date,
+          orders_products:remaining_quantity_of_pallets,
         };
+        console.log('obj WMModalTrailer.jsx line 86', obj);
 
         acc.push(obj);
 
@@ -187,14 +188,14 @@ function WMModalTrailer({ setTrailerOrder }) {
       ...new Set(trailerProducts.map((product) => product.title)),
     ];
 
-    console.log('trailerProducts', trailerProducts);
-    console.log('productNames', productNames);
-    console.log(
-      'uniqueProductNames WMModalTrailer.jsx line 182',
-      uniqueProductNames,
-    );
+    // console.log('trailerProducts', trailerProducts);
+    // console.log('productNames', productNames);
+    // console.log(
+    //   'uniqueProductNames WMModalTrailer.jsx line 182',
+    //   uniqueProductNames,
+    // );
 
-    setTrailerOrder(uniqueProductNames);
+    setTrailerOrder(trailerProducts);
   };
 
   return (

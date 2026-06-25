@@ -392,11 +392,11 @@ const ProjectContextProvider = ({ children }) => {
     },
     {
       Header: 'Delivery due date',
-      accessor: 'production_date',
+      accessor: 'fecha',
     },
     {
       Header: 'Remaining quantity of pallets ',
-      accessor: 'remaining_quantity_of_pallets',
+      accessor: 'orders_products',
     },
   ];
 
