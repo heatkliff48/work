@@ -90,79 +90,52 @@ function WarehouseManager() {
       return;
     }
 
-    const groupedByOrder = order_dispatch_data.reduce((acc, item) => {
-      const orderId = item.orderId;
-      if (!acc[orderId]) {
-        acc[orderId] = {
-          orderId,
-          fecha: item.fecha,
-          products: {},
-          trailerDates: [],
-        };
-      }
+    const result = order_dispatch_data.map((item) => {
+      const order = list_of_orders.find((o) => o.id === item.orderId);
+      const delivery = deliveryAddresses.find((d) => d.id === order?.del_adr_id);
 
-      const article = item.article;
-      const quantity = Number(item.quantity) || 0;
-      if (!acc[orderId].products[article]) {
-        acc[orderId].products[article] = 0;
-      }
-      acc[orderId].products[article] += quantity;
+      const productDisplay = `${item.title || 'Без названия'}: ${item.quantity}`;
 
-      if (item.fecha && !acc[orderId].trailerDates.includes(item.fecha)) {
-        acc[orderId].trailerDates.push(item.fecha);
-      }
-
-      return acc;
-    }, {});
-
-    const result = Object.values(groupedByOrder).map((group) => {
-      const order = list_of_orders.find((o) => o.id === group.orderId);
-      const del = deliveryAddresses.find((d) => d.id === order?.del_adr_id);
-
-      const orders_products = Object.entries(group.products).map(
-        ([article, totalQuantity]) => `${article}: ${totalQuantity}, `,
-      );
-
-      const sortedDates = group.trailerDates.sort();
-      const fecha = sortedDates[0] || '';
+      const fecha = item.fecha || order?.due_date || '';
 
       return {
-        order_id: group.orderId,
+        order_id: item.orderId,
         orders_article: order?.article || '',
-        projects_name: del?.project_name || '',
-        fecha,
-        orders_products: orders_products,
+        projects_name: delivery?.project_name || '',
+        fecha: fecha,
+        orders_products: [productDisplay],
       };
     });
 
     setWarehouseMdata(result);
     setWmoctProductShippedBD([]);
   }, [order_dispatch_data, list_of_orders, deliveryAddresses]);
-
   return (
     <>
-      {selectedOrder && <WMOrderCard selectedOrder={selectedOrder} />}
+      {selectedOrder ? (
+        <WMOrderCard selectedOrder={selectedOrder} />
+      ) : (
+        <div>
+          <button onClick={() => setwmmodalTrailer(!wmmodalTrailer)}>
+            Plan nuevo trailer
+          </button>
+          <Table
+            COLUMN_DATA={WAREHOUSE_MANAGER_TRAILER_TABLE}
+            dataOfTable={warehouseMdata}
+            // userAccess={userAccess}
+            onClickButton={() => {}}
+            buttonText={''}
+            tableName={'Order dispatch'}
+            handleRowClick={(row) => {
+              getCurrentOrderInfoHandler({ order_id: row.original.order_id });
+
+              setSelectedOrder(row.original);
+            }}
+          />
+        </div>
+      )}
       {wmmodalTrailer && <WMModalTrailer setTrailerOrder={setTrailerOrder} />}
       {wmmodalTrailerModal && <WMModalTrailerModal trailer_order={trailer_order} />}
-
-      <div>
-        <button onClick={() => setwmmodalTrailer(!wmmodalTrailer)}>
-          Plan nuevo trailer
-        </button>
-        <Table
-          COLUMN_DATA={WAREHOUSE_MANAGER_TRAILER_TABLE}
-          dataOfTable={warehouseMdata}
-          // userAccess={userAccess}
-          onClickButton={() => {}}
-          buttonText={''}
-          tableName={'Order dispatch'}
-          handleRowClick={(row) => {
-            getCurrentOrderInfoHandler({ order_id: row.original.order_id });
-
-            setSelectedOrder(row.original);
-          }}
-        />
-      </div>
     </>
   );
 }

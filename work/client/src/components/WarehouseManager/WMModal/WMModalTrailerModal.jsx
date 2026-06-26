@@ -171,24 +171,64 @@ function WMModalTrailerModal({ trailer_order }) {
     );
   };
 
+  const getProductTotal = (productId) => {
+    const product = trailer_order.find((p) => p.orderProductId === productId);
+    return product?.quantity ?? 0;
+  };
+
+  const getShippedQuantity = (productId) => {
+    const orderId = orderCartData?.id;
+    if (!orderId) return 0;
+    return order_dispatch_data
+      .filter(
+        (item) => item.orderId === orderId && item.orderProductId === productId,
+      )
+      .reduce((sum, item) => sum + (item.quantity ?? 0), 0);
+  };
+
+  const getAvailableRemaining = (productId, excludeRowIndex = -1) => {
+    const total = getProductTotal(productId);
+    const shipped = getShippedQuantity(productId);
+    let remaining = total - shipped;
+
+    trailers.forEach((row, idx) => {
+      if (idx === excludeRowIndex || row.isExisting) return;
+      const val = Number(row.products[productId]) || 0;
+      remaining -= val;
+    });
+
+    return Math.max(remaining, 0);
+  };
+
   const handleProductChange = (rowIndex, productName, value) => {
+    if (value === '') {
+      setTrailers((prev) =>
+        prev.map((row, i) =>
+          i === rowIndex
+            ? { ...row, products: { ...row.products, [productName]: '' } }
+            : row,
+        ),
+      );
+      return;
+    }
+
+    const numValue = Number(value);
+    if (isNaN(numValue)) return;
+
+    const available = getAvailableRemaining(productName, rowIndex);
+    const clampedValue = Math.min(numValue, available);
+    const newValue = clampedValue.toString();
+
     setTrailers((prev) =>
       prev.map((row, i) =>
         i === rowIndex
-          ? {
-              ...row,
-              products: {
-                ...row.products,
-                [productName]: value,
-              },
-            }
+          ? { ...row, products: { ...row.products, [productName]: newValue } }
           : row,
       ),
     );
   };
 
   const handleTrailerSave = () => {
-    // Берём только новые строки (которые не существовали)
     const newTrailers = trailers.filter((row) => !row.isExisting);
 
     const result = newTrailers.flatMap((trailerRow) =>
@@ -287,7 +327,22 @@ function WMModalTrailerModal({ trailer_order }) {
                           e.target.value,
                         )
                       }
+                      min="0"
+                      max={getAvailableRemaining(product.orderProductId, rowIndex)}
+                      style={{ width: '30%' }}
                     />
+                    {!row.isExisting && (
+                      <span
+                        style={{
+                          marginLeft: '8px',
+                          fontSize: '0.9em',
+                          color: '#555',
+                        }}
+                      >
+                        (ост.:{' '}
+                        {getAvailableRemaining(product.orderProductId, rowIndex)})
+                      </span>
+                    )}
                   </td>
                 ))}
               </tr>
