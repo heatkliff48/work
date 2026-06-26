@@ -473,7 +473,7 @@ const OrderCart = React.memo(() => {
       dispatch(
         addDataShipOrder({
           order_id,
-          shipping_date: formatDataValue,
+          shipping_date: hasShippingDate ?? formatDataValue,
         }),
       );
     }
