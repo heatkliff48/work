@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import DatePicker from 'react-datepicker';
@@ -9,11 +9,6 @@ import { addChildOrder } from '#components/redux/actions/ordersAction.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
-
-const parseNum = (v) => {
-  const n = parseFloat(v);
-  return isNaN(n) ? 0 : n;
-};
 
 const round2 = (n) => parseFloat(n.toFixed(2));
 
@@ -125,32 +120,26 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     const numValue = Number(value);
     const maxQuantity = Number(product._quantity);
 
-    // Проверка на пустое значение
     if (value === '') {
       setQuantities((prev) => ({ ...prev, [key]: value }));
       setErrors((prev) => ({ ...prev, [key]: '' }));
       return;
     }
 
-    // Проверка на отрицательное число
     if (numValue < 0) {
       setQuantities((prev) => ({ ...prev, [key]: value }));
       setErrors((prev) => ({ ...prev, [key]: 'Value cannot be negative' }));
       return;
     }
 
-    // Проверка на превышение максимума
     if (numValue > maxQuantity) {
       setErrors((prev) => ({
         ...prev,
         [key]: `Maximum allowed is ${maxQuantity}`,
       }));
-      // Можно либо не обновлять значение, либо установить максимальное
-      // setQuantities((prev) => ({ ...prev, [key]: maxQuantity.toString() }));
       return;
     }
 
-    // Если все хорошо
     setQuantities((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: '' }));
   };
@@ -163,8 +152,9 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       return;
     }
 
-    if (errors) {
-      alert('Errors in quantity input.');
+    const hasErrors = Object.values(errors).some((error) => error !== '');
+    if (hasErrors) {
+      alert('Please fix all quantity errors before confirming.');
       return;
     }
 
