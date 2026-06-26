@@ -83,7 +83,6 @@ function WMModalTrailer({ setTrailerOrder }) {
           fecha: order?.shipping_date,
           orders_products:remaining_quantity_of_pallets,
         };
-        console.log('obj WMModalTrailer.jsx line 86', obj);
 
         acc.push(obj);
 
