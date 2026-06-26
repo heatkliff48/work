@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import DatePicker from 'react-datepicker';
@@ -114,11 +114,45 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [quantities, setQuantities] = useState({});
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const handleDateChange = (date) => setSelectedDate(date);
 
   const handleQuantityChange = (key, value) => {
+    const product = allProducts.find((p) => p._key === key);
+    if (!product) return;
+
+    const numValue = Number(value);
+    const maxQuantity = Number(product._quantity);
+
+    // Проверка на пустое значение
+    if (value === '') {
+      setQuantities((prev) => ({ ...prev, [key]: value }));
+      setErrors((prev) => ({ ...prev, [key]: '' }));
+      return;
+    }
+
+    // Проверка на отрицательное число
+    if (numValue < 0) {
+      setQuantities((prev) => ({ ...prev, [key]: value }));
+      setErrors((prev) => ({ ...prev, [key]: 'Value cannot be negative' }));
+      return;
+    }
+
+    // Проверка на превышение максимума
+    if (numValue > maxQuantity) {
+      setErrors((prev) => ({
+        ...prev,
+        [key]: `Maximum allowed is ${maxQuantity}`,
+      }));
+      // Можно либо не обновлять значение, либо установить максимальное
+      // setQuantities((prev) => ({ ...prev, [key]: maxQuantity.toString() }));
+      return;
+    }
+
+    // Если все хорошо
     setQuantities((prev) => ({ ...prev, [key]: value }));
+    setErrors((prev) => ({ ...prev, [key]: '' }));
   };
 
   const getQuantityKey = (type, id) => `${type}_${id}`;
@@ -126,6 +160,11 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
   const handleConfirm = () => {
     if (!selectedDate) {
       alert('Please select a date.');
+      return;
+    }
+
+    if (errors) {
+      alert('Errors in quantity input.');
       return;
     }
 
@@ -266,6 +305,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       _key: getQuantityKey('product', p.id),
       _label: p.product_article,
       _desc: p.description,
+      _quantity: p.quantity_palet,
     })),
     ...(productLists.dryMixes || []).map((p) => ({
       ...p,
@@ -273,6 +313,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       _key: getQuantityKey('drymix', p.id),
       _label: p.product_article,
       _desc: p.description,
+      _quantity: p.quantity_palet_dry,
     })),
     ...(productLists.anchors || []).map((p) => ({
       ...p,
@@ -280,6 +321,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       _key: getQuantityKey('anchor', p.id),
       _label: p.product_article,
       _desc: p.description,
+      _quantity: p.quantity_palet_anchor,
     })),
     ...(productLists.tools || []).map((p) => ({
       ...p,
@@ -287,6 +329,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       _key: getQuantityKey('tool', p.id),
       _label: p.product_article,
       _desc: p.description,
+      _quantity: p.quantity_ud,
     })),
     ...(productLists.related_materials || []).map((p) => ({
       ...p,
@@ -294,6 +337,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       _key: getQuantityKey('relmat', p.id),
       _label: p.product_article,
       _desc: p.description,
+      _quantity: p.quantity_ud,
     })),
   ];
 
@@ -333,6 +377,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
                 <tr style={{ backgroundColor: '#f0f0f0' }}>
                   <th style={thStyle}>Article</th>
                   <th style={thStyle}>Description</th>
+                  <th style={thStyle}>Quantity in Main Order</th>
                   <th style={thStyle}>Quantity</th>
                 </tr>
               </thead>
@@ -341,10 +386,12 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
                   <tr key={p._key}>
                     <td style={tdStyle}>{p._label}</td>
                     <td style={tdStyle}>{p._desc}</td>
+                    <td style={tdStyle}>{p._quantity}</td>
                     <td style={tdStyle}>
                       <input
                         type="number"
                         min="0"
+                        max={p._quantity}
                         step="1"
                         value={quantities[p._key] ?? ''}
                         onChange={(e) =>
@@ -352,6 +399,11 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
                         }
                         style={{ width: '100px' }}
                       />
+                      {errors[p._key] && (
+                        <div style={{ color: 'red', fontSize: '12px' }}>
+                          {errors[p._key]}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
