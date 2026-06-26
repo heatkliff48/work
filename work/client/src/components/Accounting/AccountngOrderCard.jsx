@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
 import { useUsersContext } from '#components/contexts/UserContext.js';
+import AccountingInvoiceModal from './AccountingInvoiceModal.jsx';
+import { Button } from 'reactstrap';
 
 import '#components/Styles/order-card.css';
 
@@ -29,7 +31,8 @@ const AccountngOrderCard = React.memo(() => {
   const { latestProducts } = useProductsContext();
   const { latestDryMix, latestRelatedMaterials, latestAnchors, latestTools } =
     useProductsTypeJournalContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
   const productListOrder = useSelector((state) => state.productsOfOrders);
   const dispatch = useDispatch();
 
@@ -40,9 +43,19 @@ const AccountngOrderCard = React.memo(() => {
   });
 
   const [status, setStatus] = useState();
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   const filterKeys = useMemo(
-    () => ['id', 'order_id', 'client_id', 'product_id', 'createdAt', 'updatedAt'],
+    () => [
+      'id',
+      'order_id',
+      'client_id',
+      'product_id',
+      'createdAt',
+      'updatedAt',
+      'bitrix_id',
+      'bitrix_client_id',
+    ],
     [],
   );
 
@@ -95,7 +108,12 @@ const AccountngOrderCard = React.memo(() => {
 
   const addProductArticleToOrderList = useCallback(
     (productsOfOrders, productsTable, arrayName) => {
-      if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
+      if (
+        !productsOfOrders ||
+        !productsTable ||
+        !arrayName ||
+        !orderCartData?.id
+      )
         return [];
 
       const updatedOrderProducts = productsOfOrders
@@ -103,7 +121,9 @@ const AccountngOrderCard = React.memo(() => {
         .map((orderProduct) => {
           const id = getCorrectProductId(arrayName);
 
-          const product = productsTable.find((p) => p.id === orderProduct?.[id]);
+          const product = productsTable.find(
+            (p) => p.id === orderProduct?.[id],
+          );
 
           return product
             ? { product_article: product.article, ...orderProduct }
@@ -167,7 +187,11 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools');
+    return addProductArticleToOrderList(
+      toolProductsOfOrders,
+      latestTools,
+      'tools',
+    );
   }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
 
   useEffect(() => {
@@ -185,7 +209,11 @@ const AccountngOrderCard = React.memo(() => {
       latestRelatedMaterials,
       'related_materials',
     );
-  }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
+  }, [
+    relMatProductsOfOrders,
+    latestRelatedMaterials,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedRelatedMaterialsListOrder.length > 0) {
@@ -205,7 +233,10 @@ const AccountngOrderCard = React.memo(() => {
       (el) => el.accessor == newStatus,
     );
 
-    if (new_status_index < status_index || new_status_index - status_index != 1) {
+    if (
+      new_status_index < status_index ||
+      new_status_index - status_index != 1
+    ) {
       alert('Choose another status');
       return;
     }
@@ -256,11 +287,14 @@ const AccountngOrderCard = React.memo(() => {
         vat_result: 0,
       }));
     } else {
-      const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
+      const vat_euro = (
+        (vatValue.vat_procent * final_price_product) /
+        100
+      ).toFixed(2);
+
+      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(
         2,
       );
-
-      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
 
       setVatValue((prev) => ({
         ...prev,
@@ -396,6 +430,11 @@ const AccountngOrderCard = React.memo(() => {
             </div>
           </div>
           <FilesMain userAccess={userAccess} />
+          <div className="footer_button_pdf">
+            <Button color="primary" onClick={() => setIsInvoiceModalOpen(true)}>
+              Generar factura PDF
+            </Button>
+          </div>
           <div className="status-table">
             {accountingStatusList.map((item) => (
               <div key={item.accessor} className="status-row">
@@ -413,6 +452,18 @@ const AccountngOrderCard = React.memo(() => {
           </div>
         </div>
       </div>
+      <AccountingInvoiceModal
+        isOpen={isInvoiceModalOpen}
+        toggle={() => setIsInvoiceModalOpen(false)}
+        orderCartData={orderCartData}
+        productLists={productLists}
+        vatValue={vatValue}
+        latestProducts={latestProducts}
+        latestDryMix={latestDryMix}
+        latestAnchors={latestAnchors}
+        latestTools={latestTools}
+        latestRelatedMaterials={latestRelatedMaterials}
+      />
     </>
   );
 });
