@@ -1,4 +1,3 @@
-import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import React, { useState } from 'react';
 import 'react-international-phone/style.css';
@@ -66,7 +65,6 @@ function PasswordChangeModal(props) {
       </Modal.Body>
       <Modal.Footer>
         <button form="addClientModel">Add User</button>
-        <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>
   );
@@ -77,14 +75,26 @@ function ShowPasswordChangeModal() {
 
   return (
     <>
-      <Button
-        variant="primary"
-        onClick={() => {
-          setModalShow(true);
-        }}
+      <button
+        type="button"
+        className="usr-btn usr-btn--secondary"
+        onClick={() => setModalShow(true)}
       >
-        Change Password
-      </Button>
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="4" y="10" width="16" height="10" rx="2" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+        </svg>
+        Change password
+      </button>
 
       <PasswordChangeModal
         show={modalShow}
