@@ -6,6 +6,13 @@ const {
   OrderToolProducts,
   OrderRelMatProducts,
 } = require('../db/models');
+const myEmitter = require('../src/ee.js');
+const {
+  UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
+  UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
+  UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
+  UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+} = require('../src/constants/event');
 
 class OrdersRepository {
   static async getOrdersListData() {
@@ -974,115 +981,132 @@ class OrdersRepository {
       });
 
       const order_id = childOrder.id;
+      const createdProducts = {
+        products: [],
+        dryMixes: [],
+        anchors: [],
+        tools: [],
+        relMats: [],
+      };
 
       if (products && products.length > 0) {
-        await Promise.all(
-          products.map((p) =>
-            OrdersProducts.create({
-              order_id,
-              product_id: p.product_id,
-              quantity_palet: p.quantity_palet,
-              quantity_m2: p.quantity_m2 || 0,
-              quantity_real: p.quantity_real || 0,
-              price_m2: p.price_m2 || 0,
-              price_m3: p.price_m3 || 0,
-              discount: p.discount || 0,
-              final_price: p.final_price || 0,
-            }),
-          ),
+        createdProducts.products = await OrdersProducts.bulkCreate(
+          products.map((p) => ({
+            order_id,
+            product_id: p.product_id,
+            quantity_palet: p.quantity_palet,
+            quantity_m2: p.quantity_m2 || 0,
+            quantity_real: p.quantity_real || 0,
+            price_m2: p.price_m2 || 0,
+            price_m3: p.price_m3 || 0,
+            discount: p.discount || 0,
+            final_price: p.final_price || 0,
+          })),
         );
       }
 
       if (dryMixes && dryMixes.length > 0) {
-        await Promise.all(
-          dryMixes.map((p) =>
-            OrderDryMixedProducts.create({
-              order_id,
-              dry_mixed_id: p.dry_mixed_id,
-              quantity_palet_dry: p.quantity_palet_dry,
-              quantity_ud: p.quantity_ud || 0,
-              quantity_real_ud: p.quantity_real_ud || 0,
-              total: p.total || 0,
-              discount: p.discount || 0,
-              pvp: p.pvp || 0,
-              final_price: p.final_price || 0,
-            }),
-          ),
+        createdProducts.dryMixes = await OrderDryMixedProducts.bulkCreate(
+          dryMixes.map((p) => ({
+            order_id,
+            dry_mixed_id: p.dry_mixed_id,
+            quantity_palet_dry: p.quantity_palet_dry,
+            quantity_ud: p.quantity_ud || 0,
+            quantity_real_ud: p.quantity_real_ud || 0,
+            total: p.total || 0,
+            discount: p.discount || 0,
+            pvp: p.pvp || 0,
+            final_price: p.final_price || 0,
+          })),
         );
       }
 
       if (anchors && anchors.length > 0) {
-        await Promise.all(
-          anchors.map((p) =>
-            OrderAnchorProducts.create({
-              order_id,
-              anchor_id: p.anchor_id,
-              quantity_palet_anchor: p.quantity_palet_anchor,
-              quantity_ud: p.quantity_ud || 0,
-              quantity_real_ud: p.quantity_real_ud || 0,
-              total: p.total || 0,
-              discount: p.discount || 0,
-              pvp: p.pvp || 0,
-              final_price: p.final_price || 0,
-            }),
-          ),
+        createdProducts.anchors = await OrderAnchorProducts.bulkCreate(
+          anchors.map((p) => ({
+            order_id,
+            anchor_id: p.anchor_id,
+            quantity_palet_anchor: p.quantity_palet_anchor,
+            quantity_ud: p.quantity_ud || 0,
+            quantity_real_ud: p.quantity_real_ud || 0,
+            total: p.total || 0,
+            discount: p.discount || 0,
+            pvp: p.pvp || 0,
+            final_price: p.final_price || 0,
+          })),
         );
       }
 
       if (tools && tools.length > 0) {
-        await Promise.all(
-          tools.map((p) =>
-            OrderToolProducts.create({
-              order_id,
-              tool_id: p.tool_id,
-              quantity_ud: p.quantity_ud,
-              total: p.total || 0,
-              discount: p.discount || 0,
-              pvp: p.pvp || 0,
-              final_price: p.final_price || 0,
-            }),
-          ),
+        createdProducts.tools = await OrderToolProducts.bulkCreate(
+          tools.map((p) => ({
+            order_id,
+            tool_id: p.tool_id,
+            quantity_ud: p.quantity_ud,
+            total: p.total || 0,
+            discount: p.discount || 0,
+            pvp: p.pvp || 0,
+            final_price: p.final_price || 0,
+          })),
         );
       }
 
       if (relMats && relMats.length > 0) {
-        await Promise.all(
-          relMats.map((p) =>
-            OrderRelMatProducts.create({
-              order_id,
-              rel_mat_id: p.rel_mat_id,
-              quantity_ud: p.quantity_ud,
-              total: p.total || 0,
-              discount: p.discount || 0,
-              pvp: p.pvp || 0,
-              final_price: p.final_price || 0,
-            }),
-          ),
+        createdProducts.relMats = await OrderRelMatProducts.bulkCreate(
+          relMats.map((p) => ({
+            order_id,
+            rel_mat_id: p.rel_mat_id,
+            quantity_ud: p.quantity_ud,
+            total: p.total || 0,
+            discount: p.discount || 0,
+            pvp: p.pvp || 0,
+            final_price: p.final_price || 0,
+          })),
         );
       }
 
-      return childOrder;
-    } catch (error) {
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
-        error,
-      );
-      return error;
-    }
-  }
+      // Вместо отправки всего массива, отправляем каждый элемент по отдельности
+      if (createdProducts.dryMixes && createdProducts.dryMixes.length > 0) {
+        createdProducts.dryMixes.forEach((dryMix) => {
+          // Преобразуем Sequelize объект в обычный объект
+          const plainDryMix = dryMix.toJSON ? dryMix.toJSON() : dryMix;
+          myEmitter.emit(UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET, plainDryMix);
+        });
+      }
 
-  static async getDeleteOrder({ order_id }) {
-    try {
-      await OrdersProducts.destroy({ where: { order_id } });
-      await Orders.destroy({ where: { id: order_id } });
+      if (createdProducts.anchors && createdProducts.anchors.length > 0) {
+        createdProducts.anchors.forEach((anchor) => {
+          const plainAnchor = anchor.toJSON ? anchor.toJSON() : anchor;
+          myEmitter.emit(UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET, plainAnchor);
+        });
+      }
 
-      return;
+      if (createdProducts.tools && createdProducts.tools.length > 0) {
+        createdProducts.tools.forEach((tool) => {
+          const plainTool = tool.toJSON ? tool.toJSON() : tool;
+          myEmitter.emit(UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET, plainTool);
+        });
+      }
+
+      if (createdProducts.relMats && createdProducts.relMats.length > 0) {
+        createdProducts.relMats.forEach((relMat) => {
+          const plainRelMat = relMat.toJSON ? relMat.toJSON() : relMat;
+          myEmitter.emit(UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET, plainRelMat);
+        });
+      }
+
+      // Возвращаем полный объект
+      return {
+        ...childOrder.toJSON(),
+        products: createdProducts.products,
+        dryMixes: createdProducts.dryMixes,
+        anchors: createdProducts.anchors,
+        tools: createdProducts.tools,
+        relMats: createdProducts.relMats,
+      };
     } catch (error) {
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
-        error,
-      );
-      return error;
+      console.log('Error in addChildOrder:', error);
+      throw error;
     }
   }
 }
