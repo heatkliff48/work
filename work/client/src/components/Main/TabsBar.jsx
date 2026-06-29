@@ -114,7 +114,9 @@ export default function TabsBar() {
         return prev;
 
       return prev.map((t) =>
-        t.id === current.id ? { ...t, path: location.pathname, title: nextTitle } : t
+        t.id === current.id
+          ? { ...t, path: location.pathname, title: nextTitle }
+          : t,
       );
     });
   }, [location.pathname, activeId]);
@@ -184,6 +186,9 @@ export default function TabsBar() {
   return (
     <div className="tabsbar-container">
       <div className="tabsbar-left">
+        <button className="tabsbar-add-current" onClick={() => navigate(-1)}>
+          ← Back
+        </button>
         <button
           className="tabsbar-add-current"
           title="Duplicate current tab"

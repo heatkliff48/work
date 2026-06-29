@@ -5,10 +5,12 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import WMOCTable from './WMOCTable/WMOCTable';
 
 import '#components/Styles/order-card.css';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
-const WMOrderCard = React.memo(({ selectedOrder }) => {
-  console.log('selectedOrder WMOrderCard.jsx line 10', selectedOrder)
-  const { orderCartData, setOrderCartData, list_of_orders, filterKeysOrder } = useOrderContext();
+const WMOrderCard = React.memo(() => {
+  const { selectedOrder } = useWarehouseContext();
+  const { orderCartData, setOrderCartData, list_of_orders, filterKeysOrder } =
+    useOrderContext();
 
   const { displayNames } = useProjectContext();
   const [ordersStatus, setOrdersStatus] = useState([]);
