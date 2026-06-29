@@ -37,11 +37,8 @@ function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
   //   useUsersContext();
   const { WAREHOUSE_MANAGER_TRAILER_TABLE } = useProjectContext();
-  const {
-    setWmoctProductShippedBD,
-    setSelectedOrder,
-    order_dispatch_data,
-  } = useWarehouseContext();
+  const { setWmoctProductShippedBD, setSelectedOrder, order_dispatch_data } =
+    useWarehouseContext();
   const { list_of_orders, deliveryAddresses, getCurrentOrderInfoHandler } =
     useOrderContext();
 
@@ -91,26 +88,45 @@ function WarehouseManager() {
       return;
     }
 
-    const result = order_dispatch_data.map((item) => {
-      const order = list_of_orders.find((o) => o.id === item.orderId);
+    const groupedData = order_dispatch_data.reduce((acc, item) => {
+      const key = `${item.orderId}_${item.trailer}`;
+
+      if (!acc[key]) {
+        acc[key] = {
+          orderId: item.orderId,
+          trailer: item.trailer,
+          products: [],
+          fecha: item.fecha || '',
+        };
+      }
+
+      acc[key].products.push(`${item.title}: ${item.quantity}`);
+
+      if (item.fecha && !acc[key].fecha) {
+        acc[key].fecha = item.fecha;
+      }
+
+      return acc;
+    }, {});
+
+    const result = Object.values(groupedData).map((group) => {
+      const order = list_of_orders.find((o) => o.id === group.orderId);
       const delivery = deliveryAddresses.find((d) => d.id === order?.del_adr_id);
 
-      const productDisplay = `${item.title || 'Без названия'}: ${item.quantity}`;
-
-      const fecha = item.fecha || order?.due_date || '';
-
       return {
-        order_id: item.orderId,
+        order_id: group.orderId,
         orders_article: order?.article || '',
         projects_name: delivery?.project_name || '',
-        fecha: fecha,
-        orders_products: [productDisplay],
+        fecha: group.fecha || order?.due_date || '',
+        orders_products: group.products,
+        trailer: group.trailer,
       };
     });
 
     setWarehouseMdata(result);
     setWmoctProductShippedBD([]);
   }, [order_dispatch_data, list_of_orders, deliveryAddresses]);
+
   return (
     <>
       <div>
