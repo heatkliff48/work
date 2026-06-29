@@ -31,6 +31,7 @@ import {
 import '#components/Styles/main-pages.css';
 import WMModalTrailer from './WMModal/WMModalTrailer';
 import WMModalTrailerModal from './WMModal/WMModalTrailerModal';
+import { useNavigate } from 'react-router-dom';
 
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
@@ -38,7 +39,6 @@ function WarehouseManager() {
   const { WAREHOUSE_MANAGER_TRAILER_TABLE } = useProjectContext();
   const {
     setWmoctProductShippedBD,
-    selectedOrder,
     setSelectedOrder,
     order_dispatch_data,
   } = useWarehouseContext();
@@ -56,6 +56,7 @@ function WarehouseManager() {
   const [trailer_order, setTrailerOrder] = useState(null);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setWmoctPdfModal(false);
@@ -112,28 +113,26 @@ function WarehouseManager() {
   }, [order_dispatch_data, list_of_orders, deliveryAddresses]);
   return (
     <>
-      {selectedOrder ? (
-        <WMOrderCard selectedOrder={selectedOrder} />
-      ) : (
-        <div>
-          <button onClick={() => setwmmodalTrailer(!wmmodalTrailer)}>
-            Plan nuevo trailer
-          </button>
-          <Table
-            COLUMN_DATA={WAREHOUSE_MANAGER_TRAILER_TABLE}
-            dataOfTable={warehouseMdata}
-            // userAccess={userAccess}
-            onClickButton={() => {}}
-            buttonText={''}
-            tableName={'Order dispatch'}
-            handleRowClick={(row) => {
-              getCurrentOrderInfoHandler({ order_id: row.original.order_id });
+      <div>
+        <button onClick={() => setwmmodalTrailer(!wmmodalTrailer)}>
+          Plan nuevo trailer
+        </button>
+        <Table
+          COLUMN_DATA={WAREHOUSE_MANAGER_TRAILER_TABLE}
+          dataOfTable={warehouseMdata}
+          // userAccess={userAccess}
+          onClickButton={() => {}}
+          buttonText={''}
+          tableName={'Order dispatch'}
+          handleRowClick={(row) => {
+            getCurrentOrderInfoHandler({ order_id: row.original.order_id });
 
-              setSelectedOrder(row.original);
-            }}
-          />
-        </div>
-      )}
+            setSelectedOrder(row.original);
+            navigate('/warehouse-manager/order-card');
+          }}
+        />
+      </div>
+
       {wmmodalTrailer && <WMModalTrailer setTrailerOrder={setTrailerOrder} />}
       {wmmodalTrailerModal && <WMModalTrailerModal trailer_order={trailer_order} />}
     </>
