@@ -4,6 +4,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { addNewWarehouseManagerTrailer } from '#components/redux/actions/warehouseAction.js';
 import { useCallback, useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
 import { useDispatch } from 'react-redux';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
@@ -120,28 +121,36 @@ function WMModalTrailerModal({ trailer_order }) {
     [orderCartData],
   );
 
-  const formatAndValidateDateInput = (value) => {
-    let digits = value.replace(/\D/g, '').slice(0, 8);
+  const parseDate = (dateStr) => {
+    if (!dateStr) return null;
+    const parts = dateStr.split('.');
+    if (parts.length !== 3) return null;
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+    return new Date(year, month, day);
+  };
 
-    if (digits.length >= 2) {
-      const day = Number(digits.slice(0, 2));
+  const formatDate = (date) => {
+    if (!date || isNaN(date.getTime())) return '';
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
 
-      if (day === 0) digits = `01${digits.slice(2)}`;
-    }
-    if (digits.length >= 4) {
-      const month = Number(digits.slice(2, 4));
-      if (month > 12) digits = digits.slice(0, 2) + '12' + digits.slice(4);
-      if (month === 0) digits = digits.slice(0, 2) + '01' + digits.slice(4);
-    }
-    if (digits.length === 8) {
-      const year = Number(digits.slice(4));
-      if (year < 2000) digits = digits.slice(0, 4) + '2000';
-      if (year > 3000) digits = digits.slice(0, 4) + '3000';
-    }
-
-    if (digits.length <= 2) return digits;
-    if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
-    return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
+  const handleDateChange = (index, date) => {
+    const formatted = formatDate(date);
+    setTrailers((prev) =>
+      prev.map((row, i) =>
+        i === index
+          ? {
+              ...row,
+              fecha: formatted,
+            }
+          : row,
+      ),
+    );
   };
 
   const addTrailerRow = () => {
@@ -156,19 +165,6 @@ function WMModalTrailerModal({ trailer_order }) {
       isExisting: false,
     };
     setTrailers((prev) => [...prev, newRow]);
-  };
-
-  const handleDateChange = (index, value) => {
-    setTrailers((prev) =>
-      prev.map((row, i) =>
-        i === index
-          ? {
-              ...row,
-              fecha: formatAndValidateDateInput(value),
-            }
-          : row,
-      ),
-    );
   };
 
   const getProductTotal = (productId) => {
@@ -303,15 +299,14 @@ function WMModalTrailerModal({ trailer_order }) {
               <tr key={row.trailer}>
                 <td>{row.trailer}</td>
                 <td>
-                  <input
-                    value={row.fecha}
+                  <DatePicker
+                    selected={parseDate(row.fecha)}
+                    onChange={(date) => handleDateChange(rowIndex, date)}
                     disabled={row.isExisting}
-                    onChange={(e) =>
-                      handleDateChange(
-                        rowIndex,
-                        formatAndValidateDateInput(e.target.value),
-                      )
-                    }
+                    dateFormat="dd.MM.yyyy"
+                    placeholderText="ДД.ММ.ГГГГ"
+                    className="form-control"
+                    style={{ width: '100%' }}
                   />
                 </td>
                 {trailer_order.map((product) => (
