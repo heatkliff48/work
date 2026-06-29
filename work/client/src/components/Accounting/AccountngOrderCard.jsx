@@ -46,20 +46,6 @@ const AccountngOrderCard = React.memo(() => {
   const [status, setStatus] = useState();
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
-  const filterKeys = useMemo(
-    () => [
-      'id',
-      'order_id',
-      'client_id',
-      'product_id',
-      'createdAt',
-      'updatedAt',
-      'bitrix_id',
-      'bitrix_client_id',
-    ],
-    [],
-  );
-
   const [productLists, setProductLists] = useState({
     products: [],
     dryMixes: [],
