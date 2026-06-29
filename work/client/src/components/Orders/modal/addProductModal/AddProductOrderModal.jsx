@@ -512,9 +512,6 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const { COLUMNS, latestProducts } = useProductsContext();
   const { clientPriceInfo } = useProjectContext();
 
-  const [inProgress, setInProgress] = useState(false);
-  const [haveChangePriceM3, setHaveChangePriceM3] = useState(false);
-
   const dispatch = useDispatch();
 
   function extractProductTitle(description) {
@@ -540,19 +537,22 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       const product = latestProducts.filter((el) => el.id === row.original.id)[0];
       const productTitle = extractProductTitle(product?.description || '');
 
-      let discountFromClient = 0;
+      let originalPrice = product.price;
+      let discount = 0;
+
       if (clientPriceInfo && productTitle) {
         const clientPrice = clientPriceInfo.find(
           (item) =>
             item.title === productTitle &&
             item.client_type === orderCartData?.owner?.price_category,
         );
+
         if (clientPrice) {
-          discountFromClient = clientPrice.discont || 0;
+          discount = Number(clientPrice.discont || 0);
         }
       }
 
-      const newPriceM3 = product?.price * (1 - discountFromClient / 100);
+      const newPriceM3 = product?.price * (1 - discount / 100);
 
       setSelectedProduct(product);
       setProductOfOrder((prev) => ({
@@ -561,18 +561,28 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
         product_title: productTitle,
         description: product?.description,
         product_id: product?.id,
+        originalPrice,
         price_m3: formatFixed(newPriceM3 || 0, 2, ','),
-        discount: discountFromClient?.toFixed(2),
+        discount: discount?.toFixed(2),
       }));
-      setHaveChangePriceM3(false);
     },
     [latestProducts, clientPriceInfo, orderCartData],
   );
 
   const handlePriceM3Change = (e) => {
     const limited = limitDecimalInput(e.target.value, 2);
-    setProductOfOrder((prev) => ({ ...prev, price_m3: limited }));
-    setHaveChangePriceM3(true);
+
+    const price = parseLocalNumber(limited) || 0;
+    const originalPrice = Number(productOfOrder.originalPrice || 0);
+
+    const discount =
+      originalPrice === 0 ? 0 : ((originalPrice - price) / originalPrice) * 100;
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      price_m3: limited,
+      discount: discount.toFixed(2),
+    }));
   };
 
   const handlePriceM3Blur = () => {
@@ -584,8 +594,17 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
   const handleDiscountChange = (e) => {
     const limited = limitDecimalInput(e.target.value, 2);
-    setProductOfOrder((prev) => ({ ...prev, discount: limited }));
-    setHaveChangePriceM3(false);
+
+    const discount = parseLocalNumber(limited) || 0;
+    const originalPrice = Number(productOfOrder.originalPrice || 0);
+
+    const newPrice = originalPrice * (1 - discount / 100);
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      discount: limited,
+      price_m3: formatFixed(newPrice),
+    }));
   };
 
   const handleDiscountBlur = () => {
@@ -663,10 +682,10 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   }, [selectedProduct]);
 
   const final_price_value = useMemo(() => {
-    const priceM3 = parseLocalNumber(productOfOrder.price_m3) || 0;
     const m2 = quantityM2Num;
+    const priceM2 = parseLocalNumber(price_m2_value) || 0;
     const discount = discountNum;
-    const result = (priceM3 * m2 * (100 - discount)) / 100;
+    const result = (priceM2 * m2 * (100 - discount)) / 100;
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -674,7 +693,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
 
     return formatFixed(result, 2, ',');
-  }, [quantityM2Num, discountNum, productOfOrder.price_m3]);
+  }, [quantityM2Num, price_m2_value, discountNum]);
 
   const quantity_real_value = useMemo(() => {
     if (!selectedProduct) return '0,00';
