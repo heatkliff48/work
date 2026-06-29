@@ -155,6 +155,7 @@ import {
   addNewWarehouseSandPowderSocket,
   updateWarehouseSandPowderSocket,
   deleteWarehouseSandPowderSocket,
+  addNewWarehouseManagerTrailerSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -355,6 +356,7 @@ import {
   ADD_NEW_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -807,6 +809,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case DELETE_QUALITY_MANAGEMENT_DATA_SOCKET:
       dispatch(deleteQualityManagementSocket(payload));
+      break;
+
+    case ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET:
+      dispatch(addNewWarehouseManagerTrailerSocket(payload));
       break;
 
     case ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET:

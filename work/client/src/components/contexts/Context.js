@@ -372,11 +372,30 @@ const ProjectContextProvider = ({ children }) => {
       accessor: 'projects_name',
     },
     {
-      Header: 'Delivery due date',
+      Header: 'Delivery date',
       accessor: 'production_date',
     },
     {
       Header: 'Order products',
+      accessor: 'orders_products',
+    },
+  ];
+
+  const WAREHOUSE_MANAGER_TRAILER_TABLE = [
+    {
+      Header: 'Order number',
+      accessor: 'orders_article',
+    },
+    {
+      Header: 'Project name',
+      accessor: 'projects_name',
+    },
+    {
+      Header: 'Delivery due date',
+      accessor: 'fecha',
+    },
+    {
+      Header: 'Remaining quantity of pallets ',
       accessor: 'orders_products',
     },
   ];
@@ -530,6 +549,7 @@ const ProjectContextProvider = ({ children }) => {
     <ProjectContext.Provider
       value={{
         WAREHOUSE_MANAGER_TABLE,
+        WAREHOUSE_MANAGER_TRAILER_TABLE,
         DEFAULT_RAW_MATERIAL_VALUES,
         PRODUCTION_QUALITY,
         user,

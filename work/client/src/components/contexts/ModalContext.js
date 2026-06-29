@@ -7,6 +7,7 @@ export const ModalContextProvider = ({ children }) => {
   const [wmoctModal, setWmoctModal] = useState(false);
   const [wmoctPdfModal, setWmoctPdfModal] = useState(false);
   const [modalRoleCard, setModalRoleCard] = useState(false);
+  const [wmmodalTrailer, setwmmodalTrailer] = useState(false);
   const [warehouseModal, setWarehouseModal] = useState(false);
   const [modalAddClient, setModalAddClient] = useState(false);
   const [modalProductCard, setModalProductCard] = useState(false);
@@ -16,9 +17,10 @@ export const ModalContextProvider = ({ children }) => {
   const [stockBalanceModal, setStockBalanceModal] = useState(false);
   const [productModalOrder, setProductModalOrder] = useState(false);
   const [isModalWindowOpen, setIsModalWindowOpen] = useState(false);
-  const [dimensionTestModal, setDimensionTestModal] = useState(false);
   const [compressTestModal, setCompressTestModal] = useState(false);
+  const [dimensionTestModal, setDimensionTestModal] = useState(false);
   const [warehouseInfoModal, setWarehouseInfoModal] = useState(false);
+  const [wmmodalTrailerModal, setwmmodalTrailerModal] = useState(false);
   const [reserveProductModal, setReserveProductModal] = useState(false);
   const [previewProductModal, setPreviewProductModal] = useState(false);
   const [wmoctPdfAddDataModal, setWmoctPdfAddDataModal] = useState(false);
@@ -97,6 +99,10 @@ export const ModalContextProvider = ({ children }) => {
         setDimensionTestModal,
         compressTestModal,
         setCompressTestModal,
+        wmmodalTrailer,
+        setwmmodalTrailer,
+        wmmodalTrailerModal,
+        setwmmodalTrailerModal,
       }}
     >
       {children}

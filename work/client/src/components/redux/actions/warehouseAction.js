@@ -38,6 +38,8 @@ import {
   GET_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
+  GET_ALL_WAREHOUSE_MANAGER_TRAILER,
+  ADD_NEW_WAREHOUSE_MANAGER_TRAILER,
 } from '../types/warehouseTypes';
 
 export const getAllWarehouse = () => {
@@ -302,5 +304,19 @@ export const updateRawMaterialConsumptionRawMaterialsWarehouse = (
   return {
     type: UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
     payload: rawMaterialsWarehouse,
+  };
+};
+
+//WAREHOUSE MANAGER TRAILER
+export const getWarehouseManagerTrailer = () => {
+  return {
+    type: GET_ALL_WAREHOUSE_MANAGER_TRAILER,
+  };
+};
+
+export const addNewWarehouseManagerTrailer = (new_wh_trailer) => {
+  return {
+    type: ADD_NEW_WAREHOUSE_MANAGER_TRAILER,
+    payload: new_wh_trailer,
   };
 };
