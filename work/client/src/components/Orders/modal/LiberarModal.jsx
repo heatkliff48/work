@@ -271,7 +271,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       owner: orderCartData.owner?.id ?? orderCartData.owner,
       del_adr_id: orderCartData?.deliveryAddress?.id,
       contact_id: orderCartData?.contactInfo?.id,
-      secondary_contact: orderCartData?.secondaryContact ?? null,
+      secondary_contact: orderCartData?.secondaryContact?.client_id ?? null,
       person_in_charge: orderCartData?.person_in_charge ?? 0,
       shipping_date: formattedDate,
       main_order: orderCartData.article,
