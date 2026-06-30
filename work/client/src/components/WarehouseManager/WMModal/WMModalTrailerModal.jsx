@@ -227,6 +227,11 @@ function WMModalTrailerModal({ trailer_order }) {
   const handleTrailerSave = () => {
     const newTrailers = trailers.filter((row) => !row.isExisting);
 
+    if (newTrailers.some((el) => el.fecha == '')) {
+      alert('Fecha is empty! Please, write fecha');
+      return;
+    }
+
     const result = newTrailers.flatMap((trailerRow) =>
       Object.entries(trailerRow.products)
         .filter(([_, quantity]) => quantity !== '' && Number(quantity) > 0)
