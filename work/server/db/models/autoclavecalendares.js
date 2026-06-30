@@ -19,11 +19,12 @@ module.exports = (sequelize, DataTypes) => {
       residual_arrays: DataTypes.INTEGER,
       filled_autoclaves: DataTypes.INTEGER,
       produced_autoclave: DataTypes.INTEGER,
+      total_arrays_cacke_fill_up: DataTypes.INTEGER,
     },
     {
       sequelize,
       modelName: 'AutoclaveCalendares',
-    }
+    },
   );
   return AutoclaveCalendares;
 };

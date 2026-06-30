@@ -27,6 +27,9 @@ module.exports = {
       produced_autoclave: {
         type: Sequelize.INTEGER,
       },
+      total_arrays_cacke_fill_up: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
