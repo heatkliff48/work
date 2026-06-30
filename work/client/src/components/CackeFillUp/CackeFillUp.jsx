@@ -37,6 +37,7 @@ function CackeFillUp() {
 
   const [activeCakeId, setActiveCakeId] = useState(null);
   const [currentProduct, setCurrentProduct] = useState(null);
+  const [autoclave_calendar_update, set_autoclave_calendar_update] = useState(null);
 
   useEffect(() => {
     setCackeFillUp({});
@@ -65,9 +66,12 @@ function CackeFillUp() {
       const accd = autoclave_calendar.find(
         (el) => el.date === batch_in_produce.date,
       );
+      console.log('accd CackeFillUp.jsx line 69', accd);
+      set_autoclave_calendar_update(accd);
 
       const total_cacke =
-        batch_in_produce.quantity_pallets / widthInArray - accd.total_arrays;
+        batch_in_produce.quantity_pallets / widthInArray -
+        accd.total_arrays_cacke_fill_up;
 
       setCackeFillUp({ ...batch_in_produce, total_cacke });
     } else {
@@ -238,11 +242,13 @@ function CackeFillUp() {
         filled_autoclaves: totalAutoclaves,
         produced_autoclave: totalAutoclaves,
         residual_arrays: residual,
+        total_arrays_cacke_fill_up: 0,
       });
     } else {
       result.push({
         ...accd,
         total_arrays: newTotalArrays,
+        total_arrays_cacke_fill_up: allocated,
       });
     }
 
