@@ -237,7 +237,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
-    const price_m3 = productOfOrder.price_m3
+    const price_m3 = productOfOrder.price_m3;
     const result =
       selectedProduct.article.slice(2, 3) == 'N'
         ? (price_m3 * quantity_real_value * (100 - discount)) / 100
@@ -319,9 +319,24 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     }
   };
 
+  // const handlePriceM3Change = (e) => {
+  //   const limited = limitDecimalInput(e.target.value, 2);
+  //   setProductOfOrder((prev) => ({ ...prev, price_m3: limited }));};
+
   const handlePriceM3Change = (e) => {
     const limited = limitDecimalInput(e.target.value, 2);
-    setProductOfOrder((prev) => ({ ...prev, price_m3: limited }));
+
+    const price = parseLocalNumber(limited) || 0;
+    const originalPrice = Number(productOfOrder.originalPrice || 0);
+
+    const discount =
+      originalPrice === 0 ? 0 : ((originalPrice - price) / originalPrice) * 100;
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      price_m3: limited,
+      discount: discount.toFixed(2),
+    }));
   };
 
   const handlePriceM3Blur = () => {
@@ -331,9 +346,24 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     }
   };
 
+  // const handleDiscountChange = (e) => {
+  //   const limited = limitDecimalInput(e.target.value, 2);
+  //   setProductOfOrder((prev) => ({ ...prev, discount: limited }));
+  // };
+
   const handleDiscountChange = (e) => {
     const limited = limitDecimalInput(e.target.value, 2);
-    setProductOfOrder((prev) => ({ ...prev, discount: limited }));
+
+    const discount = parseLocalNumber(limited) || 0;
+    const originalPrice = Number(productOfOrder.originalPrice || 0);
+
+    const newPrice = originalPrice * (1 - discount / 100);
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      discount: limited,
+      price_m3: formatFixed(newPrice),
+    }));
   };
 
   const handleDiscountBlur = () => {

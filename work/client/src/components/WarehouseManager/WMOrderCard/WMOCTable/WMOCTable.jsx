@@ -397,14 +397,13 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   // ]);
 
   useEffect(() => {
-    if (!product_list?.orders_products) return;
+    if (!product_list?.orders_products_articles) return;
 
     setWmoctProductShippedBD([]);
     const shippedBDNext = [];
 
-    const initialProducts = product_list.orders_products
+    const initialProducts = product_list.orders_products_articles
       .map((el) => {
-        
         const match = el.match(/^([^:]+):\s*([\d.,]+)/);
         console.log('match WMOCTable.jsx line 408', match);
         if (!match) {

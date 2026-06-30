@@ -97,10 +97,12 @@ function WarehouseManager() {
           trailer: item.trailer,
           products: [],
           fecha: item.fecha || '',
+          articles: [],
         };
       }
 
       acc[key].products.push(`${item.title}: ${item.quantity}`);
+      acc[key].articles.push(`${item.article}: ${item.quantity}`);
 
       if (item.fecha && !acc[key].fecha) {
         acc[key].fecha = item.fecha;
@@ -119,6 +121,7 @@ function WarehouseManager() {
         projects_name: delivery?.project_name || '',
         fecha: group.fecha || order?.due_date || '',
         orders_products: group.products,
+        orders_products_articles: group.articles,
         trailer: group.trailer,
       };
     });
@@ -126,7 +129,7 @@ function WarehouseManager() {
     setWarehouseMdata(result);
     setWmoctProductShippedBD([]);
   }, [order_dispatch_data, list_of_orders, deliveryAddresses]);
-
+  console.log('warehouseMdata WarehouseManager.jsx line 129', warehouseMdata);
   return (
     <>
       <div>
