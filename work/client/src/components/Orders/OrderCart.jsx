@@ -1316,7 +1316,7 @@ const OrderCart = React.memo(() => {
                         }));
                       }
                     }}
-                    readOnly={orderCartData?.status < 3 ? false : true}
+                    readOnly={orderCartData?.status < 5 ? false : true}
                   />
                 </div>
               </div>
@@ -1340,7 +1340,7 @@ const OrderCart = React.memo(() => {
                         delivery: Number(e.target.value),
                       }));
                     }}
-                    readOnly={orderCartData?.status < 3 ? false : true}
+                    readOnly={orderCartData?.status < 5 ? false : true}
                     disabled={
                       !checkUserAccess(
                         user,
