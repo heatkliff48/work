@@ -26,7 +26,7 @@ function WMModalTrailer({ setTrailerOrder }) {
     anchorProductsOfOrders,
     toolProductsOfOrders,
     getCurrentOrderInfoHandler,
-    // relMatProductsOfOrders,
+    relMatProductsOfOrders,
   } = useOrderContext();
 
   const [warehouse_trailer_data, setWarehouseTrailerData] = useState([]);
@@ -43,6 +43,7 @@ function WMModalTrailer({ setTrailerOrder }) {
           num?.quantity_palet ??
           num?.quantity_palet_dry ??
           num?.quantity_palet_anchor ??
+          num?.quantity_ud ??
           num?.quantity_palet_tool;
         acc += quantity;
         return acc;
@@ -55,6 +56,7 @@ function WMModalTrailer({ setTrailerOrder }) {
       .reduce((acc, order) => {
         const id = order.id;
         const order_products = getRemainingQuantityOfPallets(productsOfOrders, id);
+        const order_tools = getRemainingQuantityOfPallets(toolProductsOfOrders, id);
         const order_dry_mixes = getRemainingQuantityOfPallets(
           dryMixedProductsOfOrders,
           id,
@@ -63,15 +65,17 @@ function WMModalTrailer({ setTrailerOrder }) {
           anchorProductsOfOrders,
           id,
         );
-        const order_tools = getRemainingQuantityOfPallets(toolProductsOfOrders, id);
-        // const order_rel_mats = getRemainingQuantityOfPallets(
-        //   relMatProductsOfOrders,
-        //   id,
-        // );
+        const order_rel_mats = getRemainingQuantityOfPallets(
+          relMatProductsOfOrders,
+          id,
+        );
 
         const remaining_quantity_of_pallets =
-          order_products + order_dry_mixes + order_anchors + order_tools;
-        // + order_rel_mats;
+          order_products +
+          order_dry_mixes +
+          order_anchors +
+          order_tools +
+          order_rel_mats;
 
         const del_adr = deliveryAddresses?.find(
           (del) => del?.id == order?.del_adr_id,
@@ -81,7 +85,7 @@ function WMModalTrailer({ setTrailerOrder }) {
           orders_article: order.article,
           projects_name: del_adr?.project_name,
           fecha: order?.shipping_date,
-          orders_products:remaining_quantity_of_pallets,
+          orders_products: remaining_quantity_of_pallets,
         };
 
         acc.push(obj);
@@ -132,6 +136,13 @@ function WMModalTrailer({ setTrailerOrder }) {
         orderRows: toolProductsOfOrders,
         productTable: latestTools,
         orderProductIdKey: 'tool_id',
+        quantityKey: 'quantity_ud',
+      },
+      {
+        type: 'relMat',
+        orderRows: relMatProductsOfOrders,
+        productTable: latestRelatedMaterials,
+        orderProductIdKey: 'rel_mat_id',
         quantityKey: 'quantity_ud',
       },
     ];
