@@ -23,6 +23,8 @@ function WMModalTrailerModal({ trailer_order }) {
 
   const [trailers, setTrailers] = useState([]);
 
+  const getProductKey = (product) => `${product.type}_${product.orderProductId}`;
+
   useEffect(() => {
     if (!wmmodalTrailerModal) return;
 
@@ -36,7 +38,7 @@ function WMModalTrailerModal({ trailer_order }) {
           trailer: 1,
           fecha: '',
           products: Object.fromEntries(
-            trailer_order.map((product) => [product.orderProductId, '']),
+            trailer_order.map((product) => [getProductKey(product), '']),
           ),
           product_table: '',
           orderId: orderCartData?.id || null,
@@ -57,15 +59,24 @@ function WMModalTrailerModal({ trailer_order }) {
           orderId: orderCartData?.id,
         };
       }
-      acc[trailer].products[orderProductId] = quantity;
+
+      const product = trailer_order.find(
+        (p) => p.orderProductId === orderProductId && p.type === item.product_table,
+      );
+
+      if (product) {
+        acc[trailer].products[getProductKey(product)] = quantity;
+      }
       return acc;
     }, {});
 
     const existingTrailers = Object.values(grouped).map((trailerObj) => {
       const fullProducts = {};
+
       trailer_order.forEach((product) => {
-        fullProducts[product.orderProductId] =
-          trailerObj.products[product.orderProductId] ?? '';
+        const key = getProductKey(product);
+
+        fullProducts[key] = trailerObj.products[key] ?? '';
       });
       return {
         ...trailerObj,
@@ -84,7 +95,7 @@ function WMModalTrailerModal({ trailer_order }) {
       trailer: maxTrailer + 1,
       fecha: '',
       products: Object.fromEntries(
-        trailer_order.map((product) => [product.orderProductId, '']),
+        trailer_order.map((product) => [getProductKey(product), '']),
       ),
       product_table: '',
       orderId: orderCartData?.id || null,
@@ -158,7 +169,7 @@ function WMModalTrailerModal({ trailer_order }) {
       trailer: trailers.length + 1,
       fecha: '',
       products: Object.fromEntries(
-        trailer_order.map((product) => [product.orderProductId, '']),
+        trailer_order.map((product) => [getProductKey(product), '']),
       ),
       product_table: '',
       orderId: orderCartData?.id || null,
@@ -167,29 +178,35 @@ function WMModalTrailerModal({ trailer_order }) {
     setTrailers((prev) => [...prev, newRow]);
   };
 
-  const getProductTotal = (productId) => {
-    const product = trailer_order.find((p) => p.orderProductId === productId);
+  const getProductTotal = (productKey) => {
+    const product = trailer_order.find((p) => getProductKey(p) === productKey);
+
     return product?.quantity ?? 0;
   };
 
-  const getShippedQuantity = (productId) => {
-    const orderId = orderCartData?.id;
-    if (!orderId) return 0;
+  const getShippedQuantity = (productKey) => {
+    const product = trailer_order.find((p) => getProductKey(p) === productKey);
+
+    if (!product) return 0;
+
     return order_dispatch_data
       .filter(
-        (item) => item.orderId === orderId && item.orderProductId === productId,
+        (item) =>
+          item.orderId === orderCartData?.id &&
+          item.orderProductId === product.orderProductId &&
+          item.product_table === product.type,
       )
-      .reduce((sum, item) => sum + (item.quantity ?? 0), 0);
+      .reduce((sum, item) => sum + item.quantity, 0);
   };
 
-  const getAvailableRemaining = (productId, excludeRowIndex = -1) => {
-    const total = getProductTotal(productId);
-    const shipped = getShippedQuantity(productId);
+  const getAvailableRemaining = (productKey, excludeRowIndex = -1) => {
+    const total = getProductTotal(productKey);
+    const shipped = getShippedQuantity(productKey);
     let remaining = total - shipped;
 
     trailers.forEach((row, idx) => {
       if (idx === excludeRowIndex || row.isExisting) return;
-      const val = Number(row.products[productId]) || 0;
+      const val = Number(row.products[productKey]) || 0;
       remaining -= val;
     });
 
@@ -235,19 +252,22 @@ function WMModalTrailerModal({ trailer_order }) {
     const result = newTrailers.flatMap((trailerRow) =>
       Object.entries(trailerRow.products)
         .filter(([_, quantity]) => quantity !== '' && Number(quantity) > 0)
-        .map(([orderProductId, quantity]) => {
-          const product = trailer_order.find(
-            (p) => p.orderProductId === Number(orderProductId),
+        .map(([orderProductKey, quantity]) => {
+          const product = trailer_order?.find(
+            (p) => getProductKey(p) === orderProductKey,
           );
+
+          if (!product) return null;
+
           return {
             trailer: trailerRow.trailer,
             fecha: trailerRow.fecha,
-            orderProductId: Number(orderProductId),
+            orderProductId: product.orderProductId,
             quantity: Number(quantity),
-            product_table: product ? product.type : null,
+            product_table: product.type,
             orderId: trailerRow.orderId,
-            title: product ? product.title : null,
-            article: product ? product.article : null,
+            title: product.title,
+            article: product.article,
           };
         }),
     );
@@ -295,7 +315,7 @@ function WMModalTrailerModal({ trailer_order }) {
               <th>Trailer</th>
               <th>Fecha</th>
               {trailer_order.map((product) => (
-                <th key={product.orderProductId}>{product.title}</th>
+                <th key={getProductKey(product)}>{product.title}</th>
               ))}
             </tr>
           </thead>
@@ -315,20 +335,20 @@ function WMModalTrailerModal({ trailer_order }) {
                   />
                 </td>
                 {trailer_order.map((product) => (
-                  <td key={product.orderProductId}>
+                  <td key={getProductKey(product)}>
                     <input
                       type="number"
-                      value={row.products[product.orderProductId] || ''}
+                      value={row.products[getProductKey(product)] || ''}
                       disabled={row.isExisting}
                       onChange={(e) =>
                         handleProductChange(
                           rowIndex,
-                          product.orderProductId,
+                          getProductKey(product),
                           e.target.value,
                         )
                       }
                       min="0"
-                      max={getAvailableRemaining(product.orderProductId, rowIndex)}
+                      max={getAvailableRemaining(getProductKey(product), rowIndex)}
                       style={{ width: '30%' }}
                     />
                     {!row.isExisting && (
@@ -340,7 +360,7 @@ function WMModalTrailerModal({ trailer_order }) {
                         }}
                       >
                         (ост.:{' '}
-                        {getAvailableRemaining(product.orderProductId, rowIndex)})
+                        {getAvailableRemaining(getProductKey(product), rowIndex)})
                       </span>
                     )}
                   </td>

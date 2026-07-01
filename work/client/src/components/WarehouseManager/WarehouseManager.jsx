@@ -101,7 +101,7 @@ function WarehouseManager() {
         };
       }
 
-      acc[key].products.push(`${item.title}: ${item.quantity}`);
+      acc[key].products.push(`${item.title}: ${item.quantity}, `);
       acc[key].articles.push(`${item.article}: ${item.quantity}`);
 
       if (item.fecha && !acc[key].fecha) {
@@ -129,7 +129,9 @@ function WarehouseManager() {
     setWarehouseMdata(result);
     setWmoctProductShippedBD([]);
   }, [order_dispatch_data, list_of_orders, deliveryAddresses]);
+
   console.log('warehouseMdata WarehouseManager.jsx line 129', warehouseMdata);
+
   return (
     <>
       <div>
