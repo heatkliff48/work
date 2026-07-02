@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { FormGroup, Input, Label } from 'reactstrap';
 import { useOrderContext } from '../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
 import {
@@ -11,6 +12,7 @@ import {
 } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
+import { useState } from 'react';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -57,6 +59,15 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const dispatch = useDispatch();
 
+  const [isReturn, setIsReturn] = useState(productOfOrder?.final_price < 0);
+
+  useEffect(() => {
+    console.log(
+      productOfOrder,
+      'productOfOrder OrderProductCardInfoModal.jsx line 66',
+    );
+  }, [productOfOrder]);
+
   const handleProductListOrderChange = (e) => {
     setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -88,7 +99,8 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
           }
         }
 
-        const newPriceM3 = selectedProduct?.price * (1 - discountFromClient / 100);
+        const newPriceM3 =
+          selectedProduct?.price * (1 - discountFromClient / 100);
         setProductOfOrder((prev) => ({ ...prev, price_m3: newPriceM3 }));
       }
     }
@@ -152,7 +164,9 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const quantity_real_value = useMemo(() => {
     if (selectedProduct.article.slice(2, 3) == 'N') {
-      const result = (quantity_palet_value * (selectedProduct?.m2 || 1))?.toFixed(2);
+      const result = (
+        quantity_palet_value * (selectedProduct?.m2 || 1)
+      )?.toFixed(2);
 
       setProductOfOrder((prev) => ({
         ...prev,
@@ -226,7 +240,9 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder((prev) => ({
       ...prev,
       price_m2:
-        selectedProduct.article.slice(2, 3) == 'N' ? result : productOfOrder?.pvp,
+        selectedProduct.article.slice(2, 3) == 'N'
+          ? result
+          : productOfOrder?.pvp,
     }));
     return result;
   }, [
@@ -261,17 +277,20 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   Math.abs(100 - discount)) /
                 100;
 
+    const finalResult = isReturn ? -Math.abs(result) : Math.abs(result);
+
     setProductOfOrder((prev) => ({
       ...prev,
-      final_price: result.toFixed(2),
+      final_price: finalResult.toFixed(2),
     }));
-    return result.toFixed(2);
+    return finalResult.toFixed(2);
   }, [
     productOfOrder.price_m3,
     quantity_real_value,
     productOfOrder?.discount,
     selectedProduct?.price_per_unit,
     productOfOrder?.quantity_ud,
+    isReturn,
   ]);
 
   const pvp_value = useMemo(() => {
@@ -309,7 +328,9 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
     if (!isNaN(palets) && selectedProduct) {
       const m2PerPallet =
-        selectedProduct.form === 'U-block' ? selectedProduct.m : selectedProduct.m2;
+        selectedProduct.form === 'U-block'
+          ? selectedProduct.m
+          : selectedProduct.m2;
       const newM2 = palets * m2PerPallet;
       setProductOfOrder((prev) => ({
         ...prev,
@@ -383,7 +404,9 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
     if (!isNaN(m2) && selectedProduct) {
       const m2PerPallet =
-        selectedProduct.form === 'U-block' ? selectedProduct.m : selectedProduct.m2;
+        selectedProduct.form === 'U-block'
+          ? selectedProduct.m
+          : selectedProduct.m2;
       const palets = Math.ceil(m2 / m2PerPallet);
       setProductOfOrder((prev) => ({
         ...prev,
@@ -393,6 +416,12 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) {
+      setIsReturn(false);
+    }
+  }, [isOpen]);
+
   return (
     <div>
       <Modal
@@ -401,6 +430,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
           toggle();
           setProductOfOrder({});
           setSelectedProduct({});
+          setIsReturn(false);
         }}
       >
         <ModalHeader
@@ -408,6 +438,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
             toggle();
             setProductOfOrder({});
             setSelectedProduct({});
+            setIsReturn(false);
           }}
         >
           <p>Fill in the remaining parameters</p>
@@ -556,6 +587,16 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                       value={final_price_value}
                       readOnly
                     />
+                    <FormGroup check className="mb-3">
+                      <Label check>
+                        <Input
+                          type="checkbox"
+                          checked={isReturn}
+                          onChange={(e) => setIsReturn(e.target.checked)}
+                        />{' '}
+                        Return
+                      </Label>
+                    </FormGroup>
                   </>
                 );
 
@@ -589,7 +630,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
           </>
         </ModalBody>
         <ModalFooter>
-          <button onClick={addProductOrder}>Add product</button>
+          <button onClick={addProductOrder}>Change product info</button>
         </ModalFooter>
       </Modal>
     </div>
