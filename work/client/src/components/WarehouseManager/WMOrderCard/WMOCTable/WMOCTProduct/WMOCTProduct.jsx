@@ -1,4 +1,5 @@
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { Fragment } from 'react';
 
@@ -17,6 +18,16 @@ const WMOCTProduct = ({
     wmoctPdfAddDataModal,
     setWmoctPdfAddDataModal,
   } = useModalContext();
+  const { list_of_orders } = useOrderContext();
+
+  console.log('wmoctProduct WMOCTProduct.jsx line 21', wmoctProduct);
+
+  const onSaveHandler = () => {
+    const order_id = wmoctProduct[0].order_id;
+    const right_order = list_of_orders.find((el) => el.id == order_id);
+    if (!right_order) return false;
+    return right_order.status >= 8;
+  };
 
   return (
     <div className="overflow-auto">
@@ -60,7 +71,7 @@ const WMOCTProduct = ({
                       <button
                         disabled={isDisableMinus(
                           product.article,
-                          product.batches[0]
+                          product.batches[0],
                         )}
                         onClick={() => handleMinus(product, 0)}
                       >
@@ -139,13 +150,15 @@ const WMOCTProduct = ({
             </Fragment>
           ))}
         </tbody>
-        <button
-          onClick={() => {
-            setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
-          }}
-        >
-          SAVE
-        </button>
+        {onSaveHandler() && (
+          <button
+            onClick={() => {
+              setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
+            }}
+          >
+            SAVE
+          </button>
+        )}
       </table>
     </div>
   );
