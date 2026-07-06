@@ -1240,6 +1240,8 @@ const OrderCart = React.memo(() => {
           filterKeys={filterKeysOrder}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
+          vatValue={vatValue}
+          setVatValue={setVatValue}
         />
 
         <div className="footer_data">
@@ -1270,7 +1272,7 @@ const OrderCart = React.memo(() => {
                         }));
                       }
                     }}
-                    readOnly={orderCartData?.status < 3 ? false : true}
+                    readOnly={orderCartData?.status < 5 ? false : true}
                   />
                 </div>
               </div>
@@ -1294,7 +1296,7 @@ const OrderCart = React.memo(() => {
                         delivery: Number(e.target.value),
                       }));
                     }}
-                    readOnly={orderCartData?.status < 3 ? false : true}
+                    readOnly={orderCartData?.status < 5 ? false : true}
                     disabled={
                       !checkUserAccess(user, roles, 'orders_save_delivery_price')
                         ?.canWrite
@@ -1322,7 +1324,7 @@ const OrderCart = React.memo(() => {
               </div>
               {vatValue.vat_result_del > 0 ? (
                 <div className="vat_result_del">
-                  <p>Result with delivery priice</p>
+                  <p>Result with delivery price</p>
                   <p>{vatValue.vat_result_del}</p>
                 </div>
               ) : null}

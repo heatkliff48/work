@@ -1,8 +1,10 @@
-import { useModalContext } from "#components/contexts/ModalContext.js";
-import { useOrderContext } from "#components/contexts/OrderContext.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { Button } from "reactstrap";
-import AddRelatedMaterialProductModal from "../modal/addProductModal/AddRelatedMaterialProductModal";
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { Button } from 'reactstrap';
+import AddRelatedMaterialProductModal from '../modal/addProductModal/AddRelatedMaterialProductModal';
+import { useState } from 'react';
+import ReturnCheckbox from './ReturnCheckbox';
 
 const RelatedMaterialJournalTableOrder = ({
   productListOrder,
@@ -10,6 +12,8 @@ const RelatedMaterialJournalTableOrder = ({
   filterKeys,
   deleteHandler,
   displayNames = {},
+  vatValue,
+  setVatValue,
 }) => {
   const { setNewOrder, orderCartData } = useOrderContext();
   const {
@@ -18,8 +22,17 @@ const RelatedMaterialJournalTableOrder = ({
   } = useModalContext();
   const { userAccess } = useUsersContext();
 
+  const [returnCheckedProducts, setReturnCheckedProducts] = useState({});
+
+  const handleReturnCheckChange = (productId, isChecked) => {
+    setReturnCheckedProducts((prev) => ({
+      ...prev,
+      [productId]: isChecked,
+    }));
+  };
+
   const columns = Object.keys(productListOrder?.[0] || {}).filter(
-    (key) => !filterKeys.includes(key) && key !== "warehouse_id" && key
+    (key) => !filterKeys.includes(key) && key !== 'warehouse_id' && key,
   );
 
   return (
@@ -29,15 +42,15 @@ const RelatedMaterialJournalTableOrder = ({
           isOpen={relatedMaterialProductModalOrder}
           toggle={() =>
             setRelatedMaterialProductModalOrder(
-              !relatedMaterialProductModalOrder
+              !relatedMaterialProductModalOrder,
             )
           }
         />
-      )}{" "}
+      )}{' '}
       <table className="product-table">
         <thead>
           <tr>
-            <td colSpan={columns.length + 1} style={{ fontWeight: "bold" }}>
+            <td colSpan={columns.length + 1} style={{ fontWeight: 'bold' }}>
               Related Materials
             </td>
           </tr>
@@ -45,7 +58,8 @@ const RelatedMaterialJournalTableOrder = ({
             {columns.map((key) => (
               <th key={key}>{displayNames[key] || key}</th>
             ))}
-            <th>Actions</th>
+            <th>Return</th>
+            <th>Delete</th>
           </tr>
         </thead>
 
@@ -55,15 +69,26 @@ const RelatedMaterialJournalTableOrder = ({
               <tr
                 key={product?.id || Math.random()}
                 onClick={() => onProductClickHandler(product)}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: 'pointer' }}
               >
                 {columns.map((key) => {
                   let value = product[key];
-                  if (value && typeof value === "object") {
+                  if (value && typeof value === 'object') {
                     value = JSON.stringify(value);
                   }
-                  return <td key={key}>{value ?? ""}</td>;
+                  return <td key={key}>{value ?? ''}</td>;
                 })}
+
+                <td onClick={(e) => e.stopPropagation()}>
+                  {product?.final_price < 0 ? <p>Return</p> : <p>No return</p>}
+                  {/* <ReturnCheckbox
+                    product={product}
+                    vatValue={vatValue}
+                    setVatValue={setVatValue}
+                    isChecked={returnCheckedProducts[product?.id] || false}
+                    onCheckChange={handleReturnCheckChange}
+                  /> */}
+                </td>
 
                 <td onClick={(e) => e.stopPropagation()}>
                   {orderCartData?.status < 3 && (
@@ -81,7 +106,7 @@ const RelatedMaterialJournalTableOrder = ({
 
           {userAccess?.canWrite && orderCartData?.status < 3 && (
             <tr>
-              <td colSpan={columns.length + 1}>
+              <td colSpan={columns.length + 2}>
                 <Button
                   block
                   onClick={() => {
@@ -93,7 +118,7 @@ const RelatedMaterialJournalTableOrder = ({
                       del_adr_id: orderCartData.deliveryAddress?.id,
                     }));
                     setRelatedMaterialProductModalOrder(
-                      !relatedMaterialProductModalOrder
+                      !relatedMaterialProductModalOrder,
                     );
                   }}
                 >

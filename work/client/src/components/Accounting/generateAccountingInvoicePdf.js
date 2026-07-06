@@ -627,13 +627,22 @@ const drawObservationsAndSignature = async (
   doc.rect(x, y + hdrH, W.obs, envH);
   setFont(doc, 7, 'normal');
   doc.setTextColor(0, 0, 0);
-  // Center the env register text vertically and horizontally
+
+  const descriptionH = envH * 0.7;
+  const commentH = envH * 0.3;
+
   const envLines = doc.splitTextToSize(description, textW);
   const envLH = 3.0;
   const envTotalH = envLines.length * envLH;
-  const envStartY = y + hdrH + (envH - envTotalH) / 2 + envLH;
+  const envStartY = y + hdrH + (descriptionH - envTotalH) / 2 + envLH;
+
   envLines.forEach((line, i) => {
     doc.text(line, x + W.obs / 2, envStartY + i * envLH, { align: 'center' });
+  });
+
+  const commentY = y + hdrH + descriptionH + 2;
+  doc.text(INVOICE_DEFAULTS.observacionesComment, textX, commentY, {
+    maxWidth: textW,
   });
 
   // ── Sub-cell 2: bank footer + payer note together ─────────────────────────────
