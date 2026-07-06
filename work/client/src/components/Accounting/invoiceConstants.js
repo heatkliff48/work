@@ -1,8 +1,5 @@
 export const COMPANY_INFO = {
-  nameLines: [
-    'BAUBLOCK MATERIALES AVANZADOS DE',
-    'CONSTRUCCION SL, B16868028',
-  ],
+  nameLines: ['BAUBLOCK MATERIALES AVANZADOS DE', 'CONSTRUCCION SL, B16868028'],
   addressLines: [
     'Dirección: CALLE ALBERT EINSTEIN, NUM. 21',
     '11500, EL PUERTO DE SANTA MARÍA, Cádiz',
@@ -21,6 +18,7 @@ export const INVOICE_DEFAULTS = {
   payerNote: 'El pagador es responsable de todas las comisiones bancarias',
   envRegister: '"Nº de Registro de productor ENV/2025/000053772"',
   currency: 'EUR',
+  observacionesComment: 'Nº de Registro de productor ENV/2025/000053772',
 };
 
 export const ID_TYPE_OPTIONS = [
