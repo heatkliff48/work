@@ -108,6 +108,28 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const pieces_per_pallet = selectedProduct?.pieces_per_unit ?? 0;
 
+  const originalPrice = useMemo(() => {
+    switch (selectedProduct.article.slice(2, 3)) {
+      case 'N':
+        return Number(selectedProduct?.price || 0);
+
+      case 'M':
+        return Number(selectedProduct?.price_per_unit || 0);
+
+      case 'F':
+        return Number(selectedProduct?.price_per_unit || 0);
+
+      case 'T':
+        return Number(selectedProduct?.price_per_unit || 0);
+
+      case 'P':
+        return Number(selectedProduct?.price_per_unit || 0);
+
+      default:
+        return 0;
+    }
+  }, [selectedProduct]);
+
   const quantity_palet_value = useMemo(() => {
     if (!selectedProduct) return;
     if (!productOfOrder?.quantity_m2) productOfOrder.quantity_m2 = 0;
@@ -237,7 +259,8 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
-    const price_m3 = productOfOrder.price_m3;
+    const price_m3 = parseLocalNumber(productOfOrder.price_m3);
+
     const result =
       selectedProduct.article.slice(2, 3) == 'N'
         ? (price_m3 * quantity_real_value * (100 - discount)) / 100
@@ -260,6 +283,8 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   productOfOrder?.quantity_ud *
                   Math.abs(100 - discount)) /
                 100;
+
+    console.log('result OrderProductCardInfoModal.jsx line 287', result);
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -327,7 +352,6 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     const limited = limitDecimalInput(e.target.value, 2);
 
     const price = parseLocalNumber(limited) || 0;
-    const originalPrice = Number(productOfOrder.originalPrice || 0);
 
     const discount =
       originalPrice === 0 ? 0 : ((originalPrice - price) / originalPrice) * 100;
@@ -355,8 +379,6 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     const limited = limitDecimalInput(e.target.value, 2);
 
     const discount = parseLocalNumber(limited) || 0;
-    const originalPrice = Number(productOfOrder.originalPrice || 0);
-
     const newPrice = originalPrice * (1 - discount / 100);
 
     setProductOfOrder((prev) => ({
