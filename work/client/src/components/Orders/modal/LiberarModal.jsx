@@ -88,11 +88,12 @@ function calcToolFields(orderRow, newUd, catalogTools) {
 function calcRelMatFields(orderRow, newUd, catalogRelMats) {
   const catalog = catalogRelMats.find((p) => p.id === orderRow.rel_mat_id);
   if (!catalog) return null;
+  const sign = Math.sign(orderRow.final_price) || 1;
 
   const discount = parseFloat(orderRow.discount) || 0;
   const total = round2(newUd);
   const final_price = round2(
-    (catalog.price_per_unit * newUd * (100 - discount)) / 100,
+    (sign * (catalog.price_per_unit * newUd * (100 - discount))) / 100,
   );
   const pvp = newUd > 0 ? round2(final_price / newUd) : 0;
 
@@ -120,9 +121,10 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     const numValue = Number(value);
     const maxQuantity = Number(product._quantity);
 
+    setErrors((prev) => ({ ...prev, [key]: '' }));
+
     if (value === '') {
       setQuantities((prev) => ({ ...prev, [key]: value }));
-      setErrors((prev) => ({ ...prev, [key]: '' }));
       return;
     }
 
@@ -133,6 +135,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     }
 
     if (numValue > maxQuantity) {
+      setQuantities((prev) => ({ ...prev, [key]: value }));
       setErrors((prev) => ({
         ...prev,
         [key]: `Maximum allowed is ${maxQuantity}`,
@@ -141,7 +144,6 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     }
 
     setQuantities((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({ ...prev, [key]: '' }));
   };
 
   const getQuantityKey = (type, id) => `${type}_${id}`;
