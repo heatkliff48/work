@@ -196,7 +196,9 @@ function WarehouseManager() {
       </div>
 
       {wmmodalTrailer && <WMModalTrailer setTrailerOrder={setTrailerOrder} />}
-      {wmmodalTrailerModal && <WMModalTrailerModal trailer_order={trailer_order} />}
+      {wmmodalTrailerModal && (
+        <WMModalTrailerModal trailer_order={trailer_order} />
+      )}
     </>
   );
 }

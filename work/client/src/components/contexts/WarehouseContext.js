@@ -268,7 +268,9 @@ const WarehouseContextProvider = ({ children }) => {
 
   const warehouse_data = useSelector((state) => state.warehouse);
   const autoclave_calendar = useSelector((state) => state.autoclave_calendar);
-  const dry_mixes_warehouse_data = useSelector((state) => state.dryMixesWarehouse);
+  const dry_mixes_warehouse_data = useSelector(
+    (state) => state.dryMixesWarehouse,
+  );
   const related_materials_warehouse_data = useSelector(
     (state) => state.relatedMaterialsWarehouse,
   );
@@ -284,7 +286,9 @@ const WarehouseContextProvider = ({ children }) => {
     relMat: related_materials_warehouse_data,
   };
 
-  const list_of_reserved_products = useSelector((state) => state.reservedProducts);
+  const list_of_reserved_products = useSelector(
+    (state) => state.reservedProducts,
+  );
 
   const list_of_dry_mix_reserved_products = useSelector(
     (state) => state.reservedDryMixedProducts,
@@ -316,7 +320,9 @@ const WarehouseContextProvider = ({ children }) => {
     (state) => state.rawMaterialsWarehouse,
   );
 
-  const warehouse_sand_slurry = useSelector((state) => state.warehouseSandSlurry);
+  const warehouse_sand_slurry = useSelector(
+    (state) => state.warehouseSandSlurry,
+  );
 
   const reservedMap = {
     product: list_of_reserved_products,
@@ -342,7 +348,9 @@ const WarehouseContextProvider = ({ children }) => {
   const [wmoctProductShippedBD, setWmoctProductShippedBD] = useState([]);
   const [listOfOrderedAuxilary, setListOfOrderedAuxilary] = useState([]);
   const [wmoctProductDeltaForPdf, setWmoctProductDeltaForPdf] = useState([]);
-  const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
+  const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState(
+    [],
+  );
 
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_orders = useSelector((state) => state.orders);
@@ -394,7 +402,8 @@ const WarehouseContextProvider = ({ children }) => {
     const certificate = product?.certificate?.slice(0, 1);
     const density = product?.density?.toString().slice(0, 1);
 
-    const articleId = warehouse_data.length === 0 ? 1 : warehouse_data.length + 1;
+    const articleId =
+      warehouse_data.length === 0 ? 1 : warehouse_data.length + 1;
     versionNumber = `0000000${articleId}`.slice(-6);
 
     const warehouseArticle = `S00${certificate}${density}${year}${month}${day}${versionNumber}`;
@@ -1120,7 +1129,10 @@ const WarehouseContextProvider = ({ children }) => {
 
       if (!art) continue;
 
-      producedByArticle.set(art, (producedByArticle.get(art) || 0) + producedUnits);
+      producedByArticle.set(
+        art,
+        (producedByArticle.get(art) || 0) + producedUnits,
+      );
     }
 
     // Распределение произведённого: идём по заказам (после сортировки) и "раздаём"
@@ -1207,7 +1219,8 @@ const WarehouseContextProvider = ({ children }) => {
     const fullyReservedOrders = Array.from(ordersMap.entries())
       .filter(([orderArticle, items]) =>
         items.every(
-          (item) => Number(item.quantity) === Number(item.quantity_in_warehouse),
+          (item) =>
+            Number(item.quantity) === Number(item.quantity_in_warehouse),
         ),
       )
       .map(([orderArticle]) => orderArticle);

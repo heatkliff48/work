@@ -107,7 +107,12 @@ const FacturaOrderCard = React.memo(() => {
 
   const addProductArticleToOrderList = useCallback(
     (productsOfOrders, productsTable, arrayName) => {
-      if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
+      if (
+        !productsOfOrders ||
+        !productsTable ||
+        !arrayName ||
+        !orderCartData?.id
+      )
         return [];
 
       const updatedOrderProducts = productsOfOrders
@@ -115,7 +120,9 @@ const FacturaOrderCard = React.memo(() => {
         .map((orderProduct) => {
           const id = getCorrectProductId(arrayName);
 
-          const product = productsTable.find((p) => p.id === orderProduct?.[id]);
+          const product = productsTable.find(
+            (p) => p.id === orderProduct?.[id],
+          );
 
           return product
             ? { product_article: product.article, ...orderProduct }
@@ -179,7 +186,11 @@ const FacturaOrderCard = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools');
+    return addProductArticleToOrderList(
+      toolProductsOfOrders,
+      latestTools,
+      'tools',
+    );
   }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
 
   useEffect(() => {
@@ -197,7 +208,11 @@ const FacturaOrderCard = React.memo(() => {
       latestRelatedMaterials,
       'related_materials',
     );
-  }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
+  }, [
+    relMatProductsOfOrders,
+    latestRelatedMaterials,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedRelatedMaterialsListOrder.length > 0) {
@@ -235,11 +250,14 @@ const FacturaOrderCard = React.memo(() => {
         vat_result: 0,
       }));
     } else {
-      const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
+      const vat_euro = (
+        (vatValue.vat_procent * final_price_product) /
+        100
+      ).toFixed(2);
+
+      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(
         2,
       );
-
-      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
 
       setVatValue((prev) => ({
         ...prev,

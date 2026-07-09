@@ -243,7 +243,9 @@ const calculateVAT = (productLists, vatProcent) => {
     };
   }
 
-  const vat_euro = Number(((vatProcent * final_price_product) / 100).toFixed(2));
+  const vat_euro = Number(
+    ((vatProcent * final_price_product) / 100).toFixed(2),
+  );
   const vat_result = Number((final_price_product + vat_euro).toFixed(2));
 
   return {
@@ -334,7 +336,9 @@ function FacturaManager() {
 
     const result = Object.values(groupedData).map((group) => {
       const order = list_of_orders.find((o) => o.id === group.orderId);
-      const delivery = deliveryAddresses.find((d) => d.id === order?.del_adr_id);
+      const delivery = deliveryAddresses.find(
+        (d) => d.id === order?.del_adr_id,
+      );
 
       // Формируем productLists для этого заказа
       const productLists = buildProductLists(
