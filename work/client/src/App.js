@@ -59,6 +59,8 @@ import TemperatureDataMonitoring from '#components/GreenLineMonitoring/Temperatu
 
 import { getWebSocketUrl } from '#utils/getApiUrl.js';
 import WMOrderCard from '#components/WarehouseManager/WMOrderCard/WMOrderCard.jsx';
+import FacturaManager from '#components/Accounting/Factura/FacturaManager.jsx';
+import FacturaOrderCard from '#components/Accounting/Factura/FacturaOrderCard.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -127,13 +129,25 @@ function App() {
               path="/production_batch_designer_new"
               element={<ProductionBatchDesignerNew />}
             />
-            <Route path="/autoclave_calendar" element={<AutoclaveCalendare />} />
+            <Route
+              path="/autoclave_calendar"
+              element={<AutoclaveCalendare />}
+            />
 
-            <Route path="/products_type_journal" element={<ProductsTypeJournal />} />
-            <Route path="/quality_management" element={<QualityManagementTable />} />
+            <Route
+              path="/products_type_journal"
+              element={<ProductsTypeJournal />}
+            />
+            <Route
+              path="/quality_management"
+              element={<QualityManagementTable />}
+            />
 
             <Route path="/raw_materials_plan" element={<RawMaterialsPlan />} />
-            <Route path="/recipe_products" element={<ProductsListForRecipes />} />
+            <Route
+              path="/recipe_products"
+              element={<ProductsListForRecipes />}
+            />
             <Route path="/recipe_orders" element={<RecipeOrders />} />
             <Route
               path="/raw_material_consumption"
@@ -153,7 +167,10 @@ function App() {
             <Route path="/users_info" element={<UsersInfo />} />
 
             <Route path="/warehouse_HCCA_blocks" element={<Warehouse />} />
-            <Route path="/warehouse_dry_mixes" element={<DryMixesWarehouse />} />
+            <Route
+              path="/warehouse_dry_mixes"
+              element={<DryMixesWarehouse />}
+            />
             <Route
               path="/warehouse_related_materials"
               element={<RelatedMaterialsWarehouse />}
@@ -168,12 +185,23 @@ function App() {
               path="/warehouse_products_type"
               element={<ProductsTypeWarehouse />}
             />
-            <Route path="/warehouse-manager/order-card" element={<WMOrderCard />} />
+            <Route
+              path="/warehouse-manager/order-card"
+              element={<WMOrderCard />}
+            />
             <Route path="/warehouse_manager" element={<WarehouseManager />} />
+            <Route path="/factura_manager" element={<FacturaManager />} />
+            <Route
+              path="/factura_manager/order-card"
+              element={<FacturaOrderCard />}
+            />
 
             <Route path="/lotes_list" element={<LotesList />} />
             <Route path="/task_board" element={<TaskBoard />} />
-            <Route path="/green_line_monitoring" element={<GreenLineMonitoring />} />
+            <Route
+              path="/green_line_monitoring"
+              element={<GreenLineMonitoring />}
+            />
             <Route
               path="/temperature_data_monitoring"
               element={<TemperatureDataMonitoring />}
