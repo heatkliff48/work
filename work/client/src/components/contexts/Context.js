@@ -440,7 +440,9 @@ const ProjectContextProvider = ({ children }) => {
   const clientPriceInfo = useSelector((state) => state.contactPriceInfo);
   const production_quality = useSelector((state) => state.productionQuality);
   const dimensions_quality = useSelector((state) => state.qualityDimensions);
-  const compressions_quality = useSelector((state) => state.qualityCompressions);
+  const compressions_quality = useSelector(
+    (state) => state.qualityCompressions,
+  );
 
   const [currentContact, setCurrentContact] = useState();
   const [currentDelivery, setCurrentDelivery] = useState();
@@ -500,6 +502,7 @@ const ProjectContextProvider = ({ children }) => {
     '/clients': 'Clients',
     '/users_info': 'Users Info',
     '/warehouse_manager': 'Order dispatch',
+    '/factura_manager': 'Furion po farmu champion',
     '/products_type_journal': 'Products catalog',
     '/statistics': 'Statistics',
     '/orders': 'Orders',
