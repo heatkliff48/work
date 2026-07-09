@@ -113,7 +113,9 @@ function WarehouseManager() {
 
     const result = Object.values(groupedData).map((group) => {
       const order = list_of_orders.find((o) => o.id === group.orderId);
-      const delivery = deliveryAddresses.find((d) => d.id === order?.del_adr_id);
+      const delivery = deliveryAddresses.find(
+        (d) => d.id === order?.del_adr_id,
+      );
 
       return {
         order_id: group.orderId,
@@ -155,7 +157,9 @@ function WarehouseManager() {
       </div>
 
       {wmmodalTrailer && <WMModalTrailer setTrailerOrder={setTrailerOrder} />}
-      {wmmodalTrailerModal && <WMModalTrailerModal trailer_order={trailer_order} />}
+      {wmmodalTrailerModal && (
+        <WMModalTrailerModal trailer_order={trailer_order} />
+      )}
     </>
   );
 }

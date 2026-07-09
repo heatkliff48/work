@@ -83,7 +83,9 @@ export const buildInvoiceLines = ({
   });
 
   productLists?.related_materials?.forEach((prod) => {
-    const relMat = latestRelatedMaterials?.find((el) => el.id === prod.rel_mat_id);
+    const relMat = latestRelatedMaterials?.find(
+      (el) => el.id === prod.rel_mat_id,
+    );
     const quantity = Number(prod.total ?? prod.quantity_ud ?? 0);
     const importe = Number(prod.final_price_rel_mat ?? prod.final_price ?? 0);
     const precio = quantity ? importe / quantity : 0;

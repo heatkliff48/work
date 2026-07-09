@@ -276,15 +276,36 @@ function MainOffcanvas() {
             )}
 
             {checkUserAccess(user, roles, 'accounting')?.canRead && (
-              <Button
-                className="custom-menu-button"
-                onClick={() => {
-                  navigate('/accounting');
-                  handleClose();
-                }}
+              <DropdownButton
+                as={ButtonGroup}
+                title="Production planner"
+                bsPrefix="custom-menu-button"
+                variant="custom"
               >
-                Accounting
-              </Button>
+                <Dropdown.Item eventKey="1">
+                  <Button
+                    className="custom-menu-button"
+                    onClick={() => {
+                      navigate('/accounting');
+                      handleClose();
+                    }}
+                  >
+                    Accounting
+                  </Button>
+                </Dropdown.Item>
+
+                <Dropdown.Item eventKey="2">
+                  <Button
+                    className="custom-menu-button"
+                    onClick={() => {
+                      navigate('/factura_manager');
+                      handleClose();
+                    }}
+                  >
+                    Fury Warrior
+                  </Button>
+                </Dropdown.Item>
+              </DropdownButton>
             )}
 
             <Button
