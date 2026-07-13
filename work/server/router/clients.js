@@ -1,5 +1,5 @@
 const clientsRouter = require('express').Router();
-const { Clients } = require('../db/models');
+const { Clients, Orders, sequelize } = require('../db/models');
 const { ClientLegalAddresses } = require('../db/models');
 const TokenService = require('../services/Token.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
@@ -13,6 +13,21 @@ const {
   ADD_CLIENTS_LEGAL_ADDRESS_SOCKET,
   UPDATE_LEGAL_ADDRESS_SOCKET,
 } = require('../src/constants/event.js');
+
+const multer = require('multer');
+const axios = require('axios');
+const qs = require('qs');
+
+const upload = multer({ storage: multer.memoryStorage() }); // для хранения файла в памяти
+
+const todayDate = () => {
+  const date = new Date();
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}.${month}.${year}`;
+};
 
 clientsRouter.get('/', async (req, res) => {
   // const fingerprint = req.fingerprint.hash;
@@ -306,5 +321,116 @@ clientsRouter.post('/bitrix-update-client', async (req, res) => {
     });
   }
 });
+
+clientsRouter.post(
+  '/bitrix-send-offer',
+  upload.single('file'), // имя поля в FormData на фронте должно быть 'file'
+  async (req, res) => {
+    const t = await sequelize.transaction();
+
+    try {
+      const { deal_id, id, vatValue } = req.body;
+
+      if (!req.file) {
+        await t.rollback();
+        return res.status(400).json({ error: 'Файл не был передан' });
+      }
+
+      if (!deal_id) {
+        await t.rollback();
+        return res.status(400).json({ error: 'Обязательное поле: deal_id' });
+      }
+
+      if (!id) {
+        await t.rollback();
+        return res.status(400).json({ error: 'Обязательное поле: id' });
+      }
+
+      // Блокируем строку заказа на время инкремента —
+      // без этого при двух почти одновременных запросах оба могут
+      // прочитать одно и то же старое значение UF_NUMBER_OFFER
+      const order = await Orders.findByPk(id, {
+        lock: t.LOCK.UPDATE,
+        transaction: t,
+      });
+
+      if (!order) {
+        await t.rollback();
+        return res.status(404).json({ error: 'Заказ не найден' });
+      }
+
+      // Инкрементируем номер, который лежит в БД
+      const newUfNumberOffer = (order.uf_number_offer || 0) + 1;
+
+      await order.update(
+        {
+          deal_id,
+          uf_number_offer: newUfNumberOffer,
+        },
+        { transaction: t },
+      );
+
+      await t.commit();
+
+      // Строка, которая реально уходит в Bitrix: новый номер + "_" + артикул
+      const ufNumberOfferForBitrix = `${newUfNumberOffer}_${order.article}`;
+
+      // Кодируем файл в base64
+      const fileBase64 = req.file.buffer.toString('base64');
+
+      const today = todayDate();
+
+      const postData = {
+        secret: process.env.BITRIX_OFFER_SECRET, // тот самый secret из sendOffer.php — храним в .env, не в коде
+        action: 'addOffer',
+        data: {
+          UF_DATE_OFFER: today,
+          SUM: vatValue,
+          DEAL_ID: Number(deal_id),
+          UF_NUMBER_OFFER: ufNumberOfferForBitrix,
+          FILES: [
+            {
+              name: req.file.originalname,
+              content: fileBase64,
+            },
+          ],
+        },
+      };
+
+      const bitrixResponse = await axios.post(
+        'https://bx24.baublock.com/local/tools/importOffer.php',
+        qs.stringify(postData),
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          timeout: 60000,
+        },
+      );
+
+      console.log(
+        bitrixResponse.data,
+        'bitrixResponse.data clients.js /bitrix-send-offer',
+      );
+
+      return res.status(200).json({
+        httpCode: bitrixResponse.status,
+        bitrixResponse: bitrixResponse.data,
+        // Возвращаем актуальные значения на фронт — без вебсокетов,
+        // прямо в ответе на этот же запрос
+        deal_id,
+        uf_number_offer: ufNumberOfferForBitrix,
+      });
+    } catch (err) {
+      if (!t.finished) await t.rollback();
+
+      console.error('Error sending offer to Bitrix:', err.message);
+
+      return res.status(500).json({
+        error: `Internal server error: ${err.message}`,
+        details:
+          process.env.NODE_ENV === 'development' ? err.message : undefined,
+      });
+    }
+  },
+);
 
 module.exports = clientsRouter;
