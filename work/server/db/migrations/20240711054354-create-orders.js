@@ -47,6 +47,12 @@ module.exports = {
       delivery: {
         type: Sequelize.FLOAT,
       },
+      deal_id: {
+        type: Sequelize.INTEGER,
+      },
+      uf_number_offer: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

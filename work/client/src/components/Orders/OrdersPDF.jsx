@@ -6,6 +6,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
 import '#components/Styles/pdf.css';
+import { getApiUrl } from '#utils/getApiUrl.js';
 
 const loadImage = () => {
   return new Promise((resolve, reject) => {
@@ -23,6 +24,20 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
   const [pdfUrl, setPdfUrl] = useState(null);
   const [pdfData, setPdfData] = useState({});
+
+  // DEAL_ID и UF_NUMBER_OFFER — заполняются менеджером и хранятся в БД заказа
+  const [dealId, setDealId] = useState(orderData?.deal_id ?? '');
+  const [ufNumberOffer, setUfNumberOffer] = useState(
+    orderData?.uf_number_offer ?? '',
+  );
+
+  // Подтягиваем значения, если orderData обновился (например, после загрузки заказа с сервера)
+  useEffect(() => {
+    if (orderData?.deal_id !== undefined) setDealId(orderData.deal_id);
+    if (orderData?.uf_number_offer !== undefined) {
+      setUfNumberOffer(orderData.uf_number_offer);
+    }
+  }, [orderData?.deal_id, orderData?.uf_number_offer]);
 
   const generatePDF = async () => {
     if (!orderData || !productList) {
@@ -103,7 +118,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfDryMixes?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
             [
               'Ref.:',
@@ -138,7 +155,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfAnchor?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
             [
               'Ref.:',
@@ -173,9 +192,17 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfTools?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
-            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
+            [
+              'Ref.:',
+              'Descripción',
+              'Total, Ud',
+              'PVP neto €/Ud',
+              'Subtotal €',
+            ],
           ],
           body: pdfData.pdfTools?.map((item) => [
             item.ref,
@@ -194,9 +221,17 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfRelMat?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
-            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
+            [
+              'Ref.:',
+              'Descripción',
+              'Total, Ud',
+              'PVP neto €/Ud',
+              'Subtotal €',
+            ],
           ],
           body: pdfData.pdfRelMat?.map((item) => [
             item.ref,
@@ -270,7 +305,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
   useEffect(() => {
     console.log('🔄 Данные заказа обновлены:', orderData);
-    const { deliveryAddress, contactInfo, owner, article, delivery } = orderData;
+    const { deliveryAddress, contactInfo, owner, article, delivery } =
+      orderData;
 
     const today = new Date();
     const nextMonthDate = new Date(today);
@@ -341,9 +377,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         product?.density
       }kg/m³`;
 
-      const total = (prod.quantity_palet * product?.quantityBlockOnPallet).toFixed(
-        0,
-      );
+      const total = (
+        prod.quantity_palet * product?.quantityBlockOnPallet
+      ).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
@@ -373,7 +409,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const totalSacos = (quantity * sacos).toFixed(0);
 
-      const totalKg = (prod.quantity_palet_dry * dryMixes?.pallet_weight).toFixed(0);
+      const totalKg = (
+        prod.quantity_palet_dry * dryMixes?.pallet_weight
+      ).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(2);
 
@@ -489,6 +527,11 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
   };
 
   const sendToBitrix = async () => {
+    if (!dealId) {
+      alert('Заполните DEAL_ID перед отправкой в Bitrix24');
+      return;
+    }
+
     try {
       const doc = await generatePDF();
 
@@ -496,31 +539,52 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         const pdfBlob = doc.output('blob');
         const formData = new FormData();
         formData.append('file', pdfBlob, 'presupuesto.pdf');
+        formData.append('deal_id', dealId);
+        formData.append('id', orderData?.id);
+        formData.append('vatValue', vatValue?.vat_result_del);
 
-        // // Добавляем дополнительные поля, если нужно
-        // formData.append('title', 'Смета');
-        // formData.append('createdBy', '1'); // ID пользователя
+        // Отправляем на СВОЙ бэкенд (аналогично /clients/bitrix-send-offer),
+        // а бэкенд уже сам кодирует файл в base64 и пересылает в Bitrix
+        // вместе с секретным ключом, который не должен светиться на фронте.
+        const baseURL = getApiUrl();
+        const response = await fetch(`${baseURL}/clients/bitrix-send-offer`, {
+          method: 'POST',
+          body: formData,
+        });
 
-        const response = await fetch(
-          'https://httpbin.org/post', //'https://ваш-портал.bitrix24.ru/rest/1/ВАШ_ТОКЕН/disk.folder.uploadfile?folderId=ВАШ_ID_ПАПКИ',
-          {
-            method: 'POST',
-            body: formData,
-          },
-        );
+        const result = await response.json().catch(() => null);
 
         if (response.ok) {
-          alert('PDF has been sent successfully');
+          alert('PDF успешно отправлен в Bitrix24');
+        } else {
+          console.error('Ошибка ответа сервера:', result);
+          alert(
+            `Ошибка отправки в Bitrix24: ${result?.error ?? response.status}`,
+          );
         }
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error:', error);
+      alert(`Ошибка отправки: ${error.message}`);
     }
   };
 
   return (
     <div>
+      <div style={{ marginBottom: '10px' }}>
+        <label>
+          DEAL_ID:{' '}
+          <input
+            type="number"
+            value={dealId}
+            onChange={(e) => {
+              setDealId(e.target.value);
+            }}
+            placeholder="Enter DEAL_ID"
+          />
+        </label>
+      </div>
+
       {pdfUrl && (
         <div>
           <button onClick={downloadPDF}>Download PDF</button>
