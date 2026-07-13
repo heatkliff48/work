@@ -42,6 +42,8 @@ module.exports = (sequelize, DataTypes) => {
       description: DataTypes.STRING,
       delivery: DataTypes.FLOAT,
       main_order: DataTypes.STRING,
+      deal_id: DataTypes.INTEGER,
+      uf_number_offer: DataTypes.INTEGER,
     },
     {
       sequelize,
