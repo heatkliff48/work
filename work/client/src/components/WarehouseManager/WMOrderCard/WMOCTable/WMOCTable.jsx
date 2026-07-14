@@ -211,7 +211,6 @@ const WMOCTable = ({ product_list, orderCartData }) => {
           return [];
       }
     };
-    console.log('warehouse_data WMOCTable.jsx line 214', warehouse_data);
     const warehouseByType = {
       product: warehouse_data || [],
       dryMixed: dry_mixes_warehouse_data || [],
@@ -250,7 +249,6 @@ const WMOCTable = ({ product_list, orderCartData }) => {
 
         const reservedList = getReservedList(productType);
 
-        console.log('reservedList WMOCTable.jsx line 253', reservedList);
         const reservedForCurrentDispatch = reservedList.filter(
           (reservedItem) =>
             Number(reservedItem.order_dispatch_id) === orderDispatchId &&
@@ -420,6 +418,8 @@ const WMOCTable = ({ product_list, orderCartData }) => {
         }}
       />
       <WMOCTProduct
+        orderId={product_list?.order_id}
+        trailer={product_list?.trailer}
         haveBatches={haveBatches}
         handlePlusBatch={handlePlusBatch}
         handlePlus={handlePlus}

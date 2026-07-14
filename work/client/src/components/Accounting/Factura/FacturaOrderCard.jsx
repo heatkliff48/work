@@ -8,8 +8,9 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import AccountingInvoiceModal from '../AccountingInvoiceModal';
+import { changeStatusWarehouseManagerTrailer } from '#components/redux/actions/warehouseAction.js';
 
 const FacturaOrderCard = React.memo(() => {
   const { selectedOrder } = useWarehouseContext();
@@ -30,9 +31,13 @@ const FacturaOrderCard = React.memo(() => {
 
   const { displayNames } = useProjectContext();
 
+  const dispatch = useDispatch();
+
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState([]);
-  const [checkboxStatus, setCheckboxStatus] = useState(false);
+  const [checkboxStatus, setCheckboxStatus] = useState(
+    selectedOrder?.trailer_stage || 0,
+  );
   const [productLists, setProductLists] = useState({
     products: [],
     dryMixes: [],
@@ -96,12 +101,7 @@ const FacturaOrderCard = React.memo(() => {
 
   const addProductArticleToOrderList = useCallback(
     (productsOfOrders, productsTable, arrayName) => {
-      if (
-        !productsOfOrders ||
-        !productsTable ||
-        !arrayName ||
-        !orderCartData?.id
-      )
+      if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
         return [];
 
       const updatedOrderProducts = productsOfOrders
@@ -109,9 +109,7 @@ const FacturaOrderCard = React.memo(() => {
         .map((orderProduct) => {
           const id = getCorrectProductId(arrayName);
 
-          const product = productsTable.find(
-            (p) => p.id === orderProduct?.[id],
-          );
+          const product = productsTable.find((p) => p.id === orderProduct?.[id]);
 
           return product
             ? { product_article: product.article, ...orderProduct }
@@ -175,11 +173,7 @@ const FacturaOrderCard = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(
-      toolProductsOfOrders,
-      latestTools,
-      'tools',
-    );
+    return addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools');
   }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
 
   useEffect(() => {
@@ -197,11 +191,7 @@ const FacturaOrderCard = React.memo(() => {
       latestRelatedMaterials,
       'related_materials',
     );
-  }, [
-    relMatProductsOfOrders,
-    latestRelatedMaterials,
-    addProductArticleToOrderList,
-  ]);
+  }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedRelatedMaterialsListOrder.length > 0) {
@@ -239,14 +229,11 @@ const FacturaOrderCard = React.memo(() => {
         vat_result: 0,
       }));
     } else {
-      const vat_euro = (
-        (vatValue.vat_procent * final_price_product) /
-        100
-      ).toFixed(2);
-
-      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(
+      const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
         2,
       );
+
+      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
 
       setVatValue((prev) => ({
         ...prev,
@@ -274,6 +261,18 @@ const FacturaOrderCard = React.memo(() => {
     if (!ordersStatus.includes(updatedOrderCartData?.status))
       setOrdersStatus((prev) => [...prev, updatedOrderCartData?.status]);
   }, [list_of_orders]);
+
+  const statusChangeHandler = () => {
+    console.log('checkboxStatus FacturaOrderCard.jsx line 264', !checkboxStatus);
+    const status = !checkboxStatus ? 1 : 0;
+    setCheckboxStatus(!checkboxStatus);
+    dispatch(
+      changeStatusWarehouseManagerTrailer({
+        status,
+        trailer: selectedOrder.trailer,
+      }),
+    );
+  };
 
   return (
     <div className="page-container">
@@ -307,7 +306,7 @@ const FacturaOrderCard = React.memo(() => {
               id="status-ready"
               type="checkbox"
               checked={checkboxStatus}
-              onChange={() => setCheckboxStatus(!checkboxStatus)}
+              onChange={() => statusChangeHandler()}
             />
           </div>
         </div>
@@ -332,10 +331,7 @@ const FacturaOrderCard = React.memo(() => {
         latestRelatedMaterials={latestRelatedMaterials}
       />
 
-      <FacturaTable
-        product_list={selectedOrder}
-        orderCartData={orderCartData}
-      />
+      <FacturaTable product_list={selectedOrder} orderCartData={orderCartData} />
     </div>
   );
 });

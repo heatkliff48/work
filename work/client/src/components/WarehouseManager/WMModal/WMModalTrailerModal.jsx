@@ -271,6 +271,7 @@ function WMModalTrailerModal({ trailer_order }) {
             orderId: Number(trailerRow.orderId),
             title: product.title,
             article: product.article,
+            trailer_stage: 0,
           };
         }),
     );
