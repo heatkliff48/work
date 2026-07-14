@@ -62,6 +62,7 @@ import {
   ALL_WAREHOUSE_MANAGER_TRAILER,
   GET_ALL_WAREHOUSE_MANAGER_TRAILER,
   ADD_NEW_WAREHOUSE_MANAGER_TRAILER,
+  DELETE_WAREHOUSE_MANAGER_TRAILER,
 } from '../types/warehouseTypes';
 import {
   ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
@@ -72,6 +73,7 @@ import {
   DELETE_REL_MAT_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DELETE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   DRY_MIXES_QUANTITYS_SOCKET,
+  NEEF_DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   NEW_ANCHOR_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   NEW_LIST_OF_ORDERED_PRODUCTION_OEM_SOCKET,
@@ -594,6 +596,18 @@ const addNewWarehouseManagerTrailer = (new_wh_trailer) => {
     });
 };
 
+const deleteWarehouseManagerTrailer = (wh_trailer_id) => {
+  return url
+    .delete('/warehouse/order_dispatch/delete', wh_trailer_id)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 function* getAllWarehouseWatcher() {
   try {
     const { warehouse } = yield call(getAllWarehouse);
@@ -1050,6 +1064,17 @@ function* addNewWarehouseManagerTrailerWatcher(action) {
   }
 }
 
+function* deleteWarehouseManagerTrailerWatcher(action) {
+  try {
+    yield call(deleteWarehouseManagerTrailer, action.payload);
+  } catch (err) {
+    yield put({
+      type: NEEF_DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+      payload: [],
+    });
+  }
+}
+
 function* warehouseWatcher() {
   yield takeLatest(GET_ALL_WAREHOUSE, getAllWarehouseWatcher);
   yield takeLatest(ADD_NEW_WAREHOUSE, addNewWarehouseWatcher);
@@ -1168,6 +1193,10 @@ function* warehouseWatcher() {
   yield takeLatest(
     ADD_NEW_WAREHOUSE_MANAGER_TRAILER,
     addNewWarehouseManagerTrailerWatcher,
+  );
+  yield takeLatest(
+    DELETE_WAREHOUSE_MANAGER_TRAILER,
+    deleteWarehouseManagerTrailerWatcher,
   );
 }
 

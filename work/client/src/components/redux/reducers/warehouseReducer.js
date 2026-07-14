@@ -38,7 +38,7 @@ export const warehouseReducer = (warehouse = [], action) => {
         });
         return result;
       } else {
-        return payload;
+        return payload.wh_data?.product ?? payload?.wh_data ?? payload;
       }
     }
 

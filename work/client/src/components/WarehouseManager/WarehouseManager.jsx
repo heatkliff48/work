@@ -81,6 +81,18 @@ function WarehouseManager() {
     dispatch(getRelatedMaterialsWarehouse());
   }, []);
 
+  const getOrderDispatchId = (item) => {
+    const rawId = item?.id ?? item?.order_dispatch_id ?? item?.orderDispatchId;
+
+    if (rawId === undefined || rawId === null || rawId === '') {
+      return null;
+    }
+
+    const numericId = Number(rawId);
+
+    return Number.isFinite(numericId) ? numericId : null;
+  };
+
   useEffect(() => {
     if (!order_dispatch_data || order_dispatch_data.length === 0) {
       setWarehouseMdata([]);
@@ -89,20 +101,43 @@ function WarehouseManager() {
     }
 
     const groupedData = order_dispatch_data.reduce((acc, item) => {
-      const key = `${item.orderId}_${item.trailer}`;
+      const orderId = Number(item.orderId);
+      const trailer = Number(item.trailer);
+
+      const key = `${orderId}_${trailer}`;
 
       if (!acc[key]) {
         acc[key] = {
-          orderId: item.orderId,
-          trailer: item.trailer,
+          orderId,
+          trailer,
           products: [],
           fecha: item.fecha || '',
           articles: [],
+          dispatchItems: [],
         };
       }
 
-      acc[key].products.push(`${item.title}: ${item.quantity}, `);
-      acc[key].articles.push(`${item.article}: ${item.quantity}`);
+      acc[key].products.push(`${item.title}: ${Number(item.quantity || 0)}, `);
+      acc[key].articles.push(`${item.article}: ${Number(item.quantity || 0)}, `);
+
+      const orderDispatchId = getOrderDispatchId(item);
+
+      if (!orderDispatchId) {
+        console.error('order_dispatch_data row has no database ID:', item);
+      }
+
+      acc[key].dispatchItems.push({
+        id: orderDispatchId,
+
+        orderId: Number(item.orderId),
+        trailer: Number(item.trailer),
+        orderProductId: Number(item.orderProductId),
+
+        product_table: item.product_table,
+        quantity: Number(item.quantity || 0),
+        article: item.article,
+        title: item.title,
+      });
 
       if (item.fecha && !acc[key].fecha) {
         acc[key].fecha = item.fecha;
@@ -112,9 +147,12 @@ function WarehouseManager() {
     }, {});
 
     const result = Object.values(groupedData).map((group) => {
-      const order = list_of_orders.find((o) => o.id === group.orderId);
+      const order = list_of_orders.find(
+        (item) => Number(item.id) === Number(group.orderId),
+      );
+
       const delivery = deliveryAddresses.find(
-        (d) => d.id === order?.del_adr_id,
+        (item) => Number(item.id) === Number(order?.del_adr_id),
       );
 
       return {
@@ -125,6 +163,7 @@ function WarehouseManager() {
         orders_products: group.products,
         orders_products_articles: group.articles,
         trailer: group.trailer,
+        dispatchItems: group.dispatchItems,
       };
     });
 
@@ -157,9 +196,7 @@ function WarehouseManager() {
       </div>
 
       {wmmodalTrailer && <WMModalTrailer setTrailerOrder={setTrailerOrder} />}
-      {wmmodalTrailerModal && (
-        <WMModalTrailerModal trailer_order={trailer_order} />
-      )}
+      {wmmodalTrailerModal && <WMModalTrailerModal trailer_order={trailer_order} />}
     </>
   );
 }

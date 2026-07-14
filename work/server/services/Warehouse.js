@@ -273,6 +273,18 @@ class WarehouseService {
       return error;
     }
   }
+
+  static async deleteWarehouseManagerTrailer(order_id) {
+    try {
+      const wh_trailer = await WarehouseRepository.deleteWarehouseManagerTrailer(
+        order_id,
+      );
+      return wh_trailer;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return error;
+    }
+  }
 }
 
 module.exports = WarehouseService;

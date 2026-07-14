@@ -20,13 +20,14 @@ const WMOCTProduct = ({
   } = useModalContext();
   const { list_of_orders } = useOrderContext();
 
-  console.log('wmoctProduct WMOCTProduct.jsx line 21', wmoctProduct);
-
   const onSaveHandler = () => {
     if (!wmoctProduct || wmoctProduct.length === 0) return false;
+
     const order_id = wmoctProduct[0].order_id;
     const right_order = list_of_orders.find((el) => el.id == order_id);
+
     if (!right_order) return false;
+
     return right_order.status >= 8;
   };
 
