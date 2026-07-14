@@ -1,6 +1,3 @@
-import Button from 'react-bootstrap/Button';
-import Container from 'react-bootstrap/Container';
-import Modal from 'react-bootstrap/Modal';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect } from 'react';
 import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo';
 import { updateContactOfOrder } from '#components/redux/actions/ordersAction.js';
+import '#components/Clients/ClientsInfo/clientsDrawer.css';
+import '../ordersView.css';
 
 function OrderContactEditModal({ show, onHide }) {
   const { setCurrentClient } = useProjectContext();
@@ -26,27 +25,41 @@ function OrderContactEditModal({ show, onHide }) {
     setCurrentClient(orderCartData?.owner);
   }, [contactInfo]);
 
+  if (!show) return null;
+
   return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      aria-labelledby="contained-modal-title-vcenter"
-      dialogClassName="modal-auto-size"
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Choose new Contact Person
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body className="grid-example">
-        <Container>
+    <div className="ord-modal-root">
+      <div className="ord-modal-overlay" onClick={onHide} />
+      <div className="ord-modal-card ord-modal-card--sm">
+        <div className="ord-modal-head ord-modal-head--sm">
+          <div className="ord-modal-head__title ord-modal-head__title--sm">
+            Choose new contact person
+          </div>
+          <button type="button" className="ord-iconbtn" onClick={onHide}>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#565d6d"
+              strokeWidth="2.1"
+              strokeLinecap="round"
+            >
+              <path d="M6 6l12 12" />
+              <path d="M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+        <div className="ord-modal-body ord-modal-body--sm">
           <ClientsContactInfo clickFunk={contacInfoHendler} />
-        </Container>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={onHide}>Close</Button>
-      </Modal.Footer>
-    </Modal>
+        </div>
+        <div className="ord-modal-foot ord-modal-foot--sm">
+          <button type="button" className="ord-btn ord-btn--ghost" onClick={onHide}>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -55,9 +68,13 @@ function ShowOrderContactEditModal() {
 
   return (
     <>
-      <Button variant="primary" onClick={() => setModalShow(true)}>
+      <button
+        type="button"
+        className="ord-btn ord-btn--ghost ord-btn--sm"
+        onClick={() => setModalShow(true)}
+      >
         Edit
-      </Button>
+      </button>
 
       <OrderContactEditModal show={modalShow} onHide={() => setModalShow(false)} />
     </>

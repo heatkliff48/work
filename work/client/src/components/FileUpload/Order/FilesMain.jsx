@@ -2,15 +2,14 @@ import React from 'react';
 import FileUpload from './FileUpload';
 import FileDownload from './FileDownload';
 import { FileContextProvider } from '#components/contexts/FileContext.js';
+import '#components/Orders/ordersView.css';
 
 const FilesMain = ({ userAccess }) => {
   return (
     <FileContextProvider>
-      <div>
-        <div className="footer_button">{userAccess?.canWrite && <FileUpload />}</div>
-        <div className="footer_button">
-          <FileDownload />
-        </div>
+      <div className="ord-file-section">
+        {userAccess?.canWrite && <FileUpload />}
+        <FileDownload />
       </div>
     </FileContextProvider>
   );

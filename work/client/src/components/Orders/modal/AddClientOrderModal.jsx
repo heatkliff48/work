@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
-import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOrderContext } from '../../contexts/OrderContext';
 import { useProjectContext } from '#components/contexts/Context.js';
@@ -12,6 +11,8 @@ import ShowClientsContactInfoModal from '#components/Clients/ClientsContactInfo/
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import Table from '#components/Table/Table';
 import '#components/Styles/modals.css';
+import '#components/Clients/ClientsInfo/clientsDrawer.css';
+import '../ordersView.css';
 
 const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -135,71 +136,102 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     setListOfClientsFiltered(filtered);
   }, [list_of_clients]);
 
+  const closeHandler = () => {
+    setNewOrder({});
+    setCurrentClient({});
+    toggle();
+  };
+
+  const stepNum = haveClient ? (haveAdddress ? 3 : 2) : 1;
+
   return (
-    <div>
-      <Modal
-        autoWidth
-        isOpen={isOpen}
-        toggle={() => {
-          setNewOrder({});
-          setCurrentClient({});
-          toggle();
-        }}
-      >
-        <ModalHeader
-          toggle={() => {
-            setNewOrder({});
-            setCurrentClient({});
-            toggle();
-          }}
-        >
-          {haveClient ? (
-            haveAdddress ? (
-              <p>Select contact person</p>
+    <div className="ord-modal-root">
+      <div className="ord-modal-overlay" onClick={closeHandler} />
+      <div className="ord-modal-card ord-modal-card--wizard">
+        <div className="ord-modal-head">
+          <div>
+            <div className="ord-modal-head__title">
+              {haveClient ? (
+                haveAdddress ? (
+                  <p style={{ margin: 0 }}>Select contact person</p>
+                ) : (
+                  <p style={{ margin: 0 }}>Select delivery address</p>
+                )
+              ) : (
+                <p style={{ margin: 0 }}>Select the client who is placing the order</p>
+              )}
+            </div>
+            <div className="ord-modal-head__subtitle">Step {stepNum} of 3</div>
+          </div>
+          <button type="button" className="ord-iconbtn" onClick={closeHandler}>
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#565d6d"
+              strokeWidth="2.1"
+              strokeLinecap="round"
+            >
+              <path d="M6 6l12 12" />
+              <path d="M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+        <div className="ord-modal-body">
+          <Fragment>
+            {haveClient ? (
+              haveAdddress ? (
+                <>
+                  <div className="ord-modal-inline-actions">
+                    <ShowClientsContactInfoModal />
+                  </div>
+                  <ClientsContactInfo
+                    clickFunk={contactInfoHendler}
+                    showSearch={true}
+                  />
+                </>
+              ) : (
+                <>
+                  <div className="ord-modal-inline-actions">
+                    <ShowDeliveryAddressModal />
+                  </div>
+                  <DeliveryAddress
+                    clickFunk={deliveryAddressHendler}
+                    showSearch={true}
+                  />
+                </>
+              )
             ) : (
-              <p>Select delivery address</p>
-            )
-          ) : (
-            <p>Select the client who is placing the order</p>
-          )}
-        </ModalHeader>
-        <Fragment>
-          {haveClient ? (
-            haveAdddress ? (
-              <>
-                <ShowClientsContactInfoModal />
-                <ClientsContactInfo
-                  clickFunk={contactInfoHendler}
-                  showSearch={true}
+              <div className="ord-card-scope">
+                <div className="ord-modal-inline-actions">
+                  <ShowClientsModal />
+                </div>
+                <Table
+                  COLUMN_DATA={clients_info_table}
+                  dataOfTable={listOfClientsFiltered}
+                  tableName={'Clients'}
+                  variant="card"
+                  hideTitle
+                  handleRowClick={(row) => {
+                    addClientOrderHendler(row.original.id);
+                  }}
                 />
-              </>
-            ) : (
-              <>
-                <ShowDeliveryAddressModal />
-                <DeliveryAddress
-                  clickFunk={deliveryAddressHendler}
-                  showSearch={true}
-                />
-              </>
-            )
-          ) : (
-            <ModalBody>
-              <ShowClientsModal />
-              <Table
-                COLUMN_DATA={clients_info_table}
-                dataOfTable={listOfClientsFiltered}
-                tableName={'Clients'}
-                handleRowClick={(row) => {
-                  addClientOrderHendler(row.original.id);
-                }}
-              />
-            </ModalBody>
-          )}
-        </Fragment>
-        <ModalFooter>
-          {haveClient ? <button onClick={backHanddler}>back</button> : <></>}
-        </ModalFooter>
-      </Modal>
+              </div>
+            )}
+          </Fragment>
+        </div>
+        <div className="ord-modal-foot ord-modal-foot--between">
+          <div>
+            {haveClient && (
+              <button type="button" className="ord-btn ord-btn--ghost" onClick={backHanddler}>
+                back
+              </button>
+            )}
+          </div>
+          <div />
+        </div>
+      </div>
     </div>
   );
 });

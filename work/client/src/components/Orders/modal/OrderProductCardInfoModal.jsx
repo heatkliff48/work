@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
-import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { ModalBody } from 'reactstrap';
 import { FormGroup, Input, Label } from 'reactstrap';
 import { useOrderContext } from '../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
+import '../ordersView.css';
 import {
   getUpdateProductInfoOfOrders,
   getUpdateAnchorProductsInfoOfOrder,
@@ -442,28 +443,39 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     }
   }, [isOpen]);
 
+  if (!isOpen) return null;
+
+  const closeHandler = () => {
+    toggle();
+    setProductOfOrder({});
+    setSelectedProduct({});
+    setIsReturn(false);
+  };
+
   return (
-    <div>
-      <Modal
-        isOpen={isOpen}
-        toggle={() => {
-          toggle();
-          setProductOfOrder({});
-          setSelectedProduct({});
-          setIsReturn(false);
-        }}
-      >
-        <ModalHeader
-          toggle={() => {
-            toggle();
-            setProductOfOrder({});
-            setSelectedProduct({});
-            setIsReturn(false);
-          }}
-        >
-          <p>Fill in the remaining parameters</p>
-        </ModalHeader>
-        <ModalBody>
+    <div className="ord-modal-root">
+      <div className="ord-modal-overlay" onClick={closeHandler} />
+      <div className="ord-modal-card ord-modal-card--md">
+        <div className="ord-modal-head ord-modal-head--sm">
+          <div className="ord-modal-head__title ord-modal-head__title--sm">
+            Fill in the remaining parameters
+          </div>
+          <button type="button" className="ord-iconbtn" onClick={closeHandler}>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#565d6d"
+              strokeWidth="2.1"
+              strokeLinecap="round"
+            >
+              <path d="M6 6l12 12" />
+              <path d="M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+        <div className="ord-modal-body ord-modal-body--sm ord-product-fields">
           <>
             {COLUMNS_ORDER?.map((el) => {
               if (el.accessor === 'product_id') return null;
@@ -648,11 +660,13 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
               );
             })}
           </>
-        </ModalBody>
-        <ModalFooter>
-          <button onClick={addProductOrder}>Change product info</button>
-        </ModalFooter>
-      </Modal>
+        </div>
+        <div className="ord-modal-foot ord-modal-foot--sm">
+          <button type="button" className="ord-btn ord-btn--primary" onClick={addProductOrder}>
+            Change product info
+          </button>
+        </div>
+      </div>
     </div>
   );
 });
