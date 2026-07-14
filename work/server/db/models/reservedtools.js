@@ -7,19 +7,19 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ OrdersProducts }) {
-    }
+    static associate({ OrdersProducts }) {}
   }
   ReservedTools.init(
     {
       warehouse_id: DataTypes.INTEGER,
       orders_products_id: DataTypes.INTEGER,
       quantity: DataTypes.INTEGER,
+      order_dispatch_id: DataTypes.INTEGER,
     },
     {
       sequelize,
       modelName: 'ReservedTools',
-    }
+    },
   );
   return ReservedTools;
 };

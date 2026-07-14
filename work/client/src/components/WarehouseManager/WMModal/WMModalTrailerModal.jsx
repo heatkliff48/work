@@ -17,19 +17,19 @@ function WMModalTrailerModal({ trailer_order }) {
     wmmodalTrailer,
   } = useModalContext();
   const { displayNames } = useProjectContext();
-  const { order_dispatch_data } = useWarehouseContext();
+  const { order_dispatch_data, normalizeProductType } = useWarehouseContext();
 
   const dispatch = useDispatch();
 
   const [trailers, setTrailers] = useState([]);
 
-  const getProductKey = (product) => `${product.type}_${product.orderProductId}`;
-
+  const getProductKey = (product) =>
+    `${normalizeProductType(product.type)}_${Number(product.orderProductId)}`;
   useEffect(() => {
     if (!wmmodalTrailerModal) return;
 
     const existingItems = order_dispatch_data.filter(
-      (item) => item.orderId === orderCartData?.id,
+      (item) => Number(item.orderId) === Number(orderCartData?.id),
     );
 
     if (existingItems.length === 0) {
@@ -48,25 +48,27 @@ function WMModalTrailerModal({ trailer_order }) {
       return;
     }
 
-    const grouped = existingItems.reduce((acc, item) => {
-      const { trailer, fecha, orderProductId, quantity } = item;
+    const grouped = existingItems.reduce((acc, dispatchItem) => {
+      const trailer = Number(dispatchItem.trailer);
+      const quantity = Number(dispatchItem.quantity || 0);
+
       if (!acc[trailer]) {
         acc[trailer] = {
           trailer,
-          fecha,
+          fecha: dispatchItem.fecha || '',
           products: {},
           isExisting: true,
-          orderId: orderCartData?.id,
+          orderId: Number(dispatchItem.orderId),
         };
       }
 
-      const product = trailer_order.find(
-        (p) => p.orderProductId === orderProductId && p.type === item.product_table,
-      );
+      const productKey = `${normalizeProductType(
+        dispatchItem.product_table,
+      )}_${Number(dispatchItem.orderProductId)}`;
 
-      if (product) {
-        acc[trailer].products[getProductKey(product)] = quantity;
-      }
+      acc[trailer].products[productKey] =
+        Number(acc[trailer].products[productKey] || 0) + quantity;
+
       return acc;
     }, {});
 
@@ -184,24 +186,25 @@ function WMModalTrailerModal({ trailer_order }) {
     return product?.quantity ?? 0;
   };
 
-  const getShippedQuantity = (productKey) => {
-    const product = trailer_order.find((p) => getProductKey(p) === productKey);
+  const getPlannedQuantity = (productKey) => {
+    const product = trailer_order.find((item) => getProductKey(item) === productKey);
 
     if (!product) return 0;
 
     return order_dispatch_data
       .filter(
         (item) =>
-          item.orderId === orderCartData?.id &&
-          item.orderProductId === product.orderProductId &&
-          item.product_table === product.type,
+          Number(item.orderId) === Number(orderCartData?.id) &&
+          Number(item.orderProductId) === Number(product.orderProductId) &&
+          normalizeProductType(item.product_table) ===
+            normalizeProductType(product.type),
       )
-      .reduce((sum, item) => sum + item.quantity, 0);
+      .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
   };
 
   const getAvailableRemaining = (productKey, excludeRowIndex = -1) => {
     const total = getProductTotal(productKey);
-    const shipped = getShippedQuantity(productKey);
+    const shipped = getPlannedQuantity(productKey);
     let remaining = total - shipped;
 
     trailers.forEach((row, idx) => {
@@ -260,12 +263,12 @@ function WMModalTrailerModal({ trailer_order }) {
           if (!product) return null;
 
           return {
-            trailer: trailerRow.trailer,
+            trailer: Number(trailerRow.trailer),
             fecha: trailerRow.fecha,
-            orderProductId: product.orderProductId,
+            orderProductId: Number(product.orderProductId),
             quantity: Number(quantity),
-            product_table: product.type,
-            orderId: trailerRow.orderId,
+            product_table: normalizeProductType(product.type),
+            orderId: Number(trailerRow.orderId),
             title: product.title,
             article: product.article,
           };

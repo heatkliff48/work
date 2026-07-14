@@ -1,4 +1,7 @@
-import { ADD_NEW_WAREHOUSE_MANAGER_TRAILER_SOCKET } from '../types/socketTypes/socket';
+import {
+  ADD_NEW_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+  NEEF_DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+} from '../types/socketTypes/socket';
 import { ALL_WAREHOUSE_MANAGER_TRAILER } from '../types/warehouseTypes';
 
 export const orderDispatchReducer = (orderDispatch = [], action) => {
@@ -9,7 +12,12 @@ export const orderDispatchReducer = (orderDispatch = [], action) => {
     }
 
     case ADD_NEW_WAREHOUSE_MANAGER_TRAILER_SOCKET: {
-      return payload ?? orderDispatch;
+      return [...orderDispatch, ...payload];
+    }
+
+    case NEEF_DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET: {
+      const arr = orderDispatch.filter((el) => el.orderId != payload);
+      return arr;
     }
 
     default:

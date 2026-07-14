@@ -104,5 +104,9 @@ router.post(
   '/order_dispatch/add',
   WarehouseController.addNewWarehouseManagerTrailer,
 );
+router.post(
+  '/order_dispatch/delete',
+  WarehouseController.deleteWarehouseManagerTrailer,
+);
 
 module.exports = router;

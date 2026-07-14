@@ -157,6 +157,7 @@ import {
   NEED_DELETE_WAREHOUSE_PALLETS_SOCKET,
   NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
   ADD_NEW_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+  NEEF_DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -879,6 +880,13 @@ export const deleteQualityManagementSocket = (qualityManagementDataID) => {
 export const addNewWarehouseManagerTrailerSocket = (wh_trailer) => {
   return {
     type: ADD_NEW_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+    payload: wh_trailer,
+  };
+};
+
+export const deleteWarehouseManagerTrailerSocket = (wh_trailer) => {
+  return {
+    type: NEEF_DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
     payload: wh_trailer,
   };
 };

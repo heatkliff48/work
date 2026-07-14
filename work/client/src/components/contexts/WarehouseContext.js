@@ -8,6 +8,7 @@ import {
   addNewRelMatReservedProducts,
   addNewReservedProducts,
   addNewToolReservedProducts,
+  deleteWarehouseManagerTrailer,
   updAnchorReservedProducts,
   updateWarehouseQuantitys,
   updDryMixedReservedProducts,
@@ -265,9 +266,7 @@ const WarehouseContextProvider = ({ children }) => {
 
   const warehouse_data = useSelector((state) => state.warehouse);
   const autoclave_calendar = useSelector((state) => state.autoclave_calendar);
-  const dry_mixes_warehouse_data = useSelector(
-    (state) => state.dryMixesWarehouse,
-  );
+  const dry_mixes_warehouse_data = useSelector((state) => state.dryMixesWarehouse);
   const related_materials_warehouse_data = useSelector(
     (state) => state.relatedMaterialsWarehouse,
   );
@@ -283,9 +282,7 @@ const WarehouseContextProvider = ({ children }) => {
     relMat: related_materials_warehouse_data,
   };
 
-  const list_of_reserved_products = useSelector(
-    (state) => state.reservedProducts,
-  );
+  const list_of_reserved_products = useSelector((state) => state.reservedProducts);
 
   const list_of_dry_mix_reserved_products = useSelector(
     (state) => state.reservedDryMixedProducts,
@@ -317,9 +314,7 @@ const WarehouseContextProvider = ({ children }) => {
     (state) => state.rawMaterialsWarehouse,
   );
 
-  const warehouse_sand_slurry = useSelector(
-    (state) => state.warehouseSandSlurry,
-  );
+  const warehouse_sand_slurry = useSelector((state) => state.warehouseSandSlurry);
 
   const reservedMap = {
     product: list_of_reserved_products,
@@ -345,9 +340,7 @@ const WarehouseContextProvider = ({ children }) => {
   const [wmoctProductShippedBD, setWmoctProductShippedBD] = useState([]);
   const [listOfOrderedAuxilary, setListOfOrderedAuxilary] = useState([]);
   const [wmoctProductDeltaForPdf, setWmoctProductDeltaForPdf] = useState([]);
-  const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState(
-    [],
-  );
+  const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
 
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_orders = useSelector((state) => state.orders);
@@ -399,8 +392,7 @@ const WarehouseContextProvider = ({ children }) => {
     const certificate = product?.certificate?.slice(0, 1);
     const density = product?.density?.toString().slice(0, 1);
 
-    const articleId =
-      warehouse_data.length === 0 ? 1 : warehouse_data.length + 1;
+    const articleId = warehouse_data.length === 0 ? 1 : warehouse_data.length + 1;
     versionNumber = `0000000${articleId}`.slice(-6);
 
     const warehouseArticle = `S00${certificate}${density}${year}${month}${day}${versionNumber}`;
@@ -408,126 +400,256 @@ const WarehouseContextProvider = ({ children }) => {
     return warehouseArticle;
   };
 
-  const saveHandler = () => {
-    const newReserved = [];
-    const wh_arr = [];
+  // const saveHandler = () => {
+  //   const newReserved = [];
+  //   const wh_arr = [];
 
-    let orderId;
+  //   let orderId;
 
-    wmoctProduct.forEach((el) => {
-      const { orders_products_id, order_id } = el;
-      orderId = order_id;
+  //   wmoctProduct.forEach((el) => {
+  //     const { orders_products_id, order_id } = el;
+  //     orderId = order_id;
 
-      const type = getProductType(el.article);
-      const warehouse_arr = warehouseMap[type];
-      const reserved_arr = reservedMap[type];
+  //     const type = getProductType(el.article);
+  //     const warehouse_arr = warehouseMap[type];
+  //     const reserved_arr = reservedMap[type];
 
-      el?.batches?.forEach((elem) => {
-        const wh = warehouse_arr.find(
-          (elwh) =>
-            elwh.article == elem.batchId && elwh.product_article == el.article,
-        );
+  //     el?.batches?.forEach((elem) => {
+  //       const wh = warehouse_arr.find(
+  //         (elwh) =>
+  //           elwh.article == elem.batchId && elwh.product_article == el.article,
+  //       );
 
-        const haveReserve = reserved_arr.find(
-          (el) =>
-            el.warehouse_id == wh.id &&
-            el.orders_products_id == orders_products_id,
-        );
+  //       const haveReserve = reserved_arr.find(
+  //         (el) =>
+  //           el.warehouse_id == wh.id && el.orders_products_id == orders_products_id,
+  //       );
 
-        const prevQty = (haveReserve?.quantity ?? elem?.minAllocated ?? 0) || 0;
+  //       const prevQty = (haveReserve?.quantity ?? elem?.minAllocated ?? 0) || 0;
 
-        const obj = {
-          article: el.article,
-          warehouse_id: wh.id,
-          orders_products_id,
-          quantity: elem.allocated,
-        };
+  //       const obj = {
+  //         article: el.article,
+  //         warehouse_id: wh.id,
+  //         orders_products_id,
+  //         quantity: elem.allocated,
+  //       };
 
-        if (prevQty === 0 && elem.allocated > 0) {
-          newReserved.push(obj);
-          console.log(`New reserved added for ${type}:`, obj);
-        }
+  //       if (prevQty === 0 && elem.allocated > 0) {
+  //         newReserved.push(obj);
+  //         console.log(`New reserved added for ${type}:`, obj);
+  //       }
 
-        if (!haveReserve) {
-          wh_arr.push({
-            warehouse_id: wh.id,
-            product_article: wh.product_article,
-            total_quantity: wh.total_quantity - elem.allocated,
-            ordered_quantity: wh.ordered_quantity - elem.allocated,
-            type,
-          });
-        }
+  //       if (!haveReserve) {
+  //         wh_arr.push({
+  //           warehouse_id: wh.id,
+  //           product_article: wh.product_article,
+  //           total_quantity: wh.total_quantity - elem.allocated,
+  //           ordered_quantity: wh.ordered_quantity - elem.allocated,
+  //           type,
+  //         });
+  //       }
 
-        if (haveReserve && haveReserve.quantity != elem.allocated) {
-          const quantity = haveReserve.quantity - elem.allocated;
+  //       if (haveReserve && haveReserve.quantity != elem.allocated) {
+  //         const quantity = haveReserve.quantity - elem.allocated;
 
-          wh_arr.push({
-            warehouse_id: wh.id,
-            product_article: wh.product_article,
-            total_quantity: wh.total_quantity + quantity,
-            ordered_quantity: wh.ordered_quantity + quantity,
-            type,
-          });
+  //         wh_arr.push({
+  //           warehouse_id: wh.id,
+  //           product_article: wh.product_article,
+  //           total_quantity: wh.total_quantity + quantity,
+  //           ordered_quantity: wh.ordered_quantity + quantity,
+  //           type,
+  //         });
 
-          switch (type) {
-            case 'product':
-              dispatch(updReservedProducts(obj));
-              break;
+  //         switch (type) {
+  //           case 'product':
+  //             dispatch(updReservedProducts(obj));
+  //             break;
 
-            case 'relMat':
-              dispatch(updRelMatReservedProducts(obj));
-              break;
+  //           case 'relMat':
+  //             dispatch(updRelMatReservedProducts(obj));
+  //             break;
 
-            case 'tool':
-              dispatch(updToolReservedProducts(obj));
-              break;
+  //           case 'tool':
+  //             dispatch(updToolReservedProducts(obj));
+  //             break;
 
-            case 'dryMixed':
-              dispatch(updDryMixedReservedProducts(obj));
-              break;
+  //           case 'dryMixed':
+  //             dispatch(updDryMixedReservedProducts(obj));
+  //             break;
 
-            case 'anchor':
-              dispatch(updAnchorReservedProducts(obj));
-              break;
+  //           case 'anchor':
+  //             dispatch(updAnchorReservedProducts(obj));
+  //             break;
 
-            default:
-              break;
-          }
-        }
-      });
-    });
+  //           default:
+  //             break;
+  //         }
+  //       }
+  //     });
+  //   });
 
-    dispatch(updateWarehouseQuantitys(wh_arr));
+  //   dispatch(updateWarehouseQuantitys(wh_arr));
 
-    const allShipped = wmoctProduct.every((el) => el.qty_total === el.shipped);
+  //   const allShipped = wmoctProduct.every((el) => el.qty_total === el.shipped);
 
-    if (allShipped) {
-      const article = list_of_orders.find((el) => el.id == orderId)?.article;
-      dispatch(
-        updateOrderStatus({
-          order_id: orderId,
-          status: 9,
-        }),
+  //   console.log('allShipped WarehouseContext.js line 494', allShipped)
+  //   if (allShipped) {
+  //     const article = list_of_orders.find((el) => el.id == orderId)?.article;
+  //     dispatch(
+  //       updateOrderStatus({
+  //         order_id: orderId,
+  //         status: 9,
+  //       }),
+  //     );
+
+  //     dispatch(
+  //       updAccountingDataList({
+  //         orders_article: article,
+  //         aproved: false,
+  //       }),
+  //     );
+  //   }
+
+  //   const pad = (n) => String(n).padStart(2, '0');
+
+  //   const now = new Date();
+  //   const dateTimeStr =
+  //     `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+  //     `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  //   // dispatch(addNewAldabaran({ num: aldabaranNum, data: dateTimeStr }));
+
+  //   const grouped = {
+  //     product: [],
+  //     relMat: [],
+  //     tool: [],
+  //     dryMixed: [],
+  //     anchor: [],
+  //   };
+
+  //   newReserved.forEach((item) => {
+  //     const { article, warehouse_id, orders_products_id, quantity } = item;
+
+  //     const obj = { warehouse_id, orders_products_id, quantity };
+
+  //     if (article.startsWith('T.')) {
+  //       grouped.product.push(obj);
+  //     } else if (article.startsWith('X.P')) {
+  //       grouped.relMat.push(obj);
+  //     } else if (article.startsWith('X.T')) {
+  //       grouped.tool.push(obj);
+  //     } else if (article.startsWith('X.M')) {
+  //       grouped.dryMixed.push(obj);
+  //     } else if (article.startsWith('X.F')) {
+  //       grouped.anchor.push(obj);
+  //     }
+  //   });
+
+  //   Object.entries(grouped).forEach(([key, items]) => {
+  //     if (typeof items !== 'undefined' && items.length > 0) {
+  //       switch (key) {
+  //         case 'product':
+  //           dispatch(addNewReservedProducts(items));
+  //           break;
+
+  //         case 'relMat':
+  //           dispatch(addNewRelMatReservedProducts(items));
+  //           break;
+
+  //         case 'tool':
+  //           dispatch(addNewToolReservedProducts(items));
+  //           break;
+
+  //         case 'dryMixed':
+  //           dispatch(addNewDryMixedReservedProducts(items));
+  //           break;
+
+  //         case 'anchor':
+  //           dispatch(addNewAnchorReservedProducts(items));
+  //           break;
+
+  //         default:
+  //           break;
+  //       }
+  //     }
+  //   });
+
+  //   setWmoctProductShippedBD([]);
+  //   setSelectedOrder(null);
+  // };
+
+  const normalizeProductType = (type) => {
+    if (type === 'dryMix') return 'dryMixed';
+    return type;
+  };
+
+  const saveHandler = async () => {
+    if (!Array.isArray(wmoctProduct) || wmoctProduct.length === 0) return;
+
+    const getWarehouseProductArticle = (warehouseItem) => {
+      return (
+        warehouseItem?.product_article ||
+        warehouseItem?.dry_mixed_article ||
+        warehouseItem?.anchor_article ||
+        warehouseItem?.tool_article ||
+        warehouseItem?.rel_mat_article ||
+        ''
       );
+    };
 
-      dispatch(
-        updAccountingDataList({
-          orders_article: article,
-          aproved: false,
-        }),
-      );
-    }
+    const getAddReserveAction = (type) => {
+      switch (type) {
+        case 'product':
+          return addNewReservedProducts;
 
-    const pad = (n) => String(n).padStart(2, '0');
+        case 'relMat':
+          return addNewRelMatReservedProducts;
 
-    const now = new Date();
-    const dateTimeStr =
-      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
-      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        case 'tool':
+          return addNewToolReservedProducts;
 
-    dispatch(addNewAldabaran({ num: aldabaranNum, data: dateTimeStr }));
+        case 'dryMixed':
+          return addNewDryMixedReservedProducts;
 
-    const grouped = {
+        case 'anchor':
+          return addNewAnchorReservedProducts;
+
+        default:
+          return null;
+      }
+    };
+
+    const getUpdateReserveAction = (type) => {
+      switch (type) {
+        case 'product':
+          return updReservedProducts;
+
+        case 'relMat':
+          return updRelMatReservedProducts;
+
+        case 'tool':
+          return updToolReservedProducts;
+
+        case 'dryMixed':
+          return updDryMixedReservedProducts;
+
+        case 'anchor':
+          return updAnchorReservedProducts;
+
+        default:
+          return null;
+      }
+    };
+
+    const orderId = Number(selectedOrder?.order_id ?? wmoctProduct[0]?.order_id);
+
+    if (!orderId) return false;
+
+    const makeDispatchReserveKey = (type, orderDispatchId) => {
+      return `${normalizeProductType(type)}_${Number(orderDispatchId)}`;
+    };
+
+    const newReservedGrouped = {
       product: [],
       relMat: [],
       tool: [],
@@ -535,55 +657,243 @@ const WarehouseContextProvider = ({ children }) => {
       anchor: [],
     };
 
-    newReserved.forEach((item) => {
-      const { article, warehouse_id, orders_products_id, quantity } = item;
+    const warehouseUpdatesMap = new Map();
 
-      const obj = { warehouse_id, orders_products_id, quantity };
+    const reservedByDispatch = new Map();
 
-      if (article.startsWith('T.')) {
-        grouped.product.push(obj);
-      } else if (article.startsWith('X.P')) {
-        grouped.relMat.push(obj);
-      } else if (article.startsWith('X.T')) {
-        grouped.tool.push(obj);
-      } else if (article.startsWith('X.M')) {
-        grouped.dryMixed.push(obj);
-      } else if (article.startsWith('X.F')) {
-        grouped.anchor.push(obj);
-      }
+    Object.entries(reservedMap).forEach(([type, reservedArr]) => {
+      const normalizedType = normalizeProductType(type);
+
+      (reservedArr || []).forEach((reservedItem) => {
+        const orderDispatchId = Number(reservedItem.order_dispatch_id);
+
+        if (!orderDispatchId) return;
+
+        const key = makeDispatchReserveKey(normalizedType, orderDispatchId);
+
+        const previous = reservedByDispatch.get(key) || 0;
+
+        reservedByDispatch.set(key, previous + Number(reservedItem.quantity || 0));
+      });
     });
 
-    Object.entries(grouped).forEach(([key, items]) => {
-      if (typeof items !== 'undefined' && items.length > 0) {
-        switch (key) {
-          case 'product':
-            dispatch(addNewReservedProducts(items));
-            break;
+    wmoctProduct.forEach((product) => {
+      const type = normalizeProductType(
+        product.product_type || getProductType(product.article),
+      );
 
-          case 'relMat':
-            dispatch(addNewRelMatReservedProducts(items));
-            break;
+      const warehouseArr = warehouseMap[type] || [];
+      const reservedArr = reservedMap[type] || [];
 
-          case 'tool':
-            dispatch(addNewToolReservedProducts(items));
-            break;
+      const ordersProductsId = Number(product.orders_products_id);
 
-          case 'dryMixed':
-            dispatch(addNewDryMixedReservedProducts(items));
-            break;
+      const orderDispatchId = Number(product.order_dispatch_id);
 
-          case 'anchor':
-            dispatch(addNewAnchorReservedProducts(items));
-            break;
+      if (!ordersProductsId) {
+        console.warn('orders_products_id is missing:', product);
+        return;
+      }
 
-          default:
-            break;
+      if (!orderDispatchId) {
+        console.warn(
+          'order_dispatch_id is missing. Reserve cannot be linked to trailer:',
+          product,
+        );
+        return;
+      }
+
+      product?.batches?.forEach((batch) => {
+        const allocated = Number(batch.allocated || 0);
+        const minAllocated = Number(batch.minAllocated || 0);
+
+        const delta = allocated - minAllocated;
+
+        if (delta <= 0) return;
+
+        const warehouseItem =
+          warehouseArr.find((wh) => Number(wh.id) === Number(batch.warehouseId)) ||
+          warehouseArr.find((wh) => {
+            const productArticle = getWarehouseProductArticle(wh);
+
+            return (
+              wh.article === batch.batchId && productArticle === product.article
+            );
+          });
+
+        if (!warehouseItem) {
+          console.warn('Warehouse item not found:', {
+            product,
+            batch,
+            type,
+          });
+          return;
         }
+
+        const existingReserve = reservedArr.find(
+          (reservedItem) =>
+            Number(reservedItem.warehouse_id) === Number(warehouseItem.id) &&
+            Number(reservedItem.orders_products_id) === Number(ordersProductsId) &&
+            Number(reservedItem.order_dispatch_id) === Number(orderDispatchId),
+        );
+
+        if (existingReserve) {
+          const nextQuantity = Number(existingReserve.quantity || 0) + delta;
+
+          const updateAction = getUpdateReserveAction(type);
+
+          if (updateAction) {
+            dispatch(
+              updateAction({
+                article: product.article,
+                warehouse_id: warehouseItem.id,
+                orders_products_id: ordersProductsId,
+                order_dispatch_id: orderDispatchId,
+                quantity: nextQuantity,
+              }),
+            );
+          }
+        } else {
+          newReservedGrouped[type].push({
+            warehouse_id: warehouseItem.id,
+            orders_products_id: ordersProductsId,
+            order_dispatch_id: orderDispatchId,
+            quantity: delta,
+          });
+        }
+
+        const reservedKey = makeDispatchReserveKey(type, orderDispatchId);
+
+        const previousReserved = reservedByDispatch.get(reservedKey) || 0;
+
+        reservedByDispatch.set(reservedKey, previousReserved + delta);
+
+        const warehouseUpdateKey = `${type}_${Number(warehouseItem.id)}`;
+
+        const previousWarehouseUpdate = warehouseUpdatesMap.get(
+          warehouseUpdateKey,
+        ) || {
+          warehouseItem,
+          type,
+          delta: 0,
+        };
+
+        previousWarehouseUpdate.delta += delta;
+
+        warehouseUpdatesMap.set(warehouseUpdateKey, previousWarehouseUpdate);
+      });
+    });
+
+    const wh_arr = Array.from(warehouseUpdatesMap.values()).map(
+      ({ warehouseItem, type, delta }) => ({
+        warehouse_id: warehouseItem.id,
+        product_article: getWarehouseProductArticle(warehouseItem),
+        total_quantity: Math.max(
+          Number(warehouseItem.total_quantity || 0) - delta,
+          0,
+        ),
+        ordered_quantity: Math.max(
+          Number(warehouseItem.ordered_quantity || 0) - delta,
+          0,
+        ),
+        type,
+      }),
+    );
+
+    if (wh_arr.length > 0) {
+      dispatch(updateWarehouseQuantitys(wh_arr));
+    }
+
+    Object.entries(newReservedGrouped).forEach(([type, items]) => {
+      if (!items.length) return;
+
+      const addAction = getAddReserveAction(type);
+
+      if (addAction) {
+        dispatch(addAction(items));
       }
     });
 
-    setWmoctProductShippedBD([]);
-    setSelectedOrder(null);
+    const dispatchRowsForOrder = (order_dispatch_data || []).filter(
+      (item) => Number(item.orderId) === Number(orderId),
+    );
+
+    const reservationCheck = dispatchRowsForOrder.map((dispatchRow) => {
+      const orderDispatchId = Number(dispatchRow.id);
+
+      const type = normalizeProductType(dispatchRow.product_table);
+
+      const plannedQuantity = Number(dispatchRow.quantity || 0);
+
+      const key = makeDispatchReserveKey(type, orderDispatchId);
+
+      const reservedQuantity = reservedByDispatch.get(key) || 0;
+
+      return {
+        orderDispatchId,
+        trailer: Number(dispatchRow.trailer),
+        article: dispatchRow.article,
+        type,
+        plannedQuantity,
+        reservedQuantity,
+        missing: Math.max(plannedQuantity - reservedQuantity, 0),
+      };
+    });
+
+    const dispatchRowsWithoutId = reservationCheck.filter(
+      (item) => !item.orderDispatchId,
+    );
+
+    const missingReservations = reservationCheck.filter((item) => item.missing > 0);
+
+    const allOrderReserved =
+      dispatchRowsForOrder.length > 0 &&
+      dispatchRowsWithoutId.length === 0 &&
+      missingReservations.length === 0;
+
+    console.table(reservationCheck);
+
+    console.log('dispatchRowsWithoutId:', dispatchRowsWithoutId);
+
+    console.log('missingReservations:', missingReservations);
+
+    console.log('allOrderReserved:', allOrderReserved);
+
+    if (allOrderReserved) {
+      const order = list_of_orders.find(
+        (item) => Number(item.id) === Number(orderId),
+      );
+
+      const article = order?.article;
+
+      if (!article) {
+        console.error('Order article not found:', orderId);
+        return false;
+      }
+
+      try {
+        await dispatch(
+          updateOrderStatus({
+            order_id: orderId,
+            status: 9,
+          }),
+        );
+
+        await dispatch(
+          updAccountingDataList({
+            orders_article: article,
+            aproved: false,
+          }),
+        );
+
+        await dispatch(deleteWarehouseManagerTrailer(orderId));
+      } catch (error) {
+        console.error('Failed to complete warehouse order:', error);
+
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const distributeToSources = (sources, amount, onEachUpdate) => {
@@ -735,10 +1045,7 @@ const WarehouseContextProvider = ({ children }) => {
 
       if (!art) continue;
 
-      producedByArticle.set(
-        art,
-        (producedByArticle.get(art) || 0) + producedUnits,
-      );
+      producedByArticle.set(art, (producedByArticle.get(art) || 0) + producedUnits);
     }
 
     // Распределение произведённого: идём по заказам (после сортировки) и "раздаём"
@@ -825,8 +1132,7 @@ const WarehouseContextProvider = ({ children }) => {
     const fullyReservedOrders = Array.from(ordersMap.entries())
       .filter(([orderArticle, items]) =>
         items.every(
-          (item) =>
-            Number(item.quantity) === Number(item.quantity_in_warehouse),
+          (item) => Number(item.quantity) === Number(item.quantity_in_warehouse),
         ),
       )
       .map(([orderArticle]) => orderArticle);
@@ -931,6 +1237,7 @@ const WarehouseContextProvider = ({ children }) => {
         batchOutside,
         warehouse_sand_slurry,
         order_dispatch_data,
+        normalizeProductType,
       }}
     >
       {children}

@@ -27,6 +27,7 @@ export const dryMixesWarehouseReducer = (dryMixesWarehouse = [], action) => {
     }
 
     case DRY_MIXES_QUANTITYS_SOCKET: {
+      console.log('payload productsTypeWarehouseReducer.js line 30', payload);
       if (payload.isArray === false) {
         const { warehouse_id, total_quantity, ordered_quantity } = payload;
 
@@ -39,7 +40,12 @@ export const dryMixesWarehouseReducer = (dryMixesWarehouse = [], action) => {
         });
         return result;
       } else {
-        return payload;
+        return (
+          payload.wh_data?.dryMix ??
+          payload.wh_data?.dryMixed ??
+          payload.wh_data ??
+          payload
+        );
       }
     }
 
@@ -83,7 +89,7 @@ export const relatedMaterialsWarehouseReducer = (
         });
         return result;
       } else {
-        return payload;
+        return payload.wh_data?.relMat ?? payload?.wh_data ?? payload;
       }
     }
 
@@ -124,7 +130,7 @@ export const anchorsWarehouseReducer = (anchorsWarehouse = [], action) => {
         });
         return result;
       } else {
-        return payload;
+        return payload.wh_data?.anchor ?? payload?.wh_data ?? payload;
       }
     }
 
@@ -165,7 +171,7 @@ export const toolsWarehouseReducer = (toolsWarehouse = [], action) => {
         });
         return result;
       } else {
-        return payload;
+        return payload.wh_data?.tool ?? payload?.wh_data ?? payload;
       }
     }
 
