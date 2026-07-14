@@ -160,6 +160,15 @@ function WMModalTrailer({ setTrailerOrder }) {
 
             if (!productInfo) return null;
 
+            if (type === 'relMat') {
+              const finalPrice =
+                orderProductRow?.final_price ?? productInfo?.final_price;
+
+              if (finalPrice < 0) {
+                return null;
+              }
+            }
+
             const fullDescription =
               productInfo.description ||
               productInfo.name ||
