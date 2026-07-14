@@ -180,17 +180,119 @@
 }
 
 /* empty state */
-.cl-page .tbl-empty {
+.cl-page .tbl-empty,
+.ord-page .tbl-empty,
+.ord-card-scope .tbl-empty {
   padding: 54px 18px;
   text-align: center;
   color: #9aa0ac;
 }
-.cl-page .tbl-empty__title {
+.cl-page .tbl-empty__title,
+.ord-page .tbl-empty__title,
+.ord-card-scope .tbl-empty__title {
   font-size: 15px;
   font-weight: 600;
   color: #565d6d;
 }
-.cl-page .tbl-empty__sub {
+.cl-page .tbl-empty__sub,
+.ord-page .tbl-empty__sub,
+.ord-card-scope .tbl-empty__sub {
   font-size: 13px;
   margin-top: 4px;
+}
+
+/* =====================================================================
+   ORDERS module — reuses the same "card" table look.
+   .ord-page  = Orders list page shell
+   .ord-card-scope = a Table variant="card" embedded inside an Orders
+   modal (e.g. the "Add new order" wizard, step 1: pick a client)
+   ===================================================================== */
+.ord-page .tbl-card,
+.ord-card-scope .tbl-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  background: #fff !important;
+  border: 1px solid #e4e6eb !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 2px rgba(20, 23, 33, 0.04), 0 6px 18px rgba(20, 23, 33, 0.03) !important;
+}
+.ord-page .tbl-card table.tbl,
+.ord-card-scope .tbl-card table.tbl {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  font-size: 14px !important;
+  background: #fff !important;
+  table-layout: auto !important;
+}
+.ord-page .tbl-card table.tbl > thead > tr,
+.ord-card-scope .tbl-card table.tbl > thead > tr {
+  background: #fafafb !important;
+  border-bottom: 1px solid #e4e6eb !important;
+}
+.ord-page .tbl-card table.tbl > thead > tr > th,
+.ord-card-scope .tbl-card table.tbl > thead > tr > th {
+  text-align: left !important;
+  padding: 13px 18px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  color: #9aa0ac !important;
+  background: #fafafb !important;
+  border: 0 !important;
+  border-bottom: 1px solid #e4e6eb !important;
+  white-space: nowrap !important;
+  position: static !important;
+}
+.ord-page .tbl-card table.tbl .tbl-th-inner,
+.ord-card-scope .tbl-card table.tbl .tbl-th-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ord-page .tbl-card table.tbl .tbl-sort,
+.ord-card-scope .tbl-card table.tbl .tbl-sort {
+  display: inline-flex;
+  align-items: center;
+  color: #c4c8d0;
+  font-size: 13px;
+}
+.ord-page .tbl-card table.tbl > tbody > tr,
+.ord-card-scope .tbl-card table.tbl > tbody > tr {
+  background: #fff !important;
+}
+.ord-page .tbl-card table.tbl > tbody > tr:nth-child(odd),
+.ord-page .tbl-card table.tbl > tbody > tr:nth-child(even),
+.ord-card-scope .tbl-card table.tbl > tbody > tr:nth-child(odd),
+.ord-card-scope .tbl-card table.tbl > tbody > tr:nth-child(even) {
+  background: #fff !important;
+}
+.ord-page .tbl-card table.tbl > tbody > tr > td,
+.ord-card-scope .tbl-card table.tbl > tbody > tr > td {
+  padding: 13px 18px !important;
+  border: 0 !important;
+  border-bottom: 1px solid #f0f1f4 !important;
+  color: #565d6d !important;
+  font-size: 13.5px !important;
+  vertical-align: middle !important;
+  background: transparent !important;
+}
+.ord-page .tbl-card table.tbl > tbody > tr:last-child > td,
+.ord-card-scope .tbl-card table.tbl > tbody > tr:last-child > td {
+  border-bottom: 0 !important;
+}
+.ord-page .tbl-card table.tbl > tbody > tr.tbl-row--click,
+.ord-card-scope .tbl-card table.tbl > tbody > tr.tbl-row--click {
+  cursor: pointer !important;
+  transition: background 0.12s;
+}
+.ord-page .tbl-card table.tbl > tbody > tr.tbl-row--click:hover,
+.ord-page .tbl-card table.tbl > tbody > tr.tbl-row--click:hover > td,
+.ord-card-scope .tbl-card table.tbl > tbody > tr.tbl-row--click:hover,
+.ord-card-scope .tbl-card table.tbl > tbody > tr.tbl-row--click:hover > td {
+  background: #fafbfc !important;
 }

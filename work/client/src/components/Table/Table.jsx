@@ -16,6 +16,8 @@ function Table({
   variant = 'default', // 'default' | 'card'
   hideTitle = false,
   renderToolbar, // (api) => JSX
+  emptyTitle = 'No clients match your search',
+  emptySubtitle = 'Try a different name, CIF/VAT or category.',
 }) {
   const columns = useMemo(() => {
     return Array.isArray(COLUMN_DATA) ? COLUMN_DATA : [];
@@ -178,10 +180,8 @@ function Table({
 
         {isCard && rows.length === 0 && (
           <div className="tbl-empty">
-            <div className="tbl-empty__title">No clients match your search</div>
-            <div className="tbl-empty__sub">
-              Try a different name, CIF/VAT or category.
-            </div>
+            <div className="tbl-empty__title">{emptyTitle}</div>
+            <div className="tbl-empty__sub">{emptySubtitle}</div>
           </div>
         )}
       </div>

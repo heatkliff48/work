@@ -4,6 +4,7 @@ import { addNewFilesOrder } from '#components/redux/actions/filesOrderAction.js'
 import { useDispatch } from 'react-redux';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useFileContext } from '#components/contexts/FileContext.js';
+import '#components/Orders/ordersView.css';
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
@@ -55,15 +56,18 @@ const FileUpload = () => {
   };
 
   return (
-    <div className="fileUpload">
-      <h5>File Upload</h5>
-      <form onSubmit={onSubmit}>
+    <div className="ord-field">
+      <label className="ord-field__label">File upload</label>
+      <form onSubmit={onSubmit} className="ord-file-row">
         <input
           type="file"
           onChange={onChange}
           accept=".pdf,.txt,.doc,.docx.,jpg,.jpeg,.png,.gif,.bmp,.svg"
+          className="ord-file-input"
         />
-        <button type="submit">Upload</button>
+        <button type="submit" className="ord-btn ord-btn--ghost ord-btn--sm">
+          Upload
+        </button>
       </form>
     </div>
   );
