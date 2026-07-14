@@ -171,8 +171,6 @@ function WarehouseManager() {
     setWmoctProductShippedBD([]);
   }, [order_dispatch_data, list_of_orders, deliveryAddresses]);
 
-  console.log('warehouseMdata WarehouseManager.jsx line 129', warehouseMdata);
-
   return (
     <>
       <div>

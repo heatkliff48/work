@@ -31,6 +31,7 @@ const {
   UPDATE_REL_MAT_QUANTITYS_SOCKET,
   GET_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+  CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
 } = require('../src/constants/event.js');
 const myEmitter = require('../src/ee.js');
 
@@ -676,12 +677,28 @@ class WarehouseController {
     }
   }
 
-  static async deleteWarehouseManagerTrailer(req, res) {
-    const order_id = req.body;
+  static async changeStatusWarehouseManagerTrailer(req, res) {
+    const new_status_trailer = req.body;
 
     try {
+      const wh_trailer = await WarehouseService.changeStatusWarehouseManagerTrailer(
+        new_status_trailer,
+      );
+
+      myEmitter.emit(CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET, wh_trailer);
+
+      return res.status(200);
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return ErrorUtils.catchError(error);
+    }
+  }
+
+  static async deleteWarehouseManagerTrailer(req, res) {
+    const { wh_trailer_id } = req.body;
+    try {
       const wh_trailer = await WarehouseService.deleteWarehouseManagerTrailer(
-        order_id,
+        wh_trailer_id,
       );
 
       myEmitter.emit(ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET, wh_trailer);

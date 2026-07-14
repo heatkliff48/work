@@ -243,9 +243,7 @@ const calculateVAT = (productLists, vatProcent) => {
     };
   }
 
-  const vat_euro = Number(
-    ((vatProcent * final_price_product) / 100).toFixed(2),
-  );
+  const vat_euro = Number(((vatProcent * final_price_product) / 100).toFixed(2));
   const vat_result = Number((final_price_product + vat_euro).toFixed(2));
 
   return {
@@ -319,6 +317,7 @@ function FacturaManager() {
           totalQuantity: 0,
           productDetails: [],
           rawProductsData: [],
+          trailer_stage: item?.trailer_stage || 0,
         };
       }
 
@@ -335,9 +334,7 @@ function FacturaManager() {
 
     const result = Object.values(groupedData).map((group) => {
       const order = list_of_orders.find((o) => o.id === group.orderId);
-      const delivery = deliveryAddresses.find(
-        (d) => d.id === order?.del_adr_id,
-      );
+      const delivery = deliveryAddresses.find((d) => d.id === order?.del_adr_id);
 
       // Формируем productLists для этого заказа
       const productLists = buildProductLists(
@@ -363,6 +360,7 @@ function FacturaManager() {
         productLists: productLists,
         vatData: vatData,
         rawProductsData: group.rawProductsData,
+        trailer_stage: group.trailer_stage,
       };
     });
 

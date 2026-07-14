@@ -105,6 +105,10 @@ router.post(
   WarehouseController.addNewWarehouseManagerTrailer,
 );
 router.post(
+  '/order_dispatch/status',
+  WarehouseController.changeStatusWarehouseManagerTrailer,
+);
+router.delete(
   '/order_dispatch/delete',
   WarehouseController.deleteWarehouseManagerTrailer,
 );

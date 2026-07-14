@@ -1142,8 +1142,6 @@ const WarehouseContextProvider = ({ children }) => {
         (order) => order.article === order_article,
       );
 
-      console.log(currOrder, 'WarehouseContext.js line 873');
-
       if (currOrder?.id && !order_status.includes(currOrder?.status)) {
         dispatch(
           updateOrderStatus({

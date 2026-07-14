@@ -1503,6 +1503,30 @@ class WarehouseRepository {
     }
   }
 
+  static async changeStatusWarehouseManagerTrailer(new_status_trailer) {
+    const { status, trailer } = new_status_trailer;
+    const t = await sequelize.transaction();
+    try {
+      const [count, new_status] = await OrderDispatches.update(
+        {
+          trailer_stage: status,
+        },
+        {
+          where: { trailer },
+          transaction: t,
+          returning: true,
+        },
+      );
+      await t.commit();
+
+      return new_status;
+    } catch (error) {
+      await t.rollback();
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return error;
+    }
+  }
+
   static async deleteWarehouseManagerTrailer(order_id) {
     try {
       await OrderDispatches.destroy({ where: { orderId: order_id } });

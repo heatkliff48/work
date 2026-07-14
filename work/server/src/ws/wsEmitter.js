@@ -169,6 +169,7 @@ const {
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
   ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+  CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -1513,6 +1514,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
           payload: wh_trailer,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET, (wh_trailer_status) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+          payload: wh_trailer_status,
         }),
       );
     }

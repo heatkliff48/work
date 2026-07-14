@@ -1,7 +1,5 @@
-import showMessage from '#components/Utils/showMessage.js';
 import {
   NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
-  NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
   NEW_WAREHOUSE_SOCKET,
   REMAINING_STOCK_SOCKET,
   WAREHOUSE_QUANTITYS_SOCKET,
@@ -44,28 +42,12 @@ export const warehouseReducer = (warehouse = [], action) => {
 
     case REMAINING_STOCK:
     case REMAINING_STOCK_SOCKET: {
-      const { warehouse_id, free_quantity_remaining, ordered_quantity } = payload;
 
       const result = warehouse.map((el) => {
         if (el.id === payload[1].id) return payload[1];
         return el;
       });
 
-      //   if (el.id == warehouse_id) {
-      //     const total_quantity = payload?.total_quantity
-      //       ? payload.total_quantity
-      //       : el.total_quantity || 0;
-
-      //     return {
-      //       ...el,
-      //       free_quantity_remaining,
-      //       ordered_quantity,
-      //       total_quantity,
-      //     };
-      //   }
-
-      //   return el;
-      // });
       return result;
     }
 
@@ -82,9 +64,6 @@ export const rawMaterialsWarehouseReducer = (rawMaterialsWarehouse = [], action)
     }
 
     case NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET: {
-      console.log({ rawMaterialsWarehouse }, 'warehouseReducer.js line 70');
-      console.log({ payload }, 'warehouseReducer.js line 71');
-
       const itemsToUpdate = Array.isArray(payload) ? payload : [payload];
 
       let result = [...rawMaterialsWarehouse];

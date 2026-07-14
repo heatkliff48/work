@@ -27,7 +27,6 @@ export const dryMixesWarehouseReducer = (dryMixesWarehouse = [], action) => {
     }
 
     case DRY_MIXES_QUANTITYS_SOCKET: {
-      console.log('payload productsTypeWarehouseReducer.js line 30', payload);
       if (payload.isArray === false) {
         const { warehouse_id, total_quantity, ordered_quantity } = payload;
 
