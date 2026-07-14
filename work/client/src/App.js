@@ -58,6 +58,9 @@ import GreenLineMonitoring from '#components/GreenLineMonitoring/GreenLineMonito
 import TemperatureDataMonitoring from '#components/GreenLineMonitoring/TemperatureDataMonitoring.jsx';
 
 import { getWebSocketUrl } from '#utils/getApiUrl.js';
+import WMOrderCard from '#components/WarehouseManager/WMOrderCard/WMOrderCard.jsx';
+import FacturaManager from '#components/Accounting/Factura/FacturaManager.jsx';
+import FacturaOrderCard from '#components/Accounting/Factura/FacturaOrderCard.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -182,7 +185,16 @@ function App() {
               path="/warehouse_products_type"
               element={<ProductsTypeWarehouse />}
             />
+            <Route
+              path="/warehouse-manager/order-card"
+              element={<WMOrderCard />}
+            />
             <Route path="/warehouse_manager" element={<WarehouseManager />} />
+            <Route path="/factura_manager" element={<FacturaManager />} />
+            <Route
+              path="/factura_manager/order-card"
+              element={<FacturaOrderCard />}
+            />
 
             <Route path="/lotes_list" element={<LotesList />} />
             <Route path="/task_board" element={<TaskBoard />} />

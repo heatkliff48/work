@@ -261,10 +261,24 @@ export default function NavBar() {
         access: 'warehouse_manager',
       },
       {
+        type: 'group',
         title: 'Accounting',
-        path: '/accounting',
         icon: accountingIcon,
         access: 'accounting',
+        children: [
+          {
+            title: 'Accounting',
+            path: '/accounting',
+            icon: accountingIcon,
+            access: 'accounting',
+          },
+          {
+            title: 'Furi',
+            path: '/factura_manager',
+            icon: accountingIcon,
+            access: 'accounting',
+          },
+        ],
       },
       {
         type: 'group',

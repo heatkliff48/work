@@ -4,6 +4,7 @@ import {
   addNewFilesOrderSocket,
   addNewFilesProductSocket,
   addNewFilesWarehouseSocket,
+  addChildOrderSocket,
   addNewOrderSocket,
   addNewProductSocket,
   addNewRelatedMaterialsJournalSocket,
@@ -154,6 +155,7 @@ import {
   addNewWarehouseSandPowderSocket,
   updateWarehouseSandPowderSocket,
   deleteWarehouseSandPowderSocket,
+  addNewWarehouseManagerTrailerSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -180,6 +182,7 @@ import {
   ADD_DELIVERY_ADDRESSES_SOCKET,
   ADD_NEW_BATCH_OUTSIDE_SOCKET,
   ADD_NEW_CLIENT_SOCKET,
+  ADD_CHILD_ORDER_SOCKET,
   ADD_NEW_ORDER_SOCKET,
   ADD_NEW_PRODUCT_SOCKET,
   UPDATE_BATCH_OUTSIDE_SOCKET,
@@ -353,6 +356,7 @@ import {
   ADD_NEW_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -405,6 +409,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_ORDER_SOCKET:
       dispatch(addNewOrderSocket(payload));
+      break;
+
+    case ADD_CHILD_ORDER_SOCKET:
+      dispatch(addChildOrderSocket(payload));
       break;
 
     case GET_DELETE_ORDER_SOCKET:
@@ -801,6 +809,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case DELETE_QUALITY_MANAGEMENT_DATA_SOCKET:
       dispatch(deleteQualityManagementSocket(payload));
+      break;
+
+    case ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET:
+      dispatch(addNewWarehouseManagerTrailerSocket(payload));
       break;
 
     case ADD_NEW_RELATED_MATERIALS_BACKORDER_SOCKET:

@@ -11,6 +11,7 @@ const PATH_LABELS = {
   '/users_info': 'Users Info',
   '/roles': 'Roles',
   '/warehouse_manager': 'Order dispatch',
+  '/factura_manager': 'Furion po farmu champion',
   '/products_type_journal': 'Products Type Journal',
   '/statistics': 'Statistics',
   '/orders': 'Orders',
@@ -46,7 +47,8 @@ function normalizeLabel(path) {
 }
 
 function genId() {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  if (typeof crypto !== 'undefined' && crypto.randomUUID)
+    return crypto.randomUUID();
   return 't_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
@@ -114,7 +116,9 @@ export default function TabsBar() {
         return prev;
 
       return prev.map((t) =>
-        t.id === current.id ? { ...t, path: location.pathname, title: nextTitle } : t
+        t.id === current.id
+          ? { ...t, path: location.pathname, title: nextTitle }
+          : t,
       );
     });
   }, [location.pathname, activeId]);
@@ -184,6 +188,9 @@ export default function TabsBar() {
   return (
     <div className="tabsbar-container">
       <div className="tabsbar-left">
+        <button className="tabsbar-add-current" onClick={() => navigate(-1)}>
+          ← Back
+        </button>
         <button
           className="tabsbar-add-current"
           title="Duplicate current tab"

@@ -20,7 +20,10 @@ module.exports = (sequelize, DataTypes) => {
         through: 'OrdersProducts',
         foreignKey: 'order_id',
       });
-      this.hasMany(OrdersProducts, { foreignKey: 'order_id', as: 'ordersProducts' });
+      this.hasMany(OrdersProducts, {
+        foreignKey: 'order_id',
+        as: 'ordersProducts',
+      });
       this.hasMany(FilesOrder, {
         foreignKey: 'order_id',
       });
@@ -38,11 +41,14 @@ module.exports = (sequelize, DataTypes) => {
       person_in_charge: DataTypes.INTEGER,
       description: DataTypes.STRING,
       delivery: DataTypes.FLOAT,
+      main_order: DataTypes.STRING,
+      deal_id: DataTypes.INTEGER,
+      uf_number_offer: DataTypes.INTEGER,
     },
     {
       sequelize,
       modelName: 'Orders',
-    }
+    },
   );
   return Orders;
 };

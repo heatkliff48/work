@@ -346,7 +346,6 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
   const tool = useSelector((state) => state.tool);
 
   function getLatestAuxilaryProducts(products) {
-    // Сначала находим последние версии всех продуктов
     const latestVersionsMap = products?.reduce((acc, product) => {
       const { article, version } = product;
       if (!acc.has(article) || version > acc.get(article).version) {
@@ -355,15 +354,11 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       return acc;
     }, new Map());
 
-    // Фильтруем исходный массив, оставляя только первое вхождение каждого артикула,
-    // но заменяем его на последнюю версию из latestVersionsMap
     const uniqueProductsInOriginalOrder = products
       ?.filter((product, index, self) => {
-        // Оставляем только первое вхождение артикула в исходном массиве
         return self.findIndex((p) => p.article === product.article) === index;
       })
       .map((product) => {
-        // Заменяем продукт на его последнюю версию из мапы
         return latestVersionsMap.get(product.article);
       });
 

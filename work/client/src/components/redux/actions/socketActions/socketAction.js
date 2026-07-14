@@ -8,6 +8,7 @@ import {
   NEW_FILES_ORDER_SOCKET,
   NEW_FILES_WAREHOUSE_SOCKET,
   NEW_ORDER_SOCKET,
+  CHILD_ORDER_SOCKET,
   NEW_PRODUCT_SOCKET,
   NEW_RECIPE_SOCKET,
   NEW_WAREHOUSE_SOCKET,
@@ -155,6 +156,7 @@ import {
   NEED_UPDATE_WAREHOUSE_PALLETS_SOCKET,
   NEED_DELETE_WAREHOUSE_PALLETS_SOCKET,
   NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
+  ADD_NEW_WAREHOUSE_MANAGER_TRAILER_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -232,6 +234,13 @@ export const addNewOrderSocket = (newOrder) => {
   return {
     type: NEW_ORDER_SOCKET,
     payload: newOrder,
+  };
+};
+
+export const addChildOrderSocket = (childOrder) => {
+  return {
+    type: CHILD_ORDER_SOCKET,
+    payload: childOrder,
   };
 };
 
@@ -864,6 +873,13 @@ export const deleteQualityManagementSocket = (qualityManagementDataID) => {
   return {
     type: NEED_DELETE_QUALITY_MANAGEMENT_DATA_SOCKET,
     payload: qualityManagementDataID,
+  };
+};
+
+export const addNewWarehouseManagerTrailerSocket = (wh_trailer) => {
+  return {
+    type: ADD_NEW_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+    payload: wh_trailer,
   };
 };
 

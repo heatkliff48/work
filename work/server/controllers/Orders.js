@@ -1,6 +1,6 @@
-const { ErrorUtils } = require("../utils/Errors.js");
-const OrdersService = require("../services/Orders.js");
-const myEmitter = require("../src/ee.js");
+const { ErrorUtils } = require('../utils/Errors.js');
+const OrdersService = require('../services/Orders.js');
+const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_ORDER_SOCKET,
   ADD_DATASHIP_ORDER_SOCKET,
@@ -28,7 +28,8 @@ const {
   GET_UPDATE_CONTACT_OF_ORDER_SOCKET,
   GET_UPDATE_ADRESS_OF_ORDER_SOCKET,
   GET_DELETE_ORDER_SOCKET,
-} = require("../src/constants/event.js");
+  ADD_CHILD_ORDER_SOCKET,
+} = require('../src/constants/event.js');
 
 class OrdersController {
   static async getOrdersList(req, res) {
@@ -65,7 +66,7 @@ class OrdersController {
 
   static async addDeliveryPrice(req, res) {
     const { order_id, delivery } = req.body;
-    console.log("req.body>>>>>>>>>>>", req.body);
+    console.log('req.body>>>>>>>>>>>', req.body);
 
     try {
       await OrdersService.addDeliveryPrice({ order_id, delivery });
@@ -207,12 +208,12 @@ class OrdersController {
       if (Array.isArray(newProductsOfOrder)) {
         product_of_order = await Promise.all(
           newProductsOfOrder.map((product) =>
-            OrdersService.getUpdateProductsOfOrder(product.newProductsOfOrder)
-          )
+            OrdersService.getUpdateProductsOfOrder(product.newProductsOfOrder),
+          ),
         );
       } else {
         product_of_order = await OrdersService.getUpdateProductsOfOrder(
-          newProductsOfOrder
+          newProductsOfOrder,
         );
       }
 
@@ -230,12 +231,12 @@ class OrdersController {
     try {
       const dry_mixed_product_of_order =
         await OrdersService.getUpdateDryMixedProductsOfOrder(
-          newDryMixedProductsOfOrder
+          newDryMixedProductsOfOrder,
         );
 
       myEmitter.emit(
         UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
-        dry_mixed_product_of_order
+        dry_mixed_product_of_order,
       );
 
       return res.status(200).json(dry_mixed_product_of_order);
@@ -250,12 +251,12 @@ class OrdersController {
     try {
       const anchor_product_of_order =
         await OrdersService.getUpdateAnchorProductsOfOrder(
-          newAnchorProductsOfOrder
+          newAnchorProductsOfOrder,
         );
 
       myEmitter.emit(
         UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
-        anchor_product_of_order
+        anchor_product_of_order,
       );
 
       return res.status(200).json(anchor_product_of_order);
@@ -270,12 +271,12 @@ class OrdersController {
     try {
       const tool_product_of_order =
         await OrdersService.getUpdateToolProductsOfOrder(
-          newToolProductsOfOrder
+          newToolProductsOfOrder,
         );
 
       myEmitter.emit(
         UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
-        tool_product_of_order
+        tool_product_of_order,
       );
 
       return res.status(200).json(tool_product_of_order);
@@ -290,12 +291,12 @@ class OrdersController {
     try {
       const rel_mat_product_of_order =
         await OrdersService.getUpdateRelMatProductsOfOrder(
-          newRelMatProductsOfOrder
+          newRelMatProductsOfOrder,
         );
 
       myEmitter.emit(
         UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
-        rel_mat_product_of_order
+        rel_mat_product_of_order,
       );
 
       return res.status(200).json(rel_mat_product_of_order);
@@ -406,7 +407,7 @@ class OrdersController {
 
       myEmitter.emit(
         GET_UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER_SOCKET,
-        upd_prod_info
+        upd_prod_info,
       );
 
       return res.status(200).json(upd_prod_info);
@@ -426,7 +427,7 @@ class OrdersController {
 
       myEmitter.emit(
         GET_UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER_SOCKET,
-        upd_prod_info
+        upd_prod_info,
       );
 
       return res.status(200).json(upd_prod_info);
@@ -446,7 +447,7 @@ class OrdersController {
 
       myEmitter.emit(
         GET_UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
-        upd_prod_info
+        upd_prod_info,
       );
 
       return res.status(200).json(upd_prod_info);
@@ -466,7 +467,7 @@ class OrdersController {
 
       myEmitter.emit(
         GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET,
-        upd_prod_info
+        upd_prod_info,
       );
 
       return res.status(200).json(upd_prod_info);
@@ -562,6 +563,48 @@ class OrdersController {
       myEmitter.emit(GET_DELETE_ORDER_SOCKET, order_id);
 
       return res.status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async addChildOrder(req, res) {
+    const {
+      article,
+      owner,
+      del_adr_id,
+      contact_id,
+      secondary_contact,
+      person_in_charge,
+      shipping_date,
+      main_order,
+      products,
+      dryMixes,
+      anchors,
+      tools,
+      relMats,
+    } = req.body;
+
+    try {
+      const childOrder = await OrdersService.addChildOrder({
+        article,
+        owner,
+        del_adr_id,
+        contact_id,
+        secondary_contact,
+        person_in_charge,
+        shipping_date,
+        main_order,
+        products,
+        dryMixes,
+        anchors,
+        tools,
+        relMats,
+      });
+
+      myEmitter.emit(ADD_CHILD_ORDER_SOCKET, childOrder);
+
+      return res.status(200).json(childOrder);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

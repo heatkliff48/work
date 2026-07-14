@@ -56,6 +56,7 @@ import {
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 import RelatedMaterialJournalTableOrder from './product_table_order/RelatedMaterialJournalTableOrder.jsx';
+import LiberarModal from './modal/LiberarModal.jsx';
 
 import '#components/Styles/order-card.css';
 
@@ -75,6 +76,7 @@ const OrderCart = React.memo(() => {
     toolProductsOfOrders,
     relMatProductsOfOrders,
     deliveryAddresses,
+    filterKeysOrder,
   } = useOrderContext();
 
   const {
@@ -115,6 +117,7 @@ const OrderCart = React.memo(() => {
   const [isAddSecCont, setIsAddSecCont] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
+  const [liberarModalShow, setLiberarModalShow] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState([]);
   const [orderStatusAccess, setOrderStatusAccess] = useState({
     canRead: true,
@@ -164,29 +167,14 @@ const OrderCart = React.memo(() => {
     }
   };
 
-  const filterKeys = useMemo(
-    () => [
-      'id',
-      'order_id',
-      'dry_mixed_id',
-      'client_id',
-      'product_id',
-      'createdAt',
-      'updatedAt',
-      'bitrix_id',
-      'bitrix_client_id',
-    ],
-    [],
-  );
-
   const haveShipDate = useMemo(() => {
     return orderCartData?.shipping_date ?? false;
   }, [orderCartData]);
 
   const filterAndMapData = useCallback(
-    (data, filterKeys) =>
+    (data, filterKeysOrder) =>
       Object.entries(data || {})
-        .filter(([key]) => !filterKeys?.includes(key))
+        .filter(([key]) => !filterKeysOrder?.includes(key))
         .map(([key, value]) => {
           if (!key || key === 'warehouse_id') return null;
 
@@ -406,6 +394,7 @@ const OrderCart = React.memo(() => {
               : sel_prod.product_article.slice(2, 3) == 'F'
                 ? latestAnchors.find((el) => el.article === sel_prod.product_article)
                 : latestTools.find((el) => el.article === sel_prod.product_article);
+
       setSelectedProduct(product);
       setProductOfOrder({ ...sel_prod, product_id: product?.id });
       setProductInfoModalOrder(!productInfoModalOrder);
@@ -459,7 +448,7 @@ const OrderCart = React.memo(() => {
       dispatch(
         addDataShipOrder({
           order_id,
-          shipping_date: formatDataValue,
+          shipping_date: hasShippingDate ?? formatDataValue,
         }),
       );
     }
@@ -964,7 +953,6 @@ const OrderCart = React.memo(() => {
     const personInChargeOption = options.find(
       (option) => option.value === orderCartData?.person_in_charge,
     );
-    // Если выбранная опция найдена, возвращаем ее, иначе возвращаем первую опцию по умолчанию
     return personInChargeOption || options[0];
   };
 
@@ -1083,6 +1071,15 @@ const OrderCart = React.memo(() => {
           toggle={() => setWarehouseInfoModal(!warehouseInfoModal)}
         />
       )}
+      {liberarModalShow && (
+        <LiberarModal
+          show={liberarModalShow}
+          onHide={() => setLiberarModalShow(false)}
+          orderCartData={orderCartData}
+          productLists={productLists}
+          onSuccess={() => navigate('/orders')}
+        />
+      )}
       {reserveModalShow && (
         <ListOfOrderedProductionReserveModal
           show={reserveModalShow}
@@ -1106,7 +1103,7 @@ const OrderCart = React.memo(() => {
         <div className="header-container">
           <div className="owner-info">
             <h4>Client Information</h4>
-            {filterAndMapData(orderCartData?.owner, filterKeys)}
+            {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
 
             <div className="description">
               <h4>Description</h4>
@@ -1145,7 +1142,7 @@ const OrderCart = React.memo(() => {
           <div className="contact-info">
             <div className="contact-text">
               <h4>Contact Person</h4>
-              {filterAndMapData(orderCartData?.contactInfo, filterKeys)}
+              {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
             </div>
             {userAccess?.canWrite && orderCartData?.status < 3 && (
               <ShowOrderContactEditModal />
@@ -1154,7 +1151,7 @@ const OrderCart = React.memo(() => {
 
           <div className="delivery-address">
             <h4>Delivery Address</h4>
-            {filterAndMapData(orderCartData?.deliveryAddress, filterKeys)}
+            {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
             {userAccess?.canWrite && orderCartData?.status < 3 && (
               <ShowOrderDeliveryEditModal />
             )}
@@ -1174,7 +1171,7 @@ const OrderCart = React.memo(() => {
               )}
             </div>
             {haveSecondaryContact ? (
-              filterAndMapData(orderCartData?.secondaryContact, filterKeys)
+              filterAndMapData(orderCartData?.secondaryContact, filterKeysOrder)
             ) : isAddSecCont ? (
               <>
                 <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
@@ -1196,13 +1193,18 @@ const OrderCart = React.memo(() => {
               Delete Order
             </Button>
           )}
+          {orderCartData.main_order == null && orderCartData?.status == 4 && (
+            <Button variant="warning" onClick={() => setLiberarModalShow(true)}>
+              Liberar
+            </Button>
+          )}
         </div>
 
         <BlocksJournalTableOrder
           productListOrder={updatedProductListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
-          filterKeys={filterKeys}
+          filterKeys={filterKeysOrder}
           productHandler={productHandler}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
@@ -1211,7 +1213,7 @@ const OrderCart = React.memo(() => {
           productListOrder={updatedDryMixesListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
-          filterKeys={filterKeys}
+          filterKeys={filterKeysOrder}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
         />
@@ -1219,7 +1221,7 @@ const OrderCart = React.memo(() => {
           productListOrder={updatedAnchorsListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
-          filterKeys={filterKeys}
+          filterKeys={filterKeysOrder}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
         />
@@ -1227,7 +1229,7 @@ const OrderCart = React.memo(() => {
           productListOrder={updatedToolsListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
-          filterKeys={filterKeys}
+          filterKeys={filterKeysOrder}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
         />
@@ -1235,9 +1237,11 @@ const OrderCart = React.memo(() => {
           productListOrder={updatedRelatedMaterialsListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
-          filterKeys={filterKeys}
+          filterKeys={filterKeysOrder}
           deleteHandler={deleteHandler}
           displayNames={displayNames}
+          vatValue={vatValue}
+          setVatValue={setVatValue}
         />
 
         <div className="footer_data">
@@ -1268,7 +1272,7 @@ const OrderCart = React.memo(() => {
                         }));
                       }
                     }}
-                    readOnly={orderCartData?.status < 3 ? false : true}
+                    readOnly={orderCartData?.status < 5 ? false : true}
                   />
                 </div>
               </div>
@@ -1292,7 +1296,7 @@ const OrderCart = React.memo(() => {
                         delivery: Number(e.target.value),
                       }));
                     }}
-                    readOnly={orderCartData?.status < 3 ? false : true}
+                    readOnly={orderCartData?.status < 5 ? false : true}
                     disabled={
                       !checkUserAccess(user, roles, 'orders_save_delivery_price')
                         ?.canWrite
@@ -1320,7 +1324,7 @@ const OrderCart = React.memo(() => {
               </div>
               {vatValue.vat_result_del > 0 ? (
                 <div className="vat_result_del">
-                  <p>Result with delivery priice</p>
+                  <p>Result with delivery price</p>
                   <p>{vatValue.vat_result_del}</p>
                 </div>
               ) : null}

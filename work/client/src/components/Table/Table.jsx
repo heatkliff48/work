@@ -17,14 +17,19 @@ function Table({
   hideTitle = false,
   renderToolbar, // (api) => JSX
 }) {
-  const columns = useMemo(() => COLUMN_DATA, []);
-  const data = useMemo(() => dataOfTable, [dataOfTable]);
+  const columns = useMemo(() => {
+    return Array.isArray(COLUMN_DATA) ? COLUMN_DATA : [];
+  }, [COLUMN_DATA]);
+
+  const data = useMemo(() => {
+    return Array.isArray(dataOfTable) ? dataOfTable : [];
+  }, [dataOfTable]);
 
   const defaultColumn = useMemo(
     () => ({
       Filter: '',
     }),
-    []
+    [],
   );
 
   function matchSorterFn(rows, id, filterValue) {
@@ -35,7 +40,7 @@ function Table({
     () => ({
       rankedMatchSorter: matchSorterFn,
     }),
-    []
+    [],
   );
 
   const sortTypes = {
@@ -57,7 +62,7 @@ function Table({
     },
     useGlobalFilter,
     useFilters,
-    useSortBy
+    useSortBy,
   );
 
   const {
@@ -116,7 +121,7 @@ function Table({
                 <tr key={key} {...restProps}>
                   {hG.headers.map((col) => {
                     const { key, ...restProps } = col.getHeaderProps(
-                      col.getSortByToggleProps()
+                      col.getSortByToggleProps(),
                     );
                     return (
                       <th key={key} {...restProps}>

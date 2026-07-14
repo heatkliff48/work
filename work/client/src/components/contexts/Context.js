@@ -380,11 +380,30 @@ const ProjectContextProvider = ({ children }) => {
       accessor: 'projects_name',
     },
     {
-      Header: 'Delivery due date',
+      Header: 'Delivery date',
       accessor: 'production_date',
     },
     {
       Header: 'Order products',
+      accessor: 'orders_products',
+    },
+  ];
+
+  const WAREHOUSE_MANAGER_TRAILER_TABLE = [
+    {
+      Header: 'Order number',
+      accessor: 'orders_article',
+    },
+    {
+      Header: 'Project name',
+      accessor: 'projects_name',
+    },
+    {
+      Header: 'Delivery due date',
+      accessor: 'fecha',
+    },
+    {
+      Header: 'Remaining quantity of pallets ',
       accessor: 'orders_products',
     },
   ];
@@ -429,7 +448,9 @@ const ProjectContextProvider = ({ children }) => {
   const clientPriceInfo = useSelector((state) => state.contactPriceInfo);
   const production_quality = useSelector((state) => state.productionQuality);
   const dimensions_quality = useSelector((state) => state.qualityDimensions);
-  const compressions_quality = useSelector((state) => state.qualityCompressions);
+  const compressions_quality = useSelector(
+    (state) => state.qualityCompressions,
+  );
 
   const [currentContact, setCurrentContact] = useState();
   const [currentDelivery, setCurrentDelivery] = useState();
@@ -489,6 +510,7 @@ const ProjectContextProvider = ({ children }) => {
     '/clients': 'Clients',
     '/users_info': 'Users Info',
     '/warehouse_manager': 'Order dispatch',
+    '/factura_manager': 'Furion po farmu champion',
     '/products_type_journal': 'Products catalog',
     '/statistics': 'Statistics',
     '/orders': 'Orders',
@@ -538,6 +560,7 @@ const ProjectContextProvider = ({ children }) => {
     <ProjectContext.Provider
       value={{
         WAREHOUSE_MANAGER_TABLE,
+        WAREHOUSE_MANAGER_TRAILER_TABLE,
         DEFAULT_RAW_MATERIAL_VALUES,
         PRODUCTION_QUALITY,
         user,

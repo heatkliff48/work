@@ -1,4 +1,4 @@
-const WarehouseRepository = require("../repositories/Warehouse.js");
+const WarehouseRepository = require('../repositories/Warehouse.js');
 
 class WarehouseService {
   static async getAllWarehouse() {
@@ -8,24 +8,20 @@ class WarehouseService {
   }
 
   static async getListOfOrderedProduction() {
-    const orderedProduction =
-      await WarehouseRepository.getListOfOrderedProduction();
+    const orderedProduction = await WarehouseRepository.getListOfOrderedProduction();
 
     return orderedProduction;
   }
 
   static async getAutoclaveCalendar() {
-    const autoclaveCalendares =
-      await WarehouseRepository.getAutoclaveCalendar();
+    const autoclaveCalendares = await WarehouseRepository.getAutoclaveCalendar();
 
     return autoclaveCalendares;
   }
 
   static async addNewAutoclaveCalendarData(autoclave_calendar_data) {
     const updAutoclaveCalendares =
-      await WarehouseRepository.addNewAutoclaveCalendarData(
-        autoclave_calendar_data,
-      );
+      await WarehouseRepository.addNewAutoclaveCalendarData(autoclave_calendar_data);
 
     return updAutoclaveCalendares;
   }
@@ -45,9 +41,7 @@ class WarehouseService {
 
   static async addNewListOfOrderedProduction({ orderedProduction }) {
     const new_ordered_production =
-      await WarehouseRepository.addNewListOfOrderedProduction(
-        orderedProduction,
-      );
+      await WarehouseRepository.addNewListOfOrderedProduction(orderedProduction);
 
     return new_ordered_production;
   }
@@ -67,9 +61,7 @@ class WarehouseService {
     return new_ordered_production_OEM;
   }
 
-  static async updateListOfOrderedProductionOEM({
-    upd_ordered_production_oem,
-  }) {
+  static async updateListOfOrderedProductionOEM({ upd_ordered_production_oem }) {
     await WarehouseRepository.updateListOfOrderedProductionOEM(
       upd_ordered_production_oem,
     );
@@ -78,7 +70,9 @@ class WarehouseService {
   }
 
   static async updateRemainingStock({ upd_rem_srock }) {
-    const updatedCake =await WarehouseRepository.updateRemainingStock(upd_rem_srock);
+    const updatedCake = await WarehouseRepository.updateRemainingStock(
+      upd_rem_srock,
+    );
 
     return updatedCake;
   }
@@ -99,8 +93,9 @@ class WarehouseService {
   }
 
   static async updateAnchorWarehouseQuantitys({ upd_rem_srock }) {
-    const updatedAnchors =
-      await WarehouseRepository.updateAnchorWarehouseQuantitys(upd_rem_srock);
+    const updatedAnchors = await WarehouseRepository.updateAnchorWarehouseQuantitys(
+      upd_rem_srock,
+    );
 
     return updatedAnchors;
   }
@@ -114,8 +109,9 @@ class WarehouseService {
   }
 
   static async updateRelMatWarehouseQuantitys({ upd_rem_srock }) {
-    const updatedRelMats =
-      await WarehouseRepository.updateRelMatWarehouseQuantitys(upd_rem_srock);
+    const updatedRelMats = await WarehouseRepository.updateRelMatWarehouseQuantitys(
+      upd_rem_srock,
+    );
 
     return updatedRelMats;
   }
@@ -156,9 +152,7 @@ class WarehouseService {
 
   static async addNewReservedDryMixedProducts({ reserved_product }) {
     const reservedDryMixes =
-      await WarehouseRepository.addNewReservedDryMixedProducts(
-        reserved_product,
-      );
+      await WarehouseRepository.addNewReservedDryMixedProducts(reserved_product);
 
     return reservedDryMixes;
   }
@@ -170,9 +164,7 @@ class WarehouseService {
   }
 
   static async deleteReservedDryMixedProducts({ reserved_products_id }) {
-    await WarehouseRepository.deleteReservedDryMixedProducts(
-      reserved_products_id,
-    );
+    await WarehouseRepository.deleteReservedDryMixedProducts(reserved_products_id);
 
     return;
   }
@@ -185,8 +177,9 @@ class WarehouseService {
   }
 
   static async addNewReservedAnchorProducts({ reserved_product }) {
-    const reservedAnchors =
-      await WarehouseRepository.addNewReservedAnchorProducts(reserved_product);
+    const reservedAnchors = await WarehouseRepository.addNewReservedAnchorProducts(
+      reserved_product,
+    );
 
     return reservedAnchors;
   }
@@ -198,9 +191,7 @@ class WarehouseService {
   }
 
   static async deleteReservedAnchorProducts({ reserved_products_id }) {
-    await WarehouseRepository.deleteReservedAnchorProducts(
-      reserved_products_id,
-    );
+    await WarehouseRepository.deleteReservedAnchorProducts(reserved_products_id);
 
     return;
   }
@@ -240,8 +231,9 @@ class WarehouseService {
   }
 
   static async addNewReservedRelMatProducts({ reserved_product }) {
-    const reservedRelMats =
-      await WarehouseRepository.addNewReservedRelMatProducts(reserved_product);
+    const reservedRelMats = await WarehouseRepository.addNewReservedRelMatProducts(
+      reserved_product,
+    );
 
     return reservedRelMats;
   }
@@ -253,11 +245,33 @@ class WarehouseService {
   }
 
   static async deleteReservedRelMatProducts({ reserved_products_id }) {
-    await WarehouseRepository.deleteReservedRelMatProducts(
-      reserved_products_id,
-    );
+    await WarehouseRepository.deleteReservedRelMatProducts(reserved_products_id);
 
     return;
+  }
+
+  //WAREHOUSE MANAGER TRAILER
+  static async getAllWarehouseManagerTrailer() {
+    try {
+      const order_dispatch =
+        await WarehouseRepository.getAllWarehouseManagerTrailer();
+      return order_dispatch;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return error;
+    }
+  }
+
+  static async addNewWarehouseManagerTrailer(new_wh_trailer) {
+    try {
+      const wh_trailer = await WarehouseRepository.addNewWarehouseManagerTrailer(
+        new_wh_trailer,
+      );
+      return wh_trailer;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return error;
+    }
   }
 }
 

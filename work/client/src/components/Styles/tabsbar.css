@@ -10,8 +10,12 @@
 }
 
 .tabsbar-left {
+  display: flex;
   flex: 0 0 auto;
+  gap: 12px;
+  align-items: center;
 }
+
 .tabsbar-right {
   flex: 0 0 auto;
 }

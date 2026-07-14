@@ -129,7 +129,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
         }
 
         return wmoctItem;
-      })
+      }),
     );
   };
 
@@ -164,7 +164,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
         });
 
         return { ...wmoctItem, shipped, qty_rem, batches: newBatches };
-      })
+      }),
     );
   };
 
@@ -397,14 +397,15 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   // ]);
 
   useEffect(() => {
-    if (!product_list?.orders_products) return;
+    if (!product_list?.orders_products_articles) return;
 
     setWmoctProductShippedBD([]);
     const shippedBDNext = [];
 
-    const initialProducts = product_list.orders_products
+    const initialProducts = product_list.orders_products_articles
       .map((el) => {
         const match = el.match(/^([^:]+):\s*([\d.,]+)/);
+        console.log('match WMOCTable.jsx line 408', match);
         if (!match) {
           console.warn('Invalid product format:', el);
           return null;
@@ -451,31 +452,31 @@ const WMOCTable = ({ product_list, orderCartData }) => {
           switch (productType) {
             case 'product':
               list_of_batches = list_of_reserved_products.filter(
-                (batch) => batch.orders_products_id == orders_products_id
+                (batch) => batch.orders_products_id == orders_products_id,
               );
               break;
 
             case 'relMat':
               list_of_batches = list_of_rel_mat_reserved_products?.filter(
-                (batch) => batch.orders_products_id == orders_products_id
+                (batch) => batch.orders_products_id == orders_products_id,
               );
               break;
 
             case 'tool':
               list_of_batches = list_of_tool_reserved_products?.filter(
-                (batch) => batch.orders_products_id == orders_products_id
+                (batch) => batch.orders_products_id == orders_products_id,
               );
               break;
 
             case 'dryMixed':
               list_of_batches = list_of_dry_mix_reserved_products?.filter(
-                (batch) => batch.orders_products_id == orders_products_id
+                (batch) => batch.orders_products_id == orders_products_id,
               );
               break;
 
             case 'anchor':
               list_of_batches = list_of_anchor_reserved_products?.filter(
-                (batch) => batch.orders_products_id == orders_products_id
+                (batch) => batch.orders_products_id == orders_products_id,
               );
               break;
 
