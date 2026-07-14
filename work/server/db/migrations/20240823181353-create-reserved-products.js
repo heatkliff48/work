@@ -26,6 +26,9 @@ module.exports = {
       quantity: {
         type: Sequelize.INTEGER,
       },
+      order_dispatch_id: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

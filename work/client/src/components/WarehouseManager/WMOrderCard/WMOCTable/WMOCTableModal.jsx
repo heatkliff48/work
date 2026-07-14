@@ -25,26 +25,35 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
 
   const onClickHandler = (batch) => {
     setWmoctProduct((prev) => {
-      console.log('batch WMOCTableModal.jsx line 28', batch);
-      const remainingInBatch = batch.total_quantity;
-      return prev.map((el) => {
-        if (el.article == selectedProduct)
-          return {
-            ...el,
-            batches: [
-              ...el.batches,
-              {
-                batchId: batch.batch_article,
-                baseRemainingInBatch: remainingInBatch,
-                remainingInBatch: remainingInBatch,
-                allocated: 0,
-                minAllocated: 0,
-              },
-            ],
-          };
-        return el;
+      const remainingInBatch = Number(batch.total_quantity || 0);
+
+      return prev.map((product) => {
+        if (product.article !== selectedProduct) {
+          return product;
+        }
+
+        return {
+          ...product,
+          batches: [
+            ...product.batches,
+            {
+              batchId: batch.batch_article,
+
+              baseRemainingInBatch: remainingInBatch,
+              remainingInBatch,
+
+              allocated: 0,
+              minAllocated: 0,
+
+              warehouseId: batch.warehouse_id,
+              orders_products_id: product.orders_products_id,
+              order_dispatch_id: product.order_dispatch_id,
+            },
+          ],
+        };
       });
     });
+
     toggle();
   };
 
@@ -73,6 +82,7 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
       })
       .filter((el) => el.ordered_quantity > 0 || el.free_quantity_remaining > 0)
       .map((el) => ({
+        warehouse_id: el.id,
         batch_article: el.article,
         free_quantity_remaining: el.free_quantity_remaining,
         quantity: el.ordered_quantity,

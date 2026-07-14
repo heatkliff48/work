@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const {
   AutoclaveCalendares,
   Warehouses,
@@ -679,12 +680,12 @@ class WarehouseRepository {
         const updatedDryMixes = await Warehouses.findAll();
         return updatedDryMixes;
       } else {
-        const updatedDryMixes = await DryMixesWarehouse.update(
+        const [count, updatedDryMixes] = await DryMixesWarehouse.update(
           {
             total_quantity,
             ordered_quantity,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id }, returning: true, plain: true },
         );
         return updatedDryMixes;
       }
@@ -774,12 +775,12 @@ class WarehouseRepository {
         const updatedAnchors = await AnchorsWarehouse.findAll();
         return updatedAnchors;
       } else {
-        const updatedAnchors = await AnchorsWarehouse.update(
+        const [count, updatedAnchors] = await AnchorsWarehouse.update(
           {
             total_quantity,
             ordered_quantity,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id }, returning: true, plain: true },
         );
         return updatedAnchors;
       }
@@ -873,12 +874,12 @@ class WarehouseRepository {
         const updatedTools = await ToolsWarehouse.findAll();
         return updatedTools;
       } else {
-        const updatedTools = await ToolsWarehouse.update(
+        const [count, updatedTools] = await ToolsWarehouse.update(
           {
             total_quantity,
             ordered_quantity,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id }, returning: true, plain: true },
         );
         return updatedTools;
       }
@@ -972,12 +973,12 @@ class WarehouseRepository {
         const updatedRelMats = await RelatedMaterialsWarehouse.findAll();
         return updatedRelMats;
       } else {
-        const updatedRelMats = await RelatedMaterialsWarehouse.update(
+        const [count, updatedRelMats] = await RelatedMaterialsWarehouse.update(
           {
             total_quantity,
             ordered_quantity,
           },
-          { where: { id: warehouse_id } },
+          { where: { id: warehouse_id }, returning: true, plain: true },
         );
         return updatedRelMats;
       }
@@ -1037,8 +1038,15 @@ class WarehouseRepository {
 
     try {
       const listOfReservedProducts = await ReservedProducts.findAll({
-        attributes: ['id', 'warehouse_id', 'orders_products_id', 'quantity'],
+        attributes: [
+          'id',
+          'warehouse_id',
+          'orders_products_id',
+          'quantity',
+          'order_dispatch_id',
+        ],
       });
+
       return listOfReservedProducts;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
@@ -1482,11 +1490,24 @@ class WarehouseRepository {
 
   static async addNewWarehouseManagerTrailer(new_wh_trailer) {
     try {
+      const added_trailer = [];
       for (let i = 0; i < new_wh_trailer.length; i++) {
-        await OrderDispatches.create(new_wh_trailer[i]);
+        const added = await OrderDispatches.create(new_wh_trailer[i]);
+        added_trailer.push(added);
       }
 
-      return new_wh_trailer;
+      return added_trailer;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return error;
+    }
+  }
+
+  static async deleteWarehouseManagerTrailer(order_id) {
+    try {
+      await OrderDispatches.destroy({ where: { orderId: order_id } });
+
+      return order_id;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return error;

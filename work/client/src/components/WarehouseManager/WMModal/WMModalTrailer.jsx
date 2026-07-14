@@ -213,6 +213,7 @@ function WMModalTrailer({ setTrailerOrder }) {
     //   'uniqueProductNames WMModalTrailer.jsx line 182',
     //   uniqueProductNames,
     // );
+    console.log('trailerProducts WMModalTrailer.jsx line 216', trailerProducts)
 
     setTrailerOrder(trailerProducts);
   };

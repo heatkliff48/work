@@ -675,6 +675,23 @@ class WarehouseController {
       return ErrorUtils.catchError(error);
     }
   }
+
+  static async deleteWarehouseManagerTrailer(req, res) {
+    const order_id = req.body;
+
+    try {
+      const wh_trailer = await WarehouseService.deleteWarehouseManagerTrailer(
+        order_id,
+      );
+
+      myEmitter.emit(ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET, wh_trailer);
+
+      return res.status(200);
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return ErrorUtils.catchError(error);
+    }
+  }
 }
 
 module.exports = WarehouseController;
