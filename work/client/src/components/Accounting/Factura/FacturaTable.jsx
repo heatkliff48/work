@@ -183,6 +183,7 @@ const FacturaTable = ({ product_list, orderCartData }) => {
         };
       })
       .filter((product) => product !== null);
+    console.log(initialProducts, 'initialProducts FacturaTable.jsx line 186');
 
     setWmoctProductShippedBD(shippedBDNext);
     setWmoctProduct(initialProducts);
@@ -238,7 +239,7 @@ const FacturaTable = ({ product_list, orderCartData }) => {
                 <td className="border p-1">{product.qty_total}</td>
                 <td className="border p-1">{product.shipped}</td>
                 <td className="border p-1">{product.qty_rem}</td>
-                {product.batches?.length > 0 ? (
+                {/* {product.batches?.length > 0 ? (
                   <>
                     <td className="border p-1">
                       {product.batches[0]?.batchId}
@@ -252,17 +253,17 @@ const FacturaTable = ({ product_list, orderCartData }) => {
                   </>
                 ) : (
                   <></>
-                )}
+                )} */}
               </tr>
               {/* Дополнительные строки для батчей */}
-              {product.batches?.slice(1).map((batch, batchIndex) => (
+              {/* {product.batches?.slice(1).map((batch, batchIndex) => (
                 <tr key={`${product.article}__${batch.batchId}`}>
                   <td className="border p-1"></td>
                   <td className="border p-1"></td>
                   <td className="border p-1"></td>
                   <td className="border p-1"></td>
                 </tr>
-              ))}
+              ))} */}
             </>
           ))}
         </tbody>
