@@ -100,51 +100,53 @@ function WarehouseManager() {
       return;
     }
 
-    const groupedData = order_dispatch_data.reduce((acc, item) => {
-      const orderId = Number(item.orderId);
-      const trailer = Number(item.trailer);
+    const groupedData = order_dispatch_data
+      .filter((el) => el.trailer_stage < 4)
+      .reduce((acc, item) => {
+        const orderId = Number(item.orderId);
+        const trailer = Number(item.trailer);
 
-      const key = `${orderId}_${trailer}`;
+        const key = `${orderId}_${trailer}`;
 
-      if (!acc[key]) {
-        acc[key] = {
-          orderId,
-          trailer,
-          products: [],
-          fecha: item.fecha || '',
-          articles: [],
-          dispatchItems: [],
-        };
-      }
+        if (!acc[key]) {
+          acc[key] = {
+            orderId,
+            trailer,
+            products: [],
+            fecha: item.fecha || '',
+            articles: [],
+            dispatchItems: [],
+          };
+        }
 
-      acc[key].products.push(`${item.title}: ${Number(item.quantity || 0)}, `);
-      acc[key].articles.push(`${item.article}: ${Number(item.quantity || 0)}, `);
+        acc[key].products.push(`${item.title}: ${Number(item.quantity || 0)}, `);
+        acc[key].articles.push(`${item.article}: ${Number(item.quantity || 0)}, `);
 
-      const orderDispatchId = getOrderDispatchId(item);
+        const orderDispatchId = getOrderDispatchId(item);
 
-      if (!orderDispatchId) {
-        console.error('order_dispatch_data row has no database ID:', item);
-      }
+        if (!orderDispatchId) {
+          console.error('order_dispatch_data row has no database ID:', item);
+        }
 
-      acc[key].dispatchItems.push({
-        id: orderDispatchId,
+        acc[key].dispatchItems.push({
+          id: orderDispatchId,
 
-        orderId: Number(item.orderId),
-        trailer: Number(item.trailer),
-        orderProductId: Number(item.orderProductId),
+          orderId: Number(item.orderId),
+          trailer: Number(item.trailer),
+          orderProductId: Number(item.orderProductId),
 
-        product_table: item.product_table,
-        quantity: Number(item.quantity || 0),
-        article: item.article,
-        title: item.title,
-      });
+          product_table: item.product_table,
+          quantity: Number(item.quantity || 0),
+          article: item.article,
+          title: item.title,
+        });
 
-      if (item.fecha && !acc[key].fecha) {
-        acc[key].fecha = item.fecha;
-      }
+        if (item.fecha && !acc[key].fecha) {
+          acc[key].fecha = item.fecha;
+        }
 
-      return acc;
-    }, {});
+        return acc;
+      }, {});
 
     const result = Object.values(groupedData).map((group) => {
       const order = list_of_orders.find(
