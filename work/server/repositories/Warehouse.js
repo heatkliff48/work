@@ -1547,10 +1547,7 @@ class WarehouseRepository {
 
       await transaction.commit();
 
-      return {
-        count,
-        updatedRows,
-      };
+      return updatedRows;
     } catch (error) {
       await transaction.rollback();
 
