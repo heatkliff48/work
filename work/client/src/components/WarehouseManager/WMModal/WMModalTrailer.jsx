@@ -201,19 +201,13 @@ function WMModalTrailer({ setTrailerOrder }) {
 
     const trailerProducts = getTrailerProductsByOrder(currentOrder);
 
-    const productNames = trailerProducts.map((product) => product.title);
+    // const productNames = trailerProducts.map((product) => product.title);
 
-    const uniqueProductNames = [
-      ...new Set(trailerProducts.map((product) => product.title)),
-    ];
+    // const uniqueProductNames = [
+    //   ...new Set(trailerProducts.map((product) => product.title)),
+    // ];
 
-    // console.log('trailerProducts', trailerProducts);
-    // console.log('productNames', productNames);
-    // console.log(
-    //   'uniqueProductNames WMModalTrailer.jsx line 182',
-    //   uniqueProductNames,
-    // );
-    console.log('trailerProducts WMModalTrailer.jsx line 216', trailerProducts)
+    console.log('trailerProducts WMModalTrailer.jsx line 216', trailerProducts);
 
     setTrailerOrder(trailerProducts);
   };

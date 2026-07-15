@@ -63,6 +63,7 @@ import {
   GET_ALL_WAREHOUSE_MANAGER_TRAILER,
   ADD_NEW_WAREHOUSE_MANAGER_TRAILER,
   DELETE_WAREHOUSE_MANAGER_TRAILER,
+  CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER,
 } from '../types/warehouseTypes';
 import {
   ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
@@ -596,9 +597,26 @@ const addNewWarehouseManagerTrailer = (new_wh_trailer) => {
     });
 };
 
-const deleteWarehouseManagerTrailer = (wh_trailer_id) => {
+const changeStatusWarehouseManagerTrailer = (new_status_trailer) => {
   return url
-    .delete('/warehouse/order_dispatch/delete', wh_trailer_id)
+    .post('/warehouse/order_dispatch/status', new_status_trailer)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const deleteWarehouseManagerTrailer = (wh_trailer_id) => {
+  console.log('wh_trailer_id warehouseSagas.js line 614', wh_trailer_id);
+  return url
+    .delete('/warehouse/order_dispatch/delete', {
+      data: {
+        wh_trailer_id,
+      },
+    })
     .then((res) => {
       return res.data;
     })
@@ -1064,6 +1082,17 @@ function* addNewWarehouseManagerTrailerWatcher(action) {
   }
 }
 
+function* changeStatusWarehouseManagerTrailerWatcher(action) {
+  try {
+    yield call(changeStatusWarehouseManagerTrailer, action.payload);
+  } catch (err) {
+    yield put({
+      type: ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+      payload: [],
+    });
+  }
+}
+
 function* deleteWarehouseManagerTrailerWatcher(action) {
   try {
     yield call(deleteWarehouseManagerTrailer, action.payload);
@@ -1193,6 +1222,10 @@ function* warehouseWatcher() {
   yield takeLatest(
     ADD_NEW_WAREHOUSE_MANAGER_TRAILER,
     addNewWarehouseManagerTrailerWatcher,
+  );
+  yield takeLatest(
+    CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER,
+    changeStatusWarehouseManagerTrailerWatcher,
   );
   yield takeLatest(
     DELETE_WAREHOUSE_MANAGER_TRAILER,

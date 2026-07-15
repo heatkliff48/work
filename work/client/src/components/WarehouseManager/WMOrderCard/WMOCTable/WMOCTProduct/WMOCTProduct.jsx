@@ -4,6 +4,8 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { Fragment } from 'react';
 
 const WMOCTProduct = ({
+  orderId,
+  trailer,
   haveBatches,
   handlePlusBatch,
   handlePlus,
@@ -11,24 +13,34 @@ const WMOCTProduct = ({
   isDisablePlus,
   isDisableMinus,
 }) => {
-  const { wmoctProduct } = useWarehouseContext();
+  const { wmoctProduct, order_dispatch_data } = useWarehouseContext();
   const {
     wmoctModal,
     setWmoctModal,
     wmoctPdfAddDataModal,
     setWmoctPdfAddDataModal,
   } = useModalContext();
+
   const { list_of_orders } = useOrderContext();
 
   const onSaveHandler = () => {
-    if (!wmoctProduct || wmoctProduct.length === 0) return false;
+    console.log('wmoctProduct WMOCTProduct.jsx line 24', wmoctProduct);
+    if (!Array.isArray(wmoctProduct) || wmoctProduct.length === 0) {
+      return false;
+    }
 
-    const order_id = wmoctProduct[0].order_id;
-    const right_order = list_of_orders.find((el) => el.id == order_id);
+    const currentTrailerDispatches = (order_dispatch_data || []).filter(
+      (dispatch) =>
+        Number(dispatch.orderId) === orderId && Number(dispatch.trailer) === trailer,
+    );
 
-    if (!right_order) return false;
+    if (currentTrailerDispatches.length === 0) {
+      return false;
+    }
 
-    return right_order.status >= 8;
+    return currentTrailerDispatches.every(
+      (dispatch) => Number(dispatch.trailer_stage) === 1,
+    );
   };
 
   return (
