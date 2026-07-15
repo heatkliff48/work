@@ -11,6 +11,7 @@ import { useProductsTypeJournalContext } from '#components/contexts/ProductsType
 import { useDispatch, useSelector } from 'react-redux';
 import AccountingInvoiceModal from '../AccountingInvoiceModal';
 import { changeStatusWarehouseManagerTrailer } from '#components/redux/actions/warehouseAction.js';
+import { useNavigate } from 'react-router-dom';
 
 const FacturaOrderCard = React.memo(() => {
   const { selectedOrder } = useWarehouseContext();
@@ -32,6 +33,7 @@ const FacturaOrderCard = React.memo(() => {
   const { displayNames } = useProjectContext();
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState([]);
@@ -51,6 +53,10 @@ const FacturaOrderCard = React.memo(() => {
     vat_euro: 0,
     vat_result: 0,
   });
+
+  useEffect(() => {
+    if (!selectedOrder) navigate('/factura_manager');
+  }, []);
 
   const productListOrder = useSelector((state) => state.productsOfOrders);
 
@@ -263,12 +269,12 @@ const FacturaOrderCard = React.memo(() => {
   }, [list_of_orders]);
 
   const statusChangeHandler = () => {
-    console.log('checkboxStatus FacturaOrderCard.jsx line 264', !checkboxStatus);
     const status = !checkboxStatus ? 1 : 0;
     setCheckboxStatus(!checkboxStatus);
     dispatch(
       changeStatusWarehouseManagerTrailer({
         status,
+        orderId: orderCartData?.id,
         trailer: selectedOrder.trailer,
       }),
     );
@@ -322,8 +328,8 @@ const FacturaOrderCard = React.memo(() => {
         isOpen={isInvoiceModalOpen}
         toggle={() => setIsInvoiceModalOpen(false)}
         orderCartData={orderCartData}
-        productLists={selectedOrder.productLists}
-        vatValue={selectedOrder.vatData}
+        productLists={selectedOrder?.productLists}
+        vatValue={selectedOrder?.vatData}
         latestProducts={latestProducts}
         latestDryMix={latestDryMix}
         latestAnchors={latestAnchors}

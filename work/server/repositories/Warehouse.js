@@ -1504,26 +1504,45 @@ class WarehouseRepository {
   }
 
   static async changeStatusWarehouseManagerTrailer(new_status_trailer) {
-    const { status, trailer } = new_status_trailer;
-    const t = await sequelize.transaction();
-    try {
-      const [count, new_status] = await OrderDispatches.update(
-        {
-          trailer_stage: status,
-        },
-        {
-          where: { trailer },
-          transaction: t,
-          returning: true,
-        },
-      );
-      await t.commit();
+    const { status, orderId } = new_status_trailer;
 
-      return new_status;
+    //const transaction = await sequelize.transaction();
+    try {
+      if (new_status_trailer?.trailer) {
+        const [count, updatedRows] = await OrderDispatches.update(
+          {
+            trailer_stage: status,
+          },
+          {
+            where: { orderId, trailer: new_status_trailer?.trailer },
+            //transaction,
+            returning: true,
+          },
+        );
+        //await transaction.commit();
+
+        return updatedRows;
+      } else {
+        const [count, updatedRows] = await OrderDispatches.update(
+          {
+            trailer_stage: status,
+          },
+          {
+            where: { orderId },
+            //transaction,
+            returning: true,
+          },
+        );
+        //await transaction.commit();
+
+        return updatedRows;
+      }
     } catch (error) {
-      await t.rollback();
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
-      return error;
+      //await transaction.rollback();
+
+      console.error('changeStatusWarehouseManagerTrailer error:', error);
+
+      throw error;
     }
   }
 

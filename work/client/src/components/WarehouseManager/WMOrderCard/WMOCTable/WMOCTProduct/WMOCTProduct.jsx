@@ -1,5 +1,4 @@
 import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { Fragment } from 'react';
 
@@ -21,10 +20,7 @@ const WMOCTProduct = ({
     setWmoctPdfAddDataModal,
   } = useModalContext();
 
-  const { list_of_orders } = useOrderContext();
-
   const onSaveHandler = () => {
-    console.log('wmoctProduct WMOCTProduct.jsx line 24', wmoctProduct);
     if (!Array.isArray(wmoctProduct) || wmoctProduct.length === 0) {
       return false;
     }

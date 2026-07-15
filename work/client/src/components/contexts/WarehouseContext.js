@@ -8,6 +8,7 @@ import {
   addNewRelMatReservedProducts,
   addNewReservedProducts,
   addNewToolReservedProducts,
+  changeStatusWarehouseManagerTrailer,
   deleteWarehouseManagerTrailer,
   updAnchorReservedProducts,
   updateWarehouseQuantitys,
@@ -16,15 +17,16 @@ import {
   updReservedProducts,
   updToolReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
+import { useNavigate } from 'react-router-dom';
 import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addNewAldabaran } from '#components/redux/actions/aldabaranAction.js';
 
 const WarehouseContext = createContext();
 
 const WarehouseContextProvider = ({ children }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const COLUMNS_WAREHOUSE = [
     {
@@ -643,7 +645,17 @@ const WarehouseContextProvider = ({ children }) => {
 
     const orderId = Number(selectedOrder?.order_id ?? wmoctProduct[0]?.order_id);
 
-    if (!orderId) return false;
+    const trailer = Number(selectedOrder?.trailer ?? wmoctProduct[0]?.trailer);
+
+    if (!orderId || !trailer) {
+      console.error('orderId or trailer is missing:', {
+        orderId,
+        trailer,
+        selectedOrder,
+      });
+
+      return false;
+    }
 
     const makeDispatchReserveKey = (type, orderDispatchId) => {
       return `${normalizeProductType(type)}_${Number(orderDispatchId)}`;
@@ -702,7 +714,7 @@ const WarehouseContextProvider = ({ children }) => {
         return;
       }
 
-      product?.batches?.forEach((batch) => {
+      product?.batches?.forEach(async (batch) => {
         const allocated = Number(batch.allocated || 0);
         const minAllocated = Number(batch.minAllocated || 0);
 
@@ -742,7 +754,7 @@ const WarehouseContextProvider = ({ children }) => {
           const updateAction = getUpdateReserveAction(type);
 
           if (updateAction) {
-            dispatch(
+            await dispatch(
               updateAction({
                 article: product.article,
                 warehouse_id: warehouseItem.id,
@@ -800,18 +812,73 @@ const WarehouseContextProvider = ({ children }) => {
     );
 
     if (wh_arr.length > 0) {
-      dispatch(updateWarehouseQuantitys(wh_arr));
+      await dispatch(updateWarehouseQuantitys(wh_arr));
     }
 
-    Object.entries(newReservedGrouped).forEach(([type, items]) => {
+    Object.entries(newReservedGrouped).forEach(async ([type, items]) => {
       if (!items.length) return;
 
       const addAction = getAddReserveAction(type);
 
       if (addAction) {
-        dispatch(addAction(items));
+        await dispatch(addAction(items));
       }
     });
+
+    const createReservationCheck = (dispatchRows) =>
+      dispatchRows.map((dispatchRow) => {
+        const orderDispatchId = Number(dispatchRow.id);
+
+        const type = normalizeProductType(dispatchRow.product_table);
+
+        const plannedQuantity = Number(dispatchRow.quantity || 0);
+
+        const key = makeDispatchReserveKey(type, orderDispatchId);
+
+        const reservedQuantity = Number(reservedByDispatch.get(key) || 0);
+
+        return {
+          orderDispatchId,
+          orderId: Number(dispatchRow.orderId),
+          trailer: Number(dispatchRow.trailer),
+          article: dispatchRow.article,
+          type,
+          plannedQuantity,
+          reservedQuantity,
+          missing: Math.max(plannedQuantity - reservedQuantity, 0),
+        };
+      });
+
+    const dispatchRowsForTrailer = (order_dispatch_data || []).filter(
+      (item) => Number(item.orderId) === orderId && Number(item.trailer) === trailer,
+    );
+
+    const trailerReservationCheck = createReservationCheck(dispatchRowsForTrailer);
+
+    const allTrailerReserved =
+      trailerReservationCheck.length > 0 &&
+      trailerReservationCheck.every(
+        (item) =>
+          item.orderDispatchId > 0 && item.reservedQuantity >= item.plannedQuantity,
+      );
+
+    console.table(trailerReservationCheck);
+
+    console.log('allTrailerReserved:', {
+      orderId,
+      trailer,
+      allTrailerReserved,
+    });
+
+    if (allTrailerReserved) {
+      await dispatch(
+        changeStatusWarehouseManagerTrailer({
+          orderId,
+          trailer,
+          status: 2,
+        }),
+      );
+    }
 
     const dispatchRowsForOrder = (order_dispatch_data || []).filter(
       (item) => Number(item.orderId) === Number(orderId),
@@ -866,7 +933,6 @@ const WarehouseContextProvider = ({ children }) => {
       const article = order?.article;
 
       if (!article) {
-        console.error('Order article not found:', orderId);
         return false;
       }
 
@@ -885,7 +951,16 @@ const WarehouseContextProvider = ({ children }) => {
           }),
         );
 
-        await dispatch(deleteWarehouseManagerTrailer(orderId));
+        await dispatch(
+          changeStatusWarehouseManagerTrailer({
+            orderId,
+            status: 4,
+          }),
+        );
+
+        navigate('/warehouse_manager');
+
+        // await dispatch(deleteWarehouseManagerTrailer(orderId));
       } catch (error) {
         console.error('Failed to complete warehouse order:', error);
 
