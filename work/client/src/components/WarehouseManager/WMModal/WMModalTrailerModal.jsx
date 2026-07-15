@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { useDispatch } from 'react-redux';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import '../warehouseManagerView.css';
 
 function WMModalTrailerModal({ trailer_order }) {
   const { orderCartData, filterKeysOrder } = useOrderContext();
@@ -290,30 +291,32 @@ function WMModalTrailerModal({ trailer_order }) {
       size="lg"
       centered
       className="modal-auto-size"
+      contentClassName="wm-modal-card wm-modal-card--lg"
+      backdropClassName="wm-modal-backdrop"
     >
       <ModalHeader toggle={toggle}>Plan nuevo trailer</ModalHeader>
 
       <ModalBody>
-        <h4>Order number: {orderCartData?.article}</h4>
+        <h4 className="wm-mono">Order number: {orderCartData?.article}</h4>
 
-        <div className="header-container">
-          <div className="owner-info">
+        <div className="wm-tiles">
+          <div className="wm-tile">
             <h4>Client Information</h4>
             {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
           </div>
-          <div className="contact-info">
+          <div className="wm-tile">
             <div className="contact-text">
               <h4>Contact Person</h4>
               {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
             </div>
           </div>
-          <div className="delivery-address">
+          <div className="wm-tile">
             <h4>Delivery Address</h4>
             {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
           </div>
         </div>
 
-        <table className="table table-bordered">
+        <table className="wm-builder-table">
           <thead>
             <tr>
               <th>Trailer</th>
@@ -353,19 +356,13 @@ function WMModalTrailerModal({ trailer_order }) {
                       }
                       min="0"
                       max={getAvailableRemaining(getProductKey(product), rowIndex)}
-                      style={{ width: '30%' }}
+                      style={{ width: '64px' }}
                     />
                     {!row.isExisting && (
-                      <span
-                        style={{
-                          marginLeft: '8px',
-                          fontSize: '0.9em',
-                          color: '#555',
-                        }}
-                      >
+                      <div className="wm-builder-table__hint">
                         (ост.:{' '}
                         {getAvailableRemaining(getProductKey(product), rowIndex)})
-                      </span>
+                      </div>
                     )}
                   </td>
                 ))}
@@ -374,11 +371,7 @@ function WMModalTrailerModal({ trailer_order }) {
             <tr>
               <td
                 colSpan={2 + trailer_order.length}
-                style={{
-                  background: '#00ff00',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                }}
+                className="wm-builder-table__addrow"
                 onClick={addTrailerRow}
               >
                 +
@@ -390,13 +383,15 @@ function WMModalTrailerModal({ trailer_order }) {
 
       <ModalFooter>
         <Button
-          color="success"
+          className="wm-btn wm-btn--primary"
           style={{ marginRight: 'auto' }}
           onClick={handleTrailerSave}
         >
           Save
         </Button>
-        <Button onClick={toggle}>Close</Button>
+        <Button className="wm-btn wm-btn--ghost" onClick={toggle}>
+          Close
+        </Button>
       </ModalFooter>
     </Modal>
   );

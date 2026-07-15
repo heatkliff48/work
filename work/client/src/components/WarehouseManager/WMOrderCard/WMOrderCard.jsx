@@ -5,6 +5,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import WMOCTable from './WMOCTable/WMOCTable';
 
 import '#components/Styles/order-card.css';
+import '../warehouseManagerView.css';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
 const escapeHtml = (value) =>
@@ -186,32 +187,34 @@ const WMOrderCard = React.memo(() => {
   }, [wmoctProduct, orderCartData]);
 
   return (
-    <div className="page-container">
-      <div className="order-header-row">
-        <h4>Order number: {orderCartData?.article}</h4>
+    <div className="wm-card-page">
+      <div className="wm-card-page__head">
+        <h4 className="wm-card-page__title wm-mono">
+          Order number: {orderCartData?.article}
+        </h4>
         <button
           type="button"
-          className="print-warehouse-sheet-btn"
+          className="wm-btn wm-btn--ghost"
           onClick={handlePrintWarehouseSheet}
         >
           Print
         </button>
       </div>
 
-      <div className="header-container">
-        <div className="owner-info">
+      <div className="wm-tiles">
+        <div className="wm-tile">
           <h4>Client Information</h4>
           {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
         </div>
 
-        <div className="contact-info">
+        <div className="wm-tile">
           <div className="contact-text">
             <h4>Contact Person</h4>
             {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
           </div>
         </div>
 
-        <div className="delivery-address">
+        <div className="wm-tile">
           <h4>Delivery Address</h4>
           {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
         </div>

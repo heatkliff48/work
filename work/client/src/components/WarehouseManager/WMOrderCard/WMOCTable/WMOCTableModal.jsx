@@ -1,6 +1,7 @@
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { Fragment, useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import '../../warehouseManagerView.css';
 
 const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
   const [wmoctmodalData, setWmoctModalData] = useState();
@@ -98,6 +99,8 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
         toggle={() => {
           toggle();
         }}
+        contentClassName="wm-modal-card wm-modal-card--sm"
+        backdropClassName="wm-modal-backdrop"
       >
         <ModalHeader
           toggle={() => {
@@ -108,12 +111,12 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
         </ModalHeader>
         <Fragment>
           <ModalBody>
-            <table className="table-auto border border-gray-300 w-full">
-              <thead className="bg-gray-100">
+            <table className="wm-prod-table">
+              <thead>
                 <tr>
-                  <th className="border px-2">Batch article</th>
-                  <th className="border px-2">Free quantity remaining</th>
-                  <th className="border px-2">Ordered quantity</th>
+                  <th>Batch article</th>
+                  <th>Free quantity remaining</th>
+                  <th>Ordered quantity</th>
                 </tr>
               </thead>
 
@@ -121,19 +124,18 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
                 {wmoctmodalData?.map((product, productIndex) => (
                   <Fragment key={productIndex}>
                     <tr
+                      className="tbl-row--click"
                       onClick={() => {
                         onClickHandler(product);
                       }}
                     >
-                      <td className="border p-1" rowSpan={product?.length || 1}>
+                      <td className="wm-mono" rowSpan={product?.length || 1}>
                         {product.batch_article}
                       </td>
-                      <td className="border p-1" rowSpan={product?.length || 1}>
+                      <td rowSpan={product?.length || 1}>
                         {product.free_quantity_remaining}
                       </td>
-                      <td className="border p-1" rowSpan={product?.length || 1}>
-                        {product.quantity}
-                      </td>
+                      <td rowSpan={product?.length || 1}>{product.quantity}</td>
                     </tr>
                   </Fragment>
                 ))}

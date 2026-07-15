@@ -1,6 +1,7 @@
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { Fragment } from 'react';
+import '../../../warehouseManagerView.css';
 
 const WMOCTProduct = ({
   orderId,
@@ -40,60 +41,115 @@ const WMOCTProduct = ({
   };
 
   return (
-    <div className="overflow-auto">
-      <table className="table-auto border border-gray-300 w-full">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="border px-2">Product article</th>
-            <th className="border px-2">Qty total, pallet</th>
-            <th className="border px-2">Qty shipped, pallet</th>
-            <th className="border px-2">Qty remaining, pallet</th>
-            <th className="border px-2">Batch ID</th>
-            <th className="border px-2">Qty in batch, pallet</th>
-            <th className="border px-2">Controls</th>
-            <th className="border px-2">Qty allocated, pallet</th>
-          </tr>
-        </thead>
-        <tbody>
-          {wmoctProduct?.map((product, productIndex) => (
-            <Fragment key={product.article}>
-              {/* Основная строка продукта */}
-              <tr>
-                <td className="border p-1" style={{ width: '25%' }}>
-                  {product.article}
-                </td>
-                <td className="border p-1">{product.qty_total}</td>
-                <td className="border p-1">{product.shipped}</td>
-                <td className="border p-1">{product.qty_rem}</td>
+    <div className="wm-prod-card">
+      <div className="overflow-auto">
+        <table className="wm-prod-table">
+          <thead>
+            <tr>
+              <th>Product article</th>
+              <th>Qty total, pallet</th>
+              <th>Qty shipped, pallet</th>
+              <th>Qty remaining, pallet</th>
+              <th>Batch ID</th>
+              <th>Qty in batch, pallet</th>
+              <th>Controls</th>
+              <th>Qty allocated, pallet</th>
+            </tr>
+          </thead>
+          <tbody>
+            {wmoctProduct?.map((product, productIndex) => (
+              <Fragment key={product.article}>
+                {/* Основная строка продукта */}
+                <tr>
+                  <td className="wm-mono">{product.article}</td>
+                  <td>{product.qty_total}</td>
+                  <td>{product.shipped}</td>
+                  <td>{product.qty_rem}</td>
+                  {haveBatches(productIndex) ? (
+                    <>
+                      <td className="wm-mono">{product.batches[0]?.batchId}</td>
+                      <td>{product.batches[0]?.remainingInBatch}</td>
+                      <td>
+                        <div className="wm-prod-table__controls">
+                          <button
+                            className="wm-round-btn"
+                            disabled={isDisablePlus(product.article)}
+                            onClick={() => handlePlus(product, 0)}
+                          >
+                            ＋
+                          </button>
+                          <button
+                            className="wm-round-btn"
+                            disabled={isDisableMinus(
+                              product.article,
+                              product.batches[0],
+                            )}
+                            onClick={() => handleMinus(product, 0)}
+                          >
+                            －
+                          </button>
+                        </div>
+                      </td>
+                      <td>{product.batches[0]?.allocated}</td>
+                    </>
+                  ) : (
+                    <>
+                      <td>
+                        <button
+                          className="wm-add-batch-btn"
+                          onClick={() => {
+                            setWmoctModal(!wmoctModal);
+                            handlePlusBatch(product);
+                          }}
+                        >
+                          ＋
+                        </button>
+                      </td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </>
+                  )}
+                </tr>
+                {/* Дополнительные строки для батчей */}
+                {product.batches?.slice(1).map((batch, batchIndex) => (
+                  <tr key={`${product.article}__${batch.batchId}`}>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td className="wm-mono">{batch.batchId}</td>
+                    <td>{batch.remainingInBatch}</td>
+                    <td>
+                      <div className="wm-prod-table__controls">
+                        <button
+                          className="wm-round-btn"
+                          disabled={isDisablePlus(product.article)}
+                          onClick={() => handlePlus(product, batchIndex + 1)}
+                        >
+                          ＋
+                        </button>
+                        <button
+                          className="wm-round-btn"
+                          disabled={isDisableMinus(product.article, batch)}
+                          onClick={() => handleMinus(product, batchIndex + 1)}
+                        >
+                          －
+                        </button>
+                      </div>
+                    </td>
+                    <td>{batch.allocated}</td>
+                  </tr>
+                ))}
                 {haveBatches(productIndex) ? (
-                  <>
-                    <td className="border p-1">{product.batches[0]?.batchId}</td>
-                    <td className="border p-1">
-                      {product.batches[0]?.remainingInBatch}
-                    </td>
-                    <td className="border p-1 text-center">
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
                       <button
-                        disabled={isDisablePlus(product.article)}
-                        onClick={() => handlePlus(product, 0)}
-                      >
-                        ＋
-                      </button>
-                      <button
-                        disabled={isDisableMinus(
-                          product.article,
-                          product.batches[0],
-                        )}
-                        onClick={() => handleMinus(product, 0)}
-                      >
-                        －
-                      </button>
-                    </td>
-                    <td className="border p-1">{product.batches[0]?.allocated}</td>
-                  </>
-                ) : (
-                  <>
-                    <td className="border p-1">
-                      <button
+                        className="wm-add-batch-btn"
                         onClick={() => {
                           setWmoctModal(!wmoctModal);
                           handlePlusBatch(product);
@@ -102,74 +158,30 @@ const WMOCTProduct = ({
                         ＋
                       </button>
                     </td>
-                    <td className="border p-1"></td>
-                    <td className="border p-1 text-center"></td>
-                    <td className="border p-1"></td>
-                  </>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                ) : (
+                  <></>
                 )}
-              </tr>
-              {/* Дополнительные строки для батчей */}
-              {product.batches?.slice(1).map((batch, batchIndex) => (
-                <tr key={`${product.article}__${batch.batchId}`}>
-                  <td className="border p-1"></td>
-                  <td className="border p-1"></td>
-                  <td className="border p-1"></td>
-                  <td className="border p-1"></td>
-                  <td className="border p-1">{batch.batchId}</td>
-                  <td className="border p-1">{batch.remainingInBatch}</td>
-                  <td className="border p-1 text-center">
-                    <button
-                      disabled={isDisablePlus(product.article)}
-                      onClick={() => handlePlus(product, batchIndex + 1)}
-                    >
-                      ＋
-                    </button>
-                    <button
-                      disabled={isDisableMinus(product.article, batch)}
-                      onClick={() => handleMinus(product, batchIndex + 1)}
-                    >
-                      －
-                    </button>
-                  </td>
-                  <td className="border p-1">{batch.allocated}</td>
-                </tr>
-              ))}
-              {haveBatches(productIndex) ? (
-                <tr>
-                  <td className="border p-1"></td>
-                  <td className="border p-1"></td>
-                  <td className="border p-1"></td>
-                  <td className="border p-1"></td>
-                  <td className="border p-1">
-                    <button
-                      onClick={() => {
-                        setWmoctModal(!wmoctModal);
-                        handlePlusBatch(product);
-                      }}
-                    >
-                      ＋
-                    </button>
-                  </td>
-                  <td className="border p-1"></td>
-                  <td className="border p-1 text-center"></td>
-                  <td className="border p-1"></td>
-                </tr>
-              ) : (
-                <></>
-              )}
-            </Fragment>
-          ))}
-        </tbody>
-        {onSaveHandler() && (
+              </Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {onSaveHandler() && (
+        <div className="wm-prod-card__foot">
           <button
+            className="wm-btn wm-btn--primary"
             onClick={() => {
               setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
             }}
           >
             SAVE
           </button>
-        )}
-      </table>
+        </div>
+      )}
     </div>
   );
 };

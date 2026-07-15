@@ -182,21 +182,27 @@
 /* empty state */
 .cl-page .tbl-empty,
 .ord-page .tbl-empty,
-.ord-card-scope .tbl-empty {
+.ord-card-scope .tbl-empty,
+.wm-page .tbl-empty,
+.wm-modal-card .tbl-empty {
   padding: 54px 18px;
   text-align: center;
   color: #9aa0ac;
 }
 .cl-page .tbl-empty__title,
 .ord-page .tbl-empty__title,
-.ord-card-scope .tbl-empty__title {
+.ord-card-scope .tbl-empty__title,
+.wm-page .tbl-empty__title,
+.wm-modal-card .tbl-empty__title {
   font-size: 15px;
   font-weight: 600;
   color: #565d6d;
 }
 .cl-page .tbl-empty__sub,
 .ord-page .tbl-empty__sub,
-.ord-card-scope .tbl-empty__sub {
+.ord-card-scope .tbl-empty__sub,
+.wm-page .tbl-empty__sub,
+.wm-modal-card .tbl-empty__sub {
   font-size: 13px;
   margin-top: 4px;
 }
@@ -295,4 +301,109 @@
 .ord-card-scope .tbl-card table.tbl > tbody > tr.tbl-row--click:hover,
 .ord-card-scope .tbl-card table.tbl > tbody > tr.tbl-row--click:hover > td {
   background: #fafbfc !important;
+}
+
+/* =====================================================================
+   WAREHOUSE MANAGER module (Order dispatch) — reuses the same "card"
+   table look. .wm-page = main dispatch list page shell. .wm-modal-card
+   = a Table variant="card" embedded inside a WarehouseManager modal
+   (select order to plan / etc.)
+   ===================================================================== */
+.wm-page .tbl-card,
+.wm-modal-card .tbl-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  background: #fff !important;
+  border: 1px solid #e4e6eb !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 2px rgba(20, 23, 33, 0.04), 0 6px 18px rgba(20, 23, 33, 0.03) !important;
+}
+.wm-page .tbl-card table.tbl,
+.wm-modal-card .tbl-card table.tbl {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  font-size: 14px !important;
+  background: #fff !important;
+  table-layout: auto !important;
+}
+.wm-page .tbl-card table.tbl > thead > tr,
+.wm-modal-card .tbl-card table.tbl > thead > tr {
+  background: #fafafb !important;
+  border-bottom: 1px solid #e4e6eb !important;
+}
+.wm-page .tbl-card table.tbl > thead > tr > th,
+.wm-modal-card .tbl-card table.tbl > thead > tr > th {
+  text-align: left !important;
+  padding: 13px 18px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  color: #9aa0ac !important;
+  background: #fafafb !important;
+  border: 0 !important;
+  border-bottom: 1px solid #e4e6eb !important;
+  white-space: nowrap !important;
+  position: static !important;
+}
+.wm-page .tbl-card table.tbl .tbl-th-inner,
+.wm-modal-card .tbl-card table.tbl .tbl-th-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.wm-page .tbl-card table.tbl .tbl-sort,
+.wm-modal-card .tbl-card table.tbl .tbl-sort {
+  display: inline-flex;
+  align-items: center;
+  color: #c4c8d0;
+  font-size: 13px;
+}
+.wm-page .tbl-card table.tbl > tbody > tr,
+.wm-modal-card .tbl-card table.tbl > tbody > tr {
+  background: #fff !important;
+}
+.wm-page .tbl-card table.tbl > tbody > tr:nth-child(odd),
+.wm-page .tbl-card table.tbl > tbody > tr:nth-child(even),
+.wm-modal-card .tbl-card table.tbl > tbody > tr:nth-child(odd),
+.wm-modal-card .tbl-card table.tbl > tbody > tr:nth-child(even) {
+  background: #fff !important;
+}
+.wm-page .tbl-card table.tbl > tbody > tr > td,
+.wm-modal-card .tbl-card table.tbl > tbody > tr > td {
+  padding: 13px 18px !important;
+  border: 0 !important;
+  border-bottom: 1px solid #f0f1f4 !important;
+  color: #565d6d !important;
+  font-size: 13.5px !important;
+  vertical-align: middle !important;
+  background: transparent !important;
+}
+.wm-page .tbl-card table.tbl > tbody > tr:last-child > td,
+.wm-modal-card .tbl-card table.tbl > tbody > tr:last-child > td {
+  border-bottom: 0 !important;
+}
+.wm-page .tbl-card table.tbl > tbody > tr.tbl-row--click,
+.wm-modal-card .tbl-card table.tbl > tbody > tr.tbl-row--click {
+  cursor: pointer !important;
+  transition: background 0.12s;
+}
+.wm-modal-card .tbl-card table.tbl > tbody > tr.tbl-row--click:hover,
+.wm-modal-card .tbl-card table.tbl > tbody > tr.tbl-row--click:hover > td {
+  background: #fafbfc !important;
+}
+
+/* Table.jsx's own title (h1) — only ever rendered with variant="card" and
+   hideTitle left at its default (false); every other card-table consumer
+   in the app passes hideTitle, so this is scoped implicitly. */
+.tbl-title {
+  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: #171a1f;
 }
