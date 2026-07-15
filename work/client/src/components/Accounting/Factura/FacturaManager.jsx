@@ -38,7 +38,7 @@ const getProductType = (
   latestDryMix,
   latestAnchors,
   latestTools,
-  latestRelatedMaterials,
+  latestRelatedMaterials
 ) => {
   if (!article) return 'unknown';
 
@@ -68,7 +68,7 @@ const getProductByArticle = (
   latestDryMix,
   latestAnchors,
   latestTools,
-  latestRelatedMaterials,
+  latestRelatedMaterials
 ) => {
   switch (type) {
     case 'product':
@@ -93,7 +93,7 @@ const buildProductLists = (
   latestDryMix,
   latestAnchors,
   latestTools,
-  latestRelatedMaterials,
+  latestRelatedMaterials
 ) => {
   const productLists = {
     products: [],
@@ -122,7 +122,7 @@ const buildProductLists = (
       latestDryMix,
       latestAnchors,
       latestTools,
-      latestRelatedMaterials,
+      latestRelatedMaterials
     );
     const product = getProductByArticle(
       article,
@@ -131,7 +131,7 @@ const buildProductLists = (
       latestDryMix,
       latestAnchors,
       latestTools,
-      latestRelatedMaterials,
+      latestRelatedMaterials
     );
 
     if (!product) return;
@@ -232,7 +232,7 @@ const calculateVAT = (productLists, vatProcent) => {
         el?.final_price_tool ||
         el?.final_price_rel_mat ||
         0),
-    0,
+    0
   );
 
   if (!final_price_product || !vatProcent) {
@@ -303,8 +303,17 @@ function FacturaManager() {
       setWmoctProductShippedBD([]);
       return;
     }
+    const filteredDispatchData = order_dispatch_data.filter((item) => {
+      const order = list_of_orders.find((o) => o.id === item.orderId);
+      return order && (order.status || 0) >= 8;
+    });
 
-    const groupedData = order_dispatch_data.reduce((acc, item) => {
+    if (filteredDispatchData.length === 0) {
+      setFacturaData([]);
+      setWmoctProductShippedBD([]);
+      return;
+    }
+    const groupedData = filteredDispatchData.reduce((acc, item) => {
       const key = `${item.orderId}_${item.trailer}`;
 
       if (!acc[key]) {
@@ -343,7 +352,7 @@ function FacturaManager() {
         latestDryMix,
         latestAnchors,
         latestTools,
-        latestRelatedMaterials,
+        latestRelatedMaterials
       );
 
       // Вычисляем VAT для этого заказа
