@@ -1506,7 +1506,7 @@ class WarehouseRepository {
   static async changeStatusWarehouseManagerTrailer(new_status_trailer) {
     const { status, orderId } = new_status_trailer;
 
-    const transaction = await sequelize.transaction();
+    //const transaction = await sequelize.transaction();
     try {
       if (new_status_trailer?.trailer) {
         const [count, updatedRows] = await OrderDispatches.update(
@@ -1515,11 +1515,11 @@ class WarehouseRepository {
           },
           {
             where: { orderId, trailer: new_status_trailer?.trailer },
-            transaction,
+            //transaction,
             returning: true,
           },
         );
-        await transaction.commit();
+        //await transaction.commit();
 
         return updatedRows;
       } else {
@@ -1529,16 +1529,16 @@ class WarehouseRepository {
           },
           {
             where: { orderId },
-            transaction,
+            //transaction,
             returning: true,
           },
         );
-        await transaction.commit();
+        //await transaction.commit();
 
         return updatedRows;
       }
     } catch (error) {
-      await transaction.rollback();
+      //await transaction.rollback();
 
       console.error('changeStatusWarehouseManagerTrailer error:', error);
 
