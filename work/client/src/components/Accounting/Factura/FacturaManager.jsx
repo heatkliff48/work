@@ -243,7 +243,9 @@ const calculateVAT = (productLists, vatProcent) => {
     };
   }
 
-  const vat_euro = Number(((vatProcent * final_price_product) / 100).toFixed(2));
+  const vat_euro = Number(
+    ((vatProcent * final_price_product) / 100).toFixed(2),
+  );
   const vat_result = Number((final_price_product + vat_euro).toFixed(2));
 
   return {
@@ -255,8 +257,16 @@ const calculateVAT = (productLists, vatProcent) => {
 
 function FacturaManager() {
   const { WAREHOUSE_MANAGER_TRAILER_TABLE } = useProjectContext();
-  const { setWmoctProductShippedBD, setSelectedOrder, order_dispatch_data } =
-    useWarehouseContext();
+  const {
+    setWmoctProductShippedBD,
+    setSelectedOrder,
+    order_dispatch_data,
+    list_of_reserved_products,
+    list_of_dry_mix_reserved_products,
+    list_of_anchor_reserved_products,
+    list_of_tool_reserved_products,
+    list_of_rel_mat_reserved_products,
+  } = useWarehouseContext();
   const { list_of_orders, deliveryAddresses, getCurrentOrderInfoHandler } =
     useOrderContext();
 
@@ -304,7 +314,78 @@ function FacturaManager() {
       return;
     }
 
-    const groupedData = order_dispatch_data.reduce((acc, item) => {
+    const filteredDispatchData = order_dispatch_data.filter((item) => {
+      const order = list_of_orders.find((o) => o.id === item.orderId);
+      if (!order || (order.status || 0) < 8) {
+        return false;
+      }
+
+      let reservedProduct = [];
+      switch (item?.product_table) {
+        case 'product':
+          reservedProduct = list_of_reserved_products?.find(
+            (reserved) => reserved.order_dispatch_id === item.id,
+          );
+
+          if (reservedProduct && reservedProduct.quantity === item.quantity) {
+            return false;
+          }
+          break;
+
+        case 'relMat':
+          reservedProduct = list_of_rel_mat_reserved_products?.find(
+            (reserved) => reserved.order_dispatch_id === item.id,
+          );
+
+          if (reservedProduct && reservedProduct.quantity === item.quantity) {
+            return false;
+          }
+          break;
+
+        case 'tool':
+          reservedProduct = list_of_tool_reserved_products?.find(
+            (reserved) => reserved.order_dispatch_id === item.id,
+          );
+
+          if (reservedProduct && reservedProduct.quantity === item.quantity) {
+            return false;
+          }
+          break;
+
+        case 'dryMixed':
+          reservedProduct = list_of_dry_mix_reserved_products?.find(
+            (reserved) => reserved.order_dispatch_id === item.id,
+          );
+
+          if (reservedProduct && reservedProduct.quantity === item.quantity) {
+            return false;
+          }
+          break;
+
+        case 'anchor':
+          reservedProduct = list_of_anchor_reserved_products?.find(
+            (reserved) => reserved.order_dispatch_id === item.id,
+          );
+
+          if (reservedProduct && reservedProduct.quantity === item.quantity) {
+            return false;
+          }
+          break;
+
+        default:
+          break;
+      }
+
+      return true;
+    });
+
+    if (filteredDispatchData.length === 0) {
+      setFacturaData([]);
+      setWmoctProductShippedBD([]);
+      return;
+    }
+
+    const groupedData = filteredDispatchData.reduce((acc, item) => {
       const key = `${item.orderId}_${item.trailer}`;
 
       if (!acc[key]) {
@@ -334,7 +415,9 @@ function FacturaManager() {
 
     const result = Object.values(groupedData).map((group) => {
       const order = list_of_orders.find((o) => o.id === group.orderId);
-      const delivery = deliveryAddresses.find((d) => d.id === order?.del_adr_id);
+      const delivery = deliveryAddresses.find(
+        (d) => d.id === order?.del_adr_id,
+      );
 
       // Формируем productLists для этого заказа
       const productLists = buildProductLists(
