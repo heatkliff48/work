@@ -18,6 +18,7 @@ function Table({
   renderToolbar, // (api) => JSX
   emptyTitle = 'No clients match your search',
   emptySubtitle = 'Try a different name, CIF/VAT or category.',
+  getRowProps, // (row) => ({ className, style }) — optional per-row view hook, nothing else changes
 }) {
   const columns = useMemo(() => {
     return Array.isArray(COLUMN_DATA) ? COLUMN_DATA : [];
@@ -157,11 +158,17 @@ function Table({
             {rows.map((row) => {
               prepareRow(row);
               const { key, ...restProps } = row.getRowProps();
+              const rowView = getRowProps ? getRowProps(row) || {} : {};
               return (
                 <tr
                   key={key}
                   {...restProps}
-                  className={handleRowClick ? 'tbl-row--click' : undefined}
+                  className={
+                    [handleRowClick ? 'tbl-row--click' : '', rowView.className]
+                      .filter(Boolean)
+                      .join(' ') || undefined
+                  }
+                  style={rowView.style}
                   onClick={() => handleRowClick && handleRowClick(row)}
                 >
                   {row.cells.map((cell) => {

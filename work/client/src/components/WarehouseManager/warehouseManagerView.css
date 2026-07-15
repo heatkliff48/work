@@ -1,0 +1,472 @@
+/* =====================================================================
+   WarehouseManager module (Order dispatch) — view styles.
+   Только внешний вид. Логика данных/бизнес-правила не затрагиваются.
+   ===================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
+
+:root {
+  --wm-red: #bc1212;
+  --wm-red-hover: #a50f0f;
+  --wm-red-soft: #fbe9e9;
+  --wm-bg: #fafafb;
+  --wm-card: #ffffff;
+  --wm-border: #e4e6eb;
+  --wm-border-2: #dee1e6;
+  --wm-border-3: #eef0f3;
+  --wm-divider: #f0f1f4;
+  --wm-text: #171a1f;
+  --wm-text-2: #565d6d;
+  --wm-text-3: #3a3f4b;
+  --wm-muted: #9aa0ac;
+  --wm-shadow-card: 0 1px 2px rgba(20, 23, 33, 0.04), 0 6px 18px rgba(20, 23, 33, 0.03);
+  --wm-shadow-modal: 0 24px 60px rgba(20, 23, 33, 0.28);
+  --wm-mono: 'Roboto Mono', monospace;
+}
+
+/* ---------- page shell (main dispatch list) ---------- */
+.wm-page {
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--wm-text);
+  padding: 26px 36px 48px;
+}
+.wm-page .tbl-title {
+  margin: 0 0 20px;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--wm-text);
+}
+
+/* ---------- toolbar (existing search + toggle + existing button) ---------- */
+.wm-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.wm-search {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+}
+.wm-search__ic {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.wm-search__input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--wm-border-2);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 14px 0 38px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--wm-text);
+  outline: none;
+}
+.wm-search__input:focus {
+  border-color: var(--wm-red);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+.wm-toolbar__spacer {
+  flex: 1;
+}
+
+/* ---------- toggle switch (the one permitted new control) ---------- */
+.wm-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px;
+}
+.wm-toggle__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--wm-text-2);
+  white-space: nowrap;
+}
+.wm-toggle__switch {
+  width: 40px;
+  height: 24px;
+  flex: 0 0 40px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  background: var(--wm-border-2);
+  position: relative;
+  padding: 0;
+  transition: background 0.15s;
+}
+.wm-toggle__switch--on {
+  background: var(--wm-red);
+}
+.wm-toggle__knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: left 0.15s;
+}
+.wm-toggle__knob--on {
+  left: 18px;
+}
+
+/* row tint by trailer_stage (0-4) — background only, value never rendered as text */
+.wm-page .tbl-card table.tbl > tbody > tr:hover > td {
+  filter: brightness(0.97);
+}
+
+/* ---------- buttons ---------- */
+.wm-btn {
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  transition: background 0.12s, border-color 0.12s;
+}
+.wm-btn--primary {
+  background: var(--wm-red);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(188, 18, 18, 0.3);
+}
+.wm-btn--primary:hover {
+  background: var(--wm-red-hover);
+}
+.wm-btn--primary:disabled {
+  background: #e2a5a5;
+  cursor: not-allowed;
+}
+.wm-btn--ghost {
+  background: #fff;
+  color: var(--wm-text-3);
+  border: 1px solid var(--wm-border-2);
+}
+.wm-btn--ghost:hover {
+  background: #f6f7fa;
+}
+.wm-btn--sm {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 12.5px;
+}
+.wm-mono {
+  font-family: var(--wm-mono);
+}
+
+/* ---------- info tiles (Client / Contact / Delivery — filterAndMapData output) ---------- */
+.wm-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.wm-tile {
+  flex: 1 1 260px;
+  background: var(--wm-card);
+  border: 1px solid var(--wm-border);
+  border-radius: 13px;
+  padding: 16px 18px;
+}
+.wm-tile h4 {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--wm-muted);
+  margin: 0 0 9px;
+}
+.wm-tile .data-text p {
+  margin: 2px 0;
+  font-size: 13.5px;
+  color: var(--wm-text-3);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* ---------- order card page shell ---------- */
+.wm-card-page {
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--wm-text);
+}
+.wm-card-page__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.wm-card-page__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--wm-text);
+}
+
+/* ---------- generic modal chrome (reactstrap Modal, only reskinned) ---------- */
+.wm-modal-card {
+  border-radius: 16px !important;
+  border: 0 !important;
+  box-shadow: var(--wm-shadow-modal) !important;
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  overflow: hidden;
+}
+.wm-modal-card--md {
+  max-width: 760px;
+}
+.wm-modal-card--lg {
+  max-width: 920px;
+}
+.wm-modal-card--sm {
+  max-width: 520px;
+}
+.wm-modal-card--xs {
+  max-width: 460px;
+}
+.wm-modal-card .modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--wm-border-3);
+}
+.wm-modal-card .modal-header .modal-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--wm-text);
+}
+.wm-modal-card .modal-body {
+  padding: 8px 24px 20px;
+}
+.wm-modal-card .modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--wm-border-3);
+  gap: 10px;
+}
+.wm-modal-backdrop {
+  background: rgba(23, 26, 31, 0.46) !important;
+}
+.wm-modal-backdrop.show {
+  opacity: 1 !important;
+}
+
+/* card-table look reused inside WM modals (see table.css .wm-modal-card scoping) */
+
+/* ---------- form fields (Additional info modal etc.) ---------- */
+.wm-field {
+  margin-bottom: 13px;
+}
+.wm-field label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--wm-text-2);
+  display: block;
+  margin-bottom: 6px;
+}
+.wm-field input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--wm-border-2) !important;
+  border-radius: 9px !important;
+  padding: 0 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  outline: none;
+  color: var(--wm-text);
+}
+.wm-field input:focus {
+  border-color: var(--wm-red) !important;
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+
+/* ---------- trailer builder table (WMModalTrailerModal) ---------- */
+.wm-builder-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.wm-builder-table thead tr {
+  background: var(--wm-bg);
+}
+.wm-builder-table th {
+  text-align: left;
+  padding: 9px 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--wm-muted);
+  border-bottom: 1px solid var(--wm-border);
+}
+.wm-builder-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--wm-divider);
+  vertical-align: middle;
+}
+.wm-builder-table input,
+.wm-builder-table .react-datepicker-wrapper input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid var(--wm-border-2);
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--wm-text);
+  outline: none;
+}
+.wm-builder-table input:focus {
+  border-color: var(--wm-red);
+}
+.wm-builder-table input:disabled {
+  background: var(--wm-bg);
+  color: var(--wm-muted);
+}
+.wm-builder-table__hint {
+  font-size: 10.5px;
+  color: var(--wm-muted);
+  font-weight: 600;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+.wm-builder-table__addrow {
+  border: 1px dashed var(--wm-border-2) !important;
+  background: #fafbfc;
+  color: var(--wm-red);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 8px !important;
+}
+.wm-builder-table__addrow:hover {
+  background: #fdf1f1;
+}
+
+/* ---------- product allocation table (WMOCTProduct) ---------- */
+.wm-prod-card {
+  background: var(--wm-card);
+  border: 1px solid var(--wm-border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--wm-shadow-card);
+}
+.wm-prod-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  background: #fff;
+}
+.wm-prod-table thead tr {
+  background: var(--wm-bg);
+}
+.wm-prod-table thead th {
+  text-align: left;
+  padding: 11px 14px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--wm-muted);
+  border-bottom: 1px solid var(--wm-border);
+  white-space: nowrap;
+}
+.wm-prod-table tbody td {
+  padding: 10px 14px;
+  color: var(--wm-text-3);
+  font-weight: 600;
+  border-bottom: 1px solid var(--wm-divider);
+  vertical-align: middle;
+}
+.wm-prod-table tbody tr:hover td {
+  background: #fafbfc;
+}
+.wm-prod-table tbody tr.tbl-row--click {
+  cursor: pointer;
+}
+.wm-prod-table__controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.wm-round-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid var(--wm-border-2);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--wm-text-2);
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.wm-round-btn:hover:not(:disabled) {
+  background: #f6f7fa;
+}
+.wm-round-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.wm-add-batch-btn {
+  border: 1px dashed var(--wm-border-2);
+  background: #fafbfc;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wm-red);
+  cursor: pointer;
+}
+.wm-add-batch-btn:hover {
+  background: #fdf1f1;
+}
+.wm-prod-card__foot {
+  padding: 14px 18px;
+  border-top: 1px solid var(--wm-border-3);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---------- PDF preview modal ---------- */
+.wm-pdf-container {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 18px;
+}
+.wm-pdf-container iframe {
+  border: 1px solid var(--wm-border);
+  border-radius: 8px;
+  background: #fff;
+}
+.wm-pdf-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* responsive */
+@media (max-width: 560px) {
+  .wm-page {
+    padding: 18px 16px 36px;
+  }
+}

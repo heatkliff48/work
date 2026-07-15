@@ -7,6 +7,7 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import Table from '#components/Table/Table.jsx';
 import { useEffect, useState } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import '../warehouseManagerView.css';
 
 function WMModalTrailer({ setTrailerOrder }) {
   const { latestProducts } = useProductsContext();
@@ -235,6 +236,8 @@ function WMModalTrailer({ setTrailerOrder }) {
       size="lg"
       centered
       className="modal-auto-size"
+      contentClassName="wm-modal-card wm-modal-card--md"
+      backdropClassName="wm-modal-backdrop"
     >
       <ModalHeader toggle={toggle}>Plan nuevo trailer</ModalHeader>
 
@@ -246,6 +249,7 @@ function WMModalTrailer({ setTrailerOrder }) {
           onClickButton={() => {}}
           buttonText={''}
           tableName={'Order dispatch'}
+          variant="card"
           handleRowClick={(row) => {
             onClickTrailer(row.original);
             setwmmodalTrailerModal(!wmmodalTrailerModal);
@@ -254,7 +258,12 @@ function WMModalTrailer({ setTrailerOrder }) {
       </ModalBody>
 
       <ModalFooter>
-        <Button onClick={() => setwmmodalTrailer(!wmmodalTrailer)}>Close</Button>
+        <Button
+          className="wm-btn wm-btn--ghost"
+          onClick={() => setwmmodalTrailer(!wmmodalTrailer)}
+        >
+          Close
+        </Button>
       </ModalFooter>
     </Modal>
   );
