@@ -1504,26 +1504,59 @@ class WarehouseRepository {
   }
 
   static async changeStatusWarehouseManagerTrailer(new_status_trailer) {
-    const { status, trailer } = new_status_trailer;
-    const t = await sequelize.transaction();
+    const { status, trailer, orderId } = new_status_trailer;
+
+    const normalizedOrderId = Number(orderId);
+    const normalizedStatus = Number(status);
+
+    if (!Number.isFinite(normalizedOrderId)) {
+      throw new Error('Invalid orderId');
+    }
+
+    if (!Number.isFinite(normalizedStatus)) {
+      throw new Error('Invalid trailer status');
+    }
+
+    const where = {
+      orderId: normalizedOrderId,
+    };
+
+    if (trailer !== undefined && trailer !== null && trailer !== '') {
+      const normalizedTrailer = Number(trailer);
+
+      if (!Number.isFinite(normalizedTrailer)) {
+        throw new Error('Invalid trailer');
+      }
+
+      where.trailer = normalizedTrailer;
+    }
+
+    const transaction = await sequelize.transaction();
+
     try {
-      const [count, new_status] = await OrderDispatches.update(
+      const [count, updatedRows] = await OrderDispatches.update(
         {
-          trailer_stage: status,
+          trailer_stage: normalizedStatus,
         },
         {
-          where: { trailer },
-          transaction: t,
+          where,
+          transaction,
           returning: true,
         },
       );
-      await t.commit();
 
-      return new_status;
+      await transaction.commit();
+
+      return {
+        count,
+        updatedRows,
+      };
     } catch (error) {
-      await t.rollback();
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
-      return error;
+      await transaction.rollback();
+
+      console.error('changeStatusWarehouseManagerTrailer error:', error);
+
+      throw error;
     }
   }
 

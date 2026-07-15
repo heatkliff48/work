@@ -263,12 +263,12 @@ const FacturaOrderCard = React.memo(() => {
   }, [list_of_orders]);
 
   const statusChangeHandler = () => {
-    console.log('checkboxStatus FacturaOrderCard.jsx line 264', !checkboxStatus);
     const status = !checkboxStatus ? 1 : 0;
     setCheckboxStatus(!checkboxStatus);
     dispatch(
       changeStatusWarehouseManagerTrailer({
         status,
+        orderId: orderCartData?.id,
         trailer: selectedOrder.trailer,
       }),
     );
