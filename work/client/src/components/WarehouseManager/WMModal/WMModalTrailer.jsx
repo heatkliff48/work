@@ -3,12 +3,14 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import Table from '#components/Table/Table.jsx';
 import { useEffect, useState } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 function WMModalTrailer({ setTrailerOrder }) {
   const { latestProducts } = useProductsContext();
+  const { order_dispatch_data } = useWarehouseContext();
   const {
     wmmodalTrailer,
     setwmmodalTrailer,
@@ -53,6 +55,19 @@ function WMModalTrailer({ setTrailerOrder }) {
   useEffect(() => {
     const readies_orders = list_of_orders
       .filter((order) => order.status >= 6)
+      .filter((order) => {
+        const dispatchesOfOrder = (order_dispatch_data || []).filter(
+          (dispatch) => Number(dispatch.orderId) === Number(order.id),
+        );
+
+        if (dispatchesOfOrder.length === 0) {
+          return true;
+        }
+
+        return dispatchesOfOrder.some(
+          (dispatch) => Number(dispatch.trailer_stage) < 4,
+        );
+      })
       .reduce((acc, order) => {
         const id = order.id;
         const order_products = getRemainingQuantityOfPallets(productsOfOrders, id);
@@ -94,7 +109,7 @@ function WMModalTrailer({ setTrailerOrder }) {
       }, []);
 
     setWarehouseTrailerData(readies_orders);
-  }, [list_of_orders]);
+  }, [list_of_orders, order_dispatch_data]);
 
   const extractProductTitle = (value = '') => {
     if (!value) return '';

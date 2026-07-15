@@ -1504,50 +1504,39 @@ class WarehouseRepository {
   }
 
   static async changeStatusWarehouseManagerTrailer(new_status_trailer) {
-    const { status, trailer, orderId } = new_status_trailer;
-
-    const normalizedOrderId = Number(orderId);
-    const normalizedStatus = Number(status);
-
-    if (!Number.isFinite(normalizedOrderId)) {
-      throw new Error('Invalid orderId');
-    }
-
-    if (!Number.isFinite(normalizedStatus)) {
-      throw new Error('Invalid trailer status');
-    }
-
-    const where = {
-      orderId: normalizedOrderId,
-    };
-
-    if (trailer !== undefined && trailer !== null && trailer !== '') {
-      const normalizedTrailer = Number(trailer);
-
-      if (!Number.isFinite(normalizedTrailer)) {
-        throw new Error('Invalid trailer');
-      }
-
-      where.trailer = normalizedTrailer;
-    }
+    const { status, orderId } = new_status_trailer;
 
     const transaction = await sequelize.transaction();
-
     try {
-      const [count, updatedRows] = await OrderDispatches.update(
-        {
-          trailer_stage: normalizedStatus,
-        },
-        {
-          where,
-          transaction,
-          returning: true,
-        },
-      );
+      if (new_status_trailer?.trailer) {
+        const [count, updatedRows] = await OrderDispatches.update(
+          {
+            trailer_stage: status,
+          },
+          {
+            where: { orderId, trailer: new_status_trailer?.trailer },
+            transaction,
+            returning: true,
+          },
+        );
+        await transaction.commit();
 
-      await transaction.commit();
+        return updatedRows;
+      } else {
+        const [count, updatedRows] = await OrderDispatches.update(
+          {
+            trailer_stage: status,
+          },
+          {
+            where: { orderId },
+            transaction,
+            returning: true,
+          },
+        );
+        await transaction.commit();
 
-      return updatedRows;
+        return updatedRows;
+      }
     } catch (error) {
       await transaction.rollback();
 

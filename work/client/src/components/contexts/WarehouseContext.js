@@ -933,7 +933,6 @@ const WarehouseContextProvider = ({ children }) => {
       const article = order?.article;
 
       if (!article) {
-        console.error('Order article not found:', orderId);
         return false;
       }
 
@@ -959,7 +958,7 @@ const WarehouseContextProvider = ({ children }) => {
           }),
         );
 
-        navigate('/quality_management');
+        navigate('/warehouse_manager');
 
         // await dispatch(deleteWarehouseManagerTrailer(orderId));
       } catch (error) {
