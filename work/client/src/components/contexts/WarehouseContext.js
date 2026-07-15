@@ -17,6 +17,7 @@ import {
   updReservedProducts,
   updToolReservedProducts,
 } from '#components/redux/actions/warehouseAction.js';
+import { useNavigate } from 'react-router-dom';
 import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,6 +26,7 @@ const WarehouseContext = createContext();
 
 const WarehouseContextProvider = ({ children }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const COLUMNS_WAREHOUSE = [
     {
@@ -956,6 +958,8 @@ const WarehouseContextProvider = ({ children }) => {
             status: 4,
           }),
         );
+
+        navigate('/quality_management');
 
         // await dispatch(deleteWarehouseManagerTrailer(orderId));
       } catch (error) {
