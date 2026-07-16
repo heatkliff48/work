@@ -15,11 +15,14 @@ module.exports = (sequelize, DataTypes) => {
     {
       num: DataTypes.INTEGER,
       data: DataTypes.STRING,
+      agencia: DataTypes.STRING,
+      matricula: DataTypes.STRING,
+      referencia: DataTypes.STRING,
     },
     {
       sequelize,
       modelName: 'Aldabarans',
-    }
+    },
   );
   return Aldabarans;
 };

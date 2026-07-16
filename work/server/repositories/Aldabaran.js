@@ -8,10 +8,13 @@ class AldabaranRepository {
   }
 
   static async createAldabaran(aldabaranData) {
-    const { data, num } = aldabaranData;
+    const { data, num, agencia, matricula, referencia } = aldabaranData;
     const currentAldabaran = await Aldabarans.create({
       data,
       num,
+      agencia,
+      matricula,
+      referencia,
     });
     return currentAldabaran;
   }

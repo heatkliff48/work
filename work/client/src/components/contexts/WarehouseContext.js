@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { addNewAldabaran } from '#components/redux/actions/aldabaranAction.js';
 
 const WarehouseContext = createContext();
 
@@ -924,6 +925,21 @@ const WarehouseContextProvider = ({ children }) => {
     console.log('missingReservations:', missingReservations);
 
     console.log('allOrderReserved:', allOrderReserved);
+
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const now = new Date();
+    const dateTimeStr =
+      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+    const aldabaran_data = {
+      num: aldabaranNum,
+      data: dateTimeStr,
+      ...additionalInfoPDF,
+    };
+
+    dispatch(addNewAldabaran({ num: aldabaranNum, data: dateTimeStr }));
 
     if (allOrderReserved) {
       const order = list_of_orders.find(
