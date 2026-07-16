@@ -53,8 +53,9 @@ function WMModalTrailer({ setTrailerOrder }) {
   };
 
   useEffect(() => {
+    if (!list_of_orders || !Array.isArray(list_of_orders)) return;
     const readies_orders = list_of_orders
-      .filter((order) => order.status >= 6)
+      ?.filter((order) => order.status >= 6)
       .filter((order) => {
         const dispatchesOfOrder = (order_dispatch_data || []).filter(
           (dispatch) => Number(dispatch.orderId) === Number(order.id),
