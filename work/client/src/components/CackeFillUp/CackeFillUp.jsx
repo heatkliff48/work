@@ -132,7 +132,7 @@ function CackeFillUp() {
     setAllocated((prev) => Math.max(0, prev - 1));
   };
 
-  const handleSave = async () => {
+  const handleSave = async (isFinished) => {
     const {
       id,
       product_article = null,
@@ -148,8 +148,8 @@ function CackeFillUp() {
 
     await dispatch(addNewLotesListCakes({ num: cakeIds, note: notes }));
 
-    if (finish) {
-      dispatch(deleteBatchOutside(id));
+    if (isFinished) {
+      await dispatch(deleteBatchOutside(id));
     } else {
       await dispatch(
         updateBatchOutside({
@@ -158,7 +158,6 @@ function CackeFillUp() {
         }),
       );
     }
-
     const cacke_id_start = cakeIds[cakeIds.length - 1];
 
     const recipe = recipeOrders.find((recipe) => recipe.id_batch === id);
@@ -190,36 +189,6 @@ function CackeFillUp() {
       }),
     );
 
-    // const accd = autoclave_calendar.find((el) => el.date === date);
-    // const result = [];
-    // if (!accd) {
-    //   console.error('Autoclave calendar entry not found for date:', date);
-    //   return;
-    // }
-
-    // const total_arrays = (accd?.total_arrays || 0) + allocated;
-
-    // if (finish) {
-    //   const filled_autoclaves = Math.ceil(allocated / 21);
-    //   const residual_arrays = total_arrays - filled_autoclaves * 21;
-    //   const produced_autoclave =
-    //     accd.produced_autoclave <= filled_autoclaves
-    //       ? filled_autoclaves
-    //       : accd.produced_autoclave;
-    //   result.push({
-    //     ...accd,
-    //     total_arrays,
-    //     residual_arrays,
-    //     filled_autoclaves,
-    //     produced_autoclave,
-    //   });
-    // } else {
-    //   result.push({
-    //     ...accd,
-    //     total_arrays,
-    //   });
-    // }
-
     const accd = autoclave_calendar.find((el) => el.date === date);
     if (!accd) {
       console.error('Autoclave calendar entry not found for date:', date);
@@ -231,7 +200,7 @@ function CackeFillUp() {
 
     const result = [];
 
-    if (finish) {
+    if (isFinished) {
       const totalAutoclaves = Math.ceil(newTotalArrays / 21);
 
       const residual = newTotalArrays % 21;
@@ -352,21 +321,18 @@ function CackeFillUp() {
               -
             </Button>
 
-            <label
-              className="ms-2"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+            <div
+              className="ms-auto"
+              style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
             >
-              <input
-                type="checkbox"
-                checked={finish}
-                onChange={(e) => setFinish(e.target.checked)}
-              />
-              Finish
-            </label>
+              <Button color="warning" onClick={() => handleSave(false)}>
+                Close sub-batch and open new
+              </Button>
 
-            <Button color="success" onClick={handleSave} className="ms-auto">
-              Save
-            </Button>
+              <Button color="success" onClick={() => handleSave(true)}>
+                Finish batch
+              </Button>
+            </div>
           </div>
 
           <div className="mt-3">
