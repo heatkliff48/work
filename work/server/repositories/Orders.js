@@ -53,6 +53,18 @@ class OrdersRepository {
     }
   }
 
+  static async addDeliveryM2Price({ delivery_m2, order_id }) {
+    try {
+      await Orders.update({ delivery_m2 }, { where: { id: order_id } });
+    } catch (error) {
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
+      return error;
+    }
+  }
+
   static async addShippingDateOrder({ order_id, shipping_date }) {
     try {
       const order = await Orders.update(

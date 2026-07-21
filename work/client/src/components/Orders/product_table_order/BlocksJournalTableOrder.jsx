@@ -1,8 +1,8 @@
-import { useModalContext } from "#components/contexts/ModalContext.js";
-import { useOrderContext } from "#components/contexts/OrderContext.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { Button } from "reactstrap";
-import AddProductOrderModal from "../modal/addProductModal/AddProductOrderModal";
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { Button } from 'reactstrap';
+import AddProductOrderModal from '../modal/addProductModal/AddProductOrderModal';
 
 const BlocksJournalTableOrder = ({
   productListOrder,
@@ -16,9 +16,22 @@ const BlocksJournalTableOrder = ({
   const { productModalOrder, setProductModalOrder } = useModalContext();
   const { userAccess } = useUsersContext();
 
-  const columns = Object.keys(productListOrder?.[0] || {}).filter(
-    (key) => !filterKeys.includes(key) && key !== "warehouse_id" && key
-  );
+  const columns = [
+    'product_article',
+    'description',
+    'quantity_m2',
+    'quantity_palet',
+    'quantity_real',
+    'price_m2',
+    'price_m3',
+    'price_m2_with_delivery',
+    'discount',
+    'final_price',
+  ];
+
+  // const columns = Object.keys(productListOrder?.[0] || {}).filter(
+  //   (key) => !filterKeys.includes(key) && key !== 'warehouse_id' && key,
+  // );
 
   return (
     <>
@@ -32,7 +45,7 @@ const BlocksJournalTableOrder = ({
       <table className="product-table">
         <thead>
           <tr>
-            <td colSpan={columns.length + 1} style={{ fontWeight: "bold" }}>
+            <td colSpan={columns.length + 1} style={{ fontWeight: 'bold' }}>
               HCCA Blocks
             </td>
           </tr>
@@ -50,14 +63,14 @@ const BlocksJournalTableOrder = ({
               <tr
                 key={product?.id || Math.random()}
                 onClick={() => onProductClickHandler(product)}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: 'pointer' }}
               >
                 {columns.map((key) => {
                   let value = product[key];
-                  if (value && typeof value === "object") {
+                  if (value && typeof value === 'object') {
                     value = JSON.stringify(value);
                   }
-                  return <td key={key}>{value ?? ""}</td>;
+                  return <td key={key}>{value ?? ''}</td>;
                 })}
 
                 <td onClick={(e) => e.stopPropagation()}>
