@@ -18,6 +18,7 @@ const ProjectContextProvider = ({ children }) => {
     quantity_real_ud: 'Real quantity, Ud',
     price_m2: 'Price, EURO per m2',
     price_m3: 'Price, EURO per m3',
+    price_m2_with_delivery: 'Price with delivery, EURO per m2',
     discount: 'Discount, %',
     final_price: 'Final price, EURO',
     total: 'Total, kg',

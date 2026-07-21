@@ -32,13 +32,15 @@ export const ordersReducer = (orders = [], action) => {
     }
 
     case NEW_DELIVERY_PRICE_SOCKET: {
-      const { order_id, delivery } = payload;
-
-      console.log('payload orderReducer.js line 32', payload);
+      const { order_id, delivery, delivery_m2 } = payload;
 
       const result = orders.map((order) => {
         if (order.id === order_id) {
-          return { ...order, delivery };
+          if (delivery) {
+            return { ...order, delivery };
+          } else {
+            return { ...order, delivery_m2 };
+          }
         }
         return order;
       });

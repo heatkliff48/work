@@ -47,6 +47,9 @@ module.exports = {
       delivery: {
         type: Sequelize.FLOAT,
       },
+      delivery_m2: {
+        type: Sequelize.FLOAT,
+      },
       deal_id: {
         type: Sequelize.INTEGER,
       },

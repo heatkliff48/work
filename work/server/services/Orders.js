@@ -33,6 +33,12 @@ class OrdersService {
     return;
   }
 
+  static async addDeliveryM2Price(data) {
+    await OrdersRepository.addDeliveryM2Price(data);
+
+    return;
+  }
+
   static async addShippingDateOrder({ date }) {
     await OrdersRepository.addShippingDateOrder(date);
 

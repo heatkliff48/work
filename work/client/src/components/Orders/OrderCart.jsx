@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useCallback, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useCallback,
+  useState,
+  useRef,
+} from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
 import ListOfOrderedProductionReserveModal from '#components/Warehouse/ListOfOrderedProduction/ListOfOrderedProductionReserveModal.jsx';
@@ -88,7 +94,8 @@ const OrderCart = React.memo(() => {
   } = useModalContext();
   const { displayNames, user } = useProjectContext();
 
-  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } =
+    useUsersContext();
   const { latestProducts } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
@@ -222,7 +229,9 @@ const OrderCart = React.memo(() => {
     const currentDate = new Date();
     const shippingDateString = orderCartData?.shipping_date;
 
-    const shippingDate = new Date(shippingDateString.split('.').reverse().join('-'));
+    const shippingDate = new Date(
+      shippingDateString.split('.').reverse().join('-'),
+    );
 
     const timeDiff = shippingDate.getTime() - currentDate.getTime();
     const daysUntil = Math.ceil(timeDiff / (1000 * 3600 * 24));
@@ -255,7 +264,12 @@ const OrderCart = React.memo(() => {
 
   const addProductArticleToOrderList = useCallback(
     (productsOfOrders, productsTable, arrayName) => {
-      if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
+      if (
+        !productsOfOrders ||
+        !productsTable ||
+        !arrayName ||
+        !orderCartData?.id
+      )
         return [];
 
       const updatedOrderProducts = productsOfOrders
@@ -267,7 +281,9 @@ const OrderCart = React.memo(() => {
           //   (el) => el.client_id == orderCartData.owner.id
           // );
 
-          const product = productsTable.find((p) => p.id === orderProduct?.[id]);
+          const product = productsTable.find(
+            (p) => p.id === orderProduct?.[id],
+          );
 
           return product
             ? {
@@ -299,14 +315,48 @@ const OrderCart = React.memo(() => {
     );
   }, [productsOfOrders, latestProducts, addProductArticleToOrderList]);
 
+  // Сумма "Real quantity, m2" по всем блокам (используется, чтобы разложить
+  // "Delivery price for m2 full" пропорционально на каждую позицию)
+  const blocksTotalQuantityRealM2 = useMemo(() => {
+    return (updatedProductListOrder || []).reduce(
+      (acc, el) => acc + (Number(el?.quantity_real) || 0),
+      0,
+    );
+  }, [updatedProductListOrder]);
+
+  // Средняя стоимость доставки на 1 m2 = введённая полная сумма / сумма Real quantity, m2
+  const deliveryPricePerM2 = useMemo(() => {
+    const deliveryM2Total = Number(orderCartData?.delivery_m2 || 0);
+    if (!deliveryM2Total || !blocksTotalQuantityRealM2) return 0;
+    return deliveryM2Total / blocksTotalQuantityRealM2;
+  }, [orderCartData?.delivery_m2, blocksTotalQuantityRealM2]);
+
+  const blocksListWithDeliveryM2 = useMemo(() => {
+    return (updatedProductListOrder || []).map((product) => {
+      const price_m2 = Number(product?.price_m2 || 0);
+      const quantity_m2 = Number(product?.quantity_m2 || 0);
+      const discount = Number(product?.discount || 0);
+
+      const price_m2_with_delivery = price_m2 + deliveryPricePerM2;
+      const final_price_with_delivery =
+        (price_m2_with_delivery * quantity_m2 * (100 - discount)) / 100;
+
+      return {
+        ...product,
+        price_m2_with_delivery: Number(price_m2_with_delivery.toFixed(2)),
+        final_price: Number(final_price_with_delivery.toFixed(2)),
+      };
+    });
+  }, [updatedProductListOrder, deliveryPricePerM2]);
+
   useEffect(() => {
-    if (updatedProductListOrder.length > 0) {
+    if (blocksListWithDeliveryM2.length > 0) {
       setProductLists((prevState) => ({
         ...prevState,
-        products: updatedProductListOrder,
+        products: blocksListWithDeliveryM2,
       }));
     }
-  }, [updatedProductListOrder]);
+  }, [blocksListWithDeliveryM2]);
 
   const updatedDryMixesListOrder = useMemo(() => {
     return addProductArticleToOrderList(
@@ -344,7 +394,11 @@ const OrderCart = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools');
+    return addProductArticleToOrderList(
+      toolProductsOfOrders,
+      latestTools,
+      'tools',
+    );
   }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
 
   useEffect(() => {
@@ -362,7 +416,11 @@ const OrderCart = React.memo(() => {
       latestRelatedMaterials,
       'related_materials',
     );
-  }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
+  }, [
+    relMatProductsOfOrders,
+    latestRelatedMaterials,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedRelatedMaterialsListOrder.length > 0) {
@@ -392,8 +450,12 @@ const OrderCart = React.memo(() => {
                   (el) => el.article === sel_prod.product_article,
                 )
               : sel_prod.product_article.slice(2, 3) == 'F'
-                ? latestAnchors.find((el) => el.article === sel_prod.product_article)
-                : latestTools.find((el) => el.article === sel_prod.product_article);
+                ? latestAnchors.find(
+                    (el) => el.article === sel_prod.product_article,
+                  )
+                : latestTools.find(
+                    (el) => el.article === sel_prod.product_article,
+                  );
 
       setSelectedProduct(product);
       setProductOfOrder({ ...sel_prod, product_id: product?.id });
@@ -430,7 +492,11 @@ const OrderCart = React.memo(() => {
         ? orderCartData?.shipping_date
         : formatDataValue;
 
-    if (!bypass && status.accessor > status_list[3].accessor && !hasShippingDate) {
+    if (
+      !bypass &&
+      status.accessor > status_list[3].accessor &&
+      !hasShippingDate
+    ) {
       alert('Please select the shipping date.');
       return;
     } else if (bypass) {
@@ -491,7 +557,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate,
@@ -561,7 +630,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate,
@@ -619,7 +691,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate,
@@ -677,7 +752,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate,
@@ -734,7 +812,10 @@ const OrderCart = React.memo(() => {
 
         // Проходим по складу и "забираем" остатки
         for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
+          if (
+            remainingToAllocate > 0 &&
+            warehouseItem.free_quantity_remaining > 0
+          ) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
               remainingToAllocate,
@@ -792,7 +873,9 @@ const OrderCart = React.memo(() => {
   };
 
   const deleteHandler = (product) => {
-    const res_prod = list_of_reserved_products.find((el) => el.id === product.id);
+    const res_prod = list_of_reserved_products.find(
+      (el) => el.id === product.id,
+    );
     if (res_prod) alert('Этот продукт зарервировван на складе');
     if (product?.product_article.charAt(0) === 'T') {
       dispatch(getDeleteProductOfOrder(product?.id));
@@ -880,30 +963,59 @@ const OrderCart = React.memo(() => {
     }));
   };
 
+  const deliveryM2Func = async () => {
+    const delivery_m2 = Number(orderCartData?.delivery_m2 || 0);
+
+    dispatch(
+      addNewDeliveryPrice({
+        order_id: orderCartData.id,
+        delivery_m2,
+      }),
+    );
+  };
+
+  const hasHydratedFromStorage = useRef(false);
+
   useEffect(() => {
     const storedData = localStorage.getItem('orderCartData')
       ? JSON.parse(localStorage.getItem('orderCartData'))
       : null;
 
+    if (!storedData?.id) return;
+
     const updatedOrderCartData = list_of_orders.find(
       (order) => order.id === storedData.id,
     );
 
-    if (storedData) {
+    // Подтягиваем сохранённые данные из localStorage только один раз
+    // (например, после перезагрузки страницы), а не при каждом обновлении
+    // list_of_orders — иначе свежие delivery/delivery_m2 будут затёрты
+    // устаревшим снапшотом.
+    if (!hasHydratedFromStorage.current) {
       setOrderCartData(storedData);
+      hasHydratedFromStorage.current = true;
     }
 
-    if (!storedData?.shipping_date && updatedOrderCartData?.shipping_date) {
+    if (!orderCartData?.shipping_date && updatedOrderCartData?.shipping_date) {
       setOrderCartData((prev) => ({
         ...prev,
         shipping_date: updatedOrderCartData.shipping_date,
       }));
     }
 
-    if (!storedData?.delivery && updatedOrderCartData?.delivery) {
+    // delivery и delivery_m2 всегда синхронизируем из свежих данных Redux
+    // (source of truth после сохранения на бэке), а не из localStorage
+    if (updatedOrderCartData?.delivery !== undefined) {
       setOrderCartData((prev) => ({
         ...prev,
         delivery: updatedOrderCartData.delivery,
+      }));
+    }
+
+    if (updatedOrderCartData?.delivery_m2 !== undefined) {
+      setOrderCartData((prev) => ({
+        ...prev,
+        delivery_m2: updatedOrderCartData.delivery_m2,
       }));
     }
 
@@ -921,9 +1033,16 @@ const OrderCart = React.memo(() => {
       ...prev,
       description: updatedOrderCartData?.description,
     }));
-
-    localStorage.setItem('orderCartData', JSON.stringify(storedData));
   }, [list_of_orders]);
+
+  // Отдельно зеркалим АКТУАЛЬНЫЙ orderCartData в localStorage (например, чтобы
+  // переживать перезагрузку страницы), вместо повторного сохранения устаревшего
+  // снапшота, прочитанного из него же самого.
+  useEffect(() => {
+    if (orderCartData?.id) {
+      localStorage.setItem('orderCartData', JSON.stringify(orderCartData));
+    }
+  }, [orderCartData]);
 
   useEffect(() => {
     if (user && roles.length > 0) {
@@ -1183,7 +1302,10 @@ const OrderCart = React.memo(() => {
               filterAndMapData(orderCartData?.secondaryContact, filterKeysOrder)
             ) : isAddSecCont ? (
               <>
-                <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
+                <ClientsContactInfo
+                  clickFunk={addSecCntFunc}
+                  fullContact={true}
+                />
               </>
             ) : (
               <button onClick={() => addSecondaryContactHandler()}>
@@ -1210,7 +1332,7 @@ const OrderCart = React.memo(() => {
         </div>
 
         <BlocksJournalTableOrder
-          productListOrder={updatedProductListOrder}
+          productListOrder={blocksListWithDeliveryM2}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1307,8 +1429,11 @@ const OrderCart = React.memo(() => {
                     }}
                     readOnly={orderCartData?.status < 5 ? false : true}
                     disabled={
-                      !checkUserAccess(user, roles, 'orders_save_delivery_price')
-                        ?.canWrite
+                      !checkUserAccess(
+                        user,
+                        roles,
+                        'orders_save_delivery_price',
+                      )?.canWrite
                     }
                   />
                   {checkUserAccess(user, roles, 'orders_description_edit')
@@ -1320,6 +1445,43 @@ const OrderCart = React.memo(() => {
                       }}
                       onClick={() => {
                         deliveryFunc();
+                      }}
+                    >
+                      Save
+                    </button>
+                  )}
+                </div>
+                <div>
+                  <p>Delivery price for m2 full</p>
+                  <input
+                    type="text"
+                    id="delivery_m2"
+                    name="delivery_m2"
+                    value={orderCartData.delivery_m2 ?? 0}
+                    onChange={(e) => {
+                      setOrderCartData((prev) => ({
+                        ...prev,
+                        delivery_m2: Number(e.target.value),
+                      }));
+                    }}
+                    readOnly={orderCartData?.status < 5 ? false : true}
+                    disabled={
+                      !checkUserAccess(
+                        user,
+                        roles,
+                        'orders_save_delivery_price',
+                      )?.canWrite
+                    }
+                  />
+                  {checkUserAccess(user, roles, 'orders_description_edit')
+                    ?.canWrite && (
+                    <button
+                      style={{
+                        padding: '4px 10px',
+                        marginLeft: '20px',
+                      }}
+                      onClick={() => {
+                        deliveryM2Func();
                       }}
                     >
                       Save
@@ -1342,8 +1504,8 @@ const OrderCart = React.memo(() => {
               {orderCartData.status >= 4 ? (
                 haveShipDate ? (
                   <p>
-                    Shipping date: {haveShipDate} ({handleDayBeforShipping()} days
-                    before shipment)
+                    Shipping date: {haveShipDate} ({handleDayBeforShipping()}{' '}
+                    days before shipment)
                   </p>
                 ) : (
                   <div>
@@ -1364,7 +1526,9 @@ const OrderCart = React.memo(() => {
               <div className="footer_button">
                 <p>Person in charge</p>
                 <Select
-                  defaultValue={getSelectedOption(orderCartData?.person_in_charge)}
+                  defaultValue={getSelectedOption(
+                    orderCartData?.person_in_charge,
+                  )}
                   onChange={(v) => {
                     handleSelectChange(v);
                   }}
@@ -1386,7 +1550,10 @@ const OrderCart = React.memo(() => {
           {orderStatusAccess?.canRead && (
             <div className="status-table">
               {!aproveAccounting && (
-                <div className="status-row" style={{ backgroundColor: 'yellow' }}>
+                <div
+                  className="status-row"
+                  style={{ backgroundColor: 'yellow' }}
+                >
                   Awaiting accounting approval
                 </div>
               )}
