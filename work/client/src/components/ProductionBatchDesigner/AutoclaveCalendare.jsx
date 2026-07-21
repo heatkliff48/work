@@ -101,23 +101,54 @@ export default function ProductionPlannerCalendar({
       : Math.max(0, Number(v) || 0);
   }
 
+  // function setQty(iso, qtyRaw) {
+  //   const prev = map[iso] ?? { scheduled_autoclaves: 0, produced_autoclave: 0 };
+
+  //   // поддержка пустой строки из инпута
+  //   const nextQty = qtyRaw === '' ? '' : clamp(qtyRaw, min, max);
+
+  //   // не даём "выполнено" быть больше плана — только если план число
+  //   const cap =
+  //     typeof nextQty === 'number' ? nextQty : Number(prev.scheduled_autoclaves) || 0;
+  //   const nextDone = clamp(prev.produced_autoclave, min, cap);
+
+  //   const next = {
+  //     ...map,
+  //     [iso]: { scheduled_autoclaves: nextQty, produced_autoclave: nextDone },
+  //   };
+  //   if (!onChange) setInternalMap(next);
+  //   onChange?.(next);
+  // }
+
   function setQty(iso, qtyRaw) {
-    const prev = map[iso] ?? { scheduled_autoclaves: 0, produced_autoclave: 0 };
+    setInternalMap((prevMap) => {
+      const prev = prevMap[iso] ?? {
+        scheduled_autoclaves: 0,
+        produced_autoclave: 0,
+      };
 
-    // поддержка пустой строки из инпута
-    const nextQty = qtyRaw === '' ? '' : clamp(qtyRaw, min, max);
+      const nextQty = qtyRaw === '' ? '' : clamp(qtyRaw, min, max);
 
-    // не даём "выполнено" быть больше плана — только если план число
-    const cap =
-      typeof nextQty === 'number' ? nextQty : Number(prev.scheduled_autoclaves) || 0;
-    const nextDone = clamp(prev.produced_autoclave, min, cap);
+      const cap =
+        typeof nextQty === 'number'
+          ? nextQty
+          : Number(prev.scheduled_autoclaves) || 0;
 
-    const next = {
-      ...map,
-      [iso]: { scheduled_autoclaves: nextQty, produced_autoclave: nextDone },
-    };
-    if (!onChange) setInternalMap(next);
-    onChange?.(next);
+      const nextDone = clamp(prev.produced_autoclave, min, cap);
+
+      const next = {
+        ...prevMap,
+        [iso]: {
+          ...prev,
+          scheduled_autoclaves: nextQty,
+          produced_autoclave: nextDone,
+        },
+      };
+
+      onChange?.(next);
+
+      return next;
+    });
   }
 
   const today = new Date();
@@ -443,17 +474,19 @@ export default function ProductionPlannerCalendar({
           const isOpen = openDayISO === iso;
           const isPast = isBefore(day, today) && !isToday(day);
 
-          const obj = map[iso] ?? { scheduled_autoclaves: 0, produced_autoclave: 0 };
+          const obj = map[iso] ?? {
+            scheduled_autoclaves: 0,
+            produced_autoclave: 0,
+          };
 
-          const autoclaveData = autoclave_calendar.find((el) => el.date == iso);
+          const autoclaveData = autoclave_calendar.find(
+            (el) => String(el.date).slice(0, 10) === iso,
+          );
 
-          const qty = autoclaveData
-            ? autoclaveData.scheduled_autoclaves
-            : obj.scheduled_autoclaves;
-          const done = autoclaveData
-            ? autoclaveData.produced_autoclave
-            : obj.produced_autoclave;
-          const fill_ac = autoclaveData ? autoclaveData?.filled_autoclaves : 0;
+          const qty = obj.scheduled_autoclaves;
+          const done = obj.produced_autoclave;
+
+          const fill_ac = Number(autoclaveData?.filled_autoclaves) || 0;
 
           const todayISO = format(new Date(), 'yyyy-MM-dd');
           const isPastBtn = iso < todayISO;
@@ -499,8 +532,8 @@ export default function ProductionPlannerCalendar({
                     ? batchOutside.filter((item) => item?.date === iso)
                     : [];
 
-                  const showProducedAutoclave =
-                    fill_ac > 0 && batchOutsideForDay.length === 0;
+                  // const showProducedAutoclave =
+                  //   fill_ac > 0 && batchOutsideForDay.length === 0;
 
                   // const producedMode =
                   //   showProducedAutoclave && filled === scheduled && filled > 0;
