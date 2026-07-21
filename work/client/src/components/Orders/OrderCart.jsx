@@ -403,10 +403,19 @@ const OrderCart = React.memo(() => {
 
   const statusChangeHandler = (status, bypass = false) => {
     if (!bypass) {
-      if (
-        status.accessor < orderCartData?.status ||
-        status.accessor > orderCartData?.status + 1
-      ) {
+      const currentStatusIndex = status_list.findIndex(
+        (item) => item.accessor === orderCartData?.status,
+      );
+
+      const newStatusIndex = status_list.findIndex(
+        (item) => item.accessor === status.accessor,
+      );
+
+      if (currentStatusIndex === -1 || newStatusIndex === -1) {
+        return alert('Unknown order status');
+      }
+
+      if (newStatusIndex !== currentStatusIndex + 1) {
         return alert('This status cannot be set');
       }
 
