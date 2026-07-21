@@ -260,14 +260,14 @@ const OrderContextProvider = ({ children }) => {
       Header: 'Initial contact',
       accessor: 1,
     },
-    {
-      Header: 'Inquiry in progress',
-      accessor: 2,
-    },
-    {
-      Header: 'Proposal approved by us',
-      accessor: 3,
-    },
+    // {
+    //   Header: 'Inquiry in progress',
+    //   accessor: 2,
+    // },
+    // {
+    //   Header: 'Proposal approved by us',
+    //   accessor: 3,
+    // },
     {
       Header: 'Proposal accepted by client',
       accessor: 4,

@@ -191,6 +191,11 @@ const WarehouseContextProvider = ({ children }) => {
       accessor: 'product_article',
       sortType: 'string',
     },
+    {
+      Header: 'Trading Mark',
+      accessor: 'tradingMark',
+      sortType: 'string',
+    },
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
     { Header: 'Quantity of pallets', accessor: 'quantity', sortType: 'number' },
     {
@@ -235,6 +240,11 @@ const WarehouseContextProvider = ({ children }) => {
     {
       Header: 'Product article',
       accessor: 'product_article',
+      sortType: 'string',
+    },
+    {
+      Header: 'Trading Mark',
+      accessor: 'tradingMark',
       sortType: 'string',
     },
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
@@ -1169,7 +1179,10 @@ const WarehouseContextProvider = ({ children }) => {
               el.order_article === item.order_article,
           )
         ) {
-          uniqueItems.push(item);
+          const product = latestProducts.find(
+            (prod) => prod.article == item.product_article,
+          );
+          uniqueItems.push({ ...item, tradingMark: product.tradingMark });
         }
         return uniqueItems;
       }, []);
@@ -1178,12 +1191,10 @@ const WarehouseContextProvider = ({ children }) => {
 
     const dryMixOrderedData = related_materials_backorder_list
       ?.filter((el) => {
-        // Определение статуса заказа
         const orderStatus = list_of_orders?.find(
           (order) => order.article === el.order_article,
         )?.status;
 
-        // Исключение заказов с указанными статусами
         return ![7, 8, 9, 10].includes(orderStatus);
       })
       .map((el) => {
@@ -1199,7 +1210,10 @@ const WarehouseContextProvider = ({ children }) => {
               el.order_article === item.order_article,
           )
         ) {
-          uniqueItems.push(item);
+          const product = latestProducts.find(
+            (prod) => prod.article == item.product_article,
+          );
+          uniqueItems.push({ ...item, tradingMark: product.tradingMark });
         }
         return uniqueItems;
       }, []);
