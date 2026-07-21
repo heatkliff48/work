@@ -65,15 +65,26 @@ class OrdersController {
   }
 
   static async addDeliveryPrice(req, res) {
-    const { order_id, delivery } = req.body;
+    const { order_id, delivery, delivery_m2 } = req.body;
     console.log('req.body>>>>>>>>>>>', req.body);
 
     try {
-      await OrdersService.addDeliveryPrice({ order_id, delivery });
+      if (delivery) {
+        await OrdersService.addDeliveryPrice({ order_id, delivery });
 
-      myEmitter.emit(ADD_NEW_DELIVERY_PRICE_SOCKET, { order_id, delivery });
+        myEmitter.emit(ADD_NEW_DELIVERY_PRICE_SOCKET, { order_id, delivery });
 
-      return res.status(200).json({ order_id, delivery });
+        return res.status(200).json({ order_id, delivery });
+      } else {
+        await OrdersService.addDeliveryM2Price({ order_id, delivery_m2 });
+
+        myEmitter.emit(ADD_NEW_DELIVERY_PRICE_SOCKET, {
+          order_id,
+          delivery_m2,
+        });
+
+        return res.status(200).json({ order_id, delivery_m2 });
+      }
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
