@@ -41,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
       person_in_charge: DataTypes.INTEGER,
       description: DataTypes.STRING,
       delivery: DataTypes.FLOAT,
+      delivery_m2: DataTypes.FLOAT,
       main_order: DataTypes.STRING,
       deal_id: DataTypes.INTEGER,
       uf_number_offer: DataTypes.INTEGER,

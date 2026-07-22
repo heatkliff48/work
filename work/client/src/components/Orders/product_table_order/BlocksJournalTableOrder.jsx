@@ -17,9 +17,22 @@ const BlocksJournalTableOrder = ({
   const { productModalOrder, setProductModalOrder } = useModalContext();
   const { userAccess } = useUsersContext();
 
-  const columns = Object.keys(productListOrder?.[0] || {}).filter(
-    (key) => !filterKeys.includes(key) && key !== "warehouse_id" && key
-  );
+  const columns = [
+    'product_article',
+    'description',
+    'quantity_m2',
+    'quantity_palet',
+    'quantity_real',
+    'price_m2',
+    'price_m3',
+    'price_m2_with_delivery',
+    'discount',
+    'final_price',
+  ];
+
+  // const columns = Object.keys(productListOrder?.[0] || {}).filter(
+  //   (key) => !filterKeys.includes(key) && key !== 'warehouse_id' && key,
+  // );
 
   return (
     <>
@@ -53,14 +66,14 @@ const BlocksJournalTableOrder = ({
                 <tr
                   key={product?.id || Math.random()}
                   onClick={() => onProductClickHandler(product)}
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: 'pointer' }}
                 >
                   {columns.map((key) => {
                     let value = product[key];
-                    if (value && typeof value === "object") {
+                    if (value && typeof value === 'object') {
                       value = JSON.stringify(value);
                     }
-                    return <td key={key}>{value ?? ""}</td>;
+                    return <td key={key}>{value ?? ''}</td>;
                   })}
 
                   <td onClick={(e) => e.stopPropagation()}>

@@ -21,14 +21,15 @@ const WMOCTProduct = ({
     setWmoctPdfAddDataModal,
   } = useModalContext();
 
-  const onSaveHandler = () => {
+  const isSaveButtonVisible = () => {
     if (!Array.isArray(wmoctProduct) || wmoctProduct.length === 0) {
       return false;
     }
 
     const currentTrailerDispatches = (order_dispatch_data || []).filter(
       (dispatch) =>
-        Number(dispatch.orderId) === orderId && Number(dispatch.trailer) === trailer,
+        Number(dispatch.orderId) === Number(orderId) &&
+        Number(dispatch.trailer) === Number(trailer),
     );
 
     if (currentTrailerDispatches.length === 0) {
@@ -38,6 +39,44 @@ const WMOCTProduct = ({
     return currentTrailerDispatches.every(
       (dispatch) => Number(dispatch.trailer_stage) === 1,
     );
+  };
+
+  const onSaveHandler = () => {
+    const incorrectlyAllocatedProducts = wmoctProduct
+      .map((product) => {
+        const qtyTotal = Number(product.qty_total);
+
+        const allocatedTotal = (product.batches || []).reduce(
+          (sum, batch) => sum + Number(batch.allocated || 0),
+          0,
+        );
+
+        return {
+          article: product.article,
+          qtyTotal,
+          allocatedTotal,
+        };
+      })
+      .filter((product) => product.allocatedTotal !== product.qtyTotal);
+
+    if (incorrectlyAllocatedProducts.length > 0) {
+      const errorDescription = incorrectlyAllocatedProducts
+        .map(
+          (product) =>
+            `${product.article}: загружено ${product.allocatedTotal} из ${product.qtyTotal}`,
+        )
+        .join('\n');
+
+      window.alert(
+        `Невозможно сохранить.\n\n` +
+          `Необходимо полностью загрузить каждый продукт:\n\n` +
+          errorDescription,
+      );
+
+      return;
+    }
+
+    setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
   };
 
   return (

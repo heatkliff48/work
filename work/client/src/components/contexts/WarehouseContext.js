@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { addNewAldabaran } from '#components/redux/actions/aldabaranAction.js';
 
 const WarehouseContext = createContext();
 
@@ -190,6 +191,11 @@ const WarehouseContextProvider = ({ children }) => {
       accessor: 'product_article',
       sortType: 'string',
     },
+    {
+      Header: 'Trading Mark',
+      accessor: 'tradingMark',
+      sortType: 'string',
+    },
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
     { Header: 'Quantity of pallets', accessor: 'quantity', sortType: 'number' },
     {
@@ -234,6 +240,11 @@ const WarehouseContextProvider = ({ children }) => {
     {
       Header: 'Product article',
       accessor: 'product_article',
+      sortType: 'string',
+    },
+    {
+      Header: 'Trading Mark',
+      accessor: 'tradingMark',
       sortType: 'string',
     },
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
@@ -925,6 +936,21 @@ const WarehouseContextProvider = ({ children }) => {
 
     console.log('allOrderReserved:', allOrderReserved);
 
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const now = new Date();
+    const dateTimeStr =
+      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+    const aldabaran_data = {
+      num: aldabaranNum,
+      data: dateTimeStr,
+      ...additionalInfoPDF,
+    };
+
+    dispatch(addNewAldabaran({ num: aldabaranNum, data: dateTimeStr }));
+
     if (allOrderReserved) {
       const order = list_of_orders.find(
         (item) => Number(item.id) === Number(orderId),
@@ -1153,7 +1179,10 @@ const WarehouseContextProvider = ({ children }) => {
               el.order_article === item.order_article,
           )
         ) {
-          uniqueItems.push(item);
+          const product = latestProducts.find(
+            (prod) => prod.article == item.product_article,
+          );
+          uniqueItems.push({ ...item, tradingMark: product.tradingMark });
         }
         return uniqueItems;
       }, []);
@@ -1162,12 +1191,10 @@ const WarehouseContextProvider = ({ children }) => {
 
     const dryMixOrderedData = related_materials_backorder_list
       ?.filter((el) => {
-        // Определение статуса заказа
         const orderStatus = list_of_orders?.find(
           (order) => order.article === el.order_article,
         )?.status;
 
-        // Исключение заказов с указанными статусами
         return ![7, 8, 9, 10].includes(orderStatus);
       })
       .map((el) => {
@@ -1183,7 +1210,10 @@ const WarehouseContextProvider = ({ children }) => {
               el.order_article === item.order_article,
           )
         ) {
-          uniqueItems.push(item);
+          const product = latestProducts.find(
+            (prod) => prod.article == item.product_article,
+          );
+          uniqueItems.push({ ...item, tradingMark: product.tradingMark });
         }
         return uniqueItems;
       }, []);

@@ -9,25 +9,25 @@ import Table from '#components/Table/Table.jsx';
 import { addNewProductionBatchLog } from '#components/redux/actions/productionBatchLogAction.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-// import { registerLocale, setDefaultLocale } from 'react-datepicker';
-// import { es } from 'date-fns/locale/es';
-// registerLocale('es', es);
+import { useProjectContext } from '#components/contexts/Context.js';
 
 function AddListOfOrderedModal(props) {
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const { COLUMNS_LIST_OF_ORDERED_PRODUCTION, list_of_ordered_production } =
     useWarehouseContext();
+  const { latestProducts } = useProjectContext();
 
   const [selectedProduct, setSelectedProduct] = useState({});
+  const [upd_data_list, setUpdDataList] = useState();
   const [startDate, setStartDate] = useState(new Date());
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handlerAddProductToBatchLog = (row) => {
-    const product = list_of_ordered_production.find(
-      (el) => el.id === row.original.id
+    const product = upd_data_list.find(
+      (el) => el.id === row.original.id,
     );
 
     setSelectedProduct(product);
@@ -43,7 +43,7 @@ function AddListOfOrderedModal(props) {
           orders_article: selectedProduct.order_article,
           production_date: new Date(startDate),
         },
-      })
+      }),
     );
     props.onHide();
     setSelectedProduct({});
@@ -55,6 +55,17 @@ function AddListOfOrderedModal(props) {
       setUserAccess(access);
     }
   }, [user, roles]);
+
+  useEffect(() => {
+    const obj = list_of_ordered_production.map((el) => {
+      const product = latestProducts.find(
+        (prod) => prod.article == el.product_article,
+      );
+      return { ...el, tradingMark: product.tradingMark };
+    });
+
+    setUpdDataList(obj);
+  }, [list_of_ordered_production]);
 
   return (
     <Modal
@@ -87,7 +98,7 @@ function AddListOfOrderedModal(props) {
             <p>Selected product: {selectedProduct.product_article}</p>
             <Table
               COLUMN_DATA={COLUMNS_LIST_OF_ORDERED_PRODUCTION}
-              dataOfTable={list_of_ordered_production}
+              dataOfTable={upd_data_list}
               userAccess={userAccess}
               tableName={'Ordered blocks pipeline'}
               handleRowClick={(row) => {
