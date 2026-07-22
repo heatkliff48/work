@@ -186,13 +186,13 @@ function Main() {
           Add New Order
         </button>
 
-        <button
+        {/* <button
           className="bb-action-btn"
           onClick={() => navigate('/clients')}
           type="button"
         >
           Add New Client
-        </button>
+        </button> */}
 
         <button
           className="bb-action-btn"
