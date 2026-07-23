@@ -394,12 +394,33 @@ class OrdersController {
   static async getUpdateProductInfoOfOrder(req, res) {
     const productOfOrder = req.body;
 
-    try {
-      const upd_prod_info = await OrdersService.getUpdateProductInfoOfOrder({
-        productOfOrder,
-      });
+    console.log(req.body, 'req.body Orders.js line 397');
 
-      myEmitter.emit(GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET, upd_prod_info);
+    try {
+      let upd_prod_info;
+
+      if (Array.isArray(productOfOrder)) {
+        upd_prod_info = await Promise.all(
+          productOfOrder.map(async (item) => {
+            const result = await OrdersService.getUpdateProductInfoOfOrder({
+              productOfOrder: item,
+            });
+            return result;
+          }),
+        );
+      } else {
+        upd_prod_info = await OrdersService.getUpdateProductInfoOfOrder({
+          productOfOrder,
+        });
+      }
+
+      if (Array.isArray(upd_prod_info)) {
+        upd_prod_info.forEach((item) => {
+          myEmitter.emit(GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET, item);
+        });
+      } else {
+        myEmitter.emit(GET_UPDATE_PRODUCT_INFO_OF_ORDER_SOCKET, upd_prod_info);
+      }
 
       return res.status(200).json(upd_prod_info);
     } catch (err) {
@@ -594,6 +615,7 @@ class OrdersController {
       anchors,
       tools,
       relMats,
+      delivery_m2,
     } = req.body;
 
     try {
@@ -611,6 +633,7 @@ class OrdersController {
         anchors,
         tools,
         relMats,
+        delivery_m2,
       });
 
       myEmitter.emit(ADD_CHILD_ORDER_SOCKET, childOrder);

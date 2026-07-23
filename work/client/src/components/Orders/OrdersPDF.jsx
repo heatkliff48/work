@@ -59,8 +59,6 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       // Смещаем начало текста на высоту изображения + отступ
       let yPosition = 10 + imgHeight + 10; // 10 мм отступ после картинки
 
-      console.log('pdfData OrdersPDF.jsx line 46', pdfData);
-
       // Основные данные заказа
       doc.setFontSize(10);
       doc.text(`Ref.: ${pdfData.ref}`, 10, yPosition);
@@ -406,7 +404,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const descripcion = `${dryMixes?.name} BAUBLOCK Sacos de ${dryMixes?.pallet_weight}kg`;
 
-      const sacos = dryMixes.units_per_pallet;
+      const sacos = dryMixes?.units_per_pallet;
 
       const totalSacos = (quantity * sacos).toFixed(0);
 
@@ -425,7 +423,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         totalSacos,
         totalKg,
         pvp_neto_ud,
-        subtotal: prod.final_price.toFixed(2),
+        subtotal: prod?.final_price?.toFixed(2),
       };
     });
 
@@ -466,11 +464,11 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
       return {
-        ref: pdfTool.article,
-        descripcion: pdfTool.description,
+        ref: pdfTool?.article,
+        descripcion: pdfTool?.description,
         total,
         pvp_neto_ud,
-        subtotal: prod.final_price.toFixed(2),
+        subtotal: prod?.final_price?.toFixed(2),
       };
     });
 
@@ -589,10 +587,18 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       {pdfUrl && (
         <div className="ord-pdf-actions">
-          <button type="button" className="ord-btn ord-btn--primary ord-btn--sm" onClick={downloadPDF}>
+          <button
+            type="button"
+            className="ord-btn ord-btn--primary ord-btn--sm"
+            onClick={downloadPDF}
+          >
             Download PDF
           </button>
-          <button type="button" className="ord-btn ord-btn--ghost ord-btn--sm" onClick={sendToBitrix}>
+          <button
+            type="button"
+            className="ord-btn ord-btn--ghost ord-btn--sm"
+            onClick={sendToBitrix}
+          >
             Send to Bitrix24
           </button>
         </div>

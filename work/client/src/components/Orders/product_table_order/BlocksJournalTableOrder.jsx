@@ -1,9 +1,9 @@
-import { useModalContext } from "#components/contexts/ModalContext.js";
-import { useOrderContext } from "#components/contexts/OrderContext.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { Button } from "reactstrap";
-import AddProductOrderModal from "../modal/addProductModal/AddProductOrderModal";
-import "../ordersView.css";
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { Button } from 'reactstrap';
+import AddProductOrderModal from '../modal/addProductModal/AddProductOrderModal';
+import '../ordersView.css';
 
 const BlocksJournalTableOrder = ({
   productListOrder,
@@ -28,6 +28,7 @@ const BlocksJournalTableOrder = ({
     'price_m2_with_delivery',
     'discount',
     'final_price',
+    'quantity_liberated',
   ];
 
   // const columns = Object.keys(productListOrder?.[0] || {}).filter(
@@ -45,7 +46,10 @@ const BlocksJournalTableOrder = ({
 
       <div className="ord-prod-card">
         <div className="ord-prod-card__head">
-          <span className="ord-badge" style={{ background: "#fbe9e9", color: "#bc1212" }}>
+          <span
+            className="ord-badge"
+            style={{ background: '#fbe9e9', color: '#bc1212' }}
+          >
             Bloque
           </span>
           <div className="ord-prod-card__title">HCCA Blocks</div>
@@ -66,14 +70,14 @@ const BlocksJournalTableOrder = ({
                 <tr
                   key={product?.id || Math.random()}
                   onClick={() => onProductClickHandler(product)}
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: 'pointer' }}
                 >
                   {columns.map((key) => {
                     let value = product[key];
-                    if (value && typeof value === "object") {
+                    if (value && typeof value === 'object') {
                       value = JSON.stringify(value);
                     }
-                    return <td key={key}>{value ?? ""}</td>;
+                    return <td key={key}>{value ?? ''}</td>;
                   })}
 
                   <td onClick={(e) => e.stopPropagation()}>
