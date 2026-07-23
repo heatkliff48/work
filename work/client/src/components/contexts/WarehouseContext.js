@@ -1062,6 +1062,16 @@ const WarehouseContextProvider = ({ children }) => {
     return Number.MAX_SAFE_INTEGER; // всё непонятное — в конец
   };
 
+  const extractProductTitle = (value = '') => {
+    if (!value) return '';
+
+    return String(value)
+      .replace(/BAUBLOCK®/gi, '')
+      .replace(/\s*Medidas[\s\S]*$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
   useEffect(() => {
     if (!Array.isArray(latestProducts) || latestProducts.length === 0) return;
     if (!Array.isArray(list_of_orders) || list_of_orders.length === 0) return;
@@ -1182,7 +1192,10 @@ const WarehouseContextProvider = ({ children }) => {
           const product = latestProducts.find(
             (prod) => prod.article == item.product_article,
           );
-          uniqueItems.push({ ...item, tradingMark: product.tradingMark });
+
+          const tradingMark = extractProductTitle(product?.description || '');
+
+          uniqueItems.push({ ...item, tradingMark });
         }
         return uniqueItems;
       }, []);
@@ -1213,7 +1226,9 @@ const WarehouseContextProvider = ({ children }) => {
           const product = latestProducts.find(
             (prod) => prod.article == item.product_article,
           );
-          uniqueItems.push({ ...item, tradingMark: product.tradingMark });
+          const tradingMark = extractProductTitle(product?.description || '');
+
+          uniqueItems.push({ ...item, tradingMark });
         }
         return uniqueItems;
       }, []);

@@ -26,9 +26,7 @@ function AddListOfOrderedModal(props) {
   const dispatch = useDispatch();
 
   const handlerAddProductToBatchLog = (row) => {
-    const product = upd_data_list.find(
-      (el) => el.id === row.original.id,
-    );
+    const product = upd_data_list.find((el) => el.id === row.original.id);
 
     setSelectedProduct(product);
   };
@@ -56,12 +54,25 @@ function AddListOfOrderedModal(props) {
     }
   }, [user, roles]);
 
+  const extractProductTitle = (value = '') => {
+    if (!value) return '';
+
+    return String(value)
+      .replace(/BAUBLOCK®/gi, '')
+      .replace(/\s*Medidas[\s\S]*$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
   useEffect(() => {
     const obj = list_of_ordered_production.map((el) => {
       const product = latestProducts.find(
         (prod) => prod.article == el.product_article,
       );
-      return { ...el, tradingMark: product.tradingMark };
+
+      const tradingMark = extractProductTitle(product?.description || '');
+
+      return { ...el, tradingMark };
     });
 
     setUpdDataList(obj);
