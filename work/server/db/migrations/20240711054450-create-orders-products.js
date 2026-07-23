@@ -32,6 +32,9 @@ module.exports = {
       quantity_real: {
         type: Sequelize.FLOAT,
       },
+      quantity_liberated: {
+        type: Sequelize.FLOAT,
+      },
       price_m2: {
         type: Sequelize.FLOAT,
       },

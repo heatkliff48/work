@@ -1,9 +1,9 @@
-import { useModalContext } from "#components/contexts/ModalContext.js";
-import { useOrderContext } from "#components/contexts/OrderContext.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { Button } from "reactstrap";
-import AddProductOrderModal from "../modal/addProductModal/AddProductOrderModal";
-import "../ordersView.css";
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { Button } from 'reactstrap';
+import AddProductOrderModal from '../modal/addProductModal/AddProductOrderModal';
+import '../ordersView.css';
 
 const BlocksJournalTableOrder = ({
   productListOrder,
@@ -28,6 +28,7 @@ const BlocksJournalTableOrder = ({
     'price_m2_with_delivery',
     'discount',
     'final_price',
+    'quantity_liberated',
   ];
 
   // const columns = Object.keys(productListOrder?.[0] || {}).filter(
@@ -45,7 +46,10 @@ const BlocksJournalTableOrder = ({
 
       <div className="ord-prod-card">
         <div className="ord-prod-card__head">
-          <span className="ord-badge" style={{ background: "#fbe9e9", color: "#bc1212" }}>
+          <span
+            className="ord-badge"
+            style={{ background: '#fbe9e9', color: '#bc1212' }}
+          >
             Bloque
           </span>
           <div className="ord-prod-card__title">HCCA Blocks</div>
