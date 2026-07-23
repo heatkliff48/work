@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useDispatch } from 'react-redux';
@@ -9,6 +7,7 @@ import { addChildOrder } from '#components/redux/actions/ordersAction.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import '../ordersView.css';
 
 const round2 = (n) => parseFloat(n.toFixed(2));
 
@@ -333,99 +332,111 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     })),
   ];
 
-  return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      size="lg"
-      aria-labelledby="liberar-modal-title"
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="liberar-modal-title">
-          Liberar — Create Child Order from {orderCartData?.article}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div style={{ marginBottom: '20px' }}>
-          <p>
-            <strong>Shipping Date</strong>
-          </p>
-          <DatePicker
-            selected={selectedDate}
-            onChange={handleDateChange}
-            dateFormat="dd.MM.yyyy"
-          />
-        </div>
+  if (!show) return null;
 
-        <div>
-          <p>
-            <strong>Products (enter quantity in pallets / units)</strong>
-          </p>
-          {allProducts.length === 0 ? (
-            <p style={{ color: '#888' }}>No products in this order.</p>
-          ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f0f0f0' }}>
-                  <th style={thStyle}>Article</th>
-                  <th style={thStyle}>Description</th>
-                  <th style={thStyle}>Quantity in Main Order</th>
-                  <th style={thStyle}>Quantity</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allProducts.map((p) => (
-                  <tr key={p._key}>
-                    <td style={tdStyle}>{p._label}</td>
-                    <td style={tdStyle}>{p._desc}</td>
-                    <td style={tdStyle}>{p._quantity}</td>
-                    <td style={tdStyle}>
-                      <input
-                        type="number"
-                        min="0"
-                        max={p._quantity}
-                        step="1"
-                        value={quantities[p._key] ?? ''}
-                        onChange={(e) =>
-                          handleQuantityChange(p._key, e.target.value)
-                        }
-                        style={{ width: '100px' }}
-                      />
-                      {errors[p._key] && (
-                        <div style={{ color: 'red', fontSize: '12px' }}>
-                          {errors[p._key]}
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+  return (
+    <div className="ord-modal-root">
+      <div className="ord-modal-overlay" onClick={onHide} />
+      <div className="ord-modal-card ord-modal-card--lg">
+        <div className="ord-modal-head">
+          <div>
+            <div className="ord-modal-head__title">Liberar — Create child order</div>
+            <div className="ord-modal-head__subtitle">
+              from {orderCartData?.article}
+            </div>
+          </div>
+          <button type="button" className="ord-iconbtn" onClick={onHide}>
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#565d6d"
+              strokeWidth="2.1"
+              strokeLinecap="round"
+            >
+              <path d="M6 6l12 12" />
+              <path d="M18 6 6 18" />
+            </svg>
+          </button>
         </div>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide} disabled={loading}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={handleConfirm} disabled={loading}>
-          {loading ? 'Creating...' : 'Confirm Order'}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+        <div className="ord-modal-body">
+          <div className="ord-field">
+            <label className="ord-field__label">Shipping date</label>
+            <DatePicker
+              className="ord-liberar-date"
+              selected={selectedDate}
+              onChange={handleDateChange}
+              dateFormat="dd.MM.yyyy"
+            />
+          </div>
+
+          <div>
+            <div className="ord-modal-head__title ord-modal-head__title--sm" style={{ marginBottom: 10 }}>
+              Products (enter quantity in pallets / units)
+            </div>
+            {allProducts.length === 0 ? (
+              <div className="ord-empty-products">No products in this order.</div>
+            ) : (
+              <table className="ord-liberar-table">
+                <thead>
+                  <tr>
+                    <th>Article</th>
+                    <th>Description</th>
+                    <th className="ord-liberar-table__num">Quantity in Main Order</th>
+                    <th className="ord-liberar-table__num">Quantity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {allProducts.map((p) => (
+                    <tr key={p._key}>
+                      <td className="ord-liberar-table__article">{p._label}</td>
+                      <td>{p._desc}</td>
+                      <td className="ord-liberar-table__num">{p._quantity}</td>
+                      <td className="ord-liberar-table__num">
+                        <input
+                          type="number"
+                          min="0"
+                          max={p._quantity}
+                          step="1"
+                          value={quantities[p._key] ?? ''}
+                          onChange={(e) =>
+                            handleQuantityChange(p._key, e.target.value)
+                          }
+                          className="ord-liberar-qty"
+                        />
+                        {errors[p._key] && (
+                          <div className="ord-liberar-error">{errors[p._key]}</div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+        <div className="ord-modal-foot">
+          <button
+            type="button"
+            className="ord-btn ord-btn--ghost"
+            onClick={onHide}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="ord-btn ord-btn--primary"
+            onClick={handleConfirm}
+            disabled={loading}
+          >
+            {loading ? 'Creating...' : 'Confirm Order'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
-
-const thStyle = {
-  padding: '8px 12px',
-  textAlign: 'left',
-  borderBottom: '2px solid #ddd',
-  fontWeight: '600',
-};
-
-const tdStyle = {
-  padding: '8px 12px',
-  borderBottom: '1px solid #eee',
-};
 
 export default LiberarModal;

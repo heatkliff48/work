@@ -38,7 +38,7 @@ const getProductType = (
   latestDryMix,
   latestAnchors,
   latestTools,
-  latestRelatedMaterials,
+  latestRelatedMaterials
 ) => {
   if (!article) return 'unknown';
 
@@ -68,7 +68,7 @@ const getProductByArticle = (
   latestDryMix,
   latestAnchors,
   latestTools,
-  latestRelatedMaterials,
+  latestRelatedMaterials
 ) => {
   switch (type) {
     case 'product':
@@ -93,7 +93,7 @@ const buildProductLists = (
   latestDryMix,
   latestAnchors,
   latestTools,
-  latestRelatedMaterials,
+  latestRelatedMaterials
 ) => {
   const productLists = {
     products: [],
@@ -122,7 +122,7 @@ const buildProductLists = (
       latestDryMix,
       latestAnchors,
       latestTools,
-      latestRelatedMaterials,
+      latestRelatedMaterials
     );
     const product = getProductByArticle(
       article,
@@ -131,7 +131,7 @@ const buildProductLists = (
       latestDryMix,
       latestAnchors,
       latestTools,
-      latestRelatedMaterials,
+      latestRelatedMaterials
     );
 
     if (!product) return;
@@ -232,7 +232,7 @@ const calculateVAT = (productLists, vatProcent) => {
         el?.final_price_tool ||
         el?.final_price_rel_mat ||
         0),
-    0,
+    0
   );
 
   if (!final_price_product || !vatProcent) {
@@ -313,70 +313,9 @@ function FacturaManager() {
       setWmoctProductShippedBD([]);
       return;
     }
-
     const filteredDispatchData = order_dispatch_data.filter((item) => {
       const order = list_of_orders.find((o) => o.id === item.orderId);
-      if (!order || (order.status || 0) < 8) {
-        return false;
-      }
-
-      let reservedProduct = [];
-      switch (item?.product_table) {
-        case 'product':
-          reservedProduct = list_of_reserved_products?.find(
-            (reserved) => reserved.order_dispatch_id === item.id,
-          );
-
-          if (reservedProduct && reservedProduct.quantity === item.quantity) {
-            return false;
-          }
-          break;
-
-        case 'relMat':
-          reservedProduct = list_of_rel_mat_reserved_products?.find(
-            (reserved) => reserved.order_dispatch_id === item.id,
-          );
-
-          if (reservedProduct && reservedProduct.quantity === item.quantity) {
-            return false;
-          }
-          break;
-
-        case 'tool':
-          reservedProduct = list_of_tool_reserved_products?.find(
-            (reserved) => reserved.order_dispatch_id === item.id,
-          );
-
-          if (reservedProduct && reservedProduct.quantity === item.quantity) {
-            return false;
-          }
-          break;
-
-        case 'dryMixed':
-          reservedProduct = list_of_dry_mix_reserved_products?.find(
-            (reserved) => reserved.order_dispatch_id === item.id,
-          );
-
-          if (reservedProduct && reservedProduct.quantity === item.quantity) {
-            return false;
-          }
-          break;
-
-        case 'anchor':
-          reservedProduct = list_of_anchor_reserved_products?.find(
-            (reserved) => reserved.order_dispatch_id === item.id,
-          );
-
-          if (reservedProduct && reservedProduct.quantity === item.quantity) {
-            return false;
-          }
-          break;
-
-        default:
-          break;
-      }
-
-      return true;
+      return order && (order.status || 0) >= 8;
     });
 
     if (filteredDispatchData.length === 0) {
@@ -384,7 +323,6 @@ function FacturaManager() {
       setWmoctProductShippedBD([]);
       return;
     }
-
     const groupedData = filteredDispatchData.reduce((acc, item) => {
       const key = `${item.orderId}_${item.trailer}`;
 
@@ -426,7 +364,7 @@ function FacturaManager() {
         latestDryMix,
         latestAnchors,
         latestTools,
-        latestRelatedMaterials,
+        latestRelatedMaterials
       );
 
       // Вычисляем VAT для этого заказа

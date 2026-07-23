@@ -1,16 +1,8 @@
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { Fragment, useState } from 'react';
-import {
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Button,
-  Input,
-  Label,
-  FormGroup,
-} from 'reactstrap';
+import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from 'reactstrap';
+import '../../warehouseManagerView.css';
 
 const WMOCTableDataModal = ({ isOpen, toggle }) => {
   const {
@@ -54,43 +46,48 @@ const WMOCTableDataModal = ({ isOpen, toggle }) => {
 
   return (
     <div>
-      <Modal isOpen={isOpen} toggle={toggle}>
+      <Modal
+        isOpen={isOpen}
+        toggle={toggle}
+        contentClassName="wm-modal-card wm-modal-card--xs"
+        backdropClassName="wm-modal-backdrop"
+      >
         <ModalHeader toggle={toggle}>
           <p>Write additional info</p>
         </ModalHeader>
         <Fragment>
           <ModalBody>
-            <FormGroup>
-              <Label for="name">Agencia Transporte:</Label>
-              <Input
+            <div className="wm-field">
+              <label htmlFor="agencia">Agencia Transporte:</label>
+              <input
                 id="agencia"
                 name="agencia"
                 value={formData.agencia}
                 onChange={handleChange}
               />
-            </FormGroup>
-            <FormGroup>
-              <Label for="position">Matricula:</Label>
-              <Input
+            </div>
+            <div className="wm-field">
+              <label htmlFor="matricula">Matricula:</label>
+              <input
                 id="matricula"
                 name="matricula"
                 value={formData.matricula}
                 onChange={handleChange}
               />
-            </FormGroup>
-            <FormGroup>
-              <Label for="comment">S/Referencia:</Label>
-              <Input
+            </div>
+            <div className="wm-field">
+              <label htmlFor="referencia">S/Referencia:</label>
+              <input
                 id="referencia"
                 name="referencia"
                 value={formData.referencia}
                 onChange={handleChange}
               />
-            </FormGroup>
+            </div>
           </ModalBody>
         </Fragment>
         <ModalFooter>
-          <Button color="primary" onClick={handleSave}>
+          <Button className="wm-btn wm-btn--primary" onClick={handleSave}>
             Сохранить
           </Button>
         </ModalFooter>

@@ -7,6 +7,7 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
 import '#components/Styles/pdf.css';
+import '../../warehouseManagerView.css';
 
 const loadImage = () => {
   return new Promise((resolve, reject) => {
@@ -275,7 +276,7 @@ const WMOPdf = ({ orderCartData, toggle }) => {
   };
 
   return (
-    <div className="pdf-preview-container">
+    <div className="pdf-preview-container wm-pdf-container">
       {pdfUrl && (
         <div>
           <iframe
@@ -285,12 +286,12 @@ const WMOPdf = ({ orderCartData, toggle }) => {
             title="PDF Preview"
           ></iframe>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <button style={{ width: '8%' }} onClick={downloadPDF}>
+          <div className="wm-pdf-actions">
+            <button className="wm-btn wm-btn--ghost" onClick={downloadPDF}>
               Download PDF
             </button>
             <button
-              style={{ width: '8%' }}
+              className="wm-btn wm-btn--primary"
               onClick={async () => {
                 await saveHandler();
                 toggle();

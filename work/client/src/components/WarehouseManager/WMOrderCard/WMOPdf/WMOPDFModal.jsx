@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import WMOPdf from './WMOPdf';
+import '../../warehouseManagerView.css';
 
 const WMOCPDFModal = ({ isOpen, toggle, orderCartData }) => {
   if (!isOpen) return null;
@@ -13,6 +14,8 @@ const WMOCPDFModal = ({ isOpen, toggle, orderCartData }) => {
           toggle();
         }}
         fullscreen
+        contentClassName="wm-modal-card"
+        backdropClassName="wm-modal-backdrop"
       >
         <ModalHeader
           toggle={() => {

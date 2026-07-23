@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 
 @tailwind components;
@@ -5,9 +7,515 @@
 @tailwind utilities;
 
 .modal-auto-size {
-  width: 90vw; /* Occupy the 90% of the screen width */
+  width: 90vw;
   max-width: 90vw;
 }
 input.invalid {
   outline-color: darkred;
+}
+
+/* =====================================================================
+   USERS INFO PAGE
+   ===================================================================== */
+
+.usr-page {
+  padding: 0;
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: #171a1f;
+}
+
+/* ---- Toolbar ---- */
+.usr-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.usr-toolbar__search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+}
+
+.usr-toolbar__search-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.usr-toolbar__input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid #dee1e6;
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 14px 0 38px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #171a1f;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.usr-toolbar__input:focus {
+  border-color: #bc1212;
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+
+.usr-toolbar__select {
+  height: 42px;
+  border: 1px solid #dee1e6;
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #171a1f;
+  cursor: pointer;
+  outline: none;
+  min-width: 170px;
+  transition: border-color 0.15s;
+}
+
+.usr-toolbar__select:focus {
+  border-color: #bc1212;
+}
+
+.usr-toolbar__spacer {
+  flex: 1;
+}
+
+/* Style "Add User" bootstrap trigger inside toolbar */
+.usr-toolbar .btn-primary {
+  height: 42px;
+  padding: 0 18px;
+  background: #bc1212 !important;
+  border-color: #bc1212 !important;
+  border-radius: 9px !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 2px rgba(188, 18, 18, 0.3) !important;
+}
+
+.usr-toolbar .btn-primary:hover,
+.usr-toolbar .btn-primary:focus,
+.usr-toolbar .btn-primary:active {
+  background: #a50f0f !important;
+  border-color: #a50f0f !important;
+  box-shadow: 0 1px 2px rgba(188, 18, 18, 0.3) !important;
+}
+
+/* ---- Table card ---- */
+.usr-card {
+  background: #fff;
+  border: 1px solid #e4e6eb;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(20, 23, 33, 0.04), 0 6px 18px rgba(20, 23, 33, 0.03);
+}
+
+.usr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.usr-table__head-row {
+  background: #fafafb;
+  border-bottom: 1px solid #e4e6eb;
+}
+
+.usr-table__th {
+  text-align: left !important;
+  padding: 13px 18px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  color: #9aa0ac !important;
+  background: #fafafb !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  border-bottom: 1px solid #e4e6eb !important;
+}
+
+.usr-table__row {
+  cursor: pointer;
+  transition: background 0.12s;
+  background: #fff;
+}
+
+.usr-table__row:hover {
+  background: #fafbfc;
+}
+
+.usr-table__row:hover .usr-table__td {
+  background: #fafbfc !important;
+}
+
+.usr-table__td {
+  padding: 13px 18px !important;
+  vertical-align: middle !important;
+  color: #565d6d !important;
+  font-size: 13.5px !important;
+  border: 0 !important;
+  border-bottom: 1px solid #f0f1f4 !important;
+  background: transparent !important;
+}
+
+.usr-table__row:last-child .usr-table__td {
+  border-bottom: 0 !important;
+}
+
+.usr-table__td--email {
+  color: #3a3f4b !important;
+}
+
+.usr-table__td--sub {
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+}
+
+.usr-table__td--arrow {
+  text-align: right !important;
+}
+
+/* ---- User cell ---- */
+.usr-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.usr-avatar {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
+.usr-avatar--lg {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  font-size: 19px;
+}
+
+.usr-user-cell__name {
+  font-weight: 700;
+  color: #171a1f;
+  white-space: nowrap;
+}
+
+.usr-user-cell__username {
+  font-size: 12.5px;
+  color: #9aa0ac;
+  font-weight: 500;
+  font-family: 'Roboto Mono', monospace;
+}
+
+/* ---- Role pill ---- */
+.usr-role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.usr-role-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ---- Shift ---- */
+.usr-shift-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #565d6d;
+  font-weight: 600;
+}
+
+.usr-shift-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* ---- Empty state ---- */
+.usr-empty {
+  padding: 54px 18px;
+  text-align: center;
+  color: #9aa0ac;
+}
+
+.usr-empty__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #565d6d;
+}
+
+.usr-empty__sub {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* ---- Footer ---- */
+.usr-footer {
+  display: flex;
+  align-items: center;
+  padding: 13px 18px;
+  border-top: 1px solid #e4e6eb;
+  background: #fafafb;
+  font-size: 13px;
+  color: #9aa0ac;
+  font-weight: 500;
+}
+
+/* =====================================================================
+   DRAWER
+   ===================================================================== */
+
+.usr-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(23, 26, 31, 0.42);
+  backdrop-filter: blur(1px);
+}
+
+.usr-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 480px;
+  max-width: 94vw;
+  background: #fff;
+  box-shadow: -12px 0 40px rgba(20, 23, 33, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---- Drawer header ---- */
+.usr-drawer__header {
+  padding: 22px 24px 20px;
+  border-bottom: 1px solid #eef0f3;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.usr-drawer__close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: #f3f4f6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+}
+
+.usr-drawer__close:hover {
+  background: #e7e9ee;
+}
+
+.usr-drawer__hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 44px;
+}
+
+.usr-drawer__name {
+  font-size: 19px;
+  font-weight: 800;
+  color: #171a1f;
+  letter-spacing: -0.3px;
+}
+
+.usr-drawer__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.usr-drawer__username {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12.5px;
+  color: #9aa0ac;
+}
+
+.usr-drawer__actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+/* ---- Buttons ---- */
+.usr-btn {
+  flex: 1;
+  height: 38px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: 0;
+  transition: background 0.12s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.usr-btn--primary {
+  background: #bc1212;
+  color: #fff;
+}
+
+.usr-btn--primary:hover {
+  background: #a50f0f;
+}
+
+.usr-btn--secondary {
+  background: #fff;
+  color: #3a3f4b;
+  border: 1px solid #dee1e6 !important;
+}
+
+.usr-btn--secondary:hover {
+  background: #f6f7fa;
+}
+
+/* ---- Drawer body ---- */
+.usr-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 24px 32px;
+}
+
+.usr-section-label {
+  padding: 18px 0 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #9aa0ac;
+}
+
+.usr-info-card {
+  border: 1px solid #eef0f3;
+  border-radius: 11px;
+  overflow: hidden;
+}
+
+.usr-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 13px 15px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.usr-info-row:last-child {
+  border-bottom: 0;
+}
+
+.usr-info-row > span:first-child {
+  font-size: 13px;
+  color: #9aa0ac;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.usr-info-row > span:last-child {
+  font-size: 13.5px;
+  color: #171a1f;
+  font-weight: 600;
+  text-align: right;
+  word-break: break-all;
+}
+
+.usr-mono {
+  font-family: monospace !important;
+}
+
+.usr-assignment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+}
+
+.usr-mini-card {
+  border: 1px solid #eef0f3;
+  border-radius: 11px;
+  padding: 13px 15px;
+}
+
+.usr-mini-card__label {
+  font-size: 11.5px;
+  color: #9aa0ac;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.usr-mini-card__value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #171a1f;
+  font-weight: 700;
+}
+
+.usr-contact-card {
+  border: 1px solid #eef0f3;
+  border-radius: 11px;
+  padding: 15px 16px;
+  background: #fcfcfd;
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.usr-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: #3a3f4b;
+  font-weight: 600;
 }

@@ -7,10 +7,11 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import Table from '#components/Table/Table.jsx';
 import { useEffect, useState } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import '../warehouseManagerView.css';
 
 function WMModalTrailer({ setTrailerOrder }) {
   const { latestProducts } = useProductsContext();
-  const { order_dispatch_data } = useWarehouseContext();
+  const { order_dispatch_data, normalizeProductType } = useWarehouseContext();
   const {
     wmmodalTrailer,
     setwmmodalTrailer,
@@ -37,53 +38,72 @@ function WMModalTrailer({ setTrailerOrder }) {
     setwmmodalTrailer(!wmmodalTrailer);
   };
 
-  const getRemainingQuantityOfPallets = (arr, order_id) => {
-    return arr
-      .filter((prod) => prod.order_id === order_id)
-      .reduce((acc, num) => {
-        const quantity =
-          num?.quantity_palet ??
-          num?.quantity_palet_dry ??
-          num?.quantity_palet_anchor ??
-          num?.quantity_ud ??
-          num?.quantity_palet_tool;
-        acc += quantity;
-        return acc;
+  const getPlannedQuantity = (orderId, productType, orderProductId) => {
+    return (order_dispatch_data || [])
+      .filter(
+        (item) =>
+          Number(item.orderId) === Number(orderId) &&
+          Number(item.orderProductId) === Number(orderProductId) &&
+          normalizeProductType(item.product_table) ===
+            normalizeProductType(productType),
+      )
+      .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  };
+
+  const getRemainingQuantityOfPallets = (
+    orderRows,
+    orderId,
+    productType,
+    quantityKey,
+  ) => {
+    if (!Array.isArray(orderRows)) return 0;
+
+    return orderRows
+      .filter((row) => Number(row.order_id) === Number(orderId))
+      .reduce((sum, row) => {
+        const totalQuantity = Number(row?.[quantityKey] || 0);
+        const plannedQuantity = getPlannedQuantity(orderId, productType, row.id);
+        return sum + Math.max(totalQuantity - plannedQuantity, 0);
       }, 0);
   };
 
   useEffect(() => {
     if (!list_of_orders || !Array.isArray(list_of_orders)) return;
     const readies_orders = list_of_orders
-      ?.filter((order) => order.status >= 6)
-      .filter((order) => {
-        const dispatchesOfOrder = (order_dispatch_data || []).filter(
-          (dispatch) => Number(dispatch.orderId) === Number(order.id),
-        );
-
-        if (dispatchesOfOrder.length === 0) {
-          return true;
-        }
-
-        return dispatchesOfOrder.some(
-          (dispatch) => Number(dispatch.trailer_stage) < 4,
-        );
-      })
+      .filter((order) => Number(order.status) >= 6)
       .reduce((acc, order) => {
         const id = order.id;
-        const order_products = getRemainingQuantityOfPallets(productsOfOrders, id);
-        const order_tools = getRemainingQuantityOfPallets(toolProductsOfOrders, id);
+        const order_products = getRemainingQuantityOfPallets(
+          productsOfOrders,
+          id,
+          'product',
+          'quantity_palet',
+        );
+
+        console.log('order_products WMModalTrailer.jsx line 84', order_products);
+        const order_tools = getRemainingQuantityOfPallets(
+          toolProductsOfOrders,
+          id,
+          'tool',
+          'quantity_ud',
+        );
         const order_dry_mixes = getRemainingQuantityOfPallets(
           dryMixedProductsOfOrders,
           id,
+          'dryMix',
+          'quantity_palet_dry',
         );
         const order_anchors = getRemainingQuantityOfPallets(
           anchorProductsOfOrders,
           id,
+          'anchor',
+          'quantity_palet_anchor',
         );
         const order_rel_mats = getRemainingQuantityOfPallets(
           relMatProductsOfOrders,
           id,
+          'relMat',
+          'quantity_ud',
         );
 
         const remaining_quantity_of_pallets =
@@ -92,6 +112,10 @@ function WMModalTrailer({ setTrailerOrder }) {
           order_anchors +
           order_tools +
           order_rel_mats;
+
+        if (remaining_quantity_of_pallets <= 0) {
+          return acc;
+        }
 
         const del_adr = deliveryAddresses?.find(
           (del) => del?.id == order?.del_adr_id,
@@ -110,7 +134,16 @@ function WMModalTrailer({ setTrailerOrder }) {
       }, []);
 
     setWarehouseTrailerData(readies_orders);
-  }, [list_of_orders, order_dispatch_data]);
+  }, [
+    list_of_orders,
+    order_dispatch_data,
+    productsOfOrders,
+    dryMixedProductsOfOrders,
+    anchorProductsOfOrders,
+    toolProductsOfOrders,
+    relMatProductsOfOrders,
+    deliveryAddresses,
+  ]);
 
   const extractProductTitle = (value = '') => {
     if (!value) return '';
@@ -235,6 +268,8 @@ function WMModalTrailer({ setTrailerOrder }) {
       size="lg"
       centered
       className="modal-auto-size"
+      contentClassName="wm-modal-card wm-modal-card--md"
+      backdropClassName="wm-modal-backdrop"
     >
       <ModalHeader toggle={toggle}>Plan nuevo trailer</ModalHeader>
 
@@ -246,6 +281,7 @@ function WMModalTrailer({ setTrailerOrder }) {
           onClickButton={() => {}}
           buttonText={''}
           tableName={'Order dispatch'}
+          variant="card"
           handleRowClick={(row) => {
             onClickTrailer(row.original);
             setwmmodalTrailerModal(!wmmodalTrailerModal);
@@ -254,7 +290,12 @@ function WMModalTrailer({ setTrailerOrder }) {
       </ModalBody>
 
       <ModalFooter>
-        <Button onClick={() => setwmmodalTrailer(!wmmodalTrailer)}>Close</Button>
+        <Button
+          className="wm-btn wm-btn--ghost"
+          onClick={() => setwmmodalTrailer(!wmmodalTrailer)}
+        >
+          Close
+        </Button>
       </ModalFooter>
     </Modal>
   );

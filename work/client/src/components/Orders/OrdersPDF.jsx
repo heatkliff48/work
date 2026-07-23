@@ -7,6 +7,7 @@ import { useProductsTypeJournalContext } from '#components/contexts/ProductsType
 
 import '#components/Styles/pdf.css';
 import { getApiUrl } from '#utils/getApiUrl.js';
+import './ordersView.css';
 
 const loadImage = () => {
   return new Promise((resolve, reject) => {
@@ -571,24 +572,27 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
   return (
     <div>
-      <div style={{ marginBottom: '10px' }}>
-        <label>
-          DEAL_ID:{' '}
-          <input
-            type="number"
-            value={dealId}
-            onChange={(e) => {
-              setDealId(e.target.value);
-            }}
-            placeholder="Enter DEAL_ID"
-          />
+      <div className="ord-field">
+        <label className="ord-field__label" htmlFor="deal_id">
+          DEAL_ID
         </label>
+        <input
+          id="deal_id"
+          type="number"
+          value={dealId}
+          onChange={(e) => {
+            setDealId(e.target.value);
+          }}
+          placeholder="Enter DEAL_ID"
+        />
       </div>
 
       {pdfUrl && (
-        <div>
-          <button onClick={downloadPDF}>Download PDF</button>
-          <button onClick={sendToBitrix} style={{ marginLeft: '10px' }}>
+        <div className="ord-pdf-actions">
+          <button type="button" className="ord-btn ord-btn--primary ord-btn--sm" onClick={downloadPDF}>
+            Download PDF
+          </button>
+          <button type="button" className="ord-btn ord-btn--ghost ord-btn--sm" onClick={sendToBitrix}>
             Send to Bitrix24
           </button>
         </div>

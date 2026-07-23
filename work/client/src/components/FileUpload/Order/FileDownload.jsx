@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useFileContext } from '#components/contexts/FileContext.js';
+import '#components/Orders/ordersView.css';
 
 const FileDownload = () => {
   const { message, setMessage, filesOrder } = useFileContext();
@@ -37,10 +38,11 @@ const FileDownload = () => {
   }, [filesOrder]);
 
   return (
-    <div className="fileDownload">
-      <h5>File Download</h5>
-      <form onSubmit={onSubmit}>
+    <div className="ord-field">
+      <label className="ord-field__label">File download</label>
+      <form onSubmit={onSubmit} className="ord-file-row">
         <select
+          className="ord-select"
           value={selectedFile}
           onChange={(e) => setSelectedFile(e.target.value)}
         >
@@ -54,12 +56,12 @@ const FileDownload = () => {
         <button
           type="submit"
           disabled={!selectedFile}
-          style={{ marginLeft: '20px' }}
+          className="ord-btn ord-btn--ghost ord-btn--sm"
         >
           Download
         </button>
       </form>
-      {message ? <p>{message}</p> : null}
+      {message ? <div className="ord-muted" style={{ marginTop: 6 }}>{message}</div> : null}
     </div>
   );
 };

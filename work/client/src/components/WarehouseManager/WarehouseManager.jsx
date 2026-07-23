@@ -29,9 +29,20 @@ import {
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 
 import '#components/Styles/main-pages.css';
+import './warehouseManagerView.css';
 import WMModalTrailer from './WMModal/WMModalTrailer';
 import WMModalTrailerModal from './WMModal/WMModalTrailerModal';
 import { useNavigate } from 'react-router-dom';
+
+// Row tint by trailer_stage (0-4). The stage value itself is never shown as
+// text/label anywhere — only used to color the row background.
+const STAGE_ROW_BG = {
+  0: '#f3f4f6',
+  1: '#eaf7ee',
+  2: '#fef6e0',
+  3: '#fdeaea',
+  4: '#f2eafb',
+};
 
 function WarehouseManager() {
   // const { roles, user, checkUserAccess, userAccess, setUserAccess } =
@@ -51,6 +62,7 @@ function WarehouseManager() {
 
   const [warehouseMdata, setWarehouseMdata] = useState([]);
   const [trailer_order, setTrailerOrder] = useState(null);
+  const [showStage4, setShowStage4] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -101,7 +113,7 @@ function WarehouseManager() {
     }
 
     const groupedData = order_dispatch_data
-      .filter((el) => el.trailer_stage < 4)
+      .filter((el) => showStage4 || el.trailer_stage < 4)
       .reduce((acc, item) => {
         const orderId = Number(item.orderId);
         const trailer = Number(item.trailer);
@@ -116,6 +128,7 @@ function WarehouseManager() {
             fecha: item.fecha || '',
             articles: [],
             dispatchItems: [],
+            trailer_stage: item.trailer_stage,
           };
         }
 
@@ -166,19 +179,17 @@ function WarehouseManager() {
         orders_products_articles: group.articles,
         trailer: group.trailer,
         dispatchItems: group.dispatchItems,
+        trailer_stage: group.trailer_stage,
       };
     });
 
     setWarehouseMdata(result);
     setWmoctProductShippedBD([]);
-  }, [order_dispatch_data, list_of_orders, deliveryAddresses]);
+  }, [order_dispatch_data, list_of_orders, deliveryAddresses, showStage4]);
 
   return (
     <>
-      <div>
-        <button onClick={() => setwmmodalTrailer(!wmmodalTrailer)}>
-          Plan nuevo trailer
-        </button>
+      <div className="wm-page">
         <Table
           COLUMN_DATA={WAREHOUSE_MANAGER_TRAILER_TABLE}
           dataOfTable={warehouseMdata}
@@ -186,12 +197,72 @@ function WarehouseManager() {
           onClickButton={() => {}}
           buttonText={''}
           tableName={'Order dispatch'}
+          variant="card"
+          getRowProps={(row) => ({
+            style: {
+              background:
+                STAGE_ROW_BG[row.original.trailer_stage] ?? STAGE_ROW_BG[0],
+            },
+          })}
           handleRowClick={(row) => {
             getCurrentOrderInfoHandler({ order_id: row.original.order_id });
 
             setSelectedOrder(row.original);
             navigate('/warehouse-manager/order-card');
           }}
+          renderToolbar={({ globalFilter, setGlobalFilter }) => (
+            <div className="wm-toolbar">
+              <div className="wm-search">
+                <svg
+                  className="wm-search__ic"
+                  width="17"
+                  height="17"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#9aa0ac"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.2-3.2" />
+                </svg>
+                <input
+                  type="text"
+                  className="wm-search__input"
+                  placeholder="Search…"
+                  value={globalFilter || ''}
+                  onChange={(e) => setGlobalFilter(e.target.value || undefined)}
+                />
+              </div>
+
+              <div className="wm-toggle">
+                <span className="wm-toggle__label">Show stage 4</span>
+                <button
+                  type="button"
+                  className={`wm-toggle__switch${
+                    showStage4 ? ' wm-toggle__switch--on' : ''
+                  }`}
+                  onClick={() => setShowStage4((prev) => !prev)}
+                >
+                  <span
+                    className={`wm-toggle__knob${
+                      showStage4 ? ' wm-toggle__knob--on' : ''
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="wm-toolbar__spacer" />
+
+              <button
+                type="button"
+                className="wm-btn wm-btn--primary"
+                onClick={() => setwmmodalTrailer(!wmmodalTrailer)}
+              >
+                Plan nuevo trailer
+              </button>
+            </div>
+          )}
         />
       </div>
 
