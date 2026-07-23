@@ -1492,6 +1492,43 @@ const OrderCart = React.memo(() => {
                     )}
                   </span>
                 </div>
+                <div className="ord-summary-row">
+                  <span className="ord-summary-row__label">
+                    Delivery price for m2 full
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input
+                      type="text"
+                      id="delivery_m2"
+                      name="delivery_m2"
+                      className="ord-summary-input"
+                      value={orderCartData.delivery_m2 ?? 0}
+                      onChange={(e) => {
+                        setOrderCartData((prev) => ({
+                          ...prev,
+                          delivery_m2: Number(e.target.value),
+                        }));
+                      }}
+                      readOnly={orderCartData?.status < 5 ? false : true}
+                      disabled={
+                        !checkUserAccess(user, roles, 'orders_save_delivery_price')
+                          ?.canWrite
+                      }
+                    />
+                    {checkUserAccess(user, roles, 'orders_description_edit')
+                      ?.canWrite && (
+                      <button
+                        type="button"
+                        className="ord-btn ord-btn--ghost ord-btn--sm"
+                        onClick={() => {
+                          deliveryM2Func();
+                        }}
+                      >
+                        Save
+                      </button>
+                    )}
+                  </span>
+                </div>
                 <div className="ord-summary-divider" />
                 <div className="ord-summary-row ord-summary-row--total">
                   <span className="ord-summary-row__label">Result</span>
