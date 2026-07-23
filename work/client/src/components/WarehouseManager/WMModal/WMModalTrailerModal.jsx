@@ -25,6 +25,7 @@ function WMModalTrailerModal({ trailer_order }) {
 
   const getProductKey = (product) =>
     `${normalizeProductType(product.type)}_${Number(product.orderProductId)}`;
+
   useEffect(() => {
     if (!wmmodalTrailerModal) return;
 
