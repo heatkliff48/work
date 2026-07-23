@@ -150,9 +150,7 @@ const OrderCart = React.memo(() => {
     [orderCartData?.status],
   );
   const cardStatusLabel = useMemo(
-    () =>
-      status_list.find((s) => s.accessor === orderCartData?.status)?.Header ||
-      '',
+    () => status_list.find((s) => s.accessor === orderCartData?.status)?.Header || '',
     [status_list, orderCartData?.status],
   );
 
@@ -477,27 +475,32 @@ const OrderCart = React.memo(() => {
     }
   };
 
-  const statusChangeHandler = (status, bypass = false) => {
-    if (!bypass) {
-      const currentStatusIndex = status_list.findIndex(
-        (item) => item.accessor === orderCartData?.status,
-      );
+  const statusByAccessor = useMemo(
+    () =>
+      Object.fromEntries((status_list ?? []).map((item) => [item.accessor, item])),
+    [status_list],
+  );
 
-      const newStatusIndex = status_list.findIndex(
-        (item) => item.accessor === status.accessor,
-      );
 
-      if (currentStatusIndex === -1 || newStatusIndex === -1) {
-        return alert('Unknown order status');
-      }
+  const statusChangeHandler = (status) => {
+    const currentStatusIndex = status_list.findIndex(
+      (item) => item.accessor === orderCartData?.status,
+    );
 
-      if (newStatusIndex !== currentStatusIndex + 1) {
-        return alert('This status cannot be set');
-      }
+    const newStatusIndex = status_list.findIndex(
+      (item) => item.accessor === status.accessor,
+    );
 
-      if (!aproveAccounting) {
-        return alert("Please await accounting's verification");
-      }
+    if (currentStatusIndex === -1 || newStatusIndex === -1) {
+      return alert('Unknown order status');
+    }
+
+    if (newStatusIndex !== currentStatusIndex + 1) {
+      return alert('This status cannot be set');
+    }
+
+    if (!aproveAccounting) {
+      return alert("Please await accounting's verification");
     }
 
     const order_id = orderCartData?.id;
@@ -506,34 +509,10 @@ const OrderCart = React.memo(() => {
         ? orderCartData?.shipping_date
         : formatDataValue;
 
-    if (
-      !bypass &&
-      status.accessor > status_list[3].accessor &&
-      !hasShippingDate
-    ) {
+    if (status.accessor > statusByAccessor[4].accessor && !hasShippingDate) {
       alert('Please select the shipping date.');
       return;
-    } else if (bypass) {
-      const today = new Date();
-      const randomDays = Math.floor(Math.random() * 365) + 1; // от 1 до 365 дней вперед
-      const randomDate = new Date(today);
-      randomDate.setDate(today.getDate() + randomDays);
-
-      const formattedDate = randomDate
-        .toLocaleDateString('ru-RU', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-        })
-        .replace(/\//g, '.');
-
-      dispatch(
-        addDataShipOrder({
-          order_id,
-          shipping_date: formattedDate,
-        }),
-      );
-    } else if (status.accessor === status_list[4].accessor) {
+    } else if (status.accessor === statusByAccessor[5].accessor) {
       dispatch(
         addDataShipOrder({
           order_id,
@@ -552,7 +531,7 @@ const OrderCart = React.memo(() => {
         (el) => el.orders_products_id == product.id,
       );
       if (
-        status.accessor === status_list[5].accessor &&
+        status.accessor === statusByAccessor[6].accessor &&
         loc === 'Spain' &&
         !haveProductReserve
       ) {
@@ -594,7 +573,6 @@ const OrderCart = React.memo(() => {
         }
         const quantity_in_warehouse =
           reservedProduct.quantity_palet - remainingToAllocate; // Сколько реально зарезервировали
-
         dispatch(
           addNewListOfOrderedProduction({
             shipping_date: orderCartData?.shipping_date,
@@ -605,7 +583,7 @@ const OrderCart = React.memo(() => {
           }),
         );
       } else if (
-        status.accessor === status_list[5].accessor &&
+        status.accessor === statusByAccessor[6].accessor &&
         !haveProductReserve
       ) {
         dispatch(
@@ -627,7 +605,7 @@ const OrderCart = React.memo(() => {
         (el) => el.article == product.product_article,
       )?.place_of_production;
 
-      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+      if (status.accessor === statusByAccessor[6].accessor && loc === 'ES') {
         const reservedProduct = dryMixedProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
@@ -688,7 +666,7 @@ const OrderCart = React.memo(() => {
         (el) => el.article == product.product_article,
       )?.place_of_production;
 
-      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+      if (status.accessor === statusByAccessor[6].accessor && loc === 'ES') {
         const reservedProduct = anchorProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
@@ -749,7 +727,7 @@ const OrderCart = React.memo(() => {
         (el) => el.article == product.product_article,
       )?.place_of_production;
 
-      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+      if (status.accessor === statusByAccessor[6].accessor && loc === 'ES') {
         const reservedProduct = toolProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
@@ -809,7 +787,7 @@ const OrderCart = React.memo(() => {
         (el) => el.article == product.product_article,
       )?.place_of_production;
 
-      if (status.accessor === status_list[5].accessor && loc === 'ES') {
+      if (status.accessor === statusByAccessor[6].accessor && loc === 'ES') {
         const reservedProduct = relMatProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
@@ -1245,15 +1223,9 @@ const OrderCart = React.memo(() => {
             {cardStatusLabel && (
               <span
                 className="ord-pill"
-                style={{
-                  background: cardStatusTheme.bg,
-                  color: cardStatusTheme.color,
-                }}
+                style={{ background: cardStatusTheme.bg, color: cardStatusTheme.color }}
               >
-                <span
-                  className="ord-pill__dot"
-                  style={{ background: cardStatusTheme.dot }}
-                />
+                <span className="ord-pill__dot" style={{ background: cardStatusTheme.dot }} />
                 {cardStatusLabel}
               </span>
             )}
@@ -1308,19 +1280,14 @@ const OrderCart = React.memo(() => {
                     <ShowOrderDeliveryEditModal />
                   )}
                 </div>
-                {filterAndMapData(
-                  orderCartData?.deliveryAddress,
-                  filterKeysOrder,
-                )}
+                {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
               </div>
 
               <div className="ord-tile">
                 <div className="ord-tile__label">Description</div>
                 {orderCartData?.description && !isEditing ? (
                   <>
-                    <div className="ord-tile__body-text">
-                      {orderCartData.description}
-                    </div>
+                    <div className="ord-tile__body-text">{orderCartData.description}</div>
                     <button
                       type="button"
                       className="ord-btn ord-btn--ghost ord-btn--sm"
@@ -1372,16 +1339,10 @@ const OrderCart = React.memo(() => {
                 )}
               </div>
               {haveSecondaryContact ? (
-                filterAndMapData(
-                  orderCartData?.secondaryContact,
-                  filterKeysOrder,
-                )
+                filterAndMapData(orderCartData?.secondaryContact, filterKeysOrder)
               ) : isAddSecCont ? (
                 <>
-                  <ClientsContactInfo
-                    clickFunk={addSecCntFunc}
-                    fullContact={true}
-                  />
+                  <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
                 </>
               ) : (
                 <button

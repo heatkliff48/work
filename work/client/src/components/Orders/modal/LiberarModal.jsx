@@ -511,6 +511,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
                       Quantity in Main Order
                     </th>
                     <th className="ord-liberar-table__num">Liberated</th>
+                    <th className="ord-liberar-table__num">Quantity in Main Order</th>
                     <th className="ord-liberar-table__num">Quantity</th>
                   </tr>
                 </thead>

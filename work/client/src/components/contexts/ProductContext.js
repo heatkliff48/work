@@ -461,14 +461,15 @@ export const ProductsContextProvider = ({ children }) => {
     return matchedOption ? matchedOption.value : null;
   };
 
-  function extractProductTitle(description) {
-    if (!description) return '';
-    const match = description.match(/BAUBLOCK®\s*(.+?)\s*(?:Medidas|$)/i);
-    if (match && match[1]) {
-      return match[1].trim();
-    }
-    return description;
-  }
+  const extractProductTitle = (value = '') => {
+    if (!value) return '';
+
+    return String(value)
+      .replace(/BAUBLOCK®/gi, '')
+      .replace(/\s*Medidas[\s\S]*$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
 
   return (
     <ProductsContext.Provider
