@@ -150,7 +150,9 @@ const OrderCart = React.memo(() => {
     [orderCartData?.status],
   );
   const cardStatusLabel = useMemo(
-    () => status_list.find((s) => s.accessor === orderCartData?.status)?.Header || '',
+    () =>
+      status_list.find((s) => s.accessor === orderCartData?.status)?.Header ||
+      '',
     [status_list, orderCartData?.status],
   );
 
@@ -911,7 +913,6 @@ const OrderCart = React.memo(() => {
   ]);
 
   useEffect(() => {
-    console.log('orderCartData OrderCart.jsx line 841', orderCartData);
     const delivery = Number(orderCartData?.delivery || 0);
     const vatPercent = Number(vatValue.vat_procent || 0);
 
@@ -1224,9 +1225,15 @@ const OrderCart = React.memo(() => {
             {cardStatusLabel && (
               <span
                 className="ord-pill"
-                style={{ background: cardStatusTheme.bg, color: cardStatusTheme.color }}
+                style={{
+                  background: cardStatusTheme.bg,
+                  color: cardStatusTheme.color,
+                }}
               >
-                <span className="ord-pill__dot" style={{ background: cardStatusTheme.dot }} />
+                <span
+                  className="ord-pill__dot"
+                  style={{ background: cardStatusTheme.dot }}
+                />
                 {cardStatusLabel}
               </span>
             )}
@@ -1281,14 +1288,19 @@ const OrderCart = React.memo(() => {
                     <ShowOrderDeliveryEditModal />
                   )}
                 </div>
-                {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
+                {filterAndMapData(
+                  orderCartData?.deliveryAddress,
+                  filterKeysOrder,
+                )}
               </div>
 
               <div className="ord-tile">
                 <div className="ord-tile__label">Description</div>
                 {orderCartData?.description && !isEditing ? (
                   <>
-                    <div className="ord-tile__body-text">{orderCartData.description}</div>
+                    <div className="ord-tile__body-text">
+                      {orderCartData.description}
+                    </div>
                     <button
                       type="button"
                       className="ord-btn ord-btn--ghost ord-btn--sm"
@@ -1340,10 +1352,16 @@ const OrderCart = React.memo(() => {
                 )}
               </div>
               {haveSecondaryContact ? (
-                filterAndMapData(orderCartData?.secondaryContact, filterKeysOrder)
+                filterAndMapData(
+                  orderCartData?.secondaryContact,
+                  filterKeysOrder,
+                )
               ) : isAddSecCont ? (
                 <>
-                  <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
+                  <ClientsContactInfo
+                    clickFunk={addSecCntFunc}
+                    fullContact={true}
+                  />
                 </>
               ) : (
                 <button
@@ -1435,11 +1453,15 @@ const OrderCart = React.memo(() => {
                 </div>
                 <div className="ord-summary-row">
                   <span className="ord-summary-row__label">VAT, €</span>
-                  <span className="ord-summary-row__value">{vatValue.vat_euro}</span>
+                  <span className="ord-summary-row__value">
+                    {vatValue.vat_euro}
+                  </span>
                 </div>
                 <div className="ord-summary-row">
                   <span className="ord-summary-row__label">Delivery price</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span
+                    style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
                     <input
                       type="text"
                       id="delivery"
@@ -1454,8 +1476,11 @@ const OrderCart = React.memo(() => {
                       }}
                       readOnly={orderCartData?.status < 5 ? false : true}
                       disabled={
-                        !checkUserAccess(user, roles, 'orders_save_delivery_price')
-                          ?.canWrite
+                        !checkUserAccess(
+                          user,
+                          roles,
+                          'orders_save_delivery_price',
+                        )?.canWrite
                       }
                     />
                     {checkUserAccess(user, roles, 'orders_description_edit')
@@ -1476,7 +1501,9 @@ const OrderCart = React.memo(() => {
                   <span className="ord-summary-row__label">
                     Delivery price for m2 full
                   </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span
+                    style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
                     <input
                       type="text"
                       id="delivery_m2"
@@ -1491,8 +1518,11 @@ const OrderCart = React.memo(() => {
                       }}
                       readOnly={orderCartData?.status < 5 ? false : true}
                       disabled={
-                        !checkUserAccess(user, roles, 'orders_save_delivery_price')
-                          ?.canWrite
+                        !checkUserAccess(
+                          user,
+                          roles,
+                          'orders_save_delivery_price',
+                        )?.canWrite
                       }
                     />
                     {checkUserAccess(user, roles, 'orders_description_edit')
@@ -1512,11 +1542,15 @@ const OrderCart = React.memo(() => {
                 <div className="ord-summary-divider" />
                 <div className="ord-summary-row ord-summary-row--total">
                   <span className="ord-summary-row__label">Result</span>
-                  <span className="ord-summary-row__value">{vatValue.vat_result}</span>
+                  <span className="ord-summary-row__value">
+                    {vatValue.vat_result}
+                  </span>
                 </div>
                 {vatValue.vat_result_del > 0 ? (
                   <div className="ord-summary-row ord-summary-row--total ord-summary-row--accent">
-                    <span className="ord-summary-row__label">Result with delivery</span>
+                    <span className="ord-summary-row__label">
+                      Result with delivery
+                    </span>
                     <span className="ord-summary-row__value">
                       {vatValue.vat_result_del}
                     </span>
@@ -1528,8 +1562,8 @@ const OrderCart = React.memo(() => {
                 <div className="ord-summary-block">
                   {haveShipDate ? (
                     <div className="ord-tile__body-text">
-                      Shipping date: {haveShipDate} ({handleDayBeforShipping()} days
-                      before shipment)
+                      Shipping date: {haveShipDate} ({handleDayBeforShipping()}{' '}
+                      days before shipment)
                     </div>
                   ) : (
                     <div className="ord-field">
@@ -1551,7 +1585,9 @@ const OrderCart = React.memo(() => {
                 <div className="ord-summary-block">
                   <div className="ord-field__label">Person in charge</div>
                   <Select
-                    defaultValue={getSelectedOption(orderCartData?.person_in_charge)}
+                    defaultValue={getSelectedOption(
+                      orderCartData?.person_in_charge,
+                    )}
                     onChange={(v) => {
                       handleSelectChange(v);
                     }}
@@ -1562,12 +1598,16 @@ const OrderCart = React.memo(() => {
               )}
 
               <div className="ord-summary-block">
-                <div className="ord-tile__label" style={{ marginBottom: 8 }}>Files</div>
+                <div className="ord-tile__label" style={{ marginBottom: 8 }}>
+                  Files
+                </div>
                 <FilesMain userAccess={userAccess} />
               </div>
 
               <div className="ord-summary-block">
-                <div className="ord-tile__label" style={{ marginBottom: 8 }}>PDF &amp; Bitrix</div>
+                <div className="ord-tile__label" style={{ marginBottom: 8 }}>
+                  PDF &amp; Bitrix
+                </div>
                 <PDFgenerate
                   orderData={orderCartData}
                   productList={productLists}
@@ -1580,7 +1620,9 @@ const OrderCart = React.memo(() => {
               <div className="ord-status-card">
                 <div className="ord-status-card__title">Order status</div>
                 {!aproveAccounting && (
-                  <div className="ord-status-warn">Awaiting accounting approval</div>
+                  <div className="ord-status-warn">
+                    Awaiting accounting approval
+                  </div>
                 )}
                 <div className="ord-steps">
                   {status_list.map((item, idx) => {
@@ -1610,7 +1652,8 @@ const OrderCart = React.memo(() => {
                           {idx < status_list.length - 1 && (
                             <div
                               className={
-                                'ord-step__line' + (isDone ? ' ord-step__line--done' : '')
+                                'ord-step__line' +
+                                (isDone ? ' ord-step__line--done' : '')
                               }
                             />
                           )}
