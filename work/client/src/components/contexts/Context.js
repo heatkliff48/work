@@ -26,6 +26,7 @@ const ProjectContextProvider = ({ children }) => {
     price_m2_with_delivery: 'Price with delivery, EURO per m2',
     discount: 'Discount, %',
     final_price: 'Final price, EURO',
+    quantity_liberated: 'Quantity liberar',
     total: 'Total, kg',
     pvp: 'PVP',
     dry_mixed_id: 'Dry mixed product id',

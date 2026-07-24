@@ -363,12 +363,20 @@
   color: #c4c8d0;
   font-size: 13px;
 }
-.wm-page .tbl-card table.tbl > tbody > tr,
+/* No !important here (unlike wm-modal-card below): WarehouseManager.jsx
+   tints each row via inline style (getRowProps -> trailer_stage color),
+   and !important on this background would always win over that inline
+   style, hiding the stage colors. */
+.wm-page .tbl-card table.tbl > tbody > tr {
+  background: #fff;
+}
+.wm-page .tbl-card table.tbl > tbody > tr:nth-child(odd),
+.wm-page .tbl-card table.tbl > tbody > tr:nth-child(even) {
+  background: #fff;
+}
 .wm-modal-card .tbl-card table.tbl > tbody > tr {
   background: #fff !important;
 }
-.wm-page .tbl-card table.tbl > tbody > tr:nth-child(odd),
-.wm-page .tbl-card table.tbl > tbody > tr:nth-child(even),
 .wm-modal-card .tbl-card table.tbl > tbody > tr:nth-child(odd),
 .wm-modal-card .tbl-card table.tbl > tbody > tr:nth-child(even) {
   background: #fff !important;

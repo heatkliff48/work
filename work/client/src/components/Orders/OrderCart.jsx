@@ -150,7 +150,9 @@ const OrderCart = React.memo(() => {
     [orderCartData?.status],
   );
   const cardStatusLabel = useMemo(
-    () => status_list.find((s) => s.accessor === orderCartData?.status)?.Header || '',
+    () =>
+      status_list.find((s) => s.accessor === orderCartData?.status)?.Header ||
+      '',
     [status_list, orderCartData?.status],
   );
 
@@ -320,6 +322,7 @@ const OrderCart = React.memo(() => {
   );
 
   const updatedProductListOrder = useMemo(() => {
+    console.log(productsOfOrders, 'productsOfOrders OrderCart.jsx line 325');
     return addProductArticleToOrderList(
       productsOfOrders,
       latestProducts,
@@ -477,10 +480,11 @@ const OrderCart = React.memo(() => {
 
   const statusByAccessor = useMemo(
     () =>
-      Object.fromEntries((status_list ?? []).map((item) => [item.accessor, item])),
+      Object.fromEntries(
+        (status_list ?? []).map((item) => [item.accessor, item]),
+      ),
     [status_list],
   );
-
 
   const statusChangeHandler = (status) => {
     const currentStatusIndex = status_list.findIndex(
@@ -1223,9 +1227,15 @@ const OrderCart = React.memo(() => {
             {cardStatusLabel && (
               <span
                 className="ord-pill"
-                style={{ background: cardStatusTheme.bg, color: cardStatusTheme.color }}
+                style={{
+                  background: cardStatusTheme.bg,
+                  color: cardStatusTheme.color,
+                }}
               >
-                <span className="ord-pill__dot" style={{ background: cardStatusTheme.dot }} />
+                <span
+                  className="ord-pill__dot"
+                  style={{ background: cardStatusTheme.dot }}
+                />
                 {cardStatusLabel}
               </span>
             )}
@@ -1280,14 +1290,19 @@ const OrderCart = React.memo(() => {
                     <ShowOrderDeliveryEditModal />
                   )}
                 </div>
-                {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
+                {filterAndMapData(
+                  orderCartData?.deliveryAddress,
+                  filterKeysOrder,
+                )}
               </div>
 
               <div className="ord-tile">
                 <div className="ord-tile__label">Description</div>
                 {orderCartData?.description && !isEditing ? (
                   <>
-                    <div className="ord-tile__body-text">{orderCartData.description}</div>
+                    <div className="ord-tile__body-text">
+                      {orderCartData.description}
+                    </div>
                     <button
                       type="button"
                       className="ord-btn ord-btn--ghost ord-btn--sm"
@@ -1339,10 +1354,16 @@ const OrderCart = React.memo(() => {
                 )}
               </div>
               {haveSecondaryContact ? (
-                filterAndMapData(orderCartData?.secondaryContact, filterKeysOrder)
+                filterAndMapData(
+                  orderCartData?.secondaryContact,
+                  filterKeysOrder,
+                )
               ) : isAddSecCont ? (
                 <>
-                  <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
+                  <ClientsContactInfo
+                    clickFunk={addSecCntFunc}
+                    fullContact={true}
+                  />
                 </>
               ) : (
                 <button
