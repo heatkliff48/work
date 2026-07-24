@@ -1,16 +1,16 @@
-import { useProjectContext } from "#components/contexts/Context.js";
-import { useModalContext } from "#components/contexts/ModalContext.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { getCurrentProductsOfOrders } from "#components/redux/actions/ordersAction.js";
-import Table from "../Table/Table";
-import { useOrderContext } from "../contexts/OrderContext";
-import AddClientOrderModal from "./modal/AddClientOrderModal";
-import { useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import RandomAhhOrder from "./RandomAhhOrder";
-import { ArticleMonoCell, makeStatusPillCell } from "./ordersCells";
-import "./ordersView.css";
+import { useProjectContext } from '#components/contexts/Context.js';
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { getCurrentProductsOfOrders } from '#components/redux/actions/ordersAction.js';
+import Table from '../Table/Table';
+import { useOrderContext } from '../contexts/OrderContext';
+import AddClientOrderModal from './modal/AddClientOrderModal';
+import { useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import RandomAhhOrder from './RandomAhhOrder';
+import { ArticleMonoCell, makeStatusPillCell } from './ordersCells';
+import './ordersView.css';
 
 function OrdersTable() {
   const {
@@ -42,8 +42,9 @@ function OrdersTable() {
   const displayColumns = useMemo(
     () =>
       (COLUMNS_ORDERS || []).map((col) => {
-        if (col.accessor === "article") return { ...col, Cell: ArticleMonoCell };
-        if (col.accessor === "status") return { ...col, Cell: StatusPillCell };
+        if (col.accessor === 'article')
+          return { ...col, Cell: ArticleMonoCell };
+        if (col.accessor === 'status') return { ...col, Cell: StatusPillCell };
         return col;
       }),
     [COLUMNS_ORDERS, StatusPillCell],
@@ -60,11 +61,11 @@ function OrdersTable() {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, "Orders");
+      const access = checkUserAccess(user, roles, 'Orders');
       setUserAccess(access);
 
       if (!access?.canRead) {
-        navigate("/"); // Перенаправление на главную страницу, если нет прав на чтение
+        navigate('/'); // Перенаправление на главную страницу, если нет прав на чтение
       }
     }
   }, [user, roles]);
@@ -108,16 +109,16 @@ function OrdersTable() {
           COLUMN_DATA={displayColumns}
           dataOfTable={ordersDataList}
           userAccess={userAccess}
-          tableName={"Orders"}
+          tableName={'Orders'}
           variant="card"
           hideTitle
           emptyTitle="No orders match your search"
           emptySubtitle="Try a different order number, client or project name."
           handleRowClick={(row) => {
-            console.log("row.original", row.original);
+            console.log('row.original', row.original);
             getCurrentOrderInfoHandler(row.original);
             dispatch(getCurrentProductsOfOrders(row.original.id));
-            navigate("/order_card");
+            navigate('/order_card');
           }}
           renderToolbar={({ globalFilter, setGlobalFilter }) => (
             <div className="ord-toolbar">
@@ -139,7 +140,7 @@ function OrdersTable() {
                   type="text"
                   className="ord-search__input"
                   placeholder="Search by order, client or project…"
-                  value={globalFilter || ""}
+                  value={globalFilter || ''}
                   onChange={(e) => setGlobalFilter(e.target.value || undefined)}
                 />
               </div>

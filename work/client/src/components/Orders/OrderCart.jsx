@@ -322,6 +322,7 @@ const OrderCart = React.memo(() => {
   );
 
   const updatedProductListOrder = useMemo(() => {
+    console.log(productsOfOrders, 'productsOfOrders OrderCart.jsx line 325');
     return addProductArticleToOrderList(
       productsOfOrders,
       latestProducts,
@@ -479,10 +480,11 @@ const OrderCart = React.memo(() => {
 
   const statusByAccessor = useMemo(
     () =>
-      Object.fromEntries((status_list ?? []).map((item) => [item.accessor, item])),
+      Object.fromEntries(
+        (status_list ?? []).map((item) => [item.accessor, item]),
+      ),
     [status_list],
   );
-
 
   const statusChangeHandler = (status) => {
     const currentStatusIndex = status_list.findIndex(

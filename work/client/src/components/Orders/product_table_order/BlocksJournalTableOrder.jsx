@@ -17,7 +17,7 @@ const BlocksJournalTableOrder = ({
   const { productModalOrder, setProductModalOrder } = useModalContext();
   const { userAccess } = useUsersContext();
 
-  const columns = [
+  const allColumns = [
     'product_article',
     'description',
     'quantity_m2',
@@ -34,6 +34,10 @@ const BlocksJournalTableOrder = ({
   // const columns = Object.keys(productListOrder?.[0] || {}).filter(
   //   (key) => !filterKeys.includes(key) && key !== 'warehouse_id' && key,
   // );
+
+  const columns = orderCartData?.main_order
+    ? allColumns.filter((col) => col !== 'quantity_liberated')
+    : allColumns;
 
   return (
     <>
