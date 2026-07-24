@@ -172,6 +172,7 @@ class OrdersRepository {
           'discount',
           'final_price',
           'warehouse_id',
+          'quantity_liberated',
         ],
       });
       return product_list;
@@ -198,6 +199,7 @@ class OrdersRepository {
           'discount',
           'pvp',
           'final_price',
+          'quantity_liberated',
         ],
       });
       return dry_mixed_product_list;
@@ -224,6 +226,7 @@ class OrdersRepository {
           'discount',
           'pvp',
           'final_price',
+          'quantity_liberated',
         ],
       });
       return anchor_product_list;
@@ -248,6 +251,7 @@ class OrdersRepository {
           'discount',
           'pvp',
           'final_price',
+          'quantity_liberated',
         ],
       });
       return tool_product_list;
@@ -272,6 +276,7 @@ class OrdersRepository {
           'discount',
           'pvp',
           'final_price',
+          'quantity_liberated',
         ],
       });
       return rel_mat_product_list;
@@ -299,6 +304,7 @@ class OrdersRepository {
           'discount',
           'final_price',
           'warehouse_id',
+          'quantity_liberated',
         ],
       });
 
@@ -648,7 +654,30 @@ class OrdersRepository {
         final_price,
         warehouse_id,
         id,
+        quantity_liberated,
       } = productOfOrder;
+
+      // Получаем текущую запись
+      const currentProduct = await OrdersProducts.findOne({
+        where: { id: id },
+      });
+
+      let finalQuantityLiberated = currentProduct.quantity_liberated;
+
+      // Если quantity_liberated передан, обрабатываем его
+      if (quantity_liberated !== undefined && quantity_liberated !== null) {
+        const currentLiberated = currentProduct.quantity_liberated || 0;
+        const newTotal = currentLiberated + quantity_liberated;
+
+        // Проверяем, не превышает ли сумма quantity_palet
+        if (newTotal > currentProduct.quantity_palet) {
+          throw new Error(
+            `Quantity liberated (${newTotal}) exceeds quantity palet (${currentProduct.quantity_palet})`,
+          );
+        }
+
+        finalQuantityLiberated = newTotal;
+      }
 
       await OrdersProducts.update(
         {
@@ -662,6 +691,7 @@ class OrdersRepository {
           discount,
           final_price,
           warehouse_id,
+          quantity_liberated: finalQuantityLiberated,
         },
         { where: { id } },
       );
@@ -680,6 +710,7 @@ class OrdersRepository {
           'discount',
           'final_price',
           'warehouse_id',
+          'quantity_liberated',
         ],
       });
 
@@ -706,7 +737,28 @@ class OrdersRepository {
         pvp,
         final_price,
         id,
+        quantity_liberated,
       } = productOfOrder;
+
+      // Получаем текущую запись
+      const currentProduct = await OrderDryMixedProducts.findByPk(id);
+
+      let finalQuantityLiberated = currentProduct.quantity_liberated;
+
+      // Если quantity_liberated передан, обрабатываем его
+      if (quantity_liberated !== undefined && quantity_liberated !== null) {
+        const currentLiberated = currentProduct.quantity_liberated || 0;
+        const newTotal = currentLiberated + quantity_liberated;
+
+        // Проверяем, не превышает ли сумма quantity_palet_dry
+        if (newTotal > currentProduct.quantity_palet_dry) {
+          throw new Error(
+            `Quantity liberated (${newTotal}) exceeds quantity palet dry (${currentProduct.quantity_palet_dry})`,
+          );
+        }
+
+        finalQuantityLiberated = newTotal;
+      }
 
       await OrderDryMixedProducts.update(
         {
@@ -719,7 +771,7 @@ class OrdersRepository {
           discount,
           pvp,
           final_price,
-          id,
+          quantity_liberated: finalQuantityLiberated,
         },
         { where: { id } },
       );
@@ -737,6 +789,7 @@ class OrdersRepository {
           'pvp',
           'final_price',
           'id',
+          'quantity_liberated',
         ],
       });
 
@@ -763,7 +816,28 @@ class OrdersRepository {
         pvp,
         final_price,
         id,
+        quantity_liberated,
       } = productOfOrder;
+
+      // Получаем текущую запись
+      const currentProduct = await OrderAnchorProducts.findByPk(id);
+
+      let finalQuantityLiberated = currentProduct.quantity_liberated;
+
+      // Если quantity_liberated передан, обрабатываем его
+      if (quantity_liberated !== undefined && quantity_liberated !== null) {
+        const currentLiberated = currentProduct.quantity_liberated || 0;
+        const newTotal = currentLiberated + quantity_liberated;
+
+        // Проверяем, не превышает ли сумма quantity_ud
+        if (newTotal > currentProduct.quantity_ud) {
+          throw new Error(
+            `Quantity liberated (${newTotal}) exceeds quantity ud (${currentProduct.quantity_ud})`,
+          );
+        }
+
+        finalQuantityLiberated = newTotal;
+      }
 
       await OrderAnchorProducts.update(
         {
@@ -776,7 +850,7 @@ class OrdersRepository {
           discount,
           pvp,
           final_price,
-          id,
+          quantity_liberated: finalQuantityLiberated,
         },
         { where: { id } },
       );
@@ -794,6 +868,7 @@ class OrdersRepository {
           'pvp',
           'final_price',
           'id',
+          'quantity_liberated',
         ],
       });
 
@@ -818,7 +893,28 @@ class OrdersRepository {
         pvp,
         final_price,
         id,
+        quantity_liberated,
       } = productOfOrder;
+
+      // Получаем текущую запись
+      const currentProduct = await OrderToolProducts.findByPk(id);
+
+      let finalQuantityLiberated = currentProduct.quantity_liberated;
+
+      // Если quantity_liberated передан, обрабатываем его
+      if (quantity_liberated !== undefined && quantity_liberated !== null) {
+        const currentLiberated = currentProduct.quantity_liberated || 0;
+        const newTotal = currentLiberated + quantity_liberated;
+
+        // Проверяем, не превышает ли сумма quantity_ud
+        if (newTotal > currentProduct.quantity_ud) {
+          throw new Error(
+            `Quantity liberated (${newTotal}) exceeds quantity ud (${currentProduct.quantity_ud})`,
+          );
+        }
+
+        finalQuantityLiberated = newTotal;
+      }
 
       await OrderToolProducts.update(
         {
@@ -829,7 +925,7 @@ class OrdersRepository {
           discount,
           pvp,
           final_price,
-          id,
+          quantity_liberated: finalQuantityLiberated,
         },
         { where: { id } },
       );
@@ -845,6 +941,7 @@ class OrdersRepository {
           'pvp',
           'final_price',
           'id',
+          'quantity_liberated',
         ],
       });
 
@@ -869,7 +966,28 @@ class OrdersRepository {
         pvp,
         final_price,
         id,
+        quantity_liberated,
       } = productOfOrder;
+
+      // Получаем текущую запись
+      const currentProduct = await OrderRelMatProducts.findByPk(id);
+
+      let finalQuantityLiberated = currentProduct.quantity_liberated;
+
+      // Если quantity_liberated передан, обрабатываем его
+      if (quantity_liberated !== undefined && quantity_liberated !== null) {
+        const currentLiberated = currentProduct.quantity_liberated || 0;
+        const newTotal = currentLiberated + quantity_liberated;
+
+        // Проверяем, не превышает ли сумма quantity_ud
+        if (newTotal > currentProduct.quantity_ud) {
+          throw new Error(
+            `Quantity liberated (${newTotal}) exceeds quantity ud (${currentProduct.quantity_ud})`,
+          );
+        }
+
+        finalQuantityLiberated = newTotal;
+      }
 
       await OrderRelMatProducts.update(
         {
@@ -880,7 +998,7 @@ class OrdersRepository {
           discount,
           pvp,
           final_price,
-          id,
+          quantity_liberated: finalQuantityLiberated,
         },
         { where: { id } },
       );
@@ -896,6 +1014,7 @@ class OrdersRepository {
           'pvp',
           'final_price',
           'id',
+          'quantity_liberated',
         ],
       });
 
@@ -978,6 +1097,7 @@ class OrdersRepository {
     anchors,
     tools,
     relMats,
+    delivery_m2,
   }) {
     try {
       const childOrder = await Orders.create({
@@ -990,6 +1110,7 @@ class OrdersRepository {
         shipping_date,
         status: 4,
         main_order,
+        delivery_m2,
       });
 
       const order_id = childOrder.id;

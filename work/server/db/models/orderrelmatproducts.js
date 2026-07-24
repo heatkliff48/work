@@ -1,5 +1,5 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class OrderRelMatProducts extends Model {
     /**
@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       order_id: DataTypes.INTEGER,
       rel_mat_id: DataTypes.INTEGER,
       quantity_ud: DataTypes.FLOAT,
+      quantity_liberated: DataTypes.FLOAT,
       total: DataTypes.FLOAT,
       discount: DataTypes.INTEGER,
       pvp: DataTypes.FLOAT,
@@ -24,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "OrderRelMatProducts",
+      modelName: 'OrderRelMatProducts',
     },
   );
   return OrderRelMatProducts;

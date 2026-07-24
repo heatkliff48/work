@@ -313,70 +313,9 @@ function FacturaManager() {
       setWmoctProductShippedBD([]);
       return;
     }
-
     const filteredDispatchData = order_dispatch_data.filter((item) => {
       const order = list_of_orders.find((o) => o.id === item.orderId);
-      if (!order || (order.status || 0) < 8) {
-        return false;
-      }
-
-      let reservedProduct = [];
-      switch (item?.product_table) {
-        case 'product':
-          reservedProduct = list_of_reserved_products?.find(
-            (reserved) => reserved.order_dispatch_id === item.id,
-          );
-
-          if (reservedProduct && reservedProduct.quantity === item.quantity) {
-            return false;
-          }
-          break;
-
-        case 'relMat':
-          reservedProduct = list_of_rel_mat_reserved_products?.find(
-            (reserved) => reserved.order_dispatch_id === item.id,
-          );
-
-          if (reservedProduct && reservedProduct.quantity === item.quantity) {
-            return false;
-          }
-          break;
-
-        case 'tool':
-          reservedProduct = list_of_tool_reserved_products?.find(
-            (reserved) => reserved.order_dispatch_id === item.id,
-          );
-
-          if (reservedProduct && reservedProduct.quantity === item.quantity) {
-            return false;
-          }
-          break;
-
-        case 'dryMixed':
-          reservedProduct = list_of_dry_mix_reserved_products?.find(
-            (reserved) => reserved.order_dispatch_id === item.id,
-          );
-
-          if (reservedProduct && reservedProduct.quantity === item.quantity) {
-            return false;
-          }
-          break;
-
-        case 'anchor':
-          reservedProduct = list_of_anchor_reserved_products?.find(
-            (reserved) => reserved.order_dispatch_id === item.id,
-          );
-
-          if (reservedProduct && reservedProduct.quantity === item.quantity) {
-            return false;
-          }
-          break;
-
-        default:
-          break;
-      }
-
-      return true;
+      return order && (order.status || 0) >= 8;
     });
 
     if (filteredDispatchData.length === 0) {
@@ -384,7 +323,6 @@ function FacturaManager() {
       setWmoctProductShippedBD([]);
       return;
     }
-
     const groupedData = filteredDispatchData.reduce((acc, item) => {
       const key = `${item.orderId}_${item.trailer}`;
 
