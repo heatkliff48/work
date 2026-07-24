@@ -4,7 +4,10 @@ import { useOrderContext } from '../../contexts/OrderContext';
 import { useProjectContext } from '#components/contexts/Context.js';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress.js';
 import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo.js';
-import { addNewOrder, getOrders } from '#components/redux/actions/ordersAction.js';
+import {
+  addNewOrder,
+  getOrders,
+} from '#components/redux/actions/ordersAction.js';
 import ShowClientsModal from '#components/Clients/ClientsInfo/ClientsInfoModal.js';
 import ShowDeliveryAddressModal from '#components/Clients/DeliveryAddress/DeliveryAddressModal';
 import ShowClientsContactInfoModal from '#components/Clients/ClientsContactInfo/ClientsContactInfoModal';
@@ -34,10 +37,13 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const [listOfClientsFiltered, setListOfClientsFiltered] =
     useState(list_of_clients);
 
-  let haveClient = useMemo(() => newOrder?.article ?? false, [newOrder?.article]);
+  let haveClient = useMemo(
+    () => newOrder?.article ?? false,
+    [newOrder?.article],
+  );
   let haveAdddress = useMemo(
     () => newOrder?.del_adr_id ?? false,
-    [newOrder?.del_adr_id]
+    [newOrder?.del_adr_id],
   );
 
   const getOrderArticle = () => {
@@ -49,7 +55,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     const currentDate = `${day}${month}${year}`;
 
     const ordersWithSameDate = list_of_orders.filter((order) =>
-      order.article?.includes(currentDate)
+      order.article?.includes(currentDate),
     );
 
     if (ordersWithSameDate.length > 0) {
@@ -131,7 +137,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
 
   useEffect(() => {
     let filtered = list_of_clients.filter((el) =>
-      el.c_name?.toLowerCase().includes(searchFilter.toLowerCase())
+      el.c_name?.toLowerCase().includes(searchFilter.toLowerCase()),
     );
     setListOfClientsFiltered(filtered);
   }, [list_of_clients]);
@@ -158,7 +164,9 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                   <p style={{ margin: 0 }}>Select delivery address</p>
                 )
               ) : (
-                <p style={{ margin: 0 }}>Select the client who is placing the order</p>
+                <p style={{ margin: 0 }}>
+                  Select the client who is placing the order
+                </p>
               )}
             </div>
             <div className="ord-modal-head__subtitle">Step {stepNum} of 3</div>
@@ -183,9 +191,9 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
             {haveClient ? (
               haveAdddress ? (
                 <>
-                  <div className="ord-modal-inline-actions">
+                  {/* <div className="ord-modal-inline-actions">
                     <ShowClientsContactInfoModal />
-                  </div>
+                  </div> */}
                   <ClientsContactInfo
                     clickFunk={contactInfoHendler}
                     showSearch={true}
@@ -193,9 +201,9 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                 </>
               ) : (
                 <>
-                  <div className="ord-modal-inline-actions">
+                  {/* <div className="ord-modal-inline-actions">
                     <ShowDeliveryAddressModal />
-                  </div>
+                  </div> */}
                   <DeliveryAddress
                     clickFunk={deliveryAddressHendler}
                     showSearch={true}
@@ -204,9 +212,9 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
               )
             ) : (
               <div className="ord-card-scope">
-                <div className="ord-modal-inline-actions">
+                {/* <div className="ord-modal-inline-actions">
                   <ShowClientsModal />
-                </div>
+                </div> */}
                 <Table
                   COLUMN_DATA={clients_info_table}
                   dataOfTable={listOfClientsFiltered}
@@ -224,7 +232,11 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
         <div className="ord-modal-foot ord-modal-foot--between">
           <div>
             {haveClient && (
-              <button type="button" className="ord-btn ord-btn--ghost" onClick={backHanddler}>
+              <button
+                type="button"
+                className="ord-btn ord-btn--ghost"
+                onClick={backHanddler}
+              >
                 back
               </button>
             )}

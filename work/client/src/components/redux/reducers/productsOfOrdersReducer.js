@@ -5,7 +5,7 @@ import {
   TOOL_PRODUCTS_OF_ORDER,
   ANCHOR_PRODUCTS_OF_ORDER,
   REL_MAT_PRODUCTS_OF_ORDER,
-} from "../types/ordersTypes";
+} from '../types/ordersTypes';
 import {
   DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
@@ -23,7 +23,7 @@ import {
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_REDUCER_SOCKET,
   UPDATE_TOOL_PRODUCT_INFO_OF_ORDER_SOCKET,
   UPDATE_TOOL_PRODUCT_OF_ORDER_REDUCER_SOCKET,
-} from "../types/socketTypes/socket";
+} from '../types/socketTypes/socket';
 
 export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
   const { type, payload } = action;
@@ -83,7 +83,7 @@ export const productsOfOrdersReducer = (productsOfOrders = [], action) => {
 
 export const dryMixedProductsOfOrdersReducer = (
   dryMixedProductsOfOrders = [],
-  action
+  action,
 ) => {
   const { type, payload } = action;
 
@@ -131,7 +131,7 @@ export const dryMixedProductsOfOrdersReducer = (
 
 export const anchorProductsOfOrdersReducer = (
   anchorProductsOfOrders = [],
-  action
+  action,
 ) => {
   const { type, payload } = action;
 
@@ -179,7 +179,7 @@ export const anchorProductsOfOrdersReducer = (
 
 export const toolProductsOfOrdersReducer = (
   toolProductsOfOrders = [],
-  action
+  action,
 ) => {
   const { type, payload } = action;
   switch (type) {
@@ -226,7 +226,7 @@ export const toolProductsOfOrdersReducer = (
 
 export const relMatProductsOfOrdersReducer = (
   relMatProductsOfOrders = [],
-  action
+  action,
 ) => {
   const { type, payload } = action;
   switch (type) {
