@@ -56,6 +56,9 @@ module.exports = {
       uf_number_offer: {
         type: Sequelize.INTEGER,
       },
+      region: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

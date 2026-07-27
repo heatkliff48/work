@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
+import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOrderContext } from '../../contexts/OrderContext';
 import { useProjectContext } from '#components/contexts/Context.js';
@@ -16,6 +17,8 @@ import Table from '#components/Table/Table';
 import '#components/Styles/modals.css';
 import '#components/Clients/ClientsInfo/clientsDrawer.css';
 import '../ordersView.css';
+import { TextSearchFilter } from '#components/Table/filters.js';
+import { MonoCell } from '#components/Clients/ClientsInfo/clientsCells.jsx';
 
 const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -29,6 +32,31 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   } = useOrderContext();
   const { clientModalOrder, setClientModalOrder } = useModalContext();
   const { setCurrentClient, clients_info_table } = useProjectContext();
+
+  const regionOptions = [
+    {
+      value: 'peninsular_spain',
+      label: 'Territorios peninsulares de España  - 21%IVA',
+    },
+    {
+      value: 'extra_peninsular_spain',
+      label: 'Territorios extrapeninsulares de España - 0%IVA',
+    },
+    {
+      value: 'eu_outside_spain',
+      label: 'EU territorios outside Spain  - 0%IVA',
+    },
+    { value: 'outside_eu', label: 'Territories outside EU - 0%IVA' },
+  ];
+
+  const region_table = [
+    {
+      Header: 'Region',
+      accessor: 'label',
+      Filter: TextSearchFilter,
+      Cell: MonoCell,
+    },
+  ];
 
   const dispatch = useDispatch();
   const list_of_clients = useSelector((state) => state.clients);
@@ -45,6 +73,28 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     () => newOrder?.del_adr_id ?? false,
     [newOrder?.del_adr_id],
   );
+  let haveContactInfo = useMemo(
+    () => newOrder?.contact_id ?? false,
+    [newOrder?.contact_id],
+  );
+
+  const getRegionOption = (accessor) => {
+    const options = regionOptions;
+    if (!options) return null;
+    const regionOption = options.find(
+      (option) => option.value === newOrder?.[accessor],
+    );
+    return regionOption || options[0];
+  };
+
+  const handleRegionChange = (regionOption, key) => {
+    // setValue(selectedOption.value);
+    setNewOrder((prev) => ({ ...prev, region: regionOption }));
+  };
+
+  useEffect(() => {
+    console.log(newOrder, 'newOrder AddClientOrderModal.jsx line 53');
+  }, [newOrder]);
 
   const getOrderArticle = () => {
     let versionNumber = '0001';
@@ -96,11 +146,19 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const contactInfoHendler = (contactId) => {
-    setNewOrder((prev) => ({ ...prev, contact_id: contactId }));
+    setNewOrder((prev) => ({
+      ...prev,
+      contact_id: contactId,
+    }));
   };
 
   const deliveryAddressHendler = (addressId) => {
     setNewOrder((prev) => ({ ...prev, del_adr_id: addressId }));
+  };
+
+  const regionHandler = (regionOption) => {
+    // setValue(selectedOption.value);
+    setNewOrder((prev) => ({ ...prev, region: regionOption }));
   };
 
   // const filterListOfClientsHandler = (e) => {
@@ -112,7 +170,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   // };
 
   useEffect(() => {
-    if (newOrder?.contact_id && newOrder?.del_adr_id) {
+    if (newOrder?.contact_id && newOrder?.del_adr_id && newOrder?.region) {
       setIsOrderReady(true);
       dispatch(addNewOrder(newOrder));
       dispatch(getOrders());
@@ -123,7 +181,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     } else {
       setIsOrderReady(false);
     }
-  }, [newOrder?.contact_id, newOrder?.del_adr_id]);
+  }, [newOrder?.contact_id, newOrder?.del_adr_id, newOrder?.region]);
 
   useEffect(() => {
     if (isOrderReady) {
@@ -190,15 +248,45 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
           <Fragment>
             {haveClient ? (
               haveAdddress ? (
-                <>
-                  {/* <div className="ord-modal-inline-actions">
+                haveContactInfo ? (
+                  <>
+                    {/* <div className="ord-modal-inline-actions">
                     <ShowClientsContactInfoModal />
                   </div> */}
-                  <ClientsContactInfo
-                    clickFunk={contactInfoHendler}
-                    showSearch={true}
-                  />
-                </>
+                    <div className="ord-card-scope">
+                      {/* <div className="ord-modal-inline-actions">
+                      <ShowClientsModal />
+                    </div> */}
+                      <Table
+                        COLUMN_DATA={region_table}
+                        dataOfTable={regionOptions}
+                        tableName={'Region'}
+                        variant="card"
+                        hideTitle
+                        handleRowClick={(row) => {
+                          regionHandler(row.original.value);
+                        }}
+                      />
+                    </div>
+                    {/* <Select
+                      defaultValue={getRegionOption('region')}
+                      onChange={(r) => {
+                        handleRegionChange(r, 'region');
+                      }}
+                      options={regionOptions}
+                    /> */}
+                  </>
+                ) : (
+                  <>
+                    {/* <div className="ord-modal-inline-actions">
+                    <ShowClientsContactInfoModal />
+                  </div> */}
+                    <ClientsContactInfo
+                      clickFunk={contactInfoHendler}
+                      showSearch={true}
+                    />
+                  </>
+                )
               ) : (
                 <>
                   {/* <div className="ord-modal-inline-actions">

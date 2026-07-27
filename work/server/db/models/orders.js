@@ -45,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
       main_order: DataTypes.STRING,
       deal_id: DataTypes.INTEGER,
       uf_number_offer: DataTypes.INTEGER,
+      region: DataTypes.STRING,
     },
     {
       sequelize,
