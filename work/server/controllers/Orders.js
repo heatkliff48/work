@@ -43,8 +43,15 @@ class OrdersController {
   }
 
   static async addNewOrder(req, res) {
-    const { article, del_adr_id, contact_id, owner, status, person_in_charge } =
-      req.body.order;
+    const {
+      article,
+      del_adr_id,
+      contact_id,
+      owner,
+      status,
+      person_in_charge,
+      region,
+    } = req.body.order;
 
     try {
       const newOrder = await OrdersService.addNewOrder({
@@ -54,6 +61,7 @@ class OrdersController {
         owner,
         status,
         person_in_charge,
+        region,
       });
 
       myEmitter.emit(ADD_NEW_ORDER_SOCKET, newOrder);

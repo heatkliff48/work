@@ -14,6 +14,7 @@ class OrdersService {
     owner,
     status,
     person_in_charge,
+    region,
   }) {
     const newOrder = await OrdersRepository.addNewOrderData({
       article,
@@ -22,6 +23,7 @@ class OrdersService {
       owner,
       status,
       person_in_charge,
+      region,
     });
 
     return newOrder;
