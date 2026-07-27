@@ -137,7 +137,7 @@ const OrderCart = React.memo(() => {
   });
   const [vatValue, setVatValue] = useState({
     vat_euro_origin: 0,
-    vat_procent: 21,
+    vat_procent: orderCartData?.region == 'peninsular_spain' ? 21 : 0,
     vat_euro: 0,
     vat_result: 0,
     vat_result_del: 0,
@@ -925,13 +925,17 @@ const OrderCart = React.memo(() => {
         vat_result: 0,
         vat_euro: 0,
         vat_result_del: delivery,
+        vat_procent: orderCartData?.region == 'peninsular_spain' ? 21 : 0,
       }));
       return;
     }
 
     const vat_euro = ((vatPercent * final_price_product) / 100).toFixed(2);
     const vat_result = (final_price_product + Number(vat_euro)).toFixed(2);
-    const vat_result_del = (Number(vat_result) + delivery).toFixed(2);
+    const vat_result_del = (
+      Number(vat_result) +
+      delivery * (1 + vatPercent / 100)
+    ).toFixed(2);
 
     setVatValue((prev) => ({
       ...prev,
@@ -944,6 +948,7 @@ const OrderCart = React.memo(() => {
 
   const deliveryFunc = async () => {
     const delivery = Number(orderCartData?.delivery || 0);
+    const vatPercent = Number(vatValue.vat_procent || 0);
 
     dispatch(
       addNewDeliveryPrice({
@@ -954,7 +959,10 @@ const OrderCart = React.memo(() => {
 
     setVatValue((prev) => ({
       ...prev,
-      vat_result_del: (Number(prev.vat_result || 0) + delivery).toFixed(2),
+      vat_result_del: (
+        Number(prev.vat_result || 0) +
+        delivery * (1 + vatPercent / 100)
+      ).toFixed(2),
     }));
   };
 
@@ -1433,7 +1441,10 @@ const OrderCart = React.memo(() => {
                 </div>
                 <div className="ord-summary-row">
                   <span className="ord-summary-row__label">VAT, %</span>
-                  <input
+                  <span className="ord-summary-row__value">
+                    {vatValue.vat_procent}
+                  </span>
+                  {/* <input
                     type="text"
                     id="vat_procent"
                     name="vat_procent"
@@ -1450,8 +1461,8 @@ const OrderCart = React.memo(() => {
                         }));
                       }
                     }}
-                    readOnly={orderCartData?.status < 5 ? false : true}
-                  />
+                    readOnly={orderCartData?.status < 5 ? true : true}
+                  /> */}
                 </div>
                 <div className="ord-summary-row">
                   <span className="ord-summary-row__label">VAT, €</span>

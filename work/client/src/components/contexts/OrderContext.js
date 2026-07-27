@@ -496,6 +496,7 @@ const OrderContextProvider = ({ children }) => {
         person_in_charge: order?.person_in_charge,
         delivery: order?.delivery,
         main_order: order?.main_order ?? null,
+        region: order?.region ?? null,
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
