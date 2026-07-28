@@ -133,3 +133,4 @@ dist
 
 .dockerignore
 Dockerfile
+.vscode

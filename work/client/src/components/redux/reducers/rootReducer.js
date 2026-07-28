@@ -1,3 +1,4 @@
+import { RESET_APP_STATE } from '../types/userTypes';
 import {
   rawMatConsumptionCurrentMoldsReducer,
   rawMatConsumptionReducer,
@@ -89,7 +90,7 @@ import {
 import { warehouseReducer, rawMaterialsWarehouseReducer } from './warehouseReducer';
 import { combineReducers } from 'redux';
 
-export const rootReducer = combineReducers({
+const appReducer = combineReducers({
   user: userReducer,
   dataFetched: dataFetchedReducer,
   products: productsReducer,
@@ -165,3 +166,22 @@ export const rootReducer = combineReducers({
   qualityCompressions: compressionsQualityReducer,
   orderDispatch: orderDispatchReducer,
 });
+
+const rootReducer = (state, action) => {
+  if (action.type === RESET_APP_STATE) {
+    const user = state?.user;
+
+    const clearedState = appReducer(undefined, {
+      type: '@@INIT',
+    });
+
+    return {
+      ...clearedState,
+      user,
+    };
+  }
+
+  return appReducer(state, action);
+};
+
+export default rootReducer;

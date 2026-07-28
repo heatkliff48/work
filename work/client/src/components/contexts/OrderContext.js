@@ -329,6 +329,24 @@ const OrderContextProvider = ({ children }) => {
   const [randomOrderCheck, setRandomOrderCheck] = useState(false);
   const [randomFillComplete, setRandomFillComplete] = useState(false);
 
+  const resetOrderState = () => {
+    setNewOrder();
+    setCurrentOrder();
+    setIsOrderReady(false);
+    setStoredData(null);
+    setAccDataList(null);
+    setSelectedProduct(null);
+    setOrderCartData({});
+    setProductOfOrder({});
+    setQuantityPallets({});
+    setBatchOrderIDs([]);
+    setOrdersDataList([]);
+    setPersonsInChargeList([]);
+    setProductonBatchDesigner([]);
+    setRandomOrderCheck(false);
+    setRandomFillComplete(false);
+  };
+
   const list_of_orders = useSelector((state) => state.orders);
   const accountingDataList = useSelector((state) => state.accountingDataList);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
@@ -625,6 +643,7 @@ const OrderContextProvider = ({ children }) => {
         randomFillComplete,
         setRandomFillComplete,
         filterKeysOrder,
+        resetOrderState
       }}
     >
       {children}
