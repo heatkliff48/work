@@ -1385,7 +1385,7 @@ const OrderCart = React.memo(() => {
             </div>
 
             <BlocksJournalTableOrder
-              productListOrder={updatedProductListOrder}
+              productListOrder={blocksListWithDeliveryM2}
               onProductClickHandler={onProductClickHandler}
               filterAndMapData={filterAndMapData}
               filterKeys={filterKeysOrder}

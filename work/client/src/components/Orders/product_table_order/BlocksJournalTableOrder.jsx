@@ -74,14 +74,14 @@ const BlocksJournalTableOrder = ({
                 <tr
                   key={product?.id || Math.random()}
                   onClick={() => onProductClickHandler(product)}
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: 'pointer' }}
                 >
                   {columns.map((key) => {
                     let value = product[key];
-                    if (value && typeof value === "object") {
+                    if (value && typeof value === 'object') {
                       value = JSON.stringify(value);
                     }
-                    return <td key={key}>{value ?? ""}</td>;
+                    return <td key={key}>{value ?? ''}</td>;
                   })}
 
                   <td onClick={(e) => e.stopPropagation()}>

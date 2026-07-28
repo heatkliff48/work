@@ -209,14 +209,9 @@ const WMOCTProduct = ({
           </tbody>
         </table>
       </div>
-      {onSaveHandler() && (
+      {isSaveButtonVisible() && (
         <div className="wm-prod-card__foot">
-          <button
-            className="wm-btn wm-btn--primary"
-            onClick={() => {
-              setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
-            }}
-          >
+          <button className="wm-btn wm-btn--primary" onClick={onSaveHandler}>
             SAVE
           </button>
         </div>
