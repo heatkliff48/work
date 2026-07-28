@@ -384,6 +384,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       shipping_date: formattedDate,
       main_order: orderCartData.article,
       delivery_m2: deliveryM2Full,
+      region: orderCartData?.region,
       products,
       dryMixes,
       anchors,
