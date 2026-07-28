@@ -225,6 +225,8 @@ const QualityManagementTable = () => {
       sorting,
     } = currentData;
 
+    console.log(currentData, 'currentData QualityManagementTable.jsx line 237');
+
     let newReservedQuantityAllocated;
     let newReservedQuantityRemaining;
     let newFreeQuantityFact;
@@ -400,6 +402,15 @@ const QualityManagementTable = () => {
     const product = latestProducts.find((el) => el.article == product_article);
     const warehouse_article = getWarehouseArticle(product, count);
 
+    console.log(
+      calculatedOrderedQuantity,
+      'calculatedOrderedQuantity QualityManagementTable.jsx line 447',
+    );
+    console.log(
+      remainingFreeQty,
+      'remainingFreeQty QualityManagementTable.jsx line 448',
+    );
+
     if (calculatedOrderedQuantity + remainingFreeQty > 0) {
       await dispatch(
         addNewWarehouse({
@@ -449,6 +460,11 @@ const QualityManagementTable = () => {
         );
       }
     }
+
+    console.log(
+      updatedReserves,
+      'updatedReserves QualityManagementTable.jsx line 506',
+    );
 
     // Обновляем все затронутые позиции в list_of_ordered_production
     for (const ordered_production of updatedReserves) {
