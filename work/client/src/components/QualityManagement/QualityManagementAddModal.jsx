@@ -219,7 +219,14 @@ function QualityManagementAddModal(props) {
     return warehouseArticle;
   };
 
-  const handlerAddProductionPlanEntry = useCallback((row) => {
+  useEffect(() => {
+    console.log(
+      list_of_ordered_production,
+      'list_of_ordered_production QualityManagementAddModal.jsx line 224',
+    );
+  }, [list_of_ordered_production]);
+
+  const handlerAddProductionPlanEntry = (row) => {
     // const prodPlanEntry = batchOutside.filter(
     //   (el) => el.id === row.original.id,
     // )[0];
@@ -341,7 +348,7 @@ function QualityManagementAddModal(props) {
     setCustomBatchSelectInput({});
 
     props.onHide();
-  }, []);
+  };
 
   // const handlerAddCustomBatchEntry = useCallback((row) => {
   //   const { batch_id, product_article, total_quantity_plan, reserved_quantity } =

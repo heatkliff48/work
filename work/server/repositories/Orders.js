@@ -1100,6 +1100,7 @@ class OrdersRepository {
     tools,
     relMats,
     delivery_m2,
+    region,
   }) {
     try {
       const childOrder = await Orders.create({
@@ -1113,6 +1114,7 @@ class OrdersRepository {
         status: 4,
         main_order,
         delivery_m2,
+        region,
       });
 
       const order_id = childOrder.id;
