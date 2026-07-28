@@ -3,12 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../redux/actions/userAction';
 import './Login.css';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import { useAutoclaveContext } from '#components/contexts/AutoclaveContext.js';
+import { useProjectContext } from '#components/contexts/Context.js';
+import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 
 function LoginForm() {
   const [formInput, setForm] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+
+  const { resetOrderState } = useOrderContext();
+  const { resetWarehouseState } = useWarehouseContext();
+  const { resetAutocalveState } = useAutoclaveContext();
+  const { resetProjectState } = useProjectContext();
+  const { resetProductTypeJState } = useProductsTypeJournalContext();
+  const { resetRecipeState } = useRecipeContext();
 
   useEffect(() => {
     if (user) {
@@ -22,6 +35,14 @@ function LoginForm() {
 
   const submitForm = async (e) => {
     e.preventDefault();
+
+    resetProjectState();
+    resetAutocalveState();
+    resetOrderState();
+    resetProductTypeJState();
+    resetRecipeState();
+    resetWarehouseState();
+
     dispatch(loginUser(formInput));
   };
 
