@@ -42,18 +42,13 @@ const QualityManagementTable = () => {
     warehouse_data,
   } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
-  const { raw_mat_consumption, list_of_recipes, recipeOrders } =
-    useRecipeContext();
+  const { raw_mat_consumption, list_of_recipes, recipeOrders } = useRecipeContext();
 
   const dispatch = useDispatch();
-  const qualityManagementData = useSelector(
-    (state) => state.qualityManagementData,
-  );
+  const qualityManagementData = useSelector((state) => state.qualityManagementData);
   const batchOutside = useSelector((state) => state.batchOutside);
 
-  const [qualityManagementDataList, setQualityManagementDataList] = useState(
-    [],
-  );
+  const [qualityManagementDataList, setQualityManagementDataList] = useState([]);
 
   const [consumptionCalculated, setConsumptionCalculated] = useState({});
   const [dateValue, setDateValue] = useState(null);
@@ -173,8 +168,7 @@ const QualityManagementTable = () => {
       setQualityManagementDataList(qualityManagementData);
       // Сначала находим density для заданного article
       const targetProduct = latestProducts.find(
-        (product) =>
-          product.article === qualityManagementData[0]?.product_article,
+        (product) => product.article === qualityManagementData[0]?.product_article,
       );
       const targetDensity = targetProduct?.density;
 
@@ -192,8 +186,7 @@ const QualityManagementTable = () => {
       // Инициализируем значения полей ввода для каждой записи
       const initialInputValues = {};
       qualityManagementData.forEach((item) => {
-        const totalQty =
-          item.reserved_quantity_allocated + item.free_quantity_fact;
+        const totalQty = item.reserved_quantity_allocated + item.free_quantity_fact;
         initialInputValues[item.id] = {
           totalQty: totalQty.toString(),
           sorting: item.sorting.toString(),
@@ -220,9 +213,7 @@ const QualityManagementTable = () => {
     const X = parseFloat(value);
     if (isNaN(X) || X < 0) return;
 
-    const currentData = qualityManagementData.find(
-      (item) => item.id === recordId,
-    );
+    const currentData = qualityManagementData.find((item) => item.id === recordId);
     if (!currentData) return;
 
     const {
@@ -282,9 +273,7 @@ const QualityManagementTable = () => {
     const sortingValue = parseFloat(value);
     if (isNaN(sortingValue) || sortingValue < 0) return;
 
-    const currentData = qualityManagementData.find(
-      (item) => item.id === recordId,
-    );
+    const currentData = qualityManagementData.find((item) => item.id === recordId);
     if (!currentData) return;
 
     const {
@@ -329,87 +318,54 @@ const QualityManagementTable = () => {
       id_ordered_product_to_warehouse,
     } = currentData;
 
-    // 1. Фильтруем резервы для текущего product_article
     const reservedProducts =
       list_of_ordered_production?.filter(
         (item) => item.product_article === product_article,
       ) || [];
 
-    // 2. Сколько осталось "свободного" количества
-    let remainingFreeQty = free_quantity_fact;
-    let summReserve = 0;
+    // Сколько из текущей партии нужно распределить по заказам
+    let remainingReservedQuantity = Math.max(
+      0,
+      Number(reserved_quantity_allocated) || 0,
+    );
 
-    // 3. Обходим каждый резерв и корректируем остатки
+    const initiallyReservedQuantity = remainingReservedQuantity;
+
     const updatedReserves = reservedProducts.map((reservedItem) => {
-      if (reservedItem.product_article !== product_article) {
-        return reservedItem;
-      }
+      const orderedQuantity = Math.max(0, Number(reservedItem.quantity) || 0);
 
-      if (remainingFreeQty <= 0) {
-        if (reservedItem.quantity == reservedItem.quantity_in_warehouse) {
-          return reservedItem;
-        } else if (reservedItem.quantity > reservedItem.quantity_in_warehouse) {
-          const newQuantityInWarehouse = Math.min(
-            reservedItem.quantity_in_warehouse + reserved_quantity_allocated,
-            reservedItem.quantity,
-          );
-          return {
-            ...reservedItem,
-            quantity_in_warehouse: newQuantityInWarehouse,
-          };
-        }
-      }
-
-      const deducted = Math.min(
-        Math.max(
-          0,
-          reservedItem.quantity -
-            reservedItem.quantity_in_warehouse -
-            reserved_quantity_allocated,
-        ),
-        remainingFreeQty,
+      const quantityInWarehouse = Math.max(
+        0,
+        Number(reservedItem.quantity_in_warehouse) || 0,
       );
 
-      remainingFreeQty -= deducted;
-      summReserve += deducted;
+      // Сколько ещё не хватает конкретной позиции
+      const remainingNeed = Math.max(0, orderedQuantity - quantityInWarehouse);
 
-      const baseQuantityInWarehouse = reservedItem.quantity_in_warehouse;
+      // Выделяем только часть общего резерва
+      const allocatedQuantity = Math.min(remainingNeed, remainingReservedQuantity);
 
-      // return production_plan_id
-      //   ? {
-      //       ...reservedItem,
-      //       quantity_in_warehouse:
-      //         baseQuantityInWarehouse + reserved_quantity_allocated + deducted,
-      //     }
-      //   : {
+      remainingReservedQuantity -= allocatedQuantity;
+
       return {
         ...reservedItem,
-        quantity_in_warehouse:
-          baseQuantityInWarehouse + reserved_quantity_allocated + deducted,
+        quantity_in_warehouse: quantityInWarehouse + allocatedQuantity,
       };
     });
 
-    // Проверки на корректность
-    if (reserved_quantity_allocated < 0) {
-      throw new Error(
-        `Ошибка в записи ${id}: reserved_quantity_allocated не может быть отрицательным.`,
-      );
-    }
+    // Сколько действительно распределили по заказам
+    const calculatedOrderedQuantity =
+      initiallyReservedQuantity - remainingReservedQuantity;
 
-    if (summReserve < 0) {
-      throw new Error(
-        `Ошибка в записи ${id}: summReserve не может быть отрицательным.`,
-      );
-    }
-
-    const calculatedOrderedQuantity = reserved_quantity_allocated + summReserve;
+    // Если резерв почему-то не удалось распределить,
+    // он становится свободной продукцией
+    const remainingFreeQty =
+      Math.max(0, Number(free_quantity_fact) || 0) + remainingReservedQuantity;
 
     // Добавляем на склад
     let totalQuantityForRawMatWarehouse = 0;
     totalQuantityForRawMatWarehouse +=
-      (calculatedOrderedQuantity ?? 0) +
-      (remainingFreeQty ?? 0) +
-      (sorting ?? 0);
+      (calculatedOrderedQuantity ?? 0) + (remainingFreeQty ?? 0) + (sorting ?? 0);
 
     const checkPallets = raw_materials_warehouse.some(
       (item) =>
@@ -500,13 +456,9 @@ const QualityManagementTable = () => {
     }
 
     if (production_plan_id) {
-      const batch = batchOutside.find(
-        (batch) => batch.id === production_plan_id,
-      );
+      const batch = batchOutside.find((batch) => batch.id === production_plan_id);
 
-      const productData = latestProducts.find(
-        (el) => el.article == product_article,
-      );
+      const productData = latestProducts.find((el) => el.article == product_article);
 
       if (productData) {
         const { m3InArray, volumeBlockOnPallet } = productData;
@@ -529,8 +481,7 @@ const QualityManagementTable = () => {
             batch_article: batch?.product_article || 'Unknown Batch',
             production_volume:
               Math.ceil(
-                (reserved_quantity_allocated + free_quantity_fact) /
-                  palletsPerArray,
+                (reserved_quantity_allocated + free_quantity_fact) / palletsPerArray,
               ) || 0,
             date: batch?.date || 'Unknown Date',
           }),
@@ -546,9 +497,7 @@ const QualityManagementTable = () => {
     );
 
     if (production_plan_id) {
-      const productData = latestProducts.find(
-        (el) => el.article == product_article,
-      );
+      const productData = latestProducts.find((el) => el.article == product_article);
 
       if (productData) {
         const { m3InArray, volumeBlockOnPallet } = productData;
@@ -657,10 +606,7 @@ const QualityManagementTable = () => {
           <div className="d-flex gap-4 flex-wrap align-items-end">
             {/* Поле ввода для Total Qty in batch, fact, pallets */}
             <div className="border rounded p-3 bg-light">
-              <Form.Label
-                htmlFor={`totalQtyInput-${record.id}`}
-                className="fw-bold"
-              >
+              <Form.Label htmlFor={`totalQtyInput-${record.id}`} className="fw-bold">
                 Total Qty in batch, fact, pallets
               </Form.Label>
               <Form.Control
@@ -677,10 +623,7 @@ const QualityManagementTable = () => {
 
             {/* Поле ввода для Quantity on sorting, pallets */}
             <div className="border rounded p-3 bg-light">
-              <Form.Label
-                htmlFor={`sortingInput-${record.id}`}
-                className="fw-bold"
-              >
+              <Form.Label htmlFor={`sortingInput-${record.id}`} className="fw-bold">
                 Quantity on sorting, pallets
               </Form.Label>
               <Form.Control
