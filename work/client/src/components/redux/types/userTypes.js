@@ -11,3 +11,5 @@ export const GET_CHECK_USER = 'GET_CHECK_USER';
 export const CHECK_USER = 'CHECK_USER';
 
 export const DATA_FETCHED = 'DATA_FETCHED';
+
+export const RESET_APP_STATE = 'RESET_APP_STATE';
