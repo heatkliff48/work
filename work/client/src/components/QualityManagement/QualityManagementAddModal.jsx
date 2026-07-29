@@ -188,9 +188,7 @@ function QualityManagementAddModal(props) {
   };
 
   const handleProductArticleSelectChange = (selectedOption, key) => {
-    const product = latestProducts.find(
-      (el) => el.article === selectedOption.value,
-    );
+    const product = latestProducts.find((el) => el.article === selectedOption.value);
     const warehouse_article = getWarehouseArticle(product);
 
     setCustomBatchSelectInput((prev) => ({
@@ -221,7 +219,14 @@ function QualityManagementAddModal(props) {
     return warehouseArticle;
   };
 
-  const handlerAddProductionPlanEntry = useCallback((row) => {
+  useEffect(() => {
+    console.log(
+      list_of_ordered_production,
+      'list_of_ordered_production QualityManagementAddModal.jsx line 224',
+    );
+  }, [list_of_ordered_production]);
+
+  const handlerAddProductionPlanEntry = (row) => {
     // const prodPlanEntry = batchOutside.filter(
     //   (el) => el.id === row.original.id,
     // )[0];
@@ -281,26 +286,54 @@ function QualityManagementAddModal(props) {
     );
 
     const warehouse_article = getWarehouseArticle(product);
-    const widthInArray = Math.floor(
-      product?.m3InArray / product?.volumeBlockOnPallet,
+
+    const widthInArray = Math.max(
+      1,
+      Math.floor(
+        Number(product?.m3InArray || 0) / Number(product?.volumeBlockOnPallet || 1),
+      ),
     );
+    
+    // Сколько палет планируется произвести в этой партии
+    const totalQuantityPlan =
+      (Number(rawMatConsEntry.production_volume) || 0) * widthInArray;
+
+    // Находим все незакрытые потребности по этому продукту
+    const remainingOrderQuantity = list_of_ordered_production
+      .filter((item) => item.product_article === rawMatConsEntry?.batch_article)
+      .reduce((sum, item) => {
+        const orderedQuantity = Number(item.quantity) || 0;
+        const quantityInWarehouse = Number(item.quantity_in_warehouse) || 0;
+
+        const remainingQuantity = Math.max(0, orderedQuantity - quantityInWarehouse);
+
+        return sum + remainingQuantity;
+      }, 0);
+
+    // Резервируем не больше:
+    // 1. чем нужно заказам;
+    // 2. чем планируется произвести в этой партии.
+    const reservedQuantity = Math.min(totalQuantityPlan, remainingOrderQuantity);
 
     dispatch(
       addNewQualityManagement({
         batch_id: warehouse_article,
         product_article: rawMatConsEntry?.batch_article,
-        total_quantity_plan: rawMatConsEntry.production_volume * widthInArray,
-        reserved_quantity: rawMatConsEntry.batch_quantity_pallets, // reservedProduct.quantity,
-        // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free,
+
+        total_quantity_plan: totalQuantityPlan,
+
+        reserved_quantity: reservedQuantity,
         reserved_quantity_allocated: 0,
-        reserved_quantity_remaining: 0, // reservedProduct.quantity,
-        // prodPlanEntry.quantity_pallets - prodPlanEntry.quantity_free - 0,
+        reserved_quantity_remaining: reservedQuantity,
+
         free_quantity_fact: 0,
         production_plan_id: null,
         raw_mat_cons_batch_id: rawMatConsEntry?.batch_id,
         sorting: 0,
+
         id_ordered_product_to_warehouse:
           rawMatConsEntry?.id_ordered_product_to_warehouse,
+
         date: rawMatConsEntry?.date,
       }),
     );
@@ -315,7 +348,7 @@ function QualityManagementAddModal(props) {
     setCustomBatchSelectInput({});
 
     props.onHide();
-  }, []);
+  };
 
   // const handlerAddCustomBatchEntry = useCallback((row) => {
   //   const { batch_id, product_article, total_quantity_plan, reserved_quantity } =
@@ -394,9 +427,7 @@ function QualityManagementAddModal(props) {
       dialogClassName="modal-auto-size"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Batch calendar
-        </Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">Batch calendar</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {customBatchSelect ? (
@@ -438,9 +469,7 @@ function QualityManagementAddModal(props) {
                             name={el.accessor}
                             type="text"
                             value={customBatchSelectInput[el.accessor] || ''}
-                            onChange={(e) =>
-                              handleCustomBatchSelectInputChange(e)
-                            }
+                            onChange={(e) => handleCustomBatchSelectInputChange(e)}
                           />
                         )}
                       </div>

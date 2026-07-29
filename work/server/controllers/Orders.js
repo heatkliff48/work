@@ -624,6 +624,7 @@ class OrdersController {
       tools,
       relMats,
       delivery_m2,
+      region,
     } = req.body;
 
     try {
@@ -642,6 +643,7 @@ class OrdersController {
         tools,
         relMats,
         delivery_m2,
+        region,
       });
 
       myEmitter.emit(ADD_CHILD_ORDER_SOCKET, childOrder);

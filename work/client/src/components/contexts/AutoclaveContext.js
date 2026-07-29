@@ -55,6 +55,13 @@ export const AutoclaveContextProvider = ({ children }) => {
     setAutoclaveCalendarData(autoclave_calendar);
   }, [autoclave_calendar]);
 
+  const resetAutocalveState = () => {
+    setAutoclave([]);
+    setInitialRowCount(0);
+    setSelectedCell(null);
+    setAutoclaveCalendarData(null);
+  };
+
   // ---------- Вспомогательные функции (копируем из старого Autoclave) ----------
   const toFlat = useCallback((rows) => {
     const flat = Array.isArray(rows) ? rows.flat() : [];
@@ -621,6 +628,7 @@ export const AutoclaveContextProvider = ({ children }) => {
       clearAutoclaves,
       onSaveHandler,
       CELLS_PER_AUTOCLAVE,
+      resetAutocalveState,
     }),
     [
       autoclave,
@@ -635,6 +643,7 @@ export const AutoclaveContextProvider = ({ children }) => {
       moveBatchLater,
       clearAutoclaves,
       onSaveHandler,
+      resetAutocalveState,
     ],
   );
 

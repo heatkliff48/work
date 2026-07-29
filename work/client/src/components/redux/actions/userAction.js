@@ -4,6 +4,7 @@ import {
   GET_CHECK_USER,
   GET_DEL_USER,
   GET_LOGIN_USER,
+  RESET_APP_STATE,
 } from '../types/userTypes';
 
 export const addUser = (user) => {
@@ -38,3 +39,7 @@ export const dataFetchedChange = (change) => {
     payload: change,
   };
 };
+
+export const resetAppState = () => ({
+  type: RESET_APP_STATE,
+});

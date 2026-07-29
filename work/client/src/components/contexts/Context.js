@@ -450,9 +450,7 @@ const ProjectContextProvider = ({ children }) => {
   const clientPriceInfo = useSelector((state) => state.contactPriceInfo);
   const production_quality = useSelector((state) => state.productionQuality);
   const dimensions_quality = useSelector((state) => state.qualityDimensions);
-  const compressions_quality = useSelector(
-    (state) => state.qualityCompressions,
-  );
+  const compressions_quality = useSelector((state) => state.qualityCompressions);
 
   const [currentContact, setCurrentContact] = useState();
   const [currentDelivery, setCurrentDelivery] = useState();
@@ -475,6 +473,26 @@ const ProjectContextProvider = ({ children }) => {
   const [currentUsersInfo, setCurrentUsersInfo] = useState({});
   const [usersInfoDataList, setUsersInfoDataList] = useState([]);
   const [productionBatchLogData, setProductionBatchLogData] = useState([]);
+
+  const resetProjectState = () => {
+    setCurrentContact();
+    setCurrentDelivery();
+    setPreviewProductData();
+    setPreviewOperationName('');
+    setVersion(1);
+    setRoleId(0);
+    setClientID(1);
+    setIsEdit(false);
+    setIsRepair(false);
+    setStayDefault(true);
+    setCackeFillUp({});
+    setCurrentClient({});
+    setClientsDataList({});
+    setProductCardData({});
+    setCurrentUsersInfo({});
+    setUsersInfoDataList({});
+    setProductionBatchLogData([]);
+  };
 
   const roleTable = [
     { id: 1, label: 'Production Manager' },
@@ -621,6 +639,7 @@ const ProjectContextProvider = ({ children }) => {
         dimensions_quality,
         compressions_quality,
         roleMap,
+        resetProjectState,
       }}
     >
       {children}

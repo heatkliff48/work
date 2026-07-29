@@ -355,6 +355,23 @@ const WarehouseContextProvider = ({ children }) => {
   const [wmoctProductDeltaForPdf, setWmoctProductDeltaForPdf] = useState([]);
   const [filteredWarehouseByProduct, setFilteredWarehouseByProduct] = useState([]);
 
+  const resetWarehouseState = () => {
+    setSelectedOrder(null);
+    setAldabaranNum(null);
+    setCurrentBatchId(0);
+    setQualityManagerChange(false);
+    setCurrentBatch();
+    setWmoctProduct();
+    setFilteredProducts();
+    setAdditionalInfoPDF({});
+    setCurrentOrderedProducts({});
+    setListOfOrderedCakes([]);
+    setWmoctProductShippedBD([]);
+    setListOfOrderedAuxilary([]);
+    setWmoctProductDeltaForPdf([]);
+    setFilteredWarehouseByProduct([]);
+  };
+
   const batchOutside = useSelector((state) => state.batchOutside);
   const list_of_orders = useSelector((state) => state.orders);
   const productsOfOrders = useSelector((state) => state.productsOfOrders);
@@ -1356,6 +1373,7 @@ const WarehouseContextProvider = ({ children }) => {
         warehouse_sand_slurry,
         order_dispatch_data,
         normalizeProductType,
+        resetWarehouseState,
       }}
     >
       {children}
