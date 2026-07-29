@@ -1638,54 +1638,69 @@ const OrderCart = React.memo(() => {
                   </div>
                 )}
                 <div className="ord-steps">
-                  {status_list.map((item, idx) => {
-                    const isDone = item.accessor < orderCartData?.status;
-                    const isCurrent = item.accessor === orderCartData?.status;
-                    return (
-                      <div key={item.accessor} className="ord-step">
-                        <div className="ord-step__rail">
-                          <input
-                            id={item.accessor}
-                            type="checkbox"
-                            className={
-                              'ord-step__checkbox' +
-                              (isDone ? ' ord-step__checkbox--done' : '') +
-                              (isCurrent ? ' ord-step__checkbox--current' : '')
-                            }
-                            checked={item.accessor === orderCartData?.status}
-                            onChange={() => {
-                              statusChangeHandler(item);
-                            }}
-                            disabled={
-                              !orderStatusAccess?.canWrite ||
-                              item?.accessor == 7 ||
-                              item?.accessor == 9
-                            } //
-                          />
-                          {idx < status_list.length - 1 && (
-                            <div
-                              className={
-                                'ord-step__line' +
-                                (isDone ? ' ord-step__line--done' : '')
-                              }
-                            />
-                          )}
-                        </div>
-                        <div
-                          className={
-                            'ord-step__label' +
-                            (isCurrent
-                              ? ' ord-step__label--current'
-                              : isDone
-                                ? ' ord-step__label--done'
-                                : '')
-                          }
-                        >
-                          {item.Header}
-                        </div>
-                      </div>
+                  {(() => {
+                    const currentStatusIndex = status_list.findIndex(
+                      (item) => item.accessor === orderCartData?.status,
                     );
-                  })}
+                    return status_list.map((item, idx) => {
+                      const isDone = item.accessor < orderCartData?.status;
+                      const isCurrent =
+                        item.accessor === orderCartData?.status;
+                      const isDisabled =
+                        !orderStatusAccess?.canWrite ||
+                        item?.accessor == 7 ||
+                        item?.accessor == 9;
+                      const isNext =
+                        currentStatusIndex !== -1 &&
+                        idx === currentStatusIndex + 1 &&
+                        !isDisabled;
+                      return (
+                        <div key={item.accessor} className="ord-step">
+                          <div className="ord-step__rail">
+                            <input
+                              id={item.accessor}
+                              type="checkbox"
+                              className={
+                                'ord-step__checkbox' +
+                                (isDone ? ' ord-step__checkbox--done' : '') +
+                                (isCurrent
+                                  ? ' ord-step__checkbox--current'
+                                  : '') +
+                                (isNext ? ' ord-step__checkbox--next' : '')
+                              }
+                              checked={item.accessor === orderCartData?.status}
+                              onChange={() => {
+                                statusChangeHandler(item);
+                              }}
+                              disabled={isDisabled} //
+                            />
+                            {idx < status_list.length - 1 && (
+                              <div
+                                className={
+                                  'ord-step__line' +
+                                  (isDone ? ' ord-step__line--done' : '')
+                                }
+                              />
+                            )}
+                          </div>
+                          <div
+                            className={
+                              'ord-step__label' +
+                              (isCurrent
+                                ? ' ord-step__label--current'
+                                : isDone
+                                  ? ' ord-step__label--done'
+                                  : isNext
+                                    ? ' ord-step__label--next'
+                                    : '')
+                            }
+                          >
+                            {item.Header}
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             )}
