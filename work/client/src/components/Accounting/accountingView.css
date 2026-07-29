@@ -1,0 +1,157 @@
+/* =====================================================================
+   Accounting module — view styles (BAUBLOCK ERP design reference)
+   Только внешний вид. Логика данных/бизнес-правила не затрагиваются.
+   ===================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
+
+:root {
+  --acc-red: #bc1212;
+  --acc-red-hover: #a50f0f;
+  --acc-red-soft: #fbe9e9;
+  --acc-bg: #fafafb;
+  --acc-card: #ffffff;
+  --acc-border: #e4e6eb;
+  --acc-border-2: #dee1e6;
+  --acc-border-3: #eef0f3;
+  --acc-divider: #f0f1f4;
+  --acc-text: #171a1f;
+  --acc-text-2: #565d6d;
+  --acc-text-3: #3a3f4b;
+  --acc-muted: #9aa0ac;
+  --acc-shadow-card: 0 1px 2px rgba(20, 23, 33, 0.04), 0 6px 18px rgba(20, 23, 33, 0.03);
+  --acc-mono: 'Roboto Mono', monospace;
+}
+
+/* ---------- page shell (list) ---------- */
+.acc-page {
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--acc-text);
+  padding: 26px 36px 48px;
+}
+.acc-page__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.acc-page__eyebrow {
+  font-size: 13px;
+  color: var(--acc-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.acc-page__title {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--acc-text);
+}
+.acc-page__stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.acc-stat {
+  text-align: right;
+}
+.acc-stat__num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--acc-text);
+  line-height: 1;
+}
+.acc-stat__label {
+  font-size: 11.5px;
+  color: var(--acc-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-top: 3px;
+}
+
+/* ---------- toolbar ---------- */
+.acc-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.acc-search {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+}
+.acc-search__ic {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.acc-search__input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--acc-border-2);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 14px 0 38px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--acc-text);
+  outline: none;
+  box-sizing: border-box;
+}
+.acc-search__input:focus {
+  border-color: var(--acc-red);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+.acc-select {
+  height: 42px;
+  border: 1px solid var(--acc-border-2);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--acc-text);
+  cursor: pointer;
+  outline: none;
+  min-width: 190px;
+}
+.acc-toolbar__spacer {
+  flex: 1;
+}
+
+/* ---------- order-card (detail) page shell ---------- */
+.acc-card {
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--acc-text);
+  padding: 22px 36px 60px;
+}
+
+/* ---------- 3-up info tiles (Client / Contact / Delivery) ----------
+   .ord-tile supplies background/border/radius/padding (reused as-is);
+   this just lays 3 of them out in one row, wrapping on narrow screens
+   — .ord-tiles from Orders is a fixed 2-col grid (built for 4 tiles),
+   which isn't a 3-up row, so we mirror WMOrderCard's .wm-tiles instead. */
+.acc-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.acc-tiles .ord-tile {
+  flex: 1 1 260px;
+}
+
+@media (max-width: 560px) {
+  .acc-page,
+  .acc-card {
+    padding: 18px 16px 36px;
+  }
+}

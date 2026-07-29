@@ -218,57 +218,66 @@ const FacturaTable = ({ product_list, orderCartData }) => {
   ]);
 
   return (
-    <div className="overflow-auto">
-      <table className="table-auto border border-gray-300 w-full">
-        <thead className="bg-gray-100">
+    <table className="ord-prod-table">
+      <thead>
+        <tr>
+          <th>Product article</th>
+          <th>Qty total, pallet</th>
+          <th>Qty shipped, pallet</th>
+          <th>Qty remaining, pallet</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Array.isArray(wmoctProduct) && wmoctProduct.length > 0 ? (
+          wmoctProduct.map((product) => (
+            <tr key={product.article}>
+              <td>
+                <span className="ord-mono">{product.article}</span>
+              </td>
+              <td>{product.qty_total}</td>
+              <td>{product.shipped}</td>
+              <td
+                className={
+                  product.qty_rem > 0 ? 'fac-qty-rem--pending' : undefined
+                }
+              >
+                {product.qty_rem}
+              </td>
+              {/* {product.batches?.length > 0 ? (
+                <>
+                  <td className="border p-1">
+                    {product.batches[0]?.batchId}
+                  </td>
+                  <td className="border p-1">
+                    {product.batches[0]?.remainingInBatch}
+                  </td>
+                  <td className="border p-1">
+                    {product.batches[0]?.allocated}
+                  </td>
+                </>
+              ) : (
+                <></>
+              )} */}
+            </tr>
+          ))
+        ) : (
           <tr>
-            <th className="border px-2">Product article</th>
-            <th className="border px-2">Qty total, pallet</th>
-            <th className="border px-2">Qty shipped, pallet</th>
-            <th className="border px-2">Qty remaining, pallet</th>
+            <td colSpan={4} className="ord-empty-products">
+              No products dispatched on this trailer.
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {wmoctProduct?.map((product, productIndex) => (
-            <>
-              {/* Основная строка продукта */}
-              <tr key={product.article}>
-                <td className="border p-1" style={{ width: '25%' }}>
-                  {product.article}
-                </td>
-                <td className="border p-1">{product.qty_total}</td>
-                <td className="border p-1">{product.shipped}</td>
-                <td className="border p-1">{product.qty_rem}</td>
-                {/* {product.batches?.length > 0 ? (
-                  <>
-                    <td className="border p-1">
-                      {product.batches[0]?.batchId}
-                    </td>
-                    <td className="border p-1">
-                      {product.batches[0]?.remainingInBatch}
-                    </td>
-                    <td className="border p-1">
-                      {product.batches[0]?.allocated}
-                    </td>
-                  </>
-                ) : (
-                  <></>
-                )} */}
-              </tr>
-              {/* Дополнительные строки для батчей */}
-              {/* {product.batches?.slice(1).map((batch, batchIndex) => (
-                <tr key={`${product.article}__${batch.batchId}`}>
-                  <td className="border p-1"></td>
-                  <td className="border p-1"></td>
-                  <td className="border p-1"></td>
-                  <td className="border p-1"></td>
-                </tr>
-              ))} */}
-            </>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        )}
+        {/* Дополнительные строки для батчей */}
+        {/* {product.batches?.slice(1).map((batch, batchIndex) => (
+          <tr key={`${product.article}__${batch.batchId}`}>
+            <td className="border p-1"></td>
+            <td className="border p-1"></td>
+            <td className="border p-1"></td>
+            <td className="border p-1"></td>
+          </tr>
+        ))} */}
+      </tbody>
+    </table>
   );
 };
 
