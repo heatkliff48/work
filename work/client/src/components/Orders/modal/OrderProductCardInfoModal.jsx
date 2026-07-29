@@ -237,6 +237,15 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
         total: result,
       }));
       return result;
+    } else if (selectedProduct.article.slice(2, 3) == 'N') {
+      const result =
+        quantity_palet_value * selectedProduct?.quantityBlockOnPallet;
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        total: result.toFixed(2),
+      }));
+      return result.toFixed(2);
     } else {
       const result = quantity_palet_value * selectedProduct?.units_per_pallet;
 
@@ -249,6 +258,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   }, [
     quantity_palet_value,
     selectedProduct?.units_per_pallet,
+    selectedProduct?.quantityBlockOnPallet,
     productOfOrder?.quantity_palet_anchor,
     productOfOrder?.quantity_ud,
     selectedProduct?.piece_weight,

@@ -870,9 +870,14 @@ const OrderCart = React.memo(() => {
 
   const deleteHandler = (product) => {
     const res_prod = list_of_reserved_products.find(
-      (el) => el.id === product.id,
+      (el) => el.orders_products_id === product.id,
     );
-    if (res_prod) alert('Этот продукт зарервировван на складе');
+    if (res_prod) {
+      const confirmed = window.confirm(
+        'Этот продукт зарезервирован на складе. Всё равно удалить?',
+      );
+      if (!confirmed) return;
+    }
     if (product?.product_article.charAt(0) === 'T') {
       dispatch(getDeleteProductOfOrder(product?.id));
     } else if (product?.product_article.charAt(2) === 'M') {
