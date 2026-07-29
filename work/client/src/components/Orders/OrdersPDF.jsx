@@ -23,7 +23,6 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
   const { dryMixesJournal, anchor, tool, relatedMaterialsJournal } =
     useProductsTypeJournalContext();
 
-  const [pdfUrl, setPdfUrl] = useState(null);
   const [pdfData, setPdfData] = useState({});
 
   // DEAL_ID и UF_NUMBER_OFFER — заполняются менеджером и хранятся в БД заказа
@@ -291,11 +290,6 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         maxWidth: 190,
       });
 
-      // Генерация PDF URL
-      const pdfBlob = doc.output('blob');
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      setPdfUrl(pdfUrl);
-
       return doc;
     } catch (error) {
       console.error('❌ Ошибка загрузки изображения:', error);
@@ -512,13 +506,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       delivery,
       footer,
     });
-
-    setPdfUrl(null); // Сбрасываем предыдущий PDF
   }, [orderData, productList]);
-
-  useEffect(() => {
-    generatePDF();
-  }, [pdfData]);
 
   const downloadPDF = async () => {
     const doc = await generatePDF();
@@ -585,24 +573,22 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         />
       </div>
 
-      {pdfUrl && (
-        <div className="ord-pdf-actions">
-          <button
-            type="button"
-            className="ord-btn ord-btn--primary ord-btn--sm"
-            onClick={downloadPDF}
-          >
-            Download PDF
-          </button>
-          <button
-            type="button"
-            className="ord-btn ord-btn--ghost ord-btn--sm"
-            onClick={sendToBitrix}
-          >
-            Send to Bitrix24
-          </button>
-        </div>
-      )}
+      <div className="ord-pdf-actions">
+        <button
+          type="button"
+          className="ord-btn ord-btn--primary ord-btn--sm"
+          onClick={downloadPDF}
+        >
+          Download PDF
+        </button>
+        <button
+          type="button"
+          className="ord-btn ord-btn--ghost ord-btn--sm"
+          onClick={sendToBitrix}
+        >
+          Send to Bitrix24
+        </button>
+      </div>
     </div>
   );
 };
