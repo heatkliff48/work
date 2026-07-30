@@ -170,6 +170,7 @@ const {
   ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+  UPDATE_PAYMENT_METHOD_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -403,6 +404,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_PERSON_IN_CHARGE_OF_ORDER_SOCKET,
           payload: person_in_charge,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_PAYMENT_METHOD_SOCKET, (payment_method) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_PAYMENT_METHOD_SOCKET,
+          payload: payment_method,
         }),
       );
     }
@@ -1519,16 +1531,19 @@ function registerWsEmitter(map) {
     }
   });
 
-  myEmitter.on(CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET, (wh_trailer_status) => {
-    for (let [id, userConnect] of map) {
-      userConnect.send(
-        JSON.stringify({
-          type: CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
-          payload: wh_trailer_status,
-        }),
-      );
-    }
-  });
+  myEmitter.on(
+    CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+    (wh_trailer_status) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+            payload: wh_trailer_status,
+          }),
+        );
+      }
+    },
+  );
 
   myEmitter.on(DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET, (wh_trailer) => {
     for (let [id, userConnect] of map) {

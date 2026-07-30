@@ -15,6 +15,7 @@ class OrdersService {
     status,
     person_in_charge,
     region,
+    payment_method,
   }) {
     const newOrder = await OrdersRepository.addNewOrderData({
       article,
@@ -24,6 +25,7 @@ class OrdersService {
       status,
       person_in_charge,
       region,
+      payment_method,
     });
 
     return newOrder;
@@ -256,6 +258,15 @@ class OrdersService {
   static async getUpdateInChargeOrder({ person_in_charge, order_id }) {
     await OrdersRepository.getUpdateInChargeOrder({
       person_in_charge,
+      order_id,
+    });
+
+    return;
+  }
+
+  static async getUpdatePaymentOrder({ payment_method, order_id }) {
+    await OrdersRepository.getUpdatePaymentOrder({
+      payment_method,
       order_id,
     });
 

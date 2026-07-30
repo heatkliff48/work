@@ -385,6 +385,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       main_order: orderCartData.article,
       delivery_m2: deliveryM2Full,
       region: orderCartData?.region,
+      payment_method: orderCartData?.payment_method,
       products,
       dryMixes,
       anchors,

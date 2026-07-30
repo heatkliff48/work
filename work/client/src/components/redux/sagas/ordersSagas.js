@@ -73,6 +73,8 @@ import {
   ADD_RANDOM_PRODUCTS_OF_ORDER,
   RANDOM_PRODUCTS_OF_ORDER,
   ADD_CHILD_ORDER,
+  PAYMENT_METHOD,
+  UPDATE_PAYMENT_METHOD,
 } from '../types/ordersTypes';
 
 import { getApiUrl } from '#utils/getApiUrl.js';
@@ -469,6 +471,18 @@ const updateStatusOfOrder = (orderStatus) => {
 const updateInChargeOfOrder = (orderInCharge) => {
   return url
     .post('/orders/update/in_charge', orderInCharge)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updatePayment = (payment_method) => {
+  return url
+    .post('/orders/update/payment_method', payment_method)
     .then((res) => {
       return res.data;
     })
@@ -916,6 +930,16 @@ function* updateInChargeOfOrderWorker(action) {
   }
 }
 
+function* updatePaymentWorker(action) {
+  try {
+    const { payload } = action;
+    const status = yield call(updatePayment, payload);
+    yield put({ type: PAYMENT_METHOD, payload: status });
+  } catch (err) {
+    yield put({ type: PAYMENT_METHOD, payload: [] });
+  }
+}
+
 function* addOrderRandomProductsWorker(action) {
   try {
     const { payload } = action;
@@ -1025,6 +1049,7 @@ function* ordersWatcher() {
     UPDATE_PERSON_IN_CHARGE_OF_ORDER,
     updateInChargeOfOrderWorker,
   );
+  yield takeLatest(UPDATE_PAYMENT_METHOD, updatePaymentWorker);
   yield takeLatest(ADD_RANDOM_PRODUCTS_OF_ORDER, addOrderRandomProductsWorker);
   yield takeLatest(ADD_CHILD_ORDER, addChildOrderWatcher);
 }

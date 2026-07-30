@@ -29,6 +29,7 @@ const {
   GET_UPDATE_ADRESS_OF_ORDER_SOCKET,
   GET_DELETE_ORDER_SOCKET,
   ADD_CHILD_ORDER_SOCKET,
+  UPDATE_PAYMENT_METHOD_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -51,6 +52,7 @@ class OrdersController {
       status,
       person_in_charge,
       region,
+      payment_method,
     } = req.body.order;
 
     try {
@@ -62,6 +64,7 @@ class OrdersController {
         status,
         person_in_charge,
         region,
+        payment_method,
       });
 
       myEmitter.emit(ADD_NEW_ORDER_SOCKET, newOrder);
@@ -592,6 +595,26 @@ class OrdersController {
     }
   }
 
+  static async getUpdatePaymentOrder(req, res) {
+    const { payment_method, order_id } = req.body;
+
+    try {
+      await OrdersService.getUpdatePaymentOrder({
+        payment_method,
+        order_id,
+      });
+
+      myEmitter.emit(UPDATE_PAYMENT_METHOD_SOCKET, {
+        payment_method,
+        order_id,
+      });
+
+      return res.json({ payment_method, order_id }).status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async getDeleteOrder(req, res) {
     const { order_id } = req.body;
 
@@ -625,6 +648,7 @@ class OrdersController {
       relMats,
       delivery_m2,
       region,
+      payment_method,
     } = req.body;
 
     try {
@@ -644,6 +668,7 @@ class OrdersController {
         relMats,
         delivery_m2,
         region,
+        payment_method,
       });
 
       myEmitter.emit(ADD_CHILD_ORDER_SOCKET, childOrder);
