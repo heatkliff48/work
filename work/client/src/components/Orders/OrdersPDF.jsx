@@ -47,9 +47,60 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
     const doc = new jsPDF('p', 'mm', 'a4');
 
+    console.log('pdfData OrdersPDF.jsx line 52', pdfData);
     try {
       const img = await loadImage();
       const pageWidth = doc.internal.pageSize.getWidth(); // Ширина страницы
+      const fullTableWidth = pageWidth - 20;
+
+      const baseTableOptions = {
+        margin: {
+          left: 10,
+          right: 10,
+        },
+
+        // Таблица занимает ту же ширину,
+        // что таблица с клиентом и таблица итогов
+        tableWidth: fullTableWidth,
+
+        theme: 'grid',
+
+        // Внешняя рамка таблицы
+        tableLineColor: [0, 0, 0],
+        tableLineWidth: 0.3,
+
+        styles: {
+          fontSize: 6,
+
+          // Белый фон и чёрный текст
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+
+          // Чёрные границы ячеек
+          lineColor: [0, 0, 0],
+          lineWidth: 0.2,
+
+          cellPadding: {
+            top: 1.2,
+            right: 1,
+            bottom: 1.2,
+            left: 1,
+          },
+
+          valign: 'middle',
+          overflow: 'linebreak',
+        },
+
+        bodyStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+        },
+
+        // Убираем серое чередование строк
+        alternateRowStyles: {
+          fillColor: [255, 255, 255],
+        },
+      };
       const imgWidth = pageWidth - 20; // Отступы 10 мм слева и справа
       const imgHeight = (imgWidth * img.height) / img.width; // Пропорциональная высота
 
@@ -58,22 +109,67 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       // Смещаем начало текста на высоту изображения + отступ
       let yPosition = 10 + imgHeight + 10; // 10 мм отступ после картинки
 
-      // Основные данные заказа
-      doc.setFontSize(10);
-      doc.text(`Ref.: ${pdfData.ref}`, 10, yPosition);
-      doc.text(`Cliente: ${pdfData.client}`, 10, yPosition + 10);
-      doc.text(`CIF: ${pdfData?.cif_vat ?? pdfData?.cif}`, 10, yPosition + 20);
-      doc.text(`Dirección: ${pdfData.address}`, 10, yPosition + 30);
+      // Таблица с информацией о заказе и клиенте
+      autoTable(doc, {
+        startY: 10 + imgHeight + 4,
+        margin: {
+          left: 10,
+          right: 10,
+        },
 
-      doc.text(`Contacto: ${pdfData.contact}`, 120, yPosition);
-      doc.text(`Email: ${pdfData.email}`, 120, yPosition + 10);
-      doc.text(`Teléfono: ${pdfData.phone}`, 120, yPosition + 20);
-      doc.text(`Válido hasta: ${pdfData.validUntil}`, 120, yPosition + 30);
+        body: [
+          ['Ref.:', pdfData.ref, 'Contacto:', pdfData.contact],
+          ['Cliente:', pdfData.client, 'Mail contacto:', pdfData.email],
+          ['CIF', pdfData.cif_vat ?? pdfData.cif, 'Teléfono:', pdfData.phone],
+          ['Dirección:', pdfData.address, 'Válido hasta:', pdfData.validUntil],
+        ],
 
+        theme: 'grid',
+
+        styles: {
+          fontSize: 8,
+          textColor: [0, 0, 0],
+          lineColor: [0, 0, 0],
+          lineWidth: 0.25,
+          cellPadding: {
+            top: 1.3,
+            right: 1.5,
+            bottom: 1.3,
+            left: 1.5,
+          },
+          valign: 'middle',
+        },
+
+        columnStyles: {
+          0: {
+            cellWidth: 18,
+            halign: 'left',
+            fontStyle: 'normal',
+          },
+          1: {
+            cellWidth: 82,
+            halign: 'center',
+          },
+          2: {
+            cellWidth: 24,
+            halign: 'left',
+            fontStyle: 'normal',
+          },
+          3: {
+            cellWidth: 66,
+            halign: 'center',
+          },
+        },
+      });
+
+      const infoTableEndY = doc.lastAutoTable.finalY;
       // Таблица с товарами (начинается ниже текста)
       if (pdfData.pdfProducts?.length) {
         autoTable(doc, {
-          startY: yPosition + 40, // Отступ от информации о заказе
+          ...baseTableOptions,
+
+          startY: infoTableEndY,
+
           head: [
             [
               'Ref.:',
@@ -90,7 +186,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
               'Subtotal €',
             ],
           ],
-          body: pdfData.pdfProducts?.map((item) => [
+
+          body: pdfData.pdfProducts.map((item) => [
             item.ref,
             item.descripcion,
             item.medición_de_proyecto,
@@ -104,21 +201,25 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
             item.pvp_neto_ud,
             item.subtotal,
           ]),
-          styles: {
-            fontSize: 6,
-          },
+
           headStyles: {
-            textColor: 'white',
-            fillColor: [255, 0, 0], // ярко-красный фон
+            fillColor: [255, 0, 0],
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            lineColor: [0, 0, 0],
+            lineWidth: 0.2,
+            halign: 'center',
+            valign: 'middle',
           },
         });
       }
 
       if (pdfData.pdfDryMixes?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable
-            ? doc.lastAutoTable.finalY + 10
-            : yPosition + 50, // Отступ от информации о заказе
+          ...baseTableOptions,
+
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY : infoTableEndY,
+
           head: [
             [
               'Ref.:',
@@ -132,7 +233,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
               'Subtotal €',
             ],
           ],
-          body: pdfData.pdfDryMixes?.map((item) => [
+
+          body: pdfData.pdfDryMixes.map((item) => [
             item.ref,
             item.descripcion,
             item.medición_de_proyecto,
@@ -143,19 +245,24 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
             item.pvp_neto_ud,
             item.subtotal,
           ]),
-          styles: { fontSize: 6 },
+
           headStyles: {
-            textColor: 'white',
-            fillColor: [255, 0, 0], // ярко-красный фон
+            fillColor: [255, 0, 0],
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            lineColor: [0, 0, 0],
+            lineWidth: 0.2,
+            halign: 'center',
           },
         });
       }
 
       if (pdfData.pdfAnchor?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable
-            ? doc.lastAutoTable.finalY + 10
-            : yPosition + 50, // Отступ от информации о заказе
+          ...baseTableOptions,
+
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+
           head: [
             [
               'Ref.:',
@@ -190,17 +297,10 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfTools?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable
-            ? doc.lastAutoTable.finalY + 10
-            : yPosition + 50, // Отступ от информации о заказе
+          ...baseTableOptions,
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
           head: [
-            [
-              'Ref.:',
-              'Descripción',
-              'Total, Ud',
-              'PVP neto €/Ud',
-              'Subtotal €',
-            ],
+            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
           ],
           body: pdfData.pdfTools?.map((item) => [
             item.ref,
@@ -219,17 +319,10 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       if (pdfData.pdfRelMat?.length) {
         autoTable(doc, {
-          startY: doc.lastAutoTable
-            ? doc.lastAutoTable.finalY + 10
-            : yPosition + 50, // Отступ от информации о заказе
+          ...baseTableOptions,
+          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
           head: [
-            [
-              'Ref.:',
-              'Descripción',
-              'Total, Ud',
-              'PVP neto €/Ud',
-              'Subtotal €',
-            ],
+            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
           ],
           body: pdfData.pdfRelMat?.map((item) => [
             item.ref,
@@ -246,49 +339,354 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         });
       }
 
-      const deliveryY = doc.lastAutoTable
-        ? doc.lastAutoTable.finalY + 10
-        : yPosition + 50;
-      const deliveryText = `Delivery price: ${pdfData.delivery}`;
+      // Преобразование значения в число
+      const toNumber = (value) => {
+        if (value === null || value === undefined || value === '') {
+          return 0;
+        }
 
-      // Настройки текста
-      doc.setFontSize(6);
-      doc.setFont(undefined, 'normal');
+        const number = Number(value);
 
-      // Размер текста (чтобы точно подобрать ширину прямоугольника)
-      const textWidth = doc.getTextWidth(deliveryText);
-      const padding = 2; // небольшой отступ внутри "фона"
+        return Number.isFinite(number) ? number : 0;
+      };
 
-      // Рисуем прямоугольник-фон
-      doc.setFillColor(255, 0, 0); // красный
-      doc.rect(176 - padding, deliveryY - 4.5, textWidth + 2 * padding, 6, 'F');
+      // Форматирование денежного значения
+      const formatMoney = (value) => {
+        return toNumber(value).toLocaleString('es-ES', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      };
 
-      // Рисуем текст
-      doc.setTextColor(255, 255, 255); // белый
-      doc.text(deliveryText, 176, deliveryY);
+      const deliveryPrice = toNumber(pdfData.delivery);
 
-      const startY = doc.lastAutoTable
-        ? doc.lastAutoTable.finalY + 20
+      // Считаем, что доставка указана, только если цена больше нуля
+      const hasDelivery = deliveryPrice > 0;
+
+      // TOTAL — сумма товаров без НДС и без доставки
+      const totalWithoutVat = toNumber(vatValue?.vat_euro_origin);
+
+      // BASE — товары + доставка
+      const baseDisponible = totalWithoutVat + (hasDelivery ? deliveryPrice : 0);
+
+      // IVA
+      const ivaAmount = toNumber(vatValue?.vat_euro);
+
+      // Итоговая сумма
+      const totalPresupuesto = baseDisponible + ivaAmount;
+
+      // Показываем только одну из двух жёлтых строк
+      const transportText = hasDelivery
+        ? 'Transporte incluido (sin descarga) - Trailer con descarga lateral de 13,6m de 24tn'
+        : 'Transporte no está incluido en precio';
+
+      const summaryStartY = doc.lastAutoTable
+        ? doc.lastAutoTable.finalY + 5
         : yPosition + 50;
 
       autoTable(doc, {
-        startY,
-        head: [['Condiciones Generales de Compraventa']],
-        body: [[pdfData.terms]],
-        styles: { fontSize: 9, cellWidth: 'wrap' },
-        headStyles: {
-          textColor: 'white',
-          fillColor: [255, 0, 0], // ярко-красный фон
+        ...baseTableOptions,
+        startY: summaryStartY,
+
+        margin: {
+          left: 10,
+          right: 10,
         },
 
-        columnStyles: { 0: { cellWidth: 180 } },
+        theme: 'grid',
+
+        body: [
+          [
+            {
+              content: 'TOTAL:',
+              colSpan: 3,
+              styles: {
+                fillColor: [255, 0, 0],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                halign: 'right',
+              },
+            },
+            {
+              content: formatMoney(totalWithoutVat),
+              styles: {
+                fillColor: [245, 232, 220],
+                textColor: [0, 0, 0],
+                halign: 'right',
+              },
+            },
+          ],
+
+          [
+            {
+              content: transportText,
+              colSpan: 4,
+              styles: {
+                fillColor: [255, 255, 0],
+                textColor: [0, 0, 0],
+                fontStyle: 'bolditalic',
+                halign: hasDelivery ? 'left' : 'center',
+              },
+            },
+          ],
+
+          [
+            {
+              content: '',
+              colSpan: 2,
+            },
+            {
+              content: 'BASE DISPONIBLE:',
+              styles: {
+                fontStyle: 'bold',
+                halign: 'right',
+              },
+            },
+            {
+              content: formatMoney(baseDisponible),
+              styles: {
+                halign: 'right',
+              },
+            },
+          ],
+
+          [
+            {
+              content: '',
+              colSpan: 2,
+            },
+            {
+              content: 'IVA 21%:',
+              styles: {
+                fontStyle: 'bold',
+                halign: 'right',
+              },
+            },
+            {
+              content: formatMoney(ivaAmount),
+              styles: {
+                halign: 'right',
+              },
+            },
+          ],
+
+          [
+            {
+              content: '',
+              colSpan: 2,
+            },
+            {
+              content: 'TOTAL PRESUPUESTO:',
+              styles: {
+                fontStyle: 'bold',
+                halign: 'right',
+              },
+            },
+            {
+              content: formatMoney(totalPresupuesto),
+              styles: {
+                fontStyle: 'bold',
+                halign: 'right',
+              },
+            },
+          ],
+
+          [
+            {
+              content: 'CUENTA CORRIENTE: ES3701823240000201897538',
+              colSpan: 4,
+              styles: {
+                halign: 'left',
+              },
+            },
+          ],
+        ],
+
+        styles: {
+          fontSize: 8,
+          textColor: [0, 0, 0],
+          lineColor: [0, 0, 0],
+          lineWidth: 0.2,
+          cellPadding: {
+            top: 1.4,
+            right: 1.5,
+            bottom: 1.4,
+            left: 1.5,
+          },
+          valign: 'middle',
+        },
+
+        columnStyles: {
+          0: {
+            cellWidth: 70,
+          },
+          1: {
+            cellWidth: 50,
+          },
+          2: {
+            cellWidth: 45,
+          },
+          3: {
+            cellWidth: 25,
+          },
+        },
       });
 
-      // Добавляем футер внизу страницы
-      doc.setFontSize(8);
-      doc.text(pdfData.footer, 10, doc.internal.pageSize.getHeight() - 10, {
-        maxWidth: 190,
+      // Пока оставляем заглушки.
+      // Позже подставим сюда конкретные поля из orderData.
+      const deliveryTerm = pdfData.address || '[completar]';
+      const paymentMethod = pdfData.payment_method || '[completar]';
+
+      const particularConditionsText = [
+        'Las partes acuerdan de forma expresa las siguientes condiciones aplicables al presente Presupuesto/Pedido:',
+        `Plazo de entrega: ${deliveryTerm}`,
+        `Forma de pago: ${paymentMethod}`,
+        'Los importes reflejados en este presupuesto se calculan conforme a las condiciones económicas vigentes en la fecha de emisión. Cualquier incremento excepcional y acreditado en el coste del combustible que afecte de forma directa a la ejecución del servicio dará lugar a una revisión del precio, previa notificación.',
+        'Otros:',
+      ].join('\n');
+
+      const particularConditionsStartY = doc.lastAutoTable
+        ? doc.lastAutoTable.finalY
+        : yPosition + 50;
+
+      autoTable(doc, {
+        ...baseTableOptions,
+        startY: particularConditionsStartY,
+
+        margin: {
+          left: 10,
+          right: 10,
+        },
+
+        pageBreak: 'avoid',
+        theme: 'grid',
+
+        head: [
+          [
+            {
+              content: 'CONDICIONES PARTICULARES DE VENTA',
+              styles: {
+                halign: 'center',
+              },
+            },
+          ],
+        ],
+
+        body: [
+          [
+            {
+              content: particularConditionsText,
+            },
+          ],
+        ],
+
+        styles: {
+          fontSize: 8,
+          textColor: [0, 0, 0],
+          lineColor: [0, 0, 0],
+          lineWidth: 0.35,
+          cellPadding: {
+            top: 1.3,
+            right: 1.5,
+            bottom: 1.3,
+            left: 1.5,
+          },
+          overflow: 'linebreak',
+          valign: 'top',
+        },
+
+        headStyles: {
+          fillColor: [255, 217, 102],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 10,
+          halign: 'center',
+          valign: 'middle',
+          cellPadding: {
+            top: 1.5,
+            right: 1.5,
+            bottom: 1.5,
+            left: 1.5,
+          },
+        },
+
+        bodyStyles: {
+          fontStyle: 'bold',
+          minCellHeight: 30,
+        },
       });
+
+      const startY = doc.lastAutoTable ? doc.lastAutoTable.finalY : yPosition + 50;
+      autoTable(doc, {
+        ...baseTableOptions,
+        startY,
+
+        margin: {
+          left: 10,
+          right: 10,
+          bottom: 35,
+        },
+
+        head: [['Condiciones Generales de Compraventa']],
+        body: [[pdfData.terms]],
+
+        styles: {
+          ...baseTableOptions.styles,
+          fontSize: 9,
+          cellWidth: 'wrap',
+          overflow: 'linebreak',
+
+          cellPadding: {
+            top: 2,
+            right: 2.5,
+            bottom: 2,
+            left: 2.5,
+          },
+        },
+
+        headStyles: {
+          textColor: [255, 255, 255],
+          fillColor: [255, 216, 102],
+        },
+
+        columnStyles: {
+          0: {
+            cellWidth: 190,
+          },
+        },
+      });
+
+      const addFinalPageFooter = () => {
+        const lastPageNumber = doc.getNumberOfPages();
+
+        doc.setPage(lastPageNumber);
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        const horizontalMargin = 10;
+        const bottomMargin = 10;
+
+        const footerWidth = pageWidth - horizontalMargin * 2;
+        const footerHeight = 20;
+
+        const footerX = horizontalMargin;
+        const footerY = pageHeight - bottomMargin - footerHeight;
+
+        // Белый фон и чёрная рамка
+        doc.setFillColor(255, 255, 255);
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.4);
+
+        doc.rect(footerX, footerY, footerWidth, footerHeight, 'FD');
+
+        // Текст футера
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.setLineHeightFactor(1.15);
+
+        const footerText = doc.splitTextToSize(pdfData.footer, footerWidth - 8);
 
       return doc;
     } catch (error) {
@@ -298,17 +696,25 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
   useEffect(() => {
     console.log('🔄 Данные заказа обновлены:', orderData);
-    const { deliveryAddress, contactInfo, owner, article, delivery } =
-      orderData;
+    const {
+      deliveryAddress,
+      contactInfo,
+      owner,
+      article,
+      delivery,
+      payment_method,
+    } = orderData;
 
-    const today = new Date();
-    const nextMonthDate = new Date(today);
-    nextMonthDate.setMonth(today.getMonth() + 1);
-    const formattedDate = nextMonthDate.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
+    const VALIDITY_DAYS = 30;
+
+    const validUntilDate = new Date();
+    validUntilDate.setDate(validUntilDate.getDate() + VALIDITY_DAYS);
+
+    const formattedValidUntil = [
+      String(validUntilDate.getDate()).padStart(2, '0'),
+      String(validUntilDate.getMonth() + 1).padStart(2, '0'),
+      validUntilDate.getFullYear(),
+    ].join('.');
 
     const terms = `Las presentes Condiciones Generales de Compraventa (en adelante, "Condiciones Generales") regulan la compraventa de productos de hormigón celular curado en autoclave (en adelante “HCCA”) por parte de BAUBLOCK a sus Comprador, así como los derechos y obligaciones de ambas partes, tanto a nivel nacional como internacional:
     1.PEDIDOS Y ACEPTACIÓN:
@@ -370,9 +776,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         product?.density
       }kg/m³`;
 
-      const total = (
-        prod.quantity_palet * product?.quantityBlockOnPallet
-      ).toFixed(0);
+      const total = (prod.quantity_palet * product?.quantityBlockOnPallet).toFixed(
+        0,
+      );
 
       const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
@@ -402,9 +808,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const totalSacos = (quantity * sacos).toFixed(0);
 
-      const totalKg = (
-        prod.quantity_palet_dry * dryMixes?.pallet_weight
-      ).toFixed(0);
+      const totalKg = (prod.quantity_palet_dry * dryMixes?.pallet_weight).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(2);
 
@@ -494,7 +898,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       contact: `${contactInfo?.first_name} ${contactInfo?.last_name}` || '',
       email: contactInfo?.email || '',
       phone: contactInfo?.phone_number_mobile || '',
-      validUntil: formattedDate || '',
+      validUntil: formattedValidUntil || '',
       pdfProducts,
       pdfDryMixes,
       pdfAnchor,
@@ -505,6 +909,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       terms,
       delivery,
       footer,
+      payment_method,
     });
   }, [orderData, productList]);
 
@@ -545,9 +950,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           alert('PDF успешно отправлен в Bitrix24');
         } else {
           console.error('Ошибка ответа сервера:', result);
-          alert(
-            `Ошибка отправки в Bitrix24: ${result?.error ?? response.status}`,
-          );
+          alert(`Ошибка отправки в Bitrix24: ${result?.error ?? response.status}`);
         }
       }
     } catch (error) {
