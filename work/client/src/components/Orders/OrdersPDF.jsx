@@ -361,7 +361,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       const deliveryPrice = toNumber(pdfData.delivery);
 
       // Считаем, что доставка указана, только если цена больше нуля
-      const hasDelivery = deliveryPrice > 0;
+      const hasDelivery = deliveryPrice > 0 || pdfData.delivery_m2 > 0;
 
       // TOTAL — сумма товаров без НДС и без доставки
       const totalWithoutVat = toNumber(vatValue?.vat_euro_origin);
@@ -422,10 +422,10 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
               content: transportText,
               colSpan: 4,
               styles: {
-                fillColor: [255, 255, 0],
+                fillColor: [255, 255, 255],
                 textColor: [0, 0, 0],
                 fontStyle: 'bolditalic',
-                halign: hasDelivery ? 'left' : 'center',
+                halign: 'left',
               },
             },
           ],
@@ -702,6 +702,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       owner,
       article,
       delivery,
+      delivery_m2,
       payment_method,
     } = orderData;
 
@@ -791,7 +792,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         m2_pal: product.m2.toFixed(2),
         blq_pal: product.quantityBlockOnPallet,
         total_m2: prod.quantity_real.toFixed(2),
-        pvp_neto_m2: prod.price_m2.toFixed(2),
+        pvp_neto_m2: prod.price_m2_with_delivery.toFixed(2),
         total,
         pvp_neto_ud,
         subtotal: prod.final_price.toFixed(2),
@@ -908,6 +909,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       finalTotal: vatValue.vat_result || 0,
       terms,
       delivery,
+      delivery_m2,
       footer,
       payment_method,
     });
