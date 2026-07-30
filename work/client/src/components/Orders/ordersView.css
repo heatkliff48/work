@@ -396,7 +396,7 @@
   cursor: not-allowed;
 }
 .ord-step__checkbox--done {
-  background: #16a34a;
+  background: #e9f6ed;
   border-color: #16a34a;
 }
 .ord-step__checkbox--done::after {
@@ -406,11 +406,15 @@
   top: 3px;
   width: 5px;
   height: 9px;
-  border: solid #fff;
+  border: solid #16a34a;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
 .ord-step__checkbox--current {
+  background: #16a34a;
+  border-color: #16a34a;
+}
+.ord-step__checkbox--next {
   background: var(--ord-red);
   border-color: var(--ord-red);
 }
@@ -669,6 +673,10 @@
 }
 .ord-step__label--done {
   color: var(--ord-text-2);
+}
+.ord-step__label--next {
+  color: var(--ord-red);
+  font-weight: 700;
 }
 
 /* ---------- modals (wizard, edit contact/delivery, product info, liberar) ---------- */

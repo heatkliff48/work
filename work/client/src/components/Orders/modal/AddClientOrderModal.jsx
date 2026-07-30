@@ -17,8 +17,6 @@ import Table from '#components/Table/Table';
 import '#components/Styles/modals.css';
 import '#components/Clients/ClientsInfo/clientsDrawer.css';
 import '../ordersView.css';
-import { TextSearchFilter } from '#components/Table/filters.js';
-import { MonoCell } from '#components/Clients/ClientsInfo/clientsCells.jsx';
 
 const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -36,26 +34,20 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const regionOptions = [
     {
       value: 'peninsular_spain',
-      label: 'Territorios peninsulares de España  - 21%IVA',
+      label: 'Territorios peninsulares de España',
+      vat: '21% IVA',
     },
     {
       value: 'extra_peninsular_spain',
-      label: 'Territorios extrapeninsulares de España - 0%IVA',
+      label: 'Territorios extrapeninsulares de España',
+      vat: '0% IVA',
     },
     {
       value: 'eu_outside_spain',
-      label: 'EU territorios outside Spain  - 0%IVA',
+      label: 'EU territorios outside Spain',
+      vat: '0% IVA',
     },
-    { value: 'outside_eu', label: 'Territories outside EU - 0%IVA' },
-  ];
-
-  const region_table = [
-    {
-      Header: 'Region',
-      accessor: 'label',
-      Filter: TextSearchFilter,
-      Cell: MonoCell,
-    },
+    { value: 'outside_eu', label: 'Territories outside EU', vat: '0% IVA' },
   ];
 
   const dispatch = useDispatch();
@@ -77,20 +69,6 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     () => newOrder?.contact_id ?? false,
     [newOrder?.contact_id],
   );
-
-  const getRegionOption = (accessor) => {
-    const options = regionOptions;
-    if (!options) return null;
-    const regionOption = options.find(
-      (option) => option.value === newOrder?.[accessor],
-    );
-    return regionOption || options[0];
-  };
-
-  const handleRegionChange = (regionOption, key) => {
-    // setValue(selectedOption.value);
-    setNewOrder((prev) => ({ ...prev, region: regionOption }));
-  };
 
   useEffect(() => {
     console.log(newOrder, 'newOrder AddClientOrderModal.jsx line 53');
@@ -135,6 +113,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
       owner: id,
       status: status_list[0].accessor,
       person_in_charge: 0,
+      payment_method: 'prepayment',
     });
     setCurrentClient(client);
     setSearchFilter('');
@@ -206,7 +185,13 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     toggle();
   };
 
-  const stepNum = haveClient ? (haveAdddress ? 3 : 2) : 1;
+  const stepNum = haveClient
+    ? haveAdddress
+      ? haveContactInfo
+        ? 4
+        : 3
+      : 2
+    : 1;
 
   return (
     <div className="ord-modal-root">
@@ -217,7 +202,11 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
             <div className="ord-modal-head__title">
               {haveClient ? (
                 haveAdddress ? (
-                  <p style={{ margin: 0 }}>Select contact person</p>
+                  haveContactInfo ? (
+                    <p style={{ margin: 0 }}>Select region</p>
+                  ) : (
+                    <p style={{ margin: 0 }}>Select contact person</p>
+                  )
                 ) : (
                   <p style={{ margin: 0 }}>Select delivery address</p>
                 )
@@ -227,7 +216,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                 </p>
               )}
             </div>
-            <div className="ord-modal-head__subtitle">Step {stepNum} of 3</div>
+            <div className="ord-modal-head__subtitle">Step {stepNum} of 4</div>
           </div>
           <button type="button" className="ord-iconbtn" onClick={closeHandler}>
             <svg
@@ -249,33 +238,49 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
             {haveClient ? (
               haveAdddress ? (
                 haveContactInfo ? (
-                  <>
-                    {/* <div className="ord-modal-inline-actions">
-                    <ShowClientsContactInfoModal />
-                  </div> */}
-                    <div className="ord-card-scope">
-                      {/* <div className="ord-modal-inline-actions">
-                      <ShowClientsModal />
-                    </div> */}
-                      <Table
-                        COLUMN_DATA={region_table}
-                        dataOfTable={regionOptions}
-                        tableName={'Region'}
-                        variant="card"
-                        hideTitle
-                        handleRowClick={(row) => {
-                          regionHandler(row.original.value);
-                        }}
-                      />
-                    </div>
-                    {/* <Select
-                      defaultValue={getRegionOption('region')}
-                      onChange={(r) => {
-                        handleRegionChange(r, 'region');
-                      }}
-                      options={regionOptions}
-                    /> */}
-                  </>
+                  <div className="cl-cardlist">
+                    {regionOptions.map((option) => (
+                      <div
+                        key={option.value}
+                        className="cl-itemcard"
+                        onClick={() => regionHandler(option.value)}
+                      >
+                        <svg
+                          className="cl-itemcard__pin"
+                          width="17"
+                          height="17"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#565d6d"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <circle cx="12" cy="12" r="9" />
+                          <path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9s1.3-6.5 3.8-9Z" />
+                        </svg>
+                        <div className="cl-min0 cl-itemcard__main">
+                          <div className="cl-itemcard__title">
+                            {option.label}
+                          </div>
+                        </div>
+                        <span className="cl-pill">{option.vat}</span>
+                        <svg
+                          className="cl-chev"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#c4c8d0"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="m9 6 6 6-6 6" />
+                        </svg>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <>
                     {/* <div className="ord-modal-inline-actions">

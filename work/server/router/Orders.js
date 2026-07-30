@@ -79,5 +79,6 @@ router.post(
 router.post('/update/status', OrdersController.getUpdateStatusOrder);
 router.post('/update/in_charge', OrdersController.getUpdateInChargeOrder);
 router.post('/child/add', OrdersController.addChildOrder);
+router.post('/update/payment_method', OrdersController.getUpdatePaymentOrder);
 
 module.exports = router;

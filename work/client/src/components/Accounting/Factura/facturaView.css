@@ -1,0 +1,177 @@
+/* =====================================================================
+   Factura Manager module — view styles (BAUBLOCK ERP design reference)
+   Только внешний вид. Логика данных/бизнес-правила не затрагиваются.
+   ===================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500&display=swap');
+
+:root {
+  --fac-red: #bc1212;
+  --fac-red-hover: #a50f0f;
+  --fac-red-soft: #fbe9e9;
+  --fac-bg: #fafafb;
+  --fac-card: #ffffff;
+  --fac-border: #e4e6eb;
+  --fac-border-2: #dee1e6;
+  --fac-border-3: #eef0f3;
+  --fac-divider: #f0f1f4;
+  --fac-text: #171a1f;
+  --fac-text-2: #565d6d;
+  --fac-text-3: #3a3f4b;
+  --fac-muted: #9aa0ac;
+  --fac-shadow-card: 0 1px 2px rgba(20, 23, 33, 0.04), 0 6px 18px rgba(20, 23, 33, 0.03);
+  --fac-mono: 'Roboto Mono', monospace;
+}
+
+/* ---------- page shell (list) ---------- */
+.fac-page {
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--fac-text);
+  padding: 26px 36px 48px;
+}
+.fac-page__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.fac-page__eyebrow {
+  font-size: 13px;
+  color: var(--fac-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.fac-page__title {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--fac-text);
+}
+.fac-page__stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.fac-stat {
+  text-align: right;
+}
+.fac-stat__num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--fac-text);
+  line-height: 1;
+}
+.fac-stat__label {
+  font-size: 11.5px;
+  color: var(--fac-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-top: 3px;
+}
+
+/* ---------- toolbar (search only — no status filter) ---------- */
+.fac-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.fac-search {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 380px;
+}
+.fac-search__ic {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.fac-search__input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--fac-border-2);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 14px 0 38px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--fac-text);
+  outline: none;
+  box-sizing: border-box;
+}
+.fac-search__input:focus {
+  border-color: var(--fac-red);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+.fac-toolbar__spacer {
+  flex: 1;
+}
+
+/* ---------- order-card (detail) page shell ---------- */
+.fac-card {
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--fac-text);
+  padding: 22px 36px 60px;
+}
+
+/* ---------- 3-up info tiles (Client / Contact / Delivery) ---------- */
+.fac-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.fac-tiles .ord-tile {
+  flex: 1 1 260px;
+}
+
+/* ---------- ready toggle pill-button (header action) ---------- */
+.fac-ready-toggle {
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.fac-ready-toggle__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.fac-ready-toggle--pending {
+  background: #fff;
+  color: var(--fac-text-3);
+  border: 1px solid var(--fac-border-2);
+}
+.fac-ready-toggle--pending:hover {
+  background: #f6f7fa;
+}
+.fac-ready-toggle--ready {
+  background: #e9f6ed;
+  color: #15803d;
+  border: 1px solid #bfe3c9;
+}
+
+/* ---------- dispatched-products table: amber "qty remaining" ---------- */
+.fac-qty-rem--pending {
+  color: #b45309;
+}
+
+@media (max-width: 560px) {
+  .fac-page,
+  .fac-card {
+    padding: 18px 16px 36px;
+  }
+}

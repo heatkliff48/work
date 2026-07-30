@@ -27,6 +27,7 @@ import {
   updAccountingDataList,
   updateOrderInCharge,
   updateOrderStatus,
+  updatePayment,
 } from '#components/redux/actions/ordersAction.js';
 import {
   addNewListOfOrderedProduction,
@@ -142,6 +143,14 @@ const OrderCart = React.memo(() => {
     vat_result: 0,
     vat_result_del: 0,
   });
+
+  const PAYMENT_METHOD_OPTIONS = [
+    { value: 'prepayment', label: 'Prepago' },
+    { value: 'bank_transfer', label: 'Transferencia bancaria' },
+    { value: 'promissory_note', label: 'Pagaré' },
+    { value: 'confirming', label: 'Confirming' },
+    { value: 'confirming_without_recourse', label: 'Confirming sin recurso' },
+  ];
 
   // Только вид: пилюля статуса в шапке карточки заказа — данные те же,
   // что уже используются в статус-степпере ниже (status_list/orderCartData.status).
@@ -870,9 +879,14 @@ const OrderCart = React.memo(() => {
 
   const deleteHandler = (product) => {
     const res_prod = list_of_reserved_products.find(
-      (el) => el.id === product.id,
+      (el) => el.orders_products_id === product.id,
     );
-    if (res_prod) alert('Этот продукт зарервировван на складе');
+    if (res_prod) {
+      const confirmed = window.confirm(
+        'Этот продукт зарезервирован на складе. Всё равно удалить?',
+      );
+      if (!confirmed) return;
+    }
     if (product?.product_article.charAt(0) === 'T') {
       dispatch(getDeleteProductOfOrder(product?.id));
     } else if (product?.product_article.charAt(2) === 'M') {
@@ -1085,6 +1099,27 @@ const OrderCart = React.memo(() => {
       (option) => option.value === orderCartData?.person_in_charge,
     );
     return personInChargeOption || options[0];
+  };
+
+  const handlePaymentMethodChange = (selectedOption) => {
+    setOrderCartData((prev) => ({
+      ...prev,
+      payment_method: selectedOption.value,
+    }));
+
+    dispatch(
+      updatePayment({
+        order_id: orderCartData?.id,
+        payment_method: selectedOption.value,
+      }),
+    );
+  };
+
+  const getSelectedPaymentMethodOption = () => {
+    const paymentMethodOption = PAYMENT_METHOD_OPTIONS.find(
+      (option) => option.value == orderCartData?.payment_method,
+    );
+    return paymentMethodOption || PAYMENT_METHOD_OPTIONS[0];
   };
 
   const productHandler = (product) => {
@@ -1471,6 +1506,21 @@ const OrderCart = React.memo(() => {
                   </span>
                 </div>
                 <div className="ord-summary-row">
+                  <span className="ord-summary-row__label">Payment method</span>
+                  <span style={{ minWidth: 220 }}>
+                    <Select
+                      value={getSelectedPaymentMethodOption(
+                        orderCartData?.payment_method,
+                      )}
+                      onChange={(v) => {
+                        handlePaymentMethodChange(v);
+                      }}
+                      options={PAYMENT_METHOD_OPTIONS}
+                      isDisabled={orderCartData?.status < 5 ? false : true}
+                    />
+                  </span>
+                </div>
+                <div className="ord-summary-row">
                   <span className="ord-summary-row__label">Delivery price</span>
                   <span
                     style={{ display: 'flex', alignItems: 'center', gap: 8 }}
@@ -1638,54 +1688,68 @@ const OrderCart = React.memo(() => {
                   </div>
                 )}
                 <div className="ord-steps">
-                  {status_list.map((item, idx) => {
-                    const isDone = item.accessor < orderCartData?.status;
-                    const isCurrent = item.accessor === orderCartData?.status;
-                    return (
-                      <div key={item.accessor} className="ord-step">
-                        <div className="ord-step__rail">
-                          <input
-                            id={item.accessor}
-                            type="checkbox"
-                            className={
-                              'ord-step__checkbox' +
-                              (isDone ? ' ord-step__checkbox--done' : '') +
-                              (isCurrent ? ' ord-step__checkbox--current' : '')
-                            }
-                            checked={item.accessor === orderCartData?.status}
-                            onChange={() => {
-                              statusChangeHandler(item);
-                            }}
-                            disabled={
-                              !orderStatusAccess?.canWrite ||
-                              item?.accessor == 7 ||
-                              item?.accessor == 9
-                            } //
-                          />
-                          {idx < status_list.length - 1 && (
-                            <div
-                              className={
-                                'ord-step__line' +
-                                (isDone ? ' ord-step__line--done' : '')
-                              }
-                            />
-                          )}
-                        </div>
-                        <div
-                          className={
-                            'ord-step__label' +
-                            (isCurrent
-                              ? ' ord-step__label--current'
-                              : isDone
-                                ? ' ord-step__label--done'
-                                : '')
-                          }
-                        >
-                          {item.Header}
-                        </div>
-                      </div>
+                  {(() => {
+                    const currentStatusIndex = status_list.findIndex(
+                      (item) => item.accessor === orderCartData?.status,
                     );
-                  })}
+                    return status_list.map((item, idx) => {
+                      const isDone = item.accessor < orderCartData?.status;
+                      const isCurrent = item.accessor === orderCartData?.status;
+                      const isDisabled =
+                        !orderStatusAccess?.canWrite ||
+                        item?.accessor == 7 ||
+                        item?.accessor == 9;
+                      const isNext =
+                        currentStatusIndex !== -1 &&
+                        idx === currentStatusIndex + 1 &&
+                        !isDisabled;
+                      return (
+                        <div key={item.accessor} className="ord-step">
+                          <div className="ord-step__rail">
+                            <input
+                              id={item.accessor}
+                              type="checkbox"
+                              className={
+                                'ord-step__checkbox' +
+                                (isDone ? ' ord-step__checkbox--done' : '') +
+                                (isCurrent
+                                  ? ' ord-step__checkbox--current'
+                                  : '') +
+                                (isNext ? ' ord-step__checkbox--next' : '')
+                              }
+                              checked={item.accessor === orderCartData?.status}
+                              onChange={() => {
+                                statusChangeHandler(item);
+                              }}
+                              disabled={isDisabled} //
+                            />
+                            {idx < status_list.length - 1 && (
+                              <div
+                                className={
+                                  'ord-step__line' +
+                                  (isDone ? ' ord-step__line--done' : '')
+                                }
+                              />
+                            )}
+                          </div>
+                          <div
+                            className={
+                              'ord-step__label' +
+                              (isCurrent
+                                ? ' ord-step__label--current'
+                                : isDone
+                                  ? ' ord-step__label--done'
+                                  : isNext
+                                    ? ' ord-step__label--next'
+                                    : '')
+                            }
+                          >
+                            {item.Header}
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             )}

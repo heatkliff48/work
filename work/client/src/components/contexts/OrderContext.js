@@ -515,6 +515,7 @@ const OrderContextProvider = ({ children }) => {
         delivery: order?.delivery,
         main_order: order?.main_order ?? null,
         region: order?.region ?? null,
+        payment_method: order?.payment_method ?? null,
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
@@ -643,7 +644,7 @@ const OrderContextProvider = ({ children }) => {
         randomFillComplete,
         setRandomFillComplete,
         filterKeysOrder,
-        resetOrderState
+        resetOrderState,
       }}
     >
       {children}

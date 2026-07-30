@@ -9,9 +9,51 @@ import { useProductsTypeJournalContext } from '#components/contexts/ProductsType
 import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import AccountingInvoiceModal from './AccountingInvoiceModal.jsx';
-import { Button } from 'reactstrap';
+import { makeStatusPillCell } from '#components/Orders/ordersCells';
 
 import '#components/Styles/order-card.css';
+import '#components/Orders/ordersView.css';
+import './accountingView.css';
+
+function ProductCategoryTable({ title, rows, qtyField, priceField }) {
+  return (
+    <div className="ord-prod-card">
+      <div className="ord-prod-card__head">
+        <span className="ord-prod-card__title">{title}</span>
+      </div>
+      <table className="ord-prod-table">
+        <thead>
+          <tr>
+            <th>Article</th>
+            <th>Qty</th>
+            <th>Unit price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Array.isArray(rows) && rows.length > 0 ? (
+            rows.map((row) => (
+              <tr key={row?.id || row?.product_article}>
+                <td>
+                  <span className="ord-mono">{row.product_article}</span>
+                </td>
+                <td>{row[qtyField]}</td>
+                <td>{row[priceField]}</td>
+                <td>{row.final_price}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={4} className="ord-empty-products">
+                No items in this category.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 const AccountngOrderCard = React.memo(() => {
   const {
@@ -22,6 +64,7 @@ const AccountngOrderCard = React.memo(() => {
     setOrderCartData,
     getAccountingStatus,
     accountingStatusList,
+    status_list,
     dryMixedProductsOfOrders,
     anchorProductsOfOrders,
     toolProductsOfOrders,
@@ -32,8 +75,7 @@ const AccountngOrderCard = React.memo(() => {
   const { latestProducts } = useProductsContext();
   const { latestDryMix, latestRelatedMaterials, latestAnchors, latestTools } =
     useProductsTypeJournalContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } =
-    useUsersContext();
+  const { userAccess } = useUsersContext();
   const productListOrder = useSelector((state) => state.productsOfOrders);
   const dispatch = useDispatch();
 
@@ -297,145 +339,180 @@ const AccountngOrderCard = React.memo(() => {
     setStatus(result);
   }, []);
 
+  const StatusPillCell = useMemo(
+    () => makeStatusPillCell(status_list),
+    [status_list],
+  );
+
   return (
     <>
-      <div className="page-container">
-        <h4>Order Card: {orderCartData?.article}</h4>
+      <div className="acc-card">
+        <button
+          type="button"
+          className="ord-card__back"
+          onClick={() => setStoredData(null)}
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m15 18-6-6 6-6"></path>
+          </svg>
+          Back to Accounting
+        </button>
 
-        <div className="header-container">
-          <div className="owner-info">
-            <h4>Client Information</h4>
+        <div className="ord-card__head">
+          <div className="ord-card__head-left">
+            <h1 className="ord-card__article ord-mono">
+              {orderCartData?.article}
+            </h1>
+            <StatusPillCell value={storedData?.orders_status} />
+          </div>
+          <div className="ord-card__actions">
+            <button
+              type="button"
+              className="ord-btn ord-btn--primary"
+              onClick={() => setIsInvoiceModalOpen(true)}
+            >
+              Generar factura PDF
+            </button>
+          </div>
+        </div>
+
+        <div className="acc-tiles">
+          <div className="ord-tile">
+            <div className="ord-tile__label">Client information</div>
             {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
           </div>
 
-          <div className="contact-info">
-            <div className="contact-text">
-              <h4>Contact Person</h4>
-              {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
-            </div>
+          <div className="ord-tile">
+            <div className="ord-tile__label">Contact person</div>
+            {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
           </div>
 
-          <div className="delivery-address">
-            <h4>Delivery Address</h4>
+          <div className="ord-tile">
+            <div className="ord-tile__label">Delivery address</div>
             {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
           </div>
         </div>
-        <table className="product-table">
-          <thead>
-            <tr>
-              <td>Products</td>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(updatedProductListOrder) &&
-              updatedProductListOrder?.map((product) => (
-                <tr key={product?.id || Math.random()} className="product-row">
-                  <td>{filterAndMapData(product, filterKeysOrder)}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        <table className="dry-mixes-table">
-          <thead>
-            <tr>
-              <td>Dry Mixes</td>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(updatedDryMixesListOrder) &&
-              updatedDryMixesListOrder?.map((product) => (
-                <tr key={product?.id || Math.random()} className="product-row">
-                  <td>{filterAndMapData(product, filterKeysOrder)}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        <table className="anchors-table">
-          <thead>
-            <tr>
-              <td>Fastners</td>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(updatedAnchorsListOrder) &&
-              updatedAnchorsListOrder?.map((product) => (
-                <tr key={product?.id || Math.random()} className="product-row">
-                  <td>{filterAndMapData(product, filterKeysOrder)}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        <table className="tools-table">
-          <thead>
-            <tr>
-              <td>Tools</td>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(updatedToolsListOrder) &&
-              updatedToolsListOrder?.map((product) => (
-                <tr key={product?.id || Math.random()} className="product-row">
-                  <td>{filterAndMapData(product, filterKeysOrder)}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        <table className="related-materials-table">
-          <thead>
-            <tr>
-              <td>Related materials</td>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(updatedRelatedMaterialsListOrder) &&
-              updatedRelatedMaterialsListOrder?.map((product) => (
-                <tr key={product?.id || Math.random()} className="product-row">
-                  <td>{filterAndMapData(product, filterKeysOrder)}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        <div className="footer_data">
-          <div className="vat_container">
-            <div className="vat">
-              <div className="vat_procent">
-                <div>
-                  <p>VAT, %</p>
-                  <p>{vatValue.vat_procent}</p>
-                </div>
-              </div>
-              <div className="vat_euro">
-                <div>
-                  <p>VAT, EURO</p>
-                  <p>{vatValue.vat_euro}</p>
-                </div>
-              </div>
-              <div className="vat_result">
-                <p>Result</p>
-                <p>{vatValue.vat_result}</p>
-              </div>
+
+        <div className="ord-grid">
+          <div>
+            <ProductCategoryTable
+              title="Products"
+              rows={updatedProductListOrder}
+              qtyField="quantity_real"
+              priceField="price_m2"
+            />
+            <ProductCategoryTable
+              title="Dry mixes"
+              rows={updatedDryMixesListOrder}
+              qtyField="quantity_ud"
+              priceField="pvp"
+            />
+            <ProductCategoryTable
+              title="Fastners"
+              rows={updatedAnchorsListOrder}
+              qtyField="quantity_ud"
+              priceField="pvp"
+            />
+            <ProductCategoryTable
+              title="Tools"
+              rows={updatedToolsListOrder}
+              qtyField="quantity_ud"
+              priceField="pvp"
+            />
+            <ProductCategoryTable
+              title="Related materials"
+              rows={updatedRelatedMaterialsListOrder}
+              qtyField="quantity_ud"
+              priceField="pvp"
+            />
+
+            <div className="ord-summary-card">
+              <div className="ord-summary-card__title">Attachments</div>
+              <FilesMain userAccess={userAccess} />
             </div>
           </div>
-          <FilesMain userAccess={userAccess} />
-          <div className="footer_button_pdf">
-            <Button color="primary" onClick={() => setIsInvoiceModalOpen(true)}>
-              Generar factura PDF
-            </Button>
-          </div>
-          <div className="status-table">
-            {accountingStatusList.map((item) => (
-              <div key={item.accessor} className="status-row">
-                <div className="header">{item.Header}</div>
-                <input
-                  id={item.accessor}
-                  type="checkbox"
-                  checked={item.accessor == status}
-                  onChange={() => {
-                    statusChangeHandler(item.accessor);
-                  }}
-                />
+
+          <div>
+            <div className="ord-summary-card">
+              <div className="ord-summary-card__title">VAT summary</div>
+              <div className="ord-summary-rows">
+                <div className="ord-summary-row">
+                  <span className="ord-summary-row__label">VAT, %</span>
+                  <span className="ord-summary-row__value">
+                    {vatValue.vat_procent}
+                  </span>
+                </div>
+                <div className="ord-summary-row">
+                  <span className="ord-summary-row__label">VAT, €</span>
+                  <span className="ord-summary-row__value">
+                    {vatValue.vat_euro}
+                  </span>
+                </div>
+                <div className="ord-summary-divider" />
+                <div className="ord-summary-row ord-summary-row--total ord-summary-row--accent">
+                  <span className="ord-summary-row__label">Total</span>
+                  <span className="ord-summary-row__value">
+                    {vatValue.vat_result}
+                  </span>
+                </div>
               </div>
-            ))}
+            </div>
+
+            <div className="ord-status-card">
+              <div className="ord-status-card__title">Approval status</div>
+              <div className="ord-steps">
+                {accountingStatusList.map((item) => {
+                  const isDone = item.accessor < status;
+                  const isCurrent = item.accessor == status;
+                  return (
+                    <div key={item.accessor} className="ord-step">
+                      <div className="ord-step__rail">
+                        <input
+                          id={item.accessor}
+                          type="checkbox"
+                          className={
+                            'ord-step__checkbox' +
+                            (isDone ? ' ord-step__checkbox--done' : '') +
+                            (isCurrent ? ' ord-step__checkbox--current' : '')
+                          }
+                          checked={item.accessor == status}
+                          onChange={() => {
+                            statusChangeHandler(item.accessor);
+                          }}
+                        />
+                        <div
+                          className={
+                            'ord-step__line' +
+                            (isDone ? ' ord-step__line--done' : '')
+                          }
+                        />
+                      </div>
+                      <div
+                        className={
+                          'ord-step__label' +
+                          (isCurrent
+                            ? ' ord-step__label--current'
+                            : isDone
+                              ? ' ord-step__label--done'
+                              : '')
+                        }
+                      >
+                        {item.Header}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>

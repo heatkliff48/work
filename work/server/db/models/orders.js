@@ -46,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
       deal_id: DataTypes.INTEGER,
       uf_number_offer: DataTypes.INTEGER,
       region: DataTypes.STRING,
+      payment_method: DataTypes.STRING,
     },
     {
       sequelize,

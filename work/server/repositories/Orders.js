@@ -1085,6 +1085,19 @@ class OrdersRepository {
     }
   }
 
+  static async getUpdatePaymentOrder({ order_id, payment_method }) {
+    try {
+      await Orders.update({ payment_method }, { where: { id: order_id } });
+      return;
+    } catch (error) {
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
+      return error;
+    }
+  }
+
   static async addChildOrder({
     article,
     owner,
@@ -1101,6 +1114,7 @@ class OrdersRepository {
     relMats,
     delivery_m2,
     region,
+    payment_method,
   }) {
     try {
       const childOrder = await Orders.create({
@@ -1115,6 +1129,7 @@ class OrdersRepository {
         main_order,
         delivery_m2,
         region,
+        payment_method,
       });
 
       const order_id = childOrder.id;

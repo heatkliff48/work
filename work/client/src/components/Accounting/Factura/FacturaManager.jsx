@@ -1,7 +1,6 @@
-import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import Table from '#components/Table/Table';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useDispatch } from 'react-redux';
 import {
@@ -27,9 +26,48 @@ import {
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import { ArticleMonoCell } from '#components/Orders/ordersCells';
 
 import '#components/Styles/main-pages.css';
+import './facturaView.css';
 import { useNavigate } from 'react-router-dom';
+
+function DateCell({ value }) {
+  if (!value) return <span className="ord-muted">—</span>;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return <span>{value}</span>;
+  return (
+    <span>
+      {d.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      })}
+    </span>
+  );
+}
+
+function ProductsSummaryCell({ value }) {
+  if (!Array.isArray(value) || value.length === 0)
+    return <span className="ord-muted">—</span>;
+  return <span>{value.join(', ')}</span>;
+}
+
+function ReadyPillCell({ value }) {
+  const isReady = (value || 0) >= 1;
+  const theme = isReady
+    ? { bg: '#e9f6ed', color: '#15803d', dot: '#16a34a', label: 'Ready' }
+    : { bg: '#fdf3e3', color: '#b45309', dot: '#d97706', label: 'Pending' };
+  return (
+    <span
+      className="ord-pill"
+      style={{ background: theme.bg, color: theme.color }}
+    >
+      <span className="ord-pill__dot" style={{ background: theme.dot }} />
+      {theme.label}
+    </span>
+  );
+}
 
 // Функция для определения типа продукта по артикулу
 const getProductType = (
@@ -256,7 +294,6 @@ const calculateVAT = (productLists, vatProcent) => {
 };
 
 function FacturaManager() {
-  const { WAREHOUSE_MANAGER_TRAILER_TABLE } = useProjectContext();
   const {
     setWmoctProductShippedBD,
     setSelectedOrder,
@@ -399,21 +436,111 @@ function FacturaManager() {
     vatValue.vat_procent,
   ]);
 
+  const readyToInvoiceCount = useMemo(
+    () => facturaData.filter((row) => (row.trailer_stage || 0) >= 1).length,
+    [facturaData],
+  );
+
+  const displayColumns = useMemo(
+    () => [
+      {
+        Header: 'Order',
+        accessor: 'orders_article',
+        disableSortBy: true,
+        Cell: ArticleMonoCell,
+      },
+      {
+        Header: 'Project',
+        accessor: 'projects_name',
+        disableSortBy: true,
+      },
+      {
+        Header: 'Trailer',
+        accessor: 'trailer',
+        disableSortBy: true,
+      },
+      {
+        Header: 'Products',
+        accessor: 'orders_products_articles',
+        disableSortBy: true,
+        Cell: ProductsSummaryCell,
+      },
+      {
+        Header: 'Dispatch date',
+        accessor: 'fecha',
+        disableSortBy: true,
+        Cell: DateCell,
+      },
+      {
+        Header: 'Status',
+        accessor: 'trailer_stage',
+        disableSortBy: true,
+        Cell: ReadyPillCell,
+      },
+    ],
+    [],
+  );
+
   return (
-    <Table
-      COLUMN_DATA={WAREHOUSE_MANAGER_TRAILER_TABLE}
-      dataOfTable={facturaData}
-      tableName={'Factura Manager'}
-      handleRowClick={(row) => {
-        getCurrentOrderInfoHandler({ order_id: row.original.order_id });
-        setSelectedOrder({
-          ...row.original,
-          productLists: row.original.productLists,
-          vatData: row.original.vatData,
-        });
-        navigate('/factura_manager/order-card');
-      }}
-    />
+    <div className="fac-page">
+      <div className="fac-page__head">
+        <div>
+          <div className="fac-page__eyebrow">Finance</div>
+          <h1 className="fac-page__title">Factura Manager</h1>
+        </div>
+        <div className="fac-page__stats">
+          <div className="fac-stat">
+            <div className="fac-stat__num">{readyToInvoiceCount}</div>
+            <div className="fac-stat__label">Ready to invoice</div>
+          </div>
+        </div>
+      </div>
+
+      <Table
+        COLUMN_DATA={displayColumns}
+        dataOfTable={facturaData}
+        variant="card"
+        hideTitle
+        emptyTitle="No dispatches match your search"
+        emptySubtitle="Try a different order number, trailer or project name."
+        handleRowClick={(row) => {
+          getCurrentOrderInfoHandler({ order_id: row.original.order_id });
+          setSelectedOrder({
+            ...row.original,
+            productLists: row.original.productLists,
+            vatData: row.original.vatData,
+          });
+          navigate('/factura_manager/order-card');
+        }}
+        renderToolbar={({ globalFilter, setGlobalFilter }) => (
+          <div className="fac-toolbar">
+            <div className="fac-search">
+              <svg
+                className="fac-search__ic"
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#9aa0ac"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <circle cx="11" cy="11" r="7"></circle>
+                <path d="m20 20-3.2-3.2"></path>
+              </svg>
+              <input
+                type="text"
+                className="fac-search__input"
+                placeholder="Search by order, trailer or project…"
+                value={globalFilter || ''}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+              />
+            </div>
+            <div className="fac-toolbar__spacer" />
+          </div>
+        )}
+      />
+    </div>
   );
 }
 

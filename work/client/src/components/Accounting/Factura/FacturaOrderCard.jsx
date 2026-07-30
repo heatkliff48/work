@@ -2,8 +2,9 @@ import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import FacturaTable from './FacturaTable';
-import { Button } from 'reactstrap';
 import '#components/Styles/order-card.css';
+import '#components/Orders/ordersView.css';
+import './facturaView.css';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
@@ -12,6 +13,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import AccountingInvoiceModal from '../AccountingInvoiceModal';
 import { changeStatusWarehouseManagerTrailer } from '#components/redux/actions/warehouseAction.js';
 import { useNavigate } from 'react-router-dom';
+
+function formatDate(value) {
+  if (!value) return '—';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
 
 const FacturaOrderCard = React.memo(() => {
   const { selectedOrder } = useWarehouseContext();
@@ -299,47 +311,132 @@ const FacturaOrderCard = React.memo(() => {
   };
 
   return (
-    <div className="page-container">
-      <div className="order-header-row">
-        <h4>Order number: {orderCartData?.article}</h4>
+    <div className="fac-card">
+      <button
+        type="button"
+        className="ord-card__back"
+        onClick={() => navigate('/factura_manager')}
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m15 18-6-6 6-6"></path>
+        </svg>
+        Back to Factura Manager
+      </button>
+
+      <div className="ord-card__head">
+        <div className="ord-card__head-left">
+          <h1 className="ord-card__article ord-mono">
+            {orderCartData?.article}
+          </h1>
+          <span className="ord-muted">Trailer {selectedOrder?.trailer}</span>
+        </div>
+        <div className="ord-card__actions">
+          <button
+            type="button"
+            className={
+              'fac-ready-toggle ' +
+              (checkboxStatus
+                ? 'fac-ready-toggle--ready'
+                : 'fac-ready-toggle--pending')
+            }
+            onClick={() => statusChangeHandler()}
+          >
+            <span
+              className="fac-ready-toggle__dot"
+              style={{ background: checkboxStatus ? '#16a34a' : '#9aa0ac' }}
+            />
+            {checkboxStatus ? 'Ready' : 'Mark as ready'}
+          </button>
+          <button
+            type="button"
+            className="ord-btn ord-btn--primary"
+            onClick={() => setIsInvoiceModalOpen(true)}
+          >
+            Generar factura PDF
+          </button>
+        </div>
       </div>
 
-      <div className="header-container">
-        <div className="owner-info">
-          <h4>Client Information</h4>
+      <div className="fac-tiles">
+        <div className="ord-tile">
+          <div className="ord-tile__label">Client information</div>
           {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
         </div>
 
-        <div className="contact-info">
-          <div className="contact-text">
-            <h4>Contact Person</h4>
-            {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
-          </div>
+        <div className="ord-tile">
+          <div className="ord-tile__label">Contact person</div>
+          {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
         </div>
 
-        <div className="delivery-address">
-          <h4>Delivery Address</h4>
+        <div className="ord-tile">
+          <div className="ord-tile__label">Delivery address</div>
           {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
-        </div>
-
-        <div className="status-ready">
-          <h4>Status</h4>
-          <div className="status-row">
-            <div className="header">Ready</div>
-            <input
-              id="status-ready"
-              type="checkbox"
-              checked={checkboxStatus}
-              onChange={() => statusChangeHandler()}
-            />
-          </div>
         </div>
       </div>
 
-      <div className="footer_button_pdf">
-        <Button color="primary" onClick={() => setIsInvoiceModalOpen(true)}>
-          Generar factura PDF
-        </Button>
+      <div className="ord-grid">
+        <div className="ord-prod-card">
+          <div className="ord-prod-card__head">
+            <span className="ord-prod-card__title">Dispatched products</span>
+          </div>
+          <FacturaTable
+            product_list={selectedOrder}
+            orderCartData={orderCartData}
+          />
+        </div>
+
+        <div>
+          <div className="ord-summary-card">
+            <div className="ord-summary-card__title">Dispatch summary</div>
+            <div className="ord-summary-rows">
+              <div className="ord-summary-row">
+                <span className="ord-summary-row__label">Trailer</span>
+                <span className="ord-summary-row__value">
+                  {selectedOrder?.trailer}
+                </span>
+              </div>
+              <div className="ord-summary-row">
+                <span className="ord-summary-row__label">Dispatch date</span>
+                <span className="ord-summary-row__value">
+                  {formatDate(selectedOrder?.fecha)}
+                </span>
+              </div>
+              <div className="ord-summary-row">
+                <span className="ord-summary-row__label">Project</span>
+                <span className="ord-summary-row__value">
+                  {selectedOrder?.projects_name}
+                </span>
+              </div>
+              <div className="ord-summary-divider" />
+              <div className="ord-summary-row ord-summary-row--total ord-summary-row--accent">
+                <span className="ord-summary-row__label">Total value</span>
+                <span className="ord-summary-row__value">
+                  {selectedOrder?.vatData?.vat_result}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="ord-summary-card">
+            <div className="ord-summary-card__title">
+              Ready for invoicing
+            </div>
+            <div className="ord-tile__sub">
+              Mark this trailer as ready once all products have been verified
+              against the delivery note. Generating the factura PDF will use
+              this dispatch&apos;s confirmed quantities.
+            </div>
+          </div>
+        </div>
       </div>
 
       <AccountingInvoiceModal
@@ -354,8 +451,6 @@ const FacturaOrderCard = React.memo(() => {
         latestTools={latestTools}
         latestRelatedMaterials={latestRelatedMaterials}
       />
-
-      <FacturaTable product_list={selectedOrder} orderCartData={orderCartData} />
     </div>
   );
 });
