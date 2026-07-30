@@ -113,6 +113,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
       owner: id,
       status: status_list[0].accessor,
       person_in_charge: 0,
+      payment_method: 'prepayment',
     });
     setCurrentClient(client);
     setSearchFilter('');

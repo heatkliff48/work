@@ -59,6 +59,9 @@ module.exports = {
       region: {
         type: Sequelize.STRING,
       },
+      payment_method: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

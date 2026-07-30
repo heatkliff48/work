@@ -27,6 +27,7 @@ import {
   updAccountingDataList,
   updateOrderInCharge,
   updateOrderStatus,
+  updatePayment,
 } from '#components/redux/actions/ordersAction.js';
 import {
   addNewListOfOrderedProduction,
@@ -142,6 +143,14 @@ const OrderCart = React.memo(() => {
     vat_result: 0,
     vat_result_del: 0,
   });
+
+  const PAYMENT_METHOD_OPTIONS = [
+    { value: 'prepayment', label: 'Prepago' },
+    { value: 'bank_transfer', label: 'Transferencia bancaria' },
+    { value: 'promissory_note', label: 'Pagaré' },
+    { value: 'confirming', label: 'Confirming' },
+    { value: 'confirming_without_recourse', label: 'Confirming sin recurso' },
+  ];
 
   // Только вид: пилюля статуса в шапке карточки заказа — данные те же,
   // что уже используются в статус-степпере ниже (status_list/orderCartData.status).
@@ -1092,6 +1101,27 @@ const OrderCart = React.memo(() => {
     return personInChargeOption || options[0];
   };
 
+  const handlePaymentMethodChange = (selectedOption) => {
+    setOrderCartData((prev) => ({
+      ...prev,
+      payment_method: selectedOption.value,
+    }));
+
+    dispatch(
+      updatePayment({
+        order_id: orderCartData?.id,
+        payment_method: selectedOption.value,
+      }),
+    );
+  };
+
+  const getSelectedPaymentMethodOption = () => {
+    const paymentMethodOption = PAYMENT_METHOD_OPTIONS.find(
+      (option) => option.value == orderCartData?.payment_method,
+    );
+    return paymentMethodOption || PAYMENT_METHOD_OPTIONS[0];
+  };
+
   const productHandler = (product) => {
     const reservedProduct = productsOfOrders.find(
       (orderedProduct) =>
@@ -1476,6 +1506,21 @@ const OrderCart = React.memo(() => {
                   </span>
                 </div>
                 <div className="ord-summary-row">
+                  <span className="ord-summary-row__label">Payment method</span>
+                  <span style={{ minWidth: 220 }}>
+                    <Select
+                      value={getSelectedPaymentMethodOption(
+                        orderCartData?.payment_method,
+                      )}
+                      onChange={(v) => {
+                        handlePaymentMethodChange(v);
+                      }}
+                      options={PAYMENT_METHOD_OPTIONS}
+                      isDisabled={orderCartData?.status < 5 ? false : true}
+                    />
+                  </span>
+                </div>
+                <div className="ord-summary-row">
                   <span className="ord-summary-row__label">Delivery price</span>
                   <span
                     style={{ display: 'flex', alignItems: 'center', gap: 8 }}
@@ -1649,8 +1694,7 @@ const OrderCart = React.memo(() => {
                     );
                     return status_list.map((item, idx) => {
                       const isDone = item.accessor < orderCartData?.status;
-                      const isCurrent =
-                        item.accessor === orderCartData?.status;
+                      const isCurrent = item.accessor === orderCartData?.status;
                       const isDisabled =
                         !orderStatusAccess?.canWrite ||
                         item?.accessor == 7 ||

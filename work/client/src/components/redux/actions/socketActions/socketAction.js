@@ -159,6 +159,7 @@ import {
   ADD_NEW_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   NEEF_DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   NEW_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+  PAYMENT_METHOD_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -418,6 +419,13 @@ export const updInChargeOrderSocket = (person_in_charge) => {
   return {
     type: PERSON_IN_CHARGE_OF_ORDER_SOCKET,
     payload: person_in_charge,
+  };
+};
+
+export const updPaymentMethodOrderSocket = (payment_method) => {
+  return {
+    type: PAYMENT_METHOD_SOCKET,
+    payload: payment_method,
   };
 };
 

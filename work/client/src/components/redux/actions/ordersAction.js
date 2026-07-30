@@ -38,6 +38,7 @@ import {
   GET_UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
   ADD_RANDOM_PRODUCTS_OF_ORDER,
   ADD_CHILD_ORDER,
+  UPDATE_PAYMENT_METHOD,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -271,6 +272,13 @@ export const updateOrderInCharge = (orderInCharge) => {
   return {
     type: UPDATE_PERSON_IN_CHARGE_OF_ORDER,
     payload: orderInCharge,
+  };
+};
+
+export const updatePayment = (payment_method) => {
+  return {
+    type: UPDATE_PAYMENT_METHOD,
+    payload: payment_method,
   };
 };
 
