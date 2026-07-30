@@ -23,6 +23,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
   const { dryMixesJournal, anchor, tool, relatedMaterialsJournal } =
     useProductsTypeJournalContext();
 
+  const [pdfUrl, setPdfUrl] = useState({});
   const [pdfData, setPdfData] = useState({});
 
   // DEAL_ID и UF_NUMBER_OFFER — заполняются менеджером и хранятся в БД заказа
@@ -688,6 +689,22 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
         const footerText = doc.splitTextToSize(pdfData.footer, footerWidth - 8);
 
+        const lineHeight = 3;
+        const textHeight = footerText.length * lineHeight;
+
+        const footerTextY = footerY + (footerHeight - textHeight) / 2 + lineHeight;
+
+        doc.text(footerText, pageWidth / 2, footerTextY, {
+          align: 'center',
+        });
+      };
+
+      addFinalPageFooter();
+      // Генерация PDF URL
+      const pdfBlob = doc.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      setPdfUrl(pdfUrl);
+
       return doc;
     } catch (error) {
       console.error('❌ Ошибка загрузки изображения:', error);
@@ -913,6 +930,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       footer,
       payment_method,
     });
+    setPdfUrl(null);
   }, [orderData, productList]);
 
   const downloadPDF = async () => {
