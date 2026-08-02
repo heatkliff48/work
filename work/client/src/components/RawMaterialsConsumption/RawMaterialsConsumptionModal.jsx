@@ -991,12 +991,12 @@ const RawMaterialsConsumptionModal = React.memo(
                     <th className="th-from-log">from log</th>
                     <th className="th-manual">
                       <div className="form-check">
-                        <input
+                        {/* <input
                           className="form-check-input"
                           type="checkbox"
                           checked={wastedMode === 'manual'}
                           onChange={onHeaderManual}
-                        />
+                        /> */}
                         <label className="form-check-label">use manual input</label>
                       </div>
                     </th>
