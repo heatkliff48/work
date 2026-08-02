@@ -152,8 +152,6 @@ const OrderCart = React.memo(() => {
     { value: 'confirming_without_recourse', label: 'Confirming sin recurso' },
   ];
 
-  // Только вид: пилюля статуса в шапке карточки заказа — данные те же,
-  // что уже используются в статус-степпере ниже (status_list/orderCartData.status).
   const cardStatusTheme = useMemo(
     () => statusThemeFor(orderCartData?.status),
     [orderCartData?.status],
@@ -339,8 +337,6 @@ const OrderCart = React.memo(() => {
     );
   }, [productsOfOrders, latestProducts, addProductArticleToOrderList]);
 
-  // Сумма "Real quantity, m2" по всем блокам (используется, чтобы разложить
-  // "Delivery price for m2 full" пропорционально на каждую позицию)
   const blocksTotalQuantityRealM2 = useMemo(() => {
     return (updatedProductListOrder || []).reduce(
       (acc, el) => acc + (Number(el?.quantity_real) || 0),
@@ -348,7 +344,6 @@ const OrderCart = React.memo(() => {
     );
   }, [updatedProductListOrder]);
 
-  // Средняя стоимость доставки на 1 m2 = введённая полная сумма / сумма Real quantity, m2
   const deliveryPricePerM2 = useMemo(() => {
     const deliveryM2Total = Number(orderCartData?.delivery_m2 || 0);
     if (!deliveryM2Total || !blocksTotalQuantityRealM2) return 0;
@@ -359,16 +354,24 @@ const OrderCart = React.memo(() => {
     return (updatedProductListOrder || []).map((product) => {
       const price_m2 = Number(product?.price_m2 || 0);
       const quantity_m2 = Number(product?.quantity_m2 || 0);
+      const quantity_real = Number(product?.quantity_real || 0);
       const discount = Number(product?.discount || 0);
 
+      const final_price = (price_m2 * quantity_m2 * (100 - discount)) / 100;
+
+      const delivery_m2_share =
+        (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
+
       const price_m2_with_delivery = price_m2 + deliveryPricePerM2;
-      const final_price_with_delivery =
-        (price_m2_with_delivery * quantity_m2 * (100 - discount)) / 100;
 
       return {
         ...product,
         price_m2_with_delivery: Number(price_m2_with_delivery.toFixed(2)),
-        final_price: Number(final_price_with_delivery.toFixed(2)),
+        final_price: Number(final_price.toFixed(2)),
+        delivery_m2_share: Number(delivery_m2_share.toFixed(2)),
+        final_price_with_delivery: Number(
+          (final_price + delivery_m2_share).toFixed(2),
+        ),
       };
     });
   }, [updatedProductListOrder, deliveryPricePerM2]);
@@ -930,6 +933,7 @@ const OrderCart = React.memo(() => {
 
   useEffect(() => {
     const delivery = Number(orderCartData?.delivery || 0);
+    const delivery_m2 = Number(orderCartData?.delivery_m2 || 0);
     const vatPercent = Number(vatValue.vat_procent || 0);
 
     if (!final_price_product || !vatPercent) {
@@ -938,7 +942,7 @@ const OrderCart = React.memo(() => {
         vat_euro_origin: 0,
         vat_result: 0,
         vat_euro: 0,
-        vat_result_del: delivery,
+        vat_result_del: delivery + delivery_m2,
         vat_procent: orderCartData?.region == 'peninsular_spain' ? 21 : 0,
       }));
       return;
@@ -946,9 +950,10 @@ const OrderCart = React.memo(() => {
 
     const vat_euro = ((vatPercent * final_price_product) / 100).toFixed(2);
     const vat_result = (final_price_product + Number(vat_euro)).toFixed(2);
+
     const vat_result_del = (
       Number(vat_result) +
-      delivery * (1 + vatPercent / 100)
+      (delivery + delivery_m2) * (1 + vatPercent / 100)
     ).toFixed(2);
 
     setVatValue((prev) => ({
@@ -958,11 +963,15 @@ const OrderCart = React.memo(() => {
       vat_euro,
       vat_result_del,
     }));
-  }, [final_price_product, vatValue.vat_procent, orderCartData?.delivery]);
+  }, [
+    final_price_product,
+    vatValue.vat_procent,
+    orderCartData?.delivery,
+    orderCartData?.delivery_m2,
+  ]);
 
   const deliveryFunc = async () => {
     const delivery = Number(orderCartData?.delivery || 0);
-    const vatPercent = Number(vatValue.vat_procent || 0);
 
     dispatch(
       addNewDeliveryPrice({
@@ -970,14 +979,6 @@ const OrderCart = React.memo(() => {
         delivery,
       }),
     );
-
-    setVatValue((prev) => ({
-      ...prev,
-      vat_result_del: (
-        Number(prev.vat_result || 0) +
-        delivery * (1 + vatPercent / 100)
-      ).toFixed(2),
-    }));
   };
 
   const deliveryM2Func = async () => {
@@ -1539,6 +1540,7 @@ const OrderCart = React.memo(() => {
                       }}
                       readOnly={orderCartData?.status < 5 ? false : true}
                       disabled={
+                        orderCartData?.status >= 5 ||
                         !checkUserAccess(
                           user,
                           roles,
@@ -1581,6 +1583,7 @@ const OrderCart = React.memo(() => {
                       }}
                       readOnly={orderCartData?.status < 5 ? false : true}
                       disabled={
+                        orderCartData?.main_order ||
                         !checkUserAccess(
                           user,
                           roles,

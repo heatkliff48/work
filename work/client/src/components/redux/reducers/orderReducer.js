@@ -37,7 +37,7 @@ export const ordersReducer = (orders = [], action) => {
 
       const result = orders.map((order) => {
         if (order.id === order_id) {
-          if (delivery) {
+          if (delivery || delivery == 0) {
             return { ...order, delivery };
           } else {
             return { ...order, delivery_m2 };
