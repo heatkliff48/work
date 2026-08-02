@@ -509,6 +509,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
   const applyRawMaterialDefaults = (data) => {
     const next = { ...data };
+
     DEFAULT_RAW_MATERIAL_VALUES.forEach(({ key, value }) => {
       if (!DEFAULT_KEYS.includes(key)) return;
 
@@ -518,6 +519,14 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
       next[key] = value;
     });
+
+    if (batchData?.aluminum_type) {
+      next.al_paste_types = batchData.aluminum_type;
+    }
+
+    if (batchData?.aluminum_2_type) {
+      next.al_paste_types_2 = batchData.aluminum_2_type;
+    }
 
     const alum1 = Number(batchData.aluminum_paste) || 0;
     const alum2 = Number(batchData.aluminum_paste_2) || 0;
