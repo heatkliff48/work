@@ -77,24 +77,23 @@ class OrdersController {
 
   static async addDeliveryPrice(req, res) {
     const { order_id, delivery, delivery_m2 } = req.body;
-    console.log('req.body>>>>>>>>>>>', req.body);
 
     try {
-      if (delivery) {
+      if (delivery !== undefined && delivery !== null) {
         await OrdersService.addDeliveryPrice({ order_id, delivery });
-
         myEmitter.emit(ADD_NEW_DELIVERY_PRICE_SOCKET, { order_id, delivery });
-
         return res.status(200).json({ order_id, delivery });
-      } else {
+      } else if (delivery_m2 !== undefined && delivery_m2 !== null) {
         await OrdersService.addDeliveryM2Price({ order_id, delivery_m2 });
-
         myEmitter.emit(ADD_NEW_DELIVERY_PRICE_SOCKET, {
           order_id,
           delivery_m2,
         });
-
         return res.status(200).json({ order_id, delivery_m2 });
+      } else {
+        return res.status(400).json({
+          error: 'Either delivery or delivery_m2 is required',
+        });
       }
     } catch (err) {
       return ErrorUtils.catchError(res, err);
