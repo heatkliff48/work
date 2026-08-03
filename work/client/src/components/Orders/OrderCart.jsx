@@ -1549,17 +1549,18 @@ const OrderCart = React.memo(() => {
                       }
                     />
                     {checkUserAccess(user, roles, 'orders_description_edit')
-                      ?.canWrite && (
-                      <button
-                        type="button"
-                        className="ord-btn ord-btn--ghost ord-btn--sm"
-                        onClick={() => {
-                          deliveryFunc();
-                        }}
-                      >
-                        Save
-                      </button>
-                    )}
+                      ?.canWrite &&
+                      orderCartData?.status < 5 && (
+                        <button
+                          type="button"
+                          className="ord-btn ord-btn--ghost ord-btn--sm"
+                          onClick={() => {
+                            deliveryFunc();
+                          }}
+                        >
+                          Save
+                        </button>
+                      )}
                   </span>
                 </div>
                 <div className="ord-summary-row">
@@ -1592,17 +1593,18 @@ const OrderCart = React.memo(() => {
                       }
                     />
                     {checkUserAccess(user, roles, 'orders_description_edit')
-                      ?.canWrite && (
-                      <button
-                        type="button"
-                        className="ord-btn ord-btn--ghost ord-btn--sm"
-                        onClick={() => {
-                          deliveryM2Func();
-                        }}
-                      >
-                        Save
-                      </button>
-                    )}
+                      ?.canWrite &&
+                      orderCartData?.status < 5 && (
+                        <button
+                          type="button"
+                          className="ord-btn ord-btn--ghost ord-btn--sm"
+                          onClick={() => {
+                            deliveryM2Func();
+                          }}
+                        >
+                          Save
+                        </button>
+                      )}
                   </span>
                 </div>
                 <div className="ord-summary-divider" />
