@@ -1594,7 +1594,8 @@ const OrderCart = React.memo(() => {
                     />
                     {checkUserAccess(user, roles, 'orders_description_edit')
                       ?.canWrite &&
-                      orderCartData?.status < 5 && (
+                      orderCartData?.status < 5 &&
+                      !orderCartData?.main_order && (
                         <button
                           type="button"
                           className="ord-btn ord-btn--ghost ord-btn--sm"
