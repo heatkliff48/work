@@ -1492,7 +1492,7 @@ const OrderCart = React.memo(() => {
           setVatValue={setVatValue}
         />
 
-        <div className="ord-tiles" style={{ marginBottom: 14 }}>
+        {/* <div className="ord-tiles" style={{ marginBottom: 14 }}>
           <div className="ord-tile">
             <div className="ord-tile__head">
               <div className="ord-tile__label">Secondary contacts</div>
@@ -1531,7 +1531,7 @@ const OrderCart = React.memo(() => {
             </div>
             <FilesMain userAccess={userAccess} />
           </div>
-        </div>
+        </div> */}
 
         <div className="ord-summary-card ord-summary-card--order">
           <div className="ord-summary-card__title">Delivery info</div>
