@@ -44,7 +44,7 @@ function ProductionBatchLog() {
         COLUMN_DATA={production_batch_log}
         dataOfTable={productionBatchLogData}
         userAccess={userAccess}
-        tableName={'Журнал производственных партий'}
+        tableName={'Production batch log'}
       />
     </>
   );

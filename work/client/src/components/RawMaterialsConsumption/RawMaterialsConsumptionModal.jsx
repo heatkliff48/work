@@ -419,20 +419,20 @@ const RawMaterialsConsumptionModal = React.memo(
 
       if (info.diff > 0) {
         return window.confirm(
-          `⚠️ Превышение production volume\n\n` +
-            `План: ${info.planned}\n` +
-            `Уже учтено: ${info.alreadyConsumed}\n` +
-            `Текущее: ${info.current}\n\n` +
-            `Сверх плана: ${info.diff}\n\n` +
-            `Продолжить?`,
+          `⚠️ Production volume exceeded\n\n` +
+            `Plan: ${info.planned}\n` +
+            `Already recorded: ${info.alreadyConsumed}\n` +
+            `Current: ${info.current}\n\n` +
+            `Over plan: ${info.diff}\n\n` +
+            `Continue?`,
         );
       } else {
         return window.confirm(
-          `ℹ️ Production volume не достигнут\n\n` +
-            `План: ${info.planned}\n` +
-            `Будет учтено всего: ${info.totalAfterSave}\n\n` +
-            `Осталось: ${Math.abs(info.diff)}\n\n` +
-            `Продолжить?`,
+          `ℹ️ Production volume not reached\n\n` +
+            `Plan: ${info.planned}\n` +
+            `Total to be recorded: ${info.totalAfterSave}\n\n` +
+            `Remaining: ${Math.abs(info.diff)}\n\n` +
+            `Continue?`,
         );
       }
     };
@@ -512,7 +512,7 @@ const RawMaterialsConsumptionModal = React.memo(
       });
 
       if (!materials.length) {
-        alert('Нет данных для списания материалов.');
+        alert('No data to write off materials.');
         return;
       }
       let result_materials = [...materials];
@@ -570,7 +570,7 @@ const RawMaterialsConsumptionModal = React.memo(
         (materials.some((m) => m.type === 'Aluminum 2') && !selectedAlu2Type?.value)
       ) {
         alert(
-          'Для алюминия необходимо выбрать тип (7040-10/70WB28, 8040-10/70WB28 и т.д.)',
+          'For aluminum, a type must be selected (7040-10/70WB28, 8040-10/70WB28, etc.)',
         );
         return;
       }
@@ -626,11 +626,11 @@ const RawMaterialsConsumptionModal = React.memo(
 
       if (shortages.length) {
         const msg =
-          'Невозможно списать материалы — недостаточно на складе:\n\n' +
+          'Cannot write off materials — insufficient stock:\n\n' +
           shortages
             .map(
               (s) =>
-                `${s.type}: нужно ${s.need}, на складе ${s.have} (не хватает ${s.lack})`,
+                `${s.type}: need ${s.need}, in stock ${s.have} (short by ${s.lack})`,
             )
             .join('\n');
         alert(msg);
@@ -651,8 +651,8 @@ const RawMaterialsConsumptionModal = React.memo(
 
         if (null_arr.length) {
           const msg =
-            'Необходимо заполнить все поля количества материалов:\n\n' +
-            null_arr.map((s) => `${s.type}: значение не указано`).join('\n');
+            'All material quantity fields must be filled in:\n\n' +
+            null_arr.map((s) => `${s.type}: value not specified`).join('\n');
           alert(msg);
           return;
         }

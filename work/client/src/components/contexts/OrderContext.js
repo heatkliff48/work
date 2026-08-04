@@ -72,7 +72,7 @@ const OrderContextProvider = ({ children }) => {
       sortType: 'number',
     },
     {
-      Header: 'Quantity of pallets',
+      Header: 'Pallets, qty',
       accessor: 'quantity_palet',
       sortType: 'number',
     },
@@ -115,7 +115,7 @@ const OrderContextProvider = ({ children }) => {
       sortType: 'number',
     },
     {
-      Header: 'Quantity of pallets',
+      Header: 'Pallets, qty',
       accessor: 'quantity_palet_dry',
       sortType: 'number',
     },

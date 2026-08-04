@@ -84,11 +84,11 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity per truck, pallets',
+      Header: 'Pallets per truck, qty',
       accessor: 'qty_per_truck',
     },
     {
-      Header: 'Quantity per contendor, pallets',
+      Header: 'Pallets per contendor, qty',
       accessor: 'qty_per_contendor',
     },
     {
@@ -290,11 +290,11 @@ const ProductsTypeJournalContextProvider = ({ children }) => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity per truck, pallet',
+      Header: 'Pallets per truck, qty',
       accessor: 'qty_per_truck',
     },
     {
-      Header: 'Quantity per contendor, pallet',
+      Header: 'Pallets per contendor, qty',
       accessor: 'qty_per_contendor',
     },
     {

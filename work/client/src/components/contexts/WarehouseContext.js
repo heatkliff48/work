@@ -41,17 +41,17 @@ const WarehouseContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Free quantity remaining, pallet',
+      Header: 'Free pallets remaining, qty',
       accessor: 'free_quantity_remaining',
       sortType: 'number',
     },
     {
-      Header: 'Total quantity, pallet',
+      Header: 'Total pallets, qty',
       accessor: 'total_quantity',
       sortType: 'number',
     },
     {
-      Header: 'Ordered quantity, pallet',
+      Header: 'Ordered pallets, qty',
       accessor: 'ordered_quantity',
       sortType: 'number',
     },
@@ -71,7 +71,7 @@ const WarehouseContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Quantity on sorting',
+      Header: 'Pallets on sorting, qty',
       accessor: 'sorting',
       sortType: 'number',
     },
@@ -98,17 +98,17 @@ const WarehouseContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Free quantity remaining, pallet',
+      Header: 'Free pallets remaining, qty',
       accessor: 'free_quantity_remaining',
       sortType: 'number',
     },
     {
-      Header: 'Total quantity, pallet',
+      Header: 'Total pallets, qty',
       accessor: 'total_quantity',
       sortType: 'number',
     },
     {
-      Header: 'Ordered quantity, pallet',
+      Header: 'Ordered pallets, qty',
       accessor: 'ordered_quantity',
       sortType: 'number',
     },
@@ -141,12 +141,12 @@ const WarehouseContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Quantity OK, pallet',
+      Header: 'Pallets OK, qty',
       accessor: 'quantity_ok',
       sortType: 'number',
     },
     {
-      Header: 'Quantity sorting, pallet',
+      Header: 'Pallets sorting, qty',
       accessor: 'quantity_sorting',
       sortType: 'number',
     },
@@ -197,19 +197,19 @@ const WarehouseContextProvider = ({ children }) => {
       sortType: 'string',
     },
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
-    { Header: 'Quantity of pallets', accessor: 'quantity', sortType: 'number' },
+    { Header: 'Pallets, qty', accessor: 'quantity', sortType: 'number' },
     {
-      Header: 'Quantity of cakes',
+      Header: 'Cakes, qty',
       accessor: 'quantity_cakes',
       sortType: 'number',
     },
     {
-      Header: 'Quantity in batch, cakes',
+      Header: 'Cakes in batch, qty',
       accessor: 'quantity_in_batch',
       sortType: 'number',
     },
     {
-      Header: 'Quantity in warehouse, pallets',
+      Header: 'Pallets in warehouse, qty',
       accessor: 'quantity_in_warehouse',
       sortType: 'number',
     },
@@ -227,7 +227,7 @@ const WarehouseContextProvider = ({ children }) => {
       sortType: 'string',
     },
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
-    { Header: 'Quantity of pallets', accessor: 'quantity', sortType: 'number' },
+    { Header: 'Pallets, qty', accessor: 'quantity', sortType: 'number' },
     { Header: 'Status', accessor: 'status', sortType: 'string' },
   ];
 
@@ -250,7 +250,7 @@ const WarehouseContextProvider = ({ children }) => {
     { Header: 'Order article', accessor: 'order_article', sortType: 'string' },
     { Header: 'Quantity', accessor: 'quantity', sortType: 'number' },
     {
-      Header: 'Quantity in warehouse, pallets',
+      Header: 'Pallets in warehouse, qty',
       accessor: 'quantity_in_warehouse',
       sortType: 'number',
     },

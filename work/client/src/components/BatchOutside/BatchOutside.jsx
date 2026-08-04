@@ -78,17 +78,17 @@ const BatchOutside = () => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity, arrays',
+      Header: 'Cakes, qty',
       accessor: 'quantity_arrays',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity, pallets',
+      Header: 'Pallets, qty',
       accessor: 'quantity_pallets',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity free, pallets',
+      Header: 'Free pallets, qty',
       accessor: 'quantity_free',
       Filter: TextSearchFilter,
     },
@@ -181,7 +181,7 @@ const BatchOutside = () => {
         <div className="cl-page__stats">
           <div className="cl-stat">
             <div className="cl-stat__num">{totalArrays}</div>
-            <div className="cl-stat__label">Arrays scheduled</div>
+            <div className="cl-stat__label">Cakes scheduled</div>
           </div>
           <div className="cl-stat__divider" />
           <div className="cl-stat">
@@ -198,19 +198,19 @@ const BatchOutside = () => {
             className={`cl-btn ${mode === 'list' ? 'cl-btn--primary' : 'cl-btn--ghost'}`}
             onClick={() => setMode('list')}
           >
-            Список
+            List
           </button>
           <button
             type="button"
             className={`cl-btn ${mode === 'grid' ? 'cl-btn--primary' : 'cl-btn--ghost'}`}
             onClick={() => setMode('grid')}
           >
-            Вид автоклавов
+            Autoclave view
           </button>
         </div>
         <div className="cl-toolbar__spacer" />
         <div className="bo-caption">
-          Автоклав — 21 массив. Плотность и размер — из каталога продукции по Product ID.
+          Autoclave — 21 cakes. Density and size — from the product catalog by Product ID.
         </div>
       </div>
 

@@ -63,13 +63,13 @@ const WMOCTProduct = ({
       const errorDescription = incorrectlyAllocatedProducts
         .map(
           (product) =>
-            `${product.article}: загружено ${product.allocatedTotal} из ${product.qtyTotal}`,
+            `${product.article}: loaded ${product.allocatedTotal} of ${product.qtyTotal}`,
         )
         .join('\n');
 
       window.alert(
-        `Невозможно сохранить.\n\n` +
-          `Необходимо полностью загрузить каждый продукт:\n\n` +
+        `Cannot save.\n\n` +
+          `Every product must be fully loaded:\n\n` +
           errorDescription,
       );
 

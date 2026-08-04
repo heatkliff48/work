@@ -38,7 +38,7 @@ const GreenLineMonitoring = () => {
       const response = await api.get('/greenlinemonitoring/dates/available');
       setAvailableDates(response.data.availableDates || []);
     } catch (err) {
-      setError('Ошибка при загрузке доступных дат');
+      setError('Error loading available dates');
       console.error('Error fetching available dates:', err);
     } finally {
       setLoading(false);
@@ -80,7 +80,7 @@ const GreenLineMonitoring = () => {
       setSensorsData(chartData);
       setSensorsStatistics(statsData);
     } catch (err) {
-      setError('Ошибка при загрузке данных датчиков');
+      setError('Error loading sensor data');
       console.error('Error fetching sensor data:', err);
     } finally {
       setLoading(false);
@@ -113,27 +113,27 @@ const GreenLineMonitoring = () => {
 
   const getStatusText = (status) => {
     const statusTexts = {
-      normal: 'Норма',
-      warning: 'Предупреждение',
-      error: 'Ошибка',
-      offline: 'Отключен',
-      critical: 'Критический',
+      normal: 'Normal',
+      warning: 'Warning',
+      error: 'Error',
+      offline: 'Offline',
+      critical: 'Critical',
     };
-    return statusTexts[status?.toLowerCase()] || status || 'Неизвестно';
+    return statusTexts[status?.toLowerCase()] || status || 'Unknown';
   };
 
   return (
     <div className="sensor-monitoring">
       <div className="controls">
         <div className="date-selector">
-          <label htmlFor="date-select">Выберите дату:</label>
+          <label htmlFor="date-select">Select date:</label>
           <select
             id="date-select"
             value={selectedDate}
             onChange={handleDateChange}
             disabled={loading}
           >
-            <option value="">-- Выберите дату --</option>
+            <option value="">-- Select date --</option>
             {availableDates.map((date) => (
               <option key={date} value={date}>
                 {formatDate(date)}
@@ -142,7 +142,7 @@ const GreenLineMonitoring = () => {
           </select>
           {availableDates.length > 0 && (
             <span className="dates-count">
-              Доступно дат: {availableDates.length}
+              Available dates: {availableDates.length}
             </span>
           )}
         </div>
@@ -158,14 +158,14 @@ const GreenLineMonitoring = () => {
       {loading && (
         <div className="loading">
           <div className="spinner"></div>
-          <span>Загрузка данных...</span>
+          <span>Loading data...</span>
         </div>
       )}
 
       {!loading && selectedDate && Object.keys(sensorsData).length === 0 && (
         <div className="no-data">
           <span className="no-data-icon">📊</span>
-          <p>Нет данных за выбранную дату</p>
+          <p>No data for the selected date</p>
         </div>
       )}
 
@@ -176,7 +176,7 @@ const GreenLineMonitoring = () => {
           return (
             <div key={sensorId} className="sensor-card">
               <div className="sensor-header">
-                <h3>Датчик №{sensorId}</h3>
+                <h3>Sensor #{sensorId}</h3>
                 <span
                   className="sensor-status"
                   style={{
@@ -198,7 +198,7 @@ const GreenLineMonitoring = () => {
                     />
                     <YAxis
                       label={{
-                        value: 'Высота (мм)',
+                        value: 'Height (mm)',
                         angle: -90,
                         position: 'insideLeft',
                         style: { fontSize: 10, textAnchor: 'middle' },
@@ -207,17 +207,17 @@ const GreenLineMonitoring = () => {
                     />
                     <Tooltip
                       formatter={(value) => [
-                        `${value?.toFixed(2)} мм`,
-                        'Высота',
+                        `${value?.toFixed(2)} mm`,
+                        'Height',
                       ]}
-                      labelFormatter={(label) => `Время: ${label}`}
+                      labelFormatter={(label) => `Time: ${label}`}
                     />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="height_mm"
                       stroke="#2196F3"
-                      name="Высота"
+                      name="Height"
                       dot={false}
                       strokeWidth={2}
                       activeDot={{ r: 6 }}
@@ -228,25 +228,25 @@ const GreenLineMonitoring = () => {
 
               <div className="sensor-stats">
                 <div className="stat-item">
-                  <span className="stat-label">Мин.</span>
+                  <span className="stat-label">Min.</span>
                   <span className="stat-value">
-                    {stats.min_height?.toFixed(2)} мм
+                    {stats.min_height?.toFixed(2)} mm
                   </span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-label">Сред.</span>
+                  <span className="stat-label">Avg.</span>
                   <span className="stat-value">
-                    {stats.average_height?.toFixed(2)} мм
+                    {stats.average_height?.toFixed(2)} mm
                   </span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-label">Макс.</span>
+                  <span className="stat-label">Max.</span>
                   <span className="stat-value">
-                    {stats.max_height?.toFixed(2)} мм
+                    {stats.max_height?.toFixed(2)} mm
                   </span>
                 </div>
                 <div className="stat-item">
-                  <span className="stat-label">Измерений</span>
+                  <span className="stat-label">Measurements</span>
                   <span className="stat-value">{stats.total_measurements}</span>
                 </div>
               </div>
