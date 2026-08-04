@@ -28,6 +28,7 @@ const PATH_LABELS = {
   '/recipe_products': 'Recipe products',
   '/raw_materials_plan': 'Raw Materials Plan',
   '/recipe_orders': 'Raw material calendar',
+  '/technology_calendar': 'Calendar',
   '/quality_management': 'Quality Management',
 };
 
