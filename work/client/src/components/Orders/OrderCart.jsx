@@ -940,7 +940,7 @@ const OrderCart = React.memo(() => {
       const delivery = Number(deliveryAmount || 0);
       const vatPercent = Number(vatValue.vat_procent || 0);
 
-      if (!final_price_product || !vatPercent) {
+      if (!final_price_product) {
         return {
           vat_euro_origin: 0,
           vat_result: 0,
@@ -1787,7 +1787,10 @@ const OrderCart = React.memo(() => {
           </div>
         </div>
 
-        <div className="ord-card__footer" style={{ marginTop: 14, textAlign: 'right' }}>
+        <div
+          className="ord-card__footer"
+          style={{ marginTop: 14, textAlign: 'right' }}
+        >
           <button
             type="button"
             className="ord-btn ord-btn--primary"
