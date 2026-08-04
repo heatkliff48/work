@@ -46,7 +46,7 @@ function Autoclave() {
       <div className="autoclave-container">
         {autoclave?.map((autoclaveRow, rowIndex) => (
           <div key={rowIndex} className="autoclave-row">
-            <h3 className="autoclave-header">Автоклав {rowIndex + 1}</h3>
+            <h3 className="autoclave-header">Autoclave {rowIndex + 1}</h3>
 
             {autoclaveRow?.map((el, cellIndex) => (
               <div

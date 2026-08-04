@@ -337,7 +337,7 @@ function WMModalTrailerModal({ trailer_order }) {
                     onChange={(date) => handleDateChange(rowIndex, date)}
                     disabled={row.isExisting}
                     dateFormat="dd.MM.yyyy"
-                    placeholderText="ДД.ММ.ГГГГ"
+                    placeholderText="DD.MM.YYYY"
                     className="form-control"
                     style={{ width: '100%' }}
                   />
@@ -361,7 +361,7 @@ function WMModalTrailerModal({ trailer_order }) {
                     />
                     {!row.isExisting && (
                       <div className="wm-builder-table__hint">
-                        (ост.:{' '}
+                        (rem.:{' '}
                         {getAvailableRemaining(getProductKey(product), rowIndex)})
                       </div>
                     )}

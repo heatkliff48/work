@@ -59,11 +59,11 @@ const AddProductOrderToWarehouseModal = React.memo(({ isOpen, toggle }) => {
     },
     cakeSelector
       ? {
-          Header: 'Quantity of cakes',
+          Header: 'Cakes, qty',
           accessor: 'quantity_cakes',
         }
       : {
-          Header: 'Quantity of pallets',
+          Header: 'Pallets, qty',
           accessor: 'quantity_pallets',
         },
     {

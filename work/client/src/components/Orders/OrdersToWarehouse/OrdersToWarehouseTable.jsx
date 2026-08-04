@@ -51,7 +51,7 @@ function OrdersToWarehouseTable() {
         sortType: 'string',
       },
       {
-        Header: 'Quantity of pallets',
+        Header: 'Pallets, qty',
         accessor: 'quantity_pallets',
       },
       {

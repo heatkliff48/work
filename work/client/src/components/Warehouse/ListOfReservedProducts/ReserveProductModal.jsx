@@ -29,7 +29,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
 
     if (quantity_palet > remaining_stock) {
       alert(
-        'Колличество заказной продукции превышает коллиичество продукции на складе!'
+        'The ordered quantity exceeds the quantity in stock!'
       );
       return;
     }

@@ -267,7 +267,7 @@ const CompressTestModal = ({ show, onHide, selectedBatch }) => {
       dialogClassName="modal-90w"
     >
       <Modal.Header closeButton>
-        <Modal.Title>Испытания на сжатие</Modal.Title>
+        <Modal.Title>Compression Tests</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div style={{ overflowX: 'auto' }}>
@@ -534,10 +534,10 @@ const CompressTestModal = ({ show, onHide, selectedBatch }) => {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>
-          Закрыть
+          Close
         </Button>
         <Button variant="primary" onClick={handleSave}>
-          Сохранить
+          Save
         </Button>
       </Modal.Footer>
     </Modal>

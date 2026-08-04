@@ -128,7 +128,7 @@ function Products() {
   }, [user, roles]);
 
   if (!userAccess?.canRead) {
-    return <div>У вас нет прав для просмотра этой страницы.</div>;
+    return <div>You do not have permission to view this page.</div>;
   }
 
   return (

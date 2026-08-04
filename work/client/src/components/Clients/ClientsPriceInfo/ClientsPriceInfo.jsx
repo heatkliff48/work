@@ -18,7 +18,7 @@ const categoryOptions = [
   { value: 'tienda_de_la_construccion', label: 'Tienda de la construcción' },
   { value: 'equipo_de_construction', label: 'Equipo de construction' },
   { value: 'agente', label: 'Agente' },
-  { value: 'cliente_privado', label: 'Сliente privado' },
+  { value: 'cliente_privado', label: 'Cliente privado' },
   { value: 'constructor_pequeno', label: 'Constructor pequeño' },
   { value: 'almacenista_pequeno', label: 'Almacenista pequeno' },
   {

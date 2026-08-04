@@ -317,7 +317,7 @@ const DimensionTestModal = ({ show, onHide, selectedBatch }) => {
       dialogClassName="modal-90w"
     >
       <Modal.Header closeButton>
-        <Modal.Title>Таблица измерений партии</Modal.Title>
+        <Modal.Title>Batch Dimensions Table</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div style={{ overflowX: 'auto' }}>
@@ -449,10 +449,10 @@ const DimensionTestModal = ({ show, onHide, selectedBatch }) => {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>
-          Закрыть
+          Close
         </Button>
         <Button variant="primary" onClick={handleSave}>
-          Сохранить
+          Save
         </Button>
       </Modal.Footer>
     </Modal>

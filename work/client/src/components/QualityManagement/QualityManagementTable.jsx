@@ -66,7 +66,7 @@ const QualityManagementTable = () => {
     //   Filter: TextSearchFilter,
     // },
     {
-      Header: 'Produсt article',
+      Header: 'Product article',
       accessor: 'product_article',
       Filter: TextSearchFilter,
     },
@@ -76,33 +76,33 @@ const QualityManagementTable = () => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Total Qty in batch, plan, pallets',
+      Header: 'Total pallets in batch, plan, qty',
       accessor: 'total_quantity_plan',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Free Qty in batch, fact, pallets',
+      Header: 'Free pallets in batch, fact, qty',
       accessor: 'free_quantity_fact',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quantity on sorting, pallets',
+      Header: 'Pallets on sorting, qty',
       accessor: 'sorting',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Reserved Qty in batch, allocated, pallets',
+      Header: 'Reserved pallets in batch, allocated, qty',
       accessor: 'reserved_quantity_allocated',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Reserved Qty in batch, pallets',
+      Header: 'Reserved pallets in batch, qty',
       accessor: 'reserved_quantity',
       Filter: TextSearchFilter,
     },
 
     {
-      Header: 'Reserved Qty in batch, remaining, pallets',
+      Header: 'Reserved pallets in batch, remaining, qty',
       accessor: 'reserved_quantity_remaining',
       Filter: TextSearchFilter,
     },
