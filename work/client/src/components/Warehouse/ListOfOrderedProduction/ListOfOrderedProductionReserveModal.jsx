@@ -123,7 +123,7 @@ function ListOfOrderedProductionReserveModal({
     { Header: 'Warehouse article', accessor: 'article', sortType: 'string' },
     { Header: 'Product article', accessor: 'product_article', sortType: 'string' },
     {
-      Header: 'Quantity in warehouse, pallets',
+      Header: 'Pallets in warehouse, qty',
       accessor: 'remaining_stock',
       sortType: 'number',
     },

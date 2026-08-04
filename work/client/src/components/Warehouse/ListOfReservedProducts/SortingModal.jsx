@@ -166,7 +166,7 @@ function SortingModal(props) {
     // Проверки на корректность
 
     if (summReserve < 0) {
-      alert('Ошибка: summReserve не может быть отрицательным.');
+      alert('Error: summReserve cannot be negative.');
 
       return;
     }

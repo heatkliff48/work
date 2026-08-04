@@ -88,7 +88,7 @@ const WMOCTableDataModal = ({ isOpen, toggle }) => {
         </Fragment>
         <ModalFooter>
           <Button className="wm-btn wm-btn--primary" onClick={handleSave}>
-            Сохранить
+            Save
           </Button>
         </ModalFooter>
       </Modal>

@@ -841,7 +841,7 @@ const OrderCart = React.memo(() => {
     );
     if (res_prod) {
       const confirmed = window.confirm(
-        'Этот продукт зарезервирован на складе. Всё равно удалить?'
+        'This product is reserved in the warehouse. Delete anyway?'
       );
       if (!confirmed) return;
     }
@@ -886,47 +886,67 @@ const OrderCart = React.memo(() => {
     productLists.related_materials,
   ]);
 
+  const [deliveryDraft, setDeliveryDraft] = useState(orderCartData?.delivery ?? 0);
+  const [deliveryM2Draft, setDeliveryM2Draft] = useState(
+    orderCartData?.delivery_m2 ?? 0
+  );
+
   useEffect(() => {
-    const delivery = Number(orderCartData?.delivery || 0);
-    const delivery_m2 = Number(orderCartData?.delivery_m2 || 0);
-    const vatPercent = Number(vatValue.vat_procent || 0);
+    setDeliveryDraft(orderCartData?.delivery ?? 0);
+  }, [orderCartData?.delivery]);
 
-    if (!final_price_product || !vatPercent) {
-      setVatValue((prev) => ({
-        ...prev,
-        vat_euro_origin: 0,
-        vat_result: 0,
-        vat_euro: 0,
-        vat_result_del: delivery,
-        vat_procent: orderCartData?.region == 'peninsular_spain' ? 21 : 0,
-      }));
-      return;
-    }
+  useEffect(() => {
+    setDeliveryM2Draft(orderCartData?.delivery_m2 ?? 0);
+  }, [orderCartData?.delivery_m2]);
 
-    const vat_euro = ((vatPercent * final_price_product) / 100).toFixed(2);
-    const vat_result = (final_price_product + Number(vat_euro)).toFixed(2);
+  const computeVatValues = useCallback(
+    (deliveryAmount) => {
+      const delivery = Number(deliveryAmount || 0);
+      const vatPercent = Number(vatValue.vat_procent || 0);
 
-    const vat_result_del = (
-      Number(vat_result) +
-      delivery * (1 + vatPercent / 100)
-    ).toFixed(2);
+      if (!final_price_product) {
+        return {
+          vat_euro_origin: 0,
+          vat_result: 0,
+          vat_euro: 0,
+          vat_result_del: delivery,
+          vat_procent: orderCartData?.region == 'peninsular_spain' ? 21 : 0,
+        };
+      }
 
+      const vat_euro = ((vatPercent * final_price_product) / 100).toFixed(2);
+      const vat_result = (final_price_product + Number(vat_euro)).toFixed(2);
+
+      const vat_result_del = (
+        Number(vat_result) +
+        delivery * (1 + vatPercent / 100)
+      ).toFixed(2);
+
+      return {
+        vat_euro_origin: final_price_product,
+        vat_result,
+        vat_euro,
+        vat_result_del,
+      };
+    },
+    [final_price_product, vatValue.vat_procent, orderCartData?.region]
+  );
+
+  // Итог заказа не пересчитывается автоматически при вводе новой стоимости
+  // доставки — только при первой загрузке заказа/изменении состава товаров
+  // (delivery/delivery_m2 намеренно не в зависимостях), либо при нажатии
+  // кнопки Save у полей Delivery price / Delivery price for m2 full
+  // (см. deliveryFunc/deliveryM2Func).
+  useEffect(() => {
     setVatValue((prev) => ({
       ...prev,
-      vat_euro_origin: final_price_product,
-      vat_result,
-      vat_euro,
-      vat_result_del,
+      ...computeVatValues(orderCartData?.delivery),
     }));
-  }, [
-    final_price_product,
-    vatValue.vat_procent,
-    orderCartData?.delivery,
-    orderCartData?.delivery_m2,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [final_price_product, vatValue.vat_procent, orderCartData?.id]);
 
   const deliveryFunc = async () => {
-    const delivery = Number(orderCartData?.delivery || 0);
+    const delivery = Number(deliveryDraft || 0);
 
     dispatch(
       addNewDeliveryPrice({
@@ -934,10 +954,13 @@ const OrderCart = React.memo(() => {
         delivery,
       })
     );
+
+    setOrderCartData((prev) => ({ ...prev, delivery }));
+    setVatValue((prev) => ({ ...prev, ...computeVatValues(delivery) }));
   };
 
   const deliveryM2Func = async () => {
-    const delivery_m2 = Number(orderCartData?.delivery_m2 || 0);
+    const delivery_m2 = Number(deliveryM2Draft || 0);
 
     dispatch(
       addNewDeliveryPrice({
@@ -945,6 +968,12 @@ const OrderCart = React.memo(() => {
         delivery_m2,
       })
     );
+
+    setOrderCartData((prev) => ({ ...prev, delivery_m2 }));
+    setVatValue((prev) => ({
+      ...prev,
+      ...computeVatValues(orderCartData?.delivery),
+    }));
   };
 
   const hasHydratedFromStorage = useRef(false);
@@ -1558,17 +1587,17 @@ const OrderCart = React.memo(() => {
             <div className="ord-summary-row">
               <span className="ord-summary-row__label">Delivery price</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="ord-summary-old-value">
+                  {orderCartData.delivery ?? 0}
+                </span>
                 <input
                   type="text"
                   id="delivery"
                   name="delivery"
                   className="ord-summary-input"
-                  value={orderCartData.delivery ?? 0}
+                  value={deliveryDraft}
                   onChange={(e) => {
-                    setOrderCartData((prev) => ({
-                      ...prev,
-                      delivery: Number(e.target.value),
-                    }));
+                    setDeliveryDraft(e.target.value);
                   }}
                   readOnly={orderCartData?.status < 5 ? false : true}
                   disabled={
@@ -1596,17 +1625,17 @@ const OrderCart = React.memo(() => {
                 Delivery price for m2 full
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="ord-summary-old-value">
+                  {orderCartData.delivery_m2 ?? 0}
+                </span>
                 <input
                   type="text"
                   id="delivery_m2"
                   name="delivery_m2"
                   className="ord-summary-input"
-                  value={orderCartData.delivery_m2 ?? 0}
+                  value={deliveryM2Draft}
                   onChange={(e) => {
-                    setOrderCartData((prev) => ({
-                      ...prev,
-                      delivery_m2: Number(e.target.value),
-                    }));
+                    setDeliveryM2Draft(e.target.value);
                   }}
                   readOnly={orderCartData?.status < 5 ? false : true}
                   disabled={
@@ -1702,6 +1731,19 @@ const OrderCart = React.memo(() => {
               ) : null}
             </div>
           </div>
+        </div>
+
+        <div
+          className="ord-card__footer"
+          style={{ marginTop: 14, textAlign: 'right' }}
+        >
+          <button
+            type="button"
+            className="ord-btn ord-btn--primary"
+            onClick={() => navigate('/orders')}
+          >
+            Save and show order list
+          </button>
         </div>
       </div>
     </>

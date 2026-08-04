@@ -95,19 +95,19 @@ function ProductionBatchDesignerNew() {
     () => [
       { Header: 'ID', accessor: 'id' },
       { Header: 'Product Article', accessor: 'product_article' },
-      { Header: 'Ширина, мм', accessor: 'width' },
-      { Header: 'Плотность, кг/м³', accessor: 'density' },
-      { Header: 'Количество, паллет', accessor: 'quantity' },
-      { Header: 'Продукт + Брак, массивов', accessor: 'product_with_brack' },
-      { Header: 'Кол-во, м³', accessor: 'quantity_m3' },
+      { Header: 'Width, mm', accessor: 'width' },
+      { Header: 'Density, kg/m³', accessor: 'density' },
+      { Header: 'Pallets, qty', accessor: 'quantity' },
+      { Header: 'Product + Defect, cakes', accessor: 'product_with_brack' },
+      { Header: 'Qty, m³', accessor: 'quantity_m3' },
       //{ Header: 'Свободная продукция, массив', accessor: 'free_product_cakes' },
       {
-        Header: 'Свободная продукция, паллет',
+        Header: 'Free product, pallets',
         accessor: 'free_product_package',
       },
-      { Header: 'Итоговое кол-во, массив', accessor: 'total_cakes' },
-      { Header: 'Размещено, массив', accessor: 'cakes_in_batch' },
-      { Header: 'Осталось разместить, массив', accessor: 'cakes_residue' },
+      { Header: 'Total cakes, qty', accessor: 'total_cakes' },
+      { Header: 'Placed cakes, qty', accessor: 'cakes_in_batch' },
+      { Header: 'Remaining cakes to place, qty', accessor: 'cakes_residue' },
     ],
     [],
   );
@@ -635,7 +635,7 @@ function ProductionBatchDesignerNew() {
         }
 
         if (rows.length === 0) {
-          alert('Нет доступных автоклавов для размещения');
+          alert('No autoclaves available for placement');
           return prev;
         }
 
@@ -737,7 +737,7 @@ function ProductionBatchDesignerNew() {
               onClick={() => placeGroupToAutoclave(row)}
               disabled={Number(row.cakes_residue || 0) === 0}
             >
-              Разместить
+              Place
             </button>
           </td>
         </tr>,
@@ -746,7 +746,7 @@ function ProductionBatchDesignerNew() {
       if (productionBatchDesigner[index + 1]?.product_article !== currentArticle) {
         rows.push(
           <tr key={`calc-${currentArticle}`} className="calculation-row">
-            <td colSpan="14">Здесь будут расчеты для артикула: {currentArticle}</td>
+            <td colSpan="14">Calculations for article: {currentArticle} will appear here</td>
           </tr>,
         );
       }

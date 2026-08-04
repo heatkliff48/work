@@ -369,7 +369,7 @@ function CackeFillUp() {
                         fontWeight: 600,
                         width: 'fit-content',
                       }}
-                      title="Нажми, чтобы добавить заметку"
+                      title="Click to add a note"
                     >
                       <span style={{ opacity: 0.7 }}>#</span>
                       <span>{id}</span>
@@ -382,7 +382,7 @@ function CackeFillUp() {
                       <div style={{ marginTop: 6 }}>
                         <textarea
                           rows={3}
-                          placeholder={`Заметка для cake id ${id}...`}
+                          placeholder={`Note for cake id ${id}...`}
                           value={cakeNotes[id] ?? ''}
                           onChange={(e) =>
                             setCakeNotes((prev) => ({

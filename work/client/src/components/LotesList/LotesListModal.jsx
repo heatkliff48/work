@@ -706,7 +706,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
           : Number(cakeData.al_paste_proportion_2);
 
       if (nextAl1 + nextAl2 > 100) {
-        alert('Сумма долей не может превышать 100');
+        alert('The sum of shares cannot exceed 100');
         return;
       }
       setCakeData((p) => ({ ...p, [name]: value }));
@@ -1111,7 +1111,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const b = Number(currentSub.cake_id_finish);
 
     if (newStart < a || newFinish > b || newStart > newFinish) {
-      alert('Некорректный диапазон');
+      alert('Invalid range');
       return;
     }
 

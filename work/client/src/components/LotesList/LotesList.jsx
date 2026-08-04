@@ -42,7 +42,7 @@ function LotesList() {
       accessor: 'recipe',
     },
     {
-      Header: 'Quantity cakes',
+      Header: 'Cakes, qty',
       accessor: 'quantity_cakes',
     },
   ];

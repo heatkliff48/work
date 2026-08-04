@@ -164,7 +164,7 @@ export const AutoclaveContextProvider = ({ children }) => {
         .filter((i) => i !== -1)
         .pop();
       if (lastEmpty === undefined) {
-        alert('Нет свободного места');
+        alert('No free space available');
         return prev;
       }
 
@@ -308,7 +308,7 @@ export const AutoclaveContextProvider = ({ children }) => {
       }
       const freeAfter = without.length - (lastUsed + 1);
       if (freeAfter < group.length) {
-        alert('Недостаточно места чтобы переместить эту партию позже');
+        alert('Not enough space to move this batch later');
         return prev;
       }
 

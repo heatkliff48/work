@@ -35,23 +35,23 @@ function BatchOutsideModal(props) {
   const dispatch = useDispatch();
   const batch_outside_info_table = [
     {
-      Header: 'качественная продукция',
+      Header: 'Quality product',
       accessor: 'quality_product',
     },
     {
-      Header: 'хвосты',
+      Header: 'Remnants',
       accessor: 'remnants',
     },
     {
-      Header: 'некондиция',
+      Header: 'Nonconforming',
       accessor: 'nonconditioning',
     },
     {
-      Header: 'брак',
+      Header: 'Discard',
       accessor: 'discard',
     },
     {
-      Header: 'не произведено',
+      Header: 'Not produced',
       accessor: 'not_complete',
     },
   ];
@@ -274,7 +274,7 @@ function BatchOutsideModal(props) {
         </Container>
       </Modal.Body>
       <Modal.Footer>
-        <button form="batchOutsideModal">Сохранить</button>
+        <button form="batchOutsideModal">Save</button>
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>

@@ -413,8 +413,8 @@ export default function ProductionPlannerCalendar({
     const qvErr = findQocVsNextQuantityViolation(corridorForCheck);
     if (qvErr) {
       window.alert(
-        `Не получится перенести партию: на ${qvErr.at} выполнено ${qvErr.actual}, ` +
-          `а впереди требуется минимум ${qvErr.needAtLeast} (из-за плана на ${qvErr.becauseOfDate}).`,
+        `Cannot move the batch: ${qvErr.actual} completed on ${qvErr.at}, ` +
+          `but at least ${qvErr.needAtLeast} is required ahead (due to the plan on ${qvErr.becauseOfDate}).`,
       );
       return;
     }
@@ -423,7 +423,7 @@ export default function ProductionPlannerCalendar({
       (d) => d.scheduled_autoclaves > planQtyNum && d.produced_autoclave < doneNum,
     );
     if (violating) {
-      window.alert(`Нельзя продолжить: ${violating.date}`);
+      window.alert(`Cannot continue: ${violating.date}`);
       return;
     }
 
@@ -718,7 +718,7 @@ export default function ProductionPlannerCalendar({
                   </div>
 
                   <div style={styles.row}>
-                    <label style={styles.label}>Количество:</label>
+                    <label style={styles.label}>Quantity:</label>
                     <input
                       type="number"
                       inputMode="numeric"
@@ -745,7 +745,7 @@ export default function ProductionPlannerCalendar({
                       style={styles.primaryBtn}
                       onClick={() => setOpenDayISO(null)}
                     >
-                      Готово
+                      Done
                     </button>
                   </div>
                 </div>
@@ -760,7 +760,7 @@ export default function ProductionPlannerCalendar({
           Save
         </button>
         <div style={styles.hint}>
-          Кликните по дате, чтобы установить план/выполнение.
+          Click a date to set the plan/completion.
         </div>
         <div style={styles.legend}>
           <span style={styles.legendItem}>
