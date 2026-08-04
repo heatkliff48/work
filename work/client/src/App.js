@@ -49,6 +49,7 @@ import RawMaterialsConsumption from '#components/RawMaterialsConsumption/RawMate
 import LotesList from '#components/LotesList/LotesList.jsx';
 import ClientsPriceInfo from '#components/Clients/ClientsPriceInfo/ClientsPriceInfo.jsx';
 import CackeFillUp from '#components/CackeFillUp/CackeFillUp.jsx';
+import TechnologyCalendar from '#components/TechnologyPlanner/TechnologyCalendar.jsx';
 import OrdersToWarehouseTable from '#components/Orders/OrdersToWarehouse/OrdersToWarehouseTable.jsx';
 import ProductionQuality from '#components/ProductionQuality/ProductionQuality.jsx';
 
@@ -149,6 +150,10 @@ function App() {
               element={<ProductsListForRecipes />}
             />
             <Route path="/recipe_orders" element={<RecipeOrders />} />
+            <Route
+              path="/technology_calendar"
+              element={<TechnologyCalendar />}
+            />
             <Route
               path="/raw_material_consumption"
               element={<RawMaterialsConsumption />}

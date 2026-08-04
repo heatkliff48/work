@@ -240,6 +240,11 @@ export default function NavBar() {
             icon: rawMatConsIcon,
           },
           { title: 'Lotes list', path: '/lotes_list', icon: lotesListIcon },
+          {
+            title: 'Calendar',
+            path: '/technology_calendar',
+            icon: batchCalendarIcon,
+          },
         ],
       },
       {
