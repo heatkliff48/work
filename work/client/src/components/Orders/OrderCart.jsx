@@ -899,42 +899,6 @@ const OrderCart = React.memo(() => {
     setDeliveryM2Draft(orderCartData?.delivery_m2 ?? 0);
   }, [orderCartData?.delivery_m2]);
 
-  const canEditDelivery = useMemo(
-    () =>
-      Boolean(
-        checkUserAccess(user, roles, 'orders_save_delivery_price')?.canWrite &&
-          orderCartData?.status < 5
-      ),
-    [user, roles, orderCartData?.status]
-  );
-
-  const canEditDeliveryM2 = useMemo(
-    () => canEditDelivery && !orderCartData?.main_order,
-    [canEditDelivery, orderCartData?.main_order]
-  );
-
-  const deliveryFunc = async () => {
-    const delivery = Number(deliveryDraft || 0);
-
-    dispatch(
-      addNewDeliveryPrice({
-        order_id: orderCartData.id,
-        delivery,
-      })
-    );
-  };
-
-  const deliveryM2Func = async () => {
-    const delivery_m2 = Number(deliveryM2Draft || 0);
-
-    dispatch(
-      addNewDeliveryPrice({
-        order_id: orderCartData.id,
-        delivery_m2,
-      })
-    );
-  };
-
   const computeVatValues = useCallback(
     (deliveryAmount) => {
       const delivery = Number(deliveryAmount || 0);
@@ -970,8 +934,9 @@ const OrderCart = React.memo(() => {
 
   // Итог заказа не пересчитывается автоматически при вводе новой стоимости
   // доставки — только при первой загрузке заказа/изменении состава товаров
-  // (delivery/delivery_m2 намеренно не в зависимостях), либо вручную кнопкой
-  // Save в блоке Order summary (см. saveOrderTotalHandler).
+  // (delivery/delivery_m2 намеренно не в зависимостях), либо при нажатии
+  // кнопки Save у полей Delivery price / Delivery price for m2 full
+  // (см. deliveryFunc/deliveryM2Func).
   useEffect(() => {
     setVatValue((prev) => ({
       ...prev,
@@ -980,38 +945,35 @@ const OrderCart = React.memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [final_price_product, vatValue.vat_procent, orderCartData?.id]);
 
-  const saveOrderTotalHandler = () => {
-    const nextDelivery = canEditDelivery
-      ? Number(deliveryDraft || 0)
-      : Number(orderCartData?.delivery || 0);
-    const nextDeliveryM2 = canEditDeliveryM2
-      ? Number(deliveryM2Draft || 0)
-      : Number(orderCartData?.delivery_m2 || 0);
+  const deliveryFunc = async () => {
+    const delivery = Number(deliveryDraft || 0);
 
-    if (canEditDelivery) {
-      dispatch(
-        addNewDeliveryPrice({
-          order_id: orderCartData.id,
-          delivery: nextDelivery,
-        })
-      );
-    }
-    if (canEditDeliveryM2) {
-      dispatch(
-        addNewDeliveryPrice({
-          order_id: orderCartData.id,
-          delivery_m2: nextDeliveryM2,
-        })
-      );
-    }
+    dispatch(
+      addNewDeliveryPrice({
+        order_id: orderCartData.id,
+        delivery,
+      })
+    );
 
-    setOrderCartData((prev) => ({
+    setOrderCartData((prev) => ({ ...prev, delivery }));
+    setVatValue((prev) => ({ ...prev, ...computeVatValues(delivery) }));
+  };
+
+  const deliveryM2Func = async () => {
+    const delivery_m2 = Number(deliveryM2Draft || 0);
+
+    dispatch(
+      addNewDeliveryPrice({
+        order_id: orderCartData.id,
+        delivery_m2,
+      })
+    );
+
+    setOrderCartData((prev) => ({ ...prev, delivery_m2 }));
+    setVatValue((prev) => ({
       ...prev,
-      delivery: nextDelivery,
-      delivery_m2: nextDeliveryM2,
+      ...computeVatValues(orderCartData?.delivery),
     }));
-
-    setVatValue((prev) => ({ ...prev, ...computeVatValues(nextDelivery) }));
   };
 
   const hasHydratedFromStorage = useRef(false);
@@ -1700,23 +1662,7 @@ const OrderCart = React.memo(() => {
           </div>
 
           <div className="ord-summary-block">
-            <div
-              className="ord-summary-card__title"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              Order summary
-              <button
-                type="button"
-                className="ord-btn ord-btn--ghost ord-btn--sm"
-                onClick={saveOrderTotalHandler}
-              >
-                Save
-              </button>
-            </div>
+            <div className="ord-summary-card__title">Order summary</div>
             <div className="ord-summary-rows">
               <div className="ord-summary-row">
                 <span className="ord-summary-row__label">VAT origin, €</span>
