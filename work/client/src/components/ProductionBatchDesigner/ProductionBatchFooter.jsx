@@ -14,7 +14,7 @@ function ProductionBatchFooter() {
 
   const selectedLabel = useMemo(() => {
     if (!selectedCell?.article) return null;
-    return `Выбран массив с article: ${selectedCell.article}`;
+    return `Selected cake with article: ${selectedCell.article}`;
   }, [selectedCell]);
 
   return (
@@ -28,29 +28,29 @@ function ProductionBatchFooter() {
           onClick={deleteBatchBySelectedArticle}
           disabled={!selectedCell?.article}
         >
-          Удалить партию
+          Delete batch
         </button>
 
         <button onClick={deleteOneArrayOfSelected} disabled={!selectedCell?.article}>
-          Удалить Массив
+          Delete cake
         </button>
 
         <button
           onClick={addArrayAfterSelected}
           disabled={!selectedCell?.article || !selectedCell?.id}
         >
-          Добавить массив
+          Add cake
         </button>
 
         <button onClick={moveBatchLater} disabled={!selectedCell?.article}>
-          Поставить партию позже
+          Move batch later
         </button>
 
         <button
           onClick={fillToRowEnd}
           disabled={!selectedCell?.article || !selectedCell?.id}
         >
-          Заполнить Автоклав
+          Fill autoclave
         </button>
 
         <button onClick={onSaveHandler}>Save</button>

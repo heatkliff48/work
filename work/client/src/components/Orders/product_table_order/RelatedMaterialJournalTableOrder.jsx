@@ -55,89 +55,91 @@ const RelatedMaterialJournalTableOrder = ({
           </span>
           <div className="ord-prod-card__title">Related Materials</div>
         </div>
-        <table className="product-table ord-prod-table">
-          <thead>
-            <tr>
-              {columns.map((key) => (
-                <th key={key}>{displayNames[key] || key}</th>
-              ))}
-              <th>Return</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
+        <div className="ord-prod-table-wrap">
+          <table className="product-table ord-prod-table">
+            <thead>
+              <tr>
+                {columns.map((key) => (
+                  <th key={key}>{displayNames[key] || key}</th>
+                ))}
+                <th>Return</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
 
-          <tbody>
-            {Array.isArray(productListOrder) &&
-              productListOrder.map((product) => (
-                <tr
-                  key={product?.id || Math.random()}
-                  onClick={() => onProductClickHandler(product)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {columns.map((key) => {
-                    let value = product[key];
-                    if (value && typeof value === 'object') {
-                      value = JSON.stringify(value);
-                    }
-                    return <td key={key}>{value ?? ''}</td>;
-                  })}
+            <tbody>
+              {Array.isArray(productListOrder) &&
+                productListOrder.map((product) => (
+                  <tr
+                    key={product?.id || Math.random()}
+                    onClick={() => onProductClickHandler(product)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {columns.map((key) => {
+                      let value = product[key];
+                      if (value && typeof value === 'object') {
+                        value = JSON.stringify(value);
+                      }
+                      return <td key={key}>{value ?? ''}</td>;
+                    })}
 
-                  <td onClick={(e) => e.stopPropagation()}>
-                    {product?.final_price < 0 ? (
-                      <span className="ord-return-text ord-return-text--active">Return</span>
-                    ) : (
-                      <span className="ord-return-text">No return</span>
-                    )}
-                    {/* <ReturnCheckbox
-                      product={product}
-                      vatValue={vatValue}
-                      setVatValue={setVatValue}
-                      isChecked={returnCheckedProducts[product?.id] || false}
-                      onCheckChange={handleReturnCheckChange}
-                    /> */}
-                  </td>
+                    <td onClick={(e) => e.stopPropagation()}>
+                      {product?.final_price < 0 ? (
+                        <span className="ord-return-text ord-return-text--active">Return</span>
+                      ) : (
+                        <span className="ord-return-text">No return</span>
+                      )}
+                      {/* <ReturnCheckbox
+                        product={product}
+                        vatValue={vatValue}
+                        setVatValue={setVatValue}
+                        isChecked={returnCheckedProducts[product?.id] || false}
+                        onCheckChange={handleReturnCheckChange}
+                      /> */}
+                    </td>
 
-                  <td onClick={(e) => e.stopPropagation()}>
-                    {orderCartData?.status < 3 && (
-                      <Button
-                        size="sm"
-                        color="danger"
-                        className="ord-mini-btn ord-mini-btn--danger ord-btn"
-                        onClick={() => deleteHandler(product)}
-                      >
-                        Delete
-                      </Button>
-                    )}
+                    <td onClick={(e) => e.stopPropagation()}>
+                      {orderCartData?.status < 3 && (
+                        <Button
+                          size="sm"
+                          color="danger"
+                          className="ord-mini-btn ord-mini-btn--danger ord-btn"
+                          onClick={() => deleteHandler(product)}
+                        >
+                          Delete
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+
+              {userAccess?.canWrite && orderCartData?.status < 3 && (
+                <tr>
+                  <td colSpan={columns.length + 2}>
+                    <Button
+                      block
+                      className="ord-add-row"
+                      onClick={() => {
+                        setNewOrder((prev) => ({
+                          ...prev,
+                          article: orderCartData.article,
+                          owner: orderCartData.owner?.id,
+                          status: orderCartData.status,
+                          del_adr_id: orderCartData.deliveryAddress?.id,
+                        }));
+                        setRelatedMaterialProductModalOrder(
+                          !relatedMaterialProductModalOrder,
+                        );
+                      }}
+                    >
+                      + Add product
+                    </Button>
                   </td>
                 </tr>
-              ))}
-
-            {userAccess?.canWrite && orderCartData?.status < 3 && (
-              <tr>
-                <td colSpan={columns.length + 2}>
-                  <Button
-                    block
-                    className="ord-add-row"
-                    onClick={() => {
-                      setNewOrder((prev) => ({
-                        ...prev,
-                        article: orderCartData.article,
-                        owner: orderCartData.owner?.id,
-                        status: orderCartData.status,
-                        del_adr_id: orderCartData.deliveryAddress?.id,
-                      }));
-                      setRelatedMaterialProductModalOrder(
-                        !relatedMaterialProductModalOrder,
-                      );
-                    }}
-                  >
-                    + Add product
-                  </Button>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );

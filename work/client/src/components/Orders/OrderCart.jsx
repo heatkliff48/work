@@ -841,7 +841,7 @@ const OrderCart = React.memo(() => {
     );
     if (res_prod) {
       const confirmed = window.confirm(
-        'Этот продукт зарезервирован на складе. Всё равно удалить?'
+        'This product is reserved in the warehouse. Delete anyway?'
       );
       if (!confirmed) return;
     }
@@ -886,47 +886,35 @@ const OrderCart = React.memo(() => {
     productLists.related_materials,
   ]);
 
+  const [deliveryDraft, setDeliveryDraft] = useState(orderCartData?.delivery ?? 0);
+  const [deliveryM2Draft, setDeliveryM2Draft] = useState(
+    orderCartData?.delivery_m2 ?? 0
+  );
+
   useEffect(() => {
-    const delivery = Number(orderCartData?.delivery || 0);
-    const delivery_m2 = Number(orderCartData?.delivery_m2 || 0);
-    const vatPercent = Number(vatValue.vat_procent || 0);
+    setDeliveryDraft(orderCartData?.delivery ?? 0);
+  }, [orderCartData?.delivery]);
 
-    if (!final_price_product || !vatPercent) {
-      setVatValue((prev) => ({
-        ...prev,
-        vat_euro_origin: 0,
-        vat_result: 0,
-        vat_euro: 0,
-        vat_result_del: delivery + delivery_m2,
-        vat_procent: orderCartData?.region == 'peninsular_spain' ? 21 : 0,
-      }));
-      return;
-    }
+  useEffect(() => {
+    setDeliveryM2Draft(orderCartData?.delivery_m2 ?? 0);
+  }, [orderCartData?.delivery_m2]);
 
-    const vat_euro = ((vatPercent * final_price_product) / 100).toFixed(2);
-    const vat_result = (final_price_product + Number(vat_euro)).toFixed(2);
+  const canEditDelivery = useMemo(
+    () =>
+      Boolean(
+        checkUserAccess(user, roles, 'orders_save_delivery_price')?.canWrite &&
+          orderCartData?.status < 5
+      ),
+    [user, roles, orderCartData?.status]
+  );
 
-    const vat_result_del = (
-      Number(vat_result) +
-      (delivery + delivery_m2) * (1 + vatPercent / 100)
-    ).toFixed(2);
-
-    setVatValue((prev) => ({
-      ...prev,
-      vat_euro_origin: final_price_product,
-      vat_result,
-      vat_euro,
-      vat_result_del,
-    }));
-  }, [
-    final_price_product,
-    vatValue.vat_procent,
-    orderCartData?.delivery,
-    orderCartData?.delivery_m2,
-  ]);
+  const canEditDeliveryM2 = useMemo(
+    () => canEditDelivery && !orderCartData?.main_order,
+    [canEditDelivery, orderCartData?.main_order]
+  );
 
   const deliveryFunc = async () => {
-    const delivery = Number(orderCartData?.delivery || 0);
+    const delivery = Number(deliveryDraft || 0);
 
     dispatch(
       addNewDeliveryPrice({
@@ -937,7 +925,7 @@ const OrderCart = React.memo(() => {
   };
 
   const deliveryM2Func = async () => {
-    const delivery_m2 = Number(orderCartData?.delivery_m2 || 0);
+    const delivery_m2 = Number(deliveryM2Draft || 0);
 
     dispatch(
       addNewDeliveryPrice({
@@ -945,6 +933,85 @@ const OrderCart = React.memo(() => {
         delivery_m2,
       })
     );
+  };
+
+  const computeVatValues = useCallback(
+    (deliveryAmount) => {
+      const delivery = Number(deliveryAmount || 0);
+      const vatPercent = Number(vatValue.vat_procent || 0);
+
+      if (!final_price_product || !vatPercent) {
+        return {
+          vat_euro_origin: 0,
+          vat_result: 0,
+          vat_euro: 0,
+          vat_result_del: delivery,
+          vat_procent: orderCartData?.region == 'peninsular_spain' ? 21 : 0,
+        };
+      }
+
+      const vat_euro = ((vatPercent * final_price_product) / 100).toFixed(2);
+      const vat_result = (final_price_product + Number(vat_euro)).toFixed(2);
+
+      const vat_result_del = (
+        Number(vat_result) +
+        delivery * (1 + vatPercent / 100)
+      ).toFixed(2);
+
+      return {
+        vat_euro_origin: final_price_product,
+        vat_result,
+        vat_euro,
+        vat_result_del,
+      };
+    },
+    [final_price_product, vatValue.vat_procent, orderCartData?.region]
+  );
+
+  // Итог заказа не пересчитывается автоматически при вводе новой стоимости
+  // доставки — только при первой загрузке заказа/изменении состава товаров
+  // (delivery/delivery_m2 намеренно не в зависимостях), либо вручную кнопкой
+  // Save в блоке Order summary (см. saveOrderTotalHandler).
+  useEffect(() => {
+    setVatValue((prev) => ({
+      ...prev,
+      ...computeVatValues(orderCartData?.delivery),
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [final_price_product, vatValue.vat_procent, orderCartData?.id]);
+
+  const saveOrderTotalHandler = () => {
+    const nextDelivery = canEditDelivery
+      ? Number(deliveryDraft || 0)
+      : Number(orderCartData?.delivery || 0);
+    const nextDeliveryM2 = canEditDeliveryM2
+      ? Number(deliveryM2Draft || 0)
+      : Number(orderCartData?.delivery_m2 || 0);
+
+    if (canEditDelivery) {
+      dispatch(
+        addNewDeliveryPrice({
+          order_id: orderCartData.id,
+          delivery: nextDelivery,
+        })
+      );
+    }
+    if (canEditDeliveryM2) {
+      dispatch(
+        addNewDeliveryPrice({
+          order_id: orderCartData.id,
+          delivery_m2: nextDeliveryM2,
+        })
+      );
+    }
+
+    setOrderCartData((prev) => ({
+      ...prev,
+      delivery: nextDelivery,
+      delivery_m2: nextDeliveryM2,
+    }));
+
+    setVatValue((prev) => ({ ...prev, ...computeVatValues(nextDelivery) }));
   };
 
   const hasHydratedFromStorage = useRef(false);
@@ -1223,6 +1290,36 @@ const OrderCart = React.memo(() => {
         <div className="ord-card__head">
           <div className="ord-card__head-left">
             <h1 className="ord-card__article">{orderCartData?.article}</h1>
+            <div className="ord-card__divider" />
+            <div className="ord-card__field">
+              <div className="ord-tile__label">Project name</div>
+              <div className="ord-tile__title">
+                {orderCartData?.deliveryAddress?.project_name}
+              </div>
+            </div>
+            {checkUserAccess(user, roles, 'orders_change_person_in_charge')
+              ?.canWrite && (
+              <>
+                <div className="ord-card__divider" />
+                <div className="ord-card__field">
+                  <div className="ord-tile__label">Person in charge</div>
+                  <span style={{ minWidth: 200, display: 'inline-block' }}>
+                    <Select
+                      defaultValue={getSelectedOption(
+                        orderCartData?.person_in_charge
+                      )}
+                      onChange={(v) => {
+                        handleSelectChange(v);
+                      }}
+                      options={personsInChargeList}
+                      isDisabled={orderCartData?.status < 3 ? false : true}
+                    />
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+          <div className="ord-card__actions">
             {cardStatusLabel && (
               <span
                 className="ord-pill"
@@ -1238,8 +1335,6 @@ const OrderCart = React.memo(() => {
                 {cardStatusLabel}
               </span>
             )}
-          </div>
-          <div className="ord-card__actions">
             {deleteOrderAccess?.canWrite && orderCartData?.status < 3 && (
               <button
                 type="button"
@@ -1264,430 +1359,442 @@ const OrderCart = React.memo(() => {
           </div>
         </div>
 
-        <div className="ord-grid">
-          <div>
-            <div className="ord-tiles">
-              <div className="ord-tile">
-                <div className="ord-tile__label">Client information</div>
-                {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
-              </div>
-
-              <div className="ord-tile">
-                <div className="ord-tile__head">
-                  <div className="ord-tile__label">Contact person</div>
-                  {userAccess?.canWrite && orderCartData?.status < 3 && (
-                    <ShowOrderContactEditModal />
-                  )}
-                </div>
-                {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
-              </div>
-
-              <div className="ord-tile">
-                <div className="ord-tile__head">
-                  <div className="ord-tile__label">Delivery address</div>
-                  {userAccess?.canWrite && orderCartData?.status < 3 && (
-                    <ShowOrderDeliveryEditModal />
-                  )}
-                </div>
-                {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
-              </div>
-
-              <div className="ord-tile">
-                <div className="ord-tile__label">Description</div>
-                {orderCartData?.description && !isEditing ? (
-                  <>
-                    <div className="ord-tile__body-text">
-                      {orderCartData.description}
-                    </div>
-                    <button
-                      type="button"
-                      className="ord-btn ord-btn--ghost ord-btn--sm"
-                      style={{ marginTop: 10 }}
-                      onClick={onEditHandler}
-                    >
-                      Edit
-                    </button>
-                  </>
-                ) : (
-                  <div className="ord-desc-edit">
-                    <textarea
-                      placeholder="Enter description..."
-                      value={newDescription}
-                      disabled={
-                        !checkUserAccess(user, roles, 'orders_description_edit')
-                          ?.canWrite
-                      }
-                      onChange={(e) => setNewDescription(e.target.value)}
-                    />
-                    {checkUserAccess(user, roles, 'orders_description_edit')
-                      ?.canWrite && (
-                      <button
-                        type="button"
-                        className="ord-btn ord-btn--primary ord-btn--sm"
-                        onClick={() => onSaveDescription(newDescription)}
-                      >
-                        Save
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
+        <div className="ord-row">
+          <div className="ord-tiles">
+            <div className="ord-tile">
+              <div className="ord-tile__label">Client information</div>
+              {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
             </div>
 
-            <div className="ord-tile" style={{ marginBottom: 16 }}>
-              <div className="ord-tile__head">
-                <div className="ord-tile__label">Secondary contacts</div>
-                {haveSecondaryContact && (
+            <div className="ord-tile">
+              <div className="ord-tile__label">Description</div>
+              {orderCartData?.description && !isEditing ? (
+                <>
+                  <div className="ord-tile__body-text">
+                    {orderCartData.description}
+                  </div>
                   <button
                     type="button"
                     className="ord-btn ord-btn--ghost ord-btn--sm"
-                    onClick={() => {
-                      dispatch(delSecondaryContact(orderCartData?.id));
-                    }}
+                    style={{ marginTop: 10 }}
+                    onClick={onEditHandler}
                   >
-                    Delete
+                    Edit
                   </button>
-                )}
-              </div>
-              {haveSecondaryContact ? (
-                filterAndMapData(orderCartData?.secondaryContact, filterKeysOrder)
-              ) : isAddSecCont ? (
-                <>
-                  <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
                 </>
               ) : (
+                <div className="ord-desc-edit">
+                  <textarea
+                    placeholder="Enter description..."
+                    value={newDescription}
+                    disabled={
+                      !checkUserAccess(user, roles, 'orders_description_edit')
+                        ?.canWrite
+                    }
+                    onChange={(e) => setNewDescription(e.target.value)}
+                  />
+                  {checkUserAccess(user, roles, 'orders_description_edit')
+                    ?.canWrite && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--primary ord-btn--sm"
+                      onClick={() => onSaveDescription(newDescription)}
+                    >
+                      Save
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {orderStatusAccess?.canRead && (
+            <div className="ord-status-card">
+              <div className="ord-status-card__title">Order status</div>
+              {!aproveAccounting && (
+                <div className="ord-status-warn">Awaiting accounting approval</div>
+              )}
+              <div className="ord-steps">
+                {(() => {
+                  const currentStatusIndex = status_list.findIndex(
+                    (item) => item.accessor === orderCartData?.status
+                  );
+                  return status_list.map((item, idx) => {
+                    const isDone = item.accessor < orderCartData?.status;
+                    const isCurrent = item.accessor === orderCartData?.status;
+                    const isDisabled =
+                      !orderStatusAccess?.canWrite ||
+                      item?.accessor == 7 ||
+                      item?.accessor == 9;
+                    const isNext =
+                      currentStatusIndex !== -1 &&
+                      idx === currentStatusIndex + 1 &&
+                      !isDisabled;
+                    return (
+                      <div key={item.accessor} className="ord-step">
+                        <div className="ord-step__rail">
+                          <input
+                            id={item.accessor}
+                            type="checkbox"
+                            className={
+                              'ord-step__checkbox' +
+                              (isDone ? ' ord-step__checkbox--done' : '') +
+                              (isCurrent ? ' ord-step__checkbox--current' : '') +
+                              (isNext ? ' ord-step__checkbox--next' : '')
+                            }
+                            checked={item.accessor === orderCartData?.status}
+                            onChange={() => {
+                              statusChangeHandler(item);
+                            }}
+                            disabled={isDisabled} //
+                          />
+                          {idx < status_list.length - 1 && (
+                            <div
+                              className={
+                                'ord-step__line' +
+                                (isDone ? ' ord-step__line--done' : '')
+                              }
+                            />
+                          )}
+                        </div>
+                        <div
+                          className={
+                            'ord-step__label' +
+                            (isCurrent
+                              ? ' ord-step__label--current'
+                              : isDone
+                              ? ' ord-step__label--done'
+                              : isNext
+                              ? ' ord-step__label--next'
+                              : '')
+                          }
+                        >
+                          {item.Header}
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="ord-row">
+          <div className="ord-tiles">
+            <div className="ord-tile">
+              <div className="ord-tile__head">
+                <div className="ord-tile__label">Delivery address</div>
+                {userAccess?.canWrite && orderCartData?.status < 3 && (
+                  <ShowOrderDeliveryEditModal />
+                )}
+              </div>
+              {filterAndMapData(orderCartData?.deliveryAddress, filterKeysOrder)}
+            </div>
+
+            <div className="ord-tile">
+              <div className="ord-tile__head">
+                <div className="ord-tile__label">Contact person</div>
+                {userAccess?.canWrite && orderCartData?.status < 3 && (
+                  <ShowOrderContactEditModal />
+                )}
+              </div>
+              {filterAndMapData(orderCartData?.contactInfo, filterKeysOrder)}
+            </div>
+          </div>
+
+          <div className="ord-tile">
+            <div className="ord-tile__label" style={{ marginBottom: 10 }}>
+              PDF &amp; Bitrix
+            </div>
+            <PDFgenerate
+              orderData={orderCartData}
+              productList={productLists}
+              vatValue={vatValue}
+            />
+          </div>
+        </div>
+
+        <BlocksJournalTableOrder
+          productListOrder={blocksListWithDeliveryM2}
+          onProductClickHandler={onProductClickHandler}
+          filterAndMapData={filterAndMapData}
+          filterKeys={filterKeysOrder}
+          productHandler={productHandler}
+          deleteHandler={deleteHandler}
+          displayNames={displayNames}
+        />
+        <DryMixesJournalTableOrder
+          productListOrder={updatedDryMixesListOrder}
+          onProductClickHandler={onProductClickHandler}
+          filterAndMapData={filterAndMapData}
+          filterKeys={filterKeysOrder}
+          deleteHandler={deleteHandler}
+          displayNames={displayNames}
+        />
+        <AnchorJournalTableOrder
+          productListOrder={updatedAnchorsListOrder}
+          onProductClickHandler={onProductClickHandler}
+          filterAndMapData={filterAndMapData}
+          filterKeys={filterKeysOrder}
+          deleteHandler={deleteHandler}
+          displayNames={displayNames}
+        />
+        <ToolJournalTableOrder
+          productListOrder={updatedToolsListOrder}
+          onProductClickHandler={onProductClickHandler}
+          filterAndMapData={filterAndMapData}
+          filterKeys={filterKeysOrder}
+          deleteHandler={deleteHandler}
+          displayNames={displayNames}
+        />
+        <RelatedMaterialJournalTableOrder
+          productListOrder={updatedRelatedMaterialsListOrder}
+          onProductClickHandler={onProductClickHandler}
+          filterAndMapData={filterAndMapData}
+          filterKeys={filterKeysOrder}
+          deleteHandler={deleteHandler}
+          displayNames={displayNames}
+          vatValue={vatValue}
+          setVatValue={setVatValue}
+        />
+
+        {/* <div className="ord-tiles" style={{ marginBottom: 14 }}>
+          <div className="ord-tile">
+            <div className="ord-tile__head">
+              <div className="ord-tile__label">Secondary contacts</div>
+              {haveSecondaryContact && (
                 <button
                   type="button"
                   className="ord-btn ord-btn--ghost ord-btn--sm"
-                  onClick={() => addSecondaryContactHandler()}
+                  onClick={() => {
+                    dispatch(delSecondaryContact(orderCartData?.id));
+                  }}
                 >
-                  Add secondary contact
+                  Delete
                 </button>
               )}
             </div>
-
-            <BlocksJournalTableOrder
-              productListOrder={blocksListWithDeliveryM2}
-              onProductClickHandler={onProductClickHandler}
-              filterAndMapData={filterAndMapData}
-              filterKeys={filterKeysOrder}
-              productHandler={productHandler}
-              deleteHandler={deleteHandler}
-              displayNames={displayNames}
-            />
-            <DryMixesJournalTableOrder
-              productListOrder={updatedDryMixesListOrder}
-              onProductClickHandler={onProductClickHandler}
-              filterAndMapData={filterAndMapData}
-              filterKeys={filterKeysOrder}
-              deleteHandler={deleteHandler}
-              displayNames={displayNames}
-            />
-            <AnchorJournalTableOrder
-              productListOrder={updatedAnchorsListOrder}
-              onProductClickHandler={onProductClickHandler}
-              filterAndMapData={filterAndMapData}
-              filterKeys={filterKeysOrder}
-              deleteHandler={deleteHandler}
-              displayNames={displayNames}
-            />
-            <ToolJournalTableOrder
-              productListOrder={updatedToolsListOrder}
-              onProductClickHandler={onProductClickHandler}
-              filterAndMapData={filterAndMapData}
-              filterKeys={filterKeysOrder}
-              deleteHandler={deleteHandler}
-              displayNames={displayNames}
-            />
-            <RelatedMaterialJournalTableOrder
-              productListOrder={updatedRelatedMaterialsListOrder}
-              onProductClickHandler={onProductClickHandler}
-              filterAndMapData={filterAndMapData}
-              filterKeys={filterKeysOrder}
-              deleteHandler={deleteHandler}
-              displayNames={displayNames}
-              vatValue={vatValue}
-              setVatValue={setVatValue}
-            />
-          </div>
-
-          <div>
-            <div className="ord-summary-card">
-              <div className="ord-summary-card__title">Order summary</div>
-              <div className="ord-summary-rows">
-                <div className="ord-summary-row">
-                  <span className="ord-summary-row__label">VAT origin, €</span>
-                  <span className="ord-summary-row__value">
-                    {vatValue.vat_euro_origin}
-                  </span>
-                </div>
-                <div className="ord-summary-row">
-                  <span className="ord-summary-row__label">VAT, %</span>
-                  <span className="ord-summary-row__value">
-                    {vatValue.vat_procent}
-                  </span>
-                  {/* <input
-                    type="text"
-                    id="vat_procent"
-                    name="vat_procent"
-                    className="ord-summary-input"
-                    value={vatValue.vat_procent}
-                    onChange={(e) => {
-                      handleInputChange(e);
-                    }}
-                    onBlur={() => {
-                      if (vatValue.vat_procent.trim() === '') {
-                        setVatValue((prev) => ({
-                          ...prev,
-                          vat_procent: 21,
-                        }));
-                      }
-                    }}
-                    readOnly={orderCartData?.status < 5 ? true : true}
-                  /> */}
-                </div>
-                <div className="ord-summary-row">
-                  <span className="ord-summary-row__label">VAT, €</span>
-                  <span className="ord-summary-row__value">{vatValue.vat_euro}</span>
-                </div>
-                <div className="ord-summary-row">
-                  <span className="ord-summary-row__label">Payment method</span>
-                  <span style={{ minWidth: 220 }}>
-                    <Select
-                      value={getSelectedPaymentMethodOption(
-                        orderCartData?.payment_method
-                      )}
-                      onChange={(v) => {
-                        handlePaymentMethodChange(v);
-                      }}
-                      options={PAYMENT_METHOD_OPTIONS}
-                      isDisabled={orderCartData?.status < 5 ? false : true}
-                    />
-                  </span>
-                </div>
-                <div className="ord-summary-row">
-                  <span className="ord-summary-row__label">Delivery price</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <input
-                      type="text"
-                      id="delivery"
-                      name="delivery"
-                      className="ord-summary-input"
-                      value={orderCartData.delivery ?? 0}
-                      onChange={(e) => {
-                        setOrderCartData((prev) => ({
-                          ...prev,
-                          delivery: Number(e.target.value),
-                        }));
-                      }}
-                      readOnly={orderCartData?.status < 5 ? false : true}
-                      disabled={
-                        orderCartData?.status >= 5 ||
-                        !checkUserAccess(user, roles, 'orders_save_delivery_price')
-                          ?.canWrite
-                      }
-                    />
-                    {checkUserAccess(user, roles, 'orders_description_edit')
-                      ?.canWrite &&
-                      orderCartData?.status < 5 && (
-                        <button
-                          type="button"
-                          className="ord-btn ord-btn--ghost ord-btn--sm"
-                          onClick={() => {
-                            deliveryFunc();
-                          }}
-                        >
-                          Save
-                        </button>
-                      )}
-                  </span>
-                </div>
-                <div className="ord-summary-row">
-                  <span className="ord-summary-row__label">
-                    Delivery price for m2 full
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <input
-                      type="text"
-                      id="delivery_m2"
-                      name="delivery_m2"
-                      className="ord-summary-input"
-                      value={orderCartData.delivery_m2 ?? 0}
-                      onChange={(e) => {
-                        setOrderCartData((prev) => ({
-                          ...prev,
-                          delivery_m2: Number(e.target.value),
-                        }));
-                      }}
-                      readOnly={orderCartData?.status < 5 ? false : true}
-                      disabled={
-                        orderCartData?.main_order ||
-                        !checkUserAccess(user, roles, 'orders_save_delivery_price')
-                          ?.canWrite
-                      }
-                    />
-                    {checkUserAccess(user, roles, 'orders_description_edit')
-                      ?.canWrite &&
-                      orderCartData?.status < 5 &&
-                      !orderCartData?.main_order && (
-                        <button
-                          type="button"
-                          className="ord-btn ord-btn--ghost ord-btn--sm"
-                          onClick={() => {
-                            deliveryM2Func();
-                          }}
-                        >
-                          Save
-                        </button>
-                      )}
-                  </span>
-                </div>
-                <div className="ord-summary-divider" />
-                <div className="ord-summary-row ord-summary-row--total">
-                  <span className="ord-summary-row__label">Result</span>
-                  <span className="ord-summary-row__value">
-                    {vatValue.vat_result}
-                  </span>
-                </div>
-                {vatValue.vat_result_del > 0 ? (
-                  <div className="ord-summary-row ord-summary-row--total ord-summary-row--accent">
-                    <span className="ord-summary-row__label">
-                      Result with delivery
-                    </span>
-                    <span className="ord-summary-row__value">
-                      {vatValue.vat_result_del}
-                    </span>
-                  </div>
-                ) : null}
-              </div>
-
-              {orderCartData.status >= 4 ? (
-                <div className="ord-summary-block">
-                  {haveShipDate ? (
-                    <div className="ord-tile__body-text">
-                      Shipping date: {haveShipDate} ({handleDayBeforShipping()} days
-                      before shipment)
-                    </div>
-                  ) : (
-                    <div className="ord-field">
-                      <label className="ord-field__label">Shipping date</label>
-                      <DatePicker
-                        id="data_pcker"
-                        selected={dataValue}
-                        onChange={(date) => handleDateChange(date)}
-                        dateFormat="dd.MM.yyyy"
-                        className="ord-liberar-date"
-                      />
-                    </div>
-                  )}
-                </div>
-              ) : null}
-
-              {checkUserAccess(user, roles, 'orders_change_person_in_charge')
-                ?.canWrite && (
-                <div className="ord-summary-block">
-                  <div className="ord-field__label">Person in charge</div>
-                  <Select
-                    defaultValue={getSelectedOption(orderCartData?.person_in_charge)}
-                    onChange={(v) => {
-                      handleSelectChange(v);
-                    }}
-                    options={personsInChargeList}
-                    isDisabled={orderCartData?.status < 3 ? false : true}
-                  />
-                </div>
-              )}
-
-              <div className="ord-summary-block">
-                <div className="ord-tile__label" style={{ marginBottom: 8 }}>
-                  Files
-                </div>
-                <FilesMain userAccess={userAccess} />
-              </div>
-
-              <div className="ord-summary-block">
-                <div className="ord-tile__label" style={{ marginBottom: 8 }}>
-                  PDF &amp; Bitrix
-                </div>
-                <PDFgenerate
-                  orderData={orderCartData}
-                  productList={productLists}
-                  vatValue={vatValue}
-                />
-              </div>
-            </div>
-
-            {orderStatusAccess?.canRead && (
-              <div className="ord-status-card">
-                <div className="ord-status-card__title">Order status</div>
-                {!aproveAccounting && (
-                  <div className="ord-status-warn">Awaiting accounting approval</div>
-                )}
-                <div className="ord-steps">
-                  {(() => {
-                    const currentStatusIndex = status_list.findIndex(
-                      (item) => item.accessor === orderCartData?.status
-                    );
-                    return status_list.map((item, idx) => {
-                      const isDone = item.accessor < orderCartData?.status;
-                      const isCurrent = item.accessor === orderCartData?.status;
-                      const isDisabled =
-                        !orderStatusAccess?.canWrite ||
-                        item?.accessor == 7 ||
-                        item?.accessor == 9;
-                      const isNext =
-                        currentStatusIndex !== -1 &&
-                        idx === currentStatusIndex + 1 &&
-                        !isDisabled;
-                      return (
-                        <div key={item.accessor} className="ord-step">
-                          <div className="ord-step__rail">
-                            <input
-                              id={item.accessor}
-                              type="checkbox"
-                              className={
-                                'ord-step__checkbox' +
-                                (isDone ? ' ord-step__checkbox--done' : '') +
-                                (isCurrent ? ' ord-step__checkbox--current' : '') +
-                                (isNext ? ' ord-step__checkbox--next' : '')
-                              }
-                              checked={item.accessor === orderCartData?.status}
-                              onChange={() => {
-                                statusChangeHandler(item);
-                              }}
-                              disabled={isDisabled} //
-                            />
-                            {idx < status_list.length - 1 && (
-                              <div
-                                className={
-                                  'ord-step__line' +
-                                  (isDone ? ' ord-step__line--done' : '')
-                                }
-                              />
-                            )}
-                          </div>
-                          <div
-                            className={
-                              'ord-step__label' +
-                              (isCurrent
-                                ? ' ord-step__label--current'
-                                : isDone
-                                ? ' ord-step__label--done'
-                                : isNext
-                                ? ' ord-step__label--next'
-                                : '')
-                            }
-                          >
-                            {item.Header}
-                          </div>
-                        </div>
-                      );
-                    });
-                  })()}
-                </div>
-              </div>
+            {haveSecondaryContact ? (
+              filterAndMapData(orderCartData?.secondaryContact, filterKeysOrder)
+            ) : isAddSecCont ? (
+              <>
+                <ClientsContactInfo clickFunk={addSecCntFunc} fullContact={true} />
+              </>
+            ) : (
+              <button
+                type="button"
+                className="ord-btn ord-btn--ghost ord-btn--sm"
+                onClick={() => addSecondaryContactHandler()}
+              >
+                Add secondary contact
+              </button>
             )}
           </div>
+
+          <div className="ord-tile">
+            <div className="ord-tile__label" style={{ marginBottom: 8 }}>
+              Files
+            </div>
+            <FilesMain userAccess={userAccess} />
+          </div>
+        </div> */}
+
+        <div className="ord-summary-card ord-summary-card--order">
+          <div className="ord-summary-card__title">Delivery info</div>
+          <div className="ord-summary-rows">
+            {orderCartData.status >= 4 ? (
+              haveShipDate ? (
+                <div className="ord-tile__body-text">
+                  Shipping date: {haveShipDate} ({handleDayBeforShipping()} days
+                  before shipment)
+                </div>
+              ) : (
+                <div className="ord-field">
+                  <label className="ord-field__label">Shipping date</label>
+                  <DatePicker
+                    id="data_pcker"
+                    selected={dataValue}
+                    onChange={(date) => handleDateChange(date)}
+                    dateFormat="dd.MM.yyyy"
+                    className="ord-liberar-date"
+                  />
+                </div>
+              )
+            ) : null}
+            <div className="ord-summary-row">
+              <span className="ord-summary-row__label">Delivery price</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="ord-summary-old-value">
+                  {orderCartData.delivery ?? 0}
+                </span>
+                <input
+                  type="text"
+                  id="delivery"
+                  name="delivery"
+                  className="ord-summary-input"
+                  value={deliveryDraft}
+                  onChange={(e) => {
+                    setDeliveryDraft(e.target.value);
+                  }}
+                  readOnly={orderCartData?.status < 5 ? false : true}
+                  disabled={
+                    orderCartData?.status >= 5 ||
+                    !checkUserAccess(user, roles, 'orders_save_delivery_price')
+                      ?.canWrite
+                  }
+                />
+                {checkUserAccess(user, roles, 'orders_description_edit')?.canWrite &&
+                  orderCartData?.status < 5 && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--ghost ord-btn--sm"
+                      onClick={() => {
+                        deliveryFunc();
+                      }}
+                    >
+                      Save
+                    </button>
+                  )}
+              </span>
+            </div>
+            <div className="ord-summary-row">
+              <span className="ord-summary-row__label">
+                Delivery price for m2 full
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="ord-summary-old-value">
+                  {orderCartData.delivery_m2 ?? 0}
+                </span>
+                <input
+                  type="text"
+                  id="delivery_m2"
+                  name="delivery_m2"
+                  className="ord-summary-input"
+                  value={deliveryM2Draft}
+                  onChange={(e) => {
+                    setDeliveryM2Draft(e.target.value);
+                  }}
+                  readOnly={orderCartData?.status < 5 ? false : true}
+                  disabled={
+                    orderCartData?.main_order ||
+                    !checkUserAccess(user, roles, 'orders_save_delivery_price')
+                      ?.canWrite
+                  }
+                />
+                {checkUserAccess(user, roles, 'orders_description_edit')?.canWrite &&
+                  orderCartData?.status < 5 &&
+                  !orderCartData?.main_order && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--ghost ord-btn--sm"
+                      onClick={() => {
+                        deliveryM2Func();
+                      }}
+                    >
+                      Save
+                    </button>
+                  )}
+              </span>
+            </div>
+          </div>
+
+          <div className="ord-summary-block">
+            <div
+              className="ord-summary-card__title"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              Order summary
+              <button
+                type="button"
+                className="ord-btn ord-btn--ghost ord-btn--sm"
+                onClick={saveOrderTotalHandler}
+              >
+                Save
+              </button>
+            </div>
+            <div className="ord-summary-rows">
+              <div className="ord-summary-row">
+                <span className="ord-summary-row__label">VAT origin, €</span>
+                <span className="ord-summary-row__value">
+                  {vatValue.vat_euro_origin}
+                </span>
+              </div>
+              <div className="ord-summary-row">
+                <span className="ord-summary-row__label">VAT, %</span>
+                <span className="ord-summary-row__value">
+                  {vatValue.vat_procent}
+                </span>
+                {/* <input
+                  type="text"
+                  id="vat_procent"
+                  name="vat_procent"
+                  className="ord-summary-input"
+                  value={vatValue.vat_procent}
+                  onChange={(e) => {
+                    handleInputChange(e);
+                  }}
+                  onBlur={() => {
+                    if (vatValue.vat_procent.trim() === '') {
+                      setVatValue((prev) => ({
+                        ...prev,
+                        vat_procent: 21,
+                      }));
+                    }
+                  }}
+                  readOnly={orderCartData?.status < 5 ? true : true}
+                /> */}
+              </div>
+              <div className="ord-summary-row">
+                <span className="ord-summary-row__label">VAT, €</span>
+                <span className="ord-summary-row__value">{vatValue.vat_euro}</span>
+              </div>
+              <div className="ord-summary-row">
+                <span className="ord-summary-row__label">Payment method</span>
+                <span style={{ minWidth: 220 }}>
+                  <Select
+                    value={getSelectedPaymentMethodOption(
+                      orderCartData?.payment_method
+                    )}
+                    onChange={(v) => {
+                      handlePaymentMethodChange(v);
+                    }}
+                    options={PAYMENT_METHOD_OPTIONS}
+                    isDisabled={orderCartData?.status < 5 ? false : true}
+                  />
+                </span>
+              </div>
+              <div className="ord-summary-divider" />
+              <div className="ord-summary-row ord-summary-row--total">
+                <span className="ord-summary-row__label">Result</span>
+                <span className="ord-summary-row__value">{vatValue.vat_result}</span>
+              </div>
+              {vatValue.vat_result_del > 0 ? (
+                <div className="ord-summary-row ord-summary-row--total ord-summary-row--accent">
+                  <span className="ord-summary-row__label">
+                    Result with delivery
+                  </span>
+                  <span className="ord-summary-row__value">
+                    {vatValue.vat_result_del}
+                  </span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        <div className="ord-card__footer" style={{ marginTop: 14, textAlign: 'right' }}>
+          <button
+            type="button"
+            className="ord-btn ord-btn--primary"
+            onClick={() => navigate('/orders')}
+          >
+            Save and show order list
+          </button>
         </div>
       </div>
     </>

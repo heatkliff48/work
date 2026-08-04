@@ -940,7 +940,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
   const sendToBitrix = async () => {
     if (!dealId) {
-      alert('Заполните DEAL_ID перед отправкой в Bitrix24');
+      alert('Fill in DEAL_ID before sending to Bitrix24');
       return;
     }
 
@@ -967,15 +967,15 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         const result = await response.json().catch(() => null);
 
         if (response.ok) {
-          alert('PDF успешно отправлен в Bitrix24');
+          alert('PDF successfully sent to Bitrix24');
         } else {
           console.error('Ошибка ответа сервера:', result);
-          alert(`Ошибка отправки в Bitrix24: ${result?.error ?? response.status}`);
+          alert(`Error sending to Bitrix24: ${result?.error ?? response.status}`);
         }
       }
     } catch (error) {
       console.error('Error:', error);
-      alert(`Ошибка отправки: ${error.message}`);
+      alert(`Send error: ${error.message}`);
     }
   };
 

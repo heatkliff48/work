@@ -18,7 +18,7 @@ const ProjectContextProvider = ({ children }) => {
     project_name: 'Project name',
     quantity_m2: 'Quantity, m2',
     quantity_ud: 'Quantity, Ud',
-    quantity_palet: 'Quantity of pallets',
+    quantity_palet: 'Pallets, qty',
     quantity_real: 'Real quantity, m2',
     quantity_real_ud: 'Real quantity, Ud',
     price_m2: 'Price, EURO per m2',
@@ -30,9 +30,9 @@ const ProjectContextProvider = ({ children }) => {
     total: 'Total, kg',
     pvp: 'PVP',
     dry_mixed_id: 'Dry mixed product id',
-    quantity_palet_dry: 'Quantity of pallets',
+    quantity_palet_dry: 'Pallets, qty',
     anchor_id: 'Anchor product id',
-    quantity_palet_anchor: 'Quantity of pallets',
+    quantity_palet_anchor: 'Pallets, qty',
     tool_id: 'Tool product id',
     rel_mat_id: 'Related material product id',
     c_name: 'Name of owner',
@@ -249,7 +249,7 @@ const ProjectContextProvider = ({ children }) => {
     { value: 'tienda_de_la_construccion', label: 'Tienda de la construcción' },
     { value: 'equipo_de_construction', label: 'Equipo de construction' },
     { value: 'agente', label: 'Agente' },
-    { value: 'cliente_privado', label: 'Сliente privado' },
+    { value: 'cliente_privado', label: 'Cliente privado' },
     { value: 'constructor_pequeno', label: 'Constructor pequeño' },
     { value: 'almacenista_pequeno', label: 'Almacenista pequeno' },
     {
@@ -270,9 +270,9 @@ const ProjectContextProvider = ({ children }) => {
     { value: 5, label: 'Mill operators' },
     { value: 6, label: 'Casting operators' },
     { value: 7, label: 'Cutting operators' },
-    { value: 8, label: 'Green array operators' },
+    { value: 8, label: 'Green cake operators' },
     { value: 9, label: 'Autoclave operators' },
-    { value: 10, label: 'White array operators' },
+    { value: 10, label: 'White cake operators' },
     { value: 11, label: 'Packaging operators' },
     { value: 12, label: 'Quality manager' },
     { value: 13, label: 'Production director' },
@@ -405,7 +405,7 @@ const ProjectContextProvider = ({ children }) => {
       accessor: 'fecha',
     },
     {
-      Header: 'Remaining quantity of pallets ',
+      Header: 'Remaining pallets, qty',
       accessor: 'orders_products',
     },
   ];
@@ -502,9 +502,9 @@ const ProjectContextProvider = ({ children }) => {
     { id: 5, label: 'Mill operators' },
     { id: 6, label: 'Casting operators' },
     { id: 7, label: 'Cutting operators' },
-    { id: 8, label: 'Green array operators' },
+    { id: 8, label: 'Green cake operators' },
     { id: 9, label: 'Autoclave operators' },
-    { id: 10, label: 'White array operators' },
+    { id: 10, label: 'White cake operators' },
     { id: 11, label: 'Packaging operators' },
     { id: 12, label: 'Quality manager' },
     { id: 13, label: 'Production director' },
@@ -526,7 +526,7 @@ const ProjectContextProvider = ({ children }) => {
     '/related_materials_journal': 'Related materials journal',
     '/anchors': 'Fasteners',
     '/tools': 'Tools',
-    '/products/edit': 'Редактирование',
+    '/products/edit': 'Edit',
     '/clients': 'Clients',
     '/users_info': 'Users Info',
     '/warehouse_manager': 'Order dispatch',
@@ -559,7 +559,7 @@ const ProjectContextProvider = ({ children }) => {
   };
 
   function getPageTitleByPath(pathname = window.location.pathname) {
-    return pageTitles[pathname] || 'Страница';
+    return pageTitles[pathname] || 'Page';
   }
 
   const getRoleName = (roleId) => {

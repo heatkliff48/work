@@ -29,7 +29,7 @@ const InputField = React.memo(
       const max = parseFloat(e.target.max);
 
       if (isNaN(parsed)) {
-        setInputError('Неверный формат числа');
+        setInputError('Invalid number format');
       } else if (parsed < min) {
         setInputError(`Must be higher than ${e.target.min}`);
       } else if (parsed > max) {
@@ -112,7 +112,7 @@ export default InputField;
 //       const max = parseFloat(e.target.max);
 
 //       if (isNaN(parsed)) {
-//         setInputError('Неверный формат числа');
+//         setInputError('Invalid number format');
 //       } else if (parsed < min) {
 //         setInputError(`Must be higher than ${e.target.min}`);
 //       } else if (parsed > max) {

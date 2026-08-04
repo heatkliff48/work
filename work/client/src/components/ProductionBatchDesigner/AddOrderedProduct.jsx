@@ -28,7 +28,7 @@ const AddOrderedProduct = ({ isOpen, toggle, data = [], onClickRow = null }) => 
       accessor: 'density',
     },
     {
-      Header: 'Quantity of pallets',
+      Header: 'Pallets, qty',
       accessor: 'quantity_pallets',
     },
     {

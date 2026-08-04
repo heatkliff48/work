@@ -32,12 +32,12 @@ function CackeFillUpModal({ show, onHide }) {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'quantity_pallets',
+      Header: 'Pallets, qty',
       accessor: 'quantity_pallets',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'quantity_free',
+      Header: 'Free pallets, qty',
       accessor: 'quantity_free',
       Filter: TextSearchFilter,
     },
@@ -63,7 +63,7 @@ function CackeFillUpModal({ show, onHide }) {
       accessor: 'product_article',
     },
     {
-      Header: 'Total Qty in batch, plan, pallets',
+      Header: 'Total pallets in batch, plan, qty',
       accessor: 'total_quantity_plan',
     },
   ];

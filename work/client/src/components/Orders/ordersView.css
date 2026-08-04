@@ -580,6 +580,12 @@
 .ord-summary-input:read-only {
   background: #fafbfc;
 }
+.ord-summary-old-value {
+  color: var(--ord-muted);
+  font-size: 12px;
+  text-decoration: line-through;
+  white-space: nowrap;
+}
 .ord-summary-divider {
   height: 1px;
   background: var(--ord-border-3);
@@ -1067,4 +1073,37 @@
   .ord-card {
     padding: 18px 16px 36px;
   }
+}
+
+/* ---------- order card: restructured rows (additive only, does not
+   change ord-grid/ord-tile/ord-summary-card/ord-status-card rules —
+   those are shared with AccountngOrderCard.jsx / FacturaOrderCard.jsx) ---------- */
+.ord-row {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr;
+  gap: 14px;
+  align-items: stretch;
+  margin-bottom: 14px;
+}
+@media (max-width: 1100px) {
+  .ord-row {
+    grid-template-columns: 1fr;
+  }
+}
+.ord-card__divider {
+  width: 1px;
+  height: 34px;
+  background: var(--ord-border);
+  flex: 0 0 auto;
+}
+.ord-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ord-prod-table-wrap {
+  overflow-x: auto;
+}
+.ord-summary-card--order {
+  max-width: 560px;
 }
