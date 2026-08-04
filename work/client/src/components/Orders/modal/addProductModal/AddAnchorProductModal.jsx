@@ -19,17 +19,18 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
     list_of_orders,
   } = useOrderContext();
 
-  const { COLUMNS_ANCHOR_PRODUCT, latestAnchors } = useProductsTypeJournalContext();
+  const { COLUMNS_ANCHOR_PRODUCT, latestAnchors } =
+    useProductsTypeJournalContext();
 
   const dispatch = useDispatch();
 
   const haveProduct = useMemo(
     () => selectedProduct?.id ?? false,
-    [selectedProduct?.id]
+    [selectedProduct?.id],
   );
 
   const haveOrderClient = list_of_orders.find(
-    (el) => el.article === newOrder.article
+    (el) => el.article === newOrder.article,
   );
 
   const handlerAddProductOrder = useCallback((row) => {
@@ -53,7 +54,9 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
     if (!selectedProduct) return;
     if (!productOfOrder?.quantity_ud) productOfOrder.quantity_ud = 0;
 
-    const result = Math.ceil(productOfOrder?.quantity_ud / (pieces_per_pallet || 1));
+    const result = Math.ceil(
+      productOfOrder?.quantity_ud / (pieces_per_pallet || 1),
+    );
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -114,6 +117,15 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
 
   const addProductOrder = async () => {
     if (haveOrderClient) {
+      if (
+        !productOfOrder?.quantity_ud ||
+        productOfOrder?.quantity_ud == 0 ||
+        !productOfOrder?.quantity_real_ud ||
+        productOfOrder?.quantity_real_ud == 0
+      ) {
+        alert('Cannot add product with 0 quantity!');
+        return;
+      }
       const newAnchorProductsOfOrder = {
         order_id: haveOrderClient.id,
         productOfOrder,
@@ -190,7 +202,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
                       />
                     </>
                   );
-                if (el.accessor === 'quantity_real')
+                if (el.accessor === 'quantity_real_ud')
                   return (
                     <>
                       <ModalBody>{el.Header}:</ModalBody>
@@ -257,7 +269,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
               <Table
                 COLUMN_DATA={COLUMNS_ANCHOR_PRODUCT}
                 dataOfTable={latestAnchors.filter(
-                  (product) => product.active_status === true
+                  (product) => product.active_status === true,
                 )}
                 // userAccess={userAccess}
                 onClickButton={() => {}}

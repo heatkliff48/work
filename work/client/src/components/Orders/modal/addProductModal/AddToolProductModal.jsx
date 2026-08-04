@@ -22,17 +22,18 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
     list_of_orders,
   } = useOrderContext();
 
-  const { COLUMNS_TOOLS_PRODUCT, latestTools } = useProductsTypeJournalContext();
+  const { COLUMNS_TOOLS_PRODUCT, latestTools } =
+    useProductsTypeJournalContext();
 
   const dispatch = useDispatch();
 
   const haveProduct = useMemo(
     () => selectedProduct?.id ?? false,
-    [selectedProduct?.id]
+    [selectedProduct?.id],
   );
 
   const haveOrderClient = list_of_orders.find(
-    (el) => el.article === newOrder.article
+    (el) => el.article === newOrder.article,
   );
 
   const handlerAddProductOrder = useCallback((row) => {
@@ -92,6 +93,15 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
 
   const addProductOrder = async () => {
     if (haveOrderClient) {
+      if (
+        !productOfOrder?.quantity_ud ||
+        productOfOrder?.quantity_ud == 0 ||
+        !productOfOrder?.total ||
+        productOfOrder?.total == 0
+      ) {
+        alert('Cannot add product with 0 quantity!');
+        return;
+      }
       const newToolProductsOfOrder = {
         order_id: haveOrderClient.id,
         productOfOrder,
@@ -209,7 +219,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
               <Table
                 COLUMN_DATA={COLUMNS_TOOLS_PRODUCT}
                 dataOfTable={latestTools.filter(
-                  (product) => product.active_status === true
+                  (product) => product.active_status === true,
                 )}
                 // userAccess={userAccess}
                 onClickButton={() => {}}
