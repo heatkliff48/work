@@ -26,11 +26,11 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
 
   const haveProduct = useMemo(
     () => selectedProduct?.id ?? false,
-    [selectedProduct?.id]
+    [selectedProduct?.id],
   );
 
   const haveOrderClient = list_of_orders.find(
-    (el) => el.article === newOrder.article
+    (el) => el.article === newOrder.article,
   );
 
   const handlerAddProductOrder = useCallback((row) => {
@@ -44,27 +44,46 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
     }));
   }, []);
 
+  // Quantity, Ud и Pallets, qty пересчитывают друг друга в зависимости от того,
+  // какое поле реально редактирует пользователь — пересчёт делается сразу здесь,
+  // одним setProductOfOrder, а не в отдельных useMemo, чтобы оба направления не
+  // перезаписывали друг друга по кругу.
   const handleProductListOrderChange = (e) => {
-    setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    const units_per_pallet = selectedProduct?.units_per_pallet || 1;
+
+    if (name === 'quantity_ud') {
+      const quantity_palet_dry = value
+        ? Math.ceil(Number(value) / units_per_pallet)
+        : 0;
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_ud: value,
+        quantity_palet_dry,
+      }));
+      return;
+    }
+
+    if (name === 'quantity_palet_dry') {
+      const quantity_ud = value ? Math.ceil(Number(value) * units_per_pallet) : 0;
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_palet_dry: value,
+        quantity_ud,
+      }));
+      return;
+    }
+
+    setProductOfOrder((prev) => ({ ...prev, [name]: value }));
   };
 
-  const quantity_palet_value = useMemo(() => {
-    if (!selectedProduct) return;
-    if (!productOfOrder?.quantity_ud) productOfOrder.quantity_ud = 0;
-    const result = Math.ceil(
-      productOfOrder?.quantity_ud / (selectedProduct?.units_per_pallet || 1)
-    );
-
-    setProductOfOrder((prev) => ({
-      ...prev,
-      quantity_palet_dry: result,
-    }));
-    return result;
-  }, [productOfOrder.quantity_ud, selectedProduct?.units_per_pallet]);
-
   const quantity_real_value = useMemo(() => {
+    if (!selectedProduct) return 0;
+    const quantity_palet_dry = Number(productOfOrder?.quantity_palet_dry || 0);
     const result = Math.ceil(
-      quantity_palet_value * (selectedProduct?.units_per_pallet || 1)
+      quantity_palet_dry * (selectedProduct?.units_per_pallet || 1),
     );
 
     setProductOfOrder((prev) => ({
@@ -72,17 +91,18 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
       quantity_real_ud: result,
     }));
     return result;
-  }, [quantity_palet_value, selectedProduct?.m2]);
+  }, [productOfOrder.quantity_palet_dry, selectedProduct?.units_per_pallet]);
 
   const total_value = useMemo(() => {
-    const result = quantity_palet_value * selectedProduct?.units_per_pallet;
+    const quantity_palet_dry = Number(productOfOrder?.quantity_palet_dry || 0);
+    const result = quantity_palet_dry * (selectedProduct?.units_per_pallet || 0);
 
     setProductOfOrder((prev) => ({
       ...prev,
       total: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [quantity_palet_value, selectedProduct?.units_per_pallet]);
+  }, [productOfOrder.quantity_palet_dry, selectedProduct?.units_per_pallet]);
 
   const final_price_value = useMemo(() => {
     const discount = productOfOrder?.discount ?? 0;
@@ -116,6 +136,15 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
 
   const addProductOrder = async () => {
     if (haveOrderClient) {
+      if (
+        !productOfOrder?.quantity_ud ||
+        productOfOrder?.quantity_ud == 0 ||
+        !productOfOrder?.quantity_palet_dry ||
+        productOfOrder?.quantity_palet_dry == 0
+      ) {
+        alert('Cannot add product with 0 quantity!');
+        return;
+      }
       const newDryMixedProductsOfOrder = {
         order_id: haveOrderClient.id,
         productOfOrder,
@@ -175,19 +204,6 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
                         id={el.accessor}
                         name={el.accessor}
                         value={productOfOrder[el.accessor] || ''}
-                        readOnly
-                      />
-                    </>
-                  );
-                if (el.accessor === 'quantity_palet')
-                  return (
-                    <>
-                      <ModalBody>{el.Header}:</ModalBody>
-                      <input
-                        type="text"
-                        id={el.accessor}
-                        name={el.accessor}
-                        value={quantity_palet_value}
                         readOnly
                       />
                     </>
@@ -259,7 +275,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
               <Table
                 COLUMN_DATA={COLUMNS_DRY_MIXED_PRODUCT}
                 dataOfTable={latestDryMix.filter(
-                  (product) => product.active_status === true
+                  (product) => product.active_status === true,
                 )}
                 // userAccess={userAccess}
                 onClickButton={() => {}}

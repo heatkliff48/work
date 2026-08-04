@@ -131,6 +131,22 @@ function ProductsTypeJournalModal(props) {
     productsTypeJournalInput.units_per_pallet,
     productsTypeJournalInput.units_of_measurement,
   ]);
+  //anchors pallet_weight
+  useEffect(() => {
+    const { boxes_on_a_pallet, box_weight } = productsTypeJournalInput;
+    if (boxes_on_a_pallet && box_weight && props.target == 3) {
+      const palletWeight =
+        parseFloat(boxes_on_a_pallet) * parseFloat(box_weight) + 23;
+      setProductsTypeJournalInput((prev) => ({
+        ...prev,
+        pallet_weight: palletWeight,
+      }));
+    }
+  }, [
+    productsTypeJournalInput.boxes_on_a_pallet,
+    productsTypeJournalInput.box_weight,
+    props.target,
+  ]);
 
   useEffect(() => {
     const { price_per_unit, bag_weight } = productsTypeJournalInput;
@@ -517,6 +533,9 @@ function ProductsTypeJournalModal(props) {
   };
 
   const isFieldDisabled = (fieldName) => {
+    if (props.target == 3 && fieldName === "pallet_weight") {
+      return true;
+    }
     if (props?.addNewVersion) {
       return props.target == 1
         ? [
