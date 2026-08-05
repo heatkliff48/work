@@ -520,16 +520,15 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       next[key] = value;
     });
 
-    if (batchData?.aluminum_type) {
-      next.al_paste_types = batchData.aluminum_type;
+    if (selectedRecipe?.aluminum_type) {
+      next.al_paste_types = selectedRecipe.aluminum_type;
+    }
+    if (selectedRecipe?.aluminum_2_type) {
+      next.al_paste_types_2 = selectedRecipe.aluminum_2_type;
     }
 
-    if (batchData?.aluminum_2_type) {
-      next.al_paste_types_2 = batchData.aluminum_2_type;
-    }
-
-    const alum1 = Number(batchData.aluminum_paste) || 0;
-    const alum2 = Number(batchData.aluminum_paste_2) || 0;
+    const alum1 = Number(selectedRecipe.aluminum_paste) || 0;
+    const alum2 = Number(selectedRecipe.aluminum_paste_2) || 0;
     const total = alum1 + alum2;
 
     if (total > 0) {
@@ -544,10 +543,12 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     if (!selectedRecipe) return;
 
     setOldBatchData({ ...selectedRecipe });
+    console.log('selectedRecipe LotesListModal.jsx line 547', selectedRecipe);
 
     const related = Array.isArray(selectedRecipe.relatedBatches)
       ? selectedRecipe.relatedBatches
       : [];
+    console.log('related LotesListModal.jsx line 548', related);
 
     const starts = related
       .map((b) => Number(b?.cake_id_start))
@@ -556,6 +557,8 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     const data = related.find(
       (rel) => rel.sub_batch_id == selectedRecipe.activeSubBatchId,
     );
+
+    console.log('data LotesListModal.jsx line 560', data);
 
     setBatchData({ ...data, relatedBatches: selectedRecipe.relatedBatches });
 

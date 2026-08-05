@@ -200,6 +200,9 @@ function CackeFillUp() {
 
     const result = [];
 
+    const prevTotalCackeFillUp = Number(accd.total_arrays_cacke_fill_up) || 0;
+    const newTotalCackeFillUp = prevTotalCackeFillUp + allocated;
+
     if (isFinished) {
       const totalAutoclaves = Math.ceil(newTotalArrays / 21);
 
@@ -217,7 +220,7 @@ function CackeFillUp() {
       result.push({
         ...accd,
         total_arrays: newTotalArrays,
-        total_arrays_cacke_fill_up: allocated,
+        total_arrays_cacke_fill_up: newTotalCackeFillUp,
       });
     }
 
