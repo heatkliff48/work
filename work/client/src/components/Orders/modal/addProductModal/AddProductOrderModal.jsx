@@ -272,6 +272,11 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     const price_m2 = parseLocalNumber(productOfOrder.price_m2) || 0;
     const final_price = parseLocalNumber(productOfOrder.final_price) || 0;
 
+    if (!quantityM2 || !quantity_palet || !quantity_real) {
+      alert('Cannot add product with 0 quantity!');
+      return;
+    }
+
     const payload = {
       ...productOfOrder,
       quantity_m2: parseFloat(quantityM2?.toFixed(2)),

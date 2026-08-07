@@ -114,7 +114,13 @@ const OrderCart = React.memo(() => {
   const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
   const [dataValue, setDataValue] = useState(new Date());
   const [newDescription, setNewDescription] = useState('');
-  const [formatDataValue, setFormatDataValue] = useState(null);
+  const [formatDataValue, setFormatDataValue] = useState(() =>
+    new Date().toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [isAddSecCont, setIsAddSecCont] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
@@ -215,23 +221,46 @@ const OrderCart = React.memo(() => {
     [orderCartData]
   );
 
-  const handleDateChange = useCallback(
-    (date) => {
-      const currentDate = new Date();
-      if (date < currentDate) {
-        alert('The selected date cannot be before than the current date');
-        return;
-      }
-      setDataValue(date);
-      const formattedDate = date.toLocaleDateString('ru-RU', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      });
-      setFormatDataValue(formattedDate);
-    },
-    [dataValue]
-  );
+  const handleDateChange = useCallback((date) => {
+    if (!date) {
+      setFormatDataValue(null);
+      return;
+    }
+
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    const selectedDate = new Date(date);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate < currentDate) {
+      alert('The selected date cannot be before than the current date');
+      return;
+    }
+
+    setDataValue(date);
+
+    const formattedDate = date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+
+    setFormatDataValue(formattedDate);
+  }, []);
+
+  const saveShippingDateHandler = () => {
+    if (!formatDataValue) {
+      return alert('Please select the shipping date.');
+    }
+
+    dispatch(
+      addDataShipOrder({
+        order_id: orderCartData?.id,
+        shipping_date: formatDataValue,
+      })
+    );
+  };
 
   const onEditHandler = () => {
     setNewDescription(orderCartData?.description);
@@ -490,21 +519,11 @@ const OrderCart = React.memo(() => {
     }
 
     const order_id = orderCartData?.id;
-    const hasShippingDate =
-      orderCartData?.shipping_date?.length > 0
-        ? orderCartData?.shipping_date
-        : formatDataValue;
+    const hasShippingDate = orderCartData?.shipping_date?.length > 0;
 
     if (status.accessor > statusByAccessor[4].accessor && !hasShippingDate) {
-      alert('Please select the shipping date.');
+      alert('Please save the shipping date before changing the status.');
       return;
-    } else if (status.accessor === statusByAccessor[5].accessor) {
-      dispatch(
-        addDataShipOrder({
-          order_id,
-          shipping_date: hasShippingDate ?? formatDataValue,
-        })
-      );
     }
 
     // blocks
@@ -1574,13 +1593,23 @@ const OrderCart = React.memo(() => {
               ) : (
                 <div className="ord-field">
                   <label className="ord-field__label">Shipping date</label>
-                  <DatePicker
-                    id="data_pcker"
-                    selected={dataValue}
-                    onChange={(date) => handleDateChange(date)}
-                    dateFormat="dd.MM.yyyy"
-                    className="ord-liberar-date"
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <DatePicker
+                      id="data_pcker"
+                      selected={dataValue}
+                      onChange={(date) => handleDateChange(date)}
+                      dateFormat="dd.MM.yyyy"
+                      className="ord-liberar-date"
+                    />
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--ghost ord-btn--sm"
+                      onClick={saveShippingDateHandler}
+                      disabled={!formatDataValue}
+                    >
+                      Save
+                    </button>
+                  </div>
                 </div>
               )
             ) : null}
