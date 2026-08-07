@@ -8,7 +8,7 @@ import Select from 'react-select';
 
 import '#components/Styles/raw-materials-plan.css';
 
-function RawMaterialsPlan() {
+function RawMaterialsPlan({ batchId, onSaved } = {}) {
   const { list_of_recipes, recipe_info } = useRecipeContext();
   const { latestProducts } = useProductsContext();
   const { raw_materials_warehouse } = useWarehouseContext();
@@ -17,6 +17,7 @@ function RawMaterialsPlan() {
     (state) => state.listOfOrderedProduction,
   );
   const warehouseAluminum1 = useSelector((state) => state.warehouseAluminum1);
+  const recipeOrders = useSelector((state) => state.recipeOrders);
 
   const [productsArray, setProductsArray] = useState([]);
   const [manualOrderShare, setManualOrderShare] = useState({});
@@ -43,6 +44,44 @@ function RawMaterialsPlan() {
     'aluminum_paste_2',
   ];
 
+  // Raw materials already reserved by batches planned elsewhere (i.e. not part
+  // of this view) must be deducted from warehouse stock, so "remaining" here
+  // reflects free stock rather than total stock. Batches shown in the current
+  // view are excluded from this deduction since their own need is already
+  // accounted for separately in the "Total"/"Requirement" rows below.
+  const currentBatchIds = new Set(productsArray.map((product) => product.id_batch));
+
+  const reservedByTitle = {};
+  const reservedAluminumByType = {};
+
+  (recipeOrders || []).forEach((order) => {
+    if (currentBatchIds.has(order.id_batch)) return;
+
+    const recipe = (list_of_recipes || []).find((r) => r.id === order.id_recipe);
+    const volume = Number(order.production_volume) || 0;
+    if (!recipe || !volume) return;
+
+    recipe_info
+      .filter((item) => !excludedAccessors.includes(item.accessor))
+      .forEach((item) => {
+        const amount = Number(recipe[item.accessor]) || 0;
+        if (!amount) return;
+        reservedByTitle[item.accessor] =
+          (reservedByTitle[item.accessor] || 0) + amount * volume;
+      });
+
+    if (recipe.aluminum_type) {
+      reservedAluminumByType[recipe.aluminum_type] =
+        (reservedAluminumByType[recipe.aluminum_type] || 0) +
+        (Number(recipe.aluminum_paste) || 0) * volume;
+    }
+    if (recipe.aluminum_2_type) {
+      reservedAluminumByType[recipe.aluminum_2_type] =
+        (reservedAluminumByType[recipe.aluminum_2_type] || 0) +
+        (Number(recipe.aluminum_paste_2) || 0) * volume;
+    }
+  });
+
   const rawMaterials = recipe_info
     .filter((item) => !excludedAccessors.includes(item.accessor))
     .map((item) => {
@@ -51,10 +90,13 @@ function RawMaterialsPlan() {
           warehouseItem.material_type === item.Header.replace(/, kg$/, '').trim(),
       );
 
+      const stock = warehouseMaterial ? warehouseMaterial.remaining_quantity : 0;
+      const reserved = reservedByTitle[item.accessor] || 0;
+
       return {
         name: item.Header,
         title: item.accessor,
-        remaining: warehouseMaterial ? warehouseMaterial.remaining_quantity : 0,
+        remaining: Math.round((stock - reserved) * 100) / 100,
       };
     });
 
@@ -66,6 +108,15 @@ function RawMaterialsPlan() {
     map[type] = (map[type] || 0) + available;
     return map;
   }, {});
+
+  new Set([
+    ...Object.keys(aluminumRemainingByType),
+    ...Object.keys(reservedAluminumByType),
+  ]).forEach((type) => {
+    const available = aluminumRemainingByType[type] || 0;
+    const reserved = reservedAluminumByType[type] || 0;
+    aluminumRemainingByType[type] = Math.round((available - reserved) * 100) / 100;
+  });
 
   const aluminumTypes = Array.from(
     new Set(
@@ -124,6 +175,7 @@ function RawMaterialsPlan() {
 
   const handlerSave = () => {
     dispatch(saveMaterialPlan(productsArray));
+    onSaved?.();
   };
 
   const handleRecipeChange = (index, selectedOption) => {
@@ -142,7 +194,11 @@ function RawMaterialsPlan() {
   };
 
   useEffect(() => {
-    const result = batchOutside
+    const sourceBatches = batchId
+      ? batchOutside.filter((batch) => batch.id === batchId)
+      : batchOutside;
+
+    const result = sourceBatches
       .map((batch) => {
         let orderedProduct;
 
@@ -196,7 +252,13 @@ function RawMaterialsPlan() {
       .filter(Boolean);
 
     setProductsArray(result);
-  }, [batchOutside, list_of_ordered_production, list_of_recipes, latestProducts]);
+  }, [
+    batchOutside,
+    list_of_ordered_production,
+    list_of_recipes,
+    latestProducts,
+    batchId,
+  ]);
 
   useEffect(() => {
     const updatedTotals = {};
@@ -234,7 +296,14 @@ function RawMaterialsPlan() {
     });
 
     setTotals(updatedTotals);
-  }, [manualOrderShare, productsArray, raw_materials_warehouse, warehouseAluminum1]);
+  }, [
+    manualOrderShare,
+    productsArray,
+    raw_materials_warehouse,
+    warehouseAluminum1,
+    recipeOrders,
+    list_of_recipes,
+  ]);
 
   return (
     <div className="raw-materials-plan">

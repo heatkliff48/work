@@ -17,12 +17,14 @@ import { ru } from 'date-fns/locale';
 import { useSelector } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import RawMaterialsPlan from '#components/RawMaterialsPlan/RawMaterialsPlan.jsx';
 
 const WEEK_STARTS_ON = 1;
 
 export default function TechnologyCalendar() {
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [selectedDate, setSelectedDate] = useState(null);
+  const [recipeBatchId, setRecipeBatchId] = useState(null);
 
   const batchOutside = useSelector((state) => state.batchOutside);
   const recipeOrders = useSelector((state) => state.recipeOrders);
@@ -167,13 +169,35 @@ export default function TechnologyCalendar() {
                     Рецепт: {recipe.article}
                   </span>
                 ) : (
-                  <span style={styles.recipeBadgeMissing}>
-                    Рецепт не выбран
-                  </span>
+                  <button
+                    type="button"
+                    style={styles.selectRecipeBtn}
+                    onClick={() => setRecipeBatchId(batch.id)}
+                  >
+                    Выбрать рецепт
+                  </button>
                 )}
               </div>
             );
           })}
+        </Modal.Body>
+      </Modal>
+
+      <Modal
+        show={!!recipeBatchId}
+        onHide={() => setRecipeBatchId(null)}
+        fullscreen
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Выбор рецепта</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {recipeBatchId && (
+            <RawMaterialsPlan
+              batchId={recipeBatchId}
+              onSaved={() => setRecipeBatchId(null)}
+            />
+          )}
         </Modal.Body>
       </Modal>
     </div>
@@ -293,13 +317,15 @@ const styles = {
     borderRadius: 999,
     padding: '4px 10px',
   },
-  recipeBadgeMissing: {
+  selectRecipeBtn: {
     flexShrink: 0,
+    border: '1px solid #2563eb',
+    background: '#fff',
+    color: '#2563eb',
     fontSize: 12,
     fontWeight: 600,
-    color: '#991b1b',
-    background: '#fee2e2',
     borderRadius: 999,
     padding: '4px 10px',
+    cursor: 'pointer',
   },
 };
