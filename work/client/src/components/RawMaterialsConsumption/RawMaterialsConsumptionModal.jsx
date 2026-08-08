@@ -40,7 +40,6 @@ const RawMaterialsConsumptionModal = React.memo(
     const [govno, setGovno] = useState(false);
     const [confirmFlag, setConfirmFlag] = useState(false);
     const [recipeArticle, setRecipeArticle] = useState('');
-    const [wastedMode, setWastedMode] = useState('default');
     const [productionVolume, setProductionVolume] = useState('');
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [selectedAlu1Type, setSelectedAlu1Type] = useState(null);
@@ -52,7 +51,6 @@ const RawMaterialsConsumptionModal = React.memo(
       setAvailableRecipes([]);
       setSelectedRecipe(null);
       setForm({});
-      setWastedMode('default');
       setProductionVolume('');
       setConfirmFlag(false);
       // setLotesListCheck(true);
@@ -88,18 +86,6 @@ const RawMaterialsConsumptionModal = React.memo(
       ];
       return uniqueTypes.map((type) => ({ value: type, label: type }));
     }, [warehouseAluminum1]);
-
-    useEffect(() => {
-      if (!isOpen) return;
-
-      const initialForm = {};
-      materialsMap.forEach((key) => {
-        initialForm[`${key}_actual_reciepe`] = null;
-        initialForm[`${key}_Wasted`] = null;
-      });
-
-      setForm(initialForm);
-    }, [isOpen]);
 
     // const warehouseByType = React.useMemo(() => {
     //   const map = new Map();
@@ -161,20 +147,28 @@ const RawMaterialsConsumptionModal = React.memo(
 
     const recipeForUI = useMemo(() => selectedRecipe || null, [selectedRecipe]);
 
-    const resolvedRecipe = useMemo(() => {
-      return wastedMode === 'from_actual'
-        ? selectedRow || null
-        : selectedRecipe || null;
-    }, [wastedMode, selectedRecipe, selectedRow]);
+    // Modified recipe fields default to the recipe's def value whenever the
+    // modal opens or a different recipe is picked; editing them is what
+    // drives the Consumed column.
+    useEffect(() => {
+      if (!isOpen) return;
+      setForm((prev) => {
+        const next = { ...prev };
+        materialsMap.forEach(({ key }) => {
+          const baseVal = Number(recipeForUI?.[key]);
+          next[`${key}_actual_reciepe`] = Number.isFinite(baseVal) ? baseVal : '';
+        });
+        return next;
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, selectedRecipe?.id, materialsMap]);
 
-    const isRecipeLocked = wastedMode === 'from_actual';
-
-    const onHeaderFromActual = (e) => {
-      setWastedMode((prev) => (e.target.checked ? 'from_actual' : 'default'));
-    };
-
-    const onHeaderManual = (e) => {
-      setWastedMode((prev) => (e.target.checked ? 'manual' : 'default'));
+    const resetToDef = (key) => {
+      const baseVal = Number(recipeForUI?.[key]);
+      setForm((p) => ({
+        ...p,
+        [`${key}_actual_reciepe`]: Number.isFinite(baseVal) ? baseVal : '',
+      }));
     };
 
     // useEffect(() => {
@@ -335,63 +329,15 @@ const RawMaterialsConsumptionModal = React.memo(
       return !Number.isFinite(n) || n === 0;
     };
 
-    const computeTotalByActual = useMemo(() => {
-      const t = {};
-      materialsMap.forEach(({ key }) => {
-        const raw = Number(form[`${key}_actual_reciepe`] || 0);
-        const baseNum = Number(recipeForUI?.[key]) || 0;
-        const aVal =
-          raw === '' || raw === null || raw === undefined ? baseNum : Number(raw);
-        t[`${key}_total`] = pvNumber ? +(aVal * pvNumber).toFixed(2) : '';
-      });
-      return t;
-    }, [form, pvNumber, recipeForUI, materialsMap]);
-
-    // const computeWasted = (key, label) => {
-    //   const mode = wastedMode || 'default';
-    //   const aVal = Number(form[`${key}_actual_reciepe`] || 0);
-    //   const baseNum = Number(recipeForUI?.[key]) || 0;
-    //   if (mode === 'manual') {
-    //     const raw = form[`${key}_Wasted`];
-    //     return raw === '' ? '' : Number(raw);
-    //   }
-
-    //   if (mode === 'from_actual') {
-    //     const raw = form[`${key}_actual_reciepe`];
-    //     const aVal =
-    //       raw === '' || raw === null || raw === undefined ? baseNum : Number(raw);
-    //     return +(aVal * pvNumber).toFixed(2);
-    //   }
-
-    //   if (pvNumber === 0) return 0;
-    //   if (mode === 'from_actual') return +(aVal * pvNumber).toFixed(2);
-    //   if (!Number.isFinite(baseNum)) return '';
-    //   return +(baseNum * pvNumber).toFixed(2);
-    // };
-
-    const computeWasted = (key, label) => {
-      const mode = wastedMode || 'default';
-      const baseNum = Number(recipeForUI?.[key]) || 0;
-
-      if (mode === 'manual') {
-        const raw = form[`${key}_Wasted`];
-        if (raw === '' || raw === null || raw === undefined) return null;
-        const num = Number(raw);
-        return Number.isFinite(num) ? num : null;
-      }
-
-      if (mode === 'from_actual') {
-        const raw = form[`${key}_actual_reciepe`];
-        if (raw === '' || raw === null || raw === undefined) return null;
-        const aVal = Number(raw);
-        if (!Number.isFinite(aVal)) return null;
-        return pvNumber ? +(aVal * pvNumber).toFixed(2) : 0;
-      }
-
-      if (pvNumber === 0) return 0;
-      if (!Number.isFinite(baseNum)) return '';
-      return +(baseNum * pvNumber).toFixed(2);
+    // Consumed = Modified recipe value (per unit) × production volume.
+    const computeConsumed = (key) => {
+      const raw = form[`${key}_actual_reciepe`];
+      if (raw === '' || raw === null || raw === undefined) return null;
+      const aVal = Number(raw);
+      if (!Number.isFinite(aVal)) return null;
+      return pvNumber ? +(aVal * pvNumber).toFixed(2) : 0;
     };
+
     const getRecipeVolumeInfo = () => {
       const planned = Number(selectedRow?.production_volume || 0);
       const current = Number(productionVolume || 0);
@@ -443,34 +389,29 @@ const RawMaterialsConsumptionModal = React.memo(
       const base = Number(recipeForUI?.[key]);
       const log = logByKey(key);
       const aVal = numOrNull(form[`${key}_actual_reciepe`]);
-      const wVal = numOrNull(form[`${key}_Wasted`]);
 
       const hasMeaningfulBase = !isEmptyOrZero(base);
       const hasMeaningfulLog = !isEmptyOrZero(log);
       const hasMeaningfulA = aVal !== null && aVal !== 0;
-      const hasMeaningfulW = wVal !== null && wVal !== 0;
 
       const hasAnyRecipeLocal =
         Boolean(selectedRecipe) || (availableRecipes?.length ?? 0) > 0;
 
       if (!hasAnyRecipeLocal) {
-        return hasMeaningfulLog || hasMeaningfulA || hasMeaningfulW;
+        return hasMeaningfulLog || hasMeaningfulA;
       }
 
-      const total = computeTotalByActual[`${key}_total`];
-      const wastedCalc = computeWasted(key, label);
+      const consumed = computeConsumed(key);
+      const hasMeaningfulConsumed = consumed !== null && Number(consumed) !== 0;
 
-      const hasMeaningfulTotal = total !== '' && Number(total) !== 0;
-      const hasMeaningfulWasted = wastedCalc !== '' && Number(wastedCalc) !== 0;
+      return hasMeaningfulBase || hasMeaningfulLog || hasMeaningfulA || hasMeaningfulConsumed;
+    };
 
-      return (
-        hasMeaningfulBase ||
-        hasMeaningfulLog ||
-        hasMeaningfulA ||
-        hasMeaningfulW ||
-        hasMeaningfulTotal ||
-        hasMeaningfulWasted
-      );
+    const isRecipeModified = (key) => {
+      const actual = numOrNull(form[`${key}_actual_reciepe`]);
+      const base = Number(recipeForUI?.[key]);
+      if (actual === null || !Number.isFinite(base)) return false;
+      return Math.abs(actual - base) > 1e-9;
     };
 
     const buildRecipeSnapshot = () => {
@@ -479,10 +420,10 @@ const RawMaterialsConsumptionModal = React.memo(
       materialsMap.forEach(({ key }) => {
         const actual = Number(form[`${key}_actual_reciepe`]);
 
-        if (wastedMode !== 'default' && Number.isFinite(actual) && actual > 0) {
+        if (Number.isFinite(actual) && actual > 0) {
           snapshot[key] = +actual.toFixed(5);
         } else {
-          const base = Number(resolvedRecipe?.[key]);
+          const base = Number(recipeForUI?.[key]);
           snapshot[key] = Number.isFinite(base) ? +base.toFixed(5) : 0;
         }
       });
@@ -495,7 +436,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (!ok) return;
 
       const materials = materialsMap.map(({ label, key }) => {
-        const w = computeWasted(key, label);
+        const w = computeConsumed(key);
         if (w === null) return { type: label, quantity: null };
 
         const wasted = Number(w);
@@ -637,25 +578,23 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
-      if (wastedMode === 'from_actual') {
-        const visibleMaterials = materialsMap
-          .map((m) => (shouldShowRow(m.label, m.key) ? m.label : null))
-          .filter(Boolean);
+      const visibleMaterials = materialsMap
+        .map((m) => (shouldShowRow(m.label, m.key) ? m.label : null))
+        .filter(Boolean);
 
-        const null_arr = [];
-        result_materials.forEach((el) => {
-          if (visibleMaterials.includes(el.type) && el.quantity === null) {
-            null_arr.push(el);
-          }
-        });
-
-        if (null_arr.length) {
-          const msg =
-            'All material quantity fields must be filled in:\n\n' +
-            null_arr.map((s) => `${s.type}: value not specified`).join('\n');
-          alert(msg);
-          return;
+      const null_arr = [];
+      result_materials.forEach((el) => {
+        if (visibleMaterials.includes(el.type) && el.quantity === null) {
+          null_arr.push(el);
         }
+      });
+
+      if (null_arr.length) {
+        const msg =
+          'All material quantity fields must be filled in:\n\n' +
+          null_arr.map((s) => `${s.type}: value not specified`).join('\n');
+        alert(msg);
+        return;
       }
 
       const fixed_materials = result_materials
@@ -691,7 +630,7 @@ const RawMaterialsConsumptionModal = React.memo(
         production_date: selectedRow?.date,
         product: prodDescription[1],
         quantity_cakes: Number(productionVolume),
-        custom_recipe: wastedMode !== 'default',
+        custom_recipe: materialsMap.some(({ key }) => isRecipeModified(key)),
         slurried: govno,
         recipe: selectedRow?.recipe_article,
         batch_id: selectedRow?.batch_id,
@@ -893,120 +832,80 @@ const RawMaterialsConsumptionModal = React.memo(
     return (
       <div>
         <Modal isOpen={isOpen} toggle={toggle} size="xl">
-          <ModalHeader toggle={toggle}>
-            <div className="d-flex gap-3 w-100" style={{ alignItems: 'flex-start' }}>
-              <div style={{ minWidth: 240 }}>
-                <span className="text-muted d-block" style={{ fontSize: 12 }}>
-                  Recipe article:
-                </span>
+          <ModalHeader toggle={toggle} className="rmc-modal-header">
+            <div className="rmc-header">
+              <div className="rmc-header-field" style={{ minWidth: 220 }}>
+                <span className="rmc-header-label">Recipe article</span>
                 {recipeArticle ? (
-                  <b className="d-block mb-2">{recipeArticle || '—'}</b>
+                  <b className="rmc-header-value">{recipeArticle || '—'}</b>
                 ) : (
                   <span className="text-muted">No recipes</span>
                 )}
+              </div>
 
-                <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
-                  Production volume:
-                </span>
+              <div className="rmc-header-field" style={{ minWidth: 160 }}>
+                <span className="rmc-header-label">Production volume</span>
                 <input
-                  className="form-control"
+                  className="form-control rmc-header-input"
                   inputMode="decimal"
                   placeholder="0"
                   value={productionVolume}
                   onChange={handlePvChange}
                 />
               </div>
-              <div style={{ flex: 1, minWidth: 280 }}>
-                <span className="text-muted d-block mb-1" style={{ fontSize: 12 }}>
-                  Recipe:
-                </span>
-                {
-                  //availableRecipes.length ? (
-                  <Select
-                    isDisabled={isRecipeLocked}
-                    onChange={handleRecipeChange}
-                    options={availableRecipes.map((r) => ({
-                      value: r.id,
-                      label: r.article,
-                    }))}
-                    value={
-                      selectedRecipe
-                        ? {
-                            value: selectedRecipe.id,
-                            label: selectedRecipe.article,
-                          }
-                        : null
-                    }
-                    menuPortalTarget={
-                      typeof document !== 'undefined' ? document.body : null
-                    }
-                    styles={{
-                      control: (provided) => ({
-                        ...provided,
-                        width: '40%',
-                        minHeight: 36,
-                        backgroundColor: 'white',
-                      }),
-                      menu: (provided) => ({
-                        ...provided,
-                        maxHeight: 360,
-                        zIndex: 9999,
-                      }),
-                      menuList: (provided) => ({
-                        ...provided,
-                        maxHeight: 360,
-                        overflowY: 'auto',
-                      }),
-                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                    }}
-                  />
-                  // ) : (
-                  //   <span className="text-muted">No recipes</span>
-                  // )
-                }
+
+              <div className="rmc-header-field" style={{ flex: 1, minWidth: 260 }}>
+                <span className="rmc-header-label">Recipe</span>
+                <Select
+                  onChange={handleRecipeChange}
+                  options={availableRecipes.map((r) => ({
+                    value: r.id,
+                    label: r.article,
+                  }))}
+                  value={
+                    selectedRecipe
+                      ? {
+                          value: selectedRecipe.id,
+                          label: selectedRecipe.article,
+                        }
+                      : null
+                  }
+                  menuPortalTarget={
+                    typeof document !== 'undefined' ? document.body : null
+                  }
+                  styles={{
+                    control: (provided) => ({
+                      ...provided,
+                      minHeight: 38,
+                      borderRadius: 8,
+                      borderColor: '#dcdfe4',
+                      backgroundColor: 'white',
+                    }),
+                    menu: (provided) => ({
+                      ...provided,
+                      maxHeight: 360,
+                      zIndex: 9999,
+                    }),
+                    menuList: (provided) => ({
+                      ...provided,
+                      maxHeight: 360,
+                      overflowY: 'auto',
+                    }),
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  }}
+                />
               </div>
             </div>
           </ModalHeader>
 
           <Fragment>
-            <ModalBody style={{ overflow: 'auto', maxHeight: '70vh' }}>
+            <ModalBody className="rmc-modal-body" style={{ overflow: 'auto', maxHeight: '70vh' }}>
               <table className="table-waste">
                 <thead>
                   <tr>
-                    <th className="th-raw-first">Raw material</th>
-                    <th className="th-mod-recipe">
-                      <div className="form-check">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={wastedMode === 'from_actual'}
-                          onChange={onHeaderFromActual}
-                        />
-                        <label className="form-check-label">
-                          use modified recipe
-                        </label>
-                      </div>
-                    </th>
-                    <th className="th-total">total</th>
-                    <th className="th-from-log">from log</th>
-                    <th className="th-manual">
-                      <div className="form-check">
-                        {/* <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={wastedMode === 'manual'}
-                          onChange={onHeaderManual}
-                        /> */}
-                        <label className="form-check-label">use manual input</label>
-                      </div>
-                    </th>
-                  </tr>
-                  <tr>
-                    <th className="th-raw-second">Raw material</th>
-                    <th className="th-mod-recipe-sub">Modified recipe</th>
-                    <th className="th-total-sub">total</th>
-                    <th className="th-from-log-sub">from log</th>
-                    <th className="th-wasted-sub">Consumed</th>
+                    <th className="th-raw">Raw material</th>
+                    <th className="th-mod-recipe">Modified recipe</th>
+                    <th className="th-consumed">Consumed</th>
                   </tr>
                 </thead>
 
@@ -1015,11 +914,9 @@ const RawMaterialsConsumptionModal = React.memo(
                     if (!shouldShowRow(label, key)) return null;
 
                     const aKey = `${key}_actual_reciepe`;
-                    const wKey = `${key}_Wasted`;
                     const base = baseByLabel(label, key);
-                    const total = computeTotalByActual[`${key}_total`];
-                    const log = logByKey(key);
-                    const wastedVal = computeWasted(key, label);
+                    const consumed = computeConsumed(key);
+                    const modified = isRecipeModified(key);
 
                     return (
                       <tr key={key}>
@@ -1064,42 +961,35 @@ const RawMaterialsConsumptionModal = React.memo(
                             </div>
                           )}
                           <div className="text-muted-small">
-                            base: {isEmptyOrZero(base) ? '' : base}
+                            def: {isEmptyOrZero(base) ? '—' : base}
                           </div>
                         </td>
 
                         <td>
-                          <input
-                            className="form-control"
-                            inputMode="decimal"
-                            placeholder="0"
-                            value={form[aKey] ?? ''}
-                            onChange={handleChange(aKey)}
-                          />
+                          <div className="modified-recipe-cell">
+                            <input
+                              className={
+                                'form-control' + (modified ? ' is-modified' : '')
+                              }
+                              inputMode="decimal"
+                              placeholder="0"
+                              value={form[aKey] ?? ''}
+                              onChange={handleChange(aKey)}
+                            />
+                            <button
+                              type="button"
+                              className="btn-set-def"
+                              onClick={() => resetToDef(key)}
+                              disabled={!modified}
+                              title="Reset to the default recipe value"
+                            >
+                              set def
+                            </button>
+                          </div>
                         </td>
 
-                        <td style={{ minWidth: 120 }}>
-                          {total === '' ? '' : total}
-                        </td>
-                        <td style={{ minWidth: 120 }}>
-                          {isEmptyOrZero(log) ? '' : log}
-                        </td>
-
-                        <td>
-                          <input
-                            className="form-control"
-                            inputMode="decimal"
-                            placeholder="0"
-                            value={
-                              wastedMode === 'manual'
-                                ? (form[wKey] ?? '')
-                                : wastedVal === ''
-                                  ? ''
-                                  : String(wastedVal)
-                            }
-                            onChange={handleChange(wKey)}
-                            disabled={wastedMode !== 'manual'}
-                          />
+                        <td className="td-consumed">
+                          {consumed === null ? '—' : consumed}
                         </td>
                       </tr>
                     );
