@@ -1,95 +1,170 @@
 /* ======  БАЗОВЫЕ ПЕРЕМЕННЫЕ (если нужно) ====== */
 :root {
-  --color-header-bg-first: #fff59d;
-  --color-header-bg-second: #fff59d;
-  --color-header-bg-log: #def7e0;
-  --color-header-bg-sub: #ffe082;
-  --color-header-bg-log-sub: #c8e6c9;
-  --color-hover: #e3f2fd; /* очень светло-голубой */
-  --color-stripe: #f5f5f5; /* светло-серый для чётных строк */
+  --color-header-bg: #f3f5f9;
+  --color-header-border: #e3e7ee;
+  --color-hover: #f0f6ff; /* очень светло-голубой */
+  --color-stripe: #fafbfc; /* светло-серый для чётных строк */
+  --color-accent: #3b82f6;
+  --color-accent-soft: #eaf2ff;
+  --color-border: #e6e8ec;
+  --color-text: #1f2430;
+  --color-text-muted: #6c757d;
 }
+
+/* ======  ШАПКА МОДАЛКИ  ====== */
+.rmc-modal-header .modal-title,
+.rmc-modal-header {
+  width: 100%;
+}
+.rmc-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  width: 100%;
+}
+.rmc-header-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.rmc-header-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+.rmc-header-value {
+  font-size: 15px;
+  color: var(--color-text);
+}
+.rmc-header-input {
+  border-radius: 8px !important;
+  border-color: var(--color-border) !important;
+}
+.rmc-header-input:focus {
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 3px var(--color-accent-soft) !important;
+}
+
 /* ======  ОБЁРТКА ТАБЛИЦЫ (опц.) ====== */
 .waste-table-wrapper {
   max-height: 70vh; /* при необходимости скролла */
   overflow: auto;
 }
+.rmc-modal-body {
+  padding: 1.25rem 1.5rem;
+}
+
 /* ======  САМА ТАБЛИЦА ====== */
 .table-waste {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin: 0;
-  background: transparent;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
 }
 /* ------  HEADER  ------ */
-.table-waste thead tr:first-child th {
+.table-waste thead th {
   position: sticky;
   top: 0;
   z-index: 1;
-}
-.table-waste th {
   text-align: left;
-  padding: 0.75rem 1rem;
-  font-weight: 600;
-  color: #212529;
+  padding: 0.7rem 1rem;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+  background: var(--color-header-bg);
+  border-bottom: 1px solid var(--color-header-border);
 }
-.th-raw-first {
-  background: var(--color-header-bg-first);
+.th-mod-recipe,
+.th-consumed {
+  min-width: 200px;
 }
-.th-mod-recipe {
-  background: var(--color-header-bg-second);
+.th-consumed {
+  text-align: right;
 }
-.th-total {
-  background: var(--color-header-bg-second);
-}
-.th-from-log {
-  background: var(--color-header-bg-log);
-}
-.th-manual {
-  background: var(--color-header-bg-second);
-}
-/* вторая строка заголовков */
-.th-raw-second {
-  background: var(--color-header-bg-sub);
-}
-.th-mod-recipe-sub {
-  background: var(--color-header-bg-sub);
-}
-.th-total-sub {
-  background: var(--color-header-bg-sub);
-}
-.th-from-log-sub {
-  background: var(--color-header-bg-log-sub);
-}
-.th-wasted-sub {
-  background: var(--color-header-bg-sub);
-}
+
 /* ------  BODY  ------ */
-.table-waste tbody tr:nth-child(odd) {
-  background-color: #ffffff; /* нечётные – белые */
-}
 .table-waste tbody tr:nth-child(even) {
-  background-color: var(--color-stripe); /* чётные – серые */
+  background-color: var(--color-stripe);
 }
 .table-waste tbody tr:hover {
   background-color: var(--color-hover);
 }
+.table-waste tbody tr:not(:last-child) td {
+  border-bottom: 1px solid var(--color-border);
+}
 .table-waste td {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
   vertical-align: middle;
+  color: var(--color-text);
 }
 /* ------  ПОЛЯ ВВОДА  ------ */
 .table-waste .form-control {
   max-width: 160px;
+  border-radius: 8px;
+  border-color: var(--color-border);
+}
+.table-waste .form-control:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 .table-waste td input[disabled] {
   background-color: #fafafa;
   color: #777;
   cursor: not-allowed;
 }
-/* ------ МЕЛКИЙ ТЕКСТ «base: …» ------ */
+.table-waste .form-control.is-modified {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+/* ------  MODIFIED RECIPE CELL (input + set-def button)  ------ */
+.modified-recipe-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn-set-def {
+  flex: 0 0 auto;
+  padding: 0.3rem 0.6rem;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+.btn-set-def:hover:not(:disabled) {
+  background: #d9e8ff;
+}
+.btn-set-def:disabled {
+  color: #b7bdc7;
+  background: #f2f3f5;
+  cursor: default;
+}
+
+/* ------  CONSUMED (расчётное значение)  ------ */
+.td-consumed {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ------ МЕЛКИЙ ТЕКСТ «def: …» ------ */
 .text-muted-small {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--color-text-muted);
 }
 
 /* =====================================================================
