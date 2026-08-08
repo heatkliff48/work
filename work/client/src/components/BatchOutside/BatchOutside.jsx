@@ -5,6 +5,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import React, { useEffect, useMemo, useState } from 'react';
+import { getISOWeek, parseISO } from 'date-fns';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import '#components/Clients/ClientsInfo/clientsDrawer.css';
@@ -39,6 +40,8 @@ function buildGridColumns(rows, latestProducts, cellsPerAutoclave) {
       for (let i = 0; i < row.quantity_arrays; i++) slots.push(row.product_article);
     });
 
+    const weekNumber = date ? getISOWeek(parseISO(date)) : null;
+
     for (let i = 0; i < slots.length; i += cellsPerAutoclave) {
       const chunk = slots.slice(i, i + cellsPerAutoclave);
       const cakeRows = [];
@@ -51,7 +54,7 @@ function buildGridColumns(rows, latestProducts, cellsPerAutoclave) {
           width: product ? product.width : '—',
         });
       }
-      columns.push({ date, colorClass, cakeRows });
+      columns.push({ date, weekNumber, colorClass, cakeRows });
     }
   });
 
@@ -209,9 +212,7 @@ const BatchOutside = () => {
           </button>
         </div>
         <div className="cl-toolbar__spacer" />
-        <div className="bo-caption">
-          Autoclave — 21 cakes. Density and size — from the product catalog by Product ID.
-        </div>
+        
       </div>
 
       {mode === 'list' && (
@@ -236,7 +237,12 @@ const BatchOutside = () => {
         <div className="bo-grid bo-fade-in">
           {gridColumns.map((col, colIndex) => (
             <div className="bo-card" key={colIndex}>
-              <div className={`bo-card__header ${col.colorClass}`}>{col.date}</div>
+              <div className={`bo-card__header ${col.colorClass}`}>
+                {col.date}
+                {col.weekNumber != null && (
+                  <span className="bo-card__week">Week {col.weekNumber}</span>
+                )}
+              </div>
               <div className="bo-card__subhead">
                 <div>№</div>
                 <div>Density</div>
