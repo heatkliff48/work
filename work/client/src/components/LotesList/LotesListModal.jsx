@@ -497,6 +497,25 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
     return fromRecipe || null;
   };
 
+  const getRelatedBatchForCake = (cakeId) => {
+    const related = Array.isArray(selectedRecipe?.relatedBatches)
+      ? selectedRecipe.relatedBatches
+      : [];
+
+    const idNum = Number(cakeId);
+
+    if (Number.isFinite(idNum)) {
+      const match = related.find((b) => {
+        const s = Number(b?.cake_id_start);
+        const f = Number(b?.cake_id_finish);
+        return Number.isFinite(s) && Number.isFinite(f) && idNum >= s && idNum <= f;
+      });
+      if (match) return match;
+    }
+
+    return selectedRecipe || null;
+  };
+
   const RAW_MATERIAL_KEYS = SECTIONS.rawMaterials.fields
     .filter((f) => f.key && f.type !== 'spacer')
     .map((f) => f.key);
@@ -507,7 +526,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
   const DEFAULT_KEYS = [...RAW_MATERIAL_KEYS, ...MIXER_BATCH_KEYS];
 
-  const applyRawMaterialDefaults = (data) => {
+  const applyRawMaterialDefaults = (data, cakeId) => {
     const next = { ...data };
 
     DEFAULT_RAW_MATERIAL_VALUES.forEach(({ key, value }) => {
@@ -520,15 +539,17 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
       next[key] = value;
     });
 
-    if (selectedRecipe?.aluminum_type) {
-      next.al_paste_types = selectedRecipe.aluminum_type;
+    const sourceBatch = getRelatedBatchForCake(cakeId);
+
+    if (sourceBatch?.aluminum_type) {
+      next.al_paste_types = sourceBatch.aluminum_type;
     }
-    if (selectedRecipe?.aluminum_2_type) {
-      next.al_paste_types_2 = selectedRecipe.aluminum_2_type;
+    if (sourceBatch?.aluminum_2_type) {
+      next.al_paste_types_2 = sourceBatch.aluminum_2_type;
     }
 
-    const alum1 = Number(selectedRecipe.aluminum_paste) || 0;
-    const alum2 = Number(selectedRecipe.aluminum_paste_2) || 0;
+    const alum1 = Number(sourceBatch?.aluminum_paste) || 0;
+    const alum2 = Number(sourceBatch?.aluminum_paste_2) || 0;
     const total = alum1 + alum2;
 
     if (total > 0) {
@@ -580,7 +601,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
 
     const baseData = found ? { ...found } : { id: Number(selectedCakeId) };
 
-    setCakeData(applyRawMaterialDefaults(baseData));
+    setCakeData(applyRawMaterialDefaults(baseData, selectedCakeId));
   }, [selectedCakeId, lotesListCakes, selectedRecipe]);
 
   useEffect(() => {
