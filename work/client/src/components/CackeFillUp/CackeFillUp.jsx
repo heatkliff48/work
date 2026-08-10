@@ -398,24 +398,26 @@ function CackeFillUp() {
 
   return (
     <>
-      <div className="mt-3">
-        <Table
-          COLUMN_DATA={production_plan_table}
-          dataOfTable={productionPlanDataList}
-          onClickButton={() => {}}
-          buttonText={''}
-          tableName={'Batch calendar'}
-          handleRowClick={(e) => {
-            if (cackeFillUp && Object.keys(cackeFillUp).length > 0) {
-              alert(
-                'Please finish or close the current batch before selecting a new one.',
-              );
-              return;
-            }
-            handleProductionPlanRowClick(e);
-          }}
-        />
-      </div>
+      {!hasCackeFillUp && (
+        <div className="mt-3">
+          <Table
+            COLUMN_DATA={production_plan_table}
+            dataOfTable={productionPlanDataList}
+            onClickButton={() => {}}
+            buttonText={''}
+            tableName={'Cacke fill-up production plan'}
+            handleRowClick={(e) => {
+              if (cackeFillUp && Object.keys(cackeFillUp).length > 0) {
+                alert(
+                  'Please finish or close the current batch before selecting a new one.',
+                );
+                return;
+              }
+              handleProductionPlanRowClick(e);
+            }}
+          />
+        </div>
+      )}
       {hasCackeFillUp && (
         <div className="mt-3" style={{ maxWidth: 900 }}>
           <div
