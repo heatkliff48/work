@@ -59,13 +59,13 @@ function CackeFillUp() {
         .filter((el) => el.is_prodused == 0 || el.is_prodused == null)
         .map((item) => {
           const product = latestProducts.find(
-            (p) => p.article === item.product_article,
+            (p) => p.article === item.product_article
           );
           const m3InArray = Number(product?.m3InArray) || 0;
           const volumeBlockOnPallet = Number(product?.volumeBlockOnPallet) || 0;
           const palletsPerArray = Math.max(
             1,
-            Math.floor(m3InArray / volumeBlockOnPallet) || 1,
+            Math.floor(m3InArray / volumeBlockOnPallet) || 1
           );
           const quantity_arrays = Math.ceil(item.quantity_pallets / palletsPerArray);
           return { ...item, quantity_arrays };
@@ -81,7 +81,7 @@ function CackeFillUp() {
       updateBatchOutside({
         id: prodPlanEntry.id,
         is_prodused: 1,
-      }),
+      })
     );
   };
 
@@ -99,15 +99,15 @@ function CackeFillUp() {
     const batch_in_produce = batchOutside.find((el) => el.is_prodused == 1);
     if (batch_in_produce) {
       const product = latestProducts.find(
-        (el) => el.article === batch_in_produce?.product_article,
+        (el) => el.article === batch_in_produce?.product_article
       );
       setCurrentProduct(product);
 
       const widthInArray = Math.floor(
-        product?.m3InArray / product?.volumeBlockOnPallet,
+        product?.m3InArray / product?.volumeBlockOnPallet
       );
       const accd = autoclave_calendar.find(
-        (el) => el.date === batch_in_produce.date,
+        (el) => el.date === batch_in_produce.date
       );
       set_autoclave_calendar_update(accd);
 
@@ -205,7 +205,7 @@ function CackeFillUp() {
         id_ordered_product_to_warehouse,
         consumption_calculated: false,
         batch_quantity_pallets: quantity_pallets - quantity_free || 0,
-      }),
+      })
     );
 
     dispatch(
@@ -214,7 +214,7 @@ function CackeFillUp() {
         date,
         product_article,
         quantity: currentAllocated,
-      }),
+      })
     );
 
     const accd = autoclave_calendar.find((el) => el.date === date);
@@ -327,7 +327,7 @@ function CackeFillUp() {
   const groupsWithId = useMemo(() => {
     const consumption = Array.isArray(raw_mat_consumption)
       ? raw_mat_consumption.filter(
-          (record) => record?.batch_article == currentProduct?.article,
+          (record) => record?.batch_article == currentProduct?.article
         )
       : [];
     const cakes = Array.isArray(lotesListCakes) ? lotesListCakes : [];
@@ -368,7 +368,7 @@ function CackeFillUp() {
     const targetId = cackeFillUp.id_ordered_product_to_warehouse;
     if (!targetId) return null;
     const related = groupsWithId.filter(
-      (g) => g.id_ordered_product_to_warehouse === targetId,
+      (g) => g.id_ordered_product_to_warehouse === targetId
     );
     if (related.length === 0) return null;
     return Math.max(...related.map((g) => g.batchId));
@@ -405,11 +405,11 @@ function CackeFillUp() {
             dataOfTable={productionPlanDataList}
             onClickButton={() => {}}
             buttonText={''}
-            tableName={'Cacke fill-up production plan'}
+            tableName={'Casting'}
             handleRowClick={(e) => {
               if (cackeFillUp && Object.keys(cackeFillUp).length > 0) {
                 alert(
-                  'Please finish or close the current batch before selecting a new one.',
+                  'Please finish or close the current batch before selecting a new one.'
                 );
                 return;
               }
@@ -683,8 +683,8 @@ function CackeFillUp() {
                             border: isSaved
                               ? '1px solid #28a745'
                               : isPending
-                                ? '1px solid #007bff'
-                                : '1px solid #ced4da',
+                              ? '1px solid #007bff'
+                              : '1px solid #ced4da',
                             borderRadius: '10px',
                             padding: '4px 8px',
                             display: 'inline-flex',
@@ -693,8 +693,8 @@ function CackeFillUp() {
                             backgroundColor: isSaved
                               ? 'rgba(40,167,69,0.1)'
                               : isPending
-                                ? 'rgba(0,123,255,0.05)'
-                                : 'transparent',
+                              ? 'rgba(0,123,255,0.05)'
+                              : 'transparent',
                             fontSize: '0.9rem',
                           }}
                           title={note || 'no note'}

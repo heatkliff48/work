@@ -13,7 +13,6 @@ import adminIcon from '#components/Styles/mainpageing/admin.svg';
 import autoclaveCalendarIcon from '#components/Styles/mainpageing/autoclave-calendar.svg';
 import batchCalendarIcon from '#components/Styles/mainpageing/batch-calendar.svg';
 import batchPlannerIcon from '#components/Styles/mainpageing/batch-planner.svg';
-import batchRecipePlannerIcon from '#components/Styles/mainpageing/batch-recepie-planer.svg';
 import blockPipelineIcon from '#components/Styles/mainpageing/block-pipeline.svg';
 import clientsIcon from '#components/Styles/mainpageing/clients.svg';
 import clientsPriceGroupsIcon from '#components/Styles/mainpageing/clients-price-groups.svg';
@@ -220,17 +219,12 @@ export default function NavBar() {
             icon: recipesCatalogIcon,
           },
           {
-            title: 'Batch recipe planner',
-            path: '/raw_materials_plan',
-            icon: batchRecipePlannerIcon,
-          },
-          {
-            title: 'Raw material calendar',
+            title: 'Production recipes calendar',
             path: '/recipe_orders',
             icon: rawMatCalIcon,
           },
           {
-            title: 'Cake fillup',
+            title: 'Casting',
             path: '/cacke_fillup',
             icon: technologyPlannerIcon,
           },
