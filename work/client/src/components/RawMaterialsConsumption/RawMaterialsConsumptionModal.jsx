@@ -13,7 +13,6 @@ import {
   updateRawMatConsumption,
 } from '#components/redux/actions/recipeAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { addNewLotesList } from '#components/redux/actions/lotesListAction.js';
 import Select from 'react-select';
@@ -30,7 +29,6 @@ const RawMaterialsConsumptionModal = React.memo(
     } = useRecipeContext();
     const { latestProducts } = useProductsContext();
 
-    const { setMainRawMaterialConsumptionMadal } = useModalContext();
     const { raw_materials_warehouse = [], warehouse_data } = useWarehouseContext();
 
     const dispatch = useDispatch();
@@ -73,8 +71,6 @@ const RawMaterialsConsumptionModal = React.memo(
         { label: 'Gypsum stone', key: 'gypsum_stone' },
         { label: 'Aluminum 1', key: 'aluminum_paste' },
         { label: 'Aluminum 2', key: 'aluminum_paste_2' },
-        { label: 'Grinding Balls', key: 'grinding_balls' },
-        { label: 'AAC', key: 'aac' },
       ],
       [],
     );
@@ -141,7 +137,7 @@ const RawMaterialsConsumptionModal = React.memo(
     }, [raw_materials_warehouse, warehouseAluminum1]);
 
     const ALWAYS_VISIBLE = useMemo(
-      () => new Set(['Aluminum 1', 'Aluminum 2', 'Grinding Balls', 'AAC']),
+      () => new Set(['Aluminum 1', 'Aluminum 2']),
       [],
     );
 
@@ -696,7 +692,6 @@ const RawMaterialsConsumptionModal = React.memo(
         );
       }
 
-      setMainRawMaterialConsumptionMadal(false);
       toggle();
       setProductionVolume('');
       setSelectedAlu1Type(null);
@@ -860,13 +855,13 @@ const RawMaterialsConsumptionModal = React.memo(
                   onChange={handleRecipeChange}
                   options={availableRecipes.map((r) => ({
                     value: r.id,
-                    label: r.article,
+                    label: r.description,
                   }))}
                   value={
                     selectedRecipe
                       ? {
                           value: selectedRecipe.id,
-                          label: selectedRecipe.article,
+                          label: selectedRecipe.description,
                         }
                       : null
                   }
