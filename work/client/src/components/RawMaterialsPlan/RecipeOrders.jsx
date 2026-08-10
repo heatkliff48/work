@@ -16,8 +16,8 @@ function RecipeOrders() {
 
   const COLUMNS_RECIPE_ORDERS = [
     {
-      Header: "ID",
-      accessor: "id",
+      Header: "Date",
+      accessor: "date",
     },
     {
       Header: "Recipe",
@@ -32,8 +32,8 @@ function RecipeOrders() {
       accessor: "production_volume",
     },
     {
-      Header: "Date",
-      accessor: "date",
+      Header: "ID",
+      accessor: "id",
     },
   ];
 
@@ -87,7 +87,7 @@ function RecipeOrders() {
       <Table
         COLUMN_DATA={COLUMNS_RECIPE_ORDERS}
         dataOfTable={recipeDataList}
-        tableName={"Raw material calendar"}
+        tableName={"Production recipes calendar"}
         handleRowClick={(row) => handlerRecipeInfo(row)}
       />
     </>

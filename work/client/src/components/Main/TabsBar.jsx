@@ -15,7 +15,7 @@ const PATH_LABELS = {
   '/products_type_journal': 'Products Type Journal',
   '/statistics': 'Statistics',
   '/orders': 'Orders',
-  '/cacke_fillup': 'Cacke FillUp',
+  '/cacke_fillup': 'Casting',
   '/accounting': 'Accounting',
   '/clients': 'Clients',
   '/warehouse_products_type': 'Warehouse',
@@ -27,7 +27,7 @@ const PATH_LABELS = {
   '/batch_outside': 'Batch calendar',
   '/recipe_products': 'Recipe products',
   '/raw_materials_plan': 'Raw Materials Plan',
-  '/recipe_orders': 'Raw material calendar',
+  '/recipe_orders': 'Production recipes calendar',
   '/technology_calendar': 'Calendar',
   '/quality_management': 'Quality Management',
 };

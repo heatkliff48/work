@@ -552,7 +552,7 @@ const ProjectContextProvider = ({ children }) => {
     '/batch_outside': 'Batch calendar',
     '/recipe_products': 'Recipes catalog',
     '/raw_materials_plan': 'Batch recipe planner',
-    '/recipe_orders': 'Raw material calendar',
+    '/recipe_orders': 'Production recipes calendar',
     '/technology_calendar': 'Calendar',
     '/quality_management': 'Quality Management',
     '/autoclave_calendar': 'Autoclave calendar',

@@ -154,7 +154,7 @@ function MainOffcanvas() {
                 handleClose();
               }}
             >
-              Cacke FillUp
+              Casting
             </Button>
 
             {checkUserAccess(user, roles, 'Warehouse')?.canRead && (
@@ -239,18 +239,6 @@ function MainOffcanvas() {
               </Button>
             )}
 
-            {checkUserAccess(user, roles, 'raw_materials_plan')?.canRead && (
-              <Button
-                className="custom-menu-button"
-                onClick={() => {
-                  navigate('/raw_materials_plan');
-                  handleClose();
-                }}
-              >
-                Raw Materials Plan
-              </Button>
-            )}
-
             {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
               <Button
                 className="custom-menu-button"
@@ -259,7 +247,7 @@ function MainOffcanvas() {
                   handleClose();
                 }}
               >
-                Raw material calendar
+                Production recipes calendar
               </Button>
             )}
 
