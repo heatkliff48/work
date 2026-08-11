@@ -583,7 +583,6 @@
 .ord-summary-old-value {
   color: var(--ord-muted);
   font-size: 12px;
-  text-decoration: line-through;
   white-space: nowrap;
 }
 .ord-summary-divider {

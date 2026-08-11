@@ -44,10 +44,6 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
     }));
   }, []);
 
-  // Quantity, Ud и Pallets, qty пересчитывают друг друга в зависимости от того,
-  // какое поле реально редактирует пользователь — пересчёт делается сразу здесь,
-  // одним setProductOfOrder, а не в отдельных useMemo, чтобы оба направления не
-  // перезаписывали друг друга по кругу.
   const handleProductListOrderChange = (e) => {
     const { name, value } = e.target;
     const units_per_pallet = selectedProduct?.units_per_pallet || 1;
@@ -66,7 +62,9 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
     }
 
     if (name === 'quantity_palet_dry') {
-      const quantity_ud = value ? Math.ceil(Number(value) * units_per_pallet) : 0;
+      const quantity_ud = value
+        ? Math.ceil(Number(value) * units_per_pallet)
+        : 0;
 
       setProductOfOrder((prev) => ({
         ...prev,
@@ -95,7 +93,8 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
 
   const total_value = useMemo(() => {
     const quantity_palet_dry = Number(productOfOrder?.quantity_palet_dry || 0);
-    const result = quantity_palet_dry * (selectedProduct?.units_per_pallet || 0);
+    const result =
+      quantity_palet_dry * (selectedProduct?.units_per_pallet || 0);
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -157,7 +156,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
   };
 
   useEffect(() => {
-    const discount = productOfOrder?.discount ?? 0;
+    const discount = Number(productOfOrder?.discount) ?? 0;
 
     setProductOfOrder((prev) => ({
       ...prev,
