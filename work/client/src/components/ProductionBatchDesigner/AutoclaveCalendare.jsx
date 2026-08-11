@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import {
   addDays,
   addMonths,
@@ -17,8 +17,8 @@ import { ru } from 'date-fns/locale';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import next3 from './next3.png';
-import { updateBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
+// import next3 from './next3.png';
+// import { updateBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 
 export default function ProductionPlannerCalendar({
   initialMonth,
@@ -171,277 +171,277 @@ export default function ProductionPlannerCalendar({
     dispatch(addNewAutoclaveCalendar(arr));
   };
 
-  function findQocVsNextQuantityViolation(corridor) {
-    if (!corridor || corridor.length < 2) return null;
+  // function findQocVsNextQuantityViolation(corridor) {
+  //   if (!corridor || corridor.length < 2) return null;
 
-    let maxRequired = 0;
-    for (let i = 0; i < corridor.length - 1; i++) {
-      const nextQty = Number(corridor[i + 1]?.scheduled_autoclaves) || 0;
-      if (nextQty >= maxRequired) maxRequired = nextQty;
+  //   let maxRequired = 0;
+  //   for (let i = 0; i < corridor.length - 1; i++) {
+  //     const nextQty = Number(corridor[i + 1]?.scheduled_autoclaves) || 0;
+  //     if (nextQty >= maxRequired) maxRequired = nextQty;
 
-      const qoc = Number(corridor[i]?.produced_autoclave) || 0;
-      if (qoc > maxRequired) {
-        return {
-          at: corridor[i].date,
-          actual: qoc,
-          needAtLeast: maxRequired,
-          becauseOfDate: corridor[i + 1].date,
-        };
-      }
-    }
-    return null;
-  }
+  //     const qoc = Number(corridor[i]?.produced_autoclave) || 0;
+  //     if (qoc > maxRequired) {
+  //       return {
+  //         at: corridor[i].date,
+  //         actual: qoc,
+  //         needAtLeast: maxRequired,
+  //         becauseOfDate: corridor[i + 1].date,
+  //       };
+  //     }
+  //   }
+  //   return null;
+  // }
 
-  function applyToMap(entries) {
-    const patch = {};
-    for (const r of entries) {
-      patch[r.date] = (prev) => {
-        const base = prev ?? { scheduled_autoclaves: 0, produced_autoclave: 0 };
-        return {
-          ...base,
-          scheduled_autoclaves: base.scheduled_autoclaves,
-          produced_autoclave: Number(r.produced_autoclave) || 0,
-        };
-      };
-    }
+  // function applyToMap(entries) {
+  //   const patch = {};
+  //   for (const r of entries) {
+  //     patch[r.date] = (prev) => {
+  //       const base = prev ?? { scheduled_autoclaves: 0, produced_autoclave: 0 };
+  //       return {
+  //         ...base,
+  //         scheduled_autoclaves: base.scheduled_autoclaves,
+  //         produced_autoclave: Number(r.produced_autoclave) || 0,
+  //       };
+  //     };
+  //   }
 
-    if (typeof onChange === 'function') {
-      const nextMap = { ...map };
-      for (const [date, updater] of Object.entries(patch)) {
-        nextMap[date] = updater(nextMap[date]);
-      }
-      onChange(nextMap);
-    } else {
-      setInternalMap((prev) => {
-        const next = { ...prev };
-        for (const [date, updater] of Object.entries(patch)) {
-          next[date] = updater(next[date]);
-        }
-        return next;
-      });
-    }
-  }
+  //   if (typeof onChange === 'function') {
+  //     const nextMap = { ...map };
+  //     for (const [date, updater] of Object.entries(patch)) {
+  //       nextMap[date] = updater(nextMap[date]);
+  //     }
+  //     onChange(nextMap);
+  //   } else {
+  //     setInternalMap((prev) => {
+  //       const next = { ...prev };
+  //       for (const [date, updater] of Object.entries(patch)) {
+  //         next[date] = updater(next[date]);
+  //       }
+  //       return next;
+  //     });
+  //   }
+  // }
 
-  function shiftForwardOneStepWithPlan(corridor) {
-    if (!corridor || corridor.length < 2) {
-      return { redistributed: corridor ?? [], transfers: [] };
-    }
+  // function shiftForwardOneStepWithPlan(corridor) {
+  //   if (!corridor || corridor.length < 2) {
+  //     return { redistributed: corridor ?? [], transfers: [] };
+  //   }
 
-    const work = corridor.map((d) => ({
-      date: d.date,
-      qty: Number(d.scheduled_autoclaves) || 0,
-      oldQoc: Number(d.produced_autoclave) || 0,
-    }));
+  //   const work = corridor.map((d) => ({
+  //     date: d.date,
+  //     qty: Number(d.scheduled_autoclaves) || 0,
+  //     oldQoc: Number(d.produced_autoclave) || 0,
+  //   }));
 
-    const n = work.length;
-    const finalQoc = Array(n).fill(0);
-    const transfers = [];
+  //   const n = work.length;
+  //   const finalQoc = Array(n).fill(0);
+  //   const transfers = [];
 
-    for (let i = 0; i < n - 1; i++) {
-      const moved = Math.min(work[i].oldQoc, work[i + 1].qty);
+  //   for (let i = 0; i < n - 1; i++) {
+  //     const moved = Math.min(work[i].oldQoc, work[i + 1].qty);
 
-      if (moved > 0) {
-        transfers.push({ from: work[i].date, to: work[i + 1].date, amount: moved });
-      }
+  //     if (moved > 0) {
+  //       transfers.push({ from: work[i].date, to: work[i + 1].date, amount: moved });
+  //     }
 
-      finalQoc[i + 1] = moved;
-    }
+  //     finalQoc[i + 1] = moved;
+  //   }
 
-    const movedFromLeft = Math.min(work[0].oldQoc, work[1].qty);
-    finalQoc[0] = work[0].oldQoc - movedFromLeft;
+  //   const movedFromLeft = Math.min(work[0].oldQoc, work[1].qty);
+  //   finalQoc[0] = work[0].oldQoc - movedFromLeft;
 
-    const redistributed = work.map((w, idx) => ({
-      date: w.date,
-      scheduled_autoclaves: w.qty,
-      produced_autoclave: finalQoc[idx],
-    }));
+  //   const redistributed = work.map((w, idx) => ({
+  //     date: w.date,
+  //     scheduled_autoclaves: w.qty,
+  //     produced_autoclave: finalQoc[idx],
+  //   }));
 
-    return { redistributed, transfers };
-  }
+  //   return { redistributed, transfers };
+  // }
 
-  function replanRightBatchOutside(items, transfers, opts = {}) {
-    const unitField = opts.unitField ?? null;
+  // function replanRightBatchOutside(items, transfers, opts = {}) {
+  //   const unitField = opts.unitField ?? null;
 
-    if (
-      !Array.isArray(items) ||
-      !Array.isArray(transfers) ||
-      transfers.length === 0
-    ) {
-      return items ?? [];
-    }
+  //   if (
+  //     !Array.isArray(items) ||
+  //     !Array.isArray(transfers) ||
+  //     transfers.length === 0
+  //   ) {
+  //     return items ?? [];
+  //   }
 
-    const out = (items ?? []).map((x) => ({
-      ...x,
-      date: String(x.date).slice(0, 10),
-    }));
+  //   const out = (items ?? []).map((x) => ({
+  //     ...x,
+  //     date: String(x.date).slice(0, 10),
+  //   }));
 
-    out.sort((a, b) => a.date.localeCompare(b.date));
+  //   out.sort((a, b) => a.date.localeCompare(b.date));
 
-    const byDate = new Map();
-    for (let i = 0; i < out.length; i++) {
-      const iso = out[i].date;
-      if (!byDate.has(iso)) byDate.set(iso, []);
-      byDate.get(iso).push(i);
-    }
-    const ensureBucket = (iso) => {
-      if (!byDate.has(iso)) byDate.set(iso, []);
-      return byDate.get(iso);
-    };
+  //   const byDate = new Map();
+  //   for (let i = 0; i < out.length; i++) {
+  //     const iso = out[i].date;
+  //     if (!byDate.has(iso)) byDate.set(iso, []);
+  //     byDate.get(iso).push(i);
+  //   }
+  //   const ensureBucket = (iso) => {
+  //     if (!byDate.has(iso)) byDate.set(iso, []);
+  //     return byDate.get(iso);
+  //   };
 
-    const ordered = [...transfers].sort((a, b) => {
-      const t = String(b.to).localeCompare(String(a.to));
-      if (t !== 0) return t;
-      const f = String(b.from).localeCompare(String(a.from));
-      if (f !== 0) return f;
-      return (Number(b.amount) || 0) - (Number(a.amount) || 0);
-    });
+  //   const ordered = [...transfers].sort((a, b) => {
+  //     const t = String(b.to).localeCompare(String(a.to));
+  //     if (t !== 0) return t;
+  //     const f = String(b.from).localeCompare(String(a.from));
+  //     if (f !== 0) return f;
+  //     return (Number(b.amount) || 0) - (Number(a.amount) || 0);
+  //   });
 
-    const takeOneIndexFrom = (iso) => {
-      const bucket = byDate.get(iso);
-      if (!bucket || bucket.length === 0) return null;
+  //   const takeOneIndexFrom = (iso) => {
+  //     const bucket = byDate.get(iso);
+  //     if (!bucket || bucket.length === 0) return null;
 
-      return bucket.pop();
-    };
-    const moveIndexTo = (idx, isoTo) => {
-      out[idx] = { ...out[idx], date: isoTo };
-      ensureBucket(isoTo).push(idx);
-    };
+  //     return bucket.pop();
+  //   };
+  //   const moveIndexTo = (idx, isoTo) => {
+  //     out[idx] = { ...out[idx], date: isoTo };
+  //     ensureBucket(isoTo).push(idx);
+  //   };
 
-    for (const { from, to, amount } of ordered) {
-      let need = Math.max(0, Math.floor(Number(amount) || 0));
-      if (need === 0) continue;
+  //   for (const { from, to, amount } of ordered) {
+  //     let need = Math.max(0, Math.floor(Number(amount) || 0));
+  //     if (need === 0) continue;
 
-      if (!unitField) {
-        while (need > 0) {
-          const idx = takeOneIndexFrom(from);
-          if (idx == null) {
-            console.warn(
-              '[replanRightBatchOutside] нет записей на',
-              from,
-              '→',
-              to,
-              'осталось',
-              need,
-            );
-            break;
-          }
-          moveIndexTo(idx, to);
-          need -= 1;
-        }
-      } else {
-        while (need > 0) {
-          const bucket = byDate.get(from);
-          if (!bucket || bucket.length === 0) {
-            console.warn(
-              '[replanRightBatchOutside] нет записей на',
-              from,
-              '→',
-              to,
-              'осталось',
-              need,
-            );
-            break;
-          }
-          const idx = bucket[bucket.length - 1];
-          const rec = out[idx];
-          const units = Math.max(0, Number(rec[unitField]) || 0);
-          if (units <= 0) {
-            bucket.pop();
-            continue;
-          }
+  //     if (!unitField) {
+  //       while (need > 0) {
+  //         const idx = takeOneIndexFrom(from);
+  //         if (idx == null) {
+  //           console.warn(
+  //             '[replanRightBatchOutside] нет записей на',
+  //             from,
+  //             '→',
+  //             to,
+  //             'осталось',
+  //             need,
+  //           );
+  //           break;
+  //         }
+  //         moveIndexTo(idx, to);
+  //         need -= 1;
+  //       }
+  //     } else {
+  //       while (need > 0) {
+  //         const bucket = byDate.get(from);
+  //         if (!bucket || bucket.length === 0) {
+  //           console.warn(
+  //             '[replanRightBatchOutside] нет записей на',
+  //             from,
+  //             '→',
+  //             to,
+  //             'осталось',
+  //             need,
+  //           );
+  //           break;
+  //         }
+  //         const idx = bucket[bucket.length - 1];
+  //         const rec = out[idx];
+  //         const units = Math.max(0, Number(rec[unitField]) || 0);
+  //         if (units <= 0) {
+  //           bucket.pop();
+  //           continue;
+  //         }
 
-          const take = Math.min(need, units);
-          if (take === units) {
-            bucket.pop();
-            moveIndexTo(idx, to);
-          } else {
-            out[idx] = { ...rec, [unitField]: units - take, date: from };
-            const moved = { ...rec, [unitField]: take, date: to };
-            const newIdx = out.length;
-            out.push(moved);
-            ensureBucket(to).push(newIdx);
-          }
+  //         const take = Math.min(need, units);
+  //         if (take === units) {
+  //           bucket.pop();
+  //           moveIndexTo(idx, to);
+  //         } else {
+  //           out[idx] = { ...rec, [unitField]: units - take, date: from };
+  //           const moved = { ...rec, [unitField]: take, date: to };
+  //           const newIdx = out.length;
+  //           out.push(moved);
+  //           ensureBucket(to).push(newIdx);
+  //         }
 
-          need -= take;
-        }
-      }
+  //         need -= take;
+  //       }
+  //     }
 
-      if (!byDate.has(from)) byDate.set(from, []);
-    }
-    out.sort((a, b) => a.date.localeCompare(b.date));
-    return out;
-  }
+  //     if (!byDate.has(from)) byDate.set(from, []);
+  //   }
+  //   out.sort((a, b) => a.date.localeCompare(b.date));
+  //   return out;
+  // }
 
-  const nextHandler = (planQtyNum, doneNum, dayISO) => {
-    const surplus = doneNum - planQtyNum;
-    if (surplus <= 0) return;
+  // const nextHandler = (planQtyNum, doneNum, dayISO) => {
+  //   const surplus = doneNum - planQtyNum;
+  //   if (surplus <= 0) return;
 
-    const arr = Object.entries(map)
-      .map(([date, obj]) => {
-        const existing = autoclave_calendar.find((i) => i.date === date);
-        return {
-          date,
-          scheduled_autoclaves: Number(obj?.scheduled_autoclaves) || 0,
-          produced_autoclave: Number(
-            existing?.produced_autoclave ?? obj?.produced_autoclave ?? 0,
-          ),
-        };
-      })
-      .sort((a, b) => a.date.localeCompare(b.date));
+  //   const arr = Object.entries(map)
+  //     .map(([date, obj]) => {
+  //       const existing = autoclave_calendar.find((i) => i.date === date);
+  //       return {
+  //         date,
+  //         scheduled_autoclaves: Number(obj?.scheduled_autoclaves) || 0,
+  //         produced_autoclave: Number(
+  //           existing?.produced_autoclave ?? obj?.produced_autoclave ?? 0,
+  //         ),
+  //       };
+  //     })
+  //     .sort((a, b) => a.date.localeCompare(b.date));
 
-    const fits = (rec) =>
-      rec.produced_autoclave === 0 ||
-      rec.scheduled_autoclaves - rec.produced_autoclave >= doneNum;
+  //   const fits = (rec) =>
+  //     rec.produced_autoclave === 0 ||
+  //     rec.scheduled_autoclaves - rec.produced_autoclave >= doneNum;
 
-    const searchTail = arr.filter((r) => r.date > dayISO);
+  //   const searchTail = arr.filter((r) => r.date > dayISO);
 
-    const farthestFit = (() => {
-      const candidates = searchTail.filter(fits);
-      return candidates.length ? candidates[candidates.length - 1] : null;
-    })();
+  //   const farthestFit = (() => {
+  //     const candidates = searchTail.filter(fits);
+  //     return candidates.length ? candidates[candidates.length - 1] : null;
+  //   })();
 
-    const next =
-      farthestFit ?? (searchTail.length ? searchTail[searchTail.length - 1] : null);
+  //   const next =
+  //     farthestFit ?? (searchTail.length ? searchTail[searchTail.length - 1] : null);
 
-    const tailFromDay = arr.filter((r) => r.date >= dayISO);
+  //   const tailFromDay = arr.filter((r) => r.date >= dayISO);
 
-    const before = next
-      ? tailFromDay.filter((r) => r.date <= next.date)
-      : tailFromDay;
+  //   const before = next
+  //     ? tailFromDay.filter((r) => r.date <= next.date)
+  //     : tailFromDay;
 
-    const corridorForCheck = before;
-    const qvErr = findQocVsNextQuantityViolation(corridorForCheck);
-    if (qvErr) {
-      window.alert(
-        `Cannot move the batch: ${qvErr.actual} completed on ${qvErr.at}, ` +
-          `but at least ${qvErr.needAtLeast} is required ahead (due to the plan on ${qvErr.becauseOfDate}).`,
-      );
-      return;
-    }
+  //   const corridorForCheck = before;
+  //   const qvErr = findQocVsNextQuantityViolation(corridorForCheck);
+  //   if (qvErr) {
+  //     window.alert(
+  //       `Cannot move the batch: ${qvErr.actual} completed on ${qvErr.at}, ` +
+  //         `but at least ${qvErr.needAtLeast} is required ahead (due to the plan on ${qvErr.becauseOfDate}).`,
+  //     );
+  //     return;
+  //   }
 
-    const violating = before.find(
-      (d) => d.scheduled_autoclaves > planQtyNum && d.produced_autoclave < doneNum,
-    );
-    if (violating) {
-      window.alert(`Cannot continue: ${violating.date}`);
-      return;
-    }
+  //   const violating = before.find(
+  //     (d) => d.scheduled_autoclaves > planQtyNum && d.produced_autoclave < doneNum,
+  //   );
+  //   if (violating) {
+  //     window.alert(`Cannot continue: ${violating.date}`);
+  //     return;
+  //   }
 
-    const beforeDates = new Set(before.map((r) => r.date));
-    const rightBatchOutside = (batchOutside ?? []).filter((item) =>
-      beforeDates.has(item?.date),
-    );
+  //   const beforeDates = new Set(before.map((r) => r.date));
+  //   const rightBatchOutside = (batchOutside ?? []).filter((item) =>
+  //     beforeDates.has(item?.date),
+  //   );
 
-    const { redistributed, transfers } = shiftForwardOneStepWithPlan(before);
-    const movedRightA = replanRightBatchOutside(rightBatchOutside, transfers);
+  //   const { redistributed, transfers } = shiftForwardOneStepWithPlan(before);
+  //   const movedRightA = replanRightBatchOutside(rightBatchOutside, transfers);
 
-    applyToMap(redistributed);
+  //   applyToMap(redistributed);
 
-    movedRightA.forEach((el) => {
-      dispatch(updateBatchOutside(el));
-    });
-    dispatch(addNewAutoclaveCalendar(redistributed));
-  };
+  //   movedRightA.forEach((el) => {
+  //     dispatch(updateBatchOutside(el));
+  //   });
+  //   dispatch(addNewAutoclaveCalendar(redistributed));
+  // };
 
   return (
     <div style={styles.wrapper}>
@@ -488,8 +488,8 @@ export default function ProductionPlannerCalendar({
 
           const fill_ac = Number(autoclaveData?.filled_autoclaves) || 0;
 
-          const todayISO = format(new Date(), 'yyyy-MM-dd');
-          const isPastBtn = iso < todayISO;
+          // const todayISO = format(new Date(), 'yyyy-MM-dd');
+          // const isPastBtn = iso < todayISO;
 
           return (
             <div key={iso} style={{ ...styles.cell, opacity: inMonth ? 1 : 0.5 }}>
@@ -508,7 +508,7 @@ export default function ProductionPlannerCalendar({
               >
                 <div style={styles.dayNumber}>
                   {format(day, 'd', { locale: ru })}
-                  {isPastBtn && done > qty && (
+                  {/* {isPastBtn && done > qty && (
                     <div
                       style={styles.btnNext}
                       onClick={(e) => {
@@ -522,7 +522,7 @@ export default function ProductionPlannerCalendar({
                         style={{ width: '30px', height: '30px' }}
                       />
                     </div>
-                  )}
+                  )} */}
                 </div>
                 {(() => {
                   const scheduled = toNum(qty);
@@ -759,9 +759,7 @@ export default function ProductionPlannerCalendar({
         <button style={styles.saveBtn} onClick={saveHandler}>
           Save
         </button>
-        <div style={styles.hint}>
-          Click a date to set the plan/completion.
-        </div>
+        <div style={styles.hint}>Click a date to set the plan/completion.</div>
         <div style={styles.legend}>
           <span style={styles.legendItem}>
             <span style={{ ...styles.legendDot, ...styles.dotRed }} /> Scheduled
@@ -834,15 +832,15 @@ const styles = {
     borderRadius: 999,
     background: '#000000ff',
   },
-  btnNext: {
-    position: 'absolute',
-    right: '-10px',
-    fontSize: '18px',
-    padding: '0px 5px',
-    borderRadius: '1000px',
-    background: 'rgba(0, 68, 255, 0)',
-    color: 'rgba(255, 255, 255, 1)',
-  },
+  // btnNext: {
+  //   position: 'absolute',
+  //   right: '-10px',
+  //   fontSize: '18px',
+  //   padding: '0px 5px',
+  //   borderRadius: '1000px',
+  //   background: 'rgba(0, 68, 255, 0)',
+  //   color: 'rgba(255, 255, 255, 1)',
+  // },
   badgePlan: {
     position: 'absolute',
     bottom: 23,
