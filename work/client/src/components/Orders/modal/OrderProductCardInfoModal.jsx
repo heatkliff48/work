@@ -62,12 +62,12 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const [isReturn, setIsReturn] = useState(productOfOrder?.final_price < 0);
 
-  useEffect(() => {
-    console.log(
-      productOfOrder,
-      'productOfOrder OrderProductCardInfoModal.jsx line 66',
-    );
-  }, [productOfOrder]);
+  // useEffect(() => {
+  //   console.log(
+  //     productOfOrder,
+  //     'productOfOrder OrderProductCardInfoModal.jsx line 66',
+  //   );
+  // }, [productOfOrder]);
 
   const handleProductListOrderChange = (e) => {
     setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -389,7 +389,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder((prev) => ({
       ...prev,
       price_m3: limited,
-      discount: discount.toFixed(2),
+      discount: Math.round(discount),
     }));
   };
 
@@ -406,14 +406,15 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   // };
 
   const handleDiscountChange = (e) => {
-    const limited = limitDecimalInput(e.target.value, 2);
+    // discount хранится в БД как integer, поэтому дробная часть не допускается
+    const limited = limitDecimalInput(e.target.value, 0);
 
     const discount = parseLocalNumber(limited) || 0;
     const newPrice = originalPrice * (1 - discount / 100);
 
     setProductOfOrder((prev) => ({
       ...prev,
-      discount: limited,
+      discount: Math.round(discount),
       price_m3: formatFixed(newPrice),
     }));
   };
@@ -421,7 +422,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   const handleDiscountBlur = () => {
     const num = parseLocalNumber(productOfOrder.discount);
     if (!isNaN(num)) {
-      setProductOfOrder((prev) => ({ ...prev, discount: num?.toFixed(2) }));
+      setProductOfOrder((prev) => ({ ...prev, discount: Math.round(num) }));
     }
   };
 
@@ -672,7 +673,11 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
           </>
         </div>
         <div className="ord-modal-foot ord-modal-foot--sm">
-          <button type="button" className="ord-btn ord-btn--primary" onClick={addProductOrder}>
+          <button
+            type="button"
+            className="ord-btn ord-btn--primary"
+            onClick={addProductOrder}
+          >
             Change product info
           </button>
         </div>

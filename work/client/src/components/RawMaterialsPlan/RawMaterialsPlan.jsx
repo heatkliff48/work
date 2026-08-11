@@ -49,7 +49,9 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
   // reflects free stock rather than total stock. Batches shown in the current
   // view are excluded from this deduction since their own need is already
   // accounted for separately in the "Total"/"Requirement" rows below.
-  const currentBatchIds = new Set(productsArray.map((product) => product.id_batch));
+  const currentBatchIds = new Set(
+    productsArray.map((product) => product.id_batch),
+  );
 
   const reservedByTitle = {};
   const reservedAluminumByType = {};
@@ -57,7 +59,9 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
   (recipeOrders || []).forEach((order) => {
     if (currentBatchIds.has(order.id_batch)) return;
 
-    const recipe = (list_of_recipes || []).find((r) => r.id === order.id_recipe);
+    const recipe = (list_of_recipes || []).find(
+      (r) => r.id === order.id_recipe,
+    );
     const volume = Number(order.production_volume) || 0;
     if (!recipe || !volume) return;
 
@@ -87,10 +91,13 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
     .map((item) => {
       const warehouseMaterial = raw_materials_warehouse.find(
         (warehouseItem) =>
-          warehouseItem.material_type === item.Header.replace(/, kg$/, '').trim(),
+          warehouseItem.material_type ===
+          item.Header.replace(/, kg$/, '').trim(),
       );
 
-      const stock = warehouseMaterial ? warehouseMaterial.remaining_quantity : 0;
+      const stock = warehouseMaterial
+        ? warehouseMaterial.remaining_quantity
+        : 0;
       const reserved = reservedByTitle[item.accessor] || 0;
 
       return {
@@ -100,14 +107,17 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
       };
     });
 
-  const aluminumRemainingByType = (warehouseAluminum1 || []).reduce((map, item) => {
-    const type = item?.type ? String(item.type).trim() : null;
-    if (!type) return map;
-    const available =
-      (Number(item.quantity) || 0) - (Number(item.consumed_quantity) || 0);
-    map[type] = (map[type] || 0) + available;
-    return map;
-  }, {});
+  const aluminumRemainingByType = (warehouseAluminum1 || []).reduce(
+    (map, item) => {
+      const type = item?.type ? String(item.type).trim() : null;
+      if (!type) return map;
+      const available =
+        (Number(item.quantity) || 0) - (Number(item.consumed_quantity) || 0);
+      map[type] = (map[type] || 0) + available;
+      return map;
+    },
+    {},
+  );
 
   new Set([
     ...Object.keys(aluminumRemainingByType),
@@ -115,7 +125,8 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
   ]).forEach((type) => {
     const available = aluminumRemainingByType[type] || 0;
     const reserved = reservedAluminumByType[type] || 0;
-    aluminumRemainingByType[type] = Math.round((available - reserved) * 100) / 100;
+    aluminumRemainingByType[type] =
+      Math.round((available - reserved) * 100) / 100;
   });
 
   const aluminumTypes = Array.from(
@@ -220,7 +231,9 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
 
         const quantity =
           batch.quantity_pallets /
-          Math.floor(productDetails.m3InArray / productDetails.volumeBlockOnPallet);
+          Math.floor(
+            productDetails.m3InArray / productDetails.volumeBlockOnPallet,
+          );
 
         const recipeArray = list_of_recipes.filter((recipe) => {
           return (
@@ -281,7 +294,9 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
       const key = `Aluminum|${type}`;
       const total =
         Math.round(
-          ((aluminumRemainingByType[type] || 0) - calculateAluminumTotal(type)) * 100,
+          ((aluminumRemainingByType[type] || 0) -
+            calculateAluminumTotal(type)) *
+            100,
         ) / 100;
       const need = Math.round(calculateNeed(total) * 100) / 100;
       const orderShare = manualOrderShare[key] || 0;
@@ -462,7 +477,9 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
               <td>{totals[material.name]?.total || 0}</td>
             ))}
             {aluminumTypes.map((type) => (
-              <td key={`alu-${type}`}>{totals[`Aluminum|${type}`]?.total || 0}</td>
+              <td key={`alu-${type}`}>
+                {totals[`Aluminum|${type}`]?.total || 0}
+              </td>
             ))}
           </tr>
           <tr>
@@ -471,7 +488,9 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
               <td>{totals[material.name]?.need || 0}</td>
             ))}
             {aluminumTypes.map((type) => (
-              <td key={`alu-${type}`}>{totals[`Aluminum|${type}`]?.need || 0}</td>
+              <td key={`alu-${type}`}>
+                {totals[`Aluminum|${type}`]?.need || 0}
+              </td>
             ))}
           </tr>
           <tr>
