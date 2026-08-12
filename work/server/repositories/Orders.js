@@ -1098,6 +1098,21 @@ class OrdersRepository {
     }
   }
 
+  static async getDeleteOrder({ order_id }) {
+    try {
+      await OrdersProducts.destroy({ where: { order_id } });
+      await Orders.destroy({ where: { id: order_id } });
+
+      return;
+    } catch (error) {
+      console.log(
+        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
+        error,
+      );
+      return error;
+    }
+  }
+
   static async addChildOrder({
     article,
     owner,
