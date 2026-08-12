@@ -104,7 +104,8 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
   }, [productOfOrder.quantity_palet_dry, selectedProduct?.units_per_pallet]);
 
   const final_price_value = useMemo(() => {
-    const discount = productOfOrder?.discount ?? 0;
+    const rawDiscount = Number(productOfOrder?.discount);
+    const discount = Number.isFinite(rawDiscount) ? rawDiscount : 0;
 
     const result =
       (selectedProduct?.price_per_unit *
@@ -156,7 +157,8 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
   };
 
   useEffect(() => {
-    const discount = Number(productOfOrder?.discount) ?? 0;
+    const rawDiscount = Number(productOfOrder?.discount);
+    const discount = Number.isFinite(rawDiscount) ? rawDiscount : 0;
 
     setProductOfOrder((prev) => ({
       ...prev,
