@@ -8,11 +8,18 @@ import AddOrderedProduct from './AddOrderedProduct';
 import Autoclave from './Autoclave';
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import ProductionBatchFooter from './ProductionBatchFooter';
 import { useAutoclaveContext } from '#components/contexts/AutoclaveContext.js';
+import {
+  computeQuantityArrays,
+  getBatchOutsideRowsForDate,
+  getFilledAutoclaveCountForDate,
+} from './autoclaveScheduleUtils';
 
 function ProductionBatchDesignerNew() {
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const { latestProducts } = useProductsContext();
   const { productBatchModal, setProductBatchModal } = useModalContext();
@@ -23,8 +30,10 @@ function ProductionBatchDesignerNew() {
     CELLS_PER_AUTOCLAVE,
     autoclaveCalendarData,
     setAutoclaveCalendarData,
+    setSelectedCell,
+    setIsEditMode,
   } = useAutoclaveContext();
-  const { listOfOrderedCakes } = useWarehouseContext();
+  const { listOfOrderedCakes, autoclave_calendar } = useWarehouseContext();
 
   const {
     productionBatchDesigner,
@@ -34,6 +43,13 @@ function ProductionBatchDesignerNew() {
   } = useOrderContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner) || [];
+  const batchOutsideRedux = useSelector((state) => state.batchOutside) || [];
+
+  // Дата и режим редактирования приходят из Batch calendar (клик по ячейке
+  // автоклава на конкретную дату): пустая ячейка -> заполнение, заполненная
+  // (после подтверждения) -> полноценное редактирование.
+  const targetDate = location.state?.date ?? null;
+  const editModeRequested = Boolean(location.state?.editMode);
 
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [autoclaveCount, setAutoclaveCount] = useState(0);
@@ -41,6 +57,7 @@ function ProductionBatchDesignerNew() {
   const [acData, setAcData] = useState([]);
 
   const didInitAutoclaveRef = useRef(false);
+  const didInitEditRef = useRef(false);
 
   const [orderedProductBatchModal, setOrderedProductBatchModal] = useState(false);
 
@@ -55,7 +72,25 @@ function ProductionBatchDesignerNew() {
     });
   };
 
+  // AutoclaveContext живёт выше <Routes> и переживает переходы между
+  // страницами. isEditMode и выбранная ячейка могли остаться от предыдущей
+  // сессии конструктора (другая дата/режим) — сбрасываем их при каждом новом
+  // монтировании; autoclave/autoclaveCalendarData сами пересчитываются
+  // нижеследующими эффектами.
   useEffect(() => {
+    didInitAutoclaveRef.current = false;
+    didInitEditRef.current = false;
+    setAutoclaveFromContext([]);
+    setInitialRowCount(0);
+    setSelectedCell(null);
+    setIsEditMode(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Автовыбор ближайшей даты с недозаполненным планом — используется только
+  // когда конструктор открыт без конкретной даты (обычная навигация).
+  useEffect(() => {
+    if (targetDate) return;
     if (!Array.isArray(autoclaveCalendarData)) return;
 
     const today = new Date().toISOString().slice(0, 10);
@@ -77,7 +112,45 @@ function ProductionBatchDesignerNew() {
       setAutoclaveCount(0);
       setAutoclaveCalendarData(null);
     }
-  }, [autoclaveCalendarData]);
+  }, [targetDate, autoclaveCalendarData]);
+
+  // Конкретная дата, выбранная в Batch calendar: считаем сколько автоклавов
+  // на эту дату ещё пустые (режим заполнения) либо сколько всего карточек
+  // (пустых + заполненных) нужно показать (режим редактирования).
+  useEffect(() => {
+    if (!targetDate) return;
+
+    const record = (autoclave_calendar || []).find(
+      (el) => String(el.date).slice(0, 10) === targetDate,
+    );
+    const scheduled = Number(record?.scheduled_autoclaves) || 0;
+    const filledCards = getFilledAutoclaveCountForDate(
+      batchOutsideRedux,
+      latestProducts,
+      targetDate,
+      CELLS_PER_AUTOCLAVE,
+    );
+    const emptyCards = Math.max(0, scheduled - filledCards);
+
+    setIsEditMode(editModeRequested);
+    setAutoclaveCount(editModeRequested ? Math.max(filledCards, scheduled) : emptyCards);
+
+    if (autoclaveCalendarData?.date !== targetDate) {
+      setAutoclaveCalendarData(
+        record ?? { date: targetDate, scheduled_autoclaves: 0, produced_autoclave: 0 },
+      );
+    }
+  }, [
+    targetDate,
+    editModeRequested,
+    autoclave_calendar,
+    batchOutsideRedux,
+    latestProducts,
+    CELLS_PER_AUTOCLAVE,
+    autoclaveCalendarData,
+    setAutoclaveCalendarData,
+    setIsEditMode,
+  ]);
 
   const MAX_QUANTITY = 10405;
 
@@ -755,7 +828,11 @@ function ProductionBatchDesignerNew() {
     });
   }, [productionBatchDesigner, headers, placeGroupToAutoclave]);
 
+  // В режиме редактирования сетку целиком строит отдельный эффект ниже —
+  // этот (шаблон из пустых ячеек) в этом режиме не участвует, чтобы два
+  // эффекта не перетирали autoclave друг у друга.
   useEffect(() => {
+    if (editModeRequested) return;
     if (!Array.isArray(acData) || acData.length === 0) return;
 
     const isAutoclaveEmpty =
@@ -769,7 +846,99 @@ function ProductionBatchDesignerNew() {
     setInitialRowCount(acData.length);
 
     didInitAutoclaveRef.current = true;
-  }, [acData, autoclave, setAutoclaveFromContext, setInitialRowCount]);
+  }, [editModeRequested, acData, autoclave, setAutoclaveFromContext, setInitialRowCount]);
+
+  // Режим редактирования: один раз подгружаем уже сохранённые позиции
+  // batchOutside за выбранную дату в сетку автоклавов (размер сетки берём
+  // из autoclaveCount, а не ждём, пока её проинициализирует эффект выше),
+  // регистрируя каждую позицию как источник в batchDesigner, чтобы её можно
+  // было удалить/дополнить и корректно пересохранить.
+  useEffect(() => {
+    if (!editModeRequested || !targetDate) {
+      didInitEditRef.current = false;
+      return;
+    }
+    if (didInitEditRef.current) return;
+    if (autoclaveCount <= 0) return;
+    if (!Array.isArray(latestProducts) || latestProducts.length === 0) return;
+
+    const capacity = autoclaveCount * CELLS_PER_AUTOCLAVE;
+    const flat = Array.from({ length: capacity }, () => ({
+      id: null,
+      density: '',
+      width: '',
+      article: '',
+    }));
+
+    const rows = getBatchOutsideRowsForDate(batchOutsideRedux, targetDate);
+
+    const maxExistingId = batchDesigner.reduce(
+      (max, item) => (Number(item.id) > max ? Number(item.id) : max),
+      0,
+    );
+    let nextSyntheticId = maxExistingId + 1;
+
+    let cursor = 0;
+    rows.forEach((row) => {
+      const product = latestProducts.find((p) => p.article === row.product_article);
+      const qty = computeQuantityArrays(row, latestProducts);
+      if (qty <= 0) return;
+
+      const linkedProductionId =
+        row.id_list_of_ordered_production != null
+          ? Number(row.id_list_of_ordered_production)
+          : null;
+      const entryId = linkedProductionId ?? nextSyntheticId++;
+
+      if (!batchDesigner.some((b) => Number(b.id) === entryId)) {
+        dispatch(
+          addBatchState({
+            id: entryId,
+            id_list_of_ordered_production: linkedProductionId,
+            id_ordered_product_to_warehouse: row.id_ordered_product_to_warehouse ?? null,
+            product_article: row.product_article,
+            cakes_in_batch: qty,
+            cakes_residue: 0,
+            total_cakes: qty,
+            free_product_package: Number(row.quantity_free) || 0,
+            free_product_cakes: 0,
+          }),
+        );
+      }
+
+      for (let k = 0; k < qty && cursor < capacity; k++) {
+        flat[cursor] = {
+          id: entryId,
+          density: product?.density ?? '',
+          width: product?.width ?? '',
+          article: row.product_article,
+        };
+        cursor += 1;
+      }
+    });
+
+    const rebuilt = [];
+    for (let r = 0; r < autoclaveCount; r++) {
+      const from = r * CELLS_PER_AUTOCLAVE;
+      rebuilt.push(flat.slice(from, from + CELLS_PER_AUTOCLAVE));
+    }
+    setAutoclaveFromContext(rebuilt);
+    setInitialRowCount(autoclaveCount);
+    didInitAutoclaveRef.current = true;
+
+    didInitEditRef.current = true;
+  }, [
+    editModeRequested,
+    targetDate,
+    autoclaveCount,
+    latestProducts,
+    batchOutsideRedux,
+    batchDesigner,
+    dispatch,
+    setAutoclaveFromContext,
+    setInitialRowCount,
+    CELLS_PER_AUTOCLAVE,
+  ]);
 
   return (
     <div style={{ display: 'flex', paddingBottom: '110px' }}>
@@ -817,8 +986,30 @@ function ProductionBatchDesignerNew() {
             'autoclaveCalendarData ProductionBatchDesignerNew.jsx line 866',
             autoclaveCalendarData,
           )}{' '}
-          <div style={{ fontWeight: 800, fontSize: '35px' }}>
-            &nbsp;{formatISO(autoclaveCalendarData?.date)}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+            }}
+          >
+            <div style={{ fontWeight: 800, fontSize: '35px' }}>
+              &nbsp;{formatISO(autoclaveCalendarData?.date)}
+            </div>
+            {editModeRequested && (
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: '#92400e',
+                  background: '#fff4e0',
+                  borderRadius: 999,
+                  padding: '4px 10px',
+                }}
+              >
+                Editing existing batch
+              </span>
+            )}
           </div>
         </div>
 
