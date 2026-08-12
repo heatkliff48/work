@@ -285,7 +285,8 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   ]);
 
   const final_price_value = useMemo(() => {
-    const discount = productOfOrder?.discount ?? 0;
+    const rawDiscount = Number(productOfOrder?.discount);
+    const discount = Number.isFinite(rawDiscount) ? rawDiscount : 0;
     const price_m3 = parseLocalNumber(productOfOrder.price_m3);
 
     const result =
@@ -385,11 +386,12 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
     const discount =
       originalPrice === 0 ? 0 : ((originalPrice - price) / originalPrice) * 100;
+    const safeDiscount = Number.isFinite(discount) ? Math.round(discount) : 0;
 
     setProductOfOrder((prev) => ({
       ...prev,
       price_m3: limited,
-      discount: Math.round(discount),
+      discount: safeDiscount,
     }));
   };
 
@@ -406,7 +408,6 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   // };
 
   const handleDiscountChange = (e) => {
-    // discount хранится в БД как integer, поэтому дробная часть не допускается
     const limited = limitDecimalInput(e.target.value, 0);
 
     const discount = parseLocalNumber(limited) || 0;
@@ -421,9 +422,10 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const handleDiscountBlur = () => {
     const num = parseLocalNumber(productOfOrder.discount);
-    if (!isNaN(num)) {
-      setProductOfOrder((prev) => ({ ...prev, discount: Math.round(num) }));
-    }
+    setProductOfOrder((prev) => ({
+      ...prev,
+      discount: isNaN(num) ? 0 : Math.round(num),
+    }));
   };
 
   const handleQuantityM2Change = (e) => {
