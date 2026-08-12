@@ -1,7 +1,9 @@
 import { useAutoclaveContext } from '#components/contexts/AutoclaveContext.js';
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function ProductionBatchFooter() {
+  const navigate = useNavigate();
   const {
     selectedCell,
     deleteBatchBySelectedArticle,
@@ -10,7 +12,14 @@ function ProductionBatchFooter() {
     moveBatchLater,
     fillToRowEnd,
     onSaveHandler,
+    onSaveEditHandler,
+    isEditMode,
   } = useAutoclaveContext();
+
+  const handleSaveClick = async () => {
+    const saved = isEditMode ? await onSaveEditHandler() : await onSaveHandler();
+    if (saved) navigate('/batch_outside');
+  };
 
   const selectedLabel = useMemo(() => {
     if (!selectedCell?.article) return null;
@@ -53,7 +62,9 @@ function ProductionBatchFooter() {
           Fill autoclave
         </button>
 
-        <button onClick={onSaveHandler}>Save</button>
+        <button onClick={handleSaveClick}>
+          {isEditMode ? 'Save edits' : 'Save'}
+        </button>
       </div>
     </div>
   );
