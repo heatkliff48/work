@@ -312,26 +312,6 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
       };
     });
 
-    aluminumTypes.forEach((type) => {
-      const key = `Aluminum|${type}`;
-      const total =
-        Math.round(
-          ((aluminumRemainingByType[type] || 0) -
-            calculateAluminumTotal(type)) *
-            100,
-        ) / 100;
-      const need = Math.round(calculateNeed(total) * 100) / 100;
-      const orderShare = manualOrderShare[key] || 0;
-      const totalOrder =
-        Math.round(calculateTotalOrder(need, orderShare) * 100) / 100;
-
-      updatedTotals[key] = {
-        total,
-        need,
-        totalOrder,
-      };
-    });
-
     setTotals(updatedTotals);
   }, [
     manualOrderShare,
@@ -514,21 +494,11 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
                 {totals[`Aluminum|${type}`]?.total || 0}
               </td>
             ))}
-            {aluminumTypes.map((type) => (
-              <td key={`alu-${type}`}>
-                {totals[`Aluminum|${type}`]?.total || 0}
-              </td>
-            ))}
           </tr>
           <tr>
             <th>Requirement</th>
             {rawMaterials.map((material, index) => (
               <td>{totals[material.name]?.need || 0}</td>
-            ))}
-            {aluminumTypes.map((type) => (
-              <td key={`alu-${type}`}>
-                {totals[`Aluminum|${type}`]?.need || 0}
-              </td>
             ))}
             {aluminumTypes.map((type) => (
               <td key={`alu-${type}`}>
