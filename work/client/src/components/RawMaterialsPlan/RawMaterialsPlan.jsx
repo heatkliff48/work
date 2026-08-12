@@ -229,6 +229,8 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
 
         if (!productDetails) return null;
 
+        if (!productDetails) return null;
+
         const quantity =
           batch.quantity_pallets /
           Math.floor(
@@ -391,6 +393,9 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
             {aluminumTypes.map((type) => (
               <th key={`alu-${type}`}>Aluminum ({type})</th>
             ))}
+            {aluminumTypes.map((type) => (
+              <th key={`alu-${type}`}>Aluminum ({type})</th>
+            ))}
             {/* <th></th>
             {raw_materials_table.map((el) => (
               <th key={el.accessor}>{el.Header}</th>
@@ -402,6 +407,9 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
             <th>Remaining raw materials</th>
             {rawMaterials.map((material, index) => (
               <td key={index}>{material.remaining}</td>
+            ))}
+            {aluminumTypes.map((type) => (
+              <td key={`alu-${type}`}>{aluminumRemainingByType[type] || 0}</td>
             ))}
             {aluminumTypes.map((type) => (
               <td key={`alu-${type}`}>{aluminumRemainingByType[type] || 0}</td>
@@ -468,6 +476,11 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
                   {getAluminumAmount(type, product)}
                 </td>
               ))}
+              {aluminumTypes.map((type) => (
+                <td key={`alu-${type}`} className="product-data">
+                  {getAluminumAmount(type, product)}
+                </td>
+              ))}
             </tr>
           ))}
 
@@ -519,11 +532,28 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
                 />
               </td>
             ))}
+            {aluminumTypes.map((type) => (
+              <td key={`alu-${type}`}>
+                <input
+                  type="number"
+                  value={manualOrderShare[`Aluminum|${type}`] || ''}
+                  onChange={(e) =>
+                    handleOrderShareChange(`Aluminum|${type}`, e.target.value)
+                  }
+                  placeholder="0"
+                />
+              </td>
+            ))}
           </tr>
           <tr>
             <th>Summary order</th>
             {rawMaterials.map((material, index) => (
               <td>{totals[material.name]?.totalOrder || 0}</td>
+            ))}
+            {aluminumTypes.map((type) => (
+              <td key={`alu-${type}`}>
+                {totals[`Aluminum|${type}`]?.totalOrder || 0}
+              </td>
             ))}
             {aluminumTypes.map((type) => (
               <td key={`alu-${type}`}>
