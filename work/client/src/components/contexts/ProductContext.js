@@ -200,7 +200,7 @@ export const ProductsContextProvider = ({ children }) => {
       accessor: 'palletSize',
       defaultValue: '0',
       Filter: DropdownFilter,
-      sortType: 'text',
+      sortType: 'string',
     },
     {
       Header: 'Pallet Height',
