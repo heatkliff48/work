@@ -167,8 +167,6 @@ export default function TechnologyCalendar() {
         .tc-tile:hover { border-color: #cbd5e1; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08); transform: translateY(-2px); }
         .tc-recipe-btn { transition: background-color .15s ease, color .15s ease, border-color .15s ease; }
         .tc-recipe-btn:hover { background: #2563eb; border-color: #2563eb; color: #fff; }
-        .tc-recipe-view-btn { transition: background-color .15s ease; }
-        .tc-recipe-view-btn:hover { background: #bbf7d0; }
       `}</style>
 
       <div style={styles.header}>
@@ -316,33 +314,19 @@ export default function TechnologyCalendar() {
                 </div>
               )}
 
-              {selectedDayProducedBatches.map((batch) => {
-                const recipe = getRecipeByArticle(batch.recipe);
-                return (
-                  <div key={batch.batch_id} style={styles.batchRow}>
-                    <div>
-                      <div style={styles.batchProduct}>{batch.product}</div>
-                      <div style={styles.batchQty}>
-                        {batch.quantity_cakes} cakes
-                      </div>
+              {selectedDayProducedBatches.map((batch) => (
+                <div key={batch.batch_id} style={styles.batchRow}>
+                  <div>
+                    <div style={styles.batchProduct}>{batch.product}</div>
+                    <div style={styles.batchQty}>
+                      {batch.quantity_cakes} cakes
                     </div>
-                    {recipe ? (
-                      <button
-                        type="button"
-                        className="tc-recipe-view-btn"
-                        style={styles.recipeBadgeOkBtn}
-                        onClick={() => handleRecipeClick(recipe)}
-                      >
-                        Recipe: {batch.recipe}
-                      </button>
-                    ) : (
-                      <span style={styles.recipeBadgeOk}>
-                        Recipe: {batch.recipe}
-                      </span>
-                    )}
                   </div>
-                );
-              })}
+                  <span style={styles.recipeBadgeOk}>
+                    Recipe: {batch.recipe}
+                  </span>
+                </div>
+              ))}
             </>
           ) : (
             <>
@@ -365,14 +349,9 @@ export default function TechnologyCalendar() {
                       </div>
                     </div>
                     {recipe ? (
-                      <button
-                        type="button"
-                        className="tc-recipe-view-btn"
-                        style={styles.recipeBadgeOkBtn}
-                        onClick={() => handleRecipeClick(recipe)}
-                      >
+                      <span style={styles.recipeBadgeOk}>
                         Recipe: {recipe.article}
-                      </button>
+                      </span>
                     ) : (
                       <button
                         type="button"
