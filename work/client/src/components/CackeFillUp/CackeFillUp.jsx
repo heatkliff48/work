@@ -245,6 +245,9 @@ function CackeFillUp() {
   };
 
   const handleFinish = async () => {
+    if (!window.confirm('Do you want to continue?')) {
+      return;
+    }
     const { id, date } = cackeFillUp;
 
     const accd = autoclave_calendar.find((el) => el.date === date);
