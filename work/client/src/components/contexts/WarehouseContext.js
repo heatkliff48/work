@@ -19,7 +19,7 @@ import {
 } from '#components/redux/actions/warehouseAction.js';
 import { useNavigate } from 'react-router-dom';
 import { useProductsContext } from './ProductContext';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewAldabaran } from '#components/redux/actions/aldabaranAction.js';
 
@@ -286,6 +286,34 @@ const WarehouseContextProvider = ({ children }) => {
   const anchors_warehouse_data = useSelector((state) => state.anchorsWarehouse);
   const tools_warehouse_data = useSelector((state) => state.toolsWarehouse);
   const order_dispatch_data = useSelector((state) => state.orderDispatch);
+
+  const relatedMaterialsJournal = useSelector(
+    (state) => state.relatedMaterialsJournal,
+  );
+
+  function getLatestAuxilaryProducts(products) {
+    const latestVersionsMap = products?.reduce((acc, product) => {
+      const { article, version } = product;
+      if (!acc.has(article) || version > acc.get(article).version) {
+        acc.set(article, product);
+      }
+      return acc;
+    }, new Map());
+
+    const uniqueProductsInOriginalOrder = products
+      ?.filter((product, index, self) => {
+        return self.findIndex((p) => p.article === product.article) === index;
+      })
+      .map((product) => {
+        return latestVersionsMap.get(product.article);
+      });
+
+    return uniqueProductsInOriginalOrder || [];
+  }
+
+  const latestRelatedMaterials = useMemo(() => {
+    return getLatestAuxilaryProducts(relatedMaterialsJournal);
+  }, [relatedMaterialsJournal]);
 
   const warehouseMap = {
     product: warehouse_data,
@@ -1218,7 +1246,6 @@ const WarehouseContextProvider = ({ children }) => {
       }, []);
 
     setListOfOrderedCakes(data);
-
     const dryMixOrderedData = related_materials_backorder_list
       ?.filter((el) => {
         const orderStatus = list_of_orders?.find(
@@ -1240,12 +1267,12 @@ const WarehouseContextProvider = ({ children }) => {
               el.order_article === item.order_article,
           )
         ) {
-          const product = latestProducts.find(
+          const product = latestRelatedMaterials.find(
             (prod) => prod.article == item.product_article,
           );
-          const tradingMark = extractProductTitle(product?.description || '');
+          
 
-          uniqueItems.push({ ...item, tradingMark });
+          uniqueItems.push({ ...item, tradingMark: product?.name });
         }
         return uniqueItems;
       }, []);
