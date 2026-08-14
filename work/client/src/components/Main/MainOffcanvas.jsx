@@ -27,12 +27,7 @@ function MainOffcanvas() {
         </button>
       </div>
 
-      <Offcanvas
-        show={show}
-        onHide={handleClose}
-        backdrop={true}
-        placement="start"
-      >
+      <Offcanvas show={show} onHide={handleClose} backdrop={true} placement="start">
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>BAUBLOCK ERP</Offcanvas.Title>
         </Offcanvas.Header>
@@ -181,8 +176,7 @@ function MainOffcanvas() {
               </Button>
             )}
 
-            {checkUserAccess(user, roles, 'production_batch_designer')
-              ?.canRead && (
+            {checkUserAccess(user, roles, 'production_batch_designer')?.canRead && (
               <DropdownButton
                 as={ButtonGroup}
                 title="Production planner"
@@ -239,7 +233,7 @@ function MainOffcanvas() {
               </Button>
             )}
 
-            {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
+            {/* {checkUserAccess(user, roles, 'recipe_orders')?.canRead && (
               <Button
                 className="custom-menu-button"
                 onClick={() => {
@@ -249,7 +243,7 @@ function MainOffcanvas() {
               >
                 Production recipes calendar
               </Button>
-            )}
+            )} */}
 
             {checkUserAccess(user, roles, 'quality_management')?.canRead && (
               <Button

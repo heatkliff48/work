@@ -1614,7 +1614,9 @@ const OrderCart = React.memo(() => {
               )
             ) : null}
             <div className="ord-summary-row">
-              <span className="ord-summary-row__label">Delivery price</span>
+              <span className="ord-summary-row__label">
+                Coste de envío explicito
+              </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span className="ord-summary-old-value">
                   {orderCartData.delivery ?? 0}
@@ -1651,7 +1653,7 @@ const OrderCart = React.memo(() => {
             </div>
             <div className="ord-summary-row">
               <span className="ord-summary-row__label">
-                Delivery price for m2 full
+                Coste de envío absorbido
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span className="ord-summary-old-value">
