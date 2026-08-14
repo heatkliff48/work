@@ -245,18 +245,33 @@ const RawMaterialsConsumptionModal = React.memo(
       setAvailableRecipes(candidateRecipes);
 
       const fromRowArticle = selectedRow?.recipe_article;
+
       const matched =
         fromRowArticle &&
+        fromRowArticle !== 'No recipe' &&
         candidateRecipes.find((r) => String(r.article) === String(fromRowArticle));
 
-      if (matched) {
-        setSelectedRecipe(matched);
+      const recipe = matched || candidateRecipes[0] || null;
+
+      setSelectedRecipe(recipe);
+      setRecipeArticle(recipe?.article || '');
+
+      if (recipe?.aluminum_type) {
+        setSelectedAlu1Type({
+          value: recipe.aluminum_type,
+          label: recipe.aluminum_type,
+        });
       } else {
-        if (selectedRow?.recipe_article === 'No recipe') {
-          setSelectedRecipe(null);
-        } else {
-          setSelectedRecipe(candidateRecipes.length ? candidateRecipes[0] : null);
-        }
+        setSelectedAlu1Type(null);
+      }
+
+      if (recipe?.aluminum_2_type) {
+        setSelectedAlu2Type({
+          value: recipe.aluminum_2_type,
+          label: recipe.aluminum_2_type,
+        });
+      } else {
+        setSelectedAlu2Type(null);
       }
     }, [isOpen, selectedRow, latestProducts, list_of_recipes]);
 
