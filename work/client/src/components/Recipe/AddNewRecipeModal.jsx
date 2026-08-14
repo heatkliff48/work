@@ -237,6 +237,22 @@ function AddNewRecipeModal({ show, onHide }) {
       return;
     }
 
+    const description = recipeInput.description?.trim();
+
+    if (!description) {
+      alert('Please fill in the Description field');
+      return;
+    }
+
+    const isDescriptionTaken = list_of_recipes.some(
+      (recipe) => recipe.description?.trim() === description,
+    );
+
+    if (isDescriptionTaken) {
+      alert('A recipe with this description already exists');
+      return;
+    }
+
     const article = recipeArticle();
 
     // Create a local copy of recipeInput and update it
@@ -271,6 +287,7 @@ function AddNewRecipeModal({ show, onHide }) {
         produced_return_dry: producedReturnDry,
         density_recipe,
         water_total,
+        description,
       }),
     );
 
@@ -512,6 +529,7 @@ function AddNewRecipeModal({ show, onHide }) {
                     <AutoResizeTextarea
                       id="description"
                       name="description"
+                      required
                       value={recipeInput.description || ''}
                       onChange={(e) => handleRecipeInfoInputChange(e)}
                       placeholder=""

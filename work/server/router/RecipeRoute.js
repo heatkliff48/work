@@ -45,7 +45,24 @@ recipeRouter.post('/', async (req, res) => {
     description,
   } = req.body;
 
+  const trimmedDescription =
+    typeof description === 'string' ? description.trim() : '';
+
+  if (!trimmedDescription) {
+    return res.status(400).json({ error: 'Description is required' });
+  }
+
   try {
+    const existingRecipe = await Recipe.findOne({
+      where: { description: trimmedDescription },
+    });
+
+    if (existingRecipe) {
+      return res
+        .status(400)
+        .json({ error: 'Recipe with this description already exists' });
+    }
+
     const recipe = await Recipe.create({
       article,
       certificate,
@@ -67,7 +84,7 @@ recipeRouter.post('/', async (req, res) => {
       density_recipe,
       produced_return_dry,
       water_total,
-      description,
+      description: trimmedDescription,
     });
 
     myEmitter.emit(ADD_NEW_RECIPE_SOCKET, recipe);
