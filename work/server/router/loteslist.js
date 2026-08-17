@@ -282,17 +282,24 @@ lotesListRouter.post('/cakes', async (req, res) => {
       const numericId = Number(id);
       if (isNaN(numericId)) continue;
 
-      let record = await LotesListsCakes.findByPk(numericId);
-      if (record) {
-        if (note && note[id] !== undefined) {
-          record.note = note[id];
-          await record.save();
-        }
-        result.push(record);
-      } else {
-        const created = await LotesListsCakes.create({ note: note[id] });
-        result.push(created);
+      const noteValue = note?.[id];
+
+      const [record, created] = await LotesListsCakes.findOrCreate({
+        where: {
+          id: numericId,
+        },
+        defaults: {
+          id: numericId,
+          note: noteValue ?? null,
+        },
+      });
+
+      if (!created && noteValue !== undefined) {
+        record.note = noteValue;
+        await record.save();
       }
+
+      result.push(record);
     }
 
     myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, result);
