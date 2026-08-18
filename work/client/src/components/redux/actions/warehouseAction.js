@@ -302,11 +302,61 @@ export const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
 
 export const updateRawMaterialConsumptionRawMaterialsWarehouse = (
   rawMaterialsWarehouse,
+  requestId = null,
 ) => {
   return {
     type: UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
     payload: rawMaterialsWarehouse,
+    ...(requestId ? { meta: { requestId } } : {}),
   };
+};
+
+const pendingRawMaterialConsumptionRequests = new Map();
+let rawMaterialConsumptionRequestSequence = 0;
+
+export const createRawMaterialConsumptionRequest = (rawMaterialsWarehouse) => {
+  rawMaterialConsumptionRequestSequence += 1;
+
+  const requestId =
+    `raw-material-consumption-${Date.now()}-` +
+    rawMaterialConsumptionRequestSequence;
+
+  let resolveRequest;
+  let rejectRequest;
+
+  const promise = new Promise((resolve, reject) => {
+    resolveRequest = resolve;
+    rejectRequest = reject;
+  });
+
+  pendingRawMaterialConsumptionRequests.set(requestId, {
+    resolve: resolveRequest,
+    reject: rejectRequest,
+  });
+
+  return {
+    action: updateRawMaterialConsumptionRawMaterialsWarehouse(
+      rawMaterialsWarehouse,
+      requestId,
+    ),
+    promise,
+  };
+};
+
+export const resolveRawMaterialConsumptionRequest = (requestId, result) => {
+  const pendingRequest = pendingRawMaterialConsumptionRequests.get(requestId);
+  if (!pendingRequest) return;
+
+  pendingRawMaterialConsumptionRequests.delete(requestId);
+  pendingRequest.resolve(result);
+};
+
+export const rejectRawMaterialConsumptionRequest = (requestId, error) => {
+  const pendingRequest = pendingRawMaterialConsumptionRequests.get(requestId);
+  if (!pendingRequest) return;
+
+  pendingRawMaterialConsumptionRequests.delete(requestId);
+  pendingRequest.reject(error);
 };
 
 //WAREHOUSE MANAGER TRAILER
