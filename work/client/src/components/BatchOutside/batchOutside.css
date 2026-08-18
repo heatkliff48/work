@@ -48,6 +48,42 @@
   box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
 }
 
+.bo-history-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cl-muted);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.bo-history-toggle input {
+  cursor: pointer;
+  accent-color: #1d4ed8;
+}
+
+.bo-card--history {
+  cursor: default;
+  background: #fafafa;
+}
+
+.bo-card--history:hover {
+  transform: none;
+  box-shadow: var(--cl-shadow-card);
+}
+
+.bo-card--history .bo-card__header {
+  filter: grayscale(0.4);
+  opacity: 0.85;
+}
+
+.bo-card--history .bo-card__row-val {
+  color: var(--cl-muted);
+}
+
 .bo-card--empty {
   background: repeating-linear-gradient(
     45deg,
