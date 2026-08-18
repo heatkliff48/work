@@ -33,6 +33,8 @@ function CackeFillUp() {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [activeSubBatchKey, setActiveSubBatchKey] = useState(null);
   const [subBatchNotes, setSubBatchNotes] = useState({});
+  const [subBatchCuttingTemperatures, setSubBatchCuttingTemperatures] = useState({});
+  const [subBatchFlowabilities, setSubBatchFlowabilities] = useState({});
 
   const production_plan_table = [
     { Header: 'Date', accessor: 'date', Filter: TextSearchFilter },
@@ -193,6 +195,8 @@ function CackeFillUp() {
     setCurrentProduct(null);
     setActiveSubBatchKey(null);
     setSubBatchNotes({});
+    setSubBatchCuttingTemperatures({});
+    setSubBatchFlowabilities({});
   }, []);
 
   useEffect(() => {
@@ -272,6 +276,20 @@ function CackeFillUp() {
           return cake?.note || '';
         }, '');
 
+        const savedCuttingTemperature = cakeIds.reduce((value, id) => {
+          if (value !== '') return value;
+
+          const cake = cakes.find((item) => Number(item?.id) === id);
+          return cake?.cutting_temperature ?? '';
+        }, '');
+
+        const savedFlowability = cakeIds.reduce((value, id) => {
+          if (value !== '') return value;
+
+          const cake = cakes.find((item) => Number(item?.id) === id);
+          return cake?.flowability ?? '';
+        }, '');
+
         return {
           key: record?.id ?? `${batchId}-${subBatchId}-${index}`,
           batchId,
@@ -281,6 +299,8 @@ function CackeFillUp() {
           productionVolume,
           cakeIds,
           note: savedNote,
+          cuttingTemperature: savedCuttingTemperature,
+          flowability: savedFlowability,
         };
       })
       .sort((a, b) => Number(a.subBatchId) - Number(b.subBatchId));
@@ -298,8 +318,27 @@ function CackeFillUp() {
     }
 
     const note = subBatchNotes[group.key] ?? group.note ?? '';
+    const cuttingTemperature =
+      subBatchCuttingTemperatures[group.key] ?? group.cuttingTemperature ?? '';
+    const flowability = subBatchFlowabilities[group.key] ?? group.flowability ?? '';
+
+    const normalizeOptionalNumber = (value) => {
+      if (value === '' || value == null) return null;
+
+      const numericValue = Number(value);
+      return Number.isFinite(numericValue) ? numericValue : null;
+    };
+
     const notes = group.cakeIds.reduce((result, cakeId) => {
       result[cakeId] = note;
+      return result;
+    }, {});
+    const cuttingTemperatures = group.cakeIds.reduce((result, cakeId) => {
+      result[cakeId] = normalizeOptionalNumber(cuttingTemperature);
+      return result;
+    }, {});
+    const flowabilities = group.cakeIds.reduce((result, cakeId) => {
+      result[cakeId] = normalizeOptionalNumber(flowability);
       return result;
     }, {});
 
@@ -308,12 +347,22 @@ function CackeFillUp() {
         addNewLotesListCakes({
           num: group.cakeIds,
           note: notes,
+          cutting_temperature: cuttingTemperatures,
+          flowability: flowabilities,
         }),
       );
 
       setSubBatchNotes((previousNotes) => ({
         ...previousNotes,
         [group.key]: note,
+      }));
+      setSubBatchCuttingTemperatures((previousValues) => ({
+        ...previousValues,
+        [group.key]: cuttingTemperature,
+      }));
+      setSubBatchFlowabilities((previousValues) => ({
+        ...previousValues,
+        [group.key]: flowability,
       }));
       setActiveSubBatchKey(null);
     } catch (error) {
@@ -422,6 +471,8 @@ function CackeFillUp() {
     setActiveBatchId(null);
     setActiveSubBatchKey(null);
     setSubBatchNotes({});
+    setSubBatchCuttingTemperatures({});
+    setSubBatchFlowabilities({});
   };
 
   const hasCackeFillUp = cackeFillUp && Object.keys(cackeFillUp).length > 0;
@@ -621,7 +672,7 @@ function CackeFillUp() {
                             fontSize: '0.8rem',
                           }}
                         >
-                          {isActive ? '▲ note' : '▼ note'}
+                          {isActive ? '▲ comment' : '▼ comment'}
                         </span>
                       </div>
                       {group.recipeArticle && (
@@ -643,6 +694,95 @@ function CackeFillUp() {
 
                     {isActive && (
                       <div style={{ marginTop: 6 }}>
+                        <div
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                            gap: 8,
+                            marginBottom: 8,
+                          }}
+                        >
+                          <label style={{ margin: 0 }}>
+                            <span
+                              style={{
+                                display: 'block',
+                                marginBottom: 4,
+                                fontSize: '0.8rem',
+                                fontWeight: 600,
+                              }}
+                            >
+                              Cutting temperature, C
+                            </span>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={
+                                subBatchCuttingTemperatures[group.key] ??
+                                group.cuttingTemperature ??
+                                ''
+                              }
+                              onChange={(event) =>
+                                setSubBatchCuttingTemperatures((previousValues) => ({
+                                  ...previousValues,
+                                  [group.key]: event.target.value,
+                                }))
+                              }
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter') {
+                                  event.preventDefault();
+                                  handleSaveSubBatchNote(group);
+                                }
+                              }}
+                              style={{
+                                width: '100%',
+                                borderRadius: 6,
+                                padding: '6px 8px',
+                                border: '1px solid rgba(0,0,0,0.25)',
+                              }}
+                            />
+                          </label>
+
+                          <label style={{ margin: 0 }}>
+                            <span
+                              style={{
+                                display: 'block',
+                                marginBottom: 4,
+                                fontSize: '0.8rem',
+                                fontWeight: 600,
+                              }}
+                            >
+                              Flowability, cm
+                            </span>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={
+                                subBatchFlowabilities[group.key] ??
+                                group.flowability ??
+                                ''
+                              }
+                              onChange={(event) =>
+                                setSubBatchFlowabilities((previousValues) => ({
+                                  ...previousValues,
+                                  [group.key]: event.target.value,
+                                }))
+                              }
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter') {
+                                  event.preventDefault();
+                                  handleSaveSubBatchNote(group);
+                                }
+                              }}
+                              style={{
+                                width: '100%',
+                                borderRadius: 6,
+                                padding: '6px 8px',
+                                border: '1px solid rgba(0,0,0,0.25)',
+                              }}
+                            />
+                          </label>
+                        </div>
+
                         <textarea
                           rows={3}
                           placeholder={`Note for Sub-batch #${group.subBatchId}... Enter to save, Shift+Enter for a new line`}
@@ -674,6 +814,15 @@ function CackeFillUp() {
                             display: 'block',
                           }}
                         />
+
+                        <Button
+                          color="success"
+                          size="sm"
+                          onClick={() => handleSaveSubBatchNote(group)}
+                          style={{ marginTop: 8 }}
+                        >
+                          Save comment
+                        </Button>
                       </div>
                     )}
                   </div>
