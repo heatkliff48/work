@@ -257,6 +257,25 @@ const BatchOutside = () => {
     [gridColumns],
   );
 
+  // Cards of the same date share one framed group so a production day reads as a single block
+  const groupedColumns = useMemo(() => {
+    const groups = [];
+    gridColumns.forEach((col, index) => {
+      const last = groups[groups.length - 1];
+      if (last && last.date === col.date) {
+        last.cols.push({ col, index });
+      } else {
+        groups.push({
+          date: col.date,
+          colorClass: col.colorClass,
+          isHistory: col.isHistory,
+          cols: [{ col, index }],
+        });
+      }
+    });
+    return groups;
+  }, [gridColumns]);
+
   // When history is shown, start the view at the current dates so the past sits to the left;
   // when it is hidden again, return to the start of the grid
   useEffect(() => {
@@ -366,54 +385,63 @@ const BatchOutside = () => {
 
       {mode === 'grid' && (
         <div className="bo-grid bo-fade-in" ref={gridRef}>
-          {gridColumns.map((col, colIndex) => (
+          {groupedColumns.map((group) => (
             <div
-              className={`bo-card ${col.isEmpty ? 'bo-card--empty' : ''} ${
-                col.isHistory ? 'bo-card--history' : ''
+              className={`bo-date-group ${group.colorClass} ${
+                group.isHistory ? 'bo-date-group--history' : ''
               }`}
-              key={colIndex}
-              ref={colIndex === firstCurrentIndex ? firstCurrentCardRef : null}
-              role={col.isHistory ? undefined : 'button'}
-              tabIndex={col.isHistory ? undefined : 0}
-              onClick={() => handleAutoclaveCardClick(col)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleAutoclaveCardClick(col);
-                }
-              }}
+              key={group.date}
             >
-              <div className={`bo-card__header ${col.colorClass}`}>
-                {col.date}
-                {col.weekNumber != null && (
-                  <span className="bo-card__week">
-                    Week {col.weekNumber}
-                    {col.isHistory ? ' · Archive' : ''}
-                  </span>
-                )}
-              </div>
-              {col.isEmpty ? (
-                <div className="bo-card__empty-state">
-                  <span className="bo-card__empty-icon">+</span>
-                  <span className="bo-card__empty-text">Empty autoclave</span>
-                  <span className="bo-card__empty-sub">Click to plan</span>
-                </div>
-              ) : (
-                <>
-                  <div className="bo-card__subhead">
-                    <div>№</div>
-                    <div>Density</div>
-                    <div>Size</div>
+              {group.cols.map(({ col, index: colIndex }) => (
+                <div
+                  className={`bo-card ${col.isEmpty ? 'bo-card--empty' : ''} ${
+                    col.isHistory ? 'bo-card--history' : ''
+                  }`}
+                  key={colIndex}
+                  ref={colIndex === firstCurrentIndex ? firstCurrentCardRef : null}
+                  role={col.isHistory ? undefined : 'button'}
+                  tabIndex={col.isHistory ? undefined : 0}
+                  onClick={() => handleAutoclaveCardClick(col)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleAutoclaveCardClick(col);
+                    }
+                  }}
+                >
+                  <div className={`bo-card__header ${col.colorClass}`}>
+                    {col.date}
+                    {col.weekNumber != null && (
+                      <span className="bo-card__week">
+                        Week {col.weekNumber}
+                        {col.isHistory ? ' · Archive' : ''}
+                      </span>
+                    )}
                   </div>
-                  {col.cakeRows.map((cake) => (
-                    <div className="bo-card__row" key={cake.no}>
-                      <div className="bo-card__row-no">{cake.no}</div>
-                      <div className="bo-card__row-val">{cake.density}</div>
-                      <div className="bo-card__row-val">{cake.width}</div>
+                  {col.isEmpty ? (
+                    <div className="bo-card__empty-state">
+                      <span className="bo-card__empty-icon">+</span>
+                      <span className="bo-card__empty-text">Empty autoclave</span>
+                      <span className="bo-card__empty-sub">Click to plan</span>
                     </div>
-                  ))}
-                </>
-              )}
+                  ) : (
+                    <>
+                      <div className="bo-card__subhead">
+                        <div>№</div>
+                        <div>Density</div>
+                        <div>Size</div>
+                      </div>
+                      {col.cakeRows.map((cake) => (
+                        <div className="bo-card__row" key={cake.no}>
+                          <div className="bo-card__row-no">{cake.no}</div>
+                          <div className="bo-card__row-val">{cake.density}</div>
+                          <div className="bo-card__row-val">{cake.width}</div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
           ))}
         </div>
