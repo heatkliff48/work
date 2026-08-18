@@ -5,15 +5,19 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import React, { useEffect, useMemo, useState } from 'react';
-import { getISOWeek, parseISO } from 'date-fns';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { format, getISOWeek, parseISO } from 'date-fns';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { getLotesList } from '#components/redux/actions/lotesListAction.js';
 import '#components/Clients/ClientsInfo/clientsDrawer.css';
 import '#components/Styles/table.css';
 import './batchOutside.css';
 
 const DATE_COLOR_CLASSES = ['bo-date--green', 'bo-date--amber', 'bo-date--blue', 'bo-date--red'];
+
+// Same pattern RawMatConsumptionModalUPD uses to derive lotes_list "product" from a product description
+const LOTES_PRODUCT_NAME_REGEX = /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/;
 
 function buildGridColumns(rows, latestProducts, cellsPerAutoclave, autoclaveCalendar) {
   const productByArticle = new Map((latestProducts || []).map((p) => [p.article, p]));
@@ -36,6 +40,7 @@ function buildGridColumns(rows, latestProducts, cellsPerAutoclave, autoclaveCale
     String(a).localeCompare(String(b)),
   );
 
+  const today = format(new Date(), 'yyyy-MM-dd');
   const columns = [];
   order.forEach((date, dateIndex) => {
     const colorClass = DATE_COLOR_CLASSES[dateIndex % DATE_COLOR_CLASSES.length];
@@ -49,6 +54,7 @@ function buildGridColumns(rows, latestProducts, cellsPerAutoclave, autoclaveCale
     });
 
     const weekNumber = date ? getISOWeek(parseISO(date)) : null;
+    const isHistory = dateRows.length > 0 && Boolean(dateRows[0].isHistory);
 
     let filledCount = 0;
     for (let i = 0; i < slots.length; i += cellsPerAutoclave) {
@@ -63,14 +69,15 @@ function buildGridColumns(rows, latestProducts, cellsPerAutoclave, autoclaveCale
           width: product ? product.width : '—',
         });
       }
-      columns.push({ date, weekNumber, colorClass, cakeRows, isEmpty: false });
+      columns.push({ date, weekNumber, colorClass, cakeRows, isEmpty: false, isHistory });
       filledCount += 1;
     }
 
-    const scheduled = scheduledByDate.get(date) || 0;
+    // No planning slots in the past: an autoclave scheduled on a gone-by date can't be filled anymore
+    const scheduled = date < today ? 0 : scheduledByDate.get(date) || 0;
     const emptyCount = Math.max(0, scheduled - filledCount);
     for (let e = 0; e < emptyCount; e++) {
-      columns.push({ date, weekNumber, colorClass, cakeRows: [], isEmpty: true });
+      columns.push({ date, weekNumber, colorClass, cakeRows: [], isEmpty: true, isHistory: false });
     }
   });
 
@@ -85,11 +92,17 @@ const BatchOutside = () => {
 
   const user = useSelector((state) => state.user);
   const batchOutside = useSelector((state) => state.batchOutside);
+  const lotesListBatches = useSelector((state) => state.lotesListBatches);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [newBatchOutside, setNewBatchOutside] = useState([]);
   const [mode, setMode] = useState('grid');
+  const [showPast, setShowPast] = useState(false);
+
+  const gridRef = useRef(null);
+  const firstCurrentCardRef = useRef(null);
 
   const batch_outside_table = [
     {
@@ -186,18 +199,88 @@ const BatchOutside = () => {
     [newBatchOutside],
   );
 
+  useEffect(() => {
+    if (showPast && (!Array.isArray(lotesListBatches) || !lotesListBatches.length)) {
+      dispatch(getLotesList());
+    }
+  }, [showPast]);
+
+  // Past dates are gone from batch_outside, so rebuild them from lotes_list records:
+  // each batch record becomes quantity_cakes filled slots on its production_date.
+  const pastRows = useMemo(() => {
+    if (!showPast || !Array.isArray(lotesListBatches)) return [];
+
+    const productByName = new Map();
+    (latestProducts || []).forEach((p) => {
+      const match = p.description?.match(LOTES_PRODUCT_NAME_REGEX);
+      if (match?.[1]) productByName.set(match[1], p);
+    });
+
+    const activeDates = new Set(
+      newBatchOutside.map((row) => String(row.date).slice(0, 10)),
+    );
+    const today = format(new Date(), 'yyyy-MM-dd');
+
+    return lotesListBatches
+      .filter((item) => {
+        const date = String(item?.production_date || '').slice(0, 10);
+        return date && date < today && !activeDates.has(date);
+      })
+      .sort(
+        (a, b) =>
+          Number(a.batch_id) - Number(b.batch_id) ||
+          Number(a.sub_batch_id) - Number(b.sub_batch_id) ||
+          Number(a.id) - Number(b.id),
+      )
+      .map((item, index) => ({
+        date: String(item.production_date).slice(0, 10),
+        product_article: productByName.get(item.product)?.article,
+        quantity_arrays: Number(item.quantity_cakes) || 0,
+        position_in_autoclave: index + 1,
+        isHistory: true,
+      }));
+  }, [showPast, lotesListBatches, latestProducts, newBatchOutside]);
+
   const gridColumns = useMemo(
     () =>
       buildGridColumns(
-        newBatchOutside,
+        [...pastRows, ...newBatchOutside],
         latestProducts,
         CELLS_PER_AUTOCLAVE,
         autoclave_calendar,
       ),
-    [newBatchOutside, latestProducts, CELLS_PER_AUTOCLAVE, autoclave_calendar],
+    [pastRows, newBatchOutside, latestProducts, CELLS_PER_AUTOCLAVE, autoclave_calendar],
   );
 
+  const firstCurrentIndex = useMemo(
+    () => gridColumns.findIndex((col) => !col.isHistory),
+    [gridColumns],
+  );
+
+  // When history is shown, start the view at the current dates so the past sits to the left;
+  // when it is hidden again, return to the start of the grid
+  useEffect(() => {
+    if (mode !== 'grid') return;
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    if (!showPast) {
+      grid.scrollLeft = 0;
+      return;
+    }
+
+    const first = firstCurrentCardRef.current;
+    if (!first) return;
+
+    grid.scrollLeft =
+      first.getBoundingClientRect().left -
+      grid.getBoundingClientRect().left +
+      grid.scrollLeft;
+  }, [mode, showPast, firstCurrentIndex]);
+
   const handleAutoclaveCardClick = (col) => {
+    if (col.isHistory) return;
+
     if (col.isEmpty) {
       navigate('/production_batch_designer_new', { state: { date: col.date } });
       return;
@@ -251,7 +334,16 @@ const BatchOutside = () => {
           </button>
         </div>
         <div className="cl-toolbar__spacer" />
-        
+        {mode === 'grid' && (
+          <label className="bo-history-toggle">
+            <input
+              type="checkbox"
+              checked={showPast}
+              onChange={(e) => setShowPast(e.target.checked)}
+            />
+            Show past days
+          </label>
+        )}
       </div>
 
       {mode === 'list' && (
@@ -273,13 +365,16 @@ const BatchOutside = () => {
       )}
 
       {mode === 'grid' && (
-        <div className="bo-grid bo-fade-in">
+        <div className="bo-grid bo-fade-in" ref={gridRef}>
           {gridColumns.map((col, colIndex) => (
             <div
-              className={`bo-card ${col.isEmpty ? 'bo-card--empty' : ''}`}
+              className={`bo-card ${col.isEmpty ? 'bo-card--empty' : ''} ${
+                col.isHistory ? 'bo-card--history' : ''
+              }`}
               key={colIndex}
-              role="button"
-              tabIndex={0}
+              ref={colIndex === firstCurrentIndex ? firstCurrentCardRef : null}
+              role={col.isHistory ? undefined : 'button'}
+              tabIndex={col.isHistory ? undefined : 0}
               onClick={() => handleAutoclaveCardClick(col)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -291,7 +386,10 @@ const BatchOutside = () => {
               <div className={`bo-card__header ${col.colorClass}`}>
                 {col.date}
                 {col.weekNumber != null && (
-                  <span className="bo-card__week">Week {col.weekNumber}</span>
+                  <span className="bo-card__week">
+                    Week {col.weekNumber}
+                    {col.isHistory ? ' · Archive' : ''}
+                  </span>
                 )}
               </div>
               {col.isEmpty ? (
