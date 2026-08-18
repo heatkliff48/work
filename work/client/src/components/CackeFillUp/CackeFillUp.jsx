@@ -31,10 +31,10 @@ function CackeFillUp() {
 
   const [activeBatchId, setActiveBatchId] = useState(null);
   const [currentProduct, setCurrentProduct] = useState(null);
-  const [activeSubBatchKey, setActiveSubBatchKey] = useState(null);
-  const [subBatchNotes, setSubBatchNotes] = useState({});
-  const [subBatchCuttingTemperatures, setSubBatchCuttingTemperatures] = useState({});
-  const [subBatchFlowabilities, setSubBatchFlowabilities] = useState({});
+  const [activeCakeId, setActiveCakeId] = useState(null);
+  const [cakeNotes, setCakeNotes] = useState({});
+  const [cakeCuttingTemperatures, setCakeCuttingTemperatures] = useState({});
+  const [cakeFlowabilities, setCakeFlowabilities] = useState({});
 
   const production_plan_table = [
     { Header: 'Date', accessor: 'date', Filter: TextSearchFilter },
@@ -193,10 +193,10 @@ function CackeFillUp() {
   useEffect(() => {
     setCackeFillUp({});
     setCurrentProduct(null);
-    setActiveSubBatchKey(null);
-    setSubBatchNotes({});
-    setSubBatchCuttingTemperatures({});
-    setSubBatchFlowabilities({});
+    setActiveCakeId(null);
+    setCakeNotes({});
+    setCakeCuttingTemperatures({});
+    setCakeFlowabilities({});
   }, []);
 
   useEffect(() => {
@@ -243,7 +243,7 @@ function CackeFillUp() {
     }, 0);
   }, [activeBatchId, lotesListBatches]);
 
-  const subBatches = useMemo(() => {
+  const productionCakes = useMemo(() => {
     if (activeBatchId == null) return [];
 
     const batches = Array.isArray(lotesListBatches) ? lotesListBatches : [];
@@ -251,76 +251,38 @@ function CackeFillUp() {
 
     return batches
       .filter((record) => String(record?.batch_id) === String(activeBatchId))
-      .map((record, index) => {
-        const batchId = record?.batch_id;
-        const subBatchId = record?.sub_batch_id;
-        const productionVolume = Number(record?.quantity_cakes) || 0;
+      .flatMap((record) => {
         const cakeIdStart = Number(record?.cake_id_start);
         const cakeIdFinish = Number(record?.cake_id_finish);
-        const cakeIds = [];
 
         if (
-          Number.isFinite(cakeIdStart) &&
-          Number.isFinite(cakeIdFinish) &&
-          cakeIdFinish >= cakeIdStart
+          !Number.isFinite(cakeIdStart) ||
+          !Number.isFinite(cakeIdFinish) ||
+          cakeIdFinish < cakeIdStart
         ) {
-          for (let id = cakeIdStart; id <= cakeIdFinish; id += 1) {
-            cakeIds.push(id);
-          }
+          return [];
         }
 
-        const savedNote = cakeIds.reduce((note, id) => {
-          if (note) return note;
+        return Array.from({ length: cakeIdFinish - cakeIdStart + 1 }, (_, index) => {
+          const id = cakeIdStart + index;
+          const savedCake = cakes.find((item) => Number(item?.id) === id);
 
-          const cake = cakes.find((item) => Number(item?.id) === id);
-          return cake?.note || '';
-        }, '');
-
-        const savedCuttingTemperature = cakeIds.reduce((value, id) => {
-          if (value !== '') return value;
-
-          const cake = cakes.find((item) => Number(item?.id) === id);
-          return cake?.cutting_temperature ?? '';
-        }, '');
-
-        const savedFlowability = cakeIds.reduce((value, id) => {
-          if (value !== '') return value;
-
-          const cake = cakes.find((item) => Number(item?.id) === id);
-          return cake?.flowability ?? '';
-        }, '');
-
-        return {
-          key: record?.id ?? `${batchId}-${subBatchId}-${index}`,
-          batchId,
-          subBatchId,
-          batchArticle: record?.product || cackeFillUp?.product_article,
-          recipeArticle: record?.recipe_article || null,
-          productionVolume,
-          cakeIds,
-          note: savedNote,
-          cuttingTemperature: savedCuttingTemperature,
-          flowability: savedFlowability,
-        };
+          return {
+            id,
+            note: savedCake?.note || '',
+            cuttingTemperature: savedCake?.cutting_temperature ?? '',
+            flowability: savedCake?.flowability ?? '',
+          };
+        });
       })
-      .sort((a, b) => Number(a.subBatchId) - Number(b.subBatchId));
-  }, [
-    activeBatchId,
-    cackeFillUp?.product_article,
-    lotesListBatches,
-    lotesListCakes,
-  ]);
+      .sort((a, b) => a.id - b.id);
+  }, [activeBatchId, lotesListBatches, lotesListCakes]);
 
-  const handleSaveSubBatchNote = async (group) => {
-    if (!group.cakeIds.length) {
-      console.error('Cake ids not found for Sub-batch:', group.subBatchId);
-      return;
-    }
-
-    const note = subBatchNotes[group.key] ?? group.note ?? '';
+  const handleSaveCakeNote = async (cake) => {
+    const note = cakeNotes[cake.id] ?? cake.note ?? '';
     const cuttingTemperature =
-      subBatchCuttingTemperatures[group.key] ?? group.cuttingTemperature ?? '';
-    const flowability = subBatchFlowabilities[group.key] ?? group.flowability ?? '';
+      cakeCuttingTemperatures[cake.id] ?? cake.cuttingTemperature ?? '';
+    const flowability = cakeFlowabilities[cake.id] ?? cake.flowability ?? '';
 
     const normalizeOptionalNumber = (value) => {
       if (value === '' || value == null) return null;
@@ -329,44 +291,33 @@ function CackeFillUp() {
       return Number.isFinite(numericValue) ? numericValue : null;
     };
 
-    const notes = group.cakeIds.reduce((result, cakeId) => {
-      result[cakeId] = note;
-      return result;
-    }, {});
-    const cuttingTemperatures = group.cakeIds.reduce((result, cakeId) => {
-      result[cakeId] = normalizeOptionalNumber(cuttingTemperature);
-      return result;
-    }, {});
-    const flowabilities = group.cakeIds.reduce((result, cakeId) => {
-      result[cakeId] = normalizeOptionalNumber(flowability);
-      return result;
-    }, {});
-
     try {
       await dispatch(
         addNewLotesListCakes({
-          num: group.cakeIds,
-          note: notes,
-          cutting_temperature: cuttingTemperatures,
-          flowability: flowabilities,
+          num: [cake.id],
+          note: { [cake.id]: note },
+          cutting_temperature: {
+            [cake.id]: normalizeOptionalNumber(cuttingTemperature),
+          },
+          flowability: { [cake.id]: normalizeOptionalNumber(flowability) },
         }),
       );
 
-      setSubBatchNotes((previousNotes) => ({
+      setCakeNotes((previousNotes) => ({
         ...previousNotes,
-        [group.key]: note,
+        [cake.id]: note,
       }));
-      setSubBatchCuttingTemperatures((previousValues) => ({
+      setCakeCuttingTemperatures((previousValues) => ({
         ...previousValues,
-        [group.key]: cuttingTemperature,
+        [cake.id]: cuttingTemperature,
       }));
-      setSubBatchFlowabilities((previousValues) => ({
+      setCakeFlowabilities((previousValues) => ({
         ...previousValues,
-        [group.key]: flowability,
+        [cake.id]: flowability,
       }));
-      setActiveSubBatchKey(null);
+      setActiveCakeId(null);
     } catch (error) {
-      console.error('Failed to save Sub-batch note:', error);
+      console.error('Failed to save cake note:', error);
     }
   };
 
@@ -469,10 +420,10 @@ function CackeFillUp() {
     setCackeFillUp({});
     setCurrentProduct(null);
     setActiveBatchId(null);
-    setActiveSubBatchKey(null);
-    setSubBatchNotes({});
-    setSubBatchCuttingTemperatures({});
-    setSubBatchFlowabilities({});
+    setActiveCakeId(null);
+    setCakeNotes({});
+    setCakeCuttingTemperatures({});
+    setCakeFlowabilities({});
   };
 
   const hasCackeFillUp = cackeFillUp && Object.keys(cackeFillUp).length > 0;
@@ -602,98 +553,57 @@ function CackeFillUp() {
           </div>
 
           <div className="mt-4">
-            <h6>Sub-batches (raw material consumptions)</h6>
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '24px',
-                alignItems: 'flex-start',
-              }}
-            >
-              {subBatches.length === 0 && (
-                <div style={{ color: '#6c757d' }}>
-                  No raw material consumptions yet.
-                </div>
-              )}
+            <div style={{ fontWeight: 600 }}>Cacke id</div>
 
-              {subBatches.map((group) => {
-                const isActive = activeSubBatchKey === group.key;
+            {productionCakes.length === 0 && (
+              <div style={{ marginTop: 8, color: '#6c757d' }}>
+                No cackes allocated yet.
+              </div>
+            )}
+
+            <div style={{ display: 'grid', gap: 6, marginTop: 8 }}>
+              {productionCakes.map((cake) => {
+                const isActive = activeCakeId === cake.id;
 
                 return (
-                  <div
-                    key={group.key}
-                    style={{
-                      border: isActive ? '2px solid #28a745' : '1px solid #dee2e6',
-                      borderRadius: '8px',
-                      padding: '12px',
-                      minWidth: '200px',
-                      backgroundColor: isActive ? 'rgba(40,167,69,0.05)' : '#f8f9fa',
-                    }}
-                  >
+                  <div key={cake.id}>
                     <div
-                      onClick={() =>
-                        setActiveSubBatchKey(isActive ? null : group.key)
-                      }
+                      onClick={() => setActiveCakeId(isActive ? null : cake.id)}
                       role="button"
                       tabIndex={0}
                       onKeyDown={(event) => {
                         if (event.key === 'Enter' || event.key === ' ') {
                           event.preventDefault();
-                          setActiveSubBatchKey(isActive ? null : group.key);
+                          setActiveCakeId(isActive ? null : cake.id);
                         }
                       }}
                       style={{
-                        fontWeight: 600,
-                        marginBottom: 8,
+                        border: isActive
+                          ? '2px solid #28a745'
+                          : '1px solid rgba(0,0,0,0.25)',
+                        borderRadius: 10,
+                        padding: '6px 10px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
                         cursor: 'pointer',
                         userSelect: 'none',
+                        background: isActive
+                          ? 'rgba(40,167,69,0.08)'
+                          : 'transparent',
+                        fontWeight: 600,
+                        width: 'fit-content',
                       }}
                     >
-                      <div>
-                        Sub-batch #{group.subBatchId}
-                        {group.batchArticle && (
-                          <span
-                            style={{
-                              fontWeight: 400,
-                              fontSize: '0.8rem',
-                              color: '#6c757d',
-                              marginLeft: 8,
-                            }}
-                          >
-                            ({group.batchArticle})
-                          </span>
-                        )}
-                        <span
-                          style={{
-                            marginLeft: 8,
-                            opacity: 0.65,
-                            fontWeight: 400,
-                            fontSize: '0.8rem',
-                          }}
-                        >
-                          {isActive ? '▲ comment' : '▼ comment'}
-                        </span>
-                      </div>
-                      {group.recipeArticle && (
-                        <span
-                          style={{
-                            display: 'block',
-                            fontWeight: 400,
-                            fontSize: '0.75rem',
-                            color: '#6c757d',
-                            marginTop: 4,
-                          }}
-                        >
-                          recipe: {group.recipeArticle}
-                        </span>
-                      )}
+                      <span style={{ opacity: 0.7 }}>#</span>
+                      <span>{cake.id}</span>
+                      <span style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}>
+                        {isActive ? '▲ note' : '▼ note'}
+                      </span>
                     </div>
 
-                    <div>Cackes: {group.productionVolume}</div>
-
                     {isActive && (
-                      <div style={{ marginTop: 6 }}>
+                      <div style={{ marginTop: 6, maxWidth: 520 }}>
                         <div
                           style={{
                             display: 'grid',
@@ -717,20 +627,20 @@ function CackeFillUp() {
                               type="number"
                               step="0.01"
                               value={
-                                subBatchCuttingTemperatures[group.key] ??
-                                group.cuttingTemperature ??
+                                cakeCuttingTemperatures[cake.id] ??
+                                cake.cuttingTemperature ??
                                 ''
                               }
                               onChange={(event) =>
-                                setSubBatchCuttingTemperatures((previousValues) => ({
+                                setCakeCuttingTemperatures((previousValues) => ({
                                   ...previousValues,
-                                  [group.key]: event.target.value,
+                                  [cake.id]: event.target.value,
                                 }))
                               }
                               onKeyDown={(event) => {
                                 if (event.key === 'Enter') {
                                   event.preventDefault();
-                                  handleSaveSubBatchNote(group);
+                                  handleSaveCakeNote(cake);
                                 }
                               }}
                               style={{
@@ -757,20 +667,18 @@ function CackeFillUp() {
                               type="number"
                               step="0.1"
                               value={
-                                subBatchFlowabilities[group.key] ??
-                                group.flowability ??
-                                ''
+                                cakeFlowabilities[cake.id] ?? cake.flowability ?? ''
                               }
                               onChange={(event) =>
-                                setSubBatchFlowabilities((previousValues) => ({
+                                setCakeFlowabilities((previousValues) => ({
                                   ...previousValues,
-                                  [group.key]: event.target.value,
+                                  [cake.id]: event.target.value,
                                 }))
                               }
                               onKeyDown={(event) => {
                                 if (event.key === 'Enter') {
                                   event.preventDefault();
-                                  handleSaveSubBatchNote(group);
+                                  handleSaveCakeNote(cake);
                                 }
                               }}
                               style={{
@@ -785,12 +693,12 @@ function CackeFillUp() {
 
                         <textarea
                           rows={3}
-                          placeholder={`Note for Sub-batch #${group.subBatchId}... Enter to save, Shift+Enter for a new line`}
-                          value={subBatchNotes[group.key] ?? group.note ?? ''}
+                          placeholder={`Note for cake id ${cake.id}... Enter to save, Shift+Enter for a new line`}
+                          value={cakeNotes[cake.id] ?? cake.note ?? ''}
                           onChange={(event) =>
-                            setSubBatchNotes((previousNotes) => ({
+                            setCakeNotes((previousNotes) => ({
                               ...previousNotes,
-                              [group.key]: event.target.value,
+                              [cake.id]: event.target.value,
                             }))
                           }
                           onKeyDown={(event) => {
@@ -800,13 +708,12 @@ function CackeFillUp() {
                               !event.nativeEvent.isComposing
                             ) {
                               event.preventDefault();
-                              handleSaveSubBatchNote(group);
+                              handleSaveCakeNote(cake);
                             }
                           }}
                           title="Enter — save, Shift+Enter — new line"
                           style={{
                             width: '100%',
-                            maxWidth: 520,
                             borderRadius: 10,
                             padding: 10,
                             border: '1px solid rgba(0,0,0,0.25)',
@@ -818,10 +725,10 @@ function CackeFillUp() {
                         <Button
                           color="success"
                           size="sm"
-                          onClick={() => handleSaveSubBatchNote(group)}
+                          onClick={() => handleSaveCakeNote(cake)}
                           style={{ marginTop: 8 }}
                         >
-                          Save comment
+                          Save note
                         </Button>
                       </div>
                     )}
