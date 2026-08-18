@@ -17,6 +17,36 @@ const {
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 
+const RECIPE_MATERIAL_FIELDS = [
+  ['sand_powder_dry', 'sand_dry'],
+  ['sand_slurry_dry'],
+  ['lime'],
+  ['cement'],
+  ['gypsum_dry'],
+  ['return_dry'],
+  ['gypsum_stone'],
+  ['aluminum_paste'],
+  ['aluminum_paste_2'],
+];
+
+const getRecipeQuantity = (recipe, fieldNames) => {
+  const fieldName = fieldNames.find(
+    (name) => recipe?.[name] !== undefined && recipe?.[name] !== null,
+  );
+  const value = fieldName ? Number(recipe[fieldName]) : 0;
+
+  if (!Number.isFinite(value)) return 0;
+
+  return Math.round(value * 100000) / 100000;
+};
+
+const hasSameRecipe = (existingRecord, incomingRecord) =>
+  RECIPE_MATERIAL_FIELDS.every(
+    (fieldNames) =>
+      getRecipeQuantity(existingRecord, fieldNames) ===
+      getRecipeQuantity(incomingRecord, fieldNames),
+  );
+
 lotesListRouter.get('/batches', async (req, res) => {
   try {
     const lotesListBatches = await LotesListsBatches.findAll({
@@ -86,77 +116,68 @@ lotesListRouter.post('/batches', async (req, res) => {
 
     const cake_id_finish = cake_id_start + quantityCakesInt - 1;
 
-    // let batch_id;
-    let sub_batch_id;
-
-    // const lastLatestBatch = await LotesListsBatches.findAll({
-    //   order: [['batch_id', 'DESC']],
-    // });
-
-    // if (new_batch) {
-    //   batch_id = Number(lastLatestBatch[0]?.batch_id ?? 0) + 1;
-    //   sub_batch_id = 1;
-    // } else {
-    // const existingSameCombo = await LotesListsBatches.findOne({
-    //   where: {
-    //     product,
-    //     production_date,
-    //   },
-    //   order: [
-    //     ['batch_id', 'DESC'],
-    //     ['sub_batch_id', 'DESC'],
-    //     ['id', 'DESC'],
-    //   ],
-    // });
-
-    // if (existingSameCombo?.batch_id) {
-    //   batch_id = Number(existingSameCombo.batch_id);
-    // } else {
-    //   const lastBatch = await LotesListsBatches.findOne({
-    //     where: {
-    //       batch_id: { [Op.ne]: null },
-    //     },
-    //     order: [
-    //       ['batch_id', 'DESC'],
-    //       ['id', 'DESC'],
-    //     ],
-    //   });
-    //   batch_id = lastBatch?.batch_id ? Number(lastBatch.batch_id) + 1 : 1;
-    // }
-
-    const lastSubBatch = await LotesListsBatches.findOne({
+    const recordsInBatch = await LotesListsBatches.findAll({
       where: {
         batch_id,
       },
       order: [
-        ['sub_batch_id', 'DESC'],
+        ['cake_id_finish', 'DESC'],
         ['id', 'DESC'],
       ],
     });
 
-    sub_batch_id = lastSubBatch?.sub_batch_id
-      ? Number(lastSubBatch.sub_batch_id) + 1
-      : 1;
-    // }
+    const latestRecordInBatch = recordsInBatch[0] || null;
+
+    const isLastCakeInDatabase =
+      latestRecordInBatch &&
+      Number(latestRecordInBatch.cake_id_finish) ===
+        Number(lastByCakeFinish?.cake_id_finish);
+
+    const sameRecipe =
+      latestRecordInBatch && hasSameRecipe(latestRecordInBatch, new_lotestList);
+
+    if (isLastCakeInDatabase && sameRecipe) {
+      const currentQuantity = Number(latestRecordInBatch.quantity_cakes);
+
+      const quantityInRecord = Number.isFinite(currentQuantity)
+        ? currentQuantity
+        : Number(latestRecordInBatch.cake_id_finish) -
+          Number(latestRecordInBatch.cake_id_start) +
+          1;
+
+      const updatedLotesListBatch = await latestRecordInBatch.update({
+        cake_id_finish:
+          Number(latestRecordInBatch.cake_id_finish) + quantityCakesInt,
+
+        quantity_cakes: quantityInRecord + quantityCakesInt,
+      });
+
+      myEmitter.emit(UPDATE_LOTES_LIST_SOCKET, updatedLotesListBatch);
+
+      return res.status(200).json(updatedLotesListBatch);
+    }
+
+    const maxSubBatchId = recordsInBatch.reduce((max, record) => {
+      const value = Number(record.sub_batch_id);
+
+      return Number.isFinite(value) ? Math.max(max, value) : max;
+    }, 0);
+
+    const sub_batch_id = maxSubBatchId + 1;
 
     const lotesListBatches = await LotesListsBatches.create({
+      ...new_lotestList,
+
       cake_id_start,
       cake_id_finish,
       batch_id,
       sub_batch_id,
-      ...new_lotestList,
       quantity_cakes: quantityCakesInt,
       sand_dry,
     });
 
-    // const lotesListCakesArray = [];
-    // for (let i = cake_id_start; i <= cake_id_finish; i++) {
-    //   const res = await LotesListsCakes.create({});
-    //   lotesListCakesArray.push(res);
-    // }
-
-    // myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, lotesListCakesArray);
     myEmitter.emit(ADD_NEW_LOTES_LIST_SOCKET, lotesListBatches);
+
     return res.status(200).json(lotesListBatches);
   } catch (err) {
     console.error(err.message);
@@ -261,17 +282,24 @@ lotesListRouter.post('/cakes', async (req, res) => {
       const numericId = Number(id);
       if (isNaN(numericId)) continue;
 
-      let record = await LotesListsCakes.findByPk(numericId);
-      if (record) {
-        if (note && note[id] !== undefined) {
-          record.note = note[id];
-          await record.save();
-        }
-        result.push(record);
-      } else {
-        const created = await LotesListsCakes.create({ note: note[id] });
-        result.push(created);
+      const noteValue = note?.[id];
+
+      const [record, created] = await LotesListsCakes.findOrCreate({
+        where: {
+          id: numericId,
+        },
+        defaults: {
+          id: numericId,
+          note: noteValue ?? null,
+        },
+      });
+
+      if (!created && noteValue !== undefined) {
+        record.note = noteValue;
+        await record.save();
       }
+
+      result.push(record);
     }
 
     myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, result);

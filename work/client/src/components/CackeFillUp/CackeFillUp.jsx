@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from 'reactstrap';
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useDispatch } from 'react-redux';
+import { addNewLotesListCakes } from '#components/redux/actions/lotesListAction.js';
 import {
   deleteBatchOutside,
   updateBatchOutside,
@@ -16,21 +17,22 @@ import { addNewProductionQuality } from '#components/redux/actions/productionQua
 import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
 import RawMaterialsConsumptionModal from '#components/CackeFillUp/RawMatConsumptionModalUPD.jsx';
 import { useModalContext } from '#components/contexts/ModalContext.js';
-import { use } from 'react';
 
 function CackeFillUp() {
   const dispatch = useDispatch();
 
   const { batchOutside, autoclave_calendar } = useWarehouseContext();
-  const { cackeFillUp, setCackeFillUp, lotesListBatches } = useProjectContext();
+  const { cackeFillUp, setCackeFillUp, lotesListBatches, lotesListCakes } =
+    useProjectContext();
   const { raw_mat_consumption } = useRecipeContext();
   const { latestProducts } = useProductsContext();
   const { rawMaterialConsumptionMadal, setRawMaterialConsumptionMadal } =
     useModalContext();
 
   const [activeBatchId, setActiveBatchId] = useState(null);
-  const [allocated, setAllocated] = useState(0);
   const [currentProduct, setCurrentProduct] = useState(null);
+  const [activeSubBatchKey, setActiveSubBatchKey] = useState(null);
+  const [subBatchNotes, setSubBatchNotes] = useState({});
 
   const production_plan_table = [
     { Header: 'Date', accessor: 'date', Filter: TextSearchFilter },
@@ -48,6 +50,25 @@ function CackeFillUp() {
   ];
 
   const [productionPlanDataList, setProductionPlanDataList] = useState([]);
+
+  const nextBatchId = useMemo(() => {
+    const lotes = Array.isArray(lotesListBatches) ? lotesListBatches : [];
+    const consumptions = Array.isArray(raw_mat_consumption)
+      ? raw_mat_consumption
+      : [];
+
+    const maxLotesBatchId = lotes.reduce((max, item) => {
+      const value = Number(item?.batch_id);
+      return Number.isFinite(value) ? Math.max(max, value) : max;
+    }, 0);
+
+    const maxConsumptionBatchId = consumptions.reduce((max, item) => {
+      const value = Number(item?.batch_id);
+      return Number.isFinite(value) ? Math.max(max, value) : max;
+    }, 0);
+
+    return Math.max(maxLotesBatchId, maxConsumptionBatchId) + 1;
+  }, [lotesListBatches, raw_mat_consumption]);
 
   useEffect(() => {
     if (batchOutside) {
@@ -74,15 +95,7 @@ function CackeFillUp() {
     const prodPlanEntry = batchOutside.find((el) => el.id === row.original.id);
     if (!prodPlanEntry) return;
 
-    const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
-
-    const maxBatchId = list.reduce((max, item) => {
-      const value = Number(item?.batch_id);
-
-      return Number.isFinite(value) ? Math.max(max, value) : max;
-    }, 0);
-
-    setActiveBatchId(maxBatchId + 1);
+    setActiveBatchId(nextBatchId);
 
     dispatch(
       updateBatchOutside({
@@ -104,7 +117,6 @@ function CackeFillUp() {
 
   useEffect(() => {
     if (!batchOutside?.length) return;
-    if (!currentProductName) return;
 
     const batchInProduce = batchOutside.find((item) => item.is_prodused == 1);
 
@@ -114,10 +126,46 @@ function CackeFillUp() {
     }
 
     const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
+    const consumptions = Array.isArray(raw_mat_consumption)
+      ? raw_mat_consumption
+      : [];
+    const orderId = batchInProduce.id_ordered_product_to_warehouse;
 
-    const existingRecords = list.filter(
-      (item) => String(item.product) === String(currentProductName),
-    );
+    const relatedConsumptions = consumptions.filter((item) => {
+      if (orderId == null || item?.id_ordered_product_to_warehouse == null) {
+        return false;
+      }
+
+      return String(item.id_ordered_product_to_warehouse) === String(orderId);
+    });
+
+    if (relatedConsumptions.length) {
+      const lastBatchId = relatedConsumptions.reduce((max, item) => {
+        const value = Number(item?.batch_id);
+        return Number.isFinite(value) ? Math.max(max, value) : max;
+      }, 0);
+
+      if (lastBatchId > 0) {
+        setActiveBatchId(lastBatchId);
+        return;
+      }
+    }
+
+    const relatedLotes = list.filter((item) => {
+      if (orderId == null || item?.id_ordered_product_to_warehouse == null) {
+        return false;
+      }
+
+      return String(item.id_ordered_product_to_warehouse) === String(orderId);
+    });
+
+    const existingRecords = relatedLotes.length
+      ? relatedLotes
+      : list.filter(
+          (item) =>
+            currentProductName != null &&
+            String(item.product) === String(currentProductName),
+        );
 
     if (existingRecords.length) {
       const lastRecord = existingRecords.reduce((latest, item) => {
@@ -131,19 +179,20 @@ function CackeFillUp() {
       return;
     }
 
-    const maxBatchId = list.reduce((max, item) => {
-      const value = Number(item?.batch_id);
-
-      return Number.isFinite(value) ? Math.max(max, value) : max;
-    }, 0);
-
-    setActiveBatchId(maxBatchId + 1);
-  }, [batchOutside, lotesListBatches, currentProductName]);
+    setActiveBatchId(nextBatchId);
+  }, [
+    batchOutside,
+    lotesListBatches,
+    raw_mat_consumption,
+    currentProductName,
+    nextBatchId,
+  ]);
 
   useEffect(() => {
     setCackeFillUp({});
-    setAllocated(0);
     setCurrentProduct(null);
+    setActiveSubBatchKey(null);
+    setSubBatchNotes({});
   }, []);
 
   useEffect(() => {
@@ -176,6 +225,101 @@ function CackeFillUp() {
     Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) || 0;
 
   const batchCalDate = cackeFillUp?.date ?? cackeFillUp?.batch_cal_date ?? '';
+
+  const allocated = useMemo(() => {
+    if (activeBatchId == null) return 0;
+
+    const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
+
+    return list.reduce((total, item) => {
+      if (String(item?.batch_id) !== String(activeBatchId)) return total;
+
+      const quantity = Number(item?.quantity_cakes);
+      return Number.isFinite(quantity) ? total + quantity : total;
+    }, 0);
+  }, [activeBatchId, lotesListBatches]);
+
+  const subBatches = useMemo(() => {
+    if (activeBatchId == null) return [];
+
+    const batches = Array.isArray(lotesListBatches) ? lotesListBatches : [];
+    const cakes = Array.isArray(lotesListCakes) ? lotesListCakes : [];
+
+    return batches
+      .filter((record) => String(record?.batch_id) === String(activeBatchId))
+      .map((record, index) => {
+        const batchId = record?.batch_id;
+        const subBatchId = record?.sub_batch_id;
+        const productionVolume = Number(record?.quantity_cakes) || 0;
+        const cakeIdStart = Number(record?.cake_id_start);
+        const cakeIdFinish = Number(record?.cake_id_finish);
+        const cakeIds = [];
+
+        if (
+          Number.isFinite(cakeIdStart) &&
+          Number.isFinite(cakeIdFinish) &&
+          cakeIdFinish >= cakeIdStart
+        ) {
+          for (let id = cakeIdStart; id <= cakeIdFinish; id += 1) {
+            cakeIds.push(id);
+          }
+        }
+
+        const savedNote = cakeIds.reduce((note, id) => {
+          if (note) return note;
+
+          const cake = cakes.find((item) => Number(item?.id) === id);
+          return cake?.note || '';
+        }, '');
+
+        return {
+          key: record?.id ?? `${batchId}-${subBatchId}-${index}`,
+          batchId,
+          subBatchId,
+          batchArticle: record?.product || cackeFillUp?.product_article,
+          recipeArticle: record?.recipe_article || null,
+          productionVolume,
+          cakeIds,
+          note: savedNote,
+        };
+      })
+      .sort((a, b) => Number(a.subBatchId) - Number(b.subBatchId));
+  }, [
+    activeBatchId,
+    cackeFillUp?.product_article,
+    lotesListBatches,
+    lotesListCakes,
+  ]);
+
+  const handleSaveSubBatchNote = async (group) => {
+    if (!group.cakeIds.length) {
+      console.error('Cake ids not found for Sub-batch:', group.subBatchId);
+      return;
+    }
+
+    const note = subBatchNotes[group.key] ?? group.note ?? '';
+    const notes = group.cakeIds.reduce((result, cakeId) => {
+      result[cakeId] = note;
+      return result;
+    }, {});
+
+    try {
+      await dispatch(
+        addNewLotesListCakes({
+          num: group.cakeIds,
+          note: notes,
+        }),
+      );
+
+      setSubBatchNotes((previousNotes) => ({
+        ...previousNotes,
+        [group.key]: note,
+      }));
+      setActiveSubBatchKey(null);
+    } catch (error) {
+      console.error('Failed to save Sub-batch note:', error);
+    }
+  };
 
   const handleNewBatch = () => {
     setRawMaterialConsumptionMadal(true);
@@ -241,7 +385,6 @@ function CackeFillUp() {
     ];
 
     dispatch(addNewAutoclaveCalendar(result));
-    setAllocated((prev) => prev + currentAllocated);
   };
 
   const handleFinish = async () => {
@@ -275,9 +418,10 @@ function CackeFillUp() {
     await dispatch(deleteBatchOutside(id));
 
     setCackeFillUp({});
-    setAllocated(0);
     setCurrentProduct(null);
     setActiveBatchId(null);
+    setActiveSubBatchKey(null);
+    setSubBatchNotes({});
   };
 
   const hasCackeFillUp = cackeFillUp && Object.keys(cackeFillUp).length > 0;
@@ -403,6 +547,138 @@ function CackeFillUp() {
               <Button color="success" onClick={handleFinish}>
                 Finish batch
               </Button>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <h6>Sub-batches (raw material consumptions)</h6>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '24px',
+                alignItems: 'flex-start',
+              }}
+            >
+              {subBatches.length === 0 && (
+                <div style={{ color: '#6c757d' }}>
+                  No raw material consumptions yet.
+                </div>
+              )}
+
+              {subBatches.map((group) => {
+                const isActive = activeSubBatchKey === group.key;
+
+                return (
+                  <div
+                    key={group.key}
+                    style={{
+                      border: isActive ? '2px solid #28a745' : '1px solid #dee2e6',
+                      borderRadius: '8px',
+                      padding: '12px',
+                      minWidth: '200px',
+                      backgroundColor: isActive ? 'rgba(40,167,69,0.05)' : '#f8f9fa',
+                    }}
+                  >
+                    <div
+                      onClick={() =>
+                        setActiveSubBatchKey(isActive ? null : group.key)
+                      }
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          setActiveSubBatchKey(isActive ? null : group.key);
+                        }
+                      }}
+                      style={{
+                        fontWeight: 600,
+                        marginBottom: 8,
+                        cursor: 'pointer',
+                        userSelect: 'none',
+                      }}
+                    >
+                      <div>
+                        Sub-batch #{group.subBatchId}
+                        {group.batchArticle && (
+                          <span
+                            style={{
+                              fontWeight: 400,
+                              fontSize: '0.8rem',
+                              color: '#6c757d',
+                              marginLeft: 8,
+                            }}
+                          >
+                            ({group.batchArticle})
+                          </span>
+                        )}
+                        <span
+                          style={{
+                            marginLeft: 8,
+                            opacity: 0.65,
+                            fontWeight: 400,
+                            fontSize: '0.8rem',
+                          }}
+                        >
+                          {isActive ? '▲ note' : '▼ note'}
+                        </span>
+                      </div>
+                      {group.recipeArticle && (
+                        <span
+                          style={{
+                            display: 'block',
+                            fontWeight: 400,
+                            fontSize: '0.75rem',
+                            color: '#6c757d',
+                            marginTop: 4,
+                          }}
+                        >
+                          recipe: {group.recipeArticle}
+                        </span>
+                      )}
+                    </div>
+
+                    <div>Cackes: {group.productionVolume}</div>
+
+                    {isActive && (
+                      <div style={{ marginTop: 6 }}>
+                        <textarea
+                          rows={3}
+                          placeholder={`Note for Sub-batch #${group.subBatchId}... Enter to save, Shift+Enter for a new line`}
+                          value={subBatchNotes[group.key] ?? group.note ?? ''}
+                          onChange={(event) =>
+                            setSubBatchNotes((previousNotes) => ({
+                              ...previousNotes,
+                              [group.key]: event.target.value,
+                            }))
+                          }
+                          onKeyDown={(event) => {
+                            if (
+                              event.key === 'Enter' &&
+                              !event.shiftKey &&
+                              !event.nativeEvent.isComposing
+                            ) {
+                              event.preventDefault();
+                              handleSaveSubBatchNote(group);
+                            }
+                          }}
+                          title="Enter — save, Shift+Enter — new line"
+                          style={{
+                            width: '100%',
+                            maxWidth: 520,
+                            borderRadius: 10,
+                            padding: 10,
+                            border: '1px solid rgba(0,0,0,0.25)',
+                            outline: 'none',
+                            display: 'block',
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
