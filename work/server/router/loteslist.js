@@ -263,17 +263,23 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes', async (req, res) => {
   try {
-    const { num: ids, note } = req.body;
+    const { num: ids, note, cutting_temperature = null, flowability = null } = req.body;
 
     if (!Array.isArray(ids)) {
       return res.status(400).json({ error: 'num must be an array of ids' });
     }
 
-    if (
-      note !== undefined &&
-      (typeof note !== 'object' || Array.isArray(note) || note === null)
-    ) {
-      return res.status(400).json({ error: 'note must be an object' });
+    const cakeFields = { note, cutting_temperature, flowability };
+
+    for (const [fieldName, values] of Object.entries(cakeFields)) {
+      if (
+        values !== undefined &&
+        (typeof values !== 'object' || Array.isArray(values) || values === null)
+      ) {
+        return res.status(400).json({
+          error: `${fieldName} must be an object`,
+        });
+      }
     }
 
     const result = [];
@@ -283,20 +289,34 @@ lotesListRouter.post('/cakes', async (req, res) => {
       if (isNaN(numericId)) continue;
 
       const noteValue = note?.[id];
+      const cuttingTemperatureValue = cutting_temperature?.[id];
+      const flowabilityValue = flowability?.[id];
+
+      const values = {
+        note: noteValue,
+        cutting_temperature: cuttingTemperatureValue,
+        flowability: flowabilityValue,
+      };
+
+      const defaults = { id: numericId };
+      const updates = {};
+
+      for (const [fieldName, value] of Object.entries(values)) {
+        if (value !== undefined) {
+          defaults[fieldName] = value;
+          updates[fieldName] = value;
+        }
+      }
 
       const [record, created] = await LotesListsCakes.findOrCreate({
         where: {
           id: numericId,
         },
-        defaults: {
-          id: numericId,
-          note: noteValue ?? null,
-        },
+        defaults,
       });
 
-      if (!created && noteValue !== undefined) {
-        record.note = noteValue;
-        await record.save();
+      if (!created && Object.keys(updates).length > 0) {
+        await record.update(updates);
       }
 
       result.push(record);
