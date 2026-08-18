@@ -1,4 +1,4 @@
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { put, call, takeEvery, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
@@ -65,6 +65,10 @@ import {
   DELETE_WAREHOUSE_MANAGER_TRAILER,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER,
 } from '../types/warehouseTypes';
+import {
+  rejectRawMaterialConsumptionRequest,
+  resolveRawMaterialConsumptionRequest,
+} from '../actions/warehouseAction.js';
 import {
   ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   ANCHOR_QUANTITYS_SOCKET,
@@ -1045,13 +1049,30 @@ function* updateNewRawMaterialsWarehouseWorker(action) {
 }
 
 function* updateRawMaterialsConsumptionRawMaterialsWarehouseWorker(action) {
+  const requestId = action.meta?.requestId;
+
   try {
-    yield call(updateRawMaterialsConsumptionRawMaterialsWarehouse, action.payload);
+    const result = yield call(
+      updateRawMaterialsConsumptionRawMaterialsWarehouse,
+      action.payload,
+    );
+
+    if (requestId) {
+      yield call(resolveRawMaterialConsumptionRequest, requestId, result);
+    }
   } catch (err) {
     yield put({
       type: UPDATE_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
       payload: [],
     });
+
+    if (requestId) {
+      yield call(
+        rejectRawMaterialConsumptionRequest,
+        requestId,
+        err.response?.data || err,
+      );
+    }
   }
 }
 
@@ -1211,7 +1232,7 @@ function* warehouseWatcher() {
     UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
     updateNewRawMaterialsWarehouseWorker,
   );
-  yield takeLatest(
+  yield takeEvery(
     UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
     updateRawMaterialsConsumptionRawMaterialsWarehouseWorker,
   );

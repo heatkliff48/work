@@ -25,13 +25,14 @@ function CackeFillUp() {
   const { cackeFillUp, setCackeFillUp, lotesListBatches, lotesListCakes } =
     useProjectContext();
   const { raw_mat_consumption } = useRecipeContext();
-  const { latestProducts } = useProductsContext();
+  const { latestProducts, extractProductTitle } = useProductsContext();
   const { rawMaterialConsumptionMadal, setRawMaterialConsumptionMadal } =
     useModalContext();
 
   const [activeBatchId, setActiveBatchId] = useState(null);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [activeCakeId, setActiveCakeId] = useState(null);
+  const [total_cacke, setTotalCacke] = useState(0);
   const [cakeNotes, setCakeNotes] = useState({});
   const [cakeCuttingTemperatures, setCakeCuttingTemperatures] = useState({});
   const [cakeFlowabilities, setCakeFlowabilities] = useState({});
@@ -201,12 +202,13 @@ function CackeFillUp() {
 
   useEffect(() => {
     const batch_in_produce = batchOutside.find((el) => el.is_prodused == 1);
-
+    console.log('batch_in_produce CackeFillUp.jsx line 204', batch_in_produce);
     if (batch_in_produce) {
       const product = latestProducts.find(
         (el) => el.article === batch_in_produce?.product_article,
       );
-      setCurrentProduct(product);
+      const fullMark = extractProductTitle(product?.description);
+      setCurrentProduct({ ...product, tradingMark: fullMark });
 
       const widthInArray = Math.floor(
         product?.m3InArray / product?.volumeBlockOnPallet,
@@ -219,9 +221,13 @@ function CackeFillUp() {
         batch_in_produce.quantity_pallets / widthInArray -
         (Number(accd?.total_arrays_cacke_fill_up) || 0);
 
+      const full_total_cacke = batch_in_produce.quantity_pallets / widthInArray;
+
+      setTotalCacke(Number.isFinite(full_total_cacke) ? full_total_cacke : 0);
       setCackeFillUp({ ...batch_in_produce, total_cacke });
     } else {
       setCurrentProduct(null);
+      setTotalCacke(0);
     }
   }, [batchOutside, autoclave_calendar, latestProducts, setCackeFillUp]);
 
@@ -242,6 +248,44 @@ function CackeFillUp() {
       return Number.isFinite(quantity) ? total + quantity : total;
     }, 0);
   }, [activeBatchId, lotesListBatches]);
+
+  const nextProductSummary = useMemo(() => {
+    if (!batchCalDate) return null;
+
+    const nextBatch = (Array.isArray(batchOutside) ? batchOutside : []).find(
+      (item) =>
+        String(item?.id) !== String(cackeFillUp?.id) &&
+        item?.date === batchCalDate &&
+        (item?.is_prodused == 0 || item?.is_prodused == null),
+    );
+
+    if (!nextBatch) return null;
+
+    const product = latestProducts.find(
+      (item) => item.article === nextBatch.product_article,
+    );
+    const widthInArray = Math.max(
+      1,
+      Math.floor(
+        (Number(product?.m3InArray) || 0) /
+          (Number(product?.volumeBlockOnPallet) || 1),
+      ) || 1,
+    );
+    const nextTotalQuantity =
+      (Number(nextBatch.quantity_pallets) || 0) / widthInArray;
+
+    return {
+      article: nextBatch.product_article || product?.article || '—',
+      mark: extractProductTitle(product?.description) || '—',
+      totalQuantity: nextTotalQuantity,
+    };
+  }, [
+    batchCalDate,
+    batchOutside,
+    cackeFillUp?.id,
+    extractProductTitle,
+    latestProducts,
+  ]);
 
   const productionCakes = useMemo(() => {
     if (activeBatchId == null) return [];
@@ -277,6 +321,16 @@ function CackeFillUp() {
       })
       .sort((a, b) => a.id - b.id);
   }, [activeBatchId, lotesListBatches, lotesListCakes]);
+
+  const productionCakeRows = useMemo(() => {
+    const rows = [];
+
+    for (let index = 0; index < productionCakes.length; index += 8) {
+      rows.push(productionCakes.slice(index, index + 8));
+    }
+
+    return rows;
+  }, [productionCakes]);
 
   const handleSaveCakeNote = async (cake) => {
     const note = cakeNotes[cake.id] ?? cake.note ?? '';
@@ -473,268 +527,433 @@ function CackeFillUp() {
       )}
 
       {hasCackeFillUp && (
-        <div className="mt-3" style={{ maxWidth: 900 }}>
-          <div
-            className="cacke-fill-up-product"
-            style={{
-              width: '50%',
-              border: '1px solid #dee2e6',
-              borderRadius: '8px',
-              padding: '16px',
-              marginBottom: '20px',
-              backgroundColor: '#f8f9fa',
-              display: 'flex',
-              gap: '32px',
-              flexWrap: 'wrap',
-              justifyContent: 'space-evenly',
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#6c757d' }}>
-                Product article
-              </div>
-              <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
-                {currentProduct?.article || '—'}
-              </div>
-            </div>
-
-            <div>
-              <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#6c757d' }}>
-                Product Mark
-              </div>
-              <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
-                {currentProduct?.tradingMark || '—'}
-              </div>
-            </div>
-          </div>
-
+        <div className="mt-3" style={{ maxWidth: nextProductSummary ? 1500 : 900 }}>
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1.2fr 1.2fr 1.6fr 1.2fr',
-              gap: 8,
-              alignItems: 'center',
+              gridTemplateColumns: nextProductSummary
+                ? 'repeat(2, minmax(0, 1fr))'
+                : 'minmax(0, 1fr)',
+              gap: 16,
+              marginBottom: '20px',
             }}
           >
-            <div>
-              <div style={{ fontWeight: 600 }}>Batch id</div>
-              <div style={{ marginTop: 6, fontSize: 18 }}>{activeBatchId}</div>
+            <div
+              style={{
+                padding: 16,
+                borderRadius: 14,
+                backgroundColor: '#e9ecef',
+              }}
+            >
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 14px',
+                  marginBottom: 10,
+                  borderRadius: 8,
+                  backgroundColor: '#495057',
+                  color: '#fff',
+                  fontWeight: 600,
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.16)',
+                }}
+              >
+                <span style={{ opacity: 0.75 }}>Date</span>
+                <span>{batchCalDate}</span>
+              </div>
+
+              <div
+                className="cacke-fill-up-product"
+                style={{
+                  width: '100%',
+                  border: '1px solid #ced4da',
+                  borderRadius: '10px',
+                  padding: '16px',
+                  backgroundColor: '#fff',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                  gap: '24px',
+                  minHeight: 94,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#6c757d',
+                    }}
+                  >
+                    Product article
+                  </div>
+                  <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                    {currentProduct?.article || '—'}
+                  </div>
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#6c757d',
+                    }}
+                  >
+                    Product Mark
+                  </div>
+                  <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                    {currentProduct?.tradingMark || '—'}
+                  </div>
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#6c757d',
+                    }}
+                  >
+                    Cakes casted / Total qty
+                  </div>
+                  <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                    {allocated} / {total_cacke}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <div style={{ fontWeight: 600 }}>Date</div>
-              <div style={{ marginTop: 6, fontSize: 18 }}>{batchCalDate}</div>
-            </div>
-            <div>
-              <div style={{ fontWeight: 600 }}>Planned cacke</div>
-              <div style={{ marginTop: 6, fontSize: 18 }}>{totalCake}</div>
-            </div>
-            <div>
-              <div style={{ fontWeight: 600 }}>Cackes allocated</div>
-              <div style={{ marginTop: 6, fontSize: 18 }}>{allocated}</div>
-            </div>
+
+            {nextProductSummary && (
+              <div
+                style={{
+                  padding: 16,
+                  borderRadius: 14,
+                  backgroundColor: '#5d5d5d',
+                  alignSelf: 'start',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '8px 14px',
+                    marginBottom: 10,
+                    borderRadius: 8,
+                    backgroundColor: '#6c757d',
+                    color: '#fff',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  Next
+                </div>
+
+                <div
+                  style={{
+                    width: '100%',
+                    border: '1px solid #adb5bd',
+                    borderRadius: '10px',
+                    padding: '16px',
+                    backgroundColor: '#eef0f2',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                    gap: '24px',
+                    minHeight: 94,
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        color: '#5c636a',
+                      }}
+                    >
+                      Product article
+                    </div>
+                    <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                      {nextProductSummary.article}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        color: '#5c636a',
+                      }}
+                    >
+                      Product Mark
+                    </div>
+                    <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                      {nextProductSummary.mark}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        color: '#5c636a',
+                      }}
+                    >
+                      Cakes casted / Total qty
+                    </div>
+                    <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                      0 / {nextProductSummary.totalQuantity}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div
-            className="mt-2"
-            style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
+            style={{
+              width: nextProductSummary ? 'calc(50% - 8px)' : '100%',
+            }}
           >
-            <Button color="success" onClick={handleNewBatch}>
-              New cacke
-            </Button>
+            <div>
+              <div>
+                <div style={{ fontWeight: 600 }}>Batch id</div>
+                <div style={{ marginTop: 6, fontSize: 18 }}>{activeBatchId}</div>
+              </div>
+            </div>
 
             <div
-              className="ms-auto"
+              className="mt-2"
               style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
             >
-              <Button color="success" onClick={handleFinish}>
-                Finish batch
+              <Button color="success" onClick={handleNewBatch}>
+                New cacke
               </Button>
-            </div>
-          </div>
 
-          <div className="mt-4">
-            <div style={{ fontWeight: 600 }}>Cacke id</div>
-
-            {productionCakes.length === 0 && (
-              <div style={{ marginTop: 8, color: '#6c757d' }}>
-                No cackes allocated yet.
+              <div
+                className="ms-auto"
+                style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
+              >
+                <Button color="success" onClick={handleFinish}>
+                  Finish batch
+                </Button>
               </div>
-            )}
+            </div>
 
-            <div style={{ display: 'grid', gap: 6, marginTop: 8 }}>
-              {productionCakes.map((cake) => {
-                const isActive = activeCakeId === cake.id;
+            <div className="mt-4">
+              <div style={{ fontWeight: 600 }}>Cacke id</div>
 
-                return (
-                  <div key={cake.id}>
-                    <div
-                      onClick={() => setActiveCakeId(isActive ? null : cake.id)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          setActiveCakeId(isActive ? null : cake.id);
-                        }
-                      }}
-                      style={{
-                        border: isActive
-                          ? '2px solid #28a745'
-                          : '1px solid rgba(0,0,0,0.25)',
-                        borderRadius: 10,
-                        padding: '6px 10px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        cursor: 'pointer',
-                        userSelect: 'none',
-                        background: isActive
-                          ? 'rgba(40,167,69,0.08)'
-                          : 'transparent',
-                        fontWeight: 600,
-                        width: 'fit-content',
-                      }}
-                    >
-                      <span style={{ opacity: 0.7 }}>#</span>
-                      <span>{cake.id}</span>
-                      <span style={{ marginLeft: 6, opacity: 0.6, fontWeight: 400 }}>
-                        {isActive ? '▲ note' : '▼ note'}
-                      </span>
-                    </div>
+              {productionCakes.length === 0 && (
+                <div style={{ marginTop: 8, color: '#6c757d' }}>
+                  No cackes allocated yet.
+                </div>
+              )}
 
-                    {isActive && (
-                      <div style={{ marginTop: 6, maxWidth: 520 }}>
-                        <div
-                          style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                            gap: 8,
-                            marginBottom: 8,
-                          }}
-                        >
-                          <label style={{ margin: 0 }}>
-                            <span
-                              style={{
-                                display: 'block',
-                                marginBottom: 4,
-                                fontSize: '0.8rem',
-                                fontWeight: 600,
-                              }}
-                            >
-                              Cutting temperature, C
-                            </span>
-                            <input
-                              type="number"
-                              step="0.01"
-                              value={
-                                cakeCuttingTemperatures[cake.id] ??
-                                cake.cuttingTemperature ??
-                                ''
+              <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
+                {productionCakeRows.map((cakeRow) => {
+                  const activeCake = cakeRow.find(
+                    (cake) => activeCakeId === cake.id,
+                  );
+
+                  return (
+                    <div key={cakeRow[0].id}>
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(8, minmax(0, 1fr))',
+                          gap: 8,
+                        }}
+                      >
+                        {cakeRow.map((cake) => {
+                          const isActive = activeCakeId === cake.id;
+
+                          return (
+                            <div
+                              key={cake.id}
+                              onClick={() =>
+                                setActiveCakeId(isActive ? null : cake.id)
                               }
-                              onChange={(event) =>
-                                setCakeCuttingTemperatures((previousValues) => ({
-                                  ...previousValues,
-                                  [cake.id]: event.target.value,
-                                }))
-                              }
+                              role="button"
+                              tabIndex={0}
                               onKeyDown={(event) => {
-                                if (event.key === 'Enter') {
+                                if (event.key === 'Enter' || event.key === ' ') {
                                   event.preventDefault();
-                                  handleSaveCakeNote(cake);
+                                  setActiveCakeId(isActive ? null : cake.id);
                                 }
                               }}
                               style={{
-                                width: '100%',
-                                borderRadius: 6,
-                                padding: '6px 8px',
-                                border: '1px solid rgba(0,0,0,0.25)',
-                              }}
-                            />
-                          </label>
-
-                          <label style={{ margin: 0 }}>
-                            <span
-                              style={{
-                                display: 'block',
-                                marginBottom: 4,
-                                fontSize: '0.8rem',
+                                border: isActive
+                                  ? '2px solid #28a745'
+                                  : '1px solid rgba(0,0,0,0.25)',
+                                borderRadius: 10,
+                                padding: '6px 10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 6,
+                                cursor: 'pointer',
+                                userSelect: 'none',
+                                background: isActive
+                                  ? 'rgba(40,167,69,0.08)'
+                                  : 'transparent',
                                 fontWeight: 600,
+                                minWidth: 0,
                               }}
                             >
-                              Flowability, cm
-                            </span>
-                            <input
-                              type="number"
-                              step="0.1"
-                              value={
-                                cakeFlowabilities[cake.id] ?? cake.flowability ?? ''
-                              }
-                              onChange={(event) =>
-                                setCakeFlowabilities((previousValues) => ({
-                                  ...previousValues,
-                                  [cake.id]: event.target.value,
-                                }))
-                              }
-                              onKeyDown={(event) => {
-                                if (event.key === 'Enter') {
-                                  event.preventDefault();
-                                  handleSaveCakeNote(cake);
-                                }
-                              }}
-                              style={{
-                                width: '100%',
-                                borderRadius: 6,
-                                padding: '6px 8px',
-                                border: '1px solid rgba(0,0,0,0.25)',
-                              }}
-                            />
-                          </label>
-                        </div>
-
-                        <textarea
-                          rows={3}
-                          placeholder={`Note for cake id ${cake.id}... Enter to save, Shift+Enter for a new line`}
-                          value={cakeNotes[cake.id] ?? cake.note ?? ''}
-                          onChange={(event) =>
-                            setCakeNotes((previousNotes) => ({
-                              ...previousNotes,
-                              [cake.id]: event.target.value,
-                            }))
-                          }
-                          onKeyDown={(event) => {
-                            if (
-                              event.key === 'Enter' &&
-                              !event.shiftKey &&
-                              !event.nativeEvent.isComposing
-                            ) {
-                              event.preventDefault();
-                              handleSaveCakeNote(cake);
-                            }
-                          }}
-                          title="Enter — save, Shift+Enter — new line"
-                          style={{
-                            width: '100%',
-                            borderRadius: 10,
-                            padding: 10,
-                            border: '1px solid rgba(0,0,0,0.25)',
-                            outline: 'none',
-                            display: 'block',
-                          }}
-                        />
-
-                        <Button
-                          color="success"
-                          size="sm"
-                          onClick={() => handleSaveCakeNote(cake)}
-                          style={{ marginTop: 8 }}
-                        >
-                          Save note
-                        </Button>
+                              <span style={{ opacity: 0.7 }}>#</span>
+                              <span>{cake.id}</span>
+                              <span
+                                style={{
+                                  opacity: 0.6,
+                                  fontWeight: 400,
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {isActive ? '▲ note' : '▼ note'}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+
+                      {activeCake && (
+                        <div style={{ marginTop: 6, maxWidth: 520 }}>
+                          <div
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                              gap: 8,
+                              marginBottom: 8,
+                            }}
+                          >
+                            <label style={{ margin: 0 }}>
+                              <span
+                                style={{
+                                  display: 'block',
+                                  marginBottom: 4,
+                                  fontSize: '0.8rem',
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Cutting temperature, C
+                              </span>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={
+                                  cakeCuttingTemperatures[activeCake.id] ??
+                                  activeCake.cuttingTemperature ??
+                                  ''
+                                }
+                                onChange={(event) =>
+                                  setCakeCuttingTemperatures((previousValues) => ({
+                                    ...previousValues,
+                                    [activeCake.id]: event.target.value,
+                                  }))
+                                }
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Enter') {
+                                    event.preventDefault();
+                                    handleSaveCakeNote(activeCake);
+                                  }
+                                }}
+                                style={{
+                                  width: '100%',
+                                  borderRadius: 6,
+                                  padding: '6px 8px',
+                                  border: '1px solid rgba(0,0,0,0.25)',
+                                }}
+                              />
+                            </label>
+
+                            <label style={{ margin: 0 }}>
+                              <span
+                                style={{
+                                  display: 'block',
+                                  marginBottom: 4,
+                                  fontSize: '0.8rem',
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Flowability, cm
+                              </span>
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={
+                                  cakeFlowabilities[activeCake.id] ??
+                                  activeCake.flowability ??
+                                  ''
+                                }
+                                onChange={(event) =>
+                                  setCakeFlowabilities((previousValues) => ({
+                                    ...previousValues,
+                                    [activeCake.id]: event.target.value,
+                                  }))
+                                }
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Enter') {
+                                    event.preventDefault();
+                                    handleSaveCakeNote(activeCake);
+                                  }
+                                }}
+                                style={{
+                                  width: '100%',
+                                  borderRadius: 6,
+                                  padding: '6px 8px',
+                                  border: '1px solid rgba(0,0,0,0.25)',
+                                }}
+                              />
+                            </label>
+                          </div>
+
+                          <textarea
+                            rows={3}
+                            placeholder={`Note for cake id ${activeCake.id}... Enter to save, Shift+Enter for a new line`}
+                            value={cakeNotes[activeCake.id] ?? activeCake.note ?? ''}
+                            onChange={(event) =>
+                              setCakeNotes((previousNotes) => ({
+                                ...previousNotes,
+                                [activeCake.id]: event.target.value,
+                              }))
+                            }
+                            onKeyDown={(event) => {
+                              if (
+                                event.key === 'Enter' &&
+                                !event.shiftKey &&
+                                !event.nativeEvent.isComposing
+                              ) {
+                                event.preventDefault();
+                                handleSaveCakeNote(activeCake);
+                              }
+                            }}
+                            title="Enter — save, Shift+Enter — new line"
+                            style={{
+                              width: '100%',
+                              borderRadius: 10,
+                              padding: 10,
+                              border: '1px solid rgba(0,0,0,0.25)',
+                              outline: 'none',
+                              display: 'block',
+                            }}
+                          />
+
+                          <Button
+                            color="success"
+                            size="sm"
+                            onClick={() => handleSaveCakeNote(activeCake)}
+                            style={{ marginTop: 8 }}
+                          >
+                            Save note
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
