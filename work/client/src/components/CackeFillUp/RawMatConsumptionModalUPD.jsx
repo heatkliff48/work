@@ -3,6 +3,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  getRawMaterialsWarehouse,
   updateRawMaterialConsumptionRawMaterialsWarehouse,
   updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
@@ -17,6 +18,10 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { addNewLotesList } from '#components/redux/actions/lotesListAction.js';
 import Select from 'react-select';
 import '#components/Styles/table.css';
+import {
+  getWarehouseAluminum1,
+  getWarehouseAluminum2,
+} from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
 const RawMaterialsConsumptionModal = React.memo(
   ({
@@ -47,7 +52,6 @@ const RawMaterialsConsumptionModal = React.memo(
     const [form, setForm] = useState({});
     const [availableRecipes, setAvailableRecipes] = useState([]);
     const [govno, setGovno] = useState(false);
-    const [confirmFlag, setConfirmFlag] = useState(false);
     const [recipeArticle, setRecipeArticle] = useState('');
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [selectedAlu1Type, setSelectedAlu1Type] = useState(null);
@@ -56,10 +60,17 @@ const RawMaterialsConsumptionModal = React.memo(
     const warehouseAluminum1 = useSelector((state) => state.warehouseAluminum1);
 
     useEffect(() => {
+      if (!isOpen) return;
+
+      dispatch(getRawMaterialsWarehouse());
+      dispatch(getWarehouseAluminum1());
+      dispatch(getWarehouseAluminum2());
+    }, [isOpen, dispatch]);
+
+    useEffect(() => {
       setAvailableRecipes([]);
       setSelectedRecipe(null);
       setForm({});
-      setConfirmFlag(false);
       // setLotesListCheck(true);
       setGovno(false);
     }, []);
@@ -573,8 +584,26 @@ const RawMaterialsConsumptionModal = React.memo(
       );
 
       if (normMaterials.length !== 0) {
-        const body = { materials: fixed_materials };
-        dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
+        try {
+          await dispatch(
+            updateRawMaterialConsumptionRawMaterialsWarehouse({
+              materials: fixed_materials,
+            }),
+          ).unwrap();
+
+          await dispatch(getRawMaterialsWarehouse()).unwrap();
+
+          // Только после успешного списания:
+          // создание записей, onSave и закрытие окна
+        } catch (error) {
+          alert(
+            error?.message ||
+              'Не удалось списать сырьё. Остатки изменились — проверьте склад.',
+          );
+
+          await dispatch(getRawMaterialsWarehouse());
+          return;
+        }
       }
 
       const recipeSnapshot = buildRecipeSnapshot();
