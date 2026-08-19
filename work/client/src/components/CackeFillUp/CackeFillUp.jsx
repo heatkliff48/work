@@ -377,7 +377,21 @@ function CackeFillUp() {
     }
   };
 
+  const isFullyAllocated = totalCake > 0 && allocated >= totalCake;
+
   const handleNewBatch = () => {
+    if (isFullyAllocated) {
+      const shouldContinue = window.confirm(
+        'Все массивы залиты, желаете продолжить?',
+      );
+
+      if (!shouldContinue) return;
+
+      const isConfirmed = window.confirm('Вы уверены, что хотите продолжить?');
+
+      if (!isConfirmed) return;
+    }
+
     setRawMaterialConsumptionMadal(true);
   };
 
@@ -750,7 +764,10 @@ function CackeFillUp() {
               className="mt-2"
               style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
             >
-              <Button color="success" onClick={handleNewBatch}>
+              <Button
+                color={isFullyAllocated ? 'danger' : 'success'}
+                onClick={handleNewBatch}
+              >
                 New cacke
               </Button>
 
