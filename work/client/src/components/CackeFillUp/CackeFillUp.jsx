@@ -35,7 +35,7 @@ function CackeFillUp() {
   const [activeRecipeArticle, setActiveRecipeArticle] = useState(null);
   const [total_cacke, setTotalCacke] = useState(0);
   const [cakeNotes, setCakeNotes] = useState({});
-  const [cakeCuttingTemperatures, setCakeCuttingTemperatures] = useState({});
+  const [cakeCastingTemperatures, setCakeCastingTemperatures] = useState({});
   const [cakeFlowabilities, setCakeFlowabilities] = useState({});
 
   const production_plan_table = [
@@ -198,7 +198,7 @@ function CackeFillUp() {
     setActiveCakeId(null);
     setActiveRecipeArticle(null);
     setCakeNotes({});
-    setCakeCuttingTemperatures({});
+    setCakeCastingTemperatures({});
     setCakeFlowabilities({});
   }, []);
 
@@ -316,7 +316,7 @@ function CackeFillUp() {
           return {
             id,
             note: savedCake?.note || '',
-            cuttingTemperature: savedCake?.cutting_temperature ?? '',
+            castingTemperature: savedCake?.casting_temperature ?? '',
             flowability: savedCake?.flowability ?? '',
           };
         });
@@ -336,8 +336,8 @@ function CackeFillUp() {
 
   const handleSaveCakeNote = async (cake) => {
     const note = cakeNotes[cake.id] ?? cake.note ?? '';
-    const cuttingTemperature =
-      cakeCuttingTemperatures[cake.id] ?? cake.cuttingTemperature ?? '';
+    const castingTemperature =
+      cakeCastingTemperatures[cake.id] ?? cake.castingTemperature ?? '';
     const flowability = cakeFlowabilities[cake.id] ?? cake.flowability ?? '';
 
     const normalizeOptionalNumber = (value) => {
@@ -350,12 +350,10 @@ function CackeFillUp() {
     try {
       await dispatch(
         addNewLotesListCakes({
-          num: [cake.id],
-          note: { [cake.id]: note },
-          cutting_temperature: {
-            [cake.id]: normalizeOptionalNumber(cuttingTemperature),
-          },
-          flowability: { [cake.id]: normalizeOptionalNumber(flowability) },
+          id: cake.id,
+          note,
+          casting_temperature: normalizeOptionalNumber(castingTemperature),
+          flowability: normalizeOptionalNumber(flowability),
         }),
       );
 
@@ -363,9 +361,9 @@ function CackeFillUp() {
         ...previousNotes,
         [cake.id]: note,
       }));
-      setCakeCuttingTemperatures((previousValues) => ({
+      setCakeCastingTemperatures((previousValues) => ({
         ...previousValues,
-        [cake.id]: cuttingTemperature,
+        [cake.id]: castingTemperature,
       }));
       setCakeFlowabilities((previousValues) => ({
         ...previousValues,
@@ -377,7 +375,21 @@ function CackeFillUp() {
     }
   };
 
+  const isFullyAllocated = totalCake > 0 && allocated >= totalCake;
+
   const handleNewBatch = () => {
+    if (isFullyAllocated) {
+      const shouldContinue = window.confirm(
+        'Все массивы залиты, желаете продолжить?',
+      );
+
+      if (!shouldContinue) return;
+
+      const isConfirmed = window.confirm('Вы уверены, что хотите продолжить?');
+
+      if (!isConfirmed) return;
+    }
+
     setRawMaterialConsumptionMadal(true);
   };
 
@@ -498,7 +510,7 @@ function CackeFillUp() {
     setActiveCakeId(null);
     setActiveRecipeArticle(null);
     setCakeNotes({});
-    setCakeCuttingTemperatures({});
+    setCakeCastingTemperatures({});
     setCakeFlowabilities({});
   };
 
@@ -750,7 +762,10 @@ function CackeFillUp() {
               className="mt-2"
               style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
             >
-              <Button color="success" onClick={handleNewBatch}>
+              <Button
+                color={isFullyAllocated ? 'danger' : 'success'}
+                onClick={handleNewBatch}
+              >
                 New cacke
               </Button>
 
@@ -859,18 +874,18 @@ function CackeFillUp() {
                                   fontWeight: 600,
                                 }}
                               >
-                                Cutting temperature, C
+                                Casting temperature, C
                               </span>
                               <input
                                 type="number"
                                 step="0.01"
                                 value={
-                                  cakeCuttingTemperatures[activeCake.id] ??
-                                  activeCake.cuttingTemperature ??
+                                  cakeCastingTemperatures[activeCake.id] ??
+                                  activeCake.castingTemperature ??
                                   ''
                                 }
                                 onChange={(event) =>
-                                  setCakeCuttingTemperatures((previousValues) => ({
+                                  setCakeCastingTemperatures((previousValues) => ({
                                     ...previousValues,
                                     [activeCake.id]: event.target.value,
                                   }))

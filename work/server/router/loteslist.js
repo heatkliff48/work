@@ -152,6 +152,15 @@ lotesListRouter.post('/batches', async (req, res) => {
         quantity_cakes: quantityInRecord + quantityCakesInt,
       });
 
+      const [emptyCake, cakeCreated] = await LotesListsCakes.findOrCreate({
+        where: { id: cake_id_start },
+        defaults: { id: cake_id_start },
+      });
+
+      if (cakeCreated) {
+        myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, [emptyCake]);
+      }
+
       myEmitter.emit(UPDATE_LOTES_LIST_SOCKET, updatedLotesListBatch);
 
       return res.status(200).json(updatedLotesListBatch);
@@ -175,6 +184,15 @@ lotesListRouter.post('/batches', async (req, res) => {
       quantity_cakes: quantityCakesInt,
       sand_dry,
     });
+
+    const [emptyCake, cakeCreated] = await LotesListsCakes.findOrCreate({
+      where: { id: cake_id_start },
+      defaults: { id: cake_id_start },
+    });
+
+    if (cakeCreated) {
+      myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, [emptyCake]);
+    }
 
     myEmitter.emit(ADD_NEW_LOTES_LIST_SOCKET, lotesListBatches);
 
@@ -263,68 +281,38 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes', async (req, res) => {
   try {
-    const { num: ids, note, cutting_temperature = null, flowability = null } = req.body;
+    const { id, note, casting_temperature, flowability } = req.body;
+    const numericId = Number(id);
 
-    if (!Array.isArray(ids)) {
-      return res.status(400).json({ error: 'num must be an array of ids' });
+    if (!Number.isFinite(numericId)) {
+      return res.status(400).json({ error: 'Invalid cake id' });
     }
 
-    const cakeFields = { note, cutting_temperature, flowability };
+    const updates = {};
 
-    for (const [fieldName, values] of Object.entries(cakeFields)) {
-      if (
-        values !== undefined &&
-        (typeof values !== 'object' || Array.isArray(values) || values === null)
-      ) {
-        return res.status(400).json({
-          error: `${fieldName} must be an object`,
-        });
-      }
+    if (note !== undefined) updates.note = note;
+    if (casting_temperature !== undefined) {
+      updates.casting_temperature = casting_temperature;
+    }
+    if (flowability !== undefined) updates.flowability = flowability;
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'No fields to update' });
     }
 
-    const result = [];
+    const [count, rows] = await LotesListsCakes.update(updates, {
+      where: { id: numericId },
+      returning: true,
+    });
 
-    for (const id of ids) {
-      const numericId = Number(id);
-      if (isNaN(numericId)) continue;
-
-      const noteValue = note?.[id];
-      const cuttingTemperatureValue = cutting_temperature?.[id];
-      const flowabilityValue = flowability?.[id];
-
-      const values = {
-        note: noteValue,
-        cutting_temperature: cuttingTemperatureValue,
-        flowability: flowabilityValue,
-      };
-
-      const defaults = { id: numericId };
-      const updates = {};
-
-      for (const [fieldName, value] of Object.entries(values)) {
-        if (value !== undefined) {
-          defaults[fieldName] = value;
-          updates[fieldName] = value;
-        }
-      }
-
-      const [record, created] = await LotesListsCakes.findOrCreate({
-        where: {
-          id: numericId,
-        },
-        defaults,
-      });
-
-      if (!created && Object.keys(updates).length > 0) {
-        await record.update(updates);
-      }
-
-      result.push(record);
+    if (count === 0) {
+      return res.status(404).json({ error: `Cake ${numericId} not found` });
     }
 
-    myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, result);
+    const updatedCake = rows[0];
+    myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, [updatedCake]);
 
-    return res.status(200).json(result);
+    return res.status(200).json(updatedCake);
   } catch (err) {
     console.error(err.message);
     return res.status(500).json({ error: err.message });
