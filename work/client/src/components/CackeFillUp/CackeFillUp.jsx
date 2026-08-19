@@ -32,6 +32,7 @@ function CackeFillUp() {
   const [activeBatchId, setActiveBatchId] = useState(null);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [activeCakeId, setActiveCakeId] = useState(null);
+  const [activeRecipeArticle, setActiveRecipeArticle] = useState(null);
   const [total_cacke, setTotalCacke] = useState(0);
   const [cakeNotes, setCakeNotes] = useState({});
   const [cakeCuttingTemperatures, setCakeCuttingTemperatures] = useState({});
@@ -195,6 +196,7 @@ function CackeFillUp() {
     setCackeFillUp({});
     setCurrentProduct(null);
     setActiveCakeId(null);
+    setActiveRecipeArticle(null);
     setCakeNotes({});
     setCakeCuttingTemperatures({});
     setCakeFlowabilities({});
@@ -383,34 +385,9 @@ function CackeFillUp() {
     const currentAllocated = Number(productionVolume) || 0;
     if (currentAllocated <= 0) return;
 
-    const {
-      id,
-      product_article = null,
-      date,
-      id_ordered_product_to_warehouse = null,
-    } = cackeFillUp;
+    const { product_article = null, date } = cackeFillUp;
 
-    const batch = batchOutside.find((el) => el.id == id);
-    if (!batch) {
-      console.error('Batch not found:', id);
-      return;
-    }
-
-    const { quantity_pallets, quantity_free } = batch;
-
-    await dispatch(
-      addNewRawMatConsumption({
-        batch_id: activeBatchId,
-        production_volume: currentAllocated,
-        recipe_article: recipeArticle || null,
-        batch_article: product_article,
-        cacke_id_start: null,
-        date,
-        id_ordered_product_to_warehouse,
-        consumption_calculated: true,
-        batch_quantity_pallets: quantity_pallets - quantity_free || 0,
-      }),
-    );
+    setActiveRecipeArticle(recipeArticle || null);
 
     dispatch(
       addNewProductionQuality({
@@ -445,12 +422,56 @@ function CackeFillUp() {
     if (!window.confirm('Do you want to continue?')) {
       return;
     }
-    const { id, date } = cackeFillUp;
+    const {
+      id,
+      product_article = null,
+      date,
+      id_ordered_product_to_warehouse = null,
+    } = cackeFillUp;
+
+    const batch = batchOutside.find((item) => item.id == id);
+    if (!batch) {
+      console.error('Batch not found:', id);
+      return;
+    }
+
+    const currentAllocated = Number(allocated) || 0;
+    const { quantity_pallets, quantity_free } = batch;
+
+    const cackeIdStart = (Array.isArray(lotesListBatches) ? lotesListBatches : [])
+      .filter((item) => String(item?.batch_id) === String(activeBatchId))
+      .reduce((minimumId, item) => {
+        const cakeIdStart = Number(item?.cake_id_start);
+
+        if (!Number.isFinite(cakeIdStart)) return minimumId;
+        return minimumId == null ? cakeIdStart : Math.min(minimumId, cakeIdStart);
+      }, null);
 
     const accd = autoclave_calendar.find((el) => el.date === date);
     if (!accd) {
       console.error('Autoclave calendar entry not found for date:', date);
       return;
+    }
+
+    if (currentAllocated > 0) {
+      if (cackeIdStart == null) {
+        console.error('Cake start id not found for batch:', activeBatchId);
+        return;
+      }
+
+      await dispatch(
+        addNewRawMatConsumption({
+          batch_id: activeBatchId,
+          production_volume: currentAllocated,
+          recipe_article: activeRecipeArticle,
+          batch_article: product_article,
+          cacke_id_start: cackeIdStart,
+          date,
+          id_ordered_product_to_warehouse,
+          consumption_calculated: true,
+          batch_quantity_pallets: quantity_pallets - quantity_free || 0,
+        }),
+      );
     }
 
     const totalArrays = Number(accd.total_arrays) || 0;
@@ -475,6 +496,7 @@ function CackeFillUp() {
     setCurrentProduct(null);
     setActiveBatchId(null);
     setActiveCakeId(null);
+    setActiveRecipeArticle(null);
     setCakeNotes({});
     setCakeCuttingTemperatures({});
     setCakeFlowabilities({});
