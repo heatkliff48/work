@@ -350,12 +350,10 @@ function CackeFillUp() {
     try {
       await dispatch(
         addNewLotesListCakes({
-          num: [cake.id],
-          note: { [cake.id]: note },
-          casting_temperature: {
-            [cake.id]: normalizeOptionalNumber(castingTemperature),
-          },
-          flowability: { [cake.id]: normalizeOptionalNumber(flowability) },
+          id: cake.id,
+          note,
+          casting_temperature: normalizeOptionalNumber(castingTemperature),
+          flowability: normalizeOptionalNumber(flowability),
         }),
       );
 
@@ -883,7 +881,7 @@ function CackeFillUp() {
                                 step="0.01"
                                 value={
                                   cakeCastingTemperatures[activeCake.id] ??
-                                  activeCake.casting_temp_c ??
+                                  activeCake.castingTemperature ??
                                   ''
                                 }
                                 onChange={(event) =>
