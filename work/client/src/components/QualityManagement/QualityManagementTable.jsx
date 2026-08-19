@@ -42,13 +42,18 @@ const QualityManagementTable = () => {
     warehouse_data,
   } = useWarehouseContext();
   const { latestProducts } = useProductsContext();
-  const { raw_mat_consumption, list_of_recipes, recipeOrders } = useRecipeContext();
+  const { raw_mat_consumption, list_of_recipes, recipeOrders } =
+    useRecipeContext();
 
   const dispatch = useDispatch();
-  const qualityManagementData = useSelector((state) => state.qualityManagementData);
+  const qualityManagementData = useSelector(
+    (state) => state.qualityManagementData,
+  );
   const batchOutside = useSelector((state) => state.batchOutside);
 
-  const [qualityManagementDataList, setQualityManagementDataList] = useState([]);
+  const [qualityManagementDataList, setQualityManagementDataList] = useState(
+    [],
+  );
 
   const [consumptionCalculated, setConsumptionCalculated] = useState({});
   const [dateValue, setDateValue] = useState(null);
@@ -96,7 +101,7 @@ const QualityManagementTable = () => {
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Reserved pallets in batch, qty',
+      Header: 'Required pallets, qty',
       accessor: 'reserved_quantity',
       Filter: TextSearchFilter,
     },
@@ -168,7 +173,8 @@ const QualityManagementTable = () => {
       setQualityManagementDataList(qualityManagementData);
       // Сначала находим density для заданного article
       const targetProduct = latestProducts.find(
-        (product) => product.article === qualityManagementData[0]?.product_article,
+        (product) =>
+          product.article === qualityManagementData[0]?.product_article,
       );
       const targetDensity = targetProduct?.density;
 
@@ -186,7 +192,8 @@ const QualityManagementTable = () => {
       // Инициализируем значения полей ввода для каждой записи
       const initialInputValues = {};
       qualityManagementData.forEach((item) => {
-        const totalQty = item.reserved_quantity_allocated + item.free_quantity_fact;
+        const totalQty =
+          item.reserved_quantity_allocated + item.free_quantity_fact;
         initialInputValues[item.id] = {
           totalQty: totalQty.toString(),
           sorting: item.sorting.toString(),
@@ -213,7 +220,9 @@ const QualityManagementTable = () => {
     const X = parseFloat(value);
     if (isNaN(X) || X < 0) return;
 
-    const currentData = qualityManagementData.find((item) => item.id === recordId);
+    const currentData = qualityManagementData.find(
+      (item) => item.id === recordId,
+    );
     if (!currentData) return;
 
     const {
@@ -275,7 +284,9 @@ const QualityManagementTable = () => {
     const sortingValue = parseFloat(value);
     if (isNaN(sortingValue) || sortingValue < 0) return;
 
-    const currentData = qualityManagementData.find((item) => item.id === recordId);
+    const currentData = qualityManagementData.find(
+      (item) => item.id === recordId,
+    );
     if (!currentData) return;
 
     const {
@@ -345,7 +356,10 @@ const QualityManagementTable = () => {
       const remainingNeed = Math.max(0, orderedQuantity - quantityInWarehouse);
 
       // Выделяем только часть общего резерва
-      const allocatedQuantity = Math.min(remainingNeed, remainingReservedQuantity);
+      const allocatedQuantity = Math.min(
+        remainingNeed,
+        remainingReservedQuantity,
+      );
 
       remainingReservedQuantity -= allocatedQuantity;
 
@@ -367,7 +381,9 @@ const QualityManagementTable = () => {
     // Добавляем на склад
     let totalQuantityForRawMatWarehouse = 0;
     totalQuantityForRawMatWarehouse +=
-      (calculatedOrderedQuantity ?? 0) + (remainingFreeQty ?? 0) + (sorting ?? 0);
+      (calculatedOrderedQuantity ?? 0) +
+      (remainingFreeQty ?? 0) +
+      (sorting ?? 0);
 
     const checkPallets = raw_materials_warehouse.some(
       (item) =>
@@ -472,9 +488,13 @@ const QualityManagementTable = () => {
     }
 
     if (production_plan_id) {
-      const batch = batchOutside.find((batch) => batch.id === production_plan_id);
+      const batch = batchOutside.find(
+        (batch) => batch.id === production_plan_id,
+      );
 
-      const productData = latestProducts.find((el) => el.article == product_article);
+      const productData = latestProducts.find(
+        (el) => el.article == product_article,
+      );
 
       if (productData) {
         const { m3InArray, volumeBlockOnPallet } = productData;
@@ -497,7 +517,8 @@ const QualityManagementTable = () => {
             batch_article: batch?.product_article || 'Unknown Batch',
             production_volume:
               Math.ceil(
-                (reserved_quantity_allocated + free_quantity_fact) / palletsPerArray,
+                (reserved_quantity_allocated + free_quantity_fact) /
+                  palletsPerArray,
               ) || 0,
             date: batch?.date || 'Unknown Date',
           }),
@@ -513,7 +534,9 @@ const QualityManagementTable = () => {
     );
 
     if (production_plan_id) {
-      const productData = latestProducts.find((el) => el.article == product_article);
+      const productData = latestProducts.find(
+        (el) => el.article == product_article,
+      );
 
       if (productData) {
         const { m3InArray, volumeBlockOnPallet } = productData;
@@ -622,7 +645,10 @@ const QualityManagementTable = () => {
           <div className="d-flex gap-4 flex-wrap align-items-end">
             {/* Поле ввода для Total Qty in batch, fact, pallets */}
             <div className="border rounded p-3 bg-light">
-              <Form.Label htmlFor={`totalQtyInput-${record.id}`} className="fw-bold">
+              <Form.Label
+                htmlFor={`totalQtyInput-${record.id}`}
+                className="fw-bold"
+              >
                 Total Qty in batch, fact, pallets
               </Form.Label>
               <Form.Control
@@ -639,7 +665,10 @@ const QualityManagementTable = () => {
 
             {/* Поле ввода для Quantity on sorting, pallets */}
             <div className="border rounded p-3 bg-light">
-              <Form.Label htmlFor={`sortingInput-${record.id}`} className="fw-bold">
+              <Form.Label
+                htmlFor={`sortingInput-${record.id}`}
+                className="fw-bold"
+              >
                 Quantity on sorting, pallets
               </Form.Label>
               <Form.Control

@@ -1,10 +1,12 @@
 import ModalTable from '#components/Table/ModalTable.jsx';
+import Table from '#components/Table/Table';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { addBatchState } from '#components/redux/actions/batchDesignerAction.js';
-import AddOrderedProduct from './AddOrderedProduct';
+import { getOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
+// import AddOrderedProduct from './AddOrderedProduct';
 import Autoclave from './Autoclave';
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -43,6 +45,7 @@ function ProductionBatchDesignerNew() {
   } = useOrderContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner) || [];
+  const list_of_orders_to_warehouse = useSelector((state) => state.orderToWarehouse);
   const batchOutsideRedux = useSelector((state) => state.batchOutside) || [];
 
   // Дата и режим редактирования приходят из Batch calendar (клик по ячейке
@@ -60,6 +63,7 @@ function ProductionBatchDesignerNew() {
   const didInitEditRef = useRef(false);
 
   const [orderedProductBatchModal, setOrderedProductBatchModal] = useState(false);
+  const [fileterdList, setFilteredList] = useState([]);
 
   const formatISO = (s) => {
     if (!s) return '—';
@@ -151,6 +155,85 @@ function ProductionBatchDesignerNew() {
     setAutoclaveCalendarData,
     setIsEditMode,
   ]);
+
+  const COLUMNS_ORDERS_TO_WAREHOUSE = useMemo(
+    () => [
+      {
+        Header: 'Ref.',
+        accessor: 'product_article',
+        disableSortBy: true,
+      },
+      {
+        Header: 'Description',
+        accessor: 'description',
+        sortType: 'string',
+      },
+      {
+        Header: 'Product size',
+        accessor: 'product_size',
+      },
+      {
+        Header: 'Product density',
+        accessor: 'density',
+      },
+      {
+        Header: 'Pallets, qty',
+        accessor: 'quantity_pallets',
+      },
+      {
+        Header: 'Real quantity, m2',
+        accessor: 'quantity_real_m2',
+      },
+      {
+        Header: 'Produced',
+        accessor: 'quantity_produced',
+      },
+      {
+        Header: 'Allocated',
+        accessor: 'quantity_allocated',
+      },
+    ],
+    [],
+  );
+
+  useEffect(() => {
+    dispatch(getOrderToWarehouse());
+  }, []);
+
+  useEffect(() => {
+    if (!list_of_orders_to_warehouse) {
+      setFilteredList([]);
+      return;
+    }
+
+    const filtered = list_of_orders_to_warehouse.filter(
+      (order) =>
+        order.quantity_pallets > order.quantity_produced &&
+        order.quantity_pallets > order.quantity_allocated,
+    );
+
+    const regex = /(\d+)\s*x\s*(\d+)\s*x\s*(\d+)/;
+    const filteredWithSize = filtered.reduce((acc, el) => {
+      const product = latestProducts.find((p) => p.article == el.product_article);
+
+      // el.description holds the order's title (dimensions already stripped out
+      // when the order was created), so the size must be parsed from the
+      // product's own description instead — see DimensionsTestModal.jsx.
+      const match = product?.description?.match(regex);
+
+      const product_size = match ? `${match[1]}x${match[2]}x${match[3]}` : '';
+
+      const newObj = {
+        ...el,
+        product_size,
+        density: product?.density,
+      };
+      acc.push(newObj);
+      return acc;
+    }, []);
+
+    setFilteredList(filteredWithSize);
+  }, [list_of_orders_to_warehouse, latestProducts]);
 
   const MAX_QUANTITY = 10405;
 
@@ -951,14 +1034,14 @@ function ProductionBatchDesignerNew() {
         />
       )}
 
-      {orderedProductBatchModal && (
+      {/* {orderedProductBatchModal && (
         <AddOrderedProduct
           isOpen={orderedProductBatchModal}
           toggle={() => setOrderedProductBatchModal(!orderedProductBatchModal)}
           data={latestProducts}
           onClickRow={addOrderedProductHandler}
         />
-      )}
+      )} */}
 
       <div>
         <div
@@ -976,12 +1059,12 @@ function ProductionBatchDesignerNew() {
           >
             Add product
           </button>
-          <button
+          {/* <button
             onClick={() => setOrderedProductBatchModal(!orderedProductBatchModal)}
             className="table_button"
           >
             Add product ordered to warehouse
-          </button>
+          </button> */}
           {console.log(
             'autoclaveCalendarData ProductionBatchDesignerNew.jsx line 866',
             autoclaveCalendarData,
@@ -1024,6 +1107,15 @@ function ProductionBatchDesignerNew() {
           </thead>
           <tbody>{renderGroupedRows()}</tbody>
         </table>
+
+        <Table
+          COLUMN_DATA={COLUMNS_ORDERS_TO_WAREHOUSE}
+          dataOfTable={fileterdList}
+          tableName={'Orders to warehouse'}
+          handleRowClick={(row) => {
+            addOrderedProductHandler(row.original);
+          }}
+        />
       </div>
 
       <div
