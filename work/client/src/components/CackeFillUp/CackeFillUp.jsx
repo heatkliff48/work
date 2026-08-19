@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from 'reactstrap';
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useDispatch } from 'react-redux';
+import { addNewLotesListCakes } from '#components/redux/actions/lotesListAction.js';
 import {
   deleteBatchOutside,
   updateBatchOutside,
@@ -16,21 +17,26 @@ import { addNewProductionQuality } from '#components/redux/actions/productionQua
 import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
 import RawMaterialsConsumptionModal from '#components/CackeFillUp/RawMatConsumptionModalUPD.jsx';
 import { useModalContext } from '#components/contexts/ModalContext.js';
-import { use } from 'react';
 
 function CackeFillUp() {
   const dispatch = useDispatch();
 
   const { batchOutside, autoclave_calendar } = useWarehouseContext();
-  const { cackeFillUp, setCackeFillUp, lotesListBatches } = useProjectContext();
+  const { cackeFillUp, setCackeFillUp, lotesListBatches, lotesListCakes } =
+    useProjectContext();
   const { raw_mat_consumption } = useRecipeContext();
-  const { latestProducts } = useProductsContext();
+  const { latestProducts, extractProductTitle } = useProductsContext();
   const { rawMaterialConsumptionMadal, setRawMaterialConsumptionMadal } =
     useModalContext();
 
   const [activeBatchId, setActiveBatchId] = useState(null);
-  const [allocated, setAllocated] = useState(0);
   const [currentProduct, setCurrentProduct] = useState(null);
+  const [activeCakeId, setActiveCakeId] = useState(null);
+  const [activeRecipeArticle, setActiveRecipeArticle] = useState(null);
+  const [total_cacke, setTotalCacke] = useState(0);
+  const [cakeNotes, setCakeNotes] = useState({});
+  const [cakeCastingTemperatures, setCakeCastingTemperatures] = useState({});
+  const [cakeFlowabilities, setCakeFlowabilities] = useState({});
 
   const production_plan_table = [
     { Header: 'Date', accessor: 'date', Filter: TextSearchFilter },
@@ -48,6 +54,25 @@ function CackeFillUp() {
   ];
 
   const [productionPlanDataList, setProductionPlanDataList] = useState([]);
+
+  const nextBatchId = useMemo(() => {
+    const lotes = Array.isArray(lotesListBatches) ? lotesListBatches : [];
+    const consumptions = Array.isArray(raw_mat_consumption)
+      ? raw_mat_consumption
+      : [];
+
+    const maxLotesBatchId = lotes.reduce((max, item) => {
+      const value = Number(item?.batch_id);
+      return Number.isFinite(value) ? Math.max(max, value) : max;
+    }, 0);
+
+    const maxConsumptionBatchId = consumptions.reduce((max, item) => {
+      const value = Number(item?.batch_id);
+      return Number.isFinite(value) ? Math.max(max, value) : max;
+    }, 0);
+
+    return Math.max(maxLotesBatchId, maxConsumptionBatchId) + 1;
+  }, [lotesListBatches, raw_mat_consumption]);
 
   useEffect(() => {
     if (batchOutside) {
@@ -74,15 +99,7 @@ function CackeFillUp() {
     const prodPlanEntry = batchOutside.find((el) => el.id === row.original.id);
     if (!prodPlanEntry) return;
 
-    const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
-
-    const maxBatchId = list.reduce((max, item) => {
-      const value = Number(item?.batch_id);
-
-      return Number.isFinite(value) ? Math.max(max, value) : max;
-    }, 0);
-
-    setActiveBatchId(maxBatchId + 1);
+    setActiveBatchId(nextBatchId);
 
     dispatch(
       updateBatchOutside({
@@ -104,7 +121,6 @@ function CackeFillUp() {
 
   useEffect(() => {
     if (!batchOutside?.length) return;
-    if (!currentProductName) return;
 
     const batchInProduce = batchOutside.find((item) => item.is_prodused == 1);
 
@@ -114,10 +130,46 @@ function CackeFillUp() {
     }
 
     const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
+    const consumptions = Array.isArray(raw_mat_consumption)
+      ? raw_mat_consumption
+      : [];
+    const orderId = batchInProduce.id_ordered_product_to_warehouse;
 
-    const existingRecords = list.filter(
-      (item) => String(item.product) === String(currentProductName),
-    );
+    const relatedConsumptions = consumptions.filter((item) => {
+      if (orderId == null || item?.id_ordered_product_to_warehouse == null) {
+        return false;
+      }
+
+      return String(item.id_ordered_product_to_warehouse) === String(orderId);
+    });
+
+    if (relatedConsumptions.length) {
+      const lastBatchId = relatedConsumptions.reduce((max, item) => {
+        const value = Number(item?.batch_id);
+        return Number.isFinite(value) ? Math.max(max, value) : max;
+      }, 0);
+
+      if (lastBatchId > 0) {
+        setActiveBatchId(lastBatchId);
+        return;
+      }
+    }
+
+    const relatedLotes = list.filter((item) => {
+      if (orderId == null || item?.id_ordered_product_to_warehouse == null) {
+        return false;
+      }
+
+      return String(item.id_ordered_product_to_warehouse) === String(orderId);
+    });
+
+    const existingRecords = relatedLotes.length
+      ? relatedLotes
+      : list.filter(
+          (item) =>
+            currentProductName != null &&
+            String(item.product) === String(currentProductName),
+        );
 
     if (existingRecords.length) {
       const lastRecord = existingRecords.reduce((latest, item) => {
@@ -131,29 +183,34 @@ function CackeFillUp() {
       return;
     }
 
-    const maxBatchId = list.reduce((max, item) => {
-      const value = Number(item?.batch_id);
-
-      return Number.isFinite(value) ? Math.max(max, value) : max;
-    }, 0);
-
-    setActiveBatchId(maxBatchId + 1);
-  }, [batchOutside, lotesListBatches, currentProductName]);
+    setActiveBatchId(nextBatchId);
+  }, [
+    batchOutside,
+    lotesListBatches,
+    raw_mat_consumption,
+    currentProductName,
+    nextBatchId,
+  ]);
 
   useEffect(() => {
     setCackeFillUp({});
-    setAllocated(0);
     setCurrentProduct(null);
+    setActiveCakeId(null);
+    setActiveRecipeArticle(null);
+    setCakeNotes({});
+    setCakeCastingTemperatures({});
+    setCakeFlowabilities({});
   }, []);
 
   useEffect(() => {
     const batch_in_produce = batchOutside.find((el) => el.is_prodused == 1);
-
+    console.log('batch_in_produce CackeFillUp.jsx line 204', batch_in_produce);
     if (batch_in_produce) {
       const product = latestProducts.find(
         (el) => el.article === batch_in_produce?.product_article,
       );
-      setCurrentProduct(product);
+      const fullMark = extractProductTitle(product?.description);
+      setCurrentProduct({ ...product, tradingMark: fullMark });
 
       const widthInArray = Math.floor(
         product?.m3InArray / product?.volumeBlockOnPallet,
@@ -166,9 +223,13 @@ function CackeFillUp() {
         batch_in_produce.quantity_pallets / widthInArray -
         (Number(accd?.total_arrays_cacke_fill_up) || 0);
 
+      const full_total_cacke = batch_in_produce.quantity_pallets / widthInArray;
+
+      setTotalCacke(Number.isFinite(full_total_cacke) ? full_total_cacke : 0);
       setCackeFillUp({ ...batch_in_produce, total_cacke });
     } else {
       setCurrentProduct(null);
+      setTotalCacke(0);
     }
   }, [batchOutside, autoclave_calendar, latestProducts, setCackeFillUp]);
 
@@ -177,7 +238,158 @@ function CackeFillUp() {
 
   const batchCalDate = cackeFillUp?.date ?? cackeFillUp?.batch_cal_date ?? '';
 
+  const allocated = useMemo(() => {
+    if (activeBatchId == null) return 0;
+
+    const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
+
+    return list.reduce((total, item) => {
+      if (String(item?.batch_id) !== String(activeBatchId)) return total;
+
+      const quantity = Number(item?.quantity_cakes);
+      return Number.isFinite(quantity) ? total + quantity : total;
+    }, 0);
+  }, [activeBatchId, lotesListBatches]);
+
+  const nextProductSummary = useMemo(() => {
+    if (!batchCalDate) return null;
+
+    const nextBatch = (Array.isArray(batchOutside) ? batchOutside : []).find(
+      (item) =>
+        String(item?.id) !== String(cackeFillUp?.id) &&
+        item?.date === batchCalDate &&
+        (item?.is_prodused == 0 || item?.is_prodused == null),
+    );
+
+    if (!nextBatch) return null;
+
+    const product = latestProducts.find(
+      (item) => item.article === nextBatch.product_article,
+    );
+    const widthInArray = Math.max(
+      1,
+      Math.floor(
+        (Number(product?.m3InArray) || 0) /
+          (Number(product?.volumeBlockOnPallet) || 1),
+      ) || 1,
+    );
+    const nextTotalQuantity =
+      (Number(nextBatch.quantity_pallets) || 0) / widthInArray;
+
+    return {
+      article: nextBatch.product_article || product?.article || '—',
+      mark: extractProductTitle(product?.description) || '—',
+      totalQuantity: nextTotalQuantity,
+    };
+  }, [
+    batchCalDate,
+    batchOutside,
+    cackeFillUp?.id,
+    extractProductTitle,
+    latestProducts,
+  ]);
+
+  const productionCakes = useMemo(() => {
+    if (activeBatchId == null) return [];
+
+    const batches = Array.isArray(lotesListBatches) ? lotesListBatches : [];
+    const cakes = Array.isArray(lotesListCakes) ? lotesListCakes : [];
+
+    return batches
+      .filter((record) => String(record?.batch_id) === String(activeBatchId))
+      .flatMap((record) => {
+        const cakeIdStart = Number(record?.cake_id_start);
+        const cakeIdFinish = Number(record?.cake_id_finish);
+
+        if (
+          !Number.isFinite(cakeIdStart) ||
+          !Number.isFinite(cakeIdFinish) ||
+          cakeIdFinish < cakeIdStart
+        ) {
+          return [];
+        }
+
+        return Array.from({ length: cakeIdFinish - cakeIdStart + 1 }, (_, index) => {
+          const id = cakeIdStart + index;
+          const savedCake = cakes.find((item) => Number(item?.id) === id);
+
+          return {
+            id,
+            note: savedCake?.note || '',
+            castingTemperature: savedCake?.casting_temperature ?? '',
+            flowability: savedCake?.flowability ?? '',
+          };
+        });
+      })
+      .sort((a, b) => a.id - b.id);
+  }, [activeBatchId, lotesListBatches, lotesListCakes]);
+
+  const productionCakeRows = useMemo(() => {
+    const rows = [];
+
+    for (let index = 0; index < productionCakes.length; index += 8) {
+      rows.push(productionCakes.slice(index, index + 8));
+    }
+
+    return rows;
+  }, [productionCakes]);
+
+  const handleSaveCakeNote = async (cake) => {
+    const note = cakeNotes[cake.id] ?? cake.note ?? '';
+    const castingTemperature =
+      cakeCastingTemperatures[cake.id] ?? cake.castingTemperature ?? '';
+    const flowability = cakeFlowabilities[cake.id] ?? cake.flowability ?? '';
+
+    const normalizeOptionalNumber = (value) => {
+      if (value === '' || value == null) return null;
+
+      const numericValue = Number(value);
+      return Number.isFinite(numericValue) ? numericValue : null;
+    };
+
+    try {
+      await dispatch(
+        addNewLotesListCakes({
+          id: cake.id,
+          note,
+          casting_temperature: normalizeOptionalNumber(castingTemperature),
+          flowability: normalizeOptionalNumber(flowability),
+        }),
+      );
+
+      setCakeNotes((previousNotes) => ({
+        ...previousNotes,
+        [cake.id]: note,
+      }));
+      setCakeCastingTemperatures((previousValues) => ({
+        ...previousValues,
+        [cake.id]: castingTemperature,
+      }));
+      setCakeFlowabilities((previousValues) => ({
+        ...previousValues,
+        [cake.id]: flowability,
+      }));
+      setActiveCakeId(null);
+    } catch (error) {
+      console.error('Failed to save cake note:', error);
+    }
+  };
+
+  const isFullyAllocated = totalCake > 0 && allocated >= totalCake;
+
   const handleNewBatch = () => {
+    if (isFullyAllocated) {
+      const shouldContinue = window.confirm(
+        'Все массивы залиты, желаете продолжить?',
+      );
+
+      if (!shouldContinue) return;
+
+      const isConfirmed = window.confirm('Вы уверены, что хотите продолжить?');
+
+      if (!isConfirmed) return;
+    }
+
     setRawMaterialConsumptionMadal(true);
   };
 
@@ -185,34 +397,9 @@ function CackeFillUp() {
     const currentAllocated = Number(productionVolume) || 0;
     if (currentAllocated <= 0) return;
 
-    const {
-      id,
-      product_article = null,
-      date,
-      id_ordered_product_to_warehouse = null,
-    } = cackeFillUp;
+    const { product_article = null, date } = cackeFillUp;
 
-    const batch = batchOutside.find((el) => el.id == id);
-    if (!batch) {
-      console.error('Batch not found:', id);
-      return;
-    }
-
-    const { quantity_pallets, quantity_free } = batch;
-
-    await dispatch(
-      addNewRawMatConsumption({
-        batch_id: activeBatchId,
-        production_volume: currentAllocated,
-        recipe_article: recipeArticle || null,
-        batch_article: product_article,
-        cacke_id_start: null,
-        date,
-        id_ordered_product_to_warehouse,
-        consumption_calculated: true,
-        batch_quantity_pallets: quantity_pallets - quantity_free || 0,
-      }),
-    );
+    setActiveRecipeArticle(recipeArticle || null);
 
     dispatch(
       addNewProductionQuality({
@@ -241,19 +428,62 @@ function CackeFillUp() {
     ];
 
     dispatch(addNewAutoclaveCalendar(result));
-    setAllocated((prev) => prev + currentAllocated);
   };
 
   const handleFinish = async () => {
     if (!window.confirm('Do you want to continue?')) {
       return;
     }
-    const { id, date } = cackeFillUp;
+    const {
+      id,
+      product_article = null,
+      date,
+      id_ordered_product_to_warehouse = null,
+    } = cackeFillUp;
+
+    const batch = batchOutside.find((item) => item.id == id);
+    if (!batch) {
+      console.error('Batch not found:', id);
+      return;
+    }
+
+    const currentAllocated = Number(allocated) || 0;
+    const { quantity_pallets, quantity_free } = batch;
+
+    const cackeIdStart = (Array.isArray(lotesListBatches) ? lotesListBatches : [])
+      .filter((item) => String(item?.batch_id) === String(activeBatchId))
+      .reduce((minimumId, item) => {
+        const cakeIdStart = Number(item?.cake_id_start);
+
+        if (!Number.isFinite(cakeIdStart)) return minimumId;
+        return minimumId == null ? cakeIdStart : Math.min(minimumId, cakeIdStart);
+      }, null);
 
     const accd = autoclave_calendar.find((el) => el.date === date);
     if (!accd) {
       console.error('Autoclave calendar entry not found for date:', date);
       return;
+    }
+
+    if (currentAllocated > 0) {
+      if (cackeIdStart == null) {
+        console.error('Cake start id not found for batch:', activeBatchId);
+        return;
+      }
+
+      await dispatch(
+        addNewRawMatConsumption({
+          batch_id: activeBatchId,
+          production_volume: currentAllocated,
+          recipe_article: activeRecipeArticle,
+          batch_article: product_article,
+          cacke_id_start: cackeIdStart,
+          date,
+          id_ordered_product_to_warehouse,
+          consumption_calculated: true,
+          batch_quantity_pallets: quantity_pallets - quantity_free || 0,
+        }),
+      );
     }
 
     const totalArrays = Number(accd.total_arrays) || 0;
@@ -275,9 +505,13 @@ function CackeFillUp() {
     await dispatch(deleteBatchOutside(id));
 
     setCackeFillUp({});
-    setAllocated(0);
     setCurrentProduct(null);
     setActiveBatchId(null);
+    setActiveCakeId(null);
+    setActiveRecipeArticle(null);
+    setCakeNotes({});
+    setCakeCastingTemperatures({});
+    setCakeFlowabilities({});
   };
 
   const hasCackeFillUp = cackeFillUp && Object.keys(cackeFillUp).length > 0;
@@ -327,82 +561,436 @@ function CackeFillUp() {
       )}
 
       {hasCackeFillUp && (
-        <div className="mt-3" style={{ maxWidth: 900 }}>
-          <div
-            className="cacke-fill-up-product"
-            style={{
-              width: '50%',
-              border: '1px solid #dee2e6',
-              borderRadius: '8px',
-              padding: '16px',
-              marginBottom: '20px',
-              backgroundColor: '#f8f9fa',
-              display: 'flex',
-              gap: '32px',
-              flexWrap: 'wrap',
-              justifyContent: 'space-evenly',
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#6c757d' }}>
-                Product article
-              </div>
-              <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
-                {currentProduct?.article || '—'}
-              </div>
-            </div>
-
-            <div>
-              <div style={{ fontWeight: 600, fontSize: '0.9rem', color: '#6c757d' }}>
-                Product Mark
-              </div>
-              <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
-                {currentProduct?.tradingMark || '—'}
-              </div>
-            </div>
-          </div>
-
+        <div className="mt-3" style={{ maxWidth: nextProductSummary ? 1500 : 900 }}>
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1.2fr 1.2fr 1.6fr 1.2fr',
-              gap: 8,
-              alignItems: 'center',
+              gridTemplateColumns: nextProductSummary
+                ? 'repeat(2, minmax(0, 1fr))'
+                : 'minmax(0, 1fr)',
+              gap: 16,
+              marginBottom: '20px',
             }}
           >
-            <div>
-              <div style={{ fontWeight: 600 }}>Batch id</div>
-              <div style={{ marginTop: 6, fontSize: 18 }}>{activeBatchId}</div>
+            <div
+              style={{
+                padding: 16,
+                borderRadius: 14,
+                backgroundColor: '#e9ecef',
+              }}
+            >
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 14px',
+                  marginBottom: 10,
+                  borderRadius: 8,
+                  backgroundColor: '#495057',
+                  color: '#fff',
+                  fontWeight: 600,
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.16)',
+                }}
+              >
+                <span style={{ opacity: 0.75 }}>Date</span>
+                <span>{batchCalDate}</span>
+              </div>
+
+              <div
+                className="cacke-fill-up-product"
+                style={{
+                  width: '100%',
+                  border: '1px solid #ced4da',
+                  borderRadius: '10px',
+                  padding: '16px',
+                  backgroundColor: '#fff',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                  gap: '24px',
+                  minHeight: 94,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#6c757d',
+                    }}
+                  >
+                    Product article
+                  </div>
+                  <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                    {currentProduct?.article || '—'}
+                  </div>
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#6c757d',
+                    }}
+                  >
+                    Product Mark
+                  </div>
+                  <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                    {currentProduct?.tradingMark || '—'}
+                  </div>
+                </div>
+
+                <div>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      color: '#6c757d',
+                    }}
+                  >
+                    Cakes casted / Total qty
+                  </div>
+                  <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                    {allocated} / {total_cacke}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <div style={{ fontWeight: 600 }}>Date</div>
-              <div style={{ marginTop: 6, fontSize: 18 }}>{batchCalDate}</div>
-            </div>
-            <div>
-              <div style={{ fontWeight: 600 }}>Planned cacke</div>
-              <div style={{ marginTop: 6, fontSize: 18 }}>{totalCake}</div>
-            </div>
-            <div>
-              <div style={{ fontWeight: 600 }}>Cackes allocated</div>
-              <div style={{ marginTop: 6, fontSize: 18 }}>{allocated}</div>
-            </div>
+
+            {nextProductSummary && (
+              <div
+                style={{
+                  padding: 16,
+                  borderRadius: 14,
+                  backgroundColor: '#5d5d5d',
+                  alignSelf: 'start',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '8px 14px',
+                    marginBottom: 10,
+                    borderRadius: 8,
+                    backgroundColor: '#6c757d',
+                    color: '#fff',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  Next
+                </div>
+
+                <div
+                  style={{
+                    width: '100%',
+                    border: '1px solid #adb5bd',
+                    borderRadius: '10px',
+                    padding: '16px',
+                    backgroundColor: '#eef0f2',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                    gap: '24px',
+                    minHeight: 94,
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        color: '#5c636a',
+                      }}
+                    >
+                      Product article
+                    </div>
+                    <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                      {nextProductSummary.article}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        color: '#5c636a',
+                      }}
+                    >
+                      Product Mark
+                    </div>
+                    <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                      {nextProductSummary.mark}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        color: '#5c636a',
+                      }}
+                    >
+                      Cakes casted / Total qty
+                    </div>
+                    <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
+                      0 / {nextProductSummary.totalQuantity}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div
-            className="mt-2"
-            style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
+            style={{
+              width: nextProductSummary ? 'calc(50% - 8px)' : '100%',
+            }}
           >
-            <Button color="success" onClick={handleNewBatch}>
-              New cacke
-            </Button>
+            <div>
+              <div>
+                <div style={{ fontWeight: 600 }}>Batch id</div>
+                <div style={{ marginTop: 6, fontSize: 18 }}>{activeBatchId}</div>
+              </div>
+            </div>
 
             <div
-              className="ms-auto"
+              className="mt-2"
               style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
             >
-              <Button color="success" onClick={handleFinish}>
-                Finish batch
+              <Button
+                color={isFullyAllocated ? 'danger' : 'success'}
+                onClick={handleNewBatch}
+              >
+                New cacke
               </Button>
+
+              <div
+                className="ms-auto"
+                style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
+              >
+                <Button color="success" onClick={handleFinish}>
+                  Finish batch
+                </Button>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <div style={{ fontWeight: 600 }}>Cacke id</div>
+
+              {productionCakes.length === 0 && (
+                <div style={{ marginTop: 8, color: '#6c757d' }}>
+                  No cackes allocated yet.
+                </div>
+              )}
+
+              <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
+                {productionCakeRows.map((cakeRow) => {
+                  const activeCake = cakeRow.find(
+                    (cake) => activeCakeId === cake.id,
+                  );
+
+                  return (
+                    <div key={cakeRow[0].id}>
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(8, minmax(0, 1fr))',
+                          gap: 8,
+                        }}
+                      >
+                        {cakeRow.map((cake) => {
+                          const isActive = activeCakeId === cake.id;
+
+                          return (
+                            <div
+                              key={cake.id}
+                              onClick={() =>
+                                setActiveCakeId(isActive ? null : cake.id)
+                              }
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                  event.preventDefault();
+                                  setActiveCakeId(isActive ? null : cake.id);
+                                }
+                              }}
+                              style={{
+                                border: isActive
+                                  ? '2px solid #28a745'
+                                  : '1px solid rgba(0,0,0,0.25)',
+                                borderRadius: 10,
+                                padding: '6px 10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 6,
+                                cursor: 'pointer',
+                                userSelect: 'none',
+                                background: isActive
+                                  ? 'rgba(40,167,69,0.08)'
+                                  : 'transparent',
+                                fontWeight: 600,
+                                minWidth: 0,
+                              }}
+                            >
+                              <span style={{ opacity: 0.7 }}>#</span>
+                              <span>{cake.id}</span>
+                              <span
+                                style={{
+                                  opacity: 0.6,
+                                  fontWeight: 400,
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {isActive ? '▲ note' : '▼ note'}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {activeCake && (
+                        <div style={{ marginTop: 6, maxWidth: 520 }}>
+                          <div
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                              gap: 8,
+                              marginBottom: 8,
+                            }}
+                          >
+                            <label style={{ margin: 0 }}>
+                              <span
+                                style={{
+                                  display: 'block',
+                                  marginBottom: 4,
+                                  fontSize: '0.8rem',
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Casting temperature, C
+                              </span>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={
+                                  cakeCastingTemperatures[activeCake.id] ??
+                                  activeCake.castingTemperature ??
+                                  ''
+                                }
+                                onChange={(event) =>
+                                  setCakeCastingTemperatures((previousValues) => ({
+                                    ...previousValues,
+                                    [activeCake.id]: event.target.value,
+                                  }))
+                                }
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Enter') {
+                                    event.preventDefault();
+                                    handleSaveCakeNote(activeCake);
+                                  }
+                                }}
+                                style={{
+                                  width: '100%',
+                                  borderRadius: 6,
+                                  padding: '6px 8px',
+                                  border: '1px solid rgba(0,0,0,0.25)',
+                                }}
+                              />
+                            </label>
+
+                            <label style={{ margin: 0 }}>
+                              <span
+                                style={{
+                                  display: 'block',
+                                  marginBottom: 4,
+                                  fontSize: '0.8rem',
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Flowability, cm
+                              </span>
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={
+                                  cakeFlowabilities[activeCake.id] ??
+                                  activeCake.flowability ??
+                                  ''
+                                }
+                                onChange={(event) =>
+                                  setCakeFlowabilities((previousValues) => ({
+                                    ...previousValues,
+                                    [activeCake.id]: event.target.value,
+                                  }))
+                                }
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Enter') {
+                                    event.preventDefault();
+                                    handleSaveCakeNote(activeCake);
+                                  }
+                                }}
+                                style={{
+                                  width: '100%',
+                                  borderRadius: 6,
+                                  padding: '6px 8px',
+                                  border: '1px solid rgba(0,0,0,0.25)',
+                                }}
+                              />
+                            </label>
+                          </div>
+
+                          <textarea
+                            rows={3}
+                            placeholder={`Note for cake id ${activeCake.id}... Enter to save, Shift+Enter for a new line`}
+                            value={cakeNotes[activeCake.id] ?? activeCake.note ?? ''}
+                            onChange={(event) =>
+                              setCakeNotes((previousNotes) => ({
+                                ...previousNotes,
+                                [activeCake.id]: event.target.value,
+                              }))
+                            }
+                            onKeyDown={(event) => {
+                              if (
+                                event.key === 'Enter' &&
+                                !event.shiftKey &&
+                                !event.nativeEvent.isComposing
+                              ) {
+                                event.preventDefault();
+                                handleSaveCakeNote(activeCake);
+                              }
+                            }}
+                            title="Enter — save, Shift+Enter — new line"
+                            style={{
+                              width: '100%',
+                              borderRadius: 10,
+                              padding: 10,
+                              border: '1px solid rgba(0,0,0,0.25)',
+                              outline: 'none',
+                              display: 'block',
+                            }}
+                          />
+
+                          <Button
+                            color="success"
+                            size="sm"
+                            onClick={() => handleSaveCakeNote(activeCake)}
+                            style={{ marginTop: 8 }}
+                          >
+                            Save note
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>

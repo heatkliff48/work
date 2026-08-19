@@ -1,9 +1,9 @@
-import React, { Fragment, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  updateRawMaterialConsumptionRawMaterialsWarehouse,
+  createRawMaterialConsumptionRequest,
   updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
 import {
@@ -52,6 +52,8 @@ const RawMaterialsConsumptionModal = React.memo(
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [selectedAlu1Type, setSelectedAlu1Type] = useState(null);
     const [selectedAlu2Type, setSelectedAlu2Type] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const savingRef = useRef(false);
 
     const warehouseAluminum1 = useSelector((state) => state.warehouseAluminum1);
 
@@ -377,7 +379,44 @@ const RawMaterialsConsumptionModal = React.memo(
       return snapshot;
     };
 
+    const writeOffMaterials = (body) => {
+      const request = createRawMaterialConsumptionRequest(body);
+
+      dispatch(request.action);
+
+      return request.promise;
+    };
+
+    const getWriteOffErrorMessage = (error) => {
+      const message = error?.message || 'Failed to write off raw materials.';
+      const shortageDetails = Array.isArray(error?.shortageDetails)
+        ? error.shortageDetails
+        : [];
+
+      if (shortageDetails.length === 0) {
+        return message;
+      }
+
+      const details = shortageDetails
+        .map((item) => {
+          const material = item.material || item.subtype || 'Unknown material';
+          const available = Number(item.available) || 0;
+          const required = Number(item.required) || 0;
+          const shortage = Number(item.shortage) || 0;
+
+          return (
+            `${material}: required ${required}, available ${available}` +
+            `, shortage ${shortage}`
+          );
+        })
+        .join('\n');
+
+      return `${message}\n\n${details}`;
+    };
+
     const handleSave = async () => {
+      if (savingRef.current) return;
+
       if (newBatchMode && !selectedRecipe) {
         alert('Please select a recipe.');
         return;
@@ -572,94 +611,111 @@ const RawMaterialsConsumptionModal = React.memo(
         (m) => m.type && Number.isFinite(Number(m.quantity)),
       );
 
-      if (normMaterials.length !== 0) {
-        const body = { materials: fixed_materials };
-        dispatch(updateRawMaterialConsumptionRawMaterialsWarehouse(body));
+      if (normMaterials.length === 0) {
+        alert('There are no materials to write off.');
+        return;
       }
 
-      const recipeSnapshot = buildRecipeSnapshot();
+      const body = { materials: normMaterials };
 
-      const new_lotestList = {
-        production_date: selectedRow?.date,
-        product: currentProductName,
-        quantity_cakes: 1,
-        custom_recipe: materialsMap.some(({ key }) => isRecipeModified(key)),
-        slurried: govno,
-        recipe:
-          selectedRecipe?.article || recipeArticle || selectedRow?.recipe_article,
-        batch_id: selectedRow?.batch_id,
-        aluminum_type: selectedAlu1Type?.value || null,
-        aluminum_2_type: selectedAlu2Type?.value || null,
-        ...recipeSnapshot,
-      };
-      addProductOrder();
+      savingRef.current = true;
+      setIsSaving(true);
 
-      dispatch(
-        addNewLotesList({
-          new_lotestList,
-          new_batch: newBatchMode,
-        }),
-      );
+      try {
+        await writeOffMaterials(body);
 
-      if (!newBatchMode) {
-        const rawRecord = raw_mat_consumption?.find(
-          (r) => String(r.batch_id) === String(selectedRow?.batch_id),
+        const recipeSnapshot = buildRecipeSnapshot();
+
+        const new_lotestList = {
+          production_date: selectedRow?.date,
+          product: currentProductName,
+          quantity_cakes: 1,
+          custom_recipe: materialsMap.some(({ key }) => isRecipeModified(key)),
+          slurried: govno,
+          recipe:
+            selectedRecipe?.article || recipeArticle || selectedRow?.recipe_article,
+          batch_id: selectedRow?.batch_id,
+          aluminum_type: selectedAlu1Type?.value || null,
+          aluminum_2_type: selectedAlu2Type?.value || null,
+          ...recipeSnapshot,
+        };
+
+        if (!newBatchMode) {
+          addProductOrder();
+        }
+
+        dispatch(
+          addNewLotesList({
+            new_lotestList,
+            new_batch: newBatchMode,
+          }),
         );
 
-        if (rawRecord) {
-          const bd_volume = Number(rawRecord.production_volume || 0);
+        if (!newBatchMode) {
+          const rawRecord = raw_mat_consumption?.find(
+            (r) => String(r.batch_id) === String(selectedRow?.batch_id),
+          );
 
-          const alreadyUsed = (rawMatConsumptionCurrentMolds || [])
-            .filter((r) => String(r.batch_id) === String(selectedRow?.batch_id))
-            .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
+          if (rawRecord) {
+            const bd_volume = Number(rawRecord.production_volume || 0);
 
-          const { id, ...newRawMatConsumptionCurrentMold } = selectedRow;
+            const alreadyUsed = (rawMatConsumptionCurrentMolds || [])
+              .filter((r) => String(r.batch_id) === String(selectedRow?.batch_id))
+              .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
-          if (rawRecord.used) {
-            dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
-          }
+            const { id, ...newRawMatConsumptionCurrentMold } = selectedRow;
 
-          if (alreadyUsed == bd_volume) {
-            dispatch(
-              updateRawMatConsumption({
-                id: selectedRow?.id,
-                consumption_calculated: true,
-              }),
-            );
+            if (rawRecord.used) {
+              dispatch(deleteRawMatConsumption({ id: selectedRow?.id }));
+            }
 
-            if (
-              rawMatConsumptionCurrentMolds.find(
-                (r) => String(r.batch_id) === String(selectedRow?.batch_id),
-              )
-            ) {
+            if (alreadyUsed == bd_volume) {
               dispatch(
-                deleteRawMatConsumptionCurrentMolds({
-                  batch_id: selectedRow?.batch_id,
+                updateRawMatConsumption({
+                  id: selectedRow?.id,
+                  consumption_calculated: true,
+                }),
+              );
+
+              if (
+                rawMatConsumptionCurrentMolds.find(
+                  (r) => String(r.batch_id) === String(selectedRow?.batch_id),
+                )
+              ) {
+                dispatch(
+                  deleteRawMatConsumptionCurrentMolds({
+                    batch_id: selectedRow?.batch_id,
+                  }),
+                );
+              }
+            } else {
+              dispatch(
+                addNewRawMatConsumptionCurrentMolds({
+                  ...newRawMatConsumptionCurrentMold,
+                  consumed_volume: 1,
                 }),
               );
             }
-          } else {
-            dispatch(
-              addNewRawMatConsumptionCurrentMolds({
-                ...newRawMatConsumptionCurrentMold,
-                consumed_volume: 1,
-              }),
-            );
           }
         }
-      }
 
-      if (onSave) {
-        await onSave({
-          productionVolume: 1,
-          recipeArticle: selectedRecipe?.article || recipeArticle || null,
-          selectedRecipe,
-        });
-      }
+        if (onSave) {
+          await onSave({
+            productionVolume: 1,
+            recipeArticle: selectedRecipe?.article || recipeArticle || null,
+            selectedRecipe,
+          });
+        }
 
-      toggle();
-      setSelectedAlu1Type(null);
-      setSelectedAlu2Type(null);
+        toggle();
+        setSelectedAlu1Type(null);
+        setSelectedAlu2Type(null);
+      } catch (error) {
+        alert(getWriteOffErrorMessage(error));
+      } finally {
+        savingRef.current = false;
+        setIsSaving(false);
+      }
     };
 
     const ddmmyyFromISO = (iso) => {
@@ -981,11 +1037,19 @@ const RawMaterialsConsumptionModal = React.memo(
               </div>
 
               <div className="d-flex gap-2">
-                <button className="btn btn-outline-secondary" onClick={toggle}>
+                <button
+                  className="btn btn-outline-secondary"
+                  onClick={toggle}
+                  disabled={isSaving}
+                >
                   Cancel
                 </button>
-                <button className="btn btn-success" onClick={handleSave}>
-                  Save
+                <button
+                  className="btn btn-success"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </ModalFooter>

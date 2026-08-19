@@ -402,204 +402,417 @@ rawMaterialsWarehouseRouter.post('/update', async (req, res) => {
 rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
   const { materials } = req.body;
 
-  console.log('======================= materials ======================', materials);
+  const round2 = (value) => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 
-  const round2 = (num) => Math.round(num * 100) / 100;
+  const createRequestError = (
+    status,
+    code,
+    message,
+    shortageDetails = undefined,
+  ) => {
+    const error = new Error(message);
+
+    error.status = status;
+    error.code = code;
+    error.shortageDetails = shortageDetails;
+
+    return error;
+  };
 
   if (!Array.isArray(materials) || materials.length === 0) {
     return res.status(400).json({
-      error: 'The materials field is required and must be a non-empty array.',
+      error: 'INVALID_MATERIALS',
+      message: 'The materials field is required and must be a non-empty array.',
     });
   }
 
   const normMaterials = materials
-    .map((m) => {
-      const qty = Number(m.quantity);
+    .map((material) => {
+      const quantity = Number(material?.quantity);
 
       return {
-        type: normalizeType(m.type),
-        quantity: round2(qty),
+        type: normalizeType(material?.type),
+        quantity: Number.isFinite(quantity) ? round2(quantity) : NaN,
       };
     })
-    .filter((m) => m.type && Number.isFinite(Number(m.quantity)));
-
-  if (normMaterials.length === 0) {
-    return res.status(400).json({ error: 'There are no valid items to write off' });
-  }
-
-  const onlySandSlurryDry = normMaterials.every(
-    (m) => m.type === 'Sand slurry (dry)',
-  );
-
-  const t = await sequelize.transaction();
-  try {
-    const today = new Date();
-    const day = today.getDate().toString().padStart(2, '0');
-    const month = (today.getMonth() + 1).toString().padStart(2, '0');
-    const year = today.getFullYear();
-    const date = `${day}.${month}.${year}`;
-
-    const now = new Date();
-
-    if (onlySandSlurryDry) {
-      const total = round2(normMaterials.reduce((s, m) => s + m.quantity, 0));
-
-      await RawMaterialsWarehouse.update(
-        {
-          consumed_quantity: sequelize.literal(
-            `ROUND((consumed_quantity + ${total})::numeric, 2)`,
-          ),
-          remaining_quantity: sequelize.literal(
-            `ROUND((remaining_quantity - ${total})::numeric, 2)`,
-          ),
-
-          last_updated: date,
-          updatedAt: now,
-        },
-        { where: { material_type: 'Sand slurry (dry)' }, transaction: t },
-      );
-
-      await t.commit();
-
-      const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
-        where: { material_type: { [Op.in]: ['Sand slurry (dry)'] } },
-      });
-
-      myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
-      return res
-        .status(200)
-        .json({ updatedRecords: allUpdatedRecords, deletedIds: [] });
-    }
-
-    const materialTotals = normMaterials.reduce((acc, m) => {
-      acc[m.type] = round2((acc[m.type] || 0) + m.quantity);
-      return acc;
-    }, {});
-
-    const updatedTypes = Object.keys(materialTotals);
-    const deletedIds = [];
-
-    const writeOffFromDetailTable = async (model, subtype, amount) => {
-      let remaining = amount;
-
-      const records = await model.findAll({
-        where: { type: subtype },
-        order: sequelize.literal(`to_date(date, 'DD.MM.YYYY') ASC`),
-        transaction: t,
-      });
-
-      for (const rec of records) {
-        if (remaining <= 0) break;
-        const available = rec.quantity - rec.consumed_quantity;
-        if (available <= 0) continue;
-        const toWrite = Math.min(available, remaining);
-        const newConsumed = rec.consumed_quantity + toWrite;
-
-        await rec.update({ consumed_quantity: newConsumed }, { transaction: t });
-
-        remaining -= toWrite;
-      }
-      if (remaining > 0) {
-        throw new Error(
-          `Недостаточно алюминия типа ${subtype} на складе. Не хватает ${remaining}`,
-        );
-      }
-    };
-
-    const aluminumSpent = { Aluminum: 0 };
-
-    for (const materialType of updatedTypes) {
-      const delta = materialTotals[materialType];
-
-      if (materialType.startsWith('Aluminum|')) {
-        const [, subtype] = materialType.split('|');
-        await writeOffFromDetailTable(WarehouseAluminum1, subtype, delta);
-        aluminumSpent.Aluminum += delta;
-        continue;
-      }
-
-      if (materialType === 'Return slurry (dry)') {
-        await RawMaterialsWarehouse.update(
-          {
-            remaining_quantity: sequelize.literal(
-              `ROUND((remaining_quantity - ${delta})::numeric, 2)`,
-            ),
-            last_updated: date,
-            updatedAt: now,
-          },
-          { where: { material_type: 'Return slurry (dry)' }, transaction: t },
-        );
-      } else {
-        await RawMaterialsWarehouse.update(
-          {
-            consumed_quantity: sequelize.literal(
-              `ROUND((consumed_quantity + ${delta})::numeric, 2)`,
-            ),
-            remaining_quantity: sequelize.literal(
-              `ROUND((remaining_quantity - ${delta})::numeric, 2)`,
-            ),
-            last_updated: date,
-            updatedAt: now,
-          },
-          { where: { material_type: materialType }, transaction: t },
-        );
-      }
-    }
-
-    for (const [alumType, totalSpent] of Object.entries(aluminumSpent)) {
-      if (totalSpent === 0) continue;
-      let model;
-      if (alumType === 'Aluminum') model = WarehouseAluminum1;
-      else continue;
-
-      const [result] = await sequelize.query(
-        `SELECT COALESCE(SUM(quantity), 0) - COALESCE(SUM(consumed_quantity), 0) as total_available
-         FROM "${model.tableName}"
-         WHERE "type" IS NOT NULL`,
-        { transaction: t, type: sequelize.QueryTypes.SELECT },
-      );
-      const totalAvailable = Number(result.total_available) || 0;
-
-      await RawMaterialsWarehouse.update(
-        {
-          remaining_quantity: totalAvailable,
-          consumed_quantity: sequelize.literal(`consumed_quantity + ${totalSpent}`),
-          last_updated: date,
-          updatedAt: now,
-        },
-        { where: { material_type: alumType }, transaction: t },
-      );
-    }
-
-    await t.commit();
-
-    const typesToRead = Array.from(
-      new Set([
-        ...updatedTypes.filter((t) => !t.includes('|')),
-        'Sand slurry (dry)',
-        'Return slurry (dry)',
-        'Aluminum',
-      ]),
+    .filter(
+      (material) =>
+        material.type &&
+        Number.isFinite(material.quantity) &&
+        material.quantity !== 0,
     );
 
-    const allUpdatedRecords = await RawMaterialsWarehouse.findAll({
-      where: { material_type: { [Op.in]: typesToRead } },
+  if (normMaterials.length === 0) {
+    return res.status(400).json({
+      error: 'NO_VALID_MATERIALS',
+      message: 'There are no valid materials to write off.',
     });
+  }
 
-    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, allUpdatedRecords);
+  const invalidNegativeMaterial = normMaterials.find(
+    (material) => material.quantity < 0 && material.type !== 'Return slurry (dry)',
+  );
 
-    return res.status(200).json({
-      updatedRecords: allUpdatedRecords,
-      deletedIds,
+  if (invalidNegativeMaterial) {
+    return res.status(400).json({
+      error: 'INVALID_MATERIAL_QUANTITY',
+      message:
+        `Negative quantity is not allowed for ` +
+        `"${invalidNegativeMaterial.type}".`,
     });
-  } catch (err) {
-    try {
-      if (!t.finished) await t.rollback();
-    } catch (rbErr) {
-      console.error('Rollback failed:', rbErr);
+  }
+
+  const materialTotals = normMaterials.reduce((result, material) => {
+    result[material.type] = round2((result[material.type] || 0) + material.quantity);
+
+    return result;
+  }, {});
+
+  for (const type of Object.keys(materialTotals)) {
+    if (materialTotals[type] === 0) {
+      delete materialTotals[type];
     }
-    console.error('❌ ROLLBACK /raw_mat_con/update:', err);
-    return res.status(500).json({ error: err.message });
+  }
+
+  const updatedTypes = Object.keys(materialTotals);
+
+  if (updatedTypes.length === 0) {
+    return res.status(400).json({
+      error: 'ZERO_MATERIAL_CONSUMPTION',
+      message: 'The total material consumption is zero.',
+    });
+  }
+
+  try {
+    const transactionResult = await sequelize.transaction(async (transaction) => {
+      const now = new Date();
+
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+
+      const currentDate = `${day}.${month}.${year}`;
+
+      const aluminumTypes = updatedTypes
+        .filter((type) => type.startsWith('Aluminum|'))
+        .sort();
+
+      const regularTypes = updatedTypes
+        .filter((type) => !type.startsWith('Aluminum|'))
+        .sort();
+
+      const summaryTypesToLock = [
+        ...regularTypes,
+        ...(aluminumTypes.length > 0 ? ['Aluminum'] : []),
+      ].sort();
+
+      const warehouseRecords = await RawMaterialsWarehouse.findAll({
+        where: {
+          material_type: {
+            [Op.in]: summaryTypesToLock,
+          },
+        },
+        order: [['material_type', 'ASC']],
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+
+      const warehouseByType = new Map(
+        warehouseRecords.map((record) => [
+          normalizeType(record.material_type),
+          record,
+        ]),
+      );
+
+      const shortageDetails = [];
+
+      for (const materialType of regularTypes) {
+        const required = round2(materialTotals[materialType]);
+        const record = warehouseByType.get(materialType);
+
+        if (!record) {
+          shortageDetails.push({
+            material: materialType,
+            available: 0,
+            required,
+            shortage: required > 0 ? required : 0,
+            reason: 'Material is not configured in the warehouse.',
+          });
+
+          continue;
+        }
+
+        const available = round2(Number(record.remaining_quantity) || 0);
+
+        if (required > 0 && available < required) {
+          shortageDetails.push({
+            material: materialType,
+            available,
+            required,
+            shortage: round2(required - available),
+          });
+        }
+      }
+
+      const aluminumRecordsByType = new Map();
+
+      for (const aluminumType of aluminumTypes) {
+        const [, rawSubtype] = aluminumType.split('|');
+        const subtype = normalizeType(rawSubtype);
+        const required = round2(materialTotals[aluminumType]);
+
+        if (!subtype) {
+          throw createRequestError(
+            400,
+            'INVALID_ALUMINUM_TYPE',
+            `Aluminum subtype is not specified for "${aluminumType}".`,
+          );
+        }
+
+        if (required <= 0) {
+          throw createRequestError(
+            400,
+            'INVALID_ALUMINUM_QUANTITY',
+            `Aluminum quantity must be greater than zero for "${subtype}".`,
+          );
+        }
+
+        const records = await WarehouseAluminum1.findAll({
+          where: { type: subtype },
+          order: [
+            [sequelize.literal(`to_date("date", 'DD.MM.YYYY')`), 'ASC'],
+            ['id', 'ASC'],
+          ],
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        });
+
+        aluminumRecordsByType.set(aluminumType, records);
+
+        const available = round2(
+          records.reduce((total, record) => {
+            const quantity = Number(record.quantity) || 0;
+            const consumed = Number(record.consumed_quantity) || 0;
+
+            return total + Math.max(0, quantity - consumed);
+          }, 0),
+        );
+
+        if (available < required) {
+          shortageDetails.push({
+            material: aluminumType,
+            subtype,
+            available,
+            required,
+            shortage: round2(required - available),
+          });
+        }
+      }
+
+      if (shortageDetails.length > 0) {
+        throw createRequestError(
+          409,
+          'INSUFFICIENT_STOCK',
+          'There are not enough materials in the warehouse.',
+          shortageDetails,
+        );
+      }
+
+      for (const materialType of regularTypes) {
+        const delta = round2(materialTotals[materialType]);
+        const record = warehouseByType.get(materialType);
+
+        const currentRemaining = round2(Number(record.remaining_quantity) || 0);
+
+        const newRemaining = round2(currentRemaining - delta);
+
+        if (newRemaining < 0) {
+          throw createRequestError(
+            409,
+            'INSUFFICIENT_STOCK',
+            `There is not enough "${materialType}" in the warehouse.`,
+            [
+              {
+                material: materialType,
+                available: currentRemaining,
+                required: delta,
+                shortage: round2(delta - currentRemaining),
+              },
+            ],
+          );
+        }
+
+        if (materialType === 'Return slurry (dry)') {
+          await record.update(
+            {
+              remaining_quantity: newRemaining,
+              last_updated: currentDate,
+              updatedAt: now,
+            },
+            { transaction },
+          );
+        } else {
+          const currentConsumed = round2(Number(record.consumed_quantity) || 0);
+
+          await record.update(
+            {
+              consumed_quantity: round2(currentConsumed + delta),
+              remaining_quantity: newRemaining,
+              last_updated: currentDate,
+              updatedAt: now,
+            },
+            { transaction },
+          );
+        }
+      }
+
+      let totalAluminumSpent = 0;
+
+      for (const aluminumType of aluminumTypes) {
+        const required = round2(materialTotals[aluminumType]);
+        const records = aluminumRecordsByType.get(aluminumType) || [];
+
+        let remainingToWriteOff = required;
+
+        for (const record of records) {
+          if (remainingToWriteOff <= 0) {
+            break;
+          }
+
+          const quantity = round2(Number(record.quantity) || 0);
+          const consumed = round2(Number(record.consumed_quantity) || 0);
+
+          const available = round2(Math.max(0, quantity - consumed));
+
+          if (available <= 0) {
+            continue;
+          }
+
+          const quantityToWriteOff = round2(
+            Math.min(available, remainingToWriteOff),
+          );
+
+          await record.update(
+            {
+              consumed_quantity: round2(consumed + quantityToWriteOff),
+            },
+            { transaction },
+          );
+
+          remainingToWriteOff = round2(remainingToWriteOff - quantityToWriteOff);
+        }
+
+        if (remainingToWriteOff > 0.001) {
+          const [, subtype] = aluminumType.split('|');
+
+          throw createRequestError(
+            409,
+            'INSUFFICIENT_STOCK',
+            `There is not enough aluminum subtype "${subtype}".`,
+            [
+              {
+                material: aluminumType,
+                subtype,
+                required,
+                shortage: remainingToWriteOff,
+              },
+            ],
+          );
+        }
+
+        totalAluminumSpent = round2(totalAluminumSpent + required);
+      }
+
+      if (totalAluminumSpent > 0) {
+        const aluminumSummaryRecord = warehouseByType.get('Aluminum');
+
+        if (!aluminumSummaryRecord) {
+          throw createRequestError(
+            409,
+            'ALUMINUM_WAREHOUSE_NOT_CONFIGURED',
+            'The general Aluminum record is missing from the warehouse.',
+          );
+        }
+
+        const totalAluminumQuantity =
+          Number(
+            await WarehouseAluminum1.sum('quantity', {
+              transaction,
+            }),
+          ) || 0;
+
+        const totalAluminumConsumed =
+          Number(
+            await WarehouseAluminum1.sum('consumed_quantity', {
+              transaction,
+            }),
+          ) || 0;
+
+        const totalAluminumAvailable = round2(
+          totalAluminumQuantity - totalAluminumConsumed,
+        );
+
+        const previousConsumed = round2(
+          Number(aluminumSummaryRecord.consumed_quantity) || 0,
+        );
+
+        await aluminumSummaryRecord.update(
+          {
+            remaining_quantity: totalAluminumAvailable,
+            consumed_quantity: round2(previousConsumed + totalAluminumSpent),
+            last_updated: currentDate,
+            updatedAt: now,
+          },
+          { transaction },
+        );
+      }
+
+      const typesToRead = [
+        ...regularTypes,
+        ...(totalAluminumSpent > 0 ? ['Aluminum'] : []),
+      ].sort();
+
+      const updatedRecords = await RawMaterialsWarehouse.findAll({
+        where: {
+          material_type: {
+            [Op.in]: typesToRead,
+          },
+        },
+        order: [['id', 'ASC']],
+        transaction,
+      });
+
+      return {
+        updatedRecords: updatedRecords.map((record) => record.toJSON()),
+        deletedIds: [],
+      };
+    });
+
+    myEmitter.emit(
+      UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+      transactionResult.updatedRecords,
+    );
+
+    return res.status(200).json(transactionResult);
+  } catch (err) {
+    const status = Number(err.status) || 500;
+
+    if (status >= 500) {
+      console.error('POST /raw_mat_con/update failed:', err);
+    } else {
+      console.warn('POST /raw_mat_con/update rejected:', err.message);
+    }
+
+    const response = {
+      error: err.code || 'RAW_MATERIAL_WRITE_OFF_FAILED',
+      message: err.message || 'Failed to write off raw materials.',
+    };
+
+    if (Array.isArray(err.shortageDetails)) {
+      response.shortageDetails = err.shortageDetails;
+    }
+
+    return res.status(status).json(response);
   }
 });
 

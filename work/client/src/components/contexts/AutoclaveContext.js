@@ -16,6 +16,7 @@ import {
 import {
   addNewBatchOutside,
   updateBatchOutside,
+  deleteBatchOutside,
 } from '#components/redux/actions/batchOutsideAction.js';
 import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
 import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
@@ -49,6 +50,7 @@ export const AutoclaveContextProvider = ({ children }) => {
   const [selectedCell, setSelectedCell] = useState(null);
   const [initialRowCount, setInitialRowCount] = useState(0);
   const [autoclaveCalendarData, setAutoclaveCalendarData] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
   const autoclave_calendar = useSelector((state) => state.autoclave_calendar);
 
   useEffect(() => {
@@ -60,6 +62,7 @@ export const AutoclaveContextProvider = ({ children }) => {
     setInitialRowCount(0);
     setSelectedCell(null);
     setAutoclaveCalendarData(null);
+    setIsEditMode(false);
   };
 
   // ---------- Вспомогательные функции (копируем из старого Autoclave) ----------
@@ -494,6 +497,7 @@ export const AutoclaveContextProvider = ({ children }) => {
       });
 
       setSelectedCell(null);
+      setIsEditMode(false);
       clearAutoclaves();
     },
     [
@@ -509,32 +513,200 @@ export const AutoclaveContextProvider = ({ children }) => {
     ],
   );
 
+  // Полноценное редактирование уже сохранённых позиций batchOutside для конкретной
+  // даты: старые записи на дату удаляются и создаются заново по текущей раскладке
+  // автоклава, а не мержатся поверх (как в обычном saveOnServer).
+  const saveEditedDateToServer = useCallback(
+    (filledCount) => {
+      if (!autoclaveCalendarData) return;
+      const { date } = autoclaveCalendarData;
+
+      const oldRecordsForDate = existingBatchOutside.filter((r) => r.date === date);
+
+      const flat = toFlat(autoclave);
+      const idsInOrder = [];
+      for (const c of flat) {
+        if (c?.id == null) continue;
+        if (!idsInOrder.includes(c.id)) idsInOrder.push(c.id);
+      }
+
+      let positionInBatch = 1;
+      const batchPositions = [];
+      idsInOrder.forEach((id) => {
+        const product = batchDesigner.find((p) => p.id === id);
+        if (product) {
+          batchPositions.push({ product, positionInBatch });
+          positionInBatch += Number(product.cakes_in_batch || 0);
+        }
+      });
+
+      const mergedNewPositions = batchPositions.reduce((acc, current) => {
+        const lastItem = acc[acc.length - 1];
+        const currentProduct = current.product;
+        if (
+          lastItem &&
+          lastItem.product.product_article === currentProduct.product_article &&
+          lastItem.product.id_list_of_ordered_production !== null &&
+          currentProduct.id_list_of_ordered_production !== null
+        ) {
+          lastItem.product.cakes_in_batch += currentProduct.cakes_in_batch;
+          lastItem.product.free_product_package +=
+            currentProduct.free_product_package;
+          lastItem.product.total_cakes += currentProduct.total_cakes;
+        } else {
+          acc.push({
+            product: { ...currentProduct },
+            positionInBatch: current.positionInBatch,
+          });
+        }
+        return acc;
+      }, []);
+
+      // Для позиций, связанных со складским заказом, считаем чистую дельту
+      // аллокации (старое значение по этой дате вычитаем, новое добавляем),
+      // т.к. updateOrderToWarehouse на сервере суммирует переданное значение.
+      const orderDelta = new Map();
+      oldRecordsForDate.forEach((rec) => {
+        if (rec.id_ordered_product_to_warehouse) {
+          orderDelta.set(
+            rec.id_ordered_product_to_warehouse,
+            (orderDelta.get(rec.id_ordered_product_to_warehouse) || 0) -
+              Number(rec.quantity_pallets || 0),
+          );
+        }
+      });
+
+      oldRecordsForDate.forEach((rec) => dispatch(deleteBatchOutside(rec.id)));
+
+      mergedNewPositions.forEach((newPosition) => {
+        const { product } = newPosition;
+
+        const quantity_total =
+          newPosition.product.id_list_of_ordered_production !== null
+            ? list_of_ordered_production?.find(
+                (order) => order.id == newPosition.product.id,
+              )
+            : 0;
+
+        const m3InArray = latestProducts?.find(
+          (p) => p.article == product.product_article,
+        )?.m3InArray;
+        const volumeBlockOnPallet = latestProducts?.find(
+          (p) => p.article == product.product_article,
+        )?.volumeBlockOnPallet;
+        const palletsPerArray = Math.max(
+          1,
+          Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+        );
+
+        const quantity_pallets = product.cakes_in_batch * palletsPerArray;
+
+        const quantity_free =
+          newPosition.product.id_list_of_ordered_production !== null &&
+          newPosition.product.cakes_in_batch &&
+          newPosition.product.total_cakes &&
+          newPosition.product.free_product_package >= 0
+            ? Math.max(0, quantity_pallets - quantity_total?.quantity)
+            : newPosition.product.id_list_of_ordered_production == null
+              ? quantity_pallets
+              : 0;
+
+        dispatch(
+          addNewBatchOutside({
+            product_article: product.product_article,
+            quantity_pallets,
+            quantity_free,
+            position_in_autoclave: newPosition.positionInBatch,
+            id_list_of_ordered_production:
+              newPosition.product.id_list_of_ordered_production !== null
+                ? newPosition.product.id
+                : null,
+            date,
+            id_ordered_product_to_warehouse:
+              newPosition.product.id_ordered_product_to_warehouse ?? null,
+          }),
+        );
+
+        if (newPosition.product.id_ordered_product_to_warehouse) {
+          orderDelta.set(
+            newPosition.product.id_ordered_product_to_warehouse,
+            (orderDelta.get(newPosition.product.id_ordered_product_to_warehouse) ||
+              0) + quantity_pallets,
+          );
+        }
+      });
+
+      orderDelta.forEach((delta, orderId) => {
+        if (!delta) return;
+        dispatch(updateOrderToWarehouse({ id: orderId, quantity_allocated: delta }));
+      });
+
+      const totalAutoclavesForDate = Math.ceil(filledCount / CELLS_PER_AUTOCLAVE);
+      dispatch(
+        addNewAutoclaveCalendar([
+          { ...autoclaveCalendarData, produced_autoclave: totalAutoclavesForDate },
+        ]),
+      );
+
+      setSelectedCell(null);
+      setIsEditMode(false);
+      clearAutoclaves();
+    },
+    [
+      autoclave,
+      autoclaveCalendarData,
+      batchDesigner,
+      existingBatchOutside,
+      list_of_ordered_production,
+      latestProducts,
+      dispatch,
+      toFlat,
+      clearAutoclaves,
+    ],
+  );
+
+  const confirmFullAutoclaves = useCallback((filledCount) => {
+    const isAutoclaveInvalid =
+      filledCount === 0 || filledCount % CELLS_PER_AUTOCLAVE !== 0;
+    if (!isAutoclaveInvalid) return true;
+
+    const override = window.confirm(
+      'Autoclave is not fully filled. Override with password?',
+    );
+    if (!override) return false;
+    const password = prompt('Enter autoclave password:');
+    if (!password) {
+      alert('Password is required');
+      return false;
+    }
+    if (password !== process.env.REACT_APP_PASSWORD_FOR_AUTOCLAVE) {
+      alert('Wrong password');
+      return false;
+    }
+    return true;
+  }, []);
+
   const onSaveHandler = useCallback(async () => {
     const filledCount = Array.isArray(autoclave)
       ? autoclave.flat().filter((cell) => cell?.id !== null).length
       : 0;
-    const isAutoclaveInvalid =
-      filledCount === 0 || filledCount % CELLS_PER_AUTOCLAVE !== 0;
 
-    if (isAutoclaveInvalid) {
-      const override = window.confirm(
-        'Autoclave is not fully filled. Override with password?',
-      );
-      if (!override) return;
-      const password = prompt('Enter autoclave password:');
-      if (!password) {
-        alert('Password is required');
-        return;
-      }
-      if (password !== process.env.REACT_APP_PASSWORD_FOR_AUTOCLAVE) {
-        alert('Wrong password');
-        return;
-      }
-      saveOnServer(filledCount);
-    } else {
-      saveOnServer(filledCount);
-    }
-  }, [autoclave, saveOnServer]);
+    if (!confirmFullAutoclaves(filledCount)) return false;
+
+    saveOnServer(filledCount);
+    return true;
+  }, [autoclave, saveOnServer, confirmFullAutoclaves]);
+
+  const onSaveEditHandler = useCallback(async () => {
+    const filledCount = Array.isArray(autoclave)
+      ? autoclave.flat().filter((cell) => cell?.id !== null).length
+      : 0;
+
+    if (!confirmFullAutoclaves(filledCount)) return false;
+
+    saveEditedDateToServer(filledCount);
+    return true;
+  }, [autoclave, saveEditedDateToServer, confirmFullAutoclaves]);
 
   const syncFromAutoclave = useCallback(
     (rows) => {
@@ -627,6 +799,9 @@ export const AutoclaveContextProvider = ({ children }) => {
       moveBatchLater,
       clearAutoclaves,
       onSaveHandler,
+      onSaveEditHandler,
+      isEditMode,
+      setIsEditMode,
       CELLS_PER_AUTOCLAVE,
       resetAutocalveState,
     }),
@@ -643,6 +818,8 @@ export const AutoclaveContextProvider = ({ children }) => {
       moveBatchLater,
       clearAutoclaves,
       onSaveHandler,
+      onSaveEditHandler,
+      isEditMode,
       resetAutocalveState,
     ],
   );
