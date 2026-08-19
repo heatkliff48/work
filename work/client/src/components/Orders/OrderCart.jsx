@@ -942,7 +942,7 @@ const OrderCart = React.memo(() => {
       ).toFixed(2);
 
       return {
-        vat_euro_origin: final_price_product,
+        vat_euro_origin: final_price_product.toFixed(2),
         vat_result,
         vat_euro,
         vat_result_del,

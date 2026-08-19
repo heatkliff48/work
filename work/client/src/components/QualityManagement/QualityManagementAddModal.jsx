@@ -188,7 +188,9 @@ function QualityManagementAddModal(props) {
   };
 
   const handleProductArticleSelectChange = (selectedOption, key) => {
-    const product = latestProducts.find((el) => el.article === selectedOption.value);
+    const product = latestProducts.find(
+      (el) => el.article === selectedOption.value,
+    );
     const warehouse_article = getWarehouseArticle(product);
 
     setCustomBatchSelectInput((prev) => ({
@@ -290,10 +292,11 @@ function QualityManagementAddModal(props) {
     const widthInArray = Math.max(
       1,
       Math.floor(
-        Number(product?.m3InArray || 0) / Number(product?.volumeBlockOnPallet || 1),
+        Number(product?.m3InArray || 0) /
+          Number(product?.volumeBlockOnPallet || 1),
       ),
     );
-    
+
     // Сколько палет планируется произвести в этой партии
     const totalQuantityPlan =
       (Number(rawMatConsEntry.production_volume) || 0) * widthInArray;
@@ -305,7 +308,10 @@ function QualityManagementAddModal(props) {
         const orderedQuantity = Number(item.quantity) || 0;
         const quantityInWarehouse = Number(item.quantity_in_warehouse) || 0;
 
-        const remainingQuantity = Math.max(0, orderedQuantity - quantityInWarehouse);
+        const remainingQuantity = Math.max(
+          0,
+          orderedQuantity - quantityInWarehouse,
+        );
 
         return sum + remainingQuantity;
       }, 0);
@@ -313,7 +319,7 @@ function QualityManagementAddModal(props) {
     // Резервируем не больше:
     // 1. чем нужно заказам;
     // 2. чем планируется произвести в этой партии.
-    const reservedQuantity = Math.min(totalQuantityPlan, remainingOrderQuantity);
+    const reservedQuantity = remainingOrderQuantity;
 
     dispatch(
       addNewQualityManagement({
@@ -427,7 +433,9 @@ function QualityManagementAddModal(props) {
       dialogClassName="modal-auto-size"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Batch calendar</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Batch calendar
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {customBatchSelect ? (
@@ -469,7 +477,9 @@ function QualityManagementAddModal(props) {
                             name={el.accessor}
                             type="text"
                             value={customBatchSelectInput[el.accessor] || ''}
-                            onChange={(e) => handleCustomBatchSelectInputChange(e)}
+                            onChange={(e) =>
+                              handleCustomBatchSelectInputChange(e)
+                            }
                           />
                         )}
                       </div>
