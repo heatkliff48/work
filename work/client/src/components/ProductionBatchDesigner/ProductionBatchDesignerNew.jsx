@@ -313,6 +313,85 @@ function ProductionBatchDesignerNew() {
     freedPalletsByWarehouseOrder,
   ]);
 
+  const COLUMNS_ORDERS_TO_WAREHOUSE = useMemo(
+    () => [
+      {
+        Header: 'Ref.',
+        accessor: 'product_article',
+        disableSortBy: true,
+      },
+      {
+        Header: 'Description',
+        accessor: 'description',
+        sortType: 'string',
+      },
+      {
+        Header: 'Product size',
+        accessor: 'product_size',
+      },
+      {
+        Header: 'Product density',
+        accessor: 'density',
+      },
+      {
+        Header: 'Pallets, qty',
+        accessor: 'quantity_pallets',
+      },
+      {
+        Header: 'Real quantity, m2',
+        accessor: 'quantity_real_m2',
+      },
+      {
+        Header: 'Produced',
+        accessor: 'quantity_produced',
+      },
+      {
+        Header: 'Allocated',
+        accessor: 'quantity_allocated',
+      },
+    ],
+    [],
+  );
+
+  useEffect(() => {
+    dispatch(getOrderToWarehouse());
+  }, []);
+
+  useEffect(() => {
+    if (!list_of_orders_to_warehouse) {
+      setFilteredList([]);
+      return;
+    }
+
+    const filtered = list_of_orders_to_warehouse.filter(
+      (order) =>
+        order.quantity_pallets > order.quantity_produced &&
+        order.quantity_pallets > order.quantity_allocated,
+    );
+
+    const regex = /(\d+)\s*x\s*(\d+)\s*x\s*(\d+)/;
+    const filteredWithSize = filtered.reduce((acc, el) => {
+      const product = latestProducts.find((p) => p.article == el.product_article);
+
+      // el.description holds the order's title (dimensions already stripped out
+      // when the order was created), so the size must be parsed from the
+      // product's own description instead — see DimensionsTestModal.jsx.
+      const match = product?.description?.match(regex);
+
+      const product_size = match ? `${match[1]}x${match[2]}x${match[3]}` : '';
+
+      const newObj = {
+        ...el,
+        product_size,
+        density: product?.density,
+      };
+      acc.push(newObj);
+      return acc;
+    }, []);
+
+    setFilteredList(filteredWithSize);
+  }, [list_of_orders_to_warehouse, latestProducts]);
+
   const MAX_QUANTITY = 10405;
 
   const emptyAutoclave = useMemo(
