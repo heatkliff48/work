@@ -32,9 +32,10 @@ function CackeFillUp() {
   const [activeBatchId, setActiveBatchId] = useState(null);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [activeCakeId, setActiveCakeId] = useState(null);
+  const [activeRecipeArticle, setActiveRecipeArticle] = useState(null);
   const [total_cacke, setTotalCacke] = useState(0);
   const [cakeNotes, setCakeNotes] = useState({});
-  const [cakeCuttingTemperatures, setCakeCuttingTemperatures] = useState({});
+  const [cakeCastingTemperatures, setCakeCastingTemperatures] = useState({});
   const [cakeFlowabilities, setCakeFlowabilities] = useState({});
 
   const production_plan_table = [
@@ -195,8 +196,9 @@ function CackeFillUp() {
     setCackeFillUp({});
     setCurrentProduct(null);
     setActiveCakeId(null);
+    setActiveRecipeArticle(null);
     setCakeNotes({});
-    setCakeCuttingTemperatures({});
+    setCakeCastingTemperatures({});
     setCakeFlowabilities({});
   }, []);
 
@@ -314,7 +316,7 @@ function CackeFillUp() {
           return {
             id,
             note: savedCake?.note || '',
-            cuttingTemperature: savedCake?.cutting_temperature ?? '',
+            castingTemperature: savedCake?.casting_temperature ?? '',
             flowability: savedCake?.flowability ?? '',
           };
         });
@@ -334,8 +336,8 @@ function CackeFillUp() {
 
   const handleSaveCakeNote = async (cake) => {
     const note = cakeNotes[cake.id] ?? cake.note ?? '';
-    const cuttingTemperature =
-      cakeCuttingTemperatures[cake.id] ?? cake.cuttingTemperature ?? '';
+    const castingTemperature =
+      cakeCastingTemperatures[cake.id] ?? cake.castingTemperature ?? '';
     const flowability = cakeFlowabilities[cake.id] ?? cake.flowability ?? '';
 
     const normalizeOptionalNumber = (value) => {
@@ -348,12 +350,10 @@ function CackeFillUp() {
     try {
       await dispatch(
         addNewLotesListCakes({
-          num: [cake.id],
-          note: { [cake.id]: note },
-          cutting_temperature: {
-            [cake.id]: normalizeOptionalNumber(cuttingTemperature),
-          },
-          flowability: { [cake.id]: normalizeOptionalNumber(flowability) },
+          id: cake.id,
+          note,
+          casting_temperature: normalizeOptionalNumber(castingTemperature),
+          flowability: normalizeOptionalNumber(flowability),
         }),
       );
 
@@ -361,9 +361,9 @@ function CackeFillUp() {
         ...previousNotes,
         [cake.id]: note,
       }));
-      setCakeCuttingTemperatures((previousValues) => ({
+      setCakeCastingTemperatures((previousValues) => ({
         ...previousValues,
-        [cake.id]: cuttingTemperature,
+        [cake.id]: castingTemperature,
       }));
       setCakeFlowabilities((previousValues) => ({
         ...previousValues,
@@ -375,7 +375,21 @@ function CackeFillUp() {
     }
   };
 
+  const isFullyAllocated = totalCake > 0 && allocated >= totalCake;
+
   const handleNewBatch = () => {
+    if (isFullyAllocated) {
+      const shouldContinue = window.confirm(
+        'Все массивы залиты, желаете продолжить?',
+      );
+
+      if (!shouldContinue) return;
+
+      const isConfirmed = window.confirm('Вы уверены, что хотите продолжить?');
+
+      if (!isConfirmed) return;
+    }
+
     setRawMaterialConsumptionMadal(true);
   };
 
@@ -383,34 +397,9 @@ function CackeFillUp() {
     const currentAllocated = Number(productionVolume) || 0;
     if (currentAllocated <= 0) return;
 
-    const {
-      id,
-      product_article = null,
-      date,
-      id_ordered_product_to_warehouse = null,
-    } = cackeFillUp;
+    const { product_article = null, date } = cackeFillUp;
 
-    const batch = batchOutside.find((el) => el.id == id);
-    if (!batch) {
-      console.error('Batch not found:', id);
-      return;
-    }
-
-    const { quantity_pallets, quantity_free } = batch;
-
-    await dispatch(
-      addNewRawMatConsumption({
-        batch_id: activeBatchId,
-        production_volume: currentAllocated,
-        recipe_article: recipeArticle || null,
-        batch_article: product_article,
-        cacke_id_start: null,
-        date,
-        id_ordered_product_to_warehouse,
-        consumption_calculated: true,
-        batch_quantity_pallets: quantity_pallets - quantity_free || 0,
-      }),
-    );
+    setActiveRecipeArticle(recipeArticle || null);
 
     dispatch(
       addNewProductionQuality({
@@ -445,12 +434,56 @@ function CackeFillUp() {
     if (!window.confirm('Do you want to continue?')) {
       return;
     }
-    const { id, date } = cackeFillUp;
+    const {
+      id,
+      product_article = null,
+      date,
+      id_ordered_product_to_warehouse = null,
+    } = cackeFillUp;
+
+    const batch = batchOutside.find((item) => item.id == id);
+    if (!batch) {
+      console.error('Batch not found:', id);
+      return;
+    }
+
+    const currentAllocated = Number(allocated) || 0;
+    const { quantity_pallets, quantity_free } = batch;
+
+    const cackeIdStart = (Array.isArray(lotesListBatches) ? lotesListBatches : [])
+      .filter((item) => String(item?.batch_id) === String(activeBatchId))
+      .reduce((minimumId, item) => {
+        const cakeIdStart = Number(item?.cake_id_start);
+
+        if (!Number.isFinite(cakeIdStart)) return minimumId;
+        return minimumId == null ? cakeIdStart : Math.min(minimumId, cakeIdStart);
+      }, null);
 
     const accd = autoclave_calendar.find((el) => el.date === date);
     if (!accd) {
       console.error('Autoclave calendar entry not found for date:', date);
       return;
+    }
+
+    if (currentAllocated > 0) {
+      if (cackeIdStart == null) {
+        console.error('Cake start id not found for batch:', activeBatchId);
+        return;
+      }
+
+      await dispatch(
+        addNewRawMatConsumption({
+          batch_id: activeBatchId,
+          production_volume: currentAllocated,
+          recipe_article: activeRecipeArticle,
+          batch_article: product_article,
+          cacke_id_start: cackeIdStart,
+          date,
+          id_ordered_product_to_warehouse,
+          consumption_calculated: true,
+          batch_quantity_pallets: quantity_pallets - quantity_free || 0,
+        }),
+      );
     }
 
     const totalArrays = Number(accd.total_arrays) || 0;
@@ -475,8 +508,9 @@ function CackeFillUp() {
     setCurrentProduct(null);
     setActiveBatchId(null);
     setActiveCakeId(null);
+    setActiveRecipeArticle(null);
     setCakeNotes({});
-    setCakeCuttingTemperatures({});
+    setCakeCastingTemperatures({});
     setCakeFlowabilities({});
   };
 
@@ -728,7 +762,10 @@ function CackeFillUp() {
               className="mt-2"
               style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
             >
-              <Button color="success" onClick={handleNewBatch}>
+              <Button
+                color={isFullyAllocated ? 'danger' : 'success'}
+                onClick={handleNewBatch}
+              >
                 New cacke
               </Button>
 
@@ -837,18 +874,18 @@ function CackeFillUp() {
                                   fontWeight: 600,
                                 }}
                               >
-                                Cutting temperature, C
+                                Casting temperature, C
                               </span>
                               <input
                                 type="number"
                                 step="0.01"
                                 value={
-                                  cakeCuttingTemperatures[activeCake.id] ??
-                                  activeCake.cuttingTemperature ??
+                                  cakeCastingTemperatures[activeCake.id] ??
+                                  activeCake.castingTemperature ??
                                   ''
                                 }
                                 onChange={(event) =>
-                                  setCakeCuttingTemperatures((previousValues) => ({
+                                  setCakeCastingTemperatures((previousValues) => ({
                                     ...previousValues,
                                     [activeCake.id]: event.target.value,
                                   }))
