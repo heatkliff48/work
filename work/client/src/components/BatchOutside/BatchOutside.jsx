@@ -36,6 +36,13 @@ function buildGridColumns(rows, latestProducts, cellsPerAutoclave, autoclaveCale
     ]),
   );
 
+  const producedByDate = new Map(
+    (autoclaveCalendar || []).map((el) => [
+      String(el.date).slice(0, 10),
+      Number(el.produced_autoclave) || 0,
+    ]),
+  );
+
   const order = Array.from(new Set([...byDate.keys(), ...scheduledByDate.keys()])).sort((a, b) =>
     String(a).localeCompare(String(b)),
   );
@@ -73,9 +80,11 @@ function buildGridColumns(rows, latestProducts, cellsPerAutoclave, autoclaveCale
       filledCount += 1;
     }
 
-    // No planning slots in the past: an autoclave scheduled on a gone-by date can't be filled anymore
+    // No planning slots in the past: an autoclave scheduled on a gone-by date can't be filled anymore.
+    // Produced autoclaves are no longer available either, so they don't count as free slots.
     const scheduled = date < today ? 0 : scheduledByDate.get(date) || 0;
-    const emptyCount = Math.max(0, scheduled - filledCount);
+    const produced = producedByDate.get(date) || 0;
+    const emptyCount = Math.max(0, scheduled - produced - filledCount);
     for (let e = 0; e < emptyCount; e++) {
       columns.push({ date, weekNumber, colorClass, cakeRows: [], isEmpty: true, isHistory: false });
     }
