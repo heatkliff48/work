@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       gypsum_stone: DataTypes.STRING,
       aluminum_paste: DataTypes.STRING,
       aluminum_paste_2: DataTypes.STRING,
+      aluminum_suspension: DataTypes.STRING,
       aluminum_type: DataTypes.STRING,
       aluminum_2_type: DataTypes.STRING,
       grinding_balls: DataTypes.STRING,
