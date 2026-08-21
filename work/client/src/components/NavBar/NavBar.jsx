@@ -195,18 +195,14 @@ export default function NavBar() {
             icon: autoclaveCalendarIcon,
           },
           {
-            title: 'Batch planner',
-            path: '/production_batch_designer_new',
-            icon: batchPlannerIcon,
+            title: 'Batch calendar',
+            path: '/batch_outside',
+            icon: batchCalendarIcon,
+            access: 'production_plan',
           },
         ],
       },
-      {
-        title: 'Batch calendar',
-        path: '/batch_outside',
-        icon: batchCalendarIcon,
-        access: 'production_plan',
-      },
+      
       {
         type: 'group',
         title: 'Technology planner',
