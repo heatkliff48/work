@@ -200,7 +200,9 @@ function Products() {
                           </span>
                         )}
                         {/* Render the columns filter UI */}
-                        <div>{col.canFilter ? col.render('Filter') : null}</div>
+                        <div onClick={(e) => e.stopPropagation()}>
+                          {col.canFilter ? col.render('Filter') : null}
+                        </div>
                       </th>
                     );
                   })}
