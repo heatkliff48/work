@@ -53,6 +53,8 @@ const RawMaterialsConsumptionModal = React.memo(
     const [selectedAlu1Type, setSelectedAlu1Type] = useState(null);
     const [selectedAlu2Type, setSelectedAlu2Type] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [moldId, setMoldId] = useState('');
+    const [ws, setWs] = useState('');
     const savingRef = useRef(false);
 
     const warehouseAluminum1 = useSelector((state) => state.warehouseAluminum1);
@@ -69,6 +71,8 @@ const RawMaterialsConsumptionModal = React.memo(
     useEffect(() => {
       if (!isOpen) return;
       setRecipeArticle(selectedRow?.recipe_article ?? '');
+      setMoldId('');
+      setWs('');
     }, [selectedRow, isOpen]);
 
     const materialsMap = useMemo(
@@ -82,6 +86,11 @@ const RawMaterialsConsumptionModal = React.memo(
         { label: 'Gypsum stone', key: 'gypsum_stone' },
         { label: 'Aluminum 1', key: 'aluminum_paste' },
         { label: 'Aluminum 2', key: 'aluminum_paste_2' },
+        {
+          label: 'Aluminum suspension, kg',
+          key: 'aluminum_suspension',
+          noWriteOff: true,
+        },
       ],
       [],
     );
@@ -111,7 +120,8 @@ const RawMaterialsConsumptionModal = React.memo(
         data.forEach((item) => {
           const subtype = item?.type ? String(item.type).trim() : null;
           const available =
-            (Number(item?.quantity) || 0) - (Number(item?.consumed_quantity) || 0);
+            (Number(item?.quantity) || 0) -
+            (Number(item?.consumed_quantity) || 0);
           if (subtype && available > 0) {
             const key = `${baseName}|${subtype}`;
             map.set(key, (map.get(key) || 0) + available);
@@ -135,13 +145,17 @@ const RawMaterialsConsumptionModal = React.memo(
       return map;
     }, [raw_materials_warehouse, warehouseAluminum1]);
 
-    const ALWAYS_VISIBLE = useMemo(() => new Set(['Aluminum 1', 'Aluminum 2']), []);
+    const ALWAYS_VISIBLE = useMemo(
+      () => new Set(['Aluminum 1', 'Aluminum 2', 'Aluminum suspension, kg']),
+      [],
+    );
 
     const recipeForUI = useMemo(() => selectedRecipe || null, [selectedRecipe]);
 
     const currentProductName = useMemo(() => {
       const productDetails = latestProducts.find(
-        (product) => String(product.article) === String(selectedRow?.batch_article),
+        (product) =>
+          String(product.article) === String(selectedRow?.batch_article),
       );
 
       if (!productDetails?.description) return null;
@@ -187,7 +201,9 @@ const RawMaterialsConsumptionModal = React.memo(
         const next = { ...prev };
         materialsMap.forEach(({ key }) => {
           const baseVal = Number(recipeForUI?.[key]);
-          next[`${key}_actual_reciepe`] = Number.isFinite(baseVal) ? baseVal : '';
+          next[`${key}_actual_reciepe`] = Number.isFinite(baseVal)
+            ? baseVal
+            : '';
         });
         return next;
       });
@@ -236,7 +252,8 @@ const RawMaterialsConsumptionModal = React.memo(
       if (product) {
         candidateRecipes = (list_of_recipes || []).filter(
           (r) =>
-            r.density === product.density && r.certificate === product.certificate,
+            r.density === product.density &&
+            r.certificate === product.certificate,
         );
       }
 
@@ -251,7 +268,9 @@ const RawMaterialsConsumptionModal = React.memo(
       const matched =
         fromRowArticle &&
         fromRowArticle !== 'No recipe' &&
-        candidateRecipes.find((r) => String(r.article) === String(fromRowArticle));
+        candidateRecipes.find(
+          (r) => String(r.article) === String(fromRowArticle),
+        );
 
       const recipe = matched || candidateRecipes[0] || null;
 
@@ -326,6 +345,14 @@ const RawMaterialsConsumptionModal = React.memo(
       return +value.toFixed(2);
     };
 
+    const aluminumTotal = [
+      'aluminum_paste',
+      'aluminum_paste_2',
+    ].reduce((sum, key) => {
+      const consumed = computeConsumed(key);
+      return consumed === null ? sum : sum + Number(consumed);
+    }, 0);
+
     const shouldShowRow = (label, key) => {
       if (ALWAYS_VISIBLE.has(label)) return true;
 
@@ -365,11 +392,13 @@ const RawMaterialsConsumptionModal = React.memo(
     const buildRecipeSnapshot = () => {
       const snapshot = {};
 
-      materialsMap.forEach(({ key }) => {
+      materialsMap.forEach(({ key, noWriteOff }) => {
         const actual = Number(form[`${key}_actual_reciepe`]);
 
         if (Number.isFinite(actual) && actual > 0) {
           snapshot[key] = +actual.toFixed(5);
+        } else if (noWriteOff) {
+          snapshot[key] = null;
         } else {
           const base = Number(recipeForUI?.[key]);
           snapshot[key] = Number.isFinite(base) ? +base.toFixed(5) : 0;
@@ -435,32 +464,34 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
-      const materials = materialsMap.map(({ label, key }) => {
-        const w = computeConsumed(key);
+      const materials = materialsMap
+        .filter(({ noWriteOff }) => !noWriteOff)
+        .map(({ label, key }) => {
+          const w = computeConsumed(key);
 
-        if (w === null) {
-          return { type: label, quantity: null };
-        }
+          if (w === null) {
+            return { type: label, quantity: null };
+          }
 
-        const wasted = Number(w);
+          const wasted = Number(w);
 
-        if (Number.isNaN(wasted)) {
-          return { type: label, quantity: null };
-        }
+          if (Number.isNaN(wasted)) {
+            return { type: label, quantity: null };
+          }
 
-        let actualType = label;
+          let actualType = label;
 
-        if (label === 'Aluminum 1' && selectedAlu1Type?.value) {
-          actualType = `Aluminum|${selectedAlu1Type.value}`;
-        } else if (label === 'Aluminum 2' && selectedAlu2Type?.value) {
-          actualType = `Aluminum|${selectedAlu2Type.value}`;
-        }
+          if (label === 'Aluminum 1' && selectedAlu1Type?.value) {
+            actualType = `Aluminum|${selectedAlu1Type.value}`;
+          } else if (label === 'Aluminum 2' && selectedAlu2Type?.value) {
+            actualType = `Aluminum|${selectedAlu2Type.value}`;
+          }
 
-        return {
-          type: actualType,
-          quantity: +wasted.toFixed(2),
-        };
-      });
+          return {
+            type: actualType,
+            quantity: +wasted.toFixed(2),
+          };
+        });
 
       if (!materials.length) {
         alert('No data to write off materials.');
@@ -471,13 +502,15 @@ const RawMaterialsConsumptionModal = React.memo(
       if (govno) {
         const totalConsumedRaw = result_materials
           .filter(
-            (m) => m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
+            (m) =>
+              m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
           )
           .reduce((sum, m) => sum + (Number(m.quantity) || 0), 0);
 
         if (Number.isFinite(totalConsumedRaw) && totalConsumedRaw > 0) {
           const idx = result_materials.findIndex(
-            (m) => m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
+            (m) =>
+              m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
           );
 
           if (idx >= 0) {
@@ -513,7 +546,8 @@ const RawMaterialsConsumptionModal = React.memo(
       if (
         (materials.some((m) => m.type === 'Aluminum 1') &&
           !selectedAlu1Type?.value) ||
-        (materials.some((m) => m.type === 'Aluminum 2') && !selectedAlu2Type?.value)
+        (materials.some((m) => m.type === 'Aluminum 2') &&
+          !selectedAlu2Type?.value)
       ) {
         alert(
           'For aluminum, a type must be selected (7040-10/70WB28, 8040-10/70WB28, etc.)',
@@ -633,10 +667,14 @@ const RawMaterialsConsumptionModal = React.memo(
           custom_recipe: materialsMap.some(({ key }) => isRecipeModified(key)),
           slurried: govno,
           recipe:
-            selectedRecipe?.article || recipeArticle || selectedRow?.recipe_article,
+            selectedRecipe?.article ||
+            recipeArticle ||
+            selectedRow?.recipe_article,
           batch_id: selectedRow?.batch_id,
           aluminum_type: selectedAlu1Type?.value || null,
           aluminum_2_type: selectedAlu2Type?.value || null,
+          mold_id: moldId.trim() || null,
+          w_s: ws.trim() || null,
           ...recipeSnapshot,
         };
 
@@ -660,7 +698,9 @@ const RawMaterialsConsumptionModal = React.memo(
             const bd_volume = Number(rawRecord.production_volume || 0);
 
             const alreadyUsed = (rawMatConsumptionCurrentMolds || [])
-              .filter((r) => String(r.batch_id) === String(selectedRow?.batch_id))
+              .filter(
+                (r) => String(r.batch_id) === String(selectedRow?.batch_id),
+              )
               .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
             const { id, ...newRawMatConsumptionCurrentMold } = selectedRow;
@@ -863,7 +903,10 @@ const RawMaterialsConsumptionModal = React.memo(
                 )}
               </div>
 
-              <div className="rmc-header-field" style={{ flex: 1, minWidth: 260 }}>
+              <div
+                className="rmc-header-field"
+                style={{ flex: 1, minWidth: 260 }}
+              >
                 <span className="rmc-header-label">Recipe</span>
                 <Select
                   onChange={handleRecipeChange}
@@ -912,6 +955,58 @@ const RawMaterialsConsumptionModal = React.memo(
               className="rmc-modal-body"
               style={{ overflow: 'auto', maxHeight: '70vh' }}
             >
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 16,
+                  flexWrap: 'wrap',
+                  marginBottom: 12,
+                }}
+              >
+                <label style={{ margin: 0, minWidth: 200 }}>
+                  <span
+                    className="fw-semibold"
+                    style={{ display: 'block', marginBottom: 4 }}
+                  >
+                    Mold id
+                  </span>
+                  <input
+                    className="form-control"
+                    value={moldId}
+                    onChange={(e) => setMoldId(e.target.value)}
+                  />
+                </label>
+
+                <label style={{ margin: 0, minWidth: 200 }}>
+                  <span
+                    className="fw-semibold"
+                    style={{ display: 'block', marginBottom: 4 }}
+                  >
+                    W/S
+                  </span>
+                  <input
+                    className="form-control"
+                    inputMode="decimal"
+                    value={ws}
+                    onChange={(e) => {
+                      let processedValue = e.target.value;
+                      if (typeof processedValue === 'string') {
+                        processedValue = processedValue.replace(
+                          /(\d+),(\d*)/g,
+                          '$1.$2',
+                        );
+                      }
+                      if (
+                        processedValue === '' ||
+                        /^-?\d*\.?\d*$/.test(processedValue)
+                      ) {
+                        setWs(processedValue);
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+
               <table className="table-waste">
                 <thead>
                   <tr>
@@ -935,7 +1030,9 @@ const RawMaterialsConsumptionModal = React.memo(
                         <td>
                           <div className="fw-semibold">{label}</div>
                           {key === 'aluminum_paste' && (
-                            <div style={{ marginTop: '4px', minWidth: '150px' }}>
+                            <div
+                              style={{ marginTop: '4px', minWidth: '150px' }}
+                            >
                               <Select
                                 options={aluminum1TypeOptions}
                                 value={selectedAlu1Type}
@@ -947,14 +1044,19 @@ const RawMaterialsConsumptionModal = React.memo(
                                     ...base,
                                     minHeight: '32px',
                                   }),
-                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                  menuPortal: (base) => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                  }),
                                 }}
                                 menuPortalTarget={document.body}
                               />
                             </div>
                           )}
                           {key === 'aluminum_paste_2' && (
-                            <div style={{ marginTop: '4px', minWidth: '150px' }}>
+                            <div
+                              style={{ marginTop: '4px', minWidth: '150px' }}
+                            >
                               <Select
                                 options={aluminum1TypeOptions}
                                 value={selectedAlu2Type}
@@ -966,7 +1068,10 @@ const RawMaterialsConsumptionModal = React.memo(
                                     ...base,
                                     minHeight: '32px',
                                   }),
-                                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                  menuPortal: (base) => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                  }),
                                 }}
                                 menuPortalTarget={document.body}
                               />
@@ -981,7 +1086,8 @@ const RawMaterialsConsumptionModal = React.memo(
                           <div className="modified-recipe-cell">
                             <input
                               className={
-                                'form-control' + (modified ? ' is-modified' : '')
+                                'form-control' +
+                                (modified ? ' is-modified' : '')
                               }
                               inputMode="decimal"
                               placeholder="0"
@@ -1018,6 +1124,26 @@ const RawMaterialsConsumptionModal = React.memo(
                       </tr>
                     );
                   })}
+
+                  <tr>
+                    <td>
+                      <div className="fw-semibold">Aluminum total, kg</div>
+                      <div className="text-muted-small">Sum of aluminums</div>
+                    </td>
+
+                    <td>
+                      <div className="modified-recipe-cell">
+                        <input
+                          className="form-control"
+                          value={+aluminumTotal.toFixed(2)}
+                          readOnly
+                          disabled
+                        />
+                      </div>
+                    </td>
+
+                    <td className="td-consumed">{+aluminumTotal.toFixed(2)}</td>
+                  </tr>
                 </tbody>
               </table>
             </ModalBody>
@@ -1031,7 +1157,10 @@ const RawMaterialsConsumptionModal = React.memo(
                   checked={govno}
                   onChange={(e) => setGovno(e.target.checked)}
                 />
-                <label className="form-check-label" htmlFor="warehouse-checkbox">
+                <label
+                  className="form-check-label"
+                  htmlFor="warehouse-checkbox"
+                >
                   All to return slurry
                 </label>
               </div>

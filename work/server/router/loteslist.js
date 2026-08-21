@@ -27,7 +27,26 @@ const RECIPE_MATERIAL_FIELDS = [
   ['gypsum_stone'],
   ['aluminum_paste'],
   ['aluminum_paste_2'],
+  ['aluminum_suspension'],
 ];
+
+const buildCakeDetails = ({ mold_id, w_s }) => {
+  const details = {};
+
+  if (
+    mold_id !== undefined &&
+    mold_id !== null &&
+    String(mold_id).trim() !== ''
+  ) {
+    details.mold_id = String(mold_id);
+  }
+
+  if (w_s !== undefined && w_s !== null && String(w_s).trim() !== '') {
+    details.water_solid_ratio = String(w_s);
+  }
+
+  return details;
+};
 
 const getRecipeQuantity = (recipe, fieldNames) => {
   const fieldName = fieldNames.find(
@@ -90,9 +109,13 @@ lotesListRouter.post('/batches', async (req, res) => {
     }
   }
 
+  const { mold_id = null, w_s = null, ...new_lotestList_data } = new_lotestList;
+
   const { quantity_cakes, product, production_date, batch_id } = new_lotestList;
   const sand_dry =
     (new_lotestList.sand_dry ?? new_lotestList.sand_powder_dry) || '0';
+
+  const cakeDetails = buildCakeDetails({ mold_id, w_s });
 
   try {
     const quantityCakesInt = Math.floor(parseFloat(quantity_cakes));
@@ -154,11 +177,14 @@ lotesListRouter.post('/batches', async (req, res) => {
 
       const [emptyCake, cakeCreated] = await LotesListsCakes.findOrCreate({
         where: { id: cake_id_start },
-        defaults: { id: cake_id_start },
+        defaults: { id: cake_id_start, ...cakeDetails },
       });
 
       if (cakeCreated) {
         myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, [emptyCake]);
+      } else if (Object.keys(cakeDetails).length) {
+        const updatedCake = await emptyCake.update(cakeDetails);
+        myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, [updatedCake]);
       }
 
       myEmitter.emit(UPDATE_LOTES_LIST_SOCKET, updatedLotesListBatch);
@@ -175,7 +201,7 @@ lotesListRouter.post('/batches', async (req, res) => {
     const sub_batch_id = maxSubBatchId + 1;
 
     const lotesListBatches = await LotesListsBatches.create({
-      ...new_lotestList,
+      ...new_lotestList_data,
 
       cake_id_start,
       cake_id_finish,
@@ -187,11 +213,14 @@ lotesListRouter.post('/batches', async (req, res) => {
 
     const [emptyCake, cakeCreated] = await LotesListsCakes.findOrCreate({
       where: { id: cake_id_start },
-      defaults: { id: cake_id_start },
+      defaults: { id: cake_id_start, ...cakeDetails },
     });
 
     if (cakeCreated) {
       myEmitter.emit(ADD_NEW_LOTES_LIST_CAKES_SOCKET, [emptyCake]);
+    } else if (Object.keys(cakeDetails).length) {
+      const updatedCake = await emptyCake.update(cakeDetails);
+      myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, [updatedCake]);
     }
 
     myEmitter.emit(ADD_NEW_LOTES_LIST_SOCKET, lotesListBatches);
@@ -213,16 +242,19 @@ lotesListRouter.post('/batches/update/recipe', async (req, res) => {
 
     const results = [];
     for (const updateData of updates) {
-      const { batch_id, sub_batch_id, cake_id_start, cake_id_finish } = updateData;
+      const { batch_id, sub_batch_id, cake_id_start, cake_id_finish } =
+        updateData;
 
-      const sand_dry = (updateData.sand_dry ?? updateData.sand_powder_dry) || '0';
+      const sand_dry =
+        (updateData.sand_dry ?? updateData.sand_powder_dry) || '0';
 
       if (updateData?.updatedAt || updateData?.createdAt) {
         delete updateData.createdAt;
         delete updateData.updatedAt;
       }
 
-      const { old_sub_batch_id = null, ...updateDataWithoutSubBatchId } = updateData;
+      const { old_sub_batch_id = null, ...updateDataWithoutSubBatchId } =
+        updateData;
 
       const updatedSubBatchId =
         old_sub_batch_id !== null ? old_sub_batch_id : sub_batch_id;
