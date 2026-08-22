@@ -316,7 +316,7 @@ function CackeFillUp() {
           return {
             id,
             note: savedCake?.note || '',
-            castingTemperature: savedCake?.casting_temperature ?? '',
+            castingTemperature: record?.casting_temp_c ?? '',
             flowability: savedCake?.flowability ?? '',
           };
         });
@@ -352,7 +352,7 @@ function CackeFillUp() {
         addNewLotesListCakes({
           id: cake.id,
           note,
-          casting_temperature: normalizeOptionalNumber(castingTemperature),
+          casting_temp_c: normalizeOptionalNumber(castingTemperature),
           flowability: normalizeOptionalNumber(flowability),
         }),
       );
