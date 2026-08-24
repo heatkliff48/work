@@ -281,7 +281,7 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes', async (req, res) => {
   try {
-    const { id, note, casting_temperature, flowability } = req.body;
+    const { id, note, casting_temp_c, flowability } = req.body;
     const numericId = Number(id);
 
     if (!Number.isFinite(numericId)) {
@@ -291,8 +291,8 @@ lotesListRouter.post('/cakes', async (req, res) => {
     const updates = {};
 
     if (note !== undefined) updates.note = note;
-    if (casting_temperature !== undefined) {
-      updates.casting_temperature = casting_temperature;
+    if (casting_temp_c !== undefined) {
+      updates.casting_temp_c = casting_temp_c;
     }
     if (flowability !== undefined) updates.flowability = flowability;
 
