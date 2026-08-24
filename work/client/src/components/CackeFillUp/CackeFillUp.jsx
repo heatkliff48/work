@@ -14,14 +14,21 @@ import { addNewRawMatConsumption } from '#components/redux/actions/recipeAction.
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { addNewProductionQuality } from '#components/redux/actions/productionQualityAction.js';
-import { addNewAutoclaveCalendar } from '#components/redux/actions/warehouseAction.js';
+import {
+  addNewAutoclaveCalendar,
+  getRawMaterialsWarehouse,
+} from '#components/redux/actions/warehouseAction.js';
 import RawMaterialsConsumptionModal from '#components/CackeFillUp/RawMatConsumptionModalUPD.jsx';
 import { useModalContext } from '#components/contexts/ModalContext.js';
+import {
+  getWarehouseAluminum1,
+  getWarehouseAluminum2,
+} from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
 function CackeFillUp() {
   const dispatch = useDispatch();
 
-  const { batchOutside, autoclave_calendar } = useWarehouseContext();
+  const { batchOutside, autoclave_calendar, raw_materials_warehouse } = useWarehouseContext();
   const { cackeFillUp, setCackeFillUp, lotesListBatches, lotesListCakes } =
     useProjectContext();
   const { raw_mat_consumption } = useRecipeContext();
@@ -94,6 +101,12 @@ function CackeFillUp() {
       setProductionPlanDataList(results);
     }
   }, [batchOutside, latestProducts]);
+
+  useEffect(() => {
+    dispatch(getRawMaterialsWarehouse());
+    dispatch(getWarehouseAluminum1());
+    dispatch(getWarehouseAluminum2());
+  }, [dispatch]);
 
   const handleProductionPlanRowClick = (row) => {
     const prodPlanEntry = batchOutside.find((el) => el.id === row.original.id);
