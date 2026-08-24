@@ -287,9 +287,12 @@ const WarehouseContextProvider = ({ children }) => {
   const tools_warehouse_data = useSelector((state) => state.toolsWarehouse);
   const order_dispatch_data = useSelector((state) => state.orderDispatch);
 
+  const dryMixesJournal = useSelector((state) => state.dryMixesJournal);
   const relatedMaterialsJournal = useSelector(
     (state) => state.relatedMaterialsJournal,
   );
+  const anchor = useSelector((state) => state.anchor);
+  const tool = useSelector((state) => state.tool);
 
   function getLatestAuxilaryProducts(products) {
     const latestVersionsMap = products?.reduce((acc, product) => {
@@ -314,6 +317,18 @@ const WarehouseContextProvider = ({ children }) => {
   const latestRelatedMaterials = useMemo(() => {
     return getLatestAuxilaryProducts(relatedMaterialsJournal);
   }, [relatedMaterialsJournal]);
+
+  const latestTools = useMemo(() => {
+    return getLatestAuxilaryProducts(tool);
+  }, [tool]);
+
+  const latestAnchors = useMemo(() => {
+    return getLatestAuxilaryProducts(anchor);
+  }, [anchor]);
+
+  const latestDryMix = useMemo(() => {
+    return getLatestAuxilaryProducts(dryMixesJournal);
+  }, [dryMixesJournal]);
 
   const warehouseMap = {
     product: warehouse_data,
@@ -1260,17 +1275,29 @@ const WarehouseContextProvider = ({ children }) => {
         };
       })
       .reduce((uniqueItems, item) => {
+        const { product_article, order_article } = item;
         if (
           !uniqueItems.some(
             (el) =>
-              el.product_article === item.product_article &&
-              el.order_article === item.order_article,
+              el.product_article === product_article &&
+              el.order_article === order_article,
           )
         ) {
-          const product = latestRelatedMaterials.find(
-            (prod) => prod.article == item.product_article,
+          let productTable = [];
+
+          if (product_article?.startsWith('X.P')) {
+            productTable = latestRelatedMaterials ?? [];
+          } else if (product_article?.startsWith('X.T')) {
+            productTable = latestTools ?? [];
+          } else if (product_article?.startsWith('X.M')) {
+            productTable = latestDryMix ?? [];
+          } else if (product_article?.startsWith('X.F')) {
+            productTable = latestAnchors ?? [];
+          }
+
+          const product = productTable.find(
+            (productItem) => productItem.article === product_article,
           );
-          
 
           uniqueItems.push({ ...item, tradingMark: product?.name });
         }
