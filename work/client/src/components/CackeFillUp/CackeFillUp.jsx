@@ -375,7 +375,7 @@ function CackeFillUp() {
     }
   };
 
-  const isFullyAllocated = totalCake > 0 && allocated >= total_cacke;
+  const isFullyAllocated = total_cacke > 0 && allocated >= total_cacke;
 
   const handleNewBatch = () => {
     if (isFullyAllocated) {
