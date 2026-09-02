@@ -4,7 +4,10 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { addBatchState } from '#components/redux/actions/batchDesignerAction.js';
+import {
+  addBatchState,
+  clearBatchState,
+} from '#components/redux/actions/batchDesignerAction.js';
 import { getOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
 // import AddOrderedProduct from './AddOrderedProduct';
 import Autoclave from './Autoclave';
@@ -18,6 +21,10 @@ import {
   getBatchOutsideRowsForDate,
   getFilledAutoclaveCountForDate,
 } from './autoclaveScheduleUtils';
+import {
+  computeListOfOrderedCakes,
+  computeOrderRemainingCakes,
+} from '#components/Warehouse/listOfOrderedCakesCalc.js';
 
 function ProductionBatchDesignerNew() {
   const dispatch = useDispatch();
@@ -35,17 +42,21 @@ function ProductionBatchDesignerNew() {
     setSelectedCell,
     setIsEditMode,
   } = useAutoclaveContext();
-  const { listOfOrderedCakes, autoclave_calendar } = useWarehouseContext();
+  const { listOfOrderedCakes, autoclave_calendar, list_of_ordered_production } =
+    useWarehouseContext();
 
   const {
     productionBatchDesigner,
     setProductonBatchDesigner,
     setBatchOrderIDs,
     setQuantityPallets,
+    list_of_orders,
   } = useOrderContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner) || [];
-  const list_of_orders_to_warehouse = useSelector((state) => state.orderToWarehouse);
+  const list_of_orders_to_warehouse = useSelector(
+    (state) => state.orderToWarehouse,
+  );
   const batchOutsideRedux = useSelector((state) => state.batchOutside) || [];
 
   // Дата и режим редактирования приходят из Batch calendar (клик по ячейке
@@ -62,7 +73,8 @@ function ProductionBatchDesignerNew() {
   const didInitAutoclaveRef = useRef(false);
   const didInitEditRef = useRef(false);
 
-  const [orderedProductBatchModal, setOrderedProductBatchModal] = useState(false);
+  const [orderedProductBatchModal, setOrderedProductBatchModal] =
+    useState(false);
   const [fileterdList, setFilteredList] = useState([]);
 
   const formatISO = (s) => {
@@ -76,11 +88,16 @@ function ProductionBatchDesignerNew() {
     });
   };
 
-  // AutoclaveContext живёт выше <Routes> и переживает переходы между
-  // страницами. isEditMode и выбранная ячейка могли остаться от предыдущей
-  // сессии конструктора (другая дата/режим) — сбрасываем их при каждом новом
-  // монтировании; autoclave/autoclaveCalendarData сами пересчитываются
-  // нижеследующими эффектами.
+  // AutoclaveContext и batchDesigner/productionBatchDesigner живут выше
+  // <Routes> (redux и OrderContext) и переживают переходы между страницами.
+  // Если открыть конструктор повторно (другая дата/режим, или та же дата
+  // ещё раз без перезагрузки страницы), из предыдущей сессии могли остаться
+  // записи batchDesigner — тогда эффект инициализации editMode находит их
+  // "уже зарегистрированными" и не обновляет свежими значениями (см.
+  // "!batchDesigner.some(...)" ниже), из-за чего таблица перестаёт
+  // корректно восстанавливаться. Сбрасываем всё при каждом новом
+  // монтировании; autoclave/autoclaveCalendarData и productionBatchDesigner
+  // сами пересчитываются нижеследующими эффектами.
   useEffect(() => {
     didInitAutoclaveRef.current = false;
     didInitEditRef.current = false;
@@ -88,6 +105,8 @@ function ProductionBatchDesignerNew() {
     setInitialRowCount(0);
     setSelectedCell(null);
     setIsEditMode(false);
+    dispatch(clearBatchState());
+    setProductonBatchDesigner([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -106,7 +125,9 @@ function ProductionBatchDesignerNew() {
         done: Number(x.produced_autoclave ?? 0),
       }))
       .map((x) => ({ ...x, value: x.qty - x.done }))
-      .filter((x) => x.value > 0 && typeof x.date === 'string' && x.date >= today)
+      .filter(
+        (x) => x.value > 0 && typeof x.date === 'string' && x.date >= today,
+      )
       .sort((a, b) => a.date.localeCompare(b.date))[0];
 
     if (nearest && nearest.value > 0) {
@@ -137,11 +158,17 @@ function ProductionBatchDesignerNew() {
     const emptyCards = Math.max(0, scheduled - filledCards);
 
     setIsEditMode(editModeRequested);
-    setAutoclaveCount(editModeRequested ? Math.max(filledCards, scheduled) : emptyCards);
+    setAutoclaveCount(
+      editModeRequested ? Math.max(filledCards, scheduled) : emptyCards,
+    );
 
     if (autoclaveCalendarData?.date !== targetDate) {
       setAutoclaveCalendarData(
-        record ?? { date: targetDate, scheduled_autoclaves: 0, produced_autoclave: 0 },
+        record ?? {
+          date: targetDate,
+          scheduled_autoclaves: 0,
+          produced_autoclave: 0,
+        },
       );
     }
   }, [
@@ -200,21 +227,65 @@ function ProductionBatchDesignerNew() {
     dispatch(getOrderToWarehouse());
   }, []);
 
+  // quantity_allocated на list_of_orders_to_warehouse — серверное значение,
+  // оно не меняется, пока правки в конструкторе не сохранены. Если позицию,
+  // связанную с заказом склада (id_ordered_product_to_warehouse), удалили из
+  // автоклава прямо сейчас (editMode), это ещё не отражено на сервере —
+  // компенсируем локально тем, что реально высвободилось в batchDesigner, той
+  // же логикой, что используется для productionBatchDesigner.
+  const freedPalletsByWarehouseOrder = useMemo(() => {
+    const map = new Map();
+
+    batchDesigner.forEach((b) => {
+      if (b.id_ordered_product_to_warehouse == null) return;
+
+      const residue = Number(b.cakes_residue) || 0;
+      if (residue <= 0) return;
+
+      const product = latestProducts?.find(
+        (p) => p.article === b.product_article,
+      );
+      if (!product) return;
+
+      const palletsPerArray = Math.max(
+        1,
+        Math.floor(
+          Number(product.m3InArray || 0) /
+            Number(product.volumeBlockOnPallet || 1),
+        ) || 1,
+      );
+
+      const key = b.id_ordered_product_to_warehouse;
+      map.set(key, (map.get(key) || 0) + residue * palletsPerArray);
+    });
+
+    return map;
+  }, [batchDesigner, latestProducts]);
+
   useEffect(() => {
     if (!list_of_orders_to_warehouse) {
       setFilteredList([]);
       return;
     }
 
-    const filtered = list_of_orders_to_warehouse.filter(
-      (order) =>
+    const filtered = list_of_orders_to_warehouse.filter((order) => {
+      const freed = freedPalletsByWarehouseOrder.get(order.id) || 0;
+      const effectiveAllocated = Math.max(
+        0,
+        (Number(order.quantity_allocated) || 0) - freed,
+      );
+
+      return (
         order.quantity_pallets > order.quantity_produced &&
-        order.quantity_pallets > order.quantity_allocated,
-    );
+        order.quantity_pallets > effectiveAllocated
+      );
+    });
 
     const regex = /(\d+)\s*x\s*(\d+)\s*x\s*(\d+)/;
     const filteredWithSize = filtered.reduce((acc, el) => {
-      const product = latestProducts.find((p) => p.article == el.product_article);
+      const product = latestProducts.find(
+        (p) => p.article == el.product_article,
+      );
 
       // el.description holds the order's title (dimensions already stripped out
       // when the order was created), so the size must be parsed from the
@@ -223,17 +294,26 @@ function ProductionBatchDesignerNew() {
 
       const product_size = match ? `${match[1]}x${match[2]}x${match[3]}` : '';
 
+      const freed = freedPalletsByWarehouseOrder.get(el.id) || 0;
       const newObj = {
         ...el,
         product_size,
         density: product?.density,
+        quantity_allocated: Math.max(
+          0,
+          (Number(el.quantity_allocated) || 0) - freed,
+        ),
       };
       acc.push(newObj);
       return acc;
     }, []);
 
     setFilteredList(filteredWithSize);
-  }, [list_of_orders_to_warehouse, latestProducts]);
+  }, [
+    list_of_orders_to_warehouse,
+    latestProducts,
+    freedPalletsByWarehouseOrder,
+  ]);
 
   const MAX_QUANTITY = 10405;
 
@@ -296,12 +376,20 @@ function ProductionBatchDesignerNew() {
   };
 
   const addProductHandler = (prod_data) => {
-    const { article, density, width, m3InArray, volumeBlockOnPallet, normOfBrack } =
-      prod_data;
+    const {
+      article,
+      density,
+      width,
+      m3InArray,
+      volumeBlockOnPallet,
+      normOfBrack,
+    } = prod_data;
 
     const maxId =
-      (batchDesigner.reduce((max, item) => (item.id > max ? item.id : max), 0) ||
-        0) + 1;
+      (batchDesigner.reduce(
+        (max, item) => (item.id > max ? item.id : max),
+        0,
+      ) || 0) + 1;
 
     setAutoclaveFromContext((prevAutoclave) => {
       const prevRows = Array.isArray(prevAutoclave) ? prevAutoclave : [];
@@ -319,7 +407,8 @@ function ProductionBatchDesignerNew() {
 
       const palletsPerArray = Math.max(
         1,
-        Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+        Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) ||
+          1,
       );
 
       const product_with_brack = (
@@ -329,7 +418,9 @@ function ProductionBatchDesignerNew() {
       const free_product_cakes = (
         Math.ceil(product_with_brack) - product_with_brack
       ).toFixed(2);
-      const free_product_package = Math.floor(free_product_cakes * palletsPerArray);
+      const free_product_package = Math.floor(
+        free_product_cakes * palletsPerArray,
+      );
       const total_cakes = Math.ceil(product_with_brack);
 
       dispatch(
@@ -368,12 +459,19 @@ function ProductionBatchDesignerNew() {
 
     console.log(prod_data, 'prod_data ProductionBatchDesignerNew.jsx line 219');
 
-    const { article, density, width, m3InArray, volumeBlockOnPallet, normOfBrack } =
-      product;
+    const {
+      article,
+      density,
+      width,
+      m3InArray,
+      volumeBlockOnPallet,
+      normOfBrack,
+    } = product;
 
     const palletsPerArray = Math.max(
       1,
-      Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+      Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) ||
+        1,
     );
 
     const product_with_brack = (
@@ -388,13 +486,17 @@ function ProductionBatchDesignerNew() {
       Math.ceil(product_with_brack) - product_with_brack
     ).toFixed(2);
 
-    const free_product_package = Math.floor(free_product_cakes * palletsPerArray);
+    const free_product_package = Math.floor(
+      free_product_cakes * palletsPerArray,
+    );
 
     const total_cakes = Math.ceil(product_with_brack);
 
     const maxId =
-      (batchDesigner.reduce((max, item) => (item.id > max ? item.id : max), 0) ||
-        0) + total_cakes;
+      (batchDesigner.reduce(
+        (max, item) => (item.id > max ? item.id : max),
+        0,
+      ) || 0) + total_cakes;
 
     setAutoclaveFromContext((prevAutoclave) => {
       const prevRows = Array.isArray(prevAutoclave) ? prevAutoclave : [];
@@ -466,12 +568,15 @@ function ProductionBatchDesignerNew() {
 
   const addCakesData = useCallback(
     (prodBatchData) => {
-      const { id, product_with_brack, article, palletsPerArray } = prodBatchData;
+      const { id, product_with_brack, article, palletsPerArray } =
+        prodBatchData;
 
       const free_product_cakes = (
         Math.ceil(product_with_brack) - product_with_brack
       ).toFixed(2);
-      const free_product_package = Math.floor(free_product_cakes * palletsPerArray);
+      const free_product_package = Math.floor(
+        free_product_cakes * palletsPerArray,
+      );
       const total_cakes = Math.ceil(product_with_brack);
 
       const cakes_in_batch = 0;
@@ -517,7 +622,8 @@ function ProductionBatchDesignerNew() {
       const { m3InArray, volumeBlockOnPallet } = product;
       const palletsPerArray = Math.max(
         1,
-        Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+        Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) ||
+          1,
       );
 
       return (
@@ -548,7 +654,9 @@ function ProductionBatchDesignerNew() {
           quantity_cakes,
           quantity_in_batch,
         }) => {
-          const product = latestProducts.find((el) => el.article == product_article);
+          const product = latestProducts.find(
+            (el) => el.article == product_article,
+          );
           if (!product) return;
 
           const {
@@ -564,12 +672,14 @@ function ProductionBatchDesignerNew() {
 
           const palletsPerArray = Math.max(
             1,
-            Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) ||
-              1,
+            Math.floor(
+              Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1),
+            ) || 1,
           );
 
           const rightQuantity =
-            quantity - (quantity_in_warehouse + quantity_in_batch * palletsPerArray);
+            quantity -
+            (quantity_in_warehouse + quantity_in_batch * palletsPerArray);
 
           const quantity_m3 = (
             rightQuantity * Number(volumeBlockOnPallet || 0)
@@ -640,7 +750,8 @@ function ProductionBatchDesignerNew() {
           (Number(item.cakes_in_batch) || 0);
 
         acc[key].cakes_residue =
-          (Number(acc[key].cakes_residue) || 0) + (Number(item.cakes_residue) || 0);
+          (Number(acc[key].cakes_residue) || 0) +
+          (Number(item.cakes_residue) || 0);
 
         acc[key].sources.push({
           id: item.id,
@@ -671,15 +782,60 @@ function ProductionBatchDesignerNew() {
 
     const filledAutoclave = [];
     for (let i = 0; i < updatedAutoclaveData.length; i += CELLS_PER_AUTOCLAVE) {
-      filledAutoclave.push(updatedAutoclaveData.slice(i, i + CELLS_PER_AUTOCLAVE));
+      filledAutoclave.push(
+        updatedAutoclaveData.slice(i, i + CELLS_PER_AUTOCLAVE),
+      );
     }
 
     setAcData(filledAutoclave);
   }, [latestProducts, listOfOrderedCakes, emptyAutoclave]);
 
+  // Строит строку для верхней таблицы (аналог того, что изначально приходит
+  // из ListOfOrderedProduction.jsx / listOfOrderedCakes) на основе текущего
+  // остатка по позиции в batchDesigner — используется, когда позицию нужно
+  // вернуть в таблицу, а не просто обновить уже существующую строку.
+  const buildRowFromAggregate = useCallback(
+    (article, agg) => {
+      const product = latestProducts?.find((p) => p.article === article);
+      if (!product) return null;
+
+      const { density, width, m3InArray, volumeBlockOnPallet, normOfBrack } =
+        product;
+      const palletsPerArray = Math.max(
+        1,
+        Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) ||
+          1,
+      );
+
+      const quantity = agg.residue * palletsPerArray;
+      const product_with_brack = (
+        agg.residue + Number(normOfBrack || 0)
+      ).toFixed(2);
+      const quantity_m3 = (quantity * Number(volumeBlockOnPallet || 0)).toFixed(
+        2,
+      );
+
+      return {
+        id: null,
+        product_article: article,
+        width,
+        density,
+        quantity,
+        product_with_brack,
+        quantity_m3,
+        free_product_package: agg.free_product_package,
+        total_cakes: agg.inBatch + agg.residue,
+        cakes_in_batch: agg.inBatch,
+        cakes_residue: agg.residue,
+        sources: agg.sources,
+      };
+    },
+    [latestProducts],
+  );
+
   useEffect(() => {
     setProductonBatchDesigner((prev) => {
-      if (!Array.isArray(prev) || prev.length === 0) return prev;
+      const prevList = Array.isArray(prev) ? prev : [];
 
       const byArticle = new Map();
 
@@ -695,11 +851,20 @@ function ProductionBatchDesignerNew() {
             inBatch: 0,
             residue: 0,
             sources: [],
+            free_product_package: 0,
+            // Только позиции, реально связанные с заказом из
+            // ListOfOrderedProduction.jsx (id_list_of_ordered_production),
+            // имеет смысл возвращать в эту таблицу при полном удалении из
+            // автоклава — вручную добавленные позиции туда никогда не
+            // попадали.
+            hasListSource: false,
           });
         }
         const agg = byArticle.get(art);
         agg.inBatch += inBatch;
         agg.residue += residue;
+        agg.free_product_package += Number(b.free_product_package) || 0;
+        if (b.id_list_of_ordered_production != null) agg.hasListSource = true;
         agg.sources.push({
           id: b.id,
           total_cakes: Number(b.total_cakes) || 0,
@@ -708,7 +873,9 @@ function ProductionBatchDesignerNew() {
         });
       }
 
-      return prev.map((row) => {
+      const seenArticles = new Set();
+      const updated = prevList.map((row) => {
+        seenArticles.add(row.product_article);
         const agg = byArticle.get(row.product_article);
         if (!agg) {
           return {
@@ -725,8 +892,38 @@ function ProductionBatchDesignerNew() {
           sources: agg.sources,
         };
       });
+
+      // Позиции, чей остаток снова стал больше нуля (например, все ячейки
+      // удалили из уже сохранённого автоклава в editMode), но для которых в
+      // таблице никогда не было строки — сами при заходе в editMode они
+      // регистрируются в batchDesigner напрямую, минуя эту таблицу. Возвращаем
+      // их, используя те же исходные данные о продукте, что и первичное
+      // построение таблицы из ListOfOrderedProduction.jsx.
+      const restored = [];
+      byArticle.forEach((agg, article) => {
+        if (seenArticles.has(article)) return;
+        if (!agg.hasListSource || agg.residue <= 0) return;
+
+        const row = buildRowFromAggregate(article, agg);
+        if (row) restored.push(row);
+      });
+
+      if (restored.length === 0) return updated;
+
+      let nextId =
+        [...updated, ...restored].reduce(
+          (max, r) => (Number(r.id) > max ? Number(r.id) : max),
+          0,
+        ) + 1;
+
+      const reindexedRestored = restored.map((row) => ({
+        ...row,
+        id: nextId++,
+      }));
+
+      return [...updated, ...reindexedRestored];
     });
-  }, [batchDesigner]);
+  }, [batchDesigner, buildRowFromAggregate]);
 
   const placeGroupToAutoclave = useCallback(
     (groupRow) => {
@@ -738,7 +935,9 @@ function ProductionBatchDesignerNew() {
 
       const { product_article } = groupRow;
 
-      const product = latestProducts?.find((p) => p.article === product_article);
+      const product = latestProducts?.find(
+        (p) => p.article === product_article,
+      );
       if (!product) return;
       const { density, width } = product;
 
@@ -842,7 +1041,9 @@ function ProductionBatchDesignerNew() {
           if (after.length >= plan.length) {
             placeToIndices(after.slice(0, plan.length), plan);
           } else {
-            const combined = after.concat(emptyIdx.filter((i) => i <= lastSame));
+            const combined = after.concat(
+              emptyIdx.filter((i) => i <= lastSame),
+            );
             placeToIndices(combined.slice(0, plan.length), plan);
           }
         } else {
@@ -899,10 +1100,14 @@ function ProductionBatchDesignerNew() {
         </tr>,
       );
 
-      if (productionBatchDesigner[index + 1]?.product_article !== currentArticle) {
+      if (
+        productionBatchDesigner[index + 1]?.product_article !== currentArticle
+      ) {
         rows.push(
           <tr key={`calc-${currentArticle}`} className="calculation-row">
-            <td colSpan="14">Calculations for article: {currentArticle} will appear here</td>
+            <td colSpan="14">
+              Calculations for article: {currentArticle} will appear here
+            </td>
           </tr>,
         );
       }
@@ -929,7 +1134,40 @@ function ProductionBatchDesignerNew() {
     setInitialRowCount(acData.length);
 
     didInitAutoclaveRef.current = true;
-  }, [editModeRequested, acData, autoclave, setAutoclaveFromContext, setInitialRowCount]);
+  }, [
+    editModeRequested,
+    acData,
+    autoclave,
+    setAutoclaveFromContext,
+    setInitialRowCount,
+  ]);
+
+  // "Истинный" список заказов ListOfOrderedProduction без учёта того, что
+  // уже стоит в batchOutside за targetDate: нужен, чтобы при заходе в уже
+  // сохранённый автоклав знать, сколько от заказа реально ещё требуется —
+  // производство могло добить автоклав сверх заказа (см. ниже), и это не
+  // должно возвращаться в таблицу как "нужно ещё" при удалении позиций.
+  const listOfOrderedCakesExcludingDate = useMemo(() => {
+    if (!editModeRequested || !targetDate) return null;
+
+    const batchOutsideExcludingDate = batchOutsideRedux.filter(
+      (r) => String(r?.date).slice(0, 10) !== targetDate,
+    );
+
+    return computeListOfOrderedCakes({
+      latestProducts,
+      list_of_orders,
+      list_of_ordered_production,
+      batchOutside: batchOutsideExcludingDate,
+    });
+  }, [
+    editModeRequested,
+    targetDate,
+    batchOutsideRedux,
+    latestProducts,
+    list_of_orders,
+    list_of_ordered_production,
+  ]);
 
   // Режим редактирования: один раз подгружаем уже сохранённые позиции
   // batchOutside за выбранную дату в сетку автоклавов (размер сетки берём
@@ -963,7 +1201,9 @@ function ProductionBatchDesignerNew() {
 
     let cursor = 0;
     rows.forEach((row) => {
-      const product = latestProducts.find((p) => p.article === row.product_article);
+      const product = latestProducts.find(
+        (p) => p.article === row.product_article,
+      );
       const qty = computeQuantityArrays(row, latestProducts);
       if (qty <= 0) return;
 
@@ -973,16 +1213,92 @@ function ProductionBatchDesignerNew() {
           : null;
       const entryId = linkedProductionId ?? nextSyntheticId++;
 
-      if (!batchDesigner.some((b) => Number(b.id) === entryId)) {
+      // qty — сколько массивов физически стоит в автоклаве для этой позиции;
+      // это НЕ то же самое, что реально нужно заказу — производство могло
+      // добить автоклав сверх заказа (особенности производства). Потолком
+      // для остатка при удалении должно быть истинное значение из исходного
+      // заказа (ListOfOrderedProduction / Orders to warehouse), а не qty.
+      let trueTotalCakes = qty;
+
+      if (product && linkedProductionId != null) {
+        // saveOnServer/saveEditedDateToServer хранят не более одной записи
+        // batchOutside на пару (артикул, дата): если подряд разместили cakes
+        // из НЕСКОЛЬКИХ разных заказов одного артикула (например, "Fill
+        // autoclave" добрал остаток из другого заказа того же товара), при
+        // сохранении они схлопываются в одну запись, а id_list_of_ordered_production
+        // остаётся только от первого из них — id остальных заказов теряется.
+        // Поэтому истинную потребность считаем по АРТИКУЛУ целиком (сумма по
+        // всем ещё открытым заказам этого артикула), а не по одному
+        // конкретному id — иначе для "не выжившего" в id заказа остаток
+        // всегда получался бы заниженным (обнулённым).
+        const ordersForArticle = (listOfOrderedCakesExcludingDate || []).filter(
+          (o) => o.product_article === row.product_article,
+        );
+
+        // Доверяем сумме по артикулу только если среди найденных заказов
+        // есть именно тот, что породил эту позицию (linkedProductionId).
+        // Если его там нет — например, list_of_orders/list_of_ordered_production
+        // ещё не подгрузились, либо у заказа сменился статус — сумма по
+        // артикулу может состоять из ЧУЖИХ, не относящихся к этой позиции
+        // заказов (или быть пустой), и тогда безопаснее откатиться на qty,
+        // а не молча посчитать остаток нулевым.
+        const hasLinkedOrder = ordersForArticle.some(
+          (o) => Number(o.id) === linkedProductionId,
+        );
+
+        if (hasLinkedOrder) {
+          trueTotalCakes = ordersForArticle.reduce(
+            (sum, o) =>
+              sum + computeOrderRemainingCakes(o, product).total_cakes,
+            0,
+          );
+        }
+      } else if (product && row.id_ordered_product_to_warehouse != null) {
+        const warehouseOrder = (list_of_orders_to_warehouse || []).find(
+          (o) => Number(o.id) === Number(row.id_ordered_product_to_warehouse),
+        );
+        if (warehouseOrder) {
+          const palletsPerArray = Math.max(
+            1,
+            Math.floor(
+              Number(product.m3InArray || 0) /
+                Number(product.volumeBlockOnPallet || 1),
+            ) || 1,
+          );
+
+          // Серверная аллокация этого заказа ещё включает саму эту (пока не
+          // пересохранённую) позицию за targetDate — вычитаем её, чтобы
+          // получить, сколько заказу на самом деле ещё нужно без учёта
+          // текущей раскладки автоклава.
+          const trueRemainingPallets =
+            (Number(warehouseOrder.quantity_pallets) || 0) -
+            (Number(warehouseOrder.quantity_produced) || 0) -
+            ((Number(warehouseOrder.quantity_allocated) || 0) -
+              (Number(row.quantity_pallets) || 0));
+
+          const product_with_brack =
+            trueRemainingPallets / palletsPerArray +
+            Number(product.normOfBrack || 0);
+
+          trueTotalCakes = Math.max(0, Math.ceil(product_with_brack));
+        }
+      }
+
+      const alreadyRegistered = batchDesigner.some(
+        (b) => Number(b.id) === entryId,
+      );
+
+      if (!alreadyRegistered) {
         dispatch(
           addBatchState({
             id: entryId,
             id_list_of_ordered_production: linkedProductionId,
-            id_ordered_product_to_warehouse: row.id_ordered_product_to_warehouse ?? null,
+            id_ordered_product_to_warehouse:
+              row.id_ordered_product_to_warehouse ?? null,
             product_article: row.product_article,
             cakes_in_batch: qty,
-            cakes_residue: 0,
-            total_cakes: qty,
+            cakes_residue: Math.max(trueTotalCakes - qty, 0),
+            total_cakes: trueTotalCakes,
             free_product_package: Number(row.quantity_free) || 0,
             free_product_cakes: 0,
           }),
@@ -1017,6 +1333,8 @@ function ProductionBatchDesignerNew() {
     latestProducts,
     batchOutsideRedux,
     batchDesigner,
+    listOfOrderedCakesExcludingDate,
+    list_of_orders_to_warehouse,
     dispatch,
     setAutoclaveFromContext,
     setInitialRowCount,
@@ -1065,10 +1383,10 @@ function ProductionBatchDesignerNew() {
           >
             Add product ordered to warehouse
           </button> */}
-          {console.log(
+          {/* {console.log(
             'autoclaveCalendarData ProductionBatchDesignerNew.jsx line 866',
             autoclaveCalendarData,
-          )}{' '}
+          )}{' '} */}
           <div
             style={{
               display: 'flex',
@@ -1128,7 +1446,9 @@ function ProductionBatchDesignerNew() {
       >
         <Autoclave />
       </div>
-      {!productBatchModal && !orderedProductBatchModal && <ProductionBatchFooter />}
+      {!productBatchModal && !orderedProductBatchModal && (
+        <ProductionBatchFooter />
+      )}
     </div>
   );
 }
