@@ -29,7 +29,7 @@ const SECTIONS = {
       { label: 'Cake id start', key: 'cake_id_start', readOnly: true },
       { label: 'Cake id finish', key: 'cake_id_finish', readOnly: true },
       { label: 'Production date', key: 'production_date', type: 'date' },
-      { label: 'Recepie', key: 'recipe', readOnly: true },
+      { label: 'Recipe', key: 'recipe', readOnly: true },
     ],
   },
 
@@ -88,19 +88,19 @@ const SECTIONS = {
   },
 
   actualRecipe: {
-    title: 'Actual Recepie',
+    title: 'Actual Recipe',
     columns: 3,
     fields: [
-      { label: 'Lime, kg', key: 'lime' },
-      { label: 'Sand slurry (dry), kg', key: 'sand_slurry_dry' },
-      { label: 'Aluminum 1, kg', key: 'aluminum_paste' },
+      { label: 'Lime, kg', key: 'lime', readOnly: true },
+      { label: 'Sand slurry (dry), kg', key: 'sand_slurry_dry', readOnly: true },
+      { label: 'Aluminum 1, kg', key: 'aluminum_paste', readOnly: true },
 
-      { label: 'Cement, kg', key: 'cement' },
-      { label: 'Gypsum (dry), kg', key: 'gypsum_dry' },
-      { label: 'Aluminum 2, kg', key: 'aluminum_paste_2' },
+      { label: 'Cement, kg', key: 'cement', readOnly: true },
+      { label: 'Gypsum (dry), kg', key: 'gypsum_dry', readOnly: true },
+      { label: 'Aluminum 2, kg', key: 'aluminum_paste_2', readOnly: true },
 
-      { label: 'Sand powder (dry), kg', key: 'sand_dry' },
-      { label: 'Return (dry), kg', key: 'return_dry' },
+      { label: 'Sand powder (dry), kg', key: 'sand_dry', readOnly: true },
+      { label: 'Return (dry), kg', key: 'return_dry', readOnly: true },
       // { label: 'Water solids', key: 'w_s' },
     ],
   },

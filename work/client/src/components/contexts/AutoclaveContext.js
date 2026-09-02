@@ -29,7 +29,9 @@ const AutoclaveContext = createContext();
 export const useAutoclaveContext = () => {
   const context = useContext(AutoclaveContext);
   if (!context)
-    throw new Error('useAutoclaveContext must be used within AutoclaveProvider');
+    throw new Error(
+      'useAutoclaveContext must be used within AutoclaveProvider',
+    );
   return context;
 };
 
@@ -99,7 +101,10 @@ export const AutoclaveContextProvider = ({ children }) => {
         (x) => String(x.id) === String(id),
       );
       const d =
-        o?.date_of_dispatch || o?.date_of_shipping || o?.shipment_date || o?.date;
+        o?.date_of_dispatch ||
+        o?.date_of_shipping ||
+        o?.shipment_date ||
+        o?.date;
       return d ? new Date(d).getTime() : 0;
     },
     [list_of_ordered_production],
@@ -154,7 +159,9 @@ export const AutoclaveContextProvider = ({ children }) => {
     const preferId = selectedCell.id;
     const idToUse = pickSourceIdForAdd(preferId);
 
-    const product = latestProducts?.find((p) => p.article === selectedCell.article);
+    const product = latestProducts?.find(
+      (p) => p.article === selectedCell.article,
+    );
     const density = product?.density ?? selectedCell.density ?? '';
     const width = product?.width ?? selectedCell.width ?? '';
 
@@ -292,7 +299,13 @@ export const AutoclaveContextProvider = ({ children }) => {
       }
       return rebuildRows(nextFlat);
     });
-  }, [selectedCell, pickSourceIdForAdd, getGroupBySourceId, toFlat, rebuildRows]);
+  }, [
+    selectedCell,
+    pickSourceIdForAdd,
+    getGroupBySourceId,
+    toFlat,
+    rebuildRows,
+  ]);
 
   const moveBatchLater = useCallback(() => {
     if (!selectedCell?.article) return;
@@ -356,7 +369,8 @@ export const AutoclaveContextProvider = ({ children }) => {
       if (!autoclaveCalendarData) return;
       const producedDelta = Math.ceil(filledCount / CELLS_PER_AUTOCLAVE);
       const { quantity, date, produced_autoclave } = autoclaveCalendarData;
-      const new_produced_autoclave = Number(produced_autoclave || 0) + producedDelta;
+      const new_produced_autoclave =
+        Number(produced_autoclave || 0) + producedDelta;
 
       dispatch(
         addNewAutoclaveCalendar([
@@ -426,7 +440,9 @@ export const AutoclaveContextProvider = ({ children }) => {
         )?.volumeBlockOnPallet;
         const palletsPerArray = Math.max(
           1,
-          Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+          Math.floor(
+            Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1),
+          ) || 1,
         );
 
         if (existingRecord) {
@@ -521,7 +537,9 @@ export const AutoclaveContextProvider = ({ children }) => {
       if (!autoclaveCalendarData) return;
       const { date } = autoclaveCalendarData;
 
-      const oldRecordsForDate = existingBatchOutside.filter((r) => r.date === date);
+      const oldRecordsForDate = existingBatchOutside.filter(
+        (r) => r.date === date,
+      );
 
       const flat = toFlat(autoclave);
       const idsInOrder = [];
@@ -596,7 +614,9 @@ export const AutoclaveContextProvider = ({ children }) => {
         )?.volumeBlockOnPallet;
         const palletsPerArray = Math.max(
           1,
-          Math.floor(Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1)) || 1,
+          Math.floor(
+            Number(m3InArray || 0) / Number(volumeBlockOnPallet || 1),
+          ) || 1,
         );
 
         const quantity_pallets = product.cakes_in_batch * palletsPerArray;
@@ -630,21 +650,29 @@ export const AutoclaveContextProvider = ({ children }) => {
         if (newPosition.product.id_ordered_product_to_warehouse) {
           orderDelta.set(
             newPosition.product.id_ordered_product_to_warehouse,
-            (orderDelta.get(newPosition.product.id_ordered_product_to_warehouse) ||
-              0) + quantity_pallets,
+            (orderDelta.get(
+              newPosition.product.id_ordered_product_to_warehouse,
+            ) || 0) + quantity_pallets,
           );
         }
       });
 
       orderDelta.forEach((delta, orderId) => {
         if (!delta) return;
-        dispatch(updateOrderToWarehouse({ id: orderId, quantity_allocated: delta }));
+        dispatch(
+          updateOrderToWarehouse({ id: orderId, quantity_allocated: delta }),
+        );
       });
 
-      const totalAutoclavesForDate = Math.ceil(filledCount / CELLS_PER_AUTOCLAVE);
+      const totalAutoclavesForDate = Math.ceil(
+        filledCount / CELLS_PER_AUTOCLAVE,
+      );
       dispatch(
         addNewAutoclaveCalendar([
-          { ...autoclaveCalendarData, produced_autoclave: totalAutoclavesForDate },
+          {
+            ...autoclaveCalendarData,
+            produced_autoclave: totalAutoclavesForDate,
+          },
         ]),
       );
 
@@ -680,6 +708,10 @@ export const AutoclaveContextProvider = ({ children }) => {
       return false;
     }
     if (password !== process.env.REACT_APP_PASSWORD_FOR_AUTOCLAVE) {
+      console.log(
+        process.env,
+        'process.env.REACT_APP_PASSWORD_FOR_AUTOCLAVE AutoclaveContext.js line 683',
+      );
       alert('Wrong password');
       return false;
     }
@@ -825,6 +857,8 @@ export const AutoclaveContextProvider = ({ children }) => {
   );
 
   return (
-    <AutoclaveContext.Provider value={value}>{children}</AutoclaveContext.Provider>
+    <AutoclaveContext.Provider value={value}>
+      {children}
+    </AutoclaveContext.Provider>
   );
 };
