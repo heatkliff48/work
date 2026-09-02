@@ -22,6 +22,7 @@ import { useProductsContext } from './ProductContext';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addNewAldabaran } from '#components/redux/actions/aldabaranAction.js';
+import { computeListOfOrderedCakes } from '#components/Warehouse/listOfOrderedCakesCalc.js';
 
 const WarehouseContext = createContext();
 
@@ -1101,164 +1102,19 @@ const WarehouseContextProvider = ({ children }) => {
     return { sources: out, taken: amount - remaining, leftover: remaining };
   };
 
-  // Надёжный парсер дат
-  const toTime = (d) => {
-    if (d == null) return Number.MAX_SAFE_INTEGER; // пустое => в конец
-    if (typeof d === 'number') return d; // уже ms
-    if (d instanceof Date) return d.getTime(); // Date -> ms
-    if (typeof d === 'string') {
-      // 1) пробуем стандартный парсер (ISO и пр.)
-      const t = Date.parse(d);
-      if (!Number.isNaN(t)) return t;
-
-      // 2) формат DD.MM.YYYY
-      const m = d.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-      if (m) {
-        const [, dd, mm, yyyy] = m;
-        return new Date(+yyyy, +mm - 1, +dd).getTime(); // локальная дата
-        // если нужен UTC: Date.UTC(+yyyy, +mm - 1, +dd)
-      }
-    }
-    return Number.MAX_SAFE_INTEGER; // всё непонятное — в конец
-  };
-
-  const extractProductTitle = (value = '') => {
-    if (!value) return '';
-
-    return String(value)
-      .replace(/BAUBLOCK®/gi, '')
-      .replace(/\s*Medidas[\s\S]*$/i, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-  };
-
   useEffect(() => {
     if (!Array.isArray(latestProducts) || latestProducts.length === 0) return;
     if (!Array.isArray(list_of_orders) || list_of_orders.length === 0) return;
-    // Построение базового списка заказов без quantity_in_batch (пока)
-    const baseOrders = list_of_ordered_production
-      .filter((el) => {
-        const orderStatus = list_of_orders.find(
-          (order) => order.article === el.order_article,
-        )?.status;
 
-        return ![7, 8, 9, 10].includes(orderStatus);
-      })
-      .map((el) => {
-        const product = latestProducts.find(
-          (prod) => prod.article === el.product_article,
-        );
-
-        const arraysPerPalletRaw = Math.floor(
-          (product?.m3InArray ?? 0) / (product?.volumeBlockOnPallet ?? 1),
-        );
-        const arraysPerPallet = arraysPerPalletRaw > 0 ? arraysPerPalletRaw : 1;
-
-        const quantity_cakes = Math.ceil(
-          (Number(el.quantity) || 0) / arraysPerPallet,
-        );
-
-        return {
-          ...el,
-          quantity_cakes,
-          quantity_in_batch: 0,
-          shipping_ts: toTime(el.shipping_date),
-        };
-      });
-
-    const byArticle = new Map();
-    const idSetByArticle = new Map();
-
-    for (const item of baseOrders) {
-      if (!byArticle.has(item.product_article)) {
-        byArticle.set(item.product_article, []);
-        idSetByArticle.set(item.product_article, new Set());
-      }
-      byArticle.get(item.product_article).push(item);
-      idSetByArticle.get(item.product_article).add(item.id);
-    }
-
-    // Сортировка внутри каждой группы по shipping_date (возрастание)
-    for (const list of byArticle.values()) {
-      list.sort((a, b) => a.shipping_ts - b.shipping_ts || a.id - b.id); // стабильный тай-брейк по id
-    }
-
-    const producedByArticle = new Map();
-
-    for (const batch of batchOutside) {
-      const m3InArray = latestProducts?.find(
-        (p) => p.article == batch.product_article,
-      )?.m3InArray;
-
-      const volumeBlockOnPallet = latestProducts?.find(
-        (p) => p.article == batch.product_article,
-      )?.volumeBlockOnPallet;
-
-      const producedUnits =
-        (Number(batch.quantity_pallets) || 0) /
-        Math.floor(m3InArray / volumeBlockOnPallet);
-
-      // пытаемся взять напрямую по product_article
-      let art = batch.product_article;
-
-      // если нет product_article — маппим по принадлежности id к группе
-      if (!art) {
-        for (const [pa, idSet] of idSetByArticle.entries()) {
-          if (
-            batch.id_list_of_ordered_production &&
-            idSet.has(batch.id_list_of_ordered_production)
-          ) {
-            art = pa;
-            break;
-          }
-        }
-      }
-
-      if (!art) continue;
-
-      producedByArticle.set(art, (producedByArticle.get(art) || 0) + producedUnits);
-    }
-
-    // Распределение произведённого: идём по заказам (после сортировки) и "раздаём"
-    for (const [article, orders] of byArticle.entries()) {
-      let remaining = producedByArticle.get(article) || 0;
-
-      for (const order of orders) {
-        if (remaining <= 0) {
-          order.quantity_in_batch = 0;
-          continue;
-        }
-
-        const need = Number(order.quantity_cakes) || 0;
-        const alloc = Math.min(need, remaining);
-
-        order.quantity_in_batch = alloc;
-        remaining -= alloc;
-      }
-    }
-
-    // Финальный массив data
-    const data = Array.from(byArticle.values())
-      .flat()
-      // если тебе всё ещё нужно уникализировать по (product_article, order_article)
-      .reduce((uniqueItems, item) => {
-        if (
-          !uniqueItems.some(
-            (el) =>
-              el.product_article === item.product_article &&
-              el.order_article === item.order_article,
-          )
-        ) {
-          const product = latestProducts.find(
-            (prod) => prod.article == item.product_article,
-          );
-
-          const tradingMark = extractProductTitle(product?.description || '');
-
-          uniqueItems.push({ ...item, tradingMark });
-        }
-        return uniqueItems;
-      }, []);
+    // Вынесено в listOfOrderedCakesCalc.js, т.к. ProductionBatchDesignerNew.jsx
+    // должен уметь пересчитать этот же список локально (например, без учёта
+    // конкретной даты) ещё до того, как правки в конструкторе сохранены.
+    const data = computeListOfOrderedCakes({
+      latestProducts,
+      list_of_orders,
+      list_of_ordered_production,
+      batchOutside,
+    });
 
     setListOfOrderedCakes(data);
     const dryMixOrderedData = related_materials_backorder_list
