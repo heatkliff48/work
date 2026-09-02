@@ -363,15 +363,24 @@ function ProductionBatchDesignerNew() {
       return;
     }
 
-    const filtered = list_of_orders_to_warehouse.filter(
-      (order) =>
+    const filtered = list_of_orders_to_warehouse.filter((order) => {
+      const freed = freedPalletsByWarehouseOrder.get(order.id) || 0;
+      const effectiveAllocated = Math.max(
+        0,
+        (Number(order.quantity_allocated) || 0) - freed,
+      );
+
+      return (
         order.quantity_pallets > order.quantity_produced &&
-        order.quantity_pallets > order.quantity_allocated,
-    );
+        order.quantity_pallets > effectiveAllocated
+      );
+    });
 
     const regex = /(\d+)\s*x\s*(\d+)\s*x\s*(\d+)/;
     const filteredWithSize = filtered.reduce((acc, el) => {
-      const product = latestProducts.find((p) => p.article == el.product_article);
+      const product = latestProducts.find(
+        (p) => p.article == el.product_article,
+      );
 
       // el.description holds the order's title (dimensions already stripped out
       // when the order was created), so the size must be parsed from the
@@ -380,17 +389,26 @@ function ProductionBatchDesignerNew() {
 
       const product_size = match ? `${match[1]}x${match[2]}x${match[3]}` : '';
 
+      const freed = freedPalletsByWarehouseOrder.get(el.id) || 0;
       const newObj = {
         ...el,
         product_size,
         density: product?.density,
+        quantity_allocated: Math.max(
+          0,
+          (Number(el.quantity_allocated) || 0) - freed,
+        ),
       };
       acc.push(newObj);
       return acc;
     }, []);
 
     setFilteredList(filteredWithSize);
-  }, [list_of_orders_to_warehouse, latestProducts]);
+  }, [
+    list_of_orders_to_warehouse,
+    latestProducts,
+    freedPalletsByWarehouseOrder,
+  ]);
 
   const MAX_QUANTITY = 10405;
 
