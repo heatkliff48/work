@@ -56,6 +56,7 @@ const RawMaterialsConsumptionModal = React.memo(
     const [moldId, setMoldId] = useState('');
     const [ws, setWs] = useState('');
     const savingRef = useRef(false);
+    const seedFromPrevRef = useRef(false);
 
     const warehouseAluminum1 = useSelector((state) => state.warehouseAluminum1);
 
@@ -68,12 +69,36 @@ const RawMaterialsConsumptionModal = React.memo(
       setGovno(false);
     }, []);
 
+    const previousBatchRecord = useMemo(() => {
+      if (!Array.isArray(lotesListBatches)) return null;
+      if (selectedRow?.batch_id == null) return null;
+
+      const records = lotesListBatches.filter(
+        (item) => String(item?.batch_id) === String(selectedRow.batch_id),
+      );
+
+      if (!records.length) return null;
+
+      return records.reduce((latest, item) => {
+        if (!latest) return item;
+
+        return Number(item.id) > Number(latest.id) ? item : latest;
+      }, null);
+    }, [lotesListBatches, selectedRow?.batch_id]);
+
     useEffect(() => {
       if (!isOpen) return;
+      seedFromPrevRef.current = true;
       setRecipeArticle(selectedRow?.recipe_article ?? '');
-      setMoldId('');
-      setWs('');
-    }, [selectedRow, isOpen]);
+      setMoldId(
+        previousBatchRecord?.mold_id != null
+          ? String(previousBatchRecord.mold_id)
+          : '',
+      );
+      setWs(
+        previousBatchRecord?.w_s != null ? String(previousBatchRecord.w_s) : '',
+      );
+    }, [selectedRow, isOpen, previousBatchRecord]);
 
     const materialsMap = useMemo(
       () => [
@@ -197,18 +222,27 @@ const RawMaterialsConsumptionModal = React.memo(
 
     useEffect(() => {
       if (!isOpen) return;
+      const prevRecord = seedFromPrevRef.current ? previousBatchRecord : null;
       setForm((prev) => {
         const next = { ...prev };
         materialsMap.forEach(({ key }) => {
+          const rawPrev = prevRecord?.[key];
+          const prevVal =
+            rawPrev == null || rawPrev === '' ? NaN : Number(rawPrev);
           const baseVal = Number(recipeForUI?.[key]);
-          next[`${key}_actual_reciepe`] = Number.isFinite(baseVal)
-            ? baseVal
-            : '';
+
+          if (Number.isFinite(prevVal)) {
+            next[`${key}_actual_reciepe`] = prevVal;
+          } else {
+            next[`${key}_actual_reciepe`] = Number.isFinite(baseVal)
+              ? baseVal
+              : '';
+          }
         });
         return next;
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isOpen, selectedRecipe?.id, materialsMap]);
+    }, [isOpen, selectedRecipe?.id, materialsMap, previousBatchRecord]);
 
     const resetToDef = (key) => {
       const baseVal = Number(recipeForUI?.[key]);
@@ -263,38 +297,51 @@ const RawMaterialsConsumptionModal = React.memo(
 
       setAvailableRecipes(candidateRecipes);
 
-      const fromRowArticle = selectedRow?.recipe_article;
+      const findByArticle = (article) =>
+        article &&
+        article !== 'No recipe' &&
+        candidateRecipes.find((r) => String(r.article) === String(article));
+
+      const fromPrevArticle = seedFromPrevRef.current
+        ? previousBatchRecord?.recipe
+        : null;
 
       const matched =
-        fromRowArticle &&
-        fromRowArticle !== 'No recipe' &&
-        candidateRecipes.find(
-          (r) => String(r.article) === String(fromRowArticle),
-        );
+        findByArticle(fromPrevArticle) ||
+        findByArticle(selectedRow?.recipe_article);
 
       const recipe = matched || candidateRecipes[0] || null;
 
       setSelectedRecipe(recipe);
       setRecipeArticle(recipe?.article || '');
 
-      if (recipe?.aluminum_type) {
+      const alu1Type =
+        (seedFromPrevRef.current ? previousBatchRecord?.aluminum_type : null) ||
+        recipe?.aluminum_type;
+
+      if (alu1Type) {
         setSelectedAlu1Type({
-          value: recipe.aluminum_type,
-          label: recipe.aluminum_type,
+          value: alu1Type,
+          label: alu1Type,
         });
       } else {
         setSelectedAlu1Type(null);
       }
 
-      if (recipe?.aluminum_2_type) {
+      const alu2Type =
+        (seedFromPrevRef.current
+          ? previousBatchRecord?.aluminum_2_type
+          : null) || recipe?.aluminum_2_type;
+
+      if (alu2Type) {
         setSelectedAlu2Type({
-          value: recipe.aluminum_2_type,
-          label: recipe.aluminum_2_type,
+          value: alu2Type,
+          label: alu2Type,
         });
       } else {
         setSelectedAlu2Type(null);
       }
-    }, [isOpen, selectedRow, latestProducts, list_of_recipes]);
+    }, [isOpen, selectedRow, latestProducts, list_of_recipes, previousBatchRecord]);
 
     const handleChange = (key) => (e) => {
       let processedValue = e.target.value;
@@ -859,6 +906,8 @@ const RawMaterialsConsumptionModal = React.memo(
     };
 
     const handleRecipeChange = (selectedOption) => {
+      seedFromPrevRef.current = false;
+
       const found = availableRecipes.find((r) => r.id === selectedOption.value);
 
       setSelectedRecipe(found || null);
