@@ -14,13 +14,25 @@ import '#components/Clients/ClientsInfo/clientsDrawer.css';
 import '#components/Styles/table.css';
 import './batchOutside.css';
 
-const DATE_COLOR_CLASSES = ['bo-date--green', 'bo-date--amber', 'bo-date--blue', 'bo-date--red'];
+const DATE_COLOR_CLASSES = [
+  'bo-date--green',
+  'bo-date--amber',
+  'bo-date--blue',
+  'bo-date--red',
+];
 
 // Same pattern RawMatConsumptionModalUPD uses to derive lotes_list "product" from a product description
 const LOTES_PRODUCT_NAME_REGEX = /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/;
 
-function buildGridColumns(rows, latestProducts, cellsPerAutoclave, autoclaveCalendar) {
-  const productByArticle = new Map((latestProducts || []).map((p) => [p.article, p]));
+function buildGridColumns(
+  rows,
+  latestProducts,
+  cellsPerAutoclave,
+  autoclaveCalendar
+) {
+  const productByArticle = new Map(
+    (latestProducts || []).map((p) => [p.article, p])
+  );
 
   const byDate = new Map();
   rows.forEach((row) => {
@@ -33,19 +45,12 @@ function buildGridColumns(rows, latestProducts, cellsPerAutoclave, autoclaveCale
     (autoclaveCalendar || []).map((el) => [
       String(el.date).slice(0, 10),
       Number(el.scheduled_autoclaves) || 0,
-    ]),
+    ])
   );
 
-  const producedByDate = new Map(
-    (autoclaveCalendar || []).map((el) => [
-      String(el.date).slice(0, 10),
-      Number(el.produced_autoclave) || 0,
-    ]),
-  );
-
-  const order = Array.from(new Set([...byDate.keys(), ...scheduledByDate.keys()])).sort((a, b) =>
-    String(a).localeCompare(String(b)),
-  );
+  const order = Array.from(
+    new Set([...byDate.keys(), ...scheduledByDate.keys()])
+  ).sort((a, b) => String(a).localeCompare(String(b)));
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const columns = [];
@@ -76,17 +81,29 @@ function buildGridColumns(rows, latestProducts, cellsPerAutoclave, autoclaveCale
           width: product ? product.width : '—',
         });
       }
-      columns.push({ date, weekNumber, colorClass, cakeRows, isEmpty: false, isHistory });
+      columns.push({
+        date,
+        weekNumber,
+        colorClass,
+        cakeRows,
+        isEmpty: false,
+        isHistory,
+      });
       filledCount += 1;
     }
 
-    // No planning slots in the past: an autoclave scheduled on a gone-by date can't be filled anymore.
-    // Produced autoclaves are no longer available either, so they don't count as free slots.
+    // No planning slots in the past: an autoclave scheduled on a gone-by date can't be filled anymore
     const scheduled = date < today ? 0 : scheduledByDate.get(date) || 0;
-    const produced = producedByDate.get(date) || 0;
-    const emptyCount = Math.max(0, scheduled - produced - filledCount);
+    const emptyCount = Math.max(0, scheduled - filledCount);
     for (let e = 0; e < emptyCount; e++) {
-      columns.push({ date, weekNumber, colorClass, cakeRows: [], isEmpty: true, isHistory: false });
+      columns.push({
+        date,
+        weekNumber,
+        colorClass,
+        cakeRows: [],
+        isEmpty: true,
+        isHistory: false,
+      });
     }
   });
 
@@ -184,7 +201,7 @@ const BatchOutside = () => {
 
       const palletsPerArray = Math.max(
         1,
-        Math.floor(m3InArray / volumeBlockOnPallet) || 1,
+        Math.floor(m3InArray / volumeBlockOnPallet) || 1
       );
 
       const quantity_arrays = Math.ceil(item.quantity_pallets / palletsPerArray);
@@ -200,12 +217,12 @@ const BatchOutside = () => {
 
   const totalArrays = useMemo(
     () => newBatchOutside.reduce((sum, row) => sum + (row.quantity_arrays || 0), 0),
-    [newBatchOutside],
+    [newBatchOutside]
   );
 
   const dateCount = useMemo(
     () => new Set(newBatchOutside.map((row) => row.date)).size,
-    [newBatchOutside],
+    [newBatchOutside]
   );
 
   useEffect(() => {
@@ -226,7 +243,7 @@ const BatchOutside = () => {
     });
 
     const activeDates = new Set(
-      newBatchOutside.map((row) => String(row.date).slice(0, 10)),
+      newBatchOutside.map((row) => String(row.date).slice(0, 10))
     );
     const today = format(new Date(), 'yyyy-MM-dd');
 
@@ -239,7 +256,7 @@ const BatchOutside = () => {
         (a, b) =>
           Number(a.batch_id) - Number(b.batch_id) ||
           Number(a.sub_batch_id) - Number(b.sub_batch_id) ||
-          Number(a.id) - Number(b.id),
+          Number(a.id) - Number(b.id)
       )
       .map((item, index) => ({
         date: String(item.production_date).slice(0, 10),
@@ -256,34 +273,21 @@ const BatchOutside = () => {
         [...pastRows, ...newBatchOutside],
         latestProducts,
         CELLS_PER_AUTOCLAVE,
-        autoclave_calendar,
+        autoclave_calendar
       ),
-    [pastRows, newBatchOutside, latestProducts, CELLS_PER_AUTOCLAVE, autoclave_calendar],
+    [
+      pastRows,
+      newBatchOutside,
+      latestProducts,
+      CELLS_PER_AUTOCLAVE,
+      autoclave_calendar,
+    ]
   );
 
   const firstCurrentIndex = useMemo(
     () => gridColumns.findIndex((col) => !col.isHistory),
-    [gridColumns],
+    [gridColumns]
   );
-
-  // Cards of the same date share one framed group so a production day reads as a single block
-  const groupedColumns = useMemo(() => {
-    const groups = [];
-    gridColumns.forEach((col, index) => {
-      const last = groups[groups.length - 1];
-      if (last && last.date === col.date) {
-        last.cols.push({ col, index });
-      } else {
-        groups.push({
-          date: col.date,
-          colorClass: col.colorClass,
-          isHistory: col.isHistory,
-          cols: [{ col, index }],
-        });
-      }
-    });
-    return groups;
-  }, [gridColumns]);
 
   // When history is shown, start the view at the current dates so the past sits to the left;
   // when it is hidden again, return to the start of the grid
@@ -315,7 +319,7 @@ const BatchOutside = () => {
     }
 
     const confirmed = window.confirm(
-      `The autoclave(s) on ${col.date} are already filled or partially filled. Do you really want to edit them?`,
+      `The autoclave(s) on ${col.date} are already filled or partially filled. Do you really want to edit them?`
     );
     if (!confirmed) return;
 
@@ -348,14 +352,18 @@ const BatchOutside = () => {
         <div className="bo-toggle">
           <button
             type="button"
-            className={`cl-btn ${mode === 'list' ? 'cl-btn--primary' : 'cl-btn--ghost'}`}
+            className={`cl-btn ${
+              mode === 'list' ? 'cl-btn--primary' : 'cl-btn--ghost'
+            }`}
             onClick={() => setMode('list')}
           >
             List
           </button>
           <button
             type="button"
-            className={`cl-btn ${mode === 'grid' ? 'cl-btn--primary' : 'cl-btn--ghost'}`}
+            className={`cl-btn ${
+              mode === 'grid' ? 'cl-btn--primary' : 'cl-btn--ghost'
+            }`}
             onClick={() => setMode('grid')}
           >
             Autoclave view
@@ -394,63 +402,54 @@ const BatchOutside = () => {
 
       {mode === 'grid' && (
         <div className="bo-grid bo-fade-in" ref={gridRef}>
-          {groupedColumns.map((group) => (
+          {gridColumns.map((col, colIndex) => (
             <div
-              className={`bo-date-group ${group.colorClass} ${
-                group.isHistory ? 'bo-date-group--history' : ''
+              className={`bo-card ${col.isEmpty ? 'bo-card--empty' : ''} ${
+                col.isHistory ? 'bo-card--history' : ''
               }`}
-              key={group.date}
+              key={colIndex}
+              ref={colIndex === firstCurrentIndex ? firstCurrentCardRef : null}
+              role={col.isHistory ? undefined : 'button'}
+              tabIndex={col.isHistory ? undefined : 0}
+              onClick={() => handleAutoclaveCardClick(col)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleAutoclaveCardClick(col);
+                }
+              }}
             >
-              {group.cols.map(({ col, index: colIndex }) => (
-                <div
-                  className={`bo-card ${col.isEmpty ? 'bo-card--empty' : ''} ${
-                    col.isHistory ? 'bo-card--history' : ''
-                  }`}
-                  key={colIndex}
-                  ref={colIndex === firstCurrentIndex ? firstCurrentCardRef : null}
-                  role={col.isHistory ? undefined : 'button'}
-                  tabIndex={col.isHistory ? undefined : 0}
-                  onClick={() => handleAutoclaveCardClick(col)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleAutoclaveCardClick(col);
-                    }
-                  }}
-                >
-                  <div className={`bo-card__header ${col.colorClass}`}>
-                    {col.date}
-                    {col.weekNumber != null && (
-                      <span className="bo-card__week">
-                        Week {col.weekNumber}
-                        {col.isHistory ? ' · Archive' : ''}
-                      </span>
-                    )}
-                  </div>
-                  {col.isEmpty ? (
-                    <div className="bo-card__empty-state">
-                      <span className="bo-card__empty-icon">+</span>
-                      <span className="bo-card__empty-text">Empty autoclave</span>
-                      <span className="bo-card__empty-sub">Click to plan</span>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="bo-card__subhead">
-                        <div>№</div>
-                        <div>Density</div>
-                        <div>Size</div>
-                      </div>
-                      {col.cakeRows.map((cake) => (
-                        <div className="bo-card__row" key={cake.no}>
-                          <div className="bo-card__row-no">{cake.no}</div>
-                          <div className="bo-card__row-val">{cake.density}</div>
-                          <div className="bo-card__row-val">{cake.width}</div>
-                        </div>
-                      ))}
-                    </>
-                  )}
+              <div className={`bo-card__header ${col.colorClass}`}>
+                {col.date}
+                {col.weekNumber != null && (
+                  <span className="bo-card__week">
+                    Week {col.weekNumber}
+                    {col.isHistory ? ' · Archive' : ''}
+                  </span>
+                )}
+              </div>
+              {col.isEmpty ? (
+                <div className="bo-card__empty-state">
+                  <span className="bo-card__empty-icon">+</span>
+                  <span className="bo-card__empty-text">Empty autoclave</span>
+                  <span className="bo-card__empty-sub">Click to plan</span>
                 </div>
-              ))}
+              ) : (
+                <>
+                  <div className="bo-card__subhead">
+                    <div>№</div>
+                    <div>Density</div>
+                    <div>Size</div>
+                  </div>
+                  {col.cakeRows.map((cake) => (
+                    <div className="bo-card__row" key={cake.no}>
+                      <div className="bo-card__row-no">{cake.no}</div>
+                      <div className="bo-card__row-val">{cake.density}</div>
+                      <div className="bo-card__row-val">{cake.width}</div>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           ))}
         </div>
