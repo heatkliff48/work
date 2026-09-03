@@ -34,6 +34,7 @@ const RawMaterialsConsumptionModal = React.memo(
     onSave,
     newBatchMode = false,
     lotesListBatches = [],
+    lotesListCakes = [],
   }) => {
     const {
       list_of_recipes = [],
@@ -95,8 +96,67 @@ const RawMaterialsConsumptionModal = React.memo(
       }, null);
     }, [lotesListBatches, selectedRow?.batch_id]);
 
+    // Cake ids of the current batch, newest first
+    const batchCakeIdsDesc = useMemo(() => {
+      if (!Array.isArray(lotesListBatches)) return [];
+      if (selectedRow?.batch_id == null) return [];
+
+      const ids = new Set();
+
+      lotesListBatches.forEach((item) => {
+        if (String(item?.batch_id) !== String(selectedRow.batch_id)) return;
+
+        const cakeIdStart = Number(item?.cake_id_start);
+        const cakeIdFinish = Number(item?.cake_id_finish);
+
+        if (
+          !Number.isFinite(cakeIdStart) ||
+          !Number.isFinite(cakeIdFinish) ||
+          cakeIdFinish < cakeIdStart
+        ) {
+          return;
+        }
+
+        for (let id = cakeIdStart; id <= cakeIdFinish; id += 1) {
+          ids.add(id);
+        }
+      });
+
+      return [...ids].sort((a, b) => b - a);
+    }, [lotesListBatches, selectedRow?.batch_id]);
+
+    // W/S is stored on the cake record (water_solid_ratio), not on the batch,
+    // so take it from the latest cake of this batch that has a value.
+    const previousCakeWs = useMemo(() => {
+      if (!Array.isArray(lotesListCakes) || !batchCakeIdsDesc.length) return '';
+
+      const cakesById = new Map(
+        lotesListCakes.map((item) => [Number(item?.id), item]),
+      );
+
+      for (const id of batchCakeIdsDesc) {
+        const value = cakesById.get(id)?.water_solid_ratio;
+
+        if (value != null && String(value).trim() !== '') {
+          return String(value);
+        }
+      }
+
+      return '';
+    }, [lotesListCakes, batchCakeIdsDesc]);
+
+    const wasOpenRef = useRef(false);
+
+    // Seed once per opening, so a redraw of the parent does not wipe user input
     useEffect(() => {
-      if (!isOpen) return;
+      if (!isOpen) {
+        wasOpenRef.current = false;
+        return;
+      }
+
+      if (wasOpenRef.current) return;
+      wasOpenRef.current = true;
+
       seedFromPrevRef.current = true;
       setRecipeArticle(selectedRow?.recipe_article ?? '');
       setMoldId(
@@ -105,9 +165,12 @@ const RawMaterialsConsumptionModal = React.memo(
           : '',
       );
       setWs(
-        previousBatchRecord?.w_s != null ? String(previousBatchRecord.w_s) : '',
+        previousCakeWs ||
+          (previousBatchRecord?.w_s != null
+            ? String(previousBatchRecord.w_s)
+            : ''),
       );
-    }, [selectedRow, isOpen, previousBatchRecord]);
+    }, [selectedRow, isOpen, previousBatchRecord, previousCakeWs]);
 
     useEffect(() => {
       if (!isOpen) return;
