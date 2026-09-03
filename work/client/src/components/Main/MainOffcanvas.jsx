@@ -145,7 +145,7 @@ function MainOffcanvas() {
             <Button
               className="custom-menu-button"
               onClick={() => {
-                navigate('/cacke_fillup');
+                navigate('/cake_fillup');
                 handleClose();
               }}
             >

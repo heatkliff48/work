@@ -82,7 +82,7 @@ class WarehouseRepository {
         const filled_autoclaves = item?.filled_autoclaves;
         const residual_arrays = item?.residual_arrays;
         const total_arrays = item?.total_arrays;
-        const total_arrays_cacke_fill_up = item?.total_arrays_cacke_fill_up;
+        const total_arrays_cake_fill_up = item?.total_arrays_cake_fill_up;
 
         if (calendarMap.has(date)) {
           const data = calendarMap.get(date);
@@ -93,7 +93,7 @@ class WarehouseRepository {
               total_arrays,
               residual_arrays,
               filled_autoclaves,
-              total_arrays_cacke_fill_up,
+              total_arrays_cake_fill_up,
             },
             { where: { id: data.id }, transaction: t },
           );
@@ -106,7 +106,7 @@ class WarehouseRepository {
               total_arrays,
               residual_arrays,
               filled_autoclaves,
-              total_arrays_cacke_fill_up,
+              total_arrays_cake_fill_up,
             },
             { transaction: t },
           );

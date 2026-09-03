@@ -18,19 +18,19 @@ import {
   addNewAutoclaveCalendar,
   getRawMaterialsWarehouse,
 } from '#components/redux/actions/warehouseAction.js';
-import RawMaterialsConsumptionModal from '#components/CackeFillUp/RawMatConsumptionModalUPD.jsx';
+import RawMaterialsConsumptionModal from '#components/CakeFillUp/RawMatConsumptionModalUPD.jsx';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import {
   getWarehouseAluminum1,
   getWarehouseAluminum2,
 } from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
-function CackeFillUp() {
+function CakeFillUp() {
   const dispatch = useDispatch();
 
   const { batchOutside, autoclave_calendar, raw_materials_warehouse } =
     useWarehouseContext();
-  const { cackeFillUp, setCackeFillUp, lotesListBatches, lotesListCakes } =
+  const { cakeFillUp, setCakeFillUp, lotesListBatches, lotesListCakes } =
     useProjectContext();
   const { raw_mat_consumption } = useRecipeContext();
   const { latestProducts, extractProductTitle } = useProductsContext();
@@ -41,7 +41,7 @@ function CackeFillUp() {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [activeCakeId, setActiveCakeId] = useState(null);
   const [activeRecipeArticle, setActiveRecipeArticle] = useState(null);
-  const [total_cacke, setTotalCacke] = useState(0);
+  const [total_cake, setTotalCake] = useState(0);
   const [cakeNotes, setCakeNotes] = useState({});
   const [cakeCastingTemperatures, setCakeCastingTemperatures] = useState({});
   const [cakeFlowabilities, setCakeFlowabilities] = useState({});
@@ -207,7 +207,7 @@ function CackeFillUp() {
   ]);
 
   useEffect(() => {
-    setCackeFillUp({});
+    setCakeFillUp({});
     setCurrentProduct(null);
     setActiveCakeId(null);
     setActiveRecipeArticle(null);
@@ -218,7 +218,7 @@ function CackeFillUp() {
 
   useEffect(() => {
     const batch_in_produce = batchOutside.find((el) => el.is_prodused == 1);
-    console.log('batch_in_produce CackeFillUp.jsx line 204', batch_in_produce);
+    console.log('batch_in_produce CakeFillUp.jsx line 204', batch_in_produce);
     if (batch_in_produce) {
       const product = latestProducts.find(
         (el) => el.article === batch_in_produce?.product_article
@@ -233,24 +233,24 @@ function CackeFillUp() {
         (el) => el.date === batch_in_produce.date
       );
 
-      const total_cacke =
+      const total_cake =
         batch_in_produce.quantity_pallets / widthInArray -
-        (Number(accd?.total_arrays_cacke_fill_up) || 0);
+        (Number(accd?.total_arrays_cake_fill_up) || 0);
 
-      const full_total_cacke = batch_in_produce.quantity_pallets / widthInArray;
+      const full_total_cake = batch_in_produce.quantity_pallets / widthInArray;
 
-      setTotalCacke(Number.isFinite(full_total_cacke) ? full_total_cacke : 0);
-      setCackeFillUp({ ...batch_in_produce, total_cacke });
+      setTotalCake(Number.isFinite(full_total_cake) ? full_total_cake : 0);
+      setCakeFillUp({ ...batch_in_produce, total_cake });
     } else {
       setCurrentProduct(null);
-      setTotalCacke(0);
+      setTotalCake(0);
     }
-  }, [batchOutside, autoclave_calendar, latestProducts, setCackeFillUp]);
+  }, [batchOutside, autoclave_calendar, latestProducts, setCakeFillUp]);
 
   const totalCake =
-    Number(cackeFillUp?.total_cacke ?? cackeFillUp?.total_quantity_plan ?? 0) || 0;
+    Number(cakeFillUp?.total_cake ?? cakeFillUp?.total_quantity_plan ?? 0) || 0;
 
-  const batchCalDate = cackeFillUp?.date ?? cackeFillUp?.batch_cal_date ?? '';
+  const batchCalDate = cakeFillUp?.date ?? cakeFillUp?.batch_cal_date ?? '';
 
   const allocated = useMemo(() => {
     if (activeBatchId == null) return 0;
@@ -270,7 +270,7 @@ function CackeFillUp() {
 
     const nextBatch = (Array.isArray(batchOutside) ? batchOutside : []).find(
       (item) =>
-        String(item?.id) !== String(cackeFillUp?.id) &&
+        String(item?.id) !== String(cakeFillUp?.id) &&
         item?.date === batchCalDate &&
         (item?.is_prodused == 0 || item?.is_prodused == null)
     );
@@ -298,7 +298,7 @@ function CackeFillUp() {
   }, [
     batchCalDate,
     batchOutside,
-    cackeFillUp?.id,
+    cakeFillUp?.id,
     extractProductTitle,
     latestProducts,
   ]);
@@ -393,7 +393,7 @@ function CackeFillUp() {
     }
   };
 
-  const isFullyAllocated = total_cacke > 0 && allocated >= total_cacke;
+  const isFullyAllocated = total_cake > 0 && allocated >= total_cake;
 
   const handleNewBatch = () => {
     if (isFullyAllocated) {
@@ -415,7 +415,7 @@ function CackeFillUp() {
     const currentAllocated = Number(productionVolume) || 0;
     if (currentAllocated <= 0) return;
 
-    const { product_article = null, date } = cackeFillUp;
+    const { product_article = null, date } = cakeFillUp;
 
     setActiveRecipeArticle(recipeArticle || null);
 
@@ -435,13 +435,13 @@ function CackeFillUp() {
     }
 
     const prevTotalArrays = Number(accd.total_arrays) || 0;
-    const prevTotalCackeFillUp = Number(accd.total_arrays_cacke_fill_up) || 0;
+    const prevTotalCakeFillUp = Number(accd.total_arrays_cake_fill_up) || 0;
 
     const result = [
       {
         ...accd,
         total_arrays: prevTotalArrays + currentAllocated,
-        total_arrays_cacke_fill_up: prevTotalCackeFillUp + currentAllocated,
+        total_arrays_cake_fill_up: prevTotalCakeFillUp + currentAllocated,
       },
     ];
 
@@ -457,7 +457,7 @@ function CackeFillUp() {
       product_article = null,
       date,
       id_ordered_product_to_warehouse = null,
-    } = cackeFillUp;
+    } = cakeFillUp;
 
     const batch = batchOutside.find((item) => item.id == id);
     if (!batch) {
@@ -468,7 +468,7 @@ function CackeFillUp() {
     const currentAllocated = Number(allocated) || 0;
     const { quantity_pallets, quantity_free } = batch;
 
-    const cackeIdStart = (Array.isArray(lotesListBatches) ? lotesListBatches : [])
+    const cakeIdStart = (Array.isArray(lotesListBatches) ? lotesListBatches : [])
       .filter((item) => String(item?.batch_id) === String(activeBatchId))
       .reduce((minimumId, item) => {
         const cakeIdStart = Number(item?.cake_id_start);
@@ -484,7 +484,7 @@ function CackeFillUp() {
     }
 
     if (currentAllocated > 0) {
-      if (cackeIdStart == null) {
+      if (cakeIdStart == null) {
         console.error('Cake start id not found for batch:', activeBatchId);
         return;
       }
@@ -495,7 +495,7 @@ function CackeFillUp() {
           production_volume: currentAllocated,
           recipe_article: activeRecipeArticle,
           batch_article: product_article,
-          cacke_id_start: cackeIdStart,
+          cake_id_start: cakeIdStart,
           date,
           id_ordered_product_to_warehouse,
           consumption_calculated: true,
@@ -515,14 +515,14 @@ function CackeFillUp() {
         filled_autoclaves: totalAutoclaves,
         produced_autoclave: totalAutoclaves,
         residual_arrays: residual,
-        total_arrays_cacke_fill_up: 0,
+        total_arrays_cake_fill_up: 0,
       },
     ];
 
     dispatch(addNewAutoclaveCalendar(result));
     await dispatch(deleteBatchOutside(id));
 
-    setCackeFillUp({});
+    setCakeFillUp({});
     setCurrentProduct(null);
     setActiveBatchId(null);
     setActiveCakeId(null);
@@ -532,17 +532,17 @@ function CackeFillUp() {
     setCakeFlowabilities({});
   };
 
-  const hasCackeFillUp = cackeFillUp && Object.keys(cackeFillUp).length > 0;
+  const hasCakeFillUp = cakeFillUp && Object.keys(cakeFillUp).length > 0;
 
-  const selectedRowForNewBatch = hasCackeFillUp
+  const selectedRowForNewBatch = hasCakeFillUp
     ? {
         batch_id: activeBatchId,
-        batch_article: cackeFillUp.product_article,
-        date: cackeFillUp.date,
+        batch_article: cakeFillUp.product_article,
+        date: cakeFillUp.date,
         production_volume: totalCake,
         recipe_article: 'No recipe',
         id_ordered_product_to_warehouse:
-          cackeFillUp.id_ordered_product_to_warehouse ?? null,
+          cakeFillUp.id_ordered_product_to_warehouse ?? null,
       }
     : null;
 
@@ -560,7 +560,7 @@ function CackeFillUp() {
         />
       )}
 
-      {!hasCackeFillUp && (
+      {!hasCakeFillUp && (
         <div className="mt-3">
           <Table
             COLUMN_DATA={production_plan_table}
@@ -569,7 +569,7 @@ function CackeFillUp() {
             buttonText={''}
             tableName={'Casting'}
             handleRowClick={(e) => {
-              if (cackeFillUp && Object.keys(cackeFillUp).length > 0) {
+              if (cakeFillUp && Object.keys(cakeFillUp).length > 0) {
                 alert('Please finish the current batch before selecting a new one.');
                 return;
               }
@@ -579,7 +579,7 @@ function CackeFillUp() {
         </div>
       )}
 
-      {hasCackeFillUp && (
+      {hasCakeFillUp && (
         <div className="mt-3" style={{ maxWidth: nextProductSummary ? 1500 : 900 }}>
           <div
             style={{
@@ -617,7 +617,7 @@ function CackeFillUp() {
               </div>
 
               <div
-                className="cacke-fill-up-product"
+                className="cake-fill-up-product"
                 style={{
                   width: '100%',
                   border: '1px solid #ced4da',
@@ -671,7 +671,7 @@ function CackeFillUp() {
                     Cakes casted / Total qty
                   </div>
                   <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
-                    {allocated} / {total_cacke}
+                    {allocated} / {total_cake}
                   </div>
                 </div>
               </div>
@@ -1021,4 +1021,4 @@ function CackeFillUp() {
   );
 }
 
-export default CackeFillUp;
+export default CakeFillUp;

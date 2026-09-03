@@ -164,7 +164,7 @@ export default function ProductionPlannerCalendar({
         residual_arrays: existing?.residual_arrays ?? 0,
         filled_autoclaves: existing?.filled_autoclaves ?? 0,
         produced_autoclave: existing?.produced_autoclave ?? 0,
-        total_arrays_cacke_fill_up: existing?.total_arrays_cacke_fill_up ?? 0,
+        total_arrays_cake_fill_up: existing?.total_arrays_cake_fill_up ?? 0,
       };
     });
 

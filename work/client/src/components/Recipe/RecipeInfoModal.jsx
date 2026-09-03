@@ -197,7 +197,7 @@ function RecipeInfoModal(props) {
                                         {props.selectedRecipe[el.accessor] ||
                                           'Empty'}
                                       </span>
-                                      {el.accessor === EDITABLE_FIELD && (
+                                      {/* {el.accessor === EDITABLE_FIELD && (
                                         <Button
                                           size="sm"
                                           variant="outline-primary"
@@ -210,7 +210,7 @@ function RecipeInfoModal(props) {
                                         >
                                           Edit
                                         </Button>
-                                      )}
+                                      )} */}
                                     </div>
                                   )}
                                 </td>
