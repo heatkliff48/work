@@ -330,6 +330,10 @@ function CackeFillUp() {
           return {
             id,
             note: savedCake?.note || '',
+            moldId:
+              savedCake?.mold_id != null && String(savedCake.mold_id).trim()
+                ? String(savedCake.mold_id).trim()
+                : '',
             castingTemperature: record?.casting_temp_c ?? '',
             flowability: savedCake?.flowability ?? '',
           };
@@ -862,8 +866,11 @@ function CackeFillUp() {
                                   fontWeight: 400,
                                   whiteSpace: 'nowrap',
                                 }}
+                                title={
+                                  cake.moldId ? `Mold id ${cake.moldId}` : 'Note'
+                                }
                               >
-                                {isActive ? '▲ note' : '▼ note'}
+                                {isActive ? '▲' : '▼'} {cake.moldId || 'note'}
                               </span>
                             </div>
                           );
