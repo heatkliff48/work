@@ -28,7 +28,8 @@ import {
 function CackeFillUp() {
   const dispatch = useDispatch();
 
-  const { batchOutside, autoclave_calendar, raw_materials_warehouse } = useWarehouseContext();
+  const { batchOutside, autoclave_calendar, raw_materials_warehouse } =
+    useWarehouseContext();
   const { cackeFillUp, setCackeFillUp, lotesListBatches, lotesListCakes } =
     useProjectContext();
   const { raw_mat_consumption } = useRecipeContext();
@@ -87,13 +88,13 @@ function CackeFillUp() {
         .filter((el) => el.is_prodused == 0 || el.is_prodused == null)
         .map((item) => {
           const product = latestProducts.find(
-            (p) => p.article === item.product_article,
+            (p) => p.article === item.product_article
           );
           const m3InArray = Number(product?.m3InArray) || 0;
           const volumeBlockOnPallet = Number(product?.volumeBlockOnPallet) || 0;
           const palletsPerArray = Math.max(
             1,
-            Math.floor(m3InArray / volumeBlockOnPallet) || 1,
+            Math.floor(m3InArray / volumeBlockOnPallet) || 1
           );
           const quantity_arrays = Math.ceil(item.quantity_pallets / palletsPerArray);
           return { ...item, quantity_arrays };
@@ -118,7 +119,7 @@ function CackeFillUp() {
       updateBatchOutside({
         id: prodPlanEntry.id,
         is_prodused: 1,
-      }),
+      })
     );
   };
 
@@ -126,7 +127,7 @@ function CackeFillUp() {
     if (!currentProduct?.description) return null;
 
     const match = currentProduct.description.match(
-      /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/,
+      /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/
     );
 
     return match?.[1] || null;
@@ -181,7 +182,7 @@ function CackeFillUp() {
       : list.filter(
           (item) =>
             currentProductName != null &&
-            String(item.product) === String(currentProductName),
+            String(item.product) === String(currentProductName)
         );
 
     if (existingRecords.length) {
@@ -220,16 +221,16 @@ function CackeFillUp() {
     console.log('batch_in_produce CackeFillUp.jsx line 204', batch_in_produce);
     if (batch_in_produce) {
       const product = latestProducts.find(
-        (el) => el.article === batch_in_produce?.product_article,
+        (el) => el.article === batch_in_produce?.product_article
       );
       const fullMark = extractProductTitle(product?.description);
       setCurrentProduct({ ...product, tradingMark: fullMark });
 
       const widthInArray = Math.floor(
-        product?.m3InArray / product?.volumeBlockOnPallet,
+        product?.m3InArray / product?.volumeBlockOnPallet
       );
       const accd = autoclave_calendar.find(
-        (el) => el.date === batch_in_produce.date,
+        (el) => el.date === batch_in_produce.date
       );
 
       const total_cacke =
@@ -271,20 +272,20 @@ function CackeFillUp() {
       (item) =>
         String(item?.id) !== String(cackeFillUp?.id) &&
         item?.date === batchCalDate &&
-        (item?.is_prodused == 0 || item?.is_prodused == null),
+        (item?.is_prodused == 0 || item?.is_prodused == null)
     );
 
     if (!nextBatch) return null;
 
     const product = latestProducts.find(
-      (item) => item.article === nextBatch.product_article,
+      (item) => item.article === nextBatch.product_article
     );
     const widthInArray = Math.max(
       1,
       Math.floor(
         (Number(product?.m3InArray) || 0) /
-          (Number(product?.volumeBlockOnPallet) || 1),
-      ) || 1,
+          (Number(product?.volumeBlockOnPallet) || 1)
+      ) || 1
     );
     const nextTotalQuantity =
       (Number(nextBatch.quantity_pallets) || 0) / widthInArray;
@@ -367,7 +368,7 @@ function CackeFillUp() {
           note,
           casting_temp_c: normalizeOptionalNumber(castingTemperature),
           flowability: normalizeOptionalNumber(flowability),
-        }),
+        })
       );
 
       setCakeNotes((previousNotes) => ({
@@ -393,7 +394,7 @@ function CackeFillUp() {
   const handleNewBatch = () => {
     if (isFullyAllocated) {
       const shouldContinue = window.confirm(
-        'Все массивы залиты, желаете продолжить?',
+        'Все массивы залиты, желаете продолжить?'
       );
 
       if (!shouldContinue) return;
@@ -420,7 +421,7 @@ function CackeFillUp() {
         date,
         product_article,
         quantity: currentAllocated,
-      }),
+      })
     );
 
     const accd = autoclave_calendar.find((el) => el.date === date);
@@ -495,7 +496,7 @@ function CackeFillUp() {
           id_ordered_product_to_warehouse,
           consumption_calculated: true,
           batch_quantity_pallets: quantity_pallets - quantity_free || 0,
-        }),
+        })
       );
     }
 
@@ -804,7 +805,7 @@ function CackeFillUp() {
               <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
                 {productionCakeRows.map((cakeRow) => {
                   const activeCake = cakeRow.find(
-                    (cake) => activeCakeId === cake.id,
+                    (cake) => activeCakeId === cake.id
                   );
 
                   return (

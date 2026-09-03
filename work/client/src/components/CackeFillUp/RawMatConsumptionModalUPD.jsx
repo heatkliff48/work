@@ -18,6 +18,14 @@ import { addNewLotesList } from '#components/redux/actions/lotesListAction.js';
 import Select from 'react-select';
 import '#components/Styles/table.css';
 
+const getCurrentTime = () => {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+
+  return `${hours}:${minutes}`;
+};
+
 const RawMaterialsConsumptionModal = React.memo(
   ({
     isOpen,
@@ -55,6 +63,7 @@ const RawMaterialsConsumptionModal = React.memo(
     const [isSaving, setIsSaving] = useState(false);
     const [moldId, setMoldId] = useState('');
     const [ws, setWs] = useState('');
+    const [castingTime, setCastingTime] = useState(getCurrentTime);
     const savingRef = useRef(false);
     const seedFromPrevRef = useRef(false);
 
@@ -99,6 +108,11 @@ const RawMaterialsConsumptionModal = React.memo(
         previousBatchRecord?.w_s != null ? String(previousBatchRecord.w_s) : '',
       );
     }, [selectedRow, isOpen, previousBatchRecord]);
+
+    useEffect(() => {
+      if (!isOpen) return;
+      setCastingTime(getCurrentTime());
+    }, [isOpen]);
 
     const materialsMap = useMemo(
       () => [
@@ -722,6 +736,7 @@ const RawMaterialsConsumptionModal = React.memo(
           aluminum_2_type: selectedAlu2Type?.value || null,
           mold_id: moldId.trim() || null,
           w_s: ws.trim() || null,
+          casting_time: castingTime.trim() || null,
           ...recipeSnapshot,
         };
 
@@ -1052,6 +1067,21 @@ const RawMaterialsConsumptionModal = React.memo(
                         setWs(processedValue);
                       }
                     }}
+                  />
+                </label>
+
+                <label style={{ margin: 0, minWidth: 200 }}>
+                  <span
+                    className="fw-semibold"
+                    style={{ display: 'block', marginBottom: 4 }}
+                  >
+                    Casting time
+                  </span>
+                  <input
+                    className="form-control"
+                    type="time"
+                    value={castingTime}
+                    onChange={(e) => setCastingTime(e.target.value)}
                   />
                 </label>
               </div>

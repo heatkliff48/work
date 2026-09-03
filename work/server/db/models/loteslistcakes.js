@@ -73,6 +73,7 @@ module.exports = (sequelize, DataTypes) => {
       sand_slurry_density: DataTypes.TEXT,
       return_slurry_density: DataTypes.TEXT,
       casting_temp_c: DataTypes.TEXT,
+      casting_time: DataTypes.TEXT,
       factory_temp_c: DataTypes.TEXT,
 
       mixer_issues: DataTypes.TEXT,
