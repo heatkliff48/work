@@ -780,7 +780,7 @@ function CackeFillUp() {
                 color={isFullyAllocated ? 'danger' : 'success'}
                 onClick={handleNewBatch}
               >
-                New cacke
+                New cake
               </Button>
 
               <div
@@ -794,11 +794,11 @@ function CackeFillUp() {
             </div>
 
             <div className="mt-4">
-              <div style={{ fontWeight: 600 }}>Cacke id</div>
+              <div style={{ fontWeight: 600 }}>Cake id</div>
 
               {productionCakes.length === 0 && (
                 <div style={{ marginTop: 8, color: '#6c757d' }}>
-                  No cackes allocated yet.
+                  No cakes allocated yet.
                 </div>
               )}
 
