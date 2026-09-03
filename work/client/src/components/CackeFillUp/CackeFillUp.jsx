@@ -552,6 +552,7 @@ function CackeFillUp() {
           newBatchMode
           onSave={handleSave}
           lotesListBatches={lotesListBatches}
+          lotesListCakes={lotesListCakes}
         />
       )}
 
