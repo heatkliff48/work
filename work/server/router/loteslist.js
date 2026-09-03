@@ -30,7 +30,7 @@ const RECIPE_MATERIAL_FIELDS = [
   ['aluminum_suspension'],
 ];
 
-const buildCakeDetails = ({ mold_id, w_s }) => {
+const buildCakeDetails = ({ mold_id, w_s, casting_time }) => {
   const details = {};
 
   if (
@@ -43,6 +43,14 @@ const buildCakeDetails = ({ mold_id, w_s }) => {
 
   if (w_s !== undefined && w_s !== null && String(w_s).trim() !== '') {
     details.water_solid_ratio = String(w_s);
+  }
+
+  if (
+    casting_time !== undefined &&
+    casting_time !== null &&
+    String(casting_time).trim() !== ''
+  ) {
+    details.casting_time = String(casting_time);
   }
 
   return details;
@@ -109,13 +117,18 @@ lotesListRouter.post('/batches', async (req, res) => {
     }
   }
 
-  const { mold_id = null, w_s = null, ...new_lotestList_data } = new_lotestList;
+  const {
+    mold_id = null,
+    w_s = null,
+    casting_time = null,
+    ...new_lotestList_data
+  } = new_lotestList;
 
   const { quantity_cakes, product, production_date, batch_id } = new_lotestList;
   const sand_dry =
     (new_lotestList.sand_dry ?? new_lotestList.sand_powder_dry) || '0';
 
-  const cakeDetails = buildCakeDetails({ mold_id, w_s });
+  const cakeDetails = buildCakeDetails({ mold_id, w_s, casting_time });
 
   try {
     const quantityCakesInt = Math.floor(parseFloat(quantity_cakes));

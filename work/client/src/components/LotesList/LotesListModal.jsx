@@ -71,6 +71,7 @@ const SECTIONS = {
       { label: 'Sand slurry density, kg/l', key: 'sand_slurry_density' },
       { label: 'Return slurry density, kg/l', key: 'return_slurry_density' },
       { label: 'Casting temperature, C', key: 'casting_temp_c' },
+      { label: 'Casting time', key: 'casting_time', type: 'time' },
       { label: 'Temperature in the factory, C', key: 'factory_temp_c' },
       { label: 'Issues with mixer', key: 'mixer_issues' },
       { label: 'Issues with oiling machine', key: 'oiling_issues' },
@@ -991,6 +992,7 @@ function RecipeInfoModal({ selectedRecipe, show, onHide }) {
         mold_moving_issues,
         mold_id,
         flowability,
+        casting_time,
 
         note,
 
