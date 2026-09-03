@@ -48,7 +48,7 @@ import ProductionBatchDesignerNew from '#components/ProductionBatchDesigner/Prod
 import RawMaterialsConsumption from '#components/RawMaterialsConsumption/RawMaterialsConsumption.jsx';
 import LotesList from '#components/LotesList/LotesList.jsx';
 import ClientsPriceInfo from '#components/Clients/ClientsPriceInfo/ClientsPriceInfo.jsx';
-import CackeFillUp from '#components/CackeFillUp/CackeFillUp.jsx';
+import CakeFillUp from '#components/CakeFillUp/CakeFillUp.jsx';
 import TechnologyCalendar from '#components/TechnologyPlanner/TechnologyCalendar.jsx';
 import OrdersToWarehouseTable from '#components/Orders/OrdersToWarehouse/OrdersToWarehouseTable.jsx';
 import ProductionQuality from '#components/ProductionQuality/ProductionQuality.jsx';
@@ -117,7 +117,7 @@ function App() {
             />
 
             <Route path="/orders" element={<OrdersTable />} />
-            <Route path="/cacke_fillup" element={<CackeFillUp />} />
+            <Route path="/cake_fillup" element={<CakeFillUp />} />
             <Route path="/order_card" element={<OrderCart />} />
             <Route
               path="/orders_to_warehouse"

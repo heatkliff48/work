@@ -466,7 +466,7 @@ const ProjectContextProvider = ({ children }) => {
   const [isRepair, setIsRepair] = useState(false);
   const [stayDefault, setStayDefault] = useState(true);
 
-  const [cackeFillUp, setCackeFillUp] = useState({});
+  const [cakeFillUp, setCakeFillUp] = useState({});
   const [currentClient, setCurrentClient] = useState({});
   const [clientsDataList, setClientsDataList] = useState([]);
   const [productCardData, setProductCardData] = useState({});
@@ -485,7 +485,7 @@ const ProjectContextProvider = ({ children }) => {
     setIsEdit(false);
     setIsRepair(false);
     setStayDefault(true);
-    setCackeFillUp({});
+    setCakeFillUp({});
     setCurrentClient({});
     setClientsDataList({});
     setProductCardData({});
@@ -605,8 +605,8 @@ const ProjectContextProvider = ({ children }) => {
         clients_contact_information_table,
         categoryOptions,
         priceCategoryOptions,
-        cackeFillUp,
-        setCackeFillUp,
+        cakeFillUp,
+        setCakeFillUp,
         currentClient,
         setCurrentClient,
         currentDelivery,

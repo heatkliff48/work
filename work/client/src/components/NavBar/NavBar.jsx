@@ -226,7 +226,7 @@ export default function NavBar() {
           // },
           {
             title: 'Casting',
-            path: '/cacke_fillup',
+            path: '/cake_fillup',
             icon: technologyPlannerIcon,
           },
           {

@@ -12,9 +12,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { updateBatchOutside } from '#components/redux/actions/batchOutsideAction.js';
 
-function CackeFillUpModal({ show, onHide }) {
+function CakeFillUpModal({ show, onHide }) {
   const dispatch = useDispatch();
-  const { setCackeFillUp } = useProjectContext();
+  const { setCakeFillUp } = useProjectContext();
   const { latestProducts } = useProductsContext();
   const { warehouse_data, list_of_ordered_production } = useWarehouseContext();
 
@@ -173,7 +173,7 @@ function CackeFillUpModal({ show, onHide }) {
       product?.m3InArray / product?.volumeBlockOnPallet,
     );
 
-    setCackeFillUp({
+    setCakeFillUp({
       date: date,
       batch_id: warehouse_article,
       product_article: prodPlanEntry.product_article,
@@ -236,7 +236,7 @@ function CackeFillUpModal({ show, onHide }) {
 
     const product = latestProducts.find((el) => el.article === product_article);
 
-    // setCackeFillUp({
+    // setCakeFillUp({
     //   batch_id,
     //   product_article,
     //   total_quantity_plan: total_quantity_plan / product?.widthInArray,
@@ -250,7 +250,7 @@ function CackeFillUpModal({ show, onHide }) {
     // });
 
     console.log(
-      'customBatchSelectInput CackeFillUpModal.jsx line 181',
+      'customBatchSelectInput CakeFillUpModal.jsx line 181',
       customBatchSelectInput,
     );
 
@@ -366,4 +366,4 @@ function CackeFillUpModal({ show, onHide }) {
   );
 }
 
-export default CackeFillUpModal;
+export default CakeFillUpModal;
