@@ -66,6 +66,12 @@
   gap: 2px;
 }
 
+/* free space under the menu (desktop: click = collapse/expand) */
+.bb-sidebar-spacer {
+  flex: 1 1 auto;
+  min-height: 24px;
+}
+
 .bb-sidebar-item {
   border: 0;
   background: transparent;
@@ -398,6 +404,11 @@
     height: 60px;
     font-size: 20px;
   }
+
+  /* на мобильных сайдбар открывается только бургером */
+  .bb-sidebar-spacer {
+    cursor: default;
+  }
 }
 
 @media (max-width: 360px) {
@@ -413,6 +424,21 @@
      DESKTOP COLLAPSED SIDEBAR
      ======================= */
 @media (min-width: 901px) {
+  /* бургер только для мобильных: на десктопе сворачиваем кликом
+     по бренду или по пустому месту в сайдбаре */
+  .bb-menu-btn {
+    display: none;
+  }
+
+  .bb-brand,
+  .bb-sidebar-spacer {
+    cursor: pointer;
+  }
+
+  .bb-brand:hover {
+    background: #f1f3f7;
+  }
+
   .bb-sidebar.bb-collapsed {
     width: 64px;
   }

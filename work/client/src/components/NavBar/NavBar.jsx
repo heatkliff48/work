@@ -60,6 +60,12 @@ export default function NavBar() {
     window.matchMedia &&
     window.matchMedia('(max-width: 900px)').matches;
 
+  // На десктопе сайдбар сворачивается кликом по бренду («ERP») или по пустому
+  // месту в сайдбаре — бургер остаётся только для мобильных
+  const toggleCollapsed = () => {
+    if (isDesktop()) setCollapsed((v) => !v);
+  };
+
   useEffect(() => {
     if (isDesktop()) {
       setCollapsed(location.pathname !== '/');
@@ -327,7 +333,19 @@ export default function NavBar() {
         <div className="bb-sidebar-overlay" onClick={closeDrawer} />
       )}
       <aside className={sidebarClassName}>
-        <div className="bb-brand" title="BAUBLOCK ERP">
+        <div
+          className="bb-brand"
+          title="BAUBLOCK ERP"
+          role="button"
+          tabIndex={0}
+          onClick={toggleCollapsed}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggleCollapsed();
+            }
+          }}
+        >
           BAUBLOCK ERP
         </div>
         <div className="bb-sidebar-menu">
@@ -434,6 +452,8 @@ export default function NavBar() {
             );
           })}
         </div>
+
+        <div className="bb-sidebar-spacer" onClick={toggleCollapsed} />
       </aside>
 
       <main className="bb-main">
@@ -442,10 +462,7 @@ export default function NavBar() {
             <button
               className="bb-menu-btn"
               type="button"
-              onClick={() => {
-                if (isDesktop()) setCollapsed((v) => !v);
-                else setDrawerOpen((v) => !v);
-              }}
+              onClick={() => setDrawerOpen((v) => !v)}
               aria-label="Open menu"
             >
               <img
