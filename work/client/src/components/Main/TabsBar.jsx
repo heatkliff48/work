@@ -11,7 +11,7 @@ const PATH_LABELS = {
   '/users_info': 'Users Info',
   '/roles': 'Roles',
   '/warehouse_manager': 'Order dispatch',
-  '/factura_manager': 'Furion po farmu champion',
+  '/factura_manager': 'Logistics planner',
   '/products_type_journal': 'Products Type Journal',
   '/statistics': 'Statistics',
   '/orders': 'Orders',
