@@ -25,6 +25,29 @@ import {
   getWarehouseAluminum2,
 } from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
+const MAX_WHOLE_DIGITS = 2;
+
+// Casting temperature and flowability keep at most two digits before the
+// decimal separator, so typing "295" turns into "29.5".
+const limitWholeDigits = (rawValue) => {
+  const cleanedValue = String(rawValue ?? '')
+    .replace(',', '.')
+    .replace(/[^\d.]/g, '');
+
+  if (!cleanedValue) return '';
+
+  const [wholePart = '', ...restParts] = cleanedValue.split('.');
+  const fractionPart = restParts.join('');
+
+  if (wholePart.length <= MAX_WHOLE_DIGITS) {
+    return fractionPart ? `${wholePart}.${fractionPart}` : wholePart;
+  }
+
+  return `${wholePart.slice(0, MAX_WHOLE_DIGITS)}.${wholePart.slice(
+    MAX_WHOLE_DIGITS
+  )}${fractionPart}`;
+};
+
 function CakeFillUp() {
   const dispatch = useDispatch();
 
@@ -900,18 +923,24 @@ function CakeFillUp() {
                               </span>
                               <input
                                 type="number"
-                                step="0.01"
+                                step="0.1"
+                                min="0"
+                                max="99.9"
                                 value={
                                   cakeCastingTemperatures[activeCake.id] ??
                                   activeCake.castingTemperature ??
                                   ''
                                 }
-                                onChange={(event) =>
+                                onChange={(event) => {
+                                  const nextValue = limitWholeDigits(
+                                    event.target.value
+                                  );
+
                                   setCakeCastingTemperatures((previousValues) => ({
                                     ...previousValues,
-                                    [activeCake.id]: event.target.value,
-                                  }))
-                                }
+                                    [activeCake.id]: nextValue,
+                                  }));
+                                }}
                                 onKeyDown={(event) => {
                                   if (event.key === 'Enter') {
                                     event.preventDefault();
@@ -941,17 +970,23 @@ function CakeFillUp() {
                               <input
                                 type="number"
                                 step="0.1"
+                                min="0"
+                                max="99.9"
                                 value={
                                   cakeFlowabilities[activeCake.id] ??
                                   activeCake.flowability ??
                                   ''
                                 }
-                                onChange={(event) =>
+                                onChange={(event) => {
+                                  const nextValue = limitWholeDigits(
+                                    event.target.value
+                                  );
+
                                   setCakeFlowabilities((previousValues) => ({
                                     ...previousValues,
-                                    [activeCake.id]: event.target.value,
-                                  }))
-                                }
+                                    [activeCake.id]: nextValue,
+                                  }));
+                                }}
                                 onKeyDown={(event) => {
                                   if (event.key === 'Enter') {
                                     event.preventDefault();
