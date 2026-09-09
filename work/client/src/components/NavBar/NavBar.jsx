@@ -202,7 +202,7 @@ export default function NavBar() {
           },
         ],
       },
-      
+
       {
         type: 'group',
         title: 'Technology planner',
@@ -268,7 +268,7 @@ export default function NavBar() {
             access: 'accounting',
           },
           {
-            title: 'Furi',
+            title: 'Logistics planner',
             path: '/factura_manager',
             icon: accountingIcon,
             access: 'accounting',
@@ -296,7 +296,7 @@ export default function NavBar() {
         ],
       },
     ],
-    []
+    [],
   );
 
   const isActive = (path) => location.pathname === path;
@@ -345,7 +345,9 @@ export default function NavBar() {
           {menuItems.map((it) => {
             if (it.type === 'group') {
               if (!canSee(it.access)) return null;
-              const visibleChildren = it.children.filter((c) => canSee(c.access));
+              const visibleChildren = it.children.filter((c) =>
+                canSee(c.access),
+              );
               if (!visibleChildren.length) return null;
               const expanded = openGroups[it.title] ?? isGroupActive(it);
 
@@ -375,7 +377,9 @@ export default function NavBar() {
                     {!collapsed && (
                       <>
                         <span className="bb-group-title">{it.title}</span>
-                        <span className={`bb-chevron ${expanded ? 'open' : ''}`}>
+                        <span
+                          className={`bb-chevron ${expanded ? 'open' : ''}`}
+                        >
                           ▾
                         </span>
                       </>
