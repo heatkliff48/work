@@ -3,11 +3,60 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+// Экранирование спецсимволов regexp
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Текущая дата в формате ДД.ММ.ГГГГ
+function formatDate(date = new Date()) {
+  const dd = String(date.getDate()).padStart(2, '0');
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const yyyy = date.getFullYear();
+  return `${dd}.${mm}.${yyyy}`;
+}
+
+// Оставляем в названии раздела только безопасные символы
+function sanitizeSection(section) {
+  const cleaned = String(section || '')
+    .trim()
+    .replace(/[^a-zA-Zа-яА-Я0-9_-]/g, '_');
+  return cleaned || 'files';
+}
+
+// Следующий порядковый номер файла для раздела+даты в указанной директории
+function getNextSequenceNumber(dir, section, date) {
+  if (!fs.existsSync(dir)) return 1;
+
+  const prefix = `${section}-${date}.`;
+  const pattern = new RegExp(`^${escapeRegex(prefix)}(\\d+)\\.`);
+
+  let max = 0;
+  for (const name of fs.readdirSync(dir)) {
+    const match = name.match(pattern);
+    if (match) {
+      const n = parseInt(match[1], 10);
+      if (n > max) max = n;
+    }
+  }
+  return max + 1;
+}
+
+// Формируем итоговое имя файла: раздел-дата.номер.расширение
+function buildFileName(section, originalName, dir) {
+  const safeSection = sanitizeSection(section);
+  const date = formatDate();
+  const seq = getNextSequenceNumber(dir, safeSection, date);
+  const ext = path.extname(originalName);
+
+  return `${safeSection}-${date}.${seq}${ext}`;
+}
+
 // Set up storage engine
 const storage = multer.diskStorage({
   destination: './uploads',
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    cb(null, buildFileName(req.query.section, file.originalname, './uploads'));
   },
 });
 
@@ -59,7 +108,10 @@ fileUpload.post('/upload', (req, res) => {
       if (req.file == undefined) {
         return res.status(400).send('No file selected!');
       } else {
-        return res.status(200).send(`File uploaded: ${req.file.filename}`);
+        return res.status(200).json({
+          message: 'File uploaded',
+          filename: req.file.filename,
+        });
       }
     }
   });
@@ -84,12 +136,15 @@ fileUpload.post('/upload/:filePath', (req, res) => {
     fs.mkdirSync(fullPath, { recursive: true });
   }
 
+  // Раздел для имени файла - первый сегмент пути (например rawMaterialsWarehouse)
+  const section = req.query.section || safePath.split('/')[0];
+
   // Настраиваем multer с динамическим destination
   const dynamicUpload = multer({
     storage: multer.diskStorage({
       destination: fullPath,
       filename: (req, file, cb) => {
-        cb(null, file.originalname);
+        cb(null, buildFileName(section, file.originalname, fullPath));
       },
     }),
     limits: { fileSize: 50000000 }, // 10MB

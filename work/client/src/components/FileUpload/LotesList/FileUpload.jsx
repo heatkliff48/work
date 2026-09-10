@@ -21,17 +21,9 @@ const FileUpload = ({ lotesList_id }) => {
       const formData = new FormData();
       formData.append('myFile', file);
 
-      dispatch(
-        addNewFilesLotesList({
-          lotesList_id: lotesList_id,
-          fileType: 'lotesList',
-          file_name: file.name,
-        }),
-      );
-
       try {
         const res = await axios.post(
-          `${process.env.REACT_APP_URL}/files/upload`,
+          `${process.env.REACT_APP_URL}/files/upload?section=lotesList`,
           formData,
           {
             headers: {
@@ -39,7 +31,16 @@ const FileUpload = ({ lotesList_id }) => {
             },
           },
         );
-        setMessage(res.data);
+
+        dispatch(
+          addNewFilesLotesList({
+            lotesList_id: lotesList_id,
+            fileType: 'lotesList',
+            file_name: res.data.filename,
+          }),
+        );
+
+        setMessage(`File uploaded: ${res.data.filename}`);
         refreshFiles();
       } catch (err) {
         if (err.response) {

@@ -22,18 +22,9 @@ const FileUpload = ({ type }) => {
       const formData = new FormData();
       formData.append('myFile', file);
 
-      dispatch(
-        addNewFilesWarehouse({
-          warehouse_id: warehouseInfoCurIdModal,
-          warehouse_type: type,
-          fileType: 'warehouse',
-          file_name: file.name,
-        }),
-      );
-
       try {
         const res = await axios.post(
-          `${process.env.REACT_APP_URL}/files/upload`,
+          `${process.env.REACT_APP_URL}/files/upload?section=warehouse`,
           formData,
           {
             headers: {
@@ -41,7 +32,17 @@ const FileUpload = ({ type }) => {
             },
           },
         );
-        setMessage(res.data);
+
+        dispatch(
+          addNewFilesWarehouse({
+            warehouse_id: warehouseInfoCurIdModal,
+            warehouse_type: type,
+            fileType: 'warehouse',
+            file_name: res.data.filename,
+          }),
+        );
+
+        setMessage(`File uploaded: ${res.data.filename}`);
         refreshFiles(); // Refresh the file list after upload
       } catch (err) {
         if (err.response) {
