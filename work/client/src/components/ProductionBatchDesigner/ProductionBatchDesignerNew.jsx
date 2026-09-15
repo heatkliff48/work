@@ -313,46 +313,6 @@ function ProductionBatchDesignerNew() {
     freedPalletsByWarehouseOrder,
   ]);
 
-  const COLUMNS_ORDERS_TO_WAREHOUSE = useMemo(
-    () => [
-      {
-        Header: 'Ref.',
-        accessor: 'product_article',
-        disableSortBy: true,
-      },
-      {
-        Header: 'Description',
-        accessor: 'description',
-        sortType: 'string',
-      },
-      {
-        Header: 'Product size',
-        accessor: 'product_size',
-      },
-      {
-        Header: 'Product density',
-        accessor: 'density',
-      },
-      {
-        Header: 'Pallets, qty',
-        accessor: 'quantity_pallets',
-      },
-      {
-        Header: 'Real quantity, m2',
-        accessor: 'quantity_real_m2',
-      },
-      {
-        Header: 'Produced',
-        accessor: 'quantity_produced',
-      },
-      {
-        Header: 'Allocated',
-        accessor: 'quantity_allocated',
-      },
-    ],
-    [],
-  );
-
   useEffect(() => {
     dispatch(getOrderToWarehouse());
   }, []);
