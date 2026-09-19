@@ -1,75 +1,97 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-const { Forbidden, Unauthorized } = require('../utils/Errors.js');
+const { Unauthorized } = require('../utils/Errors.js');
 const RefreshSessionRepository = require('../repositories/RefreshSession.js');
+
 dotenv.config();
 
+const PUBLIC_PATHS = new Set([
+  '/auth/sign-up',
+  '/auth/sign-in',
+  '/auth/logout',
+  '/auth/refresh',
+]);
+
 class TokenService {
-  static async generateAccessToken(payload) {
-    const acccessToken = await jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+  static generateAccessToken(payload) {
+    return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '30m',
     });
-    return acccessToken;
   }
 
-  static async generateRefreshToken(payload) {
-    const refreshToken = await jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-      expiresIn: '15d',
+  static generateRefreshToken(payload) {
+    return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+      expiresIn: '7d',
     });
-    return refreshToken;
   }
 
   static async checkAccess(req, res, next) {
-    const authHeader = req.headers?.authorization;
-    const token = authHeader?.split(' ')?.[1];
+    const requestPath = req.path.replace(/\/+$/, '') || '/';
 
-    // Массив путей, которые не требуют токена
-    const noTokenPaths = ['/sign-up', '/sign-in', '/logout', '/refresh'];
-
-    // Проверяем, является ли запрос запросом, который не требует токена
-    const isNoTokenRequest = noTokenPaths.some((path) => req.path.includes(path));
-
-    if (!token) {
-      // Если токен отсутствует, проверяем, является ли запрос запросом, который не требует токена
-      if (isNoTokenRequest) {
-        // Если это запрос, который не требует токена, разрешаем доступ без токена
-        return next();
-      } else {
-        // Если это не запрос, который не требует токена, отклоняем запрос
-        return next(new Unauthorized());
-      }
+    if (req.method === 'OPTIONS' || PUBLIC_PATHS.has(requestPath)) {
+      return next();
     }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-      if (err) {
-        // Если токен недействителен, отклоняем запрос
-        console.error('ERROR', err);
-        return next(new Forbidden(err));
-      } else {
-        req.session.user = user;
-        console.log('>>>>>>.REQ USER.<<<<<<<<', req.session.user);
-        return next();
-      }
-    });
+    const authHeader = req.headers.authorization;
+    const tokenMatch = authHeader?.match(/^Bearer\s+(.+)$/i);
+    const accessToken = tokenMatch?.[1];
+
+    if (!accessToken) {
+      return next(new Unauthorized('Access token is missing'));
+    }
+
+    try {
+      const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+
+      const user = {
+        id: decodedToken.id,
+        username: decodedToken.username,
+        email: decodedToken.email,
+        role: decodedToken.role,
+      };
+
+      req.user = user;
+
+      // Сессия остаётся нужна для авторизации WebSocket.
+      req.session.user = user;
+
+      return next();
+    } catch (err) {
+      console.error('Access token verification error:', err.message);
+
+      return next(new Unauthorized('Access token is invalid or expired'));
+    }
   }
 
-  static async verifyAccessToken(accessToken) {
-    return await jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+  static verifyAccessToken(accessToken) {
+    return jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
   }
-  static async verifyRefreshToken(refreshToken) {
-    return await jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+  static verifyRefreshToken(refreshToken) {
+    return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
   }
 
   static async getTokens(payload, fingerprint) {
-    const accessToken = await this.generateAccessToken(payload);
-    const refreshToken = await this.generateRefreshToken(payload);
+    const tokenPayload = {
+      id: payload.id,
+      username: payload.username,
+      email: payload.email,
+      role: payload.role,
+    };
+
+    const accessToken = this.generateAccessToken(tokenPayload);
+    const refreshToken = this.generateRefreshToken(tokenPayload);
 
     await RefreshSessionRepository.createRefreshSession({
-      user_id: payload.id,
+      user_id: tokenPayload.id,
       refresh_token: refreshToken,
       finger_print: fingerprint,
     });
-    return { accessToken, refreshToken };
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }
 

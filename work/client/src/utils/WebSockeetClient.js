@@ -2,46 +2,120 @@ class WebSocketClient {
   constructor({ url, socketOnMessageFunc }) {
     this.socketUrl = url;
     this.socketOnMessageFunc = socketOnMessageFunc;
+
     this.socket = null;
-    this.reconnectInterval = 1000; // Начальный интервал повторного соединения (1 секунда)
-    this.connect(); // Инициализация соединения при создании экземпляра
+    this.reconnectTimer = null;
+
+    this.reconnectInterval = 1000;
+    this.maxReconnectInterval = 30000;
+
+    this.shouldReconnect = true;
+
+    this.connect();
   }
 
   connect() {
-    this.socket = new WebSocket(this.socketUrl);
+    if (!this.shouldReconnect) {
+      return;
+    }
 
-    this.socket.onopen = () => {
-      console.log("WebSocket connection established");
-      this.reconnectInterval = 1000; // Сброс интервала при успешном подключении
+    if (!this.socketUrl) {
+      console.error('WebSocket URL is not defined');
+      return;
+    }
+
+    if (
+      this.socket?.readyState === WebSocket.CONNECTING ||
+      this.socket?.readyState === WebSocket.OPEN
+    ) {
+      return;
+    }
+
+    const socket = new WebSocket(this.socketUrl);
+    this.socket = socket;
+
+    socket.onopen = () => {
+      console.log('WebSocket connection established');
+
+      this.reconnectInterval = 1000;
     };
 
-    this.socket.onmessage = (event) => {
-      console.log("Message from server:", event.data); // Обработка входящих сообщений
-      this.socketOnMessageFunc(event);
+    socket.onmessage = (event) => {
+      try {
+        this.socketOnMessageFunc(event);
+      } catch (error) {
+        console.error('WebSocket message processing error:', error);
+      }
     };
 
-    this.socket.onclose = (event) => {
-      console.log("WebSocket connection closed:", event);
-      this.reconnect(); // Запуск механизма повторного подключения
+    socket.onclose = (event) => {
+      console.log('WebSocket connection closed:', event);
+
+      if (this.socket === socket) {
+        this.socket = null;
+      }
+
+      if (this.shouldReconnect) {
+        this.reconnect();
+      }
     };
 
-    this.socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      // this.reconnect()
-      this.socket.close(); // Закрываем соединение в случае ошибки
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+
+      if (
+        socket.readyState === WebSocket.CONNECTING ||
+        socket.readyState === WebSocket.OPEN
+      ) {
+        socket.close();
+      }
     };
   }
 
   reconnect() {
-    console.log(
-      `Attempting to reconnect in ${this.reconnectInterval / 1000} seconds...`
-    );
-    setTimeout(() => {
-      this.connect(); // Пытаемся снова подключиться
-      this.reconnectInterval = Math.min(this.reconnectInterval * 2, 30000); // Максимум 30 секунд
-    }, this.reconnectInterval);
+    if (!this.shouldReconnect || this.reconnectTimer) {
+      return;
+    }
+
+    const delay = this.reconnectInterval;
+
+    console.log(`Attempting to reconnect in ${delay / 1000} seconds...`);
+
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+
+      if (!this.shouldReconnect) {
+        return;
+      }
+
+      this.connect();
+
+      this.reconnectInterval = Math.min(
+        this.reconnectInterval * 2,
+        this.maxReconnectInterval,
+      );
+    }, delay);
+  }
+
+  close() {
+    this.shouldReconnect = false;
+
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
+    const socket = this.socket;
+    this.socket = null;
+
+    if (
+      socket &&
+      (socket.readyState === WebSocket.CONNECTING ||
+        socket.readyState === WebSocket.OPEN)
+    ) {
+      socket.close(1000, 'Client closed connection');
+    }
   }
 }
 
-// Экспортируем класс для использования в других файлах
 export default WebSocketClient;

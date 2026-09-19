@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import urlAxios from '../../../api/axiosConfig.js';
 import { useFileContext } from '#components/contexts/FileContext.js';
 
 const FileDownload = ({ rowData, material_type }) => {
@@ -10,7 +10,7 @@ const FileDownload = ({ rowData, material_type }) => {
     try {
       const folderPath = `rawMaterialsWarehouse/${material_type}/${rowData?.file_name}`;
 
-      const res = await axios.get(
+      const res = await urlAxios.get(
         `http://localhost:3001/files/download/${encodeURIComponent(folderPath)}`,
         {
           responseType: 'blob',

@@ -1,5 +1,4 @@
 import { put, call, takeEvery, takeLatest } from 'redux-saga/effects';
-import axios from 'axios';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
 import {
@@ -96,13 +95,7 @@ import {
   UPDATE_TOOL_PRODUCT_FROM_RESERVED_LIST_SOCKET,
 } from '../types/socketTypes/socket';
 import { errorMsgToText } from '#components/Utils/errorMsgToText.js';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 const getAllWarehouse = () => {
   return url

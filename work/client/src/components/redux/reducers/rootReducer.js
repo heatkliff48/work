@@ -70,7 +70,7 @@ import {
 } from './reservedProductsReducer';
 import { rolesReducer } from './rolesReducer';
 import { stockBalanceReducer } from './stockBalanceReducer';
-import { userReducer } from './userReducer';
+import { authCheckedReducer, userReducer } from './userReducer';
 import { usersInfoReducer, usersMainInfoReducer } from './usersInfoReducer';
 import {
   warehouseAACReducer,
@@ -92,6 +92,7 @@ import { combineReducers } from 'redux';
 
 const appReducer = combineReducers({
   user: userReducer,
+  authChecked: authCheckedReducer,
   dataFetched: dataFetchedReducer,
   products: productsReducer,
   jwt: jwtReducer,
@@ -170,6 +171,7 @@ const appReducer = combineReducers({
 const rootReducer = (state, action) => {
   if (action.type === RESET_APP_STATE) {
     const user = state?.user;
+    const authChecked = state?.authChecked;
 
     const clearedState = appReducer(undefined, {
       type: '@@INIT',
@@ -178,6 +180,7 @@ const rootReducer = (state, action) => {
     return {
       ...clearedState,
       user,
+      authChecked,
     };
   }
 

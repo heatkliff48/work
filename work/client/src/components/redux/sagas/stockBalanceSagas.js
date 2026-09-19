@@ -6,15 +6,8 @@ import {
   GET_ALL_STOCK_BALANCE,
   NEW_STOCK_BALANCE,
 } from '../types/StockBalanceTypes';
-import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 const getStockBalance = () => {
   return url

@@ -1,5 +1,4 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
-import axios from 'axios';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
 import {
@@ -12,13 +11,8 @@ import {
   REPAIR_PRODUCT,
   UPDATE_PRODUCT,
 } from '../types/productsTypes';
+import url from '../../../api/axiosConfig.js';
 
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
 
 const getAllProducts = () => {
   return url

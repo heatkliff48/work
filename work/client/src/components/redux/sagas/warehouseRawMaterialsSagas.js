@@ -104,15 +104,8 @@ import {
   DELETE_WAREHOUSE_SAND_POWDER,
   UPDATE_NEW_WAREHOUSE_SAND_POWDER,
 } from '../types/warehouseRawMaterialsTypes';
-import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 // Sand API functions
 const getWarehouseSand = () => {

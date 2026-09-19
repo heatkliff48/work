@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
+import url from '../../../api/axiosConfig.js';
 import { addNewFilesOrder } from '#components/redux/actions/filesOrderAction.js';
 import { useDispatch } from 'react-redux';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
@@ -24,7 +24,7 @@ const FileUpload = () => {
       formData.append('myFile', file);
 
       try {
-        const res = await axios.post(
+        const res = await url.post(
           `${process.env.REACT_APP_URL}/files/upload?section=order`,
           formData,
           {

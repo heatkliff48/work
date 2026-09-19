@@ -71,9 +71,6 @@ import {
   getLotesList,
   getLotesListCakes,
 } from '#components/redux/actions/lotesListAction.js';
-
-import '#components/Styles/dashboard.css';
-
 import '#components/Styles/dashboard.css';
 import { getFilesLotesList } from '#components/redux/actions/filesLotesListAction.js';
 import {
@@ -91,12 +88,6 @@ function Main() {
   const { setStoredData } = useOrderContext();
   const { roles, checkUserAccess } = useUsersContext();
   const { warehouse_sand_slurry } = useWarehouseContext();
-
-  useEffect(() => {
-    if (!user || !localStorage.getItem('user')) {
-      navigate('/sign-in');
-    }
-  }, [user]);
 
   useEffect(() => {
     dispatch(getAldabaran());

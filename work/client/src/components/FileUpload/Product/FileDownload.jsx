@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import urlAxios from '../../../api/axiosConfig.js';
 
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useFileContext } from '#components/contexts/FileContext.js';
@@ -13,7 +13,7 @@ const FileDownload = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.get(
+      const res = await urlAxios.get(
         `${process.env.REACT_APP_URL}/files/download/${selectedFile}`,
         {
           responseType: 'blob',

@@ -10,15 +10,9 @@ import {
   UPDATE_QUALITY_MANAGEMENT_DATA,
   UPDATE_NEW_QUALITY_MANAGEMENT_DATA,
 } from '../types/qualityManagementTypes';
-import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
+import url from '../../../api/axiosConfig.js';
 
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
 
 const getQualityManagement = () => {
   return url

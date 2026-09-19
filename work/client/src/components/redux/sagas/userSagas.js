@@ -1,146 +1,177 @@
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { call, put, takeLatest } from 'redux-saga/effects';
+
 import {
   ADD_USER,
-  GET_CHECK_USER,
+  CHECK_USER,
   DEL_USER,
   GET_ADD_USER,
+  GET_CHECK_USER,
   GET_DEL_USER,
   GET_LOGIN_USER,
-  CHECK_USER,
 } from '../types/userTypes';
-import axios from 'axios';
+
+import api, { getApiAccessToken } from '../../../api/axiosConfig.js';
+
+import { deleteToken, setToken } from '../actions/jwtAction.js';
+
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
-// import { deleteToken, setToken } from '../actions/jwtAction';
 
-// let accessTokenFront;
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
-
-// url.interceptors.request.use(
-//   async (config) => {
-//     // Проверяем, является ли текущий запрос запросом checkUser
-//     const isCheckUserRequest =
-//       config.url === '/auth/check/user' && config.method === 'post';
-
-//     if (isCheckUserRequest && accessTokenFront) {
-//       config.headers['Authorization'] = `Bearer ${accessTokenFront}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     console.log('Interceptor: Request error', error);
-//     return Promise.reject(error);
-//   }
-// );
-
-const addUser = (user) => {
-  return url
-    .post('/auth/sign-up', { user })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      showMessage(errorToText(err), 'error');
-      throw err;
-    });
-};
-
-const loginUser = (user) => {
-  return url
-    .post('/auth/sign-in', { user })
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      showMessage(errorToText(err), 'error');
-      throw err;
-    });
-};
-
-const checkUser = () => {
-  return url
-    .post('/auth/check/user')
-    .then((res) => {
-      return res.data;
-    })
-    .catch((err) => {
-      showMessage(errorToText(err), 'error');
-      throw err;
-    });
-};
-
-const delUser = () => {
-  return url.post('/auth/logout').catch((err) => {
-    showMessage(errorToText(err), 'error');
-    throw err;
+const addUserRequest = async (user) => {
+  const response = await api.post('/auth/sign-up', {
+    user,
   });
+
+  return response.data;
+};
+
+const loginUserRequest = async (user) => {
+  const response = await api.post('/auth/sign-in', {
+    user,
+  });
+
+  return response.data;
+};
+
+const checkUserRequest = async () => {
+  if (getApiAccessToken()) {
+    try {
+      const response = await api.post('/auth/check/user');
+      return response.data;
+    } catch (error) {
+      if (error.response?.status !== 401) {
+        throw error;
+      }
+    }
+  }
+
+  const response = await api.post('/auth/refresh');
+  return response.data;
+};
+
+const logoutUserRequest = async () => {
+  const response = await api.post('/auth/logout');
+  return response.data;
 };
 
 function* addUserWatcher(action) {
-  // accessTokenFront = yield select((state) => state.jwt);
-
   try {
-    // const { user, accessToken, accessTokenExpiration } = yield call(
-    const { user } = yield call(addUser, action.payload);
+    const { user, accessToken, accessTokenExpiration } = yield call(
+      addUserRequest,
+      action.payload,
+    );
+
+    yield put(
+      setToken({
+        accessToken,
+        accessTokenExpiration,
+      }),
+    );
 
     window.localStorage.setItem('user', JSON.stringify(user));
-    // window.localStorage.setItem('jwt', accessToken);
-    // yield put(setToken({ accessToken, accessTokenExpiration }));
-    yield put({ type: ADD_USER, payload: user });
-  } catch (err) {
-    yield put({ type: ADD_USER, payload: null });
+
+    yield put({
+      type: ADD_USER,
+      payload: user,
+    });
+  } catch (error) {
+    showMessage(errorToText(error), 'error');
+
+    window.localStorage.removeItem('user');
+
+    yield put(deleteToken());
+
+    yield put({
+      type: ADD_USER,
+      payload: null,
+    });
   }
 }
 
 function* loginUserWatcher(action) {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
+    const { user, accessToken, accessTokenExpiration } = yield call(
+      loginUserRequest,
+      action.payload,
+    );
 
-    // const { user, accessToken, accessTokenExpiration } = yield call(
-    const { user } = yield call(loginUser, action.payload);
+    yield put(
+      setToken({
+        accessToken,
+        accessTokenExpiration,
+      }),
+    );
 
     window.localStorage.setItem('user', JSON.stringify(user));
-    // window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: ADD_USER, payload: user });
-    // yield put(setToken({ accessToken, accessTokenExpiration }));
-  } catch (err) {
-    yield put({ type: ADD_USER, payload: null });
+    yield put({
+      type: ADD_USER,
+      payload: user,
+    });
+  } catch (error) {
+    showMessage(errorToText(error), 'error');
+
+    window.localStorage.removeItem('user');
+
+    yield put(deleteToken());
+
+    yield put({
+      type: ADD_USER,
+      payload: null,
+    });
   }
 }
 
-function* checkUserWatcher(action) {
+function* checkUserWatcher() {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
+    const { user, accessToken, accessTokenExpiration } =
+      yield call(checkUserRequest);
 
-    // const { user, accessToken, accessTokenExpiration } = yield call(checkUser);
-    const { user } = yield call(checkUser);
+    /*
+     * /auth/check/user возвращает только пользователя.
+     * /auth/refresh возвращает пользователя и новый токен.
+     */
+    if (accessToken) {
+      yield put(
+        setToken({
+          accessToken,
+          accessTokenExpiration,
+        }),
+      );
+    }
 
     window.localStorage.setItem('user', JSON.stringify(user));
-    // window.localStorage.setItem('jwt', accessToken);
 
-    yield put({ type: CHECK_USER, payload: user });
-    // yield put(setToken({ accessToken, accessTokenExpiration }));
-  } catch (err) {
-    yield put({ type: CHECK_USER, payload: null });
+    yield put({
+      type: CHECK_USER,
+      payload: user,
+    });
+  } catch (error) {
+    window.localStorage.removeItem('user');
+
+    yield put(deleteToken());
+
+    yield put({
+      type: CHECK_USER,
+      payload: null,
+    });
   }
 }
 
 function* delUserWatcher() {
   try {
-    // accessTokenFront = yield select((state) => state.jwt);
+    yield call(logoutUserRequest);
+  } catch (error) {
+    showMessage(errorToText(error), 'error');
+  } finally {
+    window.localStorage.removeItem('user');
 
-    yield call(delUser);
-    yield put({ type: DEL_USER, payload: null });
-    // yield put(deleteToken());
-  } catch (err) {
-    yield put({ type: DEL_USER, payload: null });
+    yield put(deleteToken());
+
+    yield put({
+      type: DEL_USER,
+      payload: null,
+    });
   }
 }
 

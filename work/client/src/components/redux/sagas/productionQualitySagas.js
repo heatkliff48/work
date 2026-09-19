@@ -1,5 +1,4 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
-import axios from 'axios';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
 import {
@@ -18,13 +17,7 @@ import {
   UPDATE_COMPRESSIONS_QUALITY,
   UPDATE_DIMENSIONS_QUALITY,
 } from '../types/productionQualityTypes';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 //PRODUCTION QUALITY
 const getProductionQuality = () => {

@@ -11,6 +11,9 @@ redisClient.on('error', (err) => {
   console.error('Redis error:', err);
 });
 const RedisStore = require('connect-redis')(session);
+const TokenService = require('./services/Token.js');
+const { COOKIE_SETTINGS } = require('./constants.js');
+const { ErrorUtils } = require('./utils/Errors.js');
 const Fingerprint = require('express-fingerprint');
 const cookieParser = require('cookie-parser');
 const registerWsEmitter = require('./src/ws/wsEmitter');
@@ -58,18 +61,21 @@ const greenLineMonitoringRouter = require('./router/greenLineMonitoring.js');
 const temperatureDataMonitoringRouter = require('./router/temperatureDataMonitoring.js');
 
 const app = express();
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 const map = new Map();
 
 const sessionParser = session({
   name: 'sesid',
-  store: new RedisStore({ client: redisClient }),
-  saveUninitialized: false,
+  store: new RedisStore({
+    client: redisClient,
+  }),
   secret: process.env.SECRET,
   resave: false,
-  cookie: {
-    expires: 24 * 60 * 60e3,
-    httpOnly: true,
-  },
+  saveUninitialized: false,
+  rolling: true,
+  cookie: COOKIE_SETTINGS.SESSION,
 });
 
 app.use(
@@ -103,9 +109,6 @@ app.use(
   }),
 );
 
-// app.use(async (req, res, next) => {
-//   await TokenService.checkAccess(req, res, next);
-// });
 app.use((req, res, next) => {
   console.log('Запрос пришел с Origin:', req.headers.origin);
   // res.locals.token = process.env.API;
@@ -114,11 +117,7 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Internal Server Error');
-});
+app.use(TokenService.checkAccess);
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
@@ -138,7 +137,7 @@ app.use('/warehouse', WarehouseRootRouter);
 app.use('/usersInfo', usersInfoRouter);
 app.use('/usersMainInfo', usersMainInfoRouter);
 app.use('/productionBatchLog', productionBatchLogRouter);
-app.use('/batchOutside', batchOutsideRouter); //???
+app.use('/batchOutside', batchOutsideRouter);
 app.use('/recipe', recipeRouter);
 app.use('/recipe_orders', recipeOrdersRouter);
 app.use('/allfiles', files);
@@ -165,33 +164,80 @@ app.use('/orderToWarehouse', orderToWarehouseRouter);
 app.use('/greenLineMonitoring', greenLineMonitoringRouter);
 app.use('/temperatureDataMonitoring', temperatureDataMonitoringRouter);
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Internal Server Error');
+});
+
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  return ErrorUtils.catchError(res, err);
+});
+
 // Обработка WebSocket соединений
-server.on('upgrade', function (req, socket, head) {
+const handleUpgradeSocketError = (error) => {
+  console.error('WebSocket upgrade error:', error);
+};
+
+server.on('upgrade', (req, socket, head) => {
+  socket.on('error', handleUpgradeSocketError);
+
   sessionParser(req, {}, () => {
-    if (!req?.session?.user?.id) {
+    const userId = req.session?.user?.id;
+
+    if (!userId) {
       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
       socket.destroy();
       return;
     }
 
-    console.log('Session is parsed!');
+    socket.removeListener('error', handleUpgradeSocketError);
 
-    wss.handleUpgrade(req, socket, head, function (ws) {
+    wss.handleUpgrade(req, socket, head, (ws) => {
       wss.emit('connection', ws, req);
     });
   });
 });
-
 registerWsEmitter(map);
 
 // Обработка соединения WebSocket
-wss.on('connection', function (ws, request) {
+wss.on('connection', (ws, request) => {
   const userId = request.session.user.id;
-  console.log('>>>>>>>>>>>>>>>>>>request.session.user', request.session.user);
-  map.set(userId, ws);
+  const connectionId = Symbol(`websocket-user-${userId}`);
 
-  ws.on('close', function () {
-    map.delete(userId);
+  const connection = {
+    userId,
+
+    send(data) {
+      if (ws.readyState !== WebSocket.OPEN) {
+        return;
+      }
+
+      ws.send(data, (error) => {
+        if (error) {
+          console.error(`WebSocket send error for user ${userId}:`, error);
+        }
+      });
+    },
+  };
+
+  map.set(connectionId, connection);
+
+  console.log(`WebSocket connected: user=${userId}, total=${map.size}`);
+
+  ws.on('close', () => {
+    map.delete(connectionId);
+
+    console.log(`WebSocket closed: user=${userId}, total=${map.size}`);
+  });
+
+  ws.on('error', (error) => {
+    map.delete(connectionId);
+
+    console.error(`WebSocket error for user ${userId}:`, error);
   });
 });
 

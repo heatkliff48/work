@@ -1,5 +1,4 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
-import axios from 'axios';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
 
@@ -76,13 +75,8 @@ import {
   PAYMENT_METHOD,
   UPDATE_PAYMENT_METHOD,
 } from '../types/ordersTypes';
+import url from '../../../api/axiosConfig.js';
 
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
 
 const getAllOrders = () => {
   return url
@@ -652,10 +646,7 @@ function* getRelMatProductsOfOrderWatcher(action) {
 
 function* getCurrentProductsOfOrderWatcher(action) {
   try {
-    const { product_list } = yield call(
-      getCurrentProductsOfOrder,
-      action.payload,
-    );
+    const { product_list } = yield call(getCurrentProductsOfOrder, action.payload);
 
     yield put({ type: CURRENT_PRODUCTS_OF_ORDER, payload: product_list });
   } catch (err) {
@@ -684,10 +675,7 @@ function* getUpdateDryMixedProductsInfoOfOrderWatcher(action) {
   try {
     const { payload } = action;
 
-    const upd_prod_info = yield call(
-      getUpdateDryMixedProductsInfoOfOrder,
-      payload,
-    );
+    const upd_prod_info = yield call(getUpdateDryMixedProductsInfoOfOrder, payload);
 
     yield put({
       type: UPDATE_DRY_MIXED_PRODUCT_INFO_OF_ORDER,
@@ -703,10 +691,7 @@ function* getUpdateAnchorProductsInfoOfOrderWatcher(action) {
   try {
     const { payload } = action;
 
-    const upd_prod_info = yield call(
-      getUpdateAnchorProductsInfoOfOrder,
-      payload,
-    );
+    const upd_prod_info = yield call(getUpdateAnchorProductsInfoOfOrder, payload);
 
     yield put({
       type: UPDATE_ANCHOR_PRODUCT_INFO_OF_ORDER,
@@ -738,10 +723,7 @@ function* getUpdateRelMatProductsInfoOfOrderWatcher(action) {
   try {
     const { payload } = action;
 
-    const upd_prod_info = yield call(
-      getUpdateRelMatProductsInfoOfOrder,
-      payload,
-    );
+    const upd_prod_info = yield call(getUpdateRelMatProductsInfoOfOrder, payload);
 
     yield put({
       type: UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER,
@@ -966,28 +948,16 @@ function* ordersWatcher() {
   yield takeLatest(ADD_ORDER_DESCRIPTION, addDescriptionOrderWatcher);
   yield takeLatest(ADD_SECONDARY_CONTACT, addSecondaryContactWatcher);
   yield takeLatest(DELETE_SECONDARY_CONTACT, deleteSecondaryContactWatcher);
-  yield takeLatest(
-    GET_CURRENT_PRODUCTS_OF_ORDER,
-    getCurrentProductsOfOrderWatcher,
-  );
+  yield takeLatest(GET_CURRENT_PRODUCTS_OF_ORDER, getCurrentProductsOfOrderWatcher);
   yield takeLatest(GET_PRODUCTS_OF_ORDER, getProductsOfOrderWatcher);
   yield takeLatest(
     GET_DRY_MIXED_PRODUCTS_OF_ORDER,
     getDryMixedProductsOfOrderWatcher,
   );
-  yield takeLatest(
-    GET_ANCHOR_PRODUCTS_OF_ORDER,
-    getAnchorProductsOfOrderWatcher,
-  );
+  yield takeLatest(GET_ANCHOR_PRODUCTS_OF_ORDER, getAnchorProductsOfOrderWatcher);
   yield takeLatest(GET_TOOL_PRODUCTS_OF_ORDER, getToolProductsOfOrderWatcher);
-  yield takeLatest(
-    GET_REL_MAT_PRODUCTS_OF_ORDER,
-    getRelMatProductsOfOrderWatcher,
-  );
-  yield takeLatest(
-    GET_UPDATE_PRODUCTS_OF_ORDER,
-    getUpdateProductsOfOrderWatcher,
-  );
+  yield takeLatest(GET_REL_MAT_PRODUCTS_OF_ORDER, getRelMatProductsOfOrderWatcher);
+  yield takeLatest(GET_UPDATE_PRODUCTS_OF_ORDER, getUpdateProductsOfOrderWatcher);
   yield takeLatest(
     GET_UPDATE_DRY_MIXED_PRODUCTS_OF_ORDER,
     getUpdateDryMixedProductsOfOrderWatcher,
@@ -1029,14 +999,8 @@ function* ordersWatcher() {
     GET_DELETE_DRY_MIXED_OF_ORDER,
     getDeleteDryMixedProductOfOrderWatcher,
   );
-  yield takeLatest(
-    GET_DELETE_ANCHOR_OF_ORDER,
-    getDeleteAnchorProductOfOrderWatcher,
-  );
-  yield takeLatest(
-    GET_DELETE_TOOL_OF_ORDER,
-    getDeleteToolProductOfOrderWatcher,
-  );
+  yield takeLatest(GET_DELETE_ANCHOR_OF_ORDER, getDeleteAnchorProductOfOrderWatcher);
+  yield takeLatest(GET_DELETE_TOOL_OF_ORDER, getDeleteToolProductOfOrderWatcher);
   yield takeLatest(
     GET_DELETE_REL_MAT_OF_ORDER,
     getDeleteRelMatProductOfOrderWatcher,
@@ -1045,10 +1009,7 @@ function* ordersWatcher() {
   yield takeLatest(UPDATE_CONTACT_OF_ORDER, updateContactOfOrderWorker);
   yield takeLatest(UPDATE_DELIVERY_OF_ORDER, updateDeliveryOfOrderWorker);
   yield takeLatest(UPDATE_STATUS_OF_ORDER, updateStatusOfOrderWorker);
-  yield takeLatest(
-    UPDATE_PERSON_IN_CHARGE_OF_ORDER,
-    updateInChargeOfOrderWorker,
-  );
+  yield takeLatest(UPDATE_PERSON_IN_CHARGE_OF_ORDER, updateInChargeOfOrderWorker);
   yield takeLatest(UPDATE_PAYMENT_METHOD, updatePaymentWorker);
   yield takeLatest(ADD_RANDOM_PRODUCTS_OF_ORDER, addOrderRandomProductsWorker);
   yield takeLatest(ADD_CHILD_ORDER, addChildOrderWatcher);

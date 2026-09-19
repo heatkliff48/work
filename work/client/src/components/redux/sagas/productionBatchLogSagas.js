@@ -1,5 +1,4 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
-import axios from 'axios';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
 
@@ -11,13 +10,7 @@ import {
   GET_ALL_PRODUCTION_BATCH_LOGS,
   NEED_UPDATE_PRODUCTION_BATCH_LOG,
 } from '../types/productionBatchLogTypes';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 const getAllProductionBatchLogs = () => {
   return url

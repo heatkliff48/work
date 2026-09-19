@@ -1,5 +1,4 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
-import axios from 'axios';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
 import {
@@ -10,13 +9,8 @@ import {
   UPDATE_ROLE,
   UPDATE_ROLE_ACTIVE,
 } from '../types/rolesTypes';
+import url from '../../../api/axiosConfig.js';
 
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
 
 const getRoles = () => {
   return url

@@ -1,5 +1,4 @@
 import { put, call, takeLatest } from 'redux-saga/effects';
-import axios from 'axios';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
 import {
@@ -16,13 +15,7 @@ import {
   NEW_USERS_MAIN_INFO,
   UPDATE_USERS_MAIN_INFO,
 } from '../types/usersInfoTypes';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 const getAllUsersInfo = () => {
   return url

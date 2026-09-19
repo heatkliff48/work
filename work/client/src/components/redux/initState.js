@@ -1,8 +1,9 @@
 const initState = {
   user: {},
+  authChecked: false,
   dataFetched: false,
   products: [],
-  // jwt: null,
+  jwt: null,
   clients: [],
   legalAddress: {},
   deliveryAddresses: [],

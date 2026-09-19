@@ -1,20 +1,36 @@
 import axios from 'axios';
 import { getApiUrl } from '#utils/getApiUrl.js';
 
+let accessToken = null;
+
+export const setApiAccessToken = (token) => {
+  accessToken = token || null;
+};
+
+export const getApiAccessToken = () => {
+  return accessToken;
+};
+
+export const clearApiAccessToken = () => {
+  accessToken = null;
+};
+
 const api = axios.create({
-  baseURL: getApiUrl() || 'http://localhost:3001', // fallback URL
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: getApiUrl() || 'http://localhost:3001',
+  withCredentials: true,
+  timeout: 60000,
 });
 
-// Добавляем интерцептор для логирования запросов (опционально)
 api.interceptors.request.use(
   (config) => {
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
     console.log(
-      `Запрос: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`,
+      `Запрос: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`,
     );
+
     return config;
   },
   (error) => {
@@ -22,26 +38,19 @@ api.interceptors.request.use(
   },
 );
 
-// Добавляем интерцептор для обработки ответов и ошибок
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
     if (error.response) {
-      // Сервер ответил с кодом ошибки
-      console.error(
-        'Ошибка ответа:',
-        error.response.status,
-        error.response.data,
-      );
+      console.error('Ошибка ответа:', error.response.status, error.response.data);
     } else if (error.request) {
-      // Запрос был сделан, но ответ не получен
       console.error('Нет ответа от сервера:', error.request);
     } else {
-      // Ошибка при настройке запроса
       console.error('Ошибка запроса:', error.message);
     }
+
     return Promise.reject(error);
   },
 );

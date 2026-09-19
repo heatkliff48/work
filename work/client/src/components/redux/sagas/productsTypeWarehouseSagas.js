@@ -1,6 +1,5 @@
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
-import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
 import {
   ADD_NEW_ANCHORS_WAREHOUSE,
@@ -28,13 +27,7 @@ import {
   UPDATE_RELATED_MATERIALS_WAREHOUSE,
   UPDATE_TOOLS_WAREHOUSE,
 } from '../types/productsTypeWarehouseTypes';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 const getDryMixesWarehouse = () => {
   return url

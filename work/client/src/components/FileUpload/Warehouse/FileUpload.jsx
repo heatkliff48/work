@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
+import url from '../../../api/axiosConfig.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { addNewFilesWarehouse } from '#components/redux/actions/filesWarehouseAction.js';
 import { useDispatch } from 'react-redux';
@@ -23,7 +23,7 @@ const FileUpload = ({ type }) => {
       formData.append('myFile', file);
 
       try {
-        const res = await axios.post(
+        const res = await url.post(
           `${process.env.REACT_APP_URL}/files/upload?section=warehouse`,
           formData,
           {

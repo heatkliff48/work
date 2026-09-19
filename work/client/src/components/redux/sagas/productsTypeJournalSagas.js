@@ -1,6 +1,5 @@
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
-import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
 import {
   ADD_NEW_ANCHOR,
@@ -32,13 +31,7 @@ import {
   UPDATE_RELATED_MATERIALS_JOURNAL,
   UPDATE_TOOL,
 } from '../types/productsTypeJournalTypes';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 const getDryMixesJournal = () => {
   return url

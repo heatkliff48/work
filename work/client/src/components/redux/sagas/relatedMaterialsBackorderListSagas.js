@@ -1,6 +1,5 @@
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
-import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
 import {
   ADD_NEW_RELATED_MATERIALS_BACKORDER,
@@ -10,13 +9,7 @@ import {
   UPDATE_NEW_RELATED_MATERIALS_BACKORDER,
   UPDATE_RELATED_MATERIALS_BACKORDER,
 } from '../types/relatedMaterialsBackorderListTypes';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 const getRelatedMaterialsBackorder = () => {
   return url

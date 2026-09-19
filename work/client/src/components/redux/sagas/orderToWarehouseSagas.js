@@ -10,15 +10,8 @@ import {
   UPDATE_ORDER_TO_WAREHOUSE,
   UPDATE_NEW_ORDER_TO_WAREHOUSE,
 } from '../types/orderToWarehouseTypes';
-import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 const getOrderToWarehouse = () => {
   return url

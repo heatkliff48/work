@@ -1,7 +1,7 @@
 import React, { createContext, useState } from 'react';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useContext } from 'react';
+import url from '../../api/axiosConfig.js';
 
 export const FileContext = createContext();
 
@@ -15,7 +15,7 @@ export const FileContextProvider = ({ children }) => {
 
   const refreshFiles = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/files/files');
+      const res = url.get('http://localhost:3001/files/files');
       setFiles(res.data);
     } catch (err) {
       setMessage('Error fetching files');

@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
+
 import rootReducer from './reducers/rootReducer';
 import initState from './initState';
 import rootSaga from './sagas/rootSagas';
@@ -11,17 +12,41 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-  persistStore,
+  createMigrate,
   persistReducer,
+  persistStore,
 } from 'redux-persist';
 
 import storage from 'redux-persist/lib/storage';
 
 const sagaMiddleware = createSagaMiddleware();
 
+const migrations = {
+  1: (state) => {
+    if (!state) {
+      return state;
+    }
+
+    const nextState = {
+      ...state,
+    };
+
+    delete nextState.jwt;
+
+    return nextState;
+  },
+};
+
 const persistConfig = {
   key: 'root',
+  version: 1,
   storage,
+
+  blacklist: ['jwt', 'authChecked'],
+
+  migrate: createMigrate(migrations, {
+    debug: false,
+  }),
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

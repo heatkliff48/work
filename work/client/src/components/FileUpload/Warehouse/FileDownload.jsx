@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import urlAxios from '../../../api/axiosConfig.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useFileContext } from '#components/contexts/FileContext.js';
 
@@ -12,7 +12,7 @@ const FileDownload = ({ type }) => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.get(
+      const res = await urlAxios.get(
         `${process.env.REACT_APP_URL}/files/download/${selectedFile}`,
         {
           responseType: 'blob',
@@ -32,8 +32,7 @@ const FileDownload = ({ type }) => {
   useEffect(() => {
     const filteredFiles = filesWarehouse.filter(
       (el) =>
-        el.warehouse_id === warehouseInfoCurIdModal &&
-        el.warehouse_type === type,
+        el.warehouse_id === warehouseInfoCurIdModal && el.warehouse_type === type,
     );
     setFilteredFiles(filteredFiles);
   }, [filesWarehouse]);

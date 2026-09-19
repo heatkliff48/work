@@ -20,15 +20,9 @@ import {
   UPD_LOTES_LIST_CAKES_BOOLEAN,
   UPD_LOTES_LIST_NOTES,
 } from '../types/lotesListTypes';
-import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
+import url from '../../../api/axiosConfig.js';
 
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
 
 const getLotesList = () => {
   return url

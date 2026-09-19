@@ -1,7 +1,15 @@
-class WebError {
+class WebError extends Error {
   constructor(status, error) {
+    const message =
+      error instanceof Error ? error.message : error || 'Unexpected error';
+
+    super(message);
+
+    this.name = this.constructor.name;
     this.status = status;
-    this.error = error;
+    this.error = message;
+
+    Error.captureStackTrace?.(this, this.constructor);
   }
 }
 
@@ -43,8 +51,18 @@ class BadRequest extends WebError {
 
 class ErrorUtils {
   static catchError(res, error) {
-    console.log(error);
-    return res.status(error.status || 500).json(error);
+    const status = Number.isInteger(error?.status) ? error.status : 500;
+
+    const message = error?.error || error?.message || 'Internal Server Error';
+
+    if (status >= 500) {
+      console.error(error);
+    }
+
+    return res.status(status).json({
+      status,
+      error: message,
+    });
   }
 }
 

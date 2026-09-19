@@ -1,10 +1,30 @@
+const isProduction = process.env.NODE_ENV === 'production';
+
+const ACCESS_TOKEN_EXPIRATION = 30 * 60 * 1000; // 30 минут
+const REFRESH_TOKEN_EXPIRATION = 7 * 24 * 60 * 60 * 1000; // 7 дней
+const SESSION_EXPIRATION = 24 * 60 * 60 * 1000; // 24 часа
+
 const COOKIE_SETTINGS = {
   REFRESH_TOKEN: {
     httpOnly: true,
-    maxAge: 6048e5, // 7 * 24 * 3600 * 1000 (7 дней)
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: REFRESH_TOKEN_EXPIRATION,
+    path: '/',
+  },
+
+  SESSION: {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: SESSION_EXPIRATION,
+    path: '/',
   },
 };
 
-const ACCESS_TOKEN_EXPIRATION = 18e5; // 1800 * 1000 (30 минут)
-
-module.exports = { ACCESS_TOKEN_EXPIRATION, COOKIE_SETTINGS };
+module.exports = {
+  ACCESS_TOKEN_EXPIRATION,
+  REFRESH_TOKEN_EXPIRATION,
+  SESSION_EXPIRATION,
+  COOKIE_SETTINGS,
+};

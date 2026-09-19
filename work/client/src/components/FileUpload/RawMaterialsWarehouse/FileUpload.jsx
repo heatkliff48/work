@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
+import url from '../../../api/axiosConfig.js';
 import { useDispatch } from 'react-redux';
 import { useFileContext } from '#components/contexts/FileContext.js';
 import { useCallback } from 'react';
@@ -49,7 +49,7 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
 
     try {
       const folderPath = `rawMaterialsWarehouse/${material_type}`;
-      const res = await axios.post(
+      const res = await url.post(
         `${process.env.REACT_APP_URL}/files/upload/${encodeURIComponent(folderPath)}?section=rawMaterialsWarehouse`,
         formData,
         {

@@ -16,10 +16,13 @@ module.exports = {
           model: 'Users',
           key: 'id',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       refresh_token: {
         allowNull: false,
-        type: Sequelize.STRING,
+        unique: true,
+        type: Sequelize.TEXT,
       },
       finger_print: {
         allowNull: false,
@@ -34,8 +37,10 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+
+    await queryInterface.addIndex('Refresh_sessions', ['user_id']);
   },
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.dropTable('Refresh_sessions');
   },
 };

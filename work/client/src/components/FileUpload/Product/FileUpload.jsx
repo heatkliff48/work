@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
+import url from '../../../api/axiosConfig.js';
 import { addNewFilesProduct } from '#components/redux/actions/filesProductAction.js';
 import { useDispatch } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
@@ -23,7 +23,7 @@ const FileUpload = () => {
       formData.append('myFile', file);
 
       try {
-        const res = await axios.post(
+        const res = await url.post(
           `${process.env.REACT_APP_URL}/files/upload?section=product`,
           formData,
           {

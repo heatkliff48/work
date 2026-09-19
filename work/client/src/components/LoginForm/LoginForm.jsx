@@ -1,76 +1,86 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../redux/actions/userAction';
+
+import { loginUser, resetAppState } from '../redux/actions/userAction';
+
 import './Login.css';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
-import { useAutoclaveContext } from '#components/contexts/AutoclaveContext.js';
-import { useProjectContext } from '#components/contexts/Context.js';
-import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 
 function LoginForm() {
-  const [formInput, setForm] = useState({});
+  const [formInput, setForm] = useState({
+    email: '',
+    password: '',
+  });
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user);
+  const location = useLocation();
 
-  const { resetOrderState } = useOrderContext();
-  const { resetWarehouseState } = useWarehouseContext();
-  const { resetAutocalveState } = useAutoclaveContext();
-  const { resetProjectState } = useProjectContext();
-  const { resetProductTypeJState } = useProductsTypeJournalContext();
-  const { resetRecipeState } = useRecipeContext();
+  const user = useSelector((state) => state.user);
+  const authChecked = useSelector((state) => state.authChecked);
+
+  const returnPath = location.state?.from?.pathname || '/';
 
   useEffect(() => {
-    if (user) {
-      navigate('/');
+    if (authChecked && user) {
+      navigate(returnPath, {
+        replace: true,
+      });
     }
-  }, [user]);
+  }, [authChecked, user, navigate, returnPath]);
 
-  const inputChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const inputChange = (event) => {
+    const { name, value } = event.target;
+
+    setForm((previousForm) => ({
+      ...previousForm,
+      [name]: value,
+    }));
   };
 
-  const submitForm = async (e) => {
-    e.preventDefault();
+  const submitForm = (event) => {
+    event.preventDefault();
 
-    resetProjectState();
-    resetAutocalveState();
-    resetOrderState();
-    resetProductTypeJState();
-    resetRecipeState();
-    resetWarehouseState();
-
+    dispatch(resetAppState());
     dispatch(loginUser(formInput));
   };
 
   return (
     <div className="login_wrapper">
       <div className="login_topic">Login Form</div>
+
       <div className="login_form_wrapper">
-        <form className="login_form" onSubmit={(e) => submitForm(e)}>
+        <form className="login_form" onSubmit={submitForm}>
           <label htmlFor="email">E-mail</label>
+
           <input
             className="login_input"
-            type="text"
+            type="email"
             id="email"
             name="email"
-            value={formInput.name}
+            value={formInput.email}
             onChange={inputChange}
+            autoComplete="email"
+            required
           />
+
           <br />
+
           <label htmlFor="password">Password</label>
+
           <input
             className="login_input"
             type="password"
             id="password"
             name="password"
-            value={formInput.name}
+            value={formInput.password}
             onChange={inputChange}
+            autoComplete="current-password"
+            required
           />
+
           <br />
+
           <button className="login_button" type="submit">
             Login
           </button>

@@ -10,15 +10,8 @@ import {
   UPDATE_BATCH_OUTSIDE,
   UPDATE_NEW_BATCH_OUTSIDE,
 } from '../types/batchOutsideTypes';
-import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
-
-import { getApiUrl } from '#utils/getApiUrl.js';
-
-const url = axios.create({
-  baseURL: getApiUrl(),
-  withCredentials: true,
-});
+import url from '../../../api/axiosConfig.js';
 
 const getBatchOutside = () => {
   return url
