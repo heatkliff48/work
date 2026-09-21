@@ -1046,6 +1046,27 @@
 .ord-liberar-qty:focus {
   border-color: var(--ord-red);
 }
+.ord-liberar-select {
+  max-width: 260px;
+  height: 34px;
+  border: 1px solid var(--ord-border-2);
+  border-radius: 8px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--ord-text);
+  background: #fff;
+  outline: none;
+}
+.ord-liberar-select:focus {
+  border-color: var(--ord-red);
+}
+.ord-liberar-sub {
+  color: var(--ord-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-top: 3px;
+}
 .ord-liberar-error {
   color: #bc1212;
   font-size: 11.5px;

@@ -57,6 +57,7 @@ import {
 import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 import RelatedMaterialJournalTableOrder from './product_table_order/RelatedMaterialJournalTableOrder.jsx';
 import LiberarModal from './modal/LiberarModal.jsx';
+import RoundPalletsModal from './modal/RoundPalletsModal.jsx';
 import { statusThemeFor } from './ordersCells.jsx';
 
 import '#components/Styles/order-card.css';
@@ -126,6 +127,9 @@ const OrderCart = React.memo(() => {
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
   const [liberarModalShow, setLiberarModalShow] = useState(false);
+  const [roundPalletsShow, setRoundPalletsShow] = useState(false);
+  // Status the order is on its way to once fractional pallets are squared up.
+  const [pendingStatus, setPendingStatus] = useState(null);
   const [ordersStatus, setOrdersStatus] = useState([]);
   const [orderStatusAccess, setOrderStatusAccess] = useState({
     canRead: true,
@@ -377,8 +381,18 @@ const OrderCart = React.memo(() => {
       const final_price =
         (price_m2_with_delivery * quantity_m2 * (100 - discount)) / 100;
 
+      // Liberar debits this line by area, so quantity_liberated can hold
+      // fractional pallets when a child order shipped the same block in
+      // another package. Showing the m2 equivalent keeps that readable.
+      const quantity_palet = Number(product?.quantity_palet || 0);
+      const quantity_liberated = Number(product?.quantity_liberated || 0);
+      const quantity_liberated_m2 = quantity_palet
+        ? (quantity_liberated * quantity_m2) / quantity_palet
+        : 0;
+
       return {
         ...product,
+        quantity_liberated_m2: Number(quantity_liberated_m2.toFixed(2)),
         price_m2_with_delivery: Number(price_m2_with_delivery.toFixed(2)),
         final_price: Number(final_price.toFixed(2)),
         delivery_m2_share: Number(delivery_m2_share.toFixed(2)),
@@ -497,7 +511,7 @@ const OrderCart = React.memo(() => {
     [status_list]
   );
 
-  const statusChangeHandler = (status) => {
+  const statusChangeHandler = (status, skipPalletCheck = false) => {
     const currentStatusIndex = status_list.findIndex(
       (item) => item.accessor === orderCartData?.status
     );
@@ -523,6 +537,25 @@ const OrderCart = React.memo(() => {
 
     if (status.accessor > statusByAccessor[4].accessor && !hasShippingDate) {
       alert('Please save the shipping date before changing the status.');
+      return;
+    }
+
+    // Liberar debits a line by square meters, so quantity_liberated comes out
+    // fractional whenever a child order shipped the block in another package,
+    // and the pallets left to ship along with it. That has to be squared up
+    // before the order is contracted and goes near production or reserves.
+    if (
+      !skipPalletCheck &&
+      status.accessor === statusByAccessor[5].accessor &&
+      productLists.products.some((product) => {
+        const remaining =
+          (Number(product.quantity_palet) || 0) -
+          (Number(product.quantity_liberated) || 0);
+        return !Number.isInteger(parseFloat(remaining.toFixed(2)));
+      })
+    ) {
+      setPendingStatus(status);
+      setRoundPalletsShow(true);
       return;
     }
 
@@ -1248,6 +1281,22 @@ const OrderCart = React.memo(() => {
           orderCartData={orderCartData}
           productLists={productLists}
           onSuccess={() => navigate('/orders')}
+        />
+      )}
+      {roundPalletsShow && (
+        <RoundPalletsModal
+          show={roundPalletsShow}
+          onHide={() => {
+            setRoundPalletsShow(false);
+            setPendingStatus(null);
+          }}
+          orderCartData={orderCartData}
+          blocks={productLists.products}
+          onConfirm={() => {
+            setRoundPalletsShow(false);
+            setPendingStatus(null);
+            if (pendingStatus) statusChangeHandler(pendingStatus, true);
+          }}
         />
       )}
       {reserveModalShow && (
