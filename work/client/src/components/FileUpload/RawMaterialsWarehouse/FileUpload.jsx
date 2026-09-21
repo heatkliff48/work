@@ -47,17 +47,10 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
     const formData = new FormData();
     formData.append('myFile', file);
 
-    dispatch(
-      updateRawMaterialAction({
-        id: rowData?.id,
-        file_name: file.name,
-      }),
-    );
-
     try {
       const folderPath = `rawMaterialsWarehouse/${material_type}`;
       const res = await axios.post(
-        `${process.env.REACT_APP_URL}/files/upload/${encodeURIComponent(folderPath)}`,
+        `${process.env.REACT_APP_URL}/files/upload/${encodeURIComponent(folderPath)}?section=rawMaterialsWarehouse`,
         formData,
         {
           headers: {
@@ -65,7 +58,15 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
           },
         },
       );
-      setMessage(res.data);
+
+      dispatch(
+        updateRawMaterialAction({
+          id: rowData?.id,
+          file_name: res.data.filename,
+        }),
+      );
+
+      setMessage(`File uploaded: ${res.data.filename}`);
       setFile(null);
     } catch (err) {
       if (err.response) {

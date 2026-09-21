@@ -22,17 +22,9 @@ const FileUpload = () => {
       const formData = new FormData();
       formData.append('myFile', file);
 
-      dispatch(
-        addNewFilesProduct({
-          product_id: productCardData?.id,
-          fileType: 'product',
-          file_name: file.name,
-        }),
-      );
-
       try {
         const res = await axios.post(
-          `${process.env.REACT_APP_URL}/files/upload`,
+          `${process.env.REACT_APP_URL}/files/upload?section=product`,
           formData,
           {
             headers: {
@@ -40,7 +32,16 @@ const FileUpload = () => {
             },
           },
         );
-        setMessage(res.data);
+
+        dispatch(
+          addNewFilesProduct({
+            product_id: productCardData?.id,
+            fileType: 'product',
+            file_name: res.data.filename,
+          }),
+        );
+
+        setMessage(`File uploaded: ${res.data.filename}`);
         //refreshFiles(); // Refresh the file list after upload
       } catch (err) {
         if (err.response) {

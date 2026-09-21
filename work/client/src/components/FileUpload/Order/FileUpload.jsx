@@ -23,17 +23,9 @@ const FileUpload = () => {
       const formData = new FormData();
       formData.append('myFile', file);
 
-      dispatch(
-        addNewFilesOrder({
-          order_id: orderCartData?.id,
-          fileType: 'order',
-          file_name: file.name,
-        }),
-      );
-
       try {
         const res = await axios.post(
-          `${process.env.REACT_APP_URL}/files/upload`,
+          `${process.env.REACT_APP_URL}/files/upload?section=order`,
           formData,
           {
             headers: {
@@ -41,7 +33,16 @@ const FileUpload = () => {
             },
           },
         );
-        setMessage(res.data);
+
+        dispatch(
+          addNewFilesOrder({
+            order_id: orderCartData?.id,
+            fileType: 'order',
+            file_name: res.data.filename,
+          }),
+        );
+
+        setMessage(`File uploaded: ${res.data.filename}`);
         refreshFiles();
       } catch (err) {
         if (err.response) {
