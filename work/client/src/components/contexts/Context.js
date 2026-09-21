@@ -490,10 +490,10 @@ const ProjectContextProvider = ({ children }) => {
     setStayDefault(true);
     setCakeFillUp({});
     setCurrentClient({});
-    setClientsDataList({});
+    setClientsDataList([]);
     setProductCardData({});
     setCurrentUsersInfo({});
-    setUsersInfoDataList({});
+    setUsersInfoDataList([]);
     setProductionBatchLogData([]);
   };
 
