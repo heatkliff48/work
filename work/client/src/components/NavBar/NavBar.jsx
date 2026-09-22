@@ -6,6 +6,7 @@ import { delUser } from '#components/redux/actions/userAction';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import TabsBar from '#components/Main/TabsBar';
+import RequireAccess from '#components/ProtectRoute/RequireAccess.jsx';
 import '#components/Styles/dashboard.css';
 
 // Импортируем все иконки
@@ -42,7 +43,7 @@ export default function NavBar() {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user);
-  const { roles, checkUserAccess } = useUsersContext();
+  const { canOpenPath } = useUsersContext();
   const { getPageTitleByPath, getRoleName } = useProjectContext();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -88,30 +89,22 @@ export default function NavBar() {
   const userrole = user ? getRoleName(user?.role) : '';
   const title = getPageTitleByPath(location.pathname);
 
-  const canSee = (access) => {
-    if (!access) return true;
-    return !!checkUserAccess(user, roles, access)?.canRead;
-  };
-
   const menuItems = useMemo(
     () => [
       {
         type: 'group',
         title: 'Admin',
         icon: adminIcon,
-        access: 'Users_info',
         children: [
           {
             title: 'Users Info',
             path: '/users_info',
             icon: userInfoIcon,
-            access: 'Users_info',
           },
           {
             title: 'Roles',
             path: '/roles',
             icon: rolesIcon,
-            access: 'Users_info',
           },
         ],
       },
@@ -119,7 +112,6 @@ export default function NavBar() {
         type: 'group',
         title: 'Products catalog',
         icon: prodCatalogIcon,
-        access: null,
         children: [
           {
             title: 'Products catalog',
@@ -138,25 +130,21 @@ export default function NavBar() {
         title: 'Clients',
         path: '/clients',
         icon: clientsIcon,
-        access: 'Clients',
       },
       {
         title: 'Clients price groups',
         path: '/clients_price_info',
         icon: clientsPriceGroupsIcon,
-        access: 'Clients',
       },
       {
         type: 'group',
         title: 'Orders catalog',
         icon: prodCatalogIcon,
-        access: null,
         children: [
           {
             title: 'Orders',
             path: '/orders',
             icon: ordersIcon,
-            access: 'Orders',
           },
           {
             title: 'Orders to warehouse',
@@ -170,7 +158,6 @@ export default function NavBar() {
         type: 'group',
         title: 'Ordered products pipeline',
         icon: pipelineIcon,
-        access: 'List_of_ordered_production',
         children: [
           {
             title: 'Ordered blocks pipeline',
@@ -193,7 +180,6 @@ export default function NavBar() {
         type: 'group',
         title: 'Production planner',
         icon: productionPlannerIcon,
-        access: 'production_batch_designer',
         children: [
           {
             title: 'Autoclave calendar',
@@ -204,7 +190,6 @@ export default function NavBar() {
             title: 'Batch calendar',
             path: '/batch_outside',
             icon: batchCalendarIcon,
-            access: 'production_plan',
           },
         ],
       },
@@ -213,7 +198,6 @@ export default function NavBar() {
         type: 'group',
         title: 'Technology planner',
         icon: technologyPlannerIcon,
-        access: 'recipe_products',
         children: [
           {
             title: 'Recipes catalog',
@@ -247,37 +231,31 @@ export default function NavBar() {
         title: 'Quality management',
         path: '/quality_management',
         icon: qualityManIcon,
-        access: 'quality_management',
       },
       {
         title: 'Warehouse',
         path: '/warehouse_products_type',
         icon: warehouseIcon,
-        access: 'Warehouse',
       },
       {
         title: 'Order dispatch',
         path: '/warehouse_manager',
         icon: orderDispatchIcon,
-        access: 'warehouse_manager',
       },
       {
         type: 'group',
         title: 'Accounting',
         icon: accountingIcon,
-        access: 'accounting',
         children: [
           {
             title: 'Accounting',
             path: '/accounting',
             icon: accountingIcon,
-            access: 'accounting',
           },
           {
             title: 'Logistics planner',
             path: '/factura_manager',
             icon: accountingIcon,
-            access: 'accounting',
           },
         ],
       },
@@ -285,19 +263,16 @@ export default function NavBar() {
         type: 'group',
         title: 'Green Line Monitoring',
         icon: technologyPlannerIcon,
-        access: 'recipe_products',
         children: [
           {
             title: 'Height Data Monitoring',
             path: '/green_line_monitoring',
             icon: batchCalendarIcon,
-            access: null,
           },
           {
             title: 'Temperature Data Monitoring',
             path: '/temperature_data_monitoring',
             icon: batchCalendarIcon,
-            access: null,
           },
         ],
       },
@@ -362,9 +337,9 @@ export default function NavBar() {
 
           {menuItems.map((it) => {
             if (it.type === 'group') {
-              if (!canSee(it.access)) return null;
+              // группа видна, если доступен хотя бы один её пункт
               const visibleChildren = it.children.filter((c) =>
-                canSee(c.access),
+                canOpenPath(c.path),
               );
               if (!visibleChildren.length) return null;
               const expanded = openGroups[it.title] ?? isGroupActive(it);
@@ -431,7 +406,7 @@ export default function NavBar() {
               );
             }
 
-            if (!canSee(it.access)) return null;
+            if (!canOpenPath(it.path)) return null;
 
             return (
               <button
@@ -489,7 +464,7 @@ export default function NavBar() {
         <TabsBar />
 
         <div className="bb-content">
-          <Outlet />
+          <RequireAccess />
         </div>
       </main>
     </div>

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { PAGE_ACCESS } from '#utils/pageAccess.js';
 
 const UsersContext = createContext();
 
@@ -26,9 +27,22 @@ export const UsersContextProvider = ({ children }) => {
     };
   };
 
+  // Можно ли текущему пользователю открыть страницу по этому пути
+  const canOpenPath = (path) => {
+    const pageName = PAGE_ACCESS[path];
+    return !pageName || checkUserAccess(user, roles, pageName).canRead;
+  };
+
   return (
     <UsersContext.Provider
-      value={{ user, roles, checkUserAccess, userAccess, setUserAccess }}
+      value={{
+        user,
+        roles,
+        checkUserAccess,
+        canOpenPath,
+        userAccess,
+        setUserAccess,
+      }}
     >
       {children}
     </UsersContext.Provider>

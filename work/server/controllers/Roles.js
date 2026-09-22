@@ -25,7 +25,7 @@ class RolesController {
 
       myEmitter.emit(UPDATE_ROLE_SOCKET, updRoleData);
 
-      return res.status(200);
+      return res.sendStatus(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -38,7 +38,7 @@ class RolesController {
       const updActiveRoleData = await RolesService.updateActiveRoles({updActiveRole});
 
       myEmitter.emit(UPDATE_ROLE_ACTIVE_SOCKET, updActiveRoleData);
-      return res.status(200);
+      return res.sendStatus(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
