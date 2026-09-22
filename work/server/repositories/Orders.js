@@ -84,11 +84,13 @@ class OrdersRepository {
     }
   }
 
-  static async addDescriptionOrder({ order_id, description }) {
+  // Сохраняет description и/или otros — обновляется только переданное поле
+  static async addDescriptionOrder({ order_id, description, otros }) {
     try {
       await Orders.update(
         {
-          description,
+          ...(description !== undefined && { description }),
+          ...(otros !== undefined && { otros }),
         },
         { where: { id: order_id } },
       );
@@ -1130,6 +1132,7 @@ class OrdersRepository {
     delivery_m2,
     region,
     payment_method,
+    otros,
   }) {
     try {
       const childOrder = await Orders.create({
@@ -1145,6 +1148,7 @@ class OrdersRepository {
         delivery_m2,
         region,
         payment_method,
+        otros,
       });
 
       const order_id = childOrder.id;

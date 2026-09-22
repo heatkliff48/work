@@ -115,6 +115,7 @@ const OrderCart = React.memo(() => {
   const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
   const [dataValue, setDataValue] = useState(new Date());
   const [newDescription, setNewDescription] = useState('');
+  const [newOtros, setNewOtros] = useState('');
   const [formatDataValue, setFormatDataValue] = useState(() =>
     new Date().toLocaleDateString('ru-RU', {
       year: 'numeric',
@@ -123,6 +124,7 @@ const OrderCart = React.memo(() => {
     })
   );
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingOtros, setIsEditingOtros] = useState(false);
   const [isAddSecCont, setIsAddSecCont] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
@@ -149,9 +151,15 @@ const OrderCart = React.memo(() => {
 
   const PAYMENT_METHOD_OPTIONS = [
     { value: 'prepayment', label: 'Prepago' },
-    { value: 'bank_transfer', label: 'Transferencia bancaria' },
+    { value: 'bank_transfer', label: 'Transferencia bancaria 30 dias' },
     { value: 'promissory_note', label: 'Pagaré' },
-    { value: 'confirming', label: 'Confirming' },
+    { value: 'confirming', label: 'Confirming 30 dias' },
+    { value: 'confirming', label: 'Confirming 45 dias' },
+    { value: 'confirming', label: 'Confirming 60 dias' },
+    { value: 'confirming', label: 'Confirming 90 dias' },
+    { value: 'confirming', label: 'Confirming 120 dias' },
+    { value: 'confirming', label: 'Confirming 180 dias' },
+    { value: 'confirming', label: 'Confirming 210 dias' },
     { value: 'confirming_without_recourse', label: 'Confirming sin recurso' },
   ];
 
@@ -285,6 +293,17 @@ const OrderCart = React.memo(() => {
   const onSaveDescription = (str) => {
     dispatch(addDescription({ order_id: orderCartData.id, description: str }));
     setIsEditing(false);
+  };
+
+  const onEditOtrosHandler = () => {
+    setNewOtros(orderCartData?.otros);
+    setIsEditingOtros(true);
+  };
+
+  // Otros попадает в PDF (presupuesto) в блок condiciones particulares
+  const onSaveOtros = (str) => {
+    dispatch(addDescription({ order_id: orderCartData.id, otros: str }));
+    setIsEditingOtros(false);
   };
 
   const addSecondaryContactHandler = () => {
@@ -1086,6 +1105,7 @@ const OrderCart = React.memo(() => {
     setOrderCartData((prev) => ({
       ...prev,
       description: updatedOrderCartData?.description,
+      otros: updatedOrderCartData?.otros,
     }));
   }, [list_of_orders]);
 
@@ -1429,6 +1449,45 @@ const OrderCart = React.memo(() => {
                       type="button"
                       className="ord-btn ord-btn--primary ord-btn--sm"
                       onClick={() => onSaveDescription(newDescription)}
+                    >
+                      Save
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <div className="ord-tile__label" style={{ marginTop: 16 }}>
+                Otros
+              </div>
+              {orderCartData?.otros && !isEditingOtros ? (
+                <>
+                  <div className="ord-tile__body-text">{orderCartData.otros}</div>
+                  <button
+                    type="button"
+                    className="ord-btn ord-btn--ghost ord-btn--sm"
+                    style={{ marginTop: 10 }}
+                    onClick={onEditOtrosHandler}
+                  >
+                    Edit
+                  </button>
+                </>
+              ) : (
+                <div className="ord-desc-edit">
+                  <textarea
+                    placeholder="Enter otros..."
+                    value={newOtros}
+                    disabled={
+                      !checkUserAccess(user, roles, 'orders_description_edit')
+                        ?.canWrite
+                    }
+                    onChange={(e) => setNewOtros(e.target.value)}
+                  />
+                  {checkUserAccess(user, roles, 'orders_description_edit')
+                    ?.canWrite && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--primary ord-btn--sm"
+                      onClick={() => onSaveOtros(newOtros)}
                     >
                       Save
                     </button>

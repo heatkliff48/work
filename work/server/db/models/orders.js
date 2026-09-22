@@ -47,6 +47,7 @@ module.exports = (sequelize, DataTypes) => {
       uf_number_offer: DataTypes.INTEGER,
       region: DataTypes.STRING,
       payment_method: DataTypes.STRING,
+      otros: DataTypes.TEXT,
     },
     {
       sequelize,

@@ -122,7 +122,7 @@ class OrdersController {
       await OrdersService.addDescriptionOrder(desc);
 
       myEmitter.emit(ADD_DESCRIPTIOM_ORDER_SOCKET, desc);
-      return res.status(200);
+      return res.sendStatus(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -648,6 +648,7 @@ class OrdersController {
       delivery_m2,
       region,
       payment_method,
+      otros,
     } = req.body;
 
     try {
@@ -668,6 +669,7 @@ class OrdersController {
         delivery_m2,
         region,
         payment_method,
+        otros,
       });
 
       myEmitter.emit(ADD_CHILD_ORDER_SOCKET, childOrder);

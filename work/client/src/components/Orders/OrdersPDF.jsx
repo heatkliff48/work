@@ -181,9 +181,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
               'm2/pal',
               'blq/pal, Ud',
               'Total m2',
-              'PVP neto € / m2',
+              'Precio neto € / m2',
               'Total, Ud',
-              'PVP neto €/Ud',
+              'Precio neto €/Ud',
               'Subtotal €',
             ],
           ],
@@ -230,7 +230,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
               'sacos/pal',
               'Total sacos, Ud',
               'Total, kg',
-              'PVP neto €/Ud',
+              'Precio neto €/Ud',
               'Subtotal €',
             ],
           ],
@@ -273,7 +273,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
               'sacos/pal',
               'Total sacos, Ud',
               'Total, kg',
-              'PVP neto €/Ud',
+              'Precio neto €/Ud',
               'Subtotal €',
             ],
           ],
@@ -301,7 +301,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           ...baseTableOptions,
           startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
           head: [
-            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
+            ['Ref.:', 'Descripción', 'Total, Ud', 'Precio neto €/Ud', 'Subtotal €'],
           ],
           body: pdfData.pdfTools?.map((item) => [
             item.ref,
@@ -323,7 +323,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           ...baseTableOptions,
           startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
           head: [
-            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
+            ['Ref.:', 'Descripción', 'Total, Ud', 'Precio neto €/Ud', 'Subtotal €'],
           ],
           body: pdfData.pdfRelMat?.map((item) => [
             item.ref,
@@ -537,13 +537,14 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       // Позже подставим сюда конкретные поля из orderData.
       const deliveryTerm = pdfData.address || '[completar]';
       const paymentMethod = pdfData.payment_method || '[completar]';
+      const otros = pdfData.otros?.trim();
 
       const particularConditionsText = [
         'Las partes acuerdan de forma expresa las siguientes condiciones aplicables al presente Presupuesto/Pedido:',
         `Plazo de entrega: ${deliveryTerm}`,
         `Forma de pago: ${paymentMethod}`,
         'Los importes reflejados en este presupuesto se calculan conforme a las condiciones económicas vigentes en la fecha de emisión. Cualquier incremento excepcional y acreditado en el coste del combustible que afecte de forma directa a la ejecución del servicio dará lugar a una revisión del precio, previa notificación.',
-        'Otros:',
+        otros ? `Otros: ${otros}` : 'Otros:',
       ].join('\n');
 
       const particularConditionsStartY = doc.lastAutoTable
@@ -721,6 +722,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       delivery,
       delivery_m2,
       payment_method,
+      otros,
     } = orderData;
 
     const VALIDITY_DAYS = 30;
@@ -929,6 +931,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       delivery_m2,
       footer,
       payment_method,
+      otros,
     });
     setPdfUrl(null);
   }, [orderData, productList]);
