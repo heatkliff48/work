@@ -10,6 +10,7 @@ import { format, getISOWeek, parseISO } from 'date-fns';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getLotesList } from '#components/redux/actions/lotesListAction.js';
+import { getProducedAutoclaveCountForDate } from '#components/ProductionBatchDesigner/autoclaveScheduleUtils.js';
 import '#components/Clients/ClientsInfo/clientsDrawer.css';
 import '#components/Styles/table.css';
 import './batchOutside.css';
@@ -56,24 +57,40 @@ function buildGridColumns(
   const columns = [];
   order.forEach((date, dateIndex) => {
     const colorClass = DATE_COLOR_CLASSES[dateIndex % DATE_COLOR_CLASSES.length];
-    const dateRows = (byDate.get(date) || [])
-      .slice()
-      .sort((a, b) => a.position_in_autoclave - b.position_in_autoclave);
+    const dateRows = byDate.get(date) || [];
 
+    // Produced cakes go in first: they physically went through the autoclaves
+    // before anything that is still only planned for the same date.
     const slots = [];
-    dateRows.forEach((row) => {
-      for (let i = 0; i < row.quantity_arrays; i++) slots.push(row.product_article);
-    });
+    dateRows
+      .filter((row) => row.isProduced)
+      .forEach((row) => {
+        for (let i = 0; i < row.quantity_arrays; i++) {
+          slots.push({ article: row.product_article, produced: true });
+        }
+      });
+    dateRows
+      .filter((row) => !row.isProduced)
+      .sort((a, b) => a.position_in_autoclave - b.position_in_autoclave)
+      .forEach((row) => {
+        for (let i = 0; i < row.quantity_arrays; i++) {
+          slots.push({ article: row.product_article, produced: false });
+        }
+      });
 
     const weekNumber = date ? getISOWeek(parseISO(date)) : null;
-    const isHistory = dateRows.length > 0 && Boolean(dateRows[0].isHistory);
+    const isPast = date < today;
 
-    let filledCount = 0;
+    let plannedCount = 0;
+    let producedCount = 0;
     for (let i = 0; i < slots.length; i += cellsPerAutoclave) {
       const chunk = slots.slice(i, i + cellsPerAutoclave);
+      // An autoclave is only locked once every cake in it has been cast; a
+      // half-cast one still carries planned cakes and stays editable.
+      const isProduced = chunk.every((slot) => slot.produced);
       const cakeRows = [];
       for (let n = 0; n < cellsPerAutoclave; n++) {
-        const article = chunk[n];
+        const article = chunk[n]?.article;
         const product = article ? productByArticle.get(article) : null;
         cakeRows.push({
           no: n + 1,
@@ -87,14 +104,23 @@ function buildGridColumns(
         colorClass,
         cakeRows,
         isEmpty: false,
-        isHistory,
+        isProduced,
+        isPast,
       });
-      filledCount += 1;
+      if (isProduced) producedCount += 1;
+      else plannedCount += 1;
     }
 
     // No planning slots in the past: an autoclave scheduled on a gone-by date can't be filled anymore
-    const scheduled = date < today ? 0 : scheduledByDate.get(date) || 0;
-    const emptyCount = Math.max(0, scheduled - filledCount);
+    const scheduled = isPast ? 0 : scheduledByDate.get(date) || 0;
+    // lotes_list may not have arrived yet, so fall back to the calendar's own
+    // count of produced autoclaves — otherwise a produced one would show up as a
+    // free slot for as long as the fetch takes.
+    const produced = Math.max(
+      producedCount,
+      getProducedAutoclaveCountForDate(autoclaveCalendar, date, cellsPerAutoclave)
+    );
+    const emptyCount = Math.max(0, scheduled - plannedCount - produced);
     for (let e = 0; e < emptyCount; e++) {
       columns.push({
         date,
@@ -102,7 +128,8 @@ function buildGridColumns(
         colorClass,
         cakeRows: [],
         isEmpty: true,
-        isHistory: false,
+        isProduced: false,
+        isPast,
       });
     }
   });
@@ -225,16 +252,21 @@ const BatchOutside = () => {
     [newBatchOutside]
   );
 
+  // Produced autoclaves are rebuilt from lotes_list, so the grid needs it loaded
+  // up front, not only once past days are toggled on.
   useEffect(() => {
-    if (showPast && (!Array.isArray(lotesListBatches) || !lotesListBatches.length)) {
+    if (!Array.isArray(lotesListBatches) || !lotesListBatches.length) {
       dispatch(getLotesList());
     }
   }, [showPast]);
 
-  // Past dates are gone from batch_outside, so rebuild them from lotes_list records:
-  // each batch record becomes quantity_cakes filled slots on its production_date.
-  const pastRows = useMemo(() => {
-    if (!showPast || !Array.isArray(lotesListBatches)) return [];
+  // Finishing a batch in Casting deletes its batch_outside row, so produced
+  // autoclaves are rebuilt from lotes_list records instead: each batch record
+  // becomes quantity_cakes filled slots on its production_date. A batch that is
+  // still being cast keeps its batch_outside row, so it is matched back by
+  // batch_id and skipped here rather than counted on both sides.
+  const producedRows = useMemo(() => {
+    if (!Array.isArray(lotesListBatches)) return [];
 
     const productByName = new Map();
     (latestProducts || []).forEach((p) => {
@@ -242,15 +274,16 @@ const BatchOutside = () => {
       if (match?.[1]) productByName.set(match[1], p);
     });
 
-    const activeDates = new Set(
-      newBatchOutside.map((row) => String(row.date).slice(0, 10))
+    const castingBatchIds = new Set(
+      newBatchOutside
+        .filter((row) => row.batch_id != null)
+        .map((row) => String(row.batch_id))
     );
-    const today = format(new Date(), 'yyyy-MM-dd');
 
     return lotesListBatches
       .filter((item) => {
         const date = String(item?.production_date || '').slice(0, 10);
-        return date && date < today && !activeDates.has(date);
+        return date && !castingBatchIds.has(String(item.batch_id));
       })
       .sort(
         (a, b) =>
@@ -258,25 +291,33 @@ const BatchOutside = () => {
           Number(a.sub_batch_id) - Number(b.sub_batch_id) ||
           Number(a.id) - Number(b.id)
       )
-      .map((item, index) => ({
+      .map((item) => ({
         date: String(item.production_date).slice(0, 10),
         product_article: productByName.get(item.product)?.article,
         quantity_arrays: Number(item.quantity_cakes) || 0,
-        position_in_autoclave: index + 1,
-        isHistory: true,
+        isProduced: true,
       }));
-  }, [showPast, lotesListBatches, latestProducts, newBatchOutside]);
+  }, [lotesListBatches, latestProducts, newBatchOutside]);
+
+  // Produced autoclaves on today's and future dates are always shown — the day's
+  // plan only reads correctly with them in place. Older ones stay behind the
+  // "Show past days" toggle.
+  const visibleProducedRows = useMemo(() => {
+    if (showPast) return producedRows;
+    const today = format(new Date(), 'yyyy-MM-dd');
+    return producedRows.filter((row) => row.date >= today);
+  }, [producedRows, showPast]);
 
   const gridColumns = useMemo(
     () =>
       buildGridColumns(
-        [...pastRows, ...newBatchOutside],
+        [...visibleProducedRows, ...newBatchOutside],
         latestProducts,
         CELLS_PER_AUTOCLAVE,
         autoclave_calendar
       ),
     [
-      pastRows,
+      visibleProducedRows,
       newBatchOutside,
       latestProducts,
       CELLS_PER_AUTOCLAVE,
@@ -285,7 +326,7 @@ const BatchOutside = () => {
   );
 
   const firstCurrentIndex = useMemo(
-    () => gridColumns.findIndex((col) => !col.isHistory),
+    () => gridColumns.findIndex((col) => !col.isPast),
     [gridColumns]
   );
 
@@ -311,7 +352,7 @@ const BatchOutside = () => {
   }, [mode, showPast, firstCurrentIndex]);
 
   const handleAutoclaveCardClick = (col) => {
-    if (col.isHistory) return;
+    if (col.isProduced) return;
 
     if (col.isEmpty) {
       navigate('/production_batch_designer_new', { state: { date: col.date } });
@@ -405,12 +446,12 @@ const BatchOutside = () => {
           {gridColumns.map((col, colIndex) => (
             <div
               className={`bo-card ${col.isEmpty ? 'bo-card--empty' : ''} ${
-                col.isHistory ? 'bo-card--history' : ''
+                col.isProduced ? 'bo-card--history' : ''
               }`}
               key={colIndex}
               ref={colIndex === firstCurrentIndex ? firstCurrentCardRef : null}
-              role={col.isHistory ? undefined : 'button'}
-              tabIndex={col.isHistory ? undefined : 0}
+              role={col.isProduced ? undefined : 'button'}
+              tabIndex={col.isProduced ? undefined : 0}
               onClick={() => handleAutoclaveCardClick(col)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -424,7 +465,7 @@ const BatchOutside = () => {
                 {col.weekNumber != null && (
                   <span className="bo-card__week">
                     Week {col.weekNumber}
-                    {col.isHistory ? ' · Archive' : ''}
+                    {col.isProduced ? ' · Produced' : ''}
                   </span>
                 )}
               </div>
