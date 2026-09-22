@@ -138,10 +138,12 @@ function CakeFillUp() {
 
     setActiveBatchId(nextBatchId);
 
+    // номер партии сохраняем в строке плана, по нему партия и восстанавливается
     dispatch(
       updateBatchOutside({
         id: prodPlanEntry.id,
         is_prodused: 1,
+        batch_id: nextBatchId,
       })
     );
   };
@@ -166,6 +168,14 @@ function CakeFillUp() {
       return;
     }
 
+    if (batchInProduce.batch_id != null) {
+      setActiveBatchId(Number(batchInProduce.batch_id));
+      return;
+    }
+
+    // Ниже — прежний подбор партии для строк, открытых до появления
+    // BatchOutsides.batch_id. Он угадывает партию по заказу или продукту и
+    // может подхватить уже закрытую партию, поэтому для новых строк не нужен.
     const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
     const consumptions = Array.isArray(raw_mat_consumption)
       ? raw_mat_consumption
