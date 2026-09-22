@@ -16,7 +16,9 @@ import {
 } from 'date-fns';
 import { useSelector } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
+import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
+import { computeQuantityArrays } from '#components/ProductionBatchDesigner/autoclaveScheduleUtils.js';
 import RawMaterialsPlan from '#components/RawMaterialsPlan/RawMaterialsPlan.jsx';
 import RecipeInfoModal from '#components/Recipe/RecipeInfoModal.jsx';
 
@@ -34,6 +36,7 @@ export default function TechnologyCalendar() {
   const recipeOrders = useSelector((state) => state.recipeOrders);
   const lotesListBatches = useSelector((state) => state.lotesListBatches);
   const { list_of_recipes } = useRecipeContext();
+  const { latestProducts } = useProductsContext();
 
   const today = new Date();
 
@@ -361,7 +364,7 @@ export default function TechnologyCalendar() {
                         {batch.product_article}
                       </div>
                       <div style={styles.batchQty}>
-                        {batch.quantity_pallets} pallets
+                        {computeQuantityArrays(batch, latestProducts)} cakes
                       </div>
                     </div>
                     {recipe ? (
