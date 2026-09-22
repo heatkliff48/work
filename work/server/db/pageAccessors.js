@@ -29,6 +29,15 @@ const PAGE_ACCESSORS = [
 const select = (queryInterface, sql, options = {}) =>
   queryInterface.sequelize.query(sql, { type: QueryTypes.SELECT, ...options });
 
+// Если строки вставлялись с явными id (восстановление из дампа, ручной INSERT),
+// последовательность отстаёт от MAX(id) и вставка падает на
+// «Key (id)=(…) already exists». Ставим следующий id сразу после MAX(id).
+const syncIdSequence = (queryInterface, table, transaction) =>
+  queryInterface.sequelize.query(
+    `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), COALESCE(MAX(id), 0) + 1, false) FROM "${table}"`,
+    { transaction }
+  );
+
 // Добавляет недостающие аксессоры и раздаёт по ним права ролям.
 // Уже существующие аксессоры не трогает, поэтому повторный запуск безопасен.
 async function addPageAccessors(queryInterface, transaction) {
@@ -41,6 +50,7 @@ async function addPageAccessors(queryInterface, transaction) {
   const missing = PAGE_ACCESSORS.filter((a) => !existing.has(a.page_name));
   if (!missing.length) return;
 
+  await syncIdSequence(queryInterface, 'Pages', transaction);
   await queryInterface.bulkInsert(
     'Pages',
     missing.map(({ page_name }) => ({
@@ -89,6 +99,7 @@ async function addPageAccessors(queryInterface, transaction) {
   }
 
   if (rows.length) {
+    await syncIdSequence(queryInterface, 'PageAndRoles', transaction);
     await queryInterface.bulkInsert('PageAndRoles', rows, { transaction });
   }
 }
