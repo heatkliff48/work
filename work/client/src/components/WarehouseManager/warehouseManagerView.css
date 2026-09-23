@@ -358,6 +358,23 @@
 .wm-builder-table__addrow:hover {
   background: #fdf1f1;
 }
+.wm-builder-table__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--wm-border-2);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--wm-muted);
+  cursor: pointer;
+}
+.wm-builder-table__remove:hover {
+  border-color: var(--wm-red);
+  background: var(--wm-red-soft);
+  color: var(--wm-red);
+}
 
 /* ---------- product allocation table (WMOCTProduct) ---------- */
 .wm-prod-card {

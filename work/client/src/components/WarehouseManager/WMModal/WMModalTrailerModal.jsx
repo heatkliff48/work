@@ -5,6 +5,7 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { addNewWarehouseManagerTrailer } from '#components/redux/actions/warehouseAction.js';
 import { useCallback, useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
+import { FaTimes } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import '../warehouseManagerView.css';
@@ -169,8 +170,9 @@ function WMModalTrailerModal({ trailer_order }) {
   };
 
   const addTrailerRow = () => {
+    const maxTrailer = trailers.reduce((max, t) => Math.max(max, t.trailer), 0);
     const newRow = {
-      trailer: trailers.length + 1,
+      trailer: maxTrailer + 1,
       fecha: '',
       products: Object.fromEntries(
         trailer_order.map((product) => [getProductKey(product), '']),
@@ -180,6 +182,23 @@ function WMModalTrailerModal({ trailer_order }) {
       isExisting: false,
     };
     setTrailers((prev) => [...prev, newRow]);
+  };
+
+  const removeTrailerRow = (rowIndex) => {
+    setTrailers((prev) => {
+      if (prev[rowIndex]?.isExisting) return prev;
+
+      const rest = prev.filter((_, i) => i !== rowIndex);
+      const maxExisting = rest
+        .filter((row) => row.isExisting)
+        .reduce((max, row) => Math.max(max, row.trailer), 0);
+
+      // keep new trailer numbers contiguous after the saved ones
+      let next = maxExisting;
+      return rest.map((row) =>
+        row.isExisting ? row : { ...row, trailer: ++next },
+      );
+    });
   };
 
   const getProductTotal = (productKey) => {
@@ -325,6 +344,7 @@ function WMModalTrailerModal({ trailer_order }) {
               {trailer_order.map((product) => (
                 <th key={getProductKey(product)}>{product.title}</th>
               ))}
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -367,11 +387,23 @@ function WMModalTrailerModal({ trailer_order }) {
                     )}
                   </td>
                 ))}
+                <td>
+                  {!row.isExisting && (
+                    <button
+                      type="button"
+                      className="wm-builder-table__remove"
+                      title="Remove trailer"
+                      onClick={() => removeTrailerRow(rowIndex)}
+                    >
+                      <FaTimes />
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
             <tr>
               <td
-                colSpan={2 + trailer_order.length}
+                colSpan={3 + trailer_order.length}
                 className="wm-builder-table__addrow"
                 onClick={addTrailerRow}
               >
