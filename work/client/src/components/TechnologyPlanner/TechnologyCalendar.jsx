@@ -6,7 +6,6 @@ import {
   endOfMonth,
   endOfWeek,
   format,
-  isBefore,
   isSameMonth,
   isToday,
   parseISO,
@@ -37,8 +36,6 @@ export default function TechnologyCalendar() {
   const lotesListBatches = useSelector((state) => state.lotesListBatches);
   const { list_of_recipes } = useRecipeContext();
   const { latestProducts } = useProductsContext();
-
-  const today = new Date();
 
   const monthLabel = useMemo(
     () => format(currentMonth, 'LLLL yyyy'),
@@ -95,12 +92,23 @@ export default function TechnologyCalendar() {
     return map;
   }, [batchesByDate, recipeOrders]);
 
+  // Finishing a batch in Casting deletes its batch_outside row, and its
+  // lotes_list records keep the planned date as production_date — so a day can
+  // hold both planned and casted batches whether it is past or not. A batch
+  // that is still being cast keeps its batch_outside row, so its lotes are
+  // skipped here rather than counted on both sides.
   const producedBatchesByDate = useMemo(() => {
     const map = new Map();
     if (!Array.isArray(lotesListBatches)) return map;
+    const castingBatchIds = new Set(
+      (Array.isArray(batchOutside) ? batchOutside : [])
+        .filter((item) => item?.batch_id != null)
+        .map((item) => String(item.batch_id)),
+    );
     lotesListBatches.forEach((item) => {
       const iso = String(item?.production_date ?? '').slice(0, 10);
       if (!iso || item?.batch_id == null) return;
+      if (castingBatchIds.has(String(item.batch_id))) return;
       if (!map.has(iso)) map.set(iso, new Map());
       const dayMap = map.get(iso);
       const key = String(item.batch_id);
@@ -122,13 +130,7 @@ export default function TechnologyCalendar() {
         existing.cake_id_finish - existing.cake_id_start + 1;
     });
     return map;
-  }, [lotesListBatches]);
-
-  const isDatePast = (date) => isBefore(date, today) && !isToday(date);
-
-  const selectedDateIsPast = selectedDate
-    ? isDatePast(parseISO(selectedDate))
-    : false;
+  }, [lotesListBatches, batchOutside]);
 
   const selectedDayBatches = selectedDate
     ? batchesByDate.get(selectedDate) || []
@@ -224,7 +226,6 @@ export default function TechnologyCalendar() {
           const iso = format(day, 'yyyy-MM-dd');
           const inMonth = isSameMonth(day, currentMonth);
           const isWeekend = [0, 6].includes(day.getDay());
-          const isPastDay = isDatePast(day);
           const { recipesSet = 0, recipesUndefined = 0 } =
             recipeStatsByDate.get(iso) || {};
           const producedCount = producedBatchesByDate.get(iso)?.size || 0;
@@ -255,34 +256,27 @@ export default function TechnologyCalendar() {
               </div>
 
               <div style={styles.tileBody}>
-                {isPastDay
-                  ? producedCount > 0 && (
-                      <span style={styles.badgeRow}>
-                        <span style={{ ...styles.dot, ...styles.dotProduced }} />
-                        <span style={styles.badgeCount}>{producedCount}</span>{' '}
-                        casted
-                      </span>
-                    )
-                  : (recipesSet > 0 || recipesUndefined > 0) && (
-                      <>
-                        {recipesSet > 0 && (
-                          <span style={styles.badgeRow}>
-                            <span style={{ ...styles.dot, ...styles.dotOk }} />
-                            <span style={styles.badgeCount}>{recipesSet}</span>{' '}
-                            recepies set
-                          </span>
-                        )}
-                        {recipesUndefined > 0 && (
-                          <span style={styles.badgeRow}>
-                            <span style={{ ...styles.dot, ...styles.dotWarn }} />
-                            <span style={styles.badgeCount}>
-                              {recipesUndefined}
-                            </span>{' '}
-                            recepies undefined
-                          </span>
-                        )}
-                      </>
-                    )}
+                {recipesSet > 0 && (
+                  <span style={styles.badgeRow}>
+                    <span style={{ ...styles.dot, ...styles.dotOk }} />
+                    <span style={styles.badgeCount}>{recipesSet}</span>{' '}
+                    recepies set
+                  </span>
+                )}
+                {recipesUndefined > 0 && (
+                  <span style={styles.badgeRow}>
+                    <span style={{ ...styles.dot, ...styles.dotWarn }} />
+                    <span style={styles.badgeCount}>{recipesUndefined}</span>{' '}
+                    recepies undefined
+                  </span>
+                )}
+                {producedCount > 0 && (
+                  <span style={styles.badgeRow}>
+                    <span style={{ ...styles.dot, ...styles.dotProduced }} />
+                    <span style={styles.badgeCount}>{producedCount}</span>{' '}
+                    casted
+                  </span>
+                )}
               </div>
             </button>
           );
@@ -311,50 +305,16 @@ export default function TechnologyCalendar() {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {selectedDateIsPast ? (
-            <>
-              {selectedDayProducedBatches.length === 0 && (
-                <div style={styles.emptyState}>
-                  No batches were poured on this date.
-                </div>
-              )}
+          {selectedDayBatches.length === 0 &&
+            selectedDayProducedBatches.length === 0 && (
+              <div style={styles.emptyState}>
+                No batches for this date.
+              </div>
+            )}
 
-              {selectedDayProducedBatches.map((batch) => {
-                const recipe = getRecipeByArticle(batch.recipe);
-                return (
-                  <div key={batch.batch_id} style={styles.batchRow}>
-                    <div>
-                      <div style={styles.batchProduct}>{batch.product}</div>
-                      <div style={styles.batchQty}>
-                        {batch.quantity_cakes} cakes
-                      </div>
-                    </div>
-                    {recipe ? (
-                      <button
-                        type="button"
-                        className="tc-recipe-view-btn"
-                        style={styles.recipeBadgeOkBtn}
-                        onClick={() => handleRecipeClick(recipe)}
-                      >
-                        Recipe: {batch.recipe}
-                      </button>
-                    ) : (
-                      <span style={styles.recipeBadgeOk}>
-                        Recipe: {batch.recipe}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </>
-          ) : (
+          {selectedDayBatches.length > 0 && (
             <>
-              {selectedDayBatches.length === 0 && (
-                <div style={styles.emptyState}>
-                  No batches are planned for this date.
-                </div>
-              )}
-
+              <div style={styles.sectionTitle}>Planned</div>
               {selectedDayBatches.map((batch) => {
                 const recipe = getRecipeForBatch(batch);
                 return (
@@ -385,6 +345,39 @@ export default function TechnologyCalendar() {
                       >
                         Select recipe
                       </button>
+                    )}
+                  </div>
+                );
+              })}
+            </>
+          )}
+
+          {selectedDayProducedBatches.length > 0 && (
+            <>
+              <div style={styles.sectionTitle}>Casted</div>
+              {selectedDayProducedBatches.map((batch) => {
+                const recipe = getRecipeByArticle(batch.recipe);
+                return (
+                  <div key={batch.batch_id} style={styles.batchRow}>
+                    <div>
+                      <div style={styles.batchProduct}>{batch.product}</div>
+                      <div style={styles.batchQty}>
+                        {batch.quantity_cakes} cakes
+                      </div>
+                    </div>
+                    {recipe ? (
+                      <button
+                        type="button"
+                        className="tc-recipe-view-btn"
+                        style={styles.recipeBadgeOkBtn}
+                        onClick={() => handleRecipeClick(recipe)}
+                      >
+                        Recipe: {batch.recipe}
+                      </button>
+                    ) : (
+                      <span style={styles.recipeBadgeOk}>
+                        Recipe: {batch.recipe}
+                      </span>
                     )}
                   </div>
                 );
@@ -612,6 +605,14 @@ const styles = {
     textAlign: 'center',
     padding: '12px 0',
     fontSize: 14,
+  },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+    color: '#94a3b8',
+    marginTop: 8,
   },
   batchRow: {
     display: 'flex',
