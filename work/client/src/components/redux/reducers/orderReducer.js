@@ -1,5 +1,6 @@
 import { ORDERS_LIST } from '../types/ordersTypes';
 import {
+  ACCOUNTING_APPROVED_SOCKET,
   CHILD_ORDER_SOCKET,
   DATASHIP_ORDER_SOCKET,
   DELETE_ORDER_SOCKET,
@@ -146,6 +147,14 @@ export const ordersReducer = (orders = [], action) => {
       const { payment_method, order_id } = payload;
       return orders.map((order) => {
         if (order.id === order_id) return { ...order, payment_method };
+        return order;
+      });
+    }
+
+    case ACCOUNTING_APPROVED_SOCKET: {
+      const { accounting_approved, order_id } = payload;
+      return orders.map((order) => {
+        if (order.id === order_id) return { ...order, accounting_approved };
         return order;
       });
     }

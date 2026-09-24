@@ -3,7 +3,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { updAccountingDataList } from '#components/redux/actions/ordersAction.js';
+import { updateAccountingApproved } from '#components/redux/actions/ordersAction.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
@@ -271,9 +271,9 @@ const AccountngOrderCard = React.memo(() => {
     }
 
     dispatch(
-      updAccountingDataList({
-        orders_article: orderCartData?.article,
-        aproved: true,
+      updateAccountingApproved({
+        order_id: orderCartData?.id,
+        accounting_approved: true,
       }),
     );
     setStoredData(null);

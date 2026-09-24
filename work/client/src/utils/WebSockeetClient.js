@@ -4,7 +4,15 @@ class WebSocketClient {
     this.socketOnMessageFunc = socketOnMessageFunc;
     this.socket = null;
     this.reconnectInterval = 1000; // Начальный интервал повторного соединения (1 секунда)
+    this.reconnectTimer = null;
+    this.isClosed = false; // true после close(): повторное подключение не выполняется
     this.connect(); // Инициализация соединения при создании экземпляра
+  }
+
+  close() {
+    this.isClosed = true;
+    clearTimeout(this.reconnectTimer);
+    this.socket?.close();
   }
 
   connect() {
@@ -22,6 +30,7 @@ class WebSocketClient {
 
     this.socket.onclose = (event) => {
       console.log("WebSocket connection closed:", event);
+      if (this.isClosed) return;
       this.reconnect(); // Запуск механизма повторного подключения
     };
 
@@ -36,7 +45,7 @@ class WebSocketClient {
     console.log(
       `Attempting to reconnect in ${this.reconnectInterval / 1000} seconds...`
     );
-    setTimeout(() => {
+    this.reconnectTimer = setTimeout(() => {
       this.connect(); // Пытаемся снова подключиться
       this.reconnectInterval = Math.min(this.reconnectInterval * 2, 30000); // Максимум 30 секунд
     }, this.reconnectInterval);

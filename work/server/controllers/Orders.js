@@ -30,6 +30,7 @@ const {
   GET_DELETE_ORDER_SOCKET,
   ADD_CHILD_ORDER_SOCKET,
   UPDATE_PAYMENT_METHOD_SOCKET,
+  UPDATE_ACCOUNTING_APPROVED_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -561,12 +562,16 @@ class OrdersController {
     const { status, order_id } = req.body;
 
     try {
-      await OrdersService.getUpdateStatusOrder({
+      const accountingReset = await OrdersService.getUpdateStatusOrder({
         status,
         order_id,
       });
 
       myEmitter.emit(UPDATE_STATUS_OF_ORDER_SOCKET, { status, order_id });
+
+      if (accountingReset) {
+        myEmitter.emit(UPDATE_ACCOUNTING_APPROVED_SOCKET, accountingReset);
+      }
 
       return res.json({ status, order_id }).status(200);
     } catch (err) {
@@ -609,6 +614,23 @@ class OrdersController {
       });
 
       return res.json({ payment_method, order_id }).status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async updateAccountingApprovedOrder(req, res) {
+    const { order_id, accounting_approved } = req.body;
+
+    try {
+      const approval = await OrdersService.updateAccountingApprovedOrder({
+        order_id,
+        accounting_approved,
+      });
+
+      myEmitter.emit(UPDATE_ACCOUNTING_APPROVED_SOCKET, approval);
+
+      return res.status(200).json(approval);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

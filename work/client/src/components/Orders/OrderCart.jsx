@@ -18,7 +18,6 @@ import {
   delSecondaryContact,
   getDeleteProductOfOrder,
   getDeleteRelMatProductOfOrder,
-  updAccountingDataList,
   updateOrderInCharge,
   updateOrderStatus,
   updatePayment,
@@ -886,14 +885,6 @@ const OrderCart = React.memo(() => {
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
 
-    if (status.accessor == 7 || status.accessor == 9) {
-      dispatch(
-        updAccountingDataList({
-          orders_article: orderCartData?.article,
-          aproved: false,
-        })
-      );
-    }
     if (status.accessor == 10) {
       dispatch(deleteAccountingData(orderCartData?.article));
     }

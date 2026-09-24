@@ -48,6 +48,11 @@ module.exports = (sequelize, DataTypes) => {
       region: DataTypes.STRING,
       payment_method: DataTypes.STRING,
       otros: DataTypes.TEXT,
+      accounting_approved: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       sequelize,

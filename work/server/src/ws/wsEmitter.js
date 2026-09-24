@@ -171,6 +171,7 @@ const {
   DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   UPDATE_PAYMENT_METHOD_SOCKET,
+  UPDATE_ACCOUNTING_APPROVED_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -415,6 +416,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_PAYMENT_METHOD_SOCKET,
           payload: payment_method,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_ACCOUNTING_APPROVED_SOCKET, (approval) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_ACCOUNTING_APPROVED_SOCKET,
+          payload: approval,
         }),
       );
     }

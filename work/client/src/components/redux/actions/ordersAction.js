@@ -12,7 +12,6 @@ import {
   UPDATE_STATUS_OF_ORDER,
   GET_PRODUCTS_OF_ORDER,
   UPDATE_PERSON_IN_CHARGE_OF_ORDER,
-  UPD_ACCOUTING_DATA_LIST,
   ADD_ACCOUTING_DATA_LIST,
   DELETE_ACCOUTING_DATA_LIST,
   CLEAR_ACCOUTING_DATA_LIST,
@@ -39,6 +38,7 @@ import {
   ADD_RANDOM_PRODUCTS_OF_ORDER,
   ADD_CHILD_ORDER,
   UPDATE_PAYMENT_METHOD,
+  UPDATE_ACCOUNTING_APPROVED,
 } from '../types/ordersTypes';
 
 export const getOrders = () => {
@@ -282,6 +282,13 @@ export const updatePayment = (payment_method) => {
   };
 };
 
+export const updateAccountingApproved = ({ order_id, accounting_approved }) => {
+  return {
+    type: UPDATE_ACCOUNTING_APPROVED,
+    payload: { order_id, accounting_approved },
+  };
+};
+
 export const clearAccountingDataList = () => {
   return {
     type: CLEAR_ACCOUTING_DATA_LIST,
@@ -292,13 +299,6 @@ export const addAccountingDataList = (accountingDataList) => {
   return {
     type: ADD_ACCOUTING_DATA_LIST,
     payload: accountingDataList,
-  };
-};
-
-export const updAccountingDataList = (article) => {
-  return {
-    type: UPD_ACCOUTING_DATA_LIST,
-    payload: article,
   };
 };
 

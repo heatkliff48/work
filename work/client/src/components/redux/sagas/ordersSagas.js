@@ -1,4 +1,4 @@
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { put, call, takeLatest, takeEvery } from 'redux-saga/effects';
 import axios from 'axios';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
@@ -75,6 +75,7 @@ import {
   ADD_CHILD_ORDER,
   PAYMENT_METHOD,
   UPDATE_PAYMENT_METHOD,
+  UPDATE_ACCOUNTING_APPROVED,
 } from '../types/ordersTypes';
 
 import { getApiUrl } from '#utils/getApiUrl.js';
@@ -483,6 +484,18 @@ const updateInChargeOfOrder = (orderInCharge) => {
 const updatePayment = (payment_method) => {
   return url
     .post('/orders/update/payment_method', payment_method)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updateAccountingApproved = (approval) => {
+  return url
+    .post('/orders/update/accounting_approved', approval)
     .then((res) => {
       return res.data;
     })
@@ -940,6 +953,21 @@ function* updatePaymentWorker(action) {
   }
 }
 
+function* updateAccountingApprovedWorker(action) {
+  try {
+    const { article, accounting_approved } = yield call(
+      updateAccountingApproved,
+      action.payload,
+    );
+    showMessage(
+      `Accounting data for order ${article} has been ${
+        accounting_approved ? 'approved' : 'unapproved'
+      }`,
+      accounting_approved ? 'success' : 'info',
+    );
+  } catch (err) {}
+}
+
 function* addOrderRandomProductsWorker(action) {
   try {
     const { payload } = action;
@@ -1050,6 +1078,7 @@ function* ordersWatcher() {
     updateInChargeOfOrderWorker,
   );
   yield takeLatest(UPDATE_PAYMENT_METHOD, updatePaymentWorker);
+  yield takeEvery(UPDATE_ACCOUNTING_APPROVED, updateAccountingApprovedWorker);
   yield takeLatest(ADD_RANDOM_PRODUCTS_OF_ORDER, addOrderRandomProductsWorker);
   yield takeLatest(ADD_CHILD_ORDER, addChildOrderWatcher);
 }
