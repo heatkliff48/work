@@ -9,6 +9,17 @@ import { FaCheck, FaTimes } from 'react-icons/fa';
 
 const ProductsContext = createContext();
 
+// "BAUBLOCK® TERMECO 36.5 Medidas 600x365x250 mm ..." -> "TERMECO 36.5"
+export const extractProductTitle = (value = '') => {
+  if (!value) return '';
+
+  return String(value)
+    .replace(/BAUBLOCK®/gi, '')
+    .replace(/\s*Medidas[\s\S]*$/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 export const ProductsContextProvider = ({ children }) => {
   const products = useSelector((state) => state.products);
 
@@ -459,16 +470,6 @@ export const ProductsContextProvider = ({ children }) => {
     );
 
     return matchedOption ? matchedOption.value : null;
-  };
-
-  const extractProductTitle = (value = '') => {
-    if (!value) return '';
-
-    return String(value)
-      .replace(/BAUBLOCK®/gi, '')
-      .replace(/\s*Medidas[\s\S]*$/i, '')
-      .replace(/\s+/g, ' ')
-      .trim();
   };
 
   return (
