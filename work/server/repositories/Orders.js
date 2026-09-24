@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const {
   Orders,
   OrdersProducts,
@@ -84,11 +85,13 @@ class OrdersRepository {
     }
   }
 
-  static async addDescriptionOrder({ order_id, description }) {
+  // Сохраняет description и/или otros — обновляется только переданное поле
+  static async addDescriptionOrder({ order_id, description, otros }) {
     try {
       await Orders.update(
         {
-          description,
+          ...(description !== undefined && { description }),
+          ...(otros !== undefined && { otros }),
         },
         { where: { id: order_id } },
       );
@@ -1072,6 +1075,17 @@ class OrdersRepository {
     }
   }
 
+  // Updates status and resets accounting approval in one query.
+  // Returns undefined when the order already has this status (nothing is reset).
+  static async updateStatusAndResetAccountingApproved({ order_id, status }) {
+    const [, [order]] = await Orders.update(
+      { status, accounting_approved: false },
+      { where: { id: order_id, status: { [Op.ne]: status } }, returning: true },
+    );
+
+    return order;
+  }
+
   static async getUpdateInChargeOrder({ order_id, person_in_charge }) {
     try {
       await Orders.update({ person_in_charge }, { where: { id: order_id } });
@@ -1096,6 +1110,15 @@ class OrdersRepository {
       );
       return error;
     }
+  }
+
+  static async updateAccountingApprovedOrder({ order_id, accounting_approved }) {
+    const [, [order]] = await Orders.update(
+      { accounting_approved },
+      { where: { id: order_id }, returning: true },
+    );
+
+    return order;
   }
 
   static async getDeleteOrder({ order_id }) {
@@ -1130,6 +1153,7 @@ class OrdersRepository {
     delivery_m2,
     region,
     payment_method,
+    otros,
   }) {
     try {
       const childOrder = await Orders.create({
@@ -1145,6 +1169,7 @@ class OrdersRepository {
         delivery_m2,
         region,
         payment_method,
+        otros,
       });
 
       const order_id = childOrder.id;

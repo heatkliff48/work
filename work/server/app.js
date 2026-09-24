@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const WebSocket = require('ws');
+const { randomUUID } = require('crypto');
 const http = require('http');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -188,10 +189,12 @@ registerWsEmitter(map);
 wss.on('connection', function (ws, request) {
   const userId = request.session.user.id;
   console.log('>>>>>>>>>>>>>>>>>>request.session.user', request.session.user);
-  map.set(userId, ws);
+  // Keyed by connection, not by user: the same user may have several tabs open.
+  const connectionId = `${userId}:${randomUUID()}`;
+  map.set(connectionId, ws);
 
   ws.on('close', function () {
-    map.delete(userId);
+    map.delete(connectionId);
   });
 });
 

@@ -159,6 +159,7 @@ import {
   deleteWarehouseManagerTrailerSocket,
   newStatusWarehouseManagerTrailerSocket,
   updPaymentMethodOrderSocket,
+  updAccountingApprovedOrderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -363,6 +364,7 @@ import {
   DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   UPDATE_PAYMENT_METHOD_SOCKET,
+  UPDATE_ACCOUNTING_APPROVED_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -523,6 +525,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_PAYMENT_METHOD_SOCKET:
       dispatch(updPaymentMethodOrderSocket(payload));
+      break;
+
+    case UPDATE_ACCOUNTING_APPROVED_SOCKET:
+      dispatch(updAccountingApprovedOrderSocket(payload));
       break;
 
     case ADD_NEW_WAREHOUSE_SOCKET:

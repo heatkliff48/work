@@ -20,6 +20,7 @@ import {
   computeQuantityArrays,
   getBatchOutsideRowsForDate,
   getFilledAutoclaveCountForDate,
+  getProducedAutoclaveCountForDate,
 } from './autoclaveScheduleUtils';
 import {
   computeListOfOrderedCakes,
@@ -118,13 +119,28 @@ function ProductionBatchDesignerNew() {
 
     const today = new Date().toISOString().slice(0, 10);
 
+    // produced_autoclave cannot be used here: the designer bumps it when a plan is
+    // saved, while Casting overwrites it with what was actually produced. Count the
+    // two sides separately instead — autoclaves already cast (gone from batchOutside)
+    // plus autoclaves already planned (still in batchOutside).
     const nearest = autoclaveCalendarData
-      .map((x) => ({
-        ...x,
-        qty: Number(x.scheduled_autoclaves ?? 0),
-        done: Number(x.produced_autoclave ?? 0),
-      }))
-      .map((x) => ({ ...x, value: x.qty - x.done }))
+      .map((x) => {
+        const iso = String(x.date).slice(0, 10);
+        const used =
+          getProducedAutoclaveCountForDate(
+            autoclaveCalendarData,
+            iso,
+            CELLS_PER_AUTOCLAVE,
+          ) +
+          getFilledAutoclaveCountForDate(
+            batchOutsideRedux,
+            latestProducts,
+            iso,
+            CELLS_PER_AUTOCLAVE,
+          );
+
+        return { ...x, value: Number(x.scheduled_autoclaves ?? 0) - used };
+      })
       .filter(
         (x) => x.value > 0 && typeof x.date === 'string' && x.date >= today,
       )
@@ -137,7 +153,13 @@ function ProductionBatchDesignerNew() {
       setAutoclaveCount(0);
       setAutoclaveCalendarData(null);
     }
-  }, [targetDate, autoclaveCalendarData]);
+  }, [
+    targetDate,
+    autoclaveCalendarData,
+    batchOutsideRedux,
+    latestProducts,
+    CELLS_PER_AUTOCLAVE,
+  ]);
 
   // Конкретная дата, выбранная в Batch calendar: считаем сколько автоклавов
   // на эту дату ещё пустые (режим заполнения) либо сколько всего карточек
@@ -155,11 +177,19 @@ function ProductionBatchDesignerNew() {
       targetDate,
       CELLS_PER_AUTOCLAVE,
     );
-    const emptyCards = Math.max(0, scheduled - filledCards);
+    // Autoclaves already cast on this date are out of reach: their batchOutside
+    // rows are deleted, so neither filling nor editing may claim their slots.
+    const producedCards = getProducedAutoclaveCountForDate(
+      autoclave_calendar,
+      targetDate,
+      CELLS_PER_AUTOCLAVE,
+    );
+    const editableCards = Math.max(0, scheduled - producedCards);
+    const emptyCards = Math.max(0, editableCards - filledCards);
 
     setIsEditMode(editModeRequested);
     setAutoclaveCount(
-      editModeRequested ? Math.max(filledCards, scheduled) : emptyCards,
+      editModeRequested ? Math.max(filledCards, editableCards) : emptyCards,
     );
 
     if (autoclaveCalendarData?.date !== targetDate) {

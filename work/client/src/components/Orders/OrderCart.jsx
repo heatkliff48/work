@@ -18,7 +18,6 @@ import {
   delSecondaryContact,
   getDeleteProductOfOrder,
   getDeleteRelMatProductOfOrder,
-  updAccountingDataList,
   updateOrderInCharge,
   updateOrderStatus,
   updatePayment,
@@ -57,6 +56,7 @@ import {
 import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 import RelatedMaterialJournalTableOrder from './product_table_order/RelatedMaterialJournalTableOrder.jsx';
 import LiberarModal from './modal/LiberarModal.jsx';
+import RoundPalletsModal from './modal/RoundPalletsModal.jsx';
 import { statusThemeFor } from './ordersCells.jsx';
 
 import '#components/Styles/order-card.css';
@@ -114,6 +114,7 @@ const OrderCart = React.memo(() => {
   const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
   const [dataValue, setDataValue] = useState(new Date());
   const [newDescription, setNewDescription] = useState('');
+  const [newOtros, setNewOtros] = useState('');
   const [formatDataValue, setFormatDataValue] = useState(() =>
     new Date().toLocaleDateString('ru-RU', {
       year: 'numeric',
@@ -122,10 +123,14 @@ const OrderCart = React.memo(() => {
     })
   );
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingOtros, setIsEditingOtros] = useState(false);
   const [isAddSecCont, setIsAddSecCont] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
   const [liberarModalShow, setLiberarModalShow] = useState(false);
+  const [roundPalletsShow, setRoundPalletsShow] = useState(false);
+  // Status the order is on its way to once fractional pallets are squared up.
+  const [pendingStatus, setPendingStatus] = useState(null);
   const [ordersStatus, setOrdersStatus] = useState([]);
   const [orderStatusAccess, setOrderStatusAccess] = useState({
     canRead: true,
@@ -145,9 +150,15 @@ const OrderCart = React.memo(() => {
 
   const PAYMENT_METHOD_OPTIONS = [
     { value: 'prepayment', label: 'Prepago' },
-    { value: 'bank_transfer', label: 'Transferencia bancaria' },
+    { value: 'bank_transfer', label: 'Transferencia bancaria 30 dias' },
     { value: 'promissory_note', label: 'Pagaré' },
-    { value: 'confirming', label: 'Confirming' },
+    { value: 'confirming', label: 'Confirming 30 dias' },
+    { value: 'confirming', label: 'Confirming 45 dias' },
+    { value: 'confirming', label: 'Confirming 60 dias' },
+    { value: 'confirming', label: 'Confirming 90 dias' },
+    { value: 'confirming', label: 'Confirming 120 dias' },
+    { value: 'confirming', label: 'Confirming 180 dias' },
+    { value: 'confirming', label: 'Confirming 210 dias' },
     { value: 'confirming_without_recourse', label: 'Confirming sin recurso' },
   ];
 
@@ -283,6 +294,17 @@ const OrderCart = React.memo(() => {
     setIsEditing(false);
   };
 
+  const onEditOtrosHandler = () => {
+    setNewOtros(orderCartData?.otros);
+    setIsEditingOtros(true);
+  };
+
+  // Otros попадает в PDF (presupuesto) в блок condiciones particulares
+  const onSaveOtros = (str) => {
+    dispatch(addDescription({ order_id: orderCartData.id, otros: str }));
+    setIsEditingOtros(false);
+  };
+
   const addSecondaryContactHandler = () => {
     setIsAddSecCont(true);
   };
@@ -377,8 +399,18 @@ const OrderCart = React.memo(() => {
       const final_price =
         (price_m2_with_delivery * quantity_m2 * (100 - discount)) / 100;
 
+      // Liberar debits this line by area, so quantity_liberated can hold
+      // fractional pallets when a child order shipped the same block in
+      // another package. Showing the m2 equivalent keeps that readable.
+      const quantity_palet = Number(product?.quantity_palet || 0);
+      const quantity_liberated = Number(product?.quantity_liberated || 0);
+      const quantity_liberated_m2 = quantity_palet
+        ? (quantity_liberated * quantity_m2) / quantity_palet
+        : 0;
+
       return {
         ...product,
+        quantity_liberated_m2: Number(quantity_liberated_m2.toFixed(2)),
         price_m2_with_delivery: Number(price_m2_with_delivery.toFixed(2)),
         final_price: Number(final_price.toFixed(2)),
         delivery_m2_share: Number(delivery_m2_share.toFixed(2)),
@@ -497,7 +529,7 @@ const OrderCart = React.memo(() => {
     [status_list]
   );
 
-  const statusChangeHandler = (status) => {
+  const statusChangeHandler = (status, skipPalletCheck = false) => {
     const currentStatusIndex = status_list.findIndex(
       (item) => item.accessor === orderCartData?.status
     );
@@ -523,6 +555,25 @@ const OrderCart = React.memo(() => {
 
     if (status.accessor > statusByAccessor[4].accessor && !hasShippingDate) {
       alert('Please save the shipping date before changing the status.');
+      return;
+    }
+
+    // Liberar debits a line by square meters, so quantity_liberated comes out
+    // fractional whenever a child order shipped the block in another package,
+    // and the pallets left to ship along with it. That has to be squared up
+    // before the order is contracted and goes near production or reserves.
+    if (
+      !skipPalletCheck &&
+      status.accessor === statusByAccessor[5].accessor &&
+      productLists.products.some((product) => {
+        const remaining =
+          (Number(product.quantity_palet) || 0) -
+          (Number(product.quantity_liberated) || 0);
+        return !Number.isInteger(parseFloat(remaining.toFixed(2)));
+      })
+    ) {
+      setPendingStatus(status);
+      setRoundPalletsShow(true);
       return;
     }
 
@@ -834,14 +885,6 @@ const OrderCart = React.memo(() => {
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
 
-    if (status.accessor == 7 || status.accessor == 9) {
-      dispatch(
-        updAccountingDataList({
-          orders_article: orderCartData?.article,
-          aproved: false,
-        })
-      );
-    }
     if (status.accessor == 10) {
       dispatch(deleteAccountingData(orderCartData?.article));
     }
@@ -1053,6 +1096,7 @@ const OrderCart = React.memo(() => {
     setOrderCartData((prev) => ({
       ...prev,
       description: updatedOrderCartData?.description,
+      otros: updatedOrderCartData?.otros,
     }));
   }, [list_of_orders]);
 
@@ -1250,6 +1294,22 @@ const OrderCart = React.memo(() => {
           onSuccess={() => navigate('/orders')}
         />
       )}
+      {roundPalletsShow && (
+        <RoundPalletsModal
+          show={roundPalletsShow}
+          onHide={() => {
+            setRoundPalletsShow(false);
+            setPendingStatus(null);
+          }}
+          orderCartData={orderCartData}
+          blocks={productLists.products}
+          onConfirm={() => {
+            setRoundPalletsShow(false);
+            setPendingStatus(null);
+            if (pendingStatus) statusChangeHandler(pendingStatus, true);
+          }}
+        />
+      )}
       {reserveModalShow && (
         <ListOfOrderedProductionReserveModal
           show={reserveModalShow}
@@ -1380,6 +1440,45 @@ const OrderCart = React.memo(() => {
                       type="button"
                       className="ord-btn ord-btn--primary ord-btn--sm"
                       onClick={() => onSaveDescription(newDescription)}
+                    >
+                      Save
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <div className="ord-tile__label" style={{ marginTop: 16 }}>
+                Otros
+              </div>
+              {orderCartData?.otros && !isEditingOtros ? (
+                <>
+                  <div className="ord-tile__body-text">{orderCartData.otros}</div>
+                  <button
+                    type="button"
+                    className="ord-btn ord-btn--ghost ord-btn--sm"
+                    style={{ marginTop: 10 }}
+                    onClick={onEditOtrosHandler}
+                  >
+                    Edit
+                  </button>
+                </>
+              ) : (
+                <div className="ord-desc-edit">
+                  <textarea
+                    placeholder="Enter otros..."
+                    value={newOtros}
+                    disabled={
+                      !checkUserAccess(user, roles, 'orders_description_edit')
+                        ?.canWrite
+                    }
+                    onChange={(e) => setNewOtros(e.target.value)}
+                  />
+                  {checkUserAccess(user, roles, 'orders_description_edit')
+                    ?.canWrite && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--primary ord-btn--sm"
+                      onClick={() => onSaveOtros(newOtros)}
                     >
                       Save
                     </button>

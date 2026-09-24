@@ -1,5 +1,6 @@
 import { ORDERS_LIST } from '../types/ordersTypes';
 import {
+  ACCOUNTING_APPROVED_SOCKET,
   CHILD_ORDER_SOCKET,
   DATASHIP_ORDER_SOCKET,
   DELETE_ORDER_SOCKET,
@@ -62,11 +63,16 @@ export const ordersReducer = (orders = [], action) => {
     }
 
     case DESCRIPTIOM_ORDER_SOCKET: {
-      const { order_id, description } = payload;
+      // Приходит либо description, либо otros — второе поле не затираем
+      const { order_id, description, otros } = payload;
 
       const result = orders.map((order) => {
         if (order.id === order_id) {
-          return { ...order, description };
+          return {
+            ...order,
+            ...(description !== undefined && { description }),
+            ...(otros !== undefined && { otros }),
+          };
         }
         return order;
       });
@@ -141,6 +147,14 @@ export const ordersReducer = (orders = [], action) => {
       const { payment_method, order_id } = payload;
       return orders.map((order) => {
         if (order.id === order_id) return { ...order, payment_method };
+        return order;
+      });
+    }
+
+    case ACCOUNTING_APPROVED_SOCKET: {
+      const { accounting_approved, order_id } = payload;
+      return orders.map((order) => {
+        if (order.id === order_id) return { ...order, accounting_approved };
         return order;
       });
     }

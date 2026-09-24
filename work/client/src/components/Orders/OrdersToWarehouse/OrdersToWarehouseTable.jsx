@@ -99,7 +99,7 @@ function OrdersToWarehouseTable() {
 
   useEffect(() => {
     if (user && roles.length > 0) {
-      const access = checkUserAccess(user, roles, 'Orders');
+      const access = checkUserAccess(user, roles, 'orders_to_warehouse');
       setUserAccess(access);
 
       if (!access?.canRead) {

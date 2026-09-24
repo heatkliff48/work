@@ -12,36 +12,19 @@ export const rolesReducer = (roles = [], action) => {
     }
 
     case UPDATE_ROLE_SOCKET: {
-      if (!payload || payload.length === 0) return roles;
-      const targetRoleId = payload[0]?.role_id;
-
-      if (!targetRoleId) return roles;
-
-      const updRole = roles.map((role) => {
-        if (role.id === targetRoleId) {
-          return {
-            ...role,
-            PageAndRolesArray: payload.map((p) => ({
-              id: p.page_id,
-              PageAndRoles: {
-                page_id: p.page_id,
-                role_id: p.role_id,
-                read: p.read,
-                write: p.write,
-                createdAt: p.createdAt,
-                updatedAt: p.updatedAt,
-              },
-            })),
-          };
-        }
-        return role;
-      });
-
-      return updRole;
+      // сервер присылает роль целиком, вместе с PageAndRolesArray
+      if (!payload?.id) return roles;
+      return roles.map((role) => (role.id === payload.id ? payload : role));
     }
 
     case UPDATE_ROLE_ACTIVE_SOCKET: {
-      return payload;
+      // здесь приходят роли без PageAndRolesArray — берём из них только флаг,
+      // иначе у всех пропадут права на страницы
+      if (!Array.isArray(payload)) return roles;
+      return roles.map((role) => {
+        const updRole = payload.find((el) => el?.id === role.id);
+        return updRole ? { ...role, isActive: updRole.isActive } : role;
+      });
     }
 
     default:

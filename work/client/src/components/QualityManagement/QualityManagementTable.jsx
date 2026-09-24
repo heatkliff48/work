@@ -1,9 +1,8 @@
 import Table from '#components/Table/Table';
-import Button from 'react-bootstrap/Button';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ShowQualityManagementAddModal from './QualityManagementAddModal';
 import {
@@ -28,9 +27,40 @@ import {
 } from '#components/redux/actions/recipeAction.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
-import { Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import ModalTable from './ModalTable';
+import '#components/Clients/ClientsInfo/clientsDrawer.css';
+import '#components/Styles/table.css';
+import './qualityManagement.css';
+
+// Ячейки таблицы. Объявлены на уровне модуля: react-table рендерит Cell как
+// <Cell />, и функция, созданная внутри компонента, пересоздавала бы input
+// на каждое нажатие клавиши — фокус терялся бы.
+const BatchIdCell = ({ value }) =>
+  value === null || value === undefined || value === '' ? (
+    <span className="cl-muted">—</span>
+  ) : (
+    <span className="qm-chip cl-mono">{value}</span>
+  );
+
+const QtyInputCell = ({ row, column }) => {
+  const { id, product_article } = row.original;
+
+  return (
+    <input
+      className="qm-input qm-input--cell"
+      id={`${column.inputIdPrefix}-${id}`}
+      aria-label={`${column.Header} — ${product_article}`}
+      type="number"
+      min="0"
+      step="1"
+      value={column.inputValues[id]?.[column.inputKey] || ''}
+      onChange={(e) => column.onInputChange(id, e)}
+      onClick={(e) => e.stopPropagation()}
+      placeholder="0"
+    />
+  );
+};
 
 const QualityManagementTable = () => {
   const { userAccess } = useUsersContext();
@@ -64,54 +94,8 @@ const QualityManagementTable = () => {
   const [inputValues, setInputValues] = useState({});
   const [batchID, setBatchID] = useState(null);
 
-  const COLUMNS_QUALITY_MANAGEMENT = [
-    // {
-    //   Header: 'Batch ID',
-    //   accessor: 'batch_id',
-    //   Filter: TextSearchFilter,
-    // },
-    {
-      Header: 'Product article',
-      accessor: 'product_article',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Date',
-      accessor: 'date',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Total pallets in batch, plan, qty',
-      accessor: 'total_quantity_plan',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Free pallets in batch, fact, qty',
-      accessor: 'free_quantity_fact',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Pallets on sorting, qty',
-      accessor: 'sorting',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Reserved pallets in batch, allocated, qty',
-      accessor: 'reserved_quantity_allocated',
-      Filter: TextSearchFilter,
-    },
-    {
-      Header: 'Required pallets, qty',
-      accessor: 'reserved_quantity',
-      Filter: TextSearchFilter,
-    },
-
-    {
-      Header: 'Reserved pallets in batch, remaining, qty',
-      accessor: 'reserved_quantity_remaining',
-      Filter: TextSearchFilter,
-    },
-  ];
+  // Только отображение: 'cards' | 'list'. На данные не влияет.
+  const [mode, setMode] = useState('cards');
 
   const addProductHandler = (prod_data) => {
     const { article } = prod_data;
@@ -627,105 +611,331 @@ const QualityManagementTable = () => {
     }
   };
 
+
+  // ===== Ниже — только представление. Данные и обработчики не меняются. =====
+
+  const hasBatches = qualityManagementDataList.length > 0;
+  const showAddBatchModal =
+    !qualityManagementData || qualityManagementData.length === 0;
+
+  // Номер партии — тот же, что уходит на склад в processSingleBatch
+  const getBatchNumber = (record) => record.raw_mat_cons_batch_id ?? batchID;
+
+  const COLUMNS_QUALITY_MANAGEMENT = [
+    {
+      Header: 'Batch ID',
+      id: 'batch_number',
+      accessor: (record) => getBatchNumber(record),
+      Cell: BatchIdCell,
+    },
+    {
+      Header: 'Product article',
+      accessor: 'product_article',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Date',
+      accessor: 'date',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Total pallets in batch, plan, qty',
+      accessor: 'total_quantity_plan',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: 'Total qty in batch, fact, pallets',
+      id: 'total_qty_fact_input',
+      Cell: QtyInputCell,
+      inputKey: 'totalQty',
+      inputIdPrefix: 'totalQtyInput',
+      inputValues,
+      onInputChange: handleTotalQtyChange,
+    },
+    {
+      Header: 'Quantity on sorting, pallets',
+      id: 'sorting_input',
+      Cell: QtyInputCell,
+      inputKey: 'sorting',
+      inputIdPrefix: 'sortingInput',
+      inputValues,
+      onInputChange: handleSortingChange,
+    },
+  ];
+
+  // Сводка по шапке страницы
+  const pageStats = useMemo(() => {
+    return (qualityManagementDataList || []).reduce(
+      (acc, item) => {
+        acc.plan += Number(item.total_quantity_plan) || 0;
+        return acc;
+      },
+      { plan: 0 },
+    );
+  }, [qualityManagementDataList]);
+
+  // Статус партии по соотношению резерва — вычисляется из уже готовых полей
+  const getBatchView = (record) => {
+    const required = Number(record.reserved_quantity) || 0;
+    const allocated = Number(record.reserved_quantity_allocated) || 0;
+    const remaining = Number(record.reserved_quantity_remaining) || 0;
+
+    const entered = inputValues[record.id]?.totalQty;
+    const hasInput =
+      entered !== '' && entered !== undefined && Number(entered) > 0;
+
+    let percent = 0;
+    if (required > 0) {
+      percent = Math.min(100, Math.round((allocated / required) * 100));
+    } else if (hasInput) {
+      percent = 100;
+    }
+
+    let tone = 'idle';
+    let label = 'Awaiting input';
+
+    if (hasInput) {
+      if (required === 0) {
+        tone = 'info';
+        label = 'Free stock';
+      } else if (remaining === 0) {
+        tone = 'ok';
+        label = 'Reserve covered';
+      } else {
+        tone = 'warn';
+        label = 'Partially covered';
+      }
+    }
+
+    return { required, allocated, remaining, percent, tone, label };
+  };
+
   return (
-    <Fragment>
-      <Table
-        COLUMN_DATA={COLUMNS_QUALITY_MANAGEMENT}
-        dataOfTable={qualityManagementDataList}
-        tableName={'Quality Management'}
-        userAccess={userAccess}
-        handleRowClick={(row) => {}}
-      />
+    <div className="cl-page qm-page">
+      <div className="cl-page__head">
+        <div>
+          <div className="cl-page__eyebrow">Production · Quality</div>
+          <h1 className="cl-page__title">Quality management</h1>
+        </div>
 
-      {/* Отображаем поля ввода для каждой записи */}
-      {qualityManagementDataList.map((record) => (
-        <div key={record.id} className="mb-4 p-3 border rounded">
-          <h5 className="mb-3">Batch: {record.product_article}</h5>
-
-          <div className="d-flex gap-4 flex-wrap align-items-end">
-            {/* Поле ввода для Total Qty in batch, fact, pallets */}
-            <div className="border rounded p-3 bg-light">
-              <Form.Label
-                htmlFor={`totalQtyInput-${record.id}`}
-                className="fw-bold"
-              >
-                Total Qty in batch, fact, pallets
-              </Form.Label>
-              <Form.Control
-                id={`totalQtyInput-${record.id}`}
-                type="number"
-                min="0"
-                step="1"
-                value={inputValues[record.id]?.totalQty || ''}
-                onChange={(e) => handleTotalQtyChange(record.id, e)}
-                placeholder="Enter total qty"
-                style={{ width: '200px' }}
-              />
+        {hasBatches && (
+          <div className="cl-page__stats">
+            <div className="cl-stat">
+              <div className="cl-stat__num">
+                {qualityManagementDataList.length}
+              </div>
+              <div className="cl-stat__label">Batches in work</div>
             </div>
-
-            {/* Поле ввода для Quantity on sorting, pallets */}
-            <div className="border rounded p-3 bg-light">
-              <Form.Label
-                htmlFor={`sortingInput-${record.id}`}
-                className="fw-bold"
-              >
-                Quantity on sorting, pallets
-              </Form.Label>
-              <Form.Control
-                id={`sortingInput-${record.id}`}
-                type="number"
-                min="0"
-                step="1"
-                value={inputValues[record.id]?.sorting || ''}
-                onChange={(e) => handleSortingChange(record.id, e)}
-                placeholder="Enter sorting qty"
-                style={{ width: '200px' }}
-              />
+            <div className="cl-stat__divider" />
+            <div className="cl-stat">
+              <div className="cl-stat__num">{pageStats.plan}</div>
+              <div className="cl-stat__label">Pallets, plan</div>
             </div>
           </div>
-        </div>
-      ))}
+        )}
+      </div>
 
-      {/* Одна кнопка для завершения всех записей */}
-      {qualityManagementDataList.length > 0 && (
-        <div className="d-flex gap-2 mb-4">
-          <DatePicker
-            id="data_pcker"
-            type="text"
-            selected={dateValue}
-            onChange={(date) => setDateValue(date)}
-            dateFormat="dd.MM.yyyy"
+      {hasBatches && (
+        <div className="cl-toolbar">
+          <div className="qm-toggle">
+            <button
+              type="button"
+              className={`cl-btn ${
+                mode === 'cards' ? 'cl-btn--primary' : 'cl-btn--ghost'
+              }`}
+              onClick={() => setMode('cards')}
+            >
+              Cards
+            </button>
+            <button
+              type="button"
+              className={`cl-btn ${
+                mode === 'list' ? 'cl-btn--primary' : 'cl-btn--ghost'
+              }`}
+              onClick={() => setMode('list')}
+            >
+              List
+            </button>
+          </div>
+          <div className="cl-toolbar__spacer" />
+        </div>
+      )}
+
+      {hasBatches && mode === 'cards' && (
+        <div className="qm-grid qm-fade-in">
+          {qualityManagementDataList.map((record) => {
+            const view = getBatchView(record);
+
+            return (
+              <article className="qm-card" key={record.id}>
+                <header className="qm-card__head">
+                  <div className="cl-min0">
+                    <div className="qm-card__article">
+                      {record.product_article}
+                    </div>
+                    <div className="qm-card__meta">
+                      {getBatchNumber(record) != null && (
+                        <span className="qm-chip cl-mono">
+                          Batch {getBatchNumber(record)}
+                        </span>
+                      )}
+                      {record.date && (
+                        <span className="qm-card__date">{record.date}</span>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`qm-status qm-status--${view.tone}`}>
+                    {view.label}
+                  </span>
+                </header>
+
+                <div className="qm-metric">
+                  <span className="qm-metric__label">
+                    Total pallets in batch, plan, qty
+                  </span>
+                  <span className="qm-metric__value">
+                    {record.total_quantity_plan}
+                  </span>
+                </div>
+
+                <div className="qm-progress">
+                  <div className="qm-progress__head">
+                    <span className="qm-progress__title">
+                      Reserve allocation
+                    </span>
+                    <span className="qm-progress__num">
+                      {view.allocated} / {view.required}
+                    </span>
+                  </div>
+                  <div className="qm-progress__track">
+                    <div
+                      className={`qm-progress__fill qm-progress__fill--${view.tone}`}
+                      style={{ width: `${view.percent}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="qm-inputs">
+                  <label
+                    className="qm-field"
+                    htmlFor={`totalQtyInput-${record.id}`}
+                  >
+                    <span className="qm-field__label">
+                      Total qty in batch, fact, pallets
+                    </span>
+                    <input
+                      className="qm-input"
+                      id={`totalQtyInput-${record.id}`}
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={inputValues[record.id]?.totalQty || ''}
+                      onChange={(e) => handleTotalQtyChange(record.id, e)}
+                      placeholder="0"
+                    />
+                  </label>
+
+                  <label
+                    className="qm-field"
+                    htmlFor={`sortingInput-${record.id}`}
+                  >
+                    <span className="qm-field__label">
+                      Quantity on sorting, pallets
+                    </span>
+                    <input
+                      className="qm-input"
+                      id={`sortingInput-${record.id}`}
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={inputValues[record.id]?.sorting || ''}
+                      onChange={(e) => handleSortingChange(record.id, e)}
+                      placeholder="0"
+                    />
+                  </label>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      {hasBatches && mode === 'list' && (
+        <div className="qm-fade-in">
+          <Table
+            COLUMN_DATA={COLUMNS_QUALITY_MANAGEMENT}
+            dataOfTable={qualityManagementDataList}
+            tableName={'Quality Management'}
+            userAccess={userAccess}
+            variant="card"
+            hideTitle
+            emptyTitle="No batches in quality control"
+            emptySubtitle="Start a new batch to see it here."
           />
-          <Button variant="warning" size="lg" onClick={finishAllBatchesHandler}>
-            Finish ALL batches ({qualityManagementDataList.length})
-          </Button>
         </div>
       )}
 
-      {(!qualityManagementData || qualityManagementData.length === 0) && (
-        <ShowQualityManagementAddModal
-          setConsumptionCalculated={setConsumptionCalculated}
-        />
+      {showAddBatchModal && (
+        <div className="qm-empty">
+          <div className="qm-empty__title">No batches in quality control</div>
+          <div className="qm-empty__sub">
+            Pick a calculated raw materials consumption entry to start a new
+            batch — its plan, reserve and free quantity will show up here.
+          </div>
+          <div className="qm-empty__action">
+            <ShowQualityManagementAddModal
+              setConsumptionCalculated={setConsumptionCalculated}
+            />
+          </div>
+        </div>
       )}
-      {qualityManagementDataList.length > 0 && (
-        <div>
-          <Button
-            variant="primary"
-            onClick={() => {
-              setRelatedProductsModal(true);
-            }}
-          >
-            Start new batch
-          </Button>
+
+      {hasBatches && (
+        <>
+          <div className="qm-actionbar">
+            <div className={`qm-date ${!dateValue ? 'qm-date--required' : ''}`}>
+              <span className="qm-date__label">Finish date</span>
+              <DatePicker
+                id="data_pcker"
+                type="text"
+                selected={dateValue}
+                onChange={(date) => setDateValue(date)}
+                dateFormat="dd.MM.yyyy"
+                placeholderText="dd.mm.yyyy"
+                className="qm-date__input"
+              />
+            </div>
+
+            <div className="qm-actionbar__spacer" />
+
+            <button
+              type="button"
+              className="cl-btn cl-btn--ghost"
+              onClick={() => {
+                setRelatedProductsModal(true);
+              }}
+            >
+              Start new batch
+            </button>
+
+            <button
+              type="button"
+              className="cl-btn cl-btn--primary"
+              onClick={finishAllBatchesHandler}
+            >
+              Finish ALL batches ({qualityManagementDataList.length})
+            </button>
+          </div>
+
           <ModalTable
             isOpen={relatedProductsModal}
             toggle={() => setRelatedProductsModal(!relatedProductsModal)}
             data={filteredList}
             onClickRow={addProductHandler}
           />
-        </div>
+        </>
       )}
-    </Fragment>
+    </div>
   );
 };
 

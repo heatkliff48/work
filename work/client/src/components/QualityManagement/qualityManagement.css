@@ -1,0 +1,676 @@
+/* =====================================================================
+   Quality management — view styles (BAUBLOCK ERP design reference)
+   Только внешний вид. Логика данных не затрагивается.
+   Токены и оболочка страницы переиспользуются из clientsDrawer.css
+   (.cl-page, .cl-btn, .cl-stat, .cl-toolbar) — здесь только то,
+   что специфично для Quality management.
+   ===================================================================== */
+
+.cl-page.qm-page {
+  --qm-ok: #0f8a4a;
+  --qm-ok-soft: #e7f5ee;
+  --qm-warn: #b26a00;
+  --qm-warn-soft: #fdf3e3;
+  --qm-info: #1f5fbf;
+  --qm-info-soft: #eaf1fc;
+  --qm-idle: #6b7280;
+  --qm-idle-soft: #f2f3f5;
+
+  /* липкая панель действий сама закрывает низ страницы */
+  padding-bottom: 0;
+}
+
+/* ---------- view toggle ---------- */
+.qm-toggle {
+  display: inline-flex;
+  gap: 8px;
+}
+
+/* ---------- cards grid ---------- */
+.qm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 16px;
+}
+
+.qm-card {
+  background: var(--cl-card);
+  border: 1px solid var(--cl-border);
+  border-radius: 14px;
+  box-shadow: var(--cl-shadow-card);
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- card head ---------- */
+.qm-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.qm-card__article {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--cl-text);
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+  word-break: break-all;
+}
+
+.qm-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.qm-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 6px;
+  background: var(--cl-border-3);
+  color: var(--cl-text-3);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.qm-card__date {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--cl-muted);
+}
+
+/* ---------- status pill ---------- */
+.qm-status {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.qm-status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.qm-status--ok {
+  background: var(--qm-ok-soft);
+  color: var(--qm-ok);
+}
+.qm-status--warn {
+  background: var(--qm-warn-soft);
+  color: var(--qm-warn);
+}
+.qm-status--info {
+  background: var(--qm-info-soft);
+  color: var(--qm-info);
+}
+.qm-status--idle {
+  background: var(--qm-idle-soft);
+  color: var(--qm-idle);
+}
+
+/* ---------- plan metric ---------- */
+.qm-metric {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fcfcfd;
+  border: 1px solid var(--cl-border-3);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.qm-metric__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--cl-muted);
+  line-height: 1.3;
+}
+
+.qm-metric__value {
+  flex: 0 0 auto;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--cl-text);
+  line-height: 1.1;
+}
+
+/* ---------- reserve progress ---------- */
+.qm-progress__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.qm-progress__title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--cl-muted);
+}
+
+.qm-progress__num {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cl-text-3);
+}
+
+.qm-progress__track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--cl-border-3);
+  overflow: hidden;
+}
+
+.qm-progress__fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+.qm-progress__fill--ok {
+  background: var(--qm-ok);
+}
+.qm-progress__fill--warn {
+  background: #e0a100;
+}
+.qm-progress__fill--info {
+  background: var(--qm-info);
+}
+.qm-progress__fill--idle {
+  background: var(--cl-muted);
+}
+
+/* ---------- inputs ---------- */
+.qm-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  border-top: 1px solid var(--cl-divider);
+  padding-top: 16px;
+}
+
+.qm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.qm-field__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--cl-text-2);
+  line-height: 1.3;
+}
+
+.qm-input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--cl-border-2);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 13px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cl-text);
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.qm-input:focus {
+  border-color: var(--cl-red);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+
+.qm-input::placeholder {
+  font-weight: 500;
+  color: var(--cl-muted);
+}
+
+/* ---------- list view: таблица с полями ввода ---------- */
+.cl-page.qm-page .tbl-card {
+  overflow-x: auto !important;
+}
+
+/* длинные заголовки переносятся, а не растягивают таблицу за край */
+.cl-page.qm-page .tbl-card table.tbl > thead > tr > th {
+  white-space: normal !important;
+  vertical-align: bottom !important;
+  line-height: 1.35;
+  min-width: 96px;
+}
+
+.qm-input.qm-input--cell {
+  width: 130px;
+  height: 36px;
+  padding: 0 11px;
+  font-size: 15px;
+}
+
+/* ---------- empty state ---------- */
+.qm-empty {
+  background: var(--cl-card);
+  border: 1px solid var(--cl-border);
+  border-radius: 14px;
+  box-shadow: var(--cl-shadow-card);
+  padding: 56px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.qm-empty__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cl-text-2);
+}
+
+.qm-empty__sub {
+  font-size: 13px;
+  color: var(--cl-muted);
+  max-width: 460px;
+}
+
+.qm-empty__action {
+  margin-top: 14px;
+}
+
+/* ---------- sticky action bar ---------- */
+.qm-actionbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  margin: 20px -36px 0;
+  padding: 14px 36px 22px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--cl-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.qm-actionbar__spacer {
+  flex: 1;
+}
+
+.qm-date {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qm-date__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--cl-muted);
+}
+
+.qm-page .qm-date__input {
+  height: 38px;
+  border: 1px solid var(--cl-border-2);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 13px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cl-text);
+  outline: none;
+  width: 150px;
+}
+
+.qm-page .qm-date__input:focus {
+  border-color: var(--cl-red);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+
+.qm-date--required .qm-date__input {
+  border-color: var(--cl-red);
+  background: #fff8f8;
+}
+
+/* ---------- list view fade ---------- */
+.qm-fade-in {
+  animation: qm-fade 0.18s ease;
+}
+
+@keyframes qm-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* =====================================================================
+   Модалки страницы: «Start new batch» (Batch calendar)
+   и «Select product». Оболочки остаются bootstrap/reactstrap,
+   меняется только оформление содержимого.
+   ===================================================================== */
+
+.cl-page.qm-modal-scope,
+.qm-modal-scope {
+  padding: 0;
+}
+
+.qm-modal-scope .cl-page__title {
+  font-size: 20px;
+}
+
+.qm-modal .modal-content {
+  border: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(20, 23, 33, 0.22);
+}
+
+.qm-modal .modal-header {
+  background: #fff;
+  border-bottom: 1px solid var(--cl-border-3);
+  padding: 18px 22px;
+}
+
+.qm-modal .modal-header .modal-title,
+.qm-modal .modal-header h5 {
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial,
+    sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: var(--cl-text);
+}
+
+.qm-modal .modal-body {
+  background: var(--cl-bg);
+  padding: 20px 22px;
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial,
+    sans-serif;
+}
+
+.qm-modal .modal-footer {
+  background: #fff;
+  border-top: 1px solid var(--cl-border-3);
+  padding: 14px 22px;
+  gap: 10px;
+}
+
+/* поиск внутри «Select product» */
+.qm-modal-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.qm-modal-search {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.qm-modal-search__ic {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--cl-muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.qm-page .qm-modal-search__input,
+.qm-modal .qm-modal-search__input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--cl-border-2);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 14px 0 38px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--cl-text);
+  outline: none;
+}
+
+.qm-modal .qm-modal-search__input:focus {
+  border-color: var(--cl-red);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+
+/* сегмент-переключатель режима поиска */
+.qm-seg {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--cl-border-2);
+  border-radius: 10px;
+  background: #fff;
+  gap: 2px;
+}
+
+.qm-seg__btn {
+  height: 32px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--cl-text-2);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.qm-seg__btn:hover {
+  background: #f6f7fa;
+  color: var(--cl-text);
+}
+
+.qm-seg__btn--active,
+.qm-seg__btn--active:hover {
+  background: var(--cl-red);
+  color: #fff;
+}
+
+.qm-modal-hint {
+  font-size: 12px;
+  color: var(--cl-muted);
+  margin-bottom: 10px;
+}
+
+.qm-modal-hint b {
+  color: var(--cl-text-3);
+  font-weight: 700;
+}
+
+.qm-modal-count {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--cl-muted);
+  font-weight: 600;
+}
+
+/* таблица выбора продукта */
+.qm-picker {
+  background: #fff;
+  border: 1px solid var(--cl-border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--cl-shadow-card);
+}
+
+.qm-picker__scroll {
+  overflow-x: auto;
+  max-height: 58vh;
+}
+
+.qm-picker table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  background: #fff;
+}
+
+.qm-picker thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--cl-text);
+  background: #e9e9e9;
+  border: 0;
+  border-bottom: 1px solid var(--cl-border);
+  white-space: nowrap;
+}
+
+.qm-picker tbody tr {
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.qm-picker tbody tr:hover {
+  background: #fafbfc;
+}
+
+.qm-picker tbody td {
+  padding: 12px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--cl-divider);
+  color: var(--cl-text-2);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.qm-picker tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.qm-picker tbody td:first-child {
+  font-family: var(--cl-mono);
+  font-weight: 500;
+  color: var(--cl-text);
+}
+
+.qm-picker__empty {
+  padding: 48px 18px;
+  text-align: center;
+}
+
+.qm-picker__empty-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cl-text-2);
+}
+
+.qm-picker__empty-sub {
+  font-size: 13px;
+  color: var(--cl-muted);
+  margin-top: 4px;
+}
+
+/* «Add custom batch dialog» — форма */
+.qm-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  background: #fff;
+  border: 1px solid var(--cl-border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--cl-shadow-card);
+}
+
+.qm-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.qm-form__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--cl-text-2);
+}
+
+.qm-modal .qm-form__input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--cl-border-2);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 13px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--cl-text);
+  outline: none;
+}
+
+.qm-modal .qm-form__input:focus {
+  border-color: var(--cl-red);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+
+/* ---------- адаптив ---------- */
+@media (max-width: 900px) {
+  .qm-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qm-actionbar {
+    margin: 20px -12px 0;
+    padding: 12px 12px 18px;
+  }
+
+  .qm-inputs {
+    grid-template-columns: 1fr;
+  }
+}

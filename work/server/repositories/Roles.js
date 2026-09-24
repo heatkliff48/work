@@ -19,7 +19,6 @@ class RolesRepository {
 
   static async updateRolesData(updRole) {
     try {
-      const results = [];
       const { id: role_id, PageAndRolesArray } = updRole;
 
       for (const pageData of PageAndRolesArray) {
@@ -39,29 +38,29 @@ class RolesRepository {
           where: { page_id, role_id },
         });
 
-        let updRoleData;
-
         if (!existingPageAndRoles) {
-          updRoleData = await PageAndRoles.create({
+          await PageAndRoles.create({
             page_id,
             role_id,
             write,
             read,
           });
         } else {
-          [, updRoleData] = await PageAndRoles.update(
+          await PageAndRoles.update(
             { write, read },
-            {
-              where: { page_id, role_id },
-              returning: true,
-              plain: true,
-            }
+            { where: { page_id, role_id } }
           );
         }
-
-        results.push(updRoleData);
       }
-      return results;
+
+      // Отдаём роль целиком, в том же виде, что и getAllRolesData: клиенту
+      // нужен page_name, по нему проверяется доступ
+      return Roles.findByPk(role_id, {
+        include: {
+          model: Pages,
+          as: 'PageAndRolesArray',
+        },
+      });
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
@@ -91,7 +90,7 @@ class RolesRepository {
 
   static async getPagesListData() {
     try {
-      const pages = await Pages.findAll();
+      const pages = await Pages.findAll({ order: [['id', 'ASC']] });
       return pages;
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);

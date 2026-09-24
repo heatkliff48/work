@@ -66,6 +66,12 @@
   gap: 2px;
 }
 
+/* free space under the menu (desktop: click = collapse/expand) */
+.bb-sidebar-spacer {
+  flex: 1 1 auto;
+  min-height: 24px;
+}
+
 .bb-sidebar-item {
   border: 0;
   background: transparent;
@@ -149,6 +155,27 @@
 .bb-child {
   padding-left: 18px;
   font-size: 13px;
+}
+
+/* Notification counter */
+.bb-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  box-sizing: border-box;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  background: var(--bb-red);
+  color: var(--bb-white);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 /* =======================
@@ -398,6 +425,11 @@
     height: 60px;
     font-size: 20px;
   }
+
+  /* на мобильных сайдбар открывается только бургером */
+  .bb-sidebar-spacer {
+    cursor: default;
+  }
 }
 
 @media (max-width: 360px) {
@@ -413,6 +445,21 @@
      DESKTOP COLLAPSED SIDEBAR
      ======================= */
 @media (min-width: 901px) {
+  /* бургер только для мобильных: на десктопе сворачиваем кликом
+     по бренду или по пустому месту в сайдбаре */
+  .bb-menu-btn {
+    display: none;
+  }
+
+  .bb-brand,
+  .bb-sidebar-spacer {
+    cursor: pointer;
+  }
+
+  .bb-brand:hover {
+    background: #f1f3f7;
+  }
+
   .bb-sidebar.bb-collapsed {
     width: 64px;
   }
@@ -449,8 +496,24 @@
 
   .bb-sidebar.bb-collapsed
     .bb-sidebar-item
-    span:not(.bb-sidebar-icon):not(.bb-emoji) {
+    span:not(.bb-sidebar-icon):not(.bb-emoji):not(.bb-badge) {
     display: none;
+  }
+
+  /* counter sits on the icon's corner */
+  .bb-sidebar.bb-collapsed .bb-sidebar-item {
+    position: relative;
+  }
+
+  .bb-sidebar.bb-collapsed .bb-badge {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 10px;
+    box-shadow: 0 0 0 2px var(--bb-white);
   }
 
   /* hide group children when collapsed */

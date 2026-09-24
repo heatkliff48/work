@@ -70,8 +70,6 @@ const RawMaterialsConsumptionModal = React.memo(
 
     const warehouseAluminum1 = useSelector((state) => state.warehouseAluminum1);
 
-    const isMoldIdFilled = moldId.trim() !== '';
-
     useEffect(() => {
       setAvailableRecipes([]);
       setSelectedRecipe(null);
@@ -574,11 +572,6 @@ const RawMaterialsConsumptionModal = React.memo(
 
       if (newBatchMode && !selectedRecipe) {
         alert('Please select a recipe.');
-        return;
-      }
-
-      if (!isMoldIdFilled) {
-        alert('Mold id is required.');
         return;
       }
 
@@ -1102,21 +1095,13 @@ const RawMaterialsConsumptionModal = React.memo(
                     className="fw-semibold"
                     style={{ display: 'block', marginBottom: 4 }}
                   >
-                    Mold id <span className="text-danger">*</span>
+                    Mold id
                   </span>
                   <input
-                    className={
-                      'form-control' + (isMoldIdFilled ? '' : ' is-invalid')
-                    }
+                    className="form-control"
                     value={moldId}
                     onChange={(e) => setMoldId(e.target.value)}
-                    required
                   />
-                  {!isMoldIdFilled && (
-                    <div className="invalid-feedback d-block">
-                      Mold id is required.
-                    </div>
-                  )}
                 </label>
 
                 <label style={{ margin: 0, minWidth: 200 }}>

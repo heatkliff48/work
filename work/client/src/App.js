@@ -74,14 +74,18 @@ function App() {
   const user = useSelector((state) => state.user);
   // const isCheckedAuth = useRef(false);
 
+  // Одно подключение на вкладку: переподключаемся только при смене пользователя,
+  // старое подключение закрываем, иначе сообщения будут приходить дважды.
   useEffect(() => {
-    if (user) {
-      const socketOnMessageFunc = createSocketOnMessage(dispatch);
-      new WebSocketClient({ url, socketOnMessageFunc });
-    }
+    if (!user?.id) return;
+
+    const socketOnMessageFunc = createSocketOnMessage(dispatch);
+    const socketClient = new WebSocketClient({ url, socketOnMessageFunc });
+
+    return () => socketClient.close();
 
     // if (isCheckedAuth && !user) navigate('/sign-in');
-  }, [user]);
+  }, [user?.id]);
 
   return (
     <MainContextProvider>

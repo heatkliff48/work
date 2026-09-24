@@ -29,6 +29,7 @@ const BlocksJournalTableOrder = ({
     'discount',
     'final_price',
     'quantity_liberated',
+    'quantity_liberated_m2',
   ];
 
   // const columns = Object.keys(productListOrder?.[0] || {}).filter(
@@ -36,7 +37,9 @@ const BlocksJournalTableOrder = ({
   // );
 
   const columns = orderCartData?.main_order
-    ? allColumns.filter((col) => col !== 'quantity_liberated')
+    ? allColumns.filter(
+        (col) => !['quantity_liberated', 'quantity_liberated_m2'].includes(col),
+      )
     : allColumns;
 
   return (
@@ -110,7 +113,8 @@ const BlocksJournalTableOrder = ({
                   </tr>
                 ))}
 
-              {userAccess?.canWrite && orderCartData?.status < 3 && (
+              {/* Добавлять товары можно до Proposal accepted by client, удалять — только на Initial contact */}
+              {userAccess?.canWrite && orderCartData?.status <= 4 && (
                 <tr>
                   <td colSpan={columns.length + 1}>
                     <Button

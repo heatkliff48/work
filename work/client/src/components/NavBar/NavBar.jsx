@@ -6,6 +6,7 @@ import { delUser } from '#components/redux/actions/userAction';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import TabsBar from '#components/Main/TabsBar';
+import RequireAccess from '#components/ProtectRoute/RequireAccess.jsx';
 import '#components/Styles/dashboard.css';
 
 // Импортируем все иконки
@@ -42,7 +43,8 @@ export default function NavBar() {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user);
-  const { roles, checkUserAccess } = useUsersContext();
+  const accountingDataList = useSelector((state) => state.accountingDataList);
+  const { canOpenPath } = useUsersContext();
   const { getPageTitleByPath, getRoleName } = useProjectContext();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -59,6 +61,12 @@ export default function NavBar() {
     typeof window !== 'undefined' &&
     window.matchMedia &&
     window.matchMedia('(max-width: 900px)').matches;
+
+  // На десктопе сайдбар сворачивается кликом по бренду («ERP») или по пустому
+  // месту в сайдбаре — бургер остаётся только для мобильных
+  const toggleCollapsed = () => {
+    if (isDesktop()) setCollapsed((v) => !v);
+  };
 
   useEffect(() => {
     if (isDesktop()) {
@@ -82,30 +90,22 @@ export default function NavBar() {
   const userrole = user ? getRoleName(user?.role) : '';
   const title = getPageTitleByPath(location.pathname);
 
-  const canSee = (access) => {
-    if (!access) return true;
-    return !!checkUserAccess(user, roles, access)?.canRead;
-  };
-
   const menuItems = useMemo(
     () => [
       {
         type: 'group',
         title: 'Admin',
         icon: adminIcon,
-        access: 'Users_info',
         children: [
           {
             title: 'Users Info',
             path: '/users_info',
             icon: userInfoIcon,
-            access: 'Users_info',
           },
           {
             title: 'Roles',
             path: '/roles',
             icon: rolesIcon,
-            access: 'Users_info',
           },
         ],
       },
@@ -113,7 +113,6 @@ export default function NavBar() {
         type: 'group',
         title: 'Products catalog',
         icon: prodCatalogIcon,
-        access: null,
         children: [
           {
             title: 'Products catalog',
@@ -132,25 +131,21 @@ export default function NavBar() {
         title: 'Clients',
         path: '/clients',
         icon: clientsIcon,
-        access: 'Clients',
       },
       {
         title: 'Clients price groups',
         path: '/clients_price_info',
         icon: clientsPriceGroupsIcon,
-        access: 'Clients',
       },
       {
         type: 'group',
         title: 'Orders catalog',
         icon: prodCatalogIcon,
-        access: null,
         children: [
           {
             title: 'Orders',
             path: '/orders',
             icon: ordersIcon,
-            access: 'Orders',
           },
           {
             title: 'Orders to warehouse',
@@ -164,7 +159,6 @@ export default function NavBar() {
         type: 'group',
         title: 'Ordered products pipeline',
         icon: pipelineIcon,
-        access: 'List_of_ordered_production',
         children: [
           {
             title: 'Ordered blocks pipeline',
@@ -187,7 +181,6 @@ export default function NavBar() {
         type: 'group',
         title: 'Production planner',
         icon: productionPlannerIcon,
-        access: 'production_batch_designer',
         children: [
           {
             title: 'Autoclave calendar',
@@ -198,7 +191,6 @@ export default function NavBar() {
             title: 'Batch calendar',
             path: '/batch_outside',
             icon: batchCalendarIcon,
-            access: 'production_plan',
           },
         ],
       },
@@ -207,7 +199,6 @@ export default function NavBar() {
         type: 'group',
         title: 'Technology planner',
         icon: technologyPlannerIcon,
-        access: 'recipe_products',
         children: [
           {
             title: 'Recipes catalog',
@@ -241,37 +232,31 @@ export default function NavBar() {
         title: 'Quality management',
         path: '/quality_management',
         icon: qualityManIcon,
-        access: 'quality_management',
       },
       {
         title: 'Warehouse',
         path: '/warehouse_products_type',
         icon: warehouseIcon,
-        access: 'Warehouse',
       },
       {
         title: 'Order dispatch',
         path: '/warehouse_manager',
         icon: orderDispatchIcon,
-        access: 'warehouse_manager',
       },
       {
         type: 'group',
         title: 'Accounting',
         icon: accountingIcon,
-        access: 'accounting',
         children: [
           {
             title: 'Accounting',
             path: '/accounting',
             icon: accountingIcon,
-            access: 'accounting',
           },
           {
             title: 'Logistics planner',
             path: '/factura_manager',
             icon: accountingIcon,
-            access: 'accounting',
           },
         ],
       },
@@ -279,25 +264,36 @@ export default function NavBar() {
         type: 'group',
         title: 'Green Line Monitoring',
         icon: technologyPlannerIcon,
-        access: 'recipe_products',
         children: [
           {
             title: 'Height Data Monitoring',
             path: '/green_line_monitoring',
             icon: batchCalendarIcon,
-            access: null,
           },
           {
             title: 'Temperature Data Monitoring',
             path: '/temperature_data_monitoring',
             icon: batchCalendarIcon,
-            access: null,
           },
         ],
       },
     ],
     [],
   );
+
+  // счётчики у пунктов меню: path -> количество записей
+  const badges = useMemo(
+    () => ({
+      '/accounting': (accountingDataList || []).filter((el) => !el.aproved)
+        .length,
+    }),
+    [accountingDataList],
+  );
+
+  const renderBadge = (count) =>
+    count > 0 ? (
+      <span className="bb-badge">{count > 99 ? '99+' : count}</span>
+    ) : null;
 
   const isActive = (path) => location.pathname === path;
 
@@ -327,7 +323,19 @@ export default function NavBar() {
         <div className="bb-sidebar-overlay" onClick={closeDrawer} />
       )}
       <aside className={sidebarClassName}>
-        <div className="bb-brand" title="BAUBLOCK ERP">
+        <div
+          className="bb-brand"
+          title="BAUBLOCK ERP"
+          role="button"
+          tabIndex={0}
+          onClick={toggleCollapsed}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggleCollapsed();
+            }
+          }}
+        >
           BAUBLOCK ERP
         </div>
         <div className="bb-sidebar-menu">
@@ -344,12 +352,16 @@ export default function NavBar() {
 
           {menuItems.map((it) => {
             if (it.type === 'group') {
-              if (!canSee(it.access)) return null;
+              // группа видна, если доступен хотя бы один её пункт
               const visibleChildren = it.children.filter((c) =>
-                canSee(c.access),
+                canOpenPath(c.path),
               );
               if (!visibleChildren.length) return null;
               const expanded = openGroups[it.title] ?? isGroupActive(it);
+              const groupBadge = visibleChildren.reduce(
+                (sum, c) => sum + (badges[c.path] || 0),
+                0,
+              );
 
               return (
                 <div key={it.title} className="bb-group">
@@ -375,8 +387,12 @@ export default function NavBar() {
                     </span>
 
                     {!collapsed && (
+                      <span className="bb-group-title">{it.title}</span>
+                    )}
+                    {/* у раскрытой группы счётчик показывают сами пункты */}
+                    {(collapsed || !expanded) && renderBadge(groupBadge)}
+                    {!collapsed && (
                       <>
-                        <span className="bb-group-title">{it.title}</span>
                         <span
                           className={`bb-chevron ${expanded ? 'open' : ''}`}
                         >
@@ -405,6 +421,7 @@ export default function NavBar() {
                             />
                           </span>
                           <span>{c.title}</span>
+                          {renderBadge(badges[c.path])}
                         </button>
                       ))}
                     </div>
@@ -413,7 +430,7 @@ export default function NavBar() {
               );
             }
 
-            if (!canSee(it.access)) return null;
+            if (!canOpenPath(it.path)) return null;
 
             return (
               <button
@@ -430,10 +447,13 @@ export default function NavBar() {
                   />
                 </span>
                 {!collapsed && <span>{it.title}</span>}
+                {renderBadge(badges[it.path])}
               </button>
             );
           })}
         </div>
+
+        <div className="bb-sidebar-spacer" onClick={toggleCollapsed} />
       </aside>
 
       <main className="bb-main">
@@ -442,10 +462,7 @@ export default function NavBar() {
             <button
               className="bb-menu-btn"
               type="button"
-              onClick={() => {
-                if (isDesktop()) setCollapsed((v) => !v);
-                else setDrawerOpen((v) => !v);
-              }}
+              onClick={() => setDrawerOpen((v) => !v)}
               aria-label="Open menu"
             >
               <img
@@ -472,7 +489,7 @@ export default function NavBar() {
         <TabsBar />
 
         <div className="bb-content">
-          <Outlet />
+          <RequireAccess />
         </div>
       </main>
     </div>

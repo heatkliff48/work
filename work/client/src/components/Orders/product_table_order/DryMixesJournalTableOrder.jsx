@@ -81,7 +81,8 @@ const DryMixesJournalTableOrder = ({
                   </tr>
                 ))}
 
-              {userAccess?.canWrite && orderCartData?.status < 3 && (
+              {/* Добавлять товары можно до Proposal accepted by client, удалять — только на Initial contact */}
+              {userAccess?.canWrite && orderCartData?.status <= 4 && (
                 <tr>
                   <td colSpan={columns.length + 1}>
                     <Button

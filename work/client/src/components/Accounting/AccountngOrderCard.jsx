@@ -3,7 +3,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { updAccountingDataList } from '#components/redux/actions/ordersAction.js';
+import { updateAccountingApproved } from '#components/redux/actions/ordersAction.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
@@ -271,9 +271,9 @@ const AccountngOrderCard = React.memo(() => {
     }
 
     dispatch(
-      updAccountingDataList({
-        orders_article: orderCartData?.article,
-        aproved: true,
+      updateAccountingApproved({
+        order_id: orderCartData?.id,
+        accounting_approved: true,
       }),
     );
     setStoredData(null);
@@ -470,47 +470,60 @@ const AccountngOrderCard = React.memo(() => {
             <div className="ord-status-card">
               <div className="ord-status-card__title">Approval status</div>
               <div className="ord-steps">
-                {accountingStatusList.map((item) => {
-                  const isDone = item.accessor < status;
-                  const isCurrent = item.accessor == status;
-                  return (
-                    <div key={item.accessor} className="ord-step">
-                      <div className="ord-step__rail">
-                        <input
-                          id={item.accessor}
-                          type="checkbox"
-                          className={
-                            'ord-step__checkbox' +
-                            (isDone ? ' ord-step__checkbox--done' : '') +
-                            (isCurrent ? ' ord-step__checkbox--current' : '')
-                          }
-                          checked={item.accessor == status}
-                          onChange={() => {
-                            statusChangeHandler(item.accessor);
-                          }}
-                        />
+                {(() => {
+                  // status 0 = nothing approved yet → index -1, so the first step is next
+                  const currentStatusIndex = accountingStatusList.findIndex(
+                    (item) => item.accessor == status,
+                  );
+                  return accountingStatusList.map((item, idx) => {
+                    const isDone = item.accessor < status;
+                    const isCurrent = item.accessor == status;
+                    const isNext =
+                      status != null && idx === currentStatusIndex + 1;
+                    return (
+                      <div key={item.accessor} className="ord-step">
+                        <div className="ord-step__rail">
+                          <input
+                            id={item.accessor}
+                            type="checkbox"
+                            className={
+                              'ord-step__checkbox' +
+                              (isDone ? ' ord-step__checkbox--done' : '') +
+                              (isCurrent ? ' ord-step__checkbox--current' : '') +
+                              (isNext ? ' ord-step__checkbox--next' : '')
+                            }
+                            checked={item.accessor == status}
+                            onChange={() => {
+                              statusChangeHandler(item.accessor);
+                            }}
+                          />
+                          {idx < accountingStatusList.length - 1 && (
+                            <div
+                              className={
+                                'ord-step__line' +
+                                (isDone ? ' ord-step__line--done' : '')
+                              }
+                            />
+                          )}
+                        </div>
                         <div
                           className={
-                            'ord-step__line' +
-                            (isDone ? ' ord-step__line--done' : '')
+                            'ord-step__label' +
+                            (isCurrent
+                              ? ' ord-step__label--current'
+                              : isDone
+                                ? ' ord-step__label--done'
+                                : isNext
+                                  ? ' ord-step__label--next'
+                                  : '')
                           }
-                        />
+                        >
+                          {item.Header}
+                        </div>
                       </div>
-                      <div
-                        className={
-                          'ord-step__label' +
-                          (isCurrent
-                            ? ' ord-step__label--current'
-                            : isDone
-                              ? ' ord-step__label--done'
-                              : '')
-                        }
-                      >
-                        {item.Header}
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  });
+                })()}
               </div>
             </div>
           </div>
