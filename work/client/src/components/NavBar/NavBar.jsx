@@ -43,6 +43,7 @@ export default function NavBar() {
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user);
+  const accountingDataList = useSelector((state) => state.accountingDataList);
   const { canOpenPath } = useUsersContext();
   const { getPageTitleByPath, getRoleName } = useProjectContext();
 
@@ -280,6 +281,20 @@ export default function NavBar() {
     [],
   );
 
+  // счётчики у пунктов меню: path -> количество записей
+  const badges = useMemo(
+    () => ({
+      '/accounting': (accountingDataList || []).filter((el) => !el.aproved)
+        .length,
+    }),
+    [accountingDataList],
+  );
+
+  const renderBadge = (count) =>
+    count > 0 ? (
+      <span className="bb-badge">{count > 99 ? '99+' : count}</span>
+    ) : null;
+
   const isActive = (path) => location.pathname === path;
 
   const isGroupActive = (g) => g.children?.some((c) => isActive(c.path));
@@ -343,6 +358,10 @@ export default function NavBar() {
               );
               if (!visibleChildren.length) return null;
               const expanded = openGroups[it.title] ?? isGroupActive(it);
+              const groupBadge = visibleChildren.reduce(
+                (sum, c) => sum + (badges[c.path] || 0),
+                0,
+              );
 
               return (
                 <div key={it.title} className="bb-group">
@@ -368,8 +387,12 @@ export default function NavBar() {
                     </span>
 
                     {!collapsed && (
+                      <span className="bb-group-title">{it.title}</span>
+                    )}
+                    {/* у раскрытой группы счётчик показывают сами пункты */}
+                    {(collapsed || !expanded) && renderBadge(groupBadge)}
+                    {!collapsed && (
                       <>
-                        <span className="bb-group-title">{it.title}</span>
                         <span
                           className={`bb-chevron ${expanded ? 'open' : ''}`}
                         >
@@ -398,6 +421,7 @@ export default function NavBar() {
                             />
                           </span>
                           <span>{c.title}</span>
+                          {renderBadge(badges[c.path])}
                         </button>
                       ))}
                     </div>
@@ -423,6 +447,7 @@ export default function NavBar() {
                   />
                 </span>
                 {!collapsed && <span>{it.title}</span>}
+                {renderBadge(badges[it.path])}
               </button>
             );
           })}

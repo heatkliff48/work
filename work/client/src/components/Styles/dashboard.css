@@ -157,6 +157,27 @@
   font-size: 13px;
 }
 
+/* Notification counter */
+.bb-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  box-sizing: border-box;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  background: var(--bb-red);
+  color: var(--bb-white);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 /* =======================
      TOPBAR
      ======================= */
@@ -475,8 +496,24 @@
 
   .bb-sidebar.bb-collapsed
     .bb-sidebar-item
-    span:not(.bb-sidebar-icon):not(.bb-emoji) {
+    span:not(.bb-sidebar-icon):not(.bb-emoji):not(.bb-badge) {
     display: none;
+  }
+
+  /* counter sits on the icon's corner */
+  .bb-sidebar.bb-collapsed .bb-sidebar-item {
+    position: relative;
+  }
+
+  .bb-sidebar.bb-collapsed .bb-badge {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 10px;
+    box-shadow: 0 0 0 2px var(--bb-white);
   }
 
   /* hide group children when collapsed */
