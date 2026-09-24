@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import '#components/Styles/tabsbar.css';
@@ -88,6 +88,38 @@ export default function TabsBar() {
     const match = tabs.find((t) => t.path === location.pathname);
     return match ? match.id : tabs[0]?.id;
   });
+
+  const scrollRef = useRef(null);
+
+  // активная вкладка всегда в видимой части полосы
+  useEffect(() => {
+    const strip = scrollRef.current;
+    const el = strip?.querySelector('.bb-tab-active');
+    if (!el) return;
+    if (el.offsetLeft < strip.scrollLeft) {
+      strip.scrollLeft = el.offsetLeft;
+    } else if (
+      el.offsetLeft + el.offsetWidth >
+      strip.scrollLeft + strip.clientWidth
+    ) {
+      strip.scrollLeft = el.offsetLeft + el.offsetWidth - strip.clientWidth;
+    }
+  }, [activeId, tabs.length]);
+
+  // скроллбар скрыт — прокручиваем вкладки колесом мыши.
+  // Нативный слушатель: React вешает wheel как passive, и preventDefault
+  // не остановил бы прокрутку страницы
+  useEffect(() => {
+    const strip = scrollRef.current;
+    if (!strip) return;
+    const onWheel = (e) => {
+      if (!e.deltaY || strip.scrollWidth <= strip.clientWidth) return;
+      e.preventDefault();
+      strip.scrollLeft += e.deltaY;
+    };
+    strip.addEventListener('wheel', onWheel, { passive: false });
+    return () => strip.removeEventListener('wheel', onWheel);
+  }, [user]);
 
   // persist
   useEffect(() => {
@@ -187,35 +219,86 @@ export default function TabsBar() {
   if (!user) return null;
 
   return (
-    <div className="tabsbar-container">
-      <div className="tabsbar-left">
-        <button className="tabsbar-add-current" onClick={() => navigate(-1)}>
-          ← Back
-        </button>
-        <button
-          className="tabsbar-add-current"
-          title="Duplicate current tab"
-          onClick={duplicateCurrent}
+    <div className="bb-tabs">
+      <button
+        type="button"
+        className="bb-tabs-back"
+        title="Back"
+        onClick={() => navigate(-1)}
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          + Add current
-        </button>
-      </div>
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+        <span className="bb-tabs-back-label">Back</span>
+      </button>
 
-      <div className="tabsbar-scroll">
+      <span className="bb-tabs-divider" />
+
+      <div
+        className="bb-tabs-scroll"
+        ref={scrollRef}
+        role="tablist"
+      >
         {tabs.map((t) => (
           <div
             key={t.id}
-            className={`tab-item ${activeId === t.id ? 'active' : ''}`}
+            className={`bb-tab ${activeId === t.id ? 'bb-tab-active' : ''}`}
             onClick={() => activateTab(t.id)}
             title={t.title}
+            role="tab"
+            aria-selected={activeId === t.id}
           >
-            <span className="tab-title">{t.title}</span>
-            <button className="tab-close" onClick={(e) => closeTab(t.id, e)}>
-              ×
+            <span className="bb-tab-title">{t.title}</span>
+            <button
+              type="button"
+              className="bb-tab-close"
+              aria-label={`Close ${t.title}`}
+              onClick={(e) => closeTab(t.id, e)}
+            >
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
             </button>
           </div>
         ))}
       </div>
+
+      <button
+        type="button"
+        className="bb-tabs-add"
+        title="Duplicate current tab"
+        aria-label="Duplicate current tab"
+        onClick={duplicateCurrent}
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
     </div>
   );
 }
