@@ -24,7 +24,8 @@ function LoginForm() {
   const { resetRecipeState } = useRecipeContext();
 
   useEffect(() => {
-    if (user) {
+    // пустой объект {} тоже truthy — проверяем именно id
+    if (user?.id) {
       navigate('/');
     }
   }, [user]);
