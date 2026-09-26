@@ -12,6 +12,7 @@ import {
   NEW_PRODUCT_SOCKET,
   NEW_RECIPE_SOCKET,
   NEW_WAREHOUSE_SOCKET,
+  NEED_DELETE_WAREHOUSE_SOCKET,
   REMAINING_STOCK_SOCKET,
   NEW_MATERIAL_PLAN_SOCKET,
   STATUS_OF_ORDER_SOCKET,
@@ -595,6 +596,13 @@ export const addNewWarehouseSocket = (new_warehouse) => {
   return {
     type: NEW_WAREHOUSE_SOCKET,
     payload: new_warehouse,
+  };
+};
+
+export const deleteWarehouseSocket = (warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_SOCKET,
+    payload: warehouse_id,
   };
 };
 

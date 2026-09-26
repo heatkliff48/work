@@ -21,6 +21,7 @@ const {
   OrderDispatches,
   sequelize,
 } = require('../db/models');
+const { NotFound, Conflict } = require('../utils/Errors.js');
 
 const MODELS_BY_TYPE = {
   product: Warehouses,
@@ -180,6 +181,33 @@ class WarehouseRepository {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error', error);
       return error;
     }
+  }
+
+  // Удалять можно только записи качества NOT OK без резервов
+  static async deleteWarehouse(warehouse_id) {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>deleteWarehouse', warehouse_id);
+
+    const warehouse = await Warehouses.findByPk(warehouse_id);
+
+    if (!warehouse) {
+      throw new NotFound(`Warehouse entry ${warehouse_id} not found`);
+    }
+
+    if (warehouse.type !== 'NOT OK') {
+      throw new Conflict('Only NOT OK warehouse entries can be deleted');
+    }
+
+    const reservedCount = await ReservedProducts.count({
+      where: { warehouse_id },
+    });
+
+    if (reservedCount > 0) {
+      throw new Conflict('Warehouse entry has reserved products');
+    }
+
+    await Warehouses.destroy({ where: { id: warehouse_id } });
+
+    return warehouse.id;
   }
 
   static async addNewListOfOrderedProduction(ordered_production) {

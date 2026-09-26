@@ -138,6 +138,9 @@ export const UPDATE_REL_MAT_PRODUCT_INFO_OF_ORDER_SOCKET =
 export const ADD_NEW_WAREHOUSE_SOCKET = 'ADD_NEW_WAREHOUSE_SOCKET';
 export const NEW_WAREHOUSE_SOCKET = 'NEW_WAREHOUSE_SOCKET';
 
+export const DELETE_WAREHOUSE_SOCKET = 'DELETE_WAREHOUSE_SOCKET'; // back -> socket.message
+export const NEED_DELETE_WAREHOUSE_SOCKET = 'NEED_DELETE_WAREHOUSE_SOCKET'; // socketAction -> reducer
+
 export const ADD_NEW_CLIENT_SOCKET = 'ADD_NEW_CLIENT_SOCKET'; // back -> socket.message
 export const NEW_CLIENT_SOCKET = 'NEW_CLIENT_SOCKET'; // socketAction -> reducer
 

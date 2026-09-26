@@ -11,6 +11,7 @@ import {
   addNewRecipeSocket,
   addNewStockBalanceSocket,
   addNewWarehouseSocket,
+  deleteWarehouseSocket,
   deeleteProductOfOrderSocket,
   deleteFilesOrderSocket,
   deleteFilesProductSocket,
@@ -201,6 +202,7 @@ import {
   UPDATE_ROLE_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
   ADD_NEW_WAREHOUSE_SOCKET,
+  DELETE_WAREHOUSE_SOCKET,
   DELETE_BATCH_OUTSIDE_SOCKET,
   ADD_NEW_RECIPE_SOCKET,
   DELETE_RECIPE_SOCKET,
@@ -533,6 +535,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case ADD_NEW_WAREHOUSE_SOCKET:
       dispatch(addNewWarehouseSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_SOCKET:
+      dispatch(deleteWarehouseSocket(payload));
       break;
 
     case ADD_NEW_CLIENT_SOCKET:
