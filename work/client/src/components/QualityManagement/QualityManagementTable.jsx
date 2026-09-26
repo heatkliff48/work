@@ -87,6 +87,9 @@ const QualityManagementTable = () => {
 
   const [consumptionCalculated, setConsumptionCalculated] = useState({});
   const [dateValue, setDateValue] = useState(null);
+  // Пластик на упаковку вводится вручную, общий на все партии, kg
+  const [plasticUsed, setPlasticUsed] = useState('');
+  const [plasticWasted, setPlasticWasted] = useState('');
   const [filteredList, setFilteredList] = useState([]);
   const [relatedProductsModal, setRelatedProductsModal] = useState(false);
 
@@ -300,7 +303,8 @@ const QualityManagementTable = () => {
   };
 
   // Обработка одной записи (вызывается в цикле)
-  const processSingleBatch = async (currentData, count) => {
+  // plasticQuantity > 0 только у одной партии — пластик списывается один раз
+  const processSingleBatch = async (currentData, count, plasticQuantity = 0) => {
     const {
       id,
       batch_id,
@@ -375,27 +379,12 @@ const QualityManagementTable = () => {
         item.remaining_quantity >= totalQuantityForRawMatWarehouse,
     );
 
-    const checkPlastics = raw_materials_warehouse.some(
-      (item) =>
-        item.material_type == 'Plastics' &&
-        item.remaining_quantity >= totalQuantityForRawMatWarehouse * 0.45,
-    );
-
     if (!checkPallets) {
       const pallets =
         raw_materials_warehouse.find((item) => item.material_type == 'Pallets')
           ?.remaining_quantity || 0;
       throw new Error(
         `Not enough pallets in the warehouse for batch ${batch_id}. Available: ${pallets}, need: ${totalQuantityForRawMatWarehouse}.`,
-      );
-    }
-
-    if (!checkPlastics) {
-      const plastics =
-        raw_materials_warehouse.find((item) => item.material_type == 'Plastics')
-          ?.remaining_quantity || 0;
-      throw new Error(
-        `Not enough plastic in the warehouse for batch ${batch_id}. Available: ${plastics}, need: ${totalQuantityForRawMatWarehouse * 0.45}.`,
       );
     }
 
@@ -514,6 +503,7 @@ const QualityManagementTable = () => {
       deleteQualityManagement({
         id,
         quantity: totalQuantityForRawMatWarehouse,
+        plastic_quantity: plasticQuantity,
       }),
     );
 
@@ -552,8 +542,35 @@ const QualityManagementTable = () => {
       return;
     }
 
+    if (plasticUsed === '' || plasticWasted === '') {
+      alert('Enter plastic total used and total wasted, kg.');
+      return;
+    }
+
+    const used = parseFloat(plasticUsed);
+    const wasted = parseFloat(plasticWasted);
+    if (isNaN(used) || isNaN(wasted) || used < 0 || wasted < 0) {
+      alert('Plastic used and wasted must be non-negative numbers.');
+      return;
+    }
+
+    // Со склада уходит и использованный пластик, и отходы
+    const plasticTotal = +(used + wasted).toFixed(2);
+    const plasticAvailable =
+      raw_materials_warehouse.find((item) => item.material_type == 'Plastics')
+        ?.remaining_quantity || 0;
+
+    if (plasticTotal > plasticAvailable) {
+      alert(
+        `Not enough plastic in the warehouse. Available: ${plasticAvailable}, need: ${plasticTotal}.`,
+      );
+      return;
+    }
+
     const isConfirmed = window.confirm(
-      `Are you sure you want to finish ALL ${qualityManagementDataList.length} batch(es)?\nPress 'OK' to confirm or 'Cancel' to exit.`,
+      `Are you sure you want to finish ALL ${qualityManagementDataList.length} batch(es)?\n` +
+        `Plastic: used ${used} kg + wasted ${wasted} kg = ${plasticTotal} kg.\n` +
+        `Press 'OK' to confirm or 'Cancel' to exit.`,
     );
 
     if (!isConfirmed) return;
@@ -562,11 +579,18 @@ const QualityManagementTable = () => {
     const processedBatches = [];
 
     let count = 0;
+    // Пластик списывается вместе с первой успешно обработанной партией
+    let plasticToWriteOff = plasticTotal;
 
     for (const record of qualityManagementDataList) {
       try {
-        const result = await processSingleBatch(record, count);
+        const result = await processSingleBatch(
+          record,
+          count,
+          plasticToWriteOff,
+        );
         processedBatches.push(result);
+        plasticToWriteOff = 0;
         count += 1;
       } catch (error) {
         console.error(`Error processing batch ${record.batch_id}:`, error);
@@ -585,6 +609,8 @@ const QualityManagementTable = () => {
         });
         return newValues;
       });
+      setPlasticUsed('');
+      setPlasticWasted('');
     }
 
     setBatchID(null);
@@ -668,11 +694,15 @@ const QualityManagementTable = () => {
     return (qualityManagementDataList || []).reduce(
       (acc, item) => {
         acc.plan += Number(item.total_quantity_plan) || 0;
+        // Факт + сортировка — столько паллет уйдёт со склада
+        acc.total +=
+          (Number(inputValues[item.id]?.totalQty) || 0) +
+          (Number(inputValues[item.id]?.sorting) || 0);
         return acc;
       },
-      { plan: 0 },
+      { plan: 0, total: 0 },
     );
-  }, [qualityManagementDataList]);
+  }, [qualityManagementDataList, inputValues]);
 
   // Статус партии по соотношению резерва — вычисляется из уже готовых полей
   const getBatchView = (record) => {
@@ -730,6 +760,11 @@ const QualityManagementTable = () => {
             <div className="cl-stat">
               <div className="cl-stat__num">{pageStats.plan}</div>
               <div className="cl-stat__label">Pallets, plan</div>
+            </div>
+            <div className="cl-stat__divider" />
+            <div className="cl-stat">
+              <div className="cl-stat__num">{pageStats.total}</div>
+              <div className="cl-stat__label">Pallets, total</div>
             </div>
           </div>
         )}
@@ -905,6 +940,40 @@ const QualityManagementTable = () => {
                 className="qm-date__input"
               />
             </div>
+
+            <label
+              className={`qm-date ${plasticUsed === '' ? 'qm-date--required' : ''}`}
+              htmlFor="plasticUsedInput"
+            >
+              <span className="qm-date__label">Plastic, total used, kg</span>
+              <input
+                className="qm-date__input qm-date__input--num"
+                id="plasticUsedInput"
+                type="number"
+                min="0"
+                step="0.01"
+                value={plasticUsed}
+                onChange={(e) => setPlasticUsed(e.target.value)}
+                placeholder="0"
+              />
+            </label>
+
+            <label
+              className={`qm-date ${plasticWasted === '' ? 'qm-date--required' : ''}`}
+              htmlFor="plasticWastedInput"
+            >
+              <span className="qm-date__label">Plastic, total wasted, kg</span>
+              <input
+                className="qm-date__input qm-date__input--num"
+                id="plasticWastedInput"
+                type="number"
+                min="0"
+                step="0.01"
+                value={plasticWasted}
+                onChange={(e) => setPlasticWasted(e.target.value)}
+                placeholder="0"
+              />
+            </label>
 
             <div className="qm-actionbar__spacer" />
 
