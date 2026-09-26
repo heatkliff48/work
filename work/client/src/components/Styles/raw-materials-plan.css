@@ -28,3 +28,9 @@
   padding: 0;
   text-align: center;
 }
+.raw-materials-plan .difference-row th,
+.raw-materials-plan .difference-row td {
+  background-color: #f1f5f9;
+  color: #334155;
+  font-style: italic;
+}
