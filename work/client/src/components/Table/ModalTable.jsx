@@ -27,7 +27,13 @@ const ModalTable = ({ isOpen, toggle, data = [], onClickRow = null }) => {
       } else {
         // Поиск по всем полям (кроме id и скрытых)
         result = result.filter((item) => {
-          const searchableFields = ['article', 'density', 'width'];
+          const searchableFields = [
+            'article',
+            'density',
+            'width',
+            'palletSize',
+            'palletHeight',
+          ];
           return searchableFields.some((field) => {
             const value = item?.[field];
             if (value === undefined || value === null) return false;
@@ -47,6 +53,8 @@ const ModalTable = ({ isOpen, toggle, data = [], onClickRow = null }) => {
       article: item.article,
       density: item?.density,
       width: item?.width,
+      palletSize: item?.palletSize,
+      palletHeight: item?.palletHeight,
       m3InArray: item?.m3InArray,
       volumeBlockOnPallet: item?.volumeBlockOnPallet,
       normOfBrack: item?.normOfBrack,
@@ -130,7 +138,7 @@ const ModalTable = ({ isOpen, toggle, data = [], onClickRow = null }) => {
             <span className="font-medium">
               {searchMode === 'article'
                 ? 'article field only'
-                : 'all fields (article, density, width)'}
+                : 'all fields (article, density, width, pallet size, pallet height)'}
             </span>
           </div>
         )}
