@@ -404,6 +404,7 @@ export const ProductsContextProvider = ({ children }) => {
         { value: 0, label: 'Std' },
         { value: 1, label: 'Marine' },
         { value: 2, label: 'High' },
+        { value: 3, label: 'Std+1' },
       ],
     }),
     [],

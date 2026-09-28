@@ -88,6 +88,7 @@ const ModalWindow = React.memo(
         placeOfProduction,
         typeOfPackaging,
         palletSize,
+        palletHeight,
       } = formInput;
 
       const rightPlaceOfProduction = getOptionValue(
@@ -100,22 +101,37 @@ const ModalWindow = React.memo(
       );
 
       const rightPalletSize = getOptionValue('palletSize', palletSize);
+      // Std+1 (value 3) получает свои буквы M–X, остальные высоты — A–L
+      const rightExtraRow =
+        getOptionValue('palletHeight', palletHeight) === 3 ? 1 : 0;
       const combinationMap = {
-        '0-0-0': 'A',
-        '0-0-1': 'B',
-        '0-0-2': 'C',
-        '0-1-0': 'D',
-        '0-1-1': 'E',
-        '0-1-2': 'F',
-        '1-0-0': 'G',
-        '1-0-1': 'H',
-        '1-0-2': 'I',
-        '1-1-0': 'J',
-        '1-1-1': 'K',
-        '1-1-2': 'L',
+        '0-0-0-0': 'A',
+        '0-0-1-0': 'B',
+        '0-0-2-0': 'C',
+        '0-1-0-0': 'D',
+        '0-1-1-0': 'E',
+        '0-1-2-0': 'F',
+        '1-0-0-0': 'G',
+        '1-0-1-0': 'H',
+        '1-0-2-0': 'I',
+        '1-1-0-0': 'J',
+        '1-1-1-0': 'K',
+        '1-1-2-0': 'L',
+        '0-0-0-1': 'M',
+        '0-0-1-1': 'N',
+        '0-0-2-1': 'O',
+        '0-1-0-1': 'P',
+        '0-1-1-1': 'Q',
+        '0-1-2-1': 'R',
+        '1-0-0-1': 'S',
+        '1-0-1-1': 'T',
+        '1-0-2-1': 'U',
+        '1-1-0-1': 'V',
+        '1-1-1-1': 'W',
+        '1-1-2-1': 'X',
       };
 
-      const combinationKey = `${rightPlaceOfProduction}-${rightTypeOfPackaging}-${rightPalletSize}`;
+      const combinationKey = `${rightPlaceOfProduction}-${rightTypeOfPackaging}-${rightPalletSize}-${rightExtraRow}`;
       const combinationLetter = combinationMap[combinationKey];
 
       if (!combinationLetter) {
@@ -322,14 +338,22 @@ const ModalWindow = React.memo(
       }
 
       // Определение высоты паллета
-      // При редактировании приходит label ('Std' / 'Marine' / 'High'), при создании — value (0 / 1 / 2)
+      // При редактировании приходит label ('Std' / 'Marine' / 'High' / 'Std+1'), при создании — value (0 / 1 / 2 / 3)
       const palletHeightMap = {
         0: 1150,
         1: 1000,
         2: 1500,
+        3: 1150,
         std: 1150,
         marine: 1000,
         high: 1500,
+        'std+1': 1150,
+      };
+
+      // Std+1 — как Std, но с дополнительным рядом блоков сверху
+      const extraRowsMap = {
+        3: 1,
+        'std+1': 1,
       };
 
       const palletHeightKey =
@@ -337,11 +361,13 @@ const ModalWindow = React.memo(
           ? palletHeight.toLowerCase()
           : palletHeight;
       const palletHeightValue = palletHeightMap[palletHeightKey] ?? 1140;
+      const extraRowsValue = extraRowsMap[palletHeightKey] ?? 0;
 
       return {
         palletWidth: palletWidthValue,
         palletLength: palletLengthValue,
         palletHeight: palletHeightValue,
+        extraRows: extraRowsValue,
       };
     };
 
@@ -350,7 +376,7 @@ const ModalWindow = React.memo(
         const values = {};
         const updateFuncs = {};
 
-        const { palletWidth, palletLength, palletHeight } =
+        const { palletWidth, palletLength, palletHeight, extraRows } =
           calculatePalletDimensions(
             formInput?.palletSize,
             formInput?.palletHeight,
@@ -365,7 +391,8 @@ const ModalWindow = React.memo(
           palletHeight
         ) {
           const blocksAlongLength = Math.floor(palletLength / formInput?.lengths);
-          const blocksInHeight = Math.floor(palletHeight / formInput?.width);
+          const blocksInHeight =
+            Math.floor(palletHeight / formInput?.width) + extraRows;
           const blocksAlongWidth = Math.floor(palletWidth / formInput?.height);
 
           values.quantityBlockOnPallet =
