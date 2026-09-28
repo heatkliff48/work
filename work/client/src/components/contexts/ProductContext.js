@@ -473,6 +473,76 @@ export const ProductsContextProvider = ({ children }) => {
     return matchedOption ? matchedOption.value : null;
   };
 
+  // Буква комбинации в артикуле: место-упаковка-размер-высота;
+  // после Z идут цифры 2–7 (без 0/1, чтобы не путать с O/I)
+  const articleCombinationMap = {
+    '0-0-0-0': 'A',
+    '0-0-0-1': 'B',
+    '0-0-0-2': 'C',
+    '0-0-0-3': 'D',
+    '0-0-1-0': 'E',
+    '0-0-1-1': 'F',
+    '0-0-1-2': 'G',
+    '0-0-1-3': 'H',
+    '0-1-0-0': 'I',
+    '0-1-0-1': 'J',
+    '0-1-0-2': 'K',
+    '0-1-0-3': 'L',
+    '0-1-1-0': 'M',
+    '0-1-1-1': 'N',
+    '0-1-1-2': 'O',
+    '0-1-1-3': 'P',
+    '1-0-0-0': 'Q',
+    '1-0-0-1': 'R',
+    '1-0-0-2': 'S',
+    '1-0-0-3': 'T',
+    '1-0-1-0': 'U',
+    '1-0-1-1': 'V',
+    '1-0-1-2': 'W',
+    '1-0-1-3': 'X',
+    '1-1-0-0': 'Y',
+    '1-1-0-1': 'Z',
+    '1-1-0-2': '2',
+    '1-1-0-3': '3',
+    '1-1-1-0': '4',
+    '1-1-1-1': '5',
+    '1-1-1-2': '6',
+    '1-1-1-3': '7',
+  };
+
+  // Принимает как value (при создании), так и label (из latestProducts)
+  const buildProductArticle = ({
+    form,
+    certificate,
+    width,
+    density,
+    placeOfProduction,
+    typeOfPackaging,
+    palletSize,
+    palletHeight,
+  }) => {
+    const combinationKey = [
+      getOptionValue('placeOfProduction', placeOfProduction),
+      getOptionValue('typeOfPackaging', typeOfPackaging),
+      getOptionValue('palletSize', palletSize),
+      getOptionValue('palletHeight', palletHeight),
+    ].join('-');
+    const combinationLetter = articleCombinationMap[combinationKey];
+
+    if (!combinationLetter) {
+      console.warn('Unknown combination for prodArticle:', combinationKey);
+    }
+
+    return `T.${form
+      ?.toUpperCase()
+      .slice(
+        0,
+        1,
+      )}${combinationLetter}D${density.toString().slice(0, 2)}W${width
+      .toString()
+      .slice(0, 2)}${certificate?.substr(0, 1)}`;
+  };
+
   return (
     <ProductsContext.Provider
       value={{
@@ -482,6 +552,7 @@ export const ProductsContextProvider = ({ children }) => {
         products,
         selectOptions,
         getOptionValue,
+        buildProductArticle,
         extractProductTitle,
       }}
     >

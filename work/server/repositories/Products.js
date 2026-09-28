@@ -4,7 +4,23 @@ const {
   QualityDimensions,
   QualityCompressions,
 } = require('../db/models');
+const models = require('../db/models');
 const { sequelize } = require('../db/models');
+const { Op } = require('sequelize');
+const { Conflict, BadRequest } = require('../utils/Errors.js');
+
+// Колонки, в которых хранится артикул продукта (строкой, без связи по id)
+const PRODUCT_ARTICLE_REFERENCES = [
+  ['Warehouses', 'product_article'],
+  ['StockBalances', 'product_article'],
+  ['OrderToWarehouse', 'product_article'],
+  ['ListOfOrderedProductions', 'product_article'],
+  ['ListOfOrderedProductionOEMs', 'product_article'],
+  ['BatchOutside', 'product_article'],
+  ['QualityManagement', 'product_article'],
+  ['ProductionQualities', 'product_article'],
+  ['ProductionBatchLog', 'products_article'],
+];
 
 class ProductsRepository {
   static async getAllProductsData() {
@@ -54,6 +70,59 @@ class ProductsRepository {
     });
 
     return repProduct;
+  }
+
+  // changes: [{ from, to }] — переименовывает артикул во всех версиях продукта
+  // и во всех таблицах, где он упоминается
+  static async fixProductArticles(changes) {
+    const froms = changes.map(({ from }) => from);
+    const tos = changes.map(({ to }) => to);
+
+    if (
+      !changes.length ||
+      [...froms, ...tos].some((article) => !article) ||
+      new Set(froms).size !== froms.length ||
+      new Set(tos).size !== tos.length
+    ) {
+      throw new BadRequest('Invalid list of article changes');
+    }
+
+    // Все замены применяются одним CASE, поэтому цепочки (A→B, B→C) не мешают друг другу
+    const articleCase = (column) =>
+      sequelize.literal(
+        `CASE "${column}" ${changes
+          .map(
+            ({ from, to }) =>
+              `WHEN ${sequelize.escape(from)} THEN ${sequelize.escape(to)}`,
+          )
+          .join(' ')} ELSE "${column}" END`,
+      );
+
+    return sequelize.transaction(async (transaction) => {
+      const taken = await Products.findOne({
+        where: { article: { [Op.in]: tos, [Op.notIn]: froms } },
+        transaction,
+      });
+      if (taken) {
+        throw new Conflict(
+          `Article ${taken.article} is already used by another product`,
+        );
+      }
+
+      const updated = {};
+      for (const [modelName, column] of [
+        ['Products', 'article'],
+        ...PRODUCT_ARTICLE_REFERENCES,
+      ]) {
+        const [count] = await models[modelName].update(
+          { [column]: articleCase(column) },
+          { where: { [column]: { [Op.in]: froms } }, transaction },
+        );
+        updated[modelName] = count;
+      }
+
+      return updated;
+    });
   }
 
   //PRODUCTION QUALITY

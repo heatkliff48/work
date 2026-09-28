@@ -15,6 +15,7 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import PreviewProductCardModal from './modal/PreviewProductCardModal';
+import ArticleCheckModal from './modal/ArticleCheckModal';
 import { updateProduct } from '#components/redux/actions/productsAction.js';
 
 function Products() {
@@ -32,6 +33,7 @@ function Products() {
   const { setProductCardData, previewOperationName } = useProjectContext();
 
   const [data, setData] = useState([]);
+  const [articleCheckModal, setArticleCheckModal] = useState(false);
   const columns = useMemo(() => TABLE_COLUMNS, []);
   // const data = useMemo(() => latestProducts ?? [], [latestProducts, products]);
 
@@ -146,6 +148,13 @@ function Products() {
       )}
 
       {modalProductCard && <ProductCardModal />}
+      {articleCheckModal && (
+        <ArticleCheckModal
+          isOpen={articleCheckModal}
+          toggle={() => setArticleCheckModal(!articleCheckModal)}
+          canFix={userAccess?.canWrite}
+        />
+      )}
       <h1>HCCA Blocks</h1>
       {userAccess?.canWrite && (
         <button
@@ -165,6 +174,7 @@ function Products() {
       <button onClick={() => dispatch(updateProduct())}>
         Fix width in cakes
       </button>
+      <button onClick={() => setArticleCheckModal(true)}>Check articles</button>
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}
         <GlobalFilterInput

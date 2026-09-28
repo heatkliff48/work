@@ -65,6 +65,18 @@ class ProductController {
     }
   }
 
+  static async fixProductArticles(req, res) {
+    const { changes = [] } = req.body;
+
+    try {
+      const updated = await ProductService.fixProductArticles(changes);
+
+      return res.status(200).json({ updated });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   //PRODUCTION QUALITY
   static async getAllProductionQuality(req, res) {
     try {
