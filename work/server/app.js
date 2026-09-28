@@ -67,8 +67,11 @@ const sessionParser = session({
   saveUninitialized: false,
   secret: process.env.SECRET,
   resave: false,
+  // Скользящая сессия: каждый HTTP-запрос продлевает её ещё на 12 часов,
+  // выход происходит только после 12 часов бездействия.
+  rolling: true,
   cookie: {
-    expires: 24 * 60 * 60e3,
+    maxAge: 12 * 60 * 60e3,
     httpOnly: true,
   },
 });
@@ -124,6 +127,12 @@ app.use((err, req, res, next) => {
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 
+// Код закрытия WS «сессия недействительна». HTTP-статус ответа на upgrade
+// браузер клиенту не показывает, поэтому используем код из диапазона
+// 4000–4999, отведённого под приложение (по аналогии с HTTP 401).
+const WS_UNAUTHORIZED_CLOSE_CODE = 4401;
+const WS_HEARTBEAT_INTERVAL = 30e3;
+
 app.use('/aldabaran', AldabaranRootRouter);
 app.use('/auth', AuthRootRouter);
 app.use('/products', ProductRootRouter);
@@ -170,8 +179,9 @@ app.use('/temperatureDataMonitoring', temperatureDataMonitoringRouter);
 server.on('upgrade', function (req, socket, head) {
   sessionParser(req, {}, () => {
     if (!req?.session?.user?.id) {
-      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-      socket.destroy();
+      wss.handleUpgrade(req, socket, head, function (ws) {
+        ws.close(WS_UNAUTHORIZED_CLOSE_CODE, 'Unauthorized');
+      });
       return;
     }
 
@@ -193,10 +203,33 @@ wss.on('connection', function (ws, request) {
   const connectionId = `${userId}:${randomUUID()}`;
   map.set(connectionId, ws);
 
+  ws.isAlive = true;
+  ws.on('pong', function () {
+    ws.isAlive = true;
+  });
+
+  // Клиент сам проверяет, живо ли соединение (после сна, смены сети и т.п.)
+  ws.on('message', function (data) {
+    if (data.toString() === 'ping') ws.send('pong');
+  });
+
   ws.on('close', function () {
     map.delete(connectionId);
   });
 });
+
+// Соединения, оборванные без закрытия (сон ноутбука, пропала сеть),
+// не присылают pong — закрываем их, чтобы не слать сообщения в пустоту.
+setInterval(function () {
+  for (const ws of map.values()) {
+    if (!ws.isAlive) {
+      ws.terminate();
+      continue;
+    }
+    ws.isAlive = false;
+    ws.ping();
+  }
+}, WS_HEARTBEAT_INTERVAL);
 
 server.listen(process.env.PORT, '0.0.0.0', () => {
   console.log(`Server start on http://ваш_локальный_IP:${process.env.PORT}`);
