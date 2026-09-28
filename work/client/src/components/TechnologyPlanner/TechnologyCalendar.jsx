@@ -152,6 +152,13 @@ export default function TechnologyCalendar() {
     );
   };
 
+  const recipeBatchHasRecipe =
+    recipeBatchId != null &&
+    Array.isArray(recipeOrders) &&
+    recipeOrders.some(
+      (ro) => ro.id_batch === recipeBatchId && ro.id_recipe != null,
+    );
+
   const getRecipeByArticle = (article) =>
     (Array.isArray(list_of_recipes) &&
       list_of_recipes.find((r) => r.article === article)) ||
@@ -328,14 +335,24 @@ export default function TechnologyCalendar() {
                       </div>
                     </div>
                     {recipe ? (
-                      <button
-                        type="button"
-                        className="tc-recipe-view-btn"
-                        style={styles.recipeBadgeOkBtn}
-                        onClick={() => handleRecipeClick(recipe)}
-                      >
-                        Recipe: {recipe.article}
-                      </button>
+                      <div style={styles.recipeActions}>
+                        <button
+                          type="button"
+                          className="tc-recipe-view-btn"
+                          style={styles.recipeBadgeOkBtn}
+                          onClick={() => handleRecipeClick(recipe)}
+                        >
+                          Recipe: {recipe.article}
+                        </button>
+                        <button
+                          type="button"
+                          className="tc-recipe-btn"
+                          style={styles.selectRecipeBtn}
+                          onClick={() => setRecipeBatchId(batch.id)}
+                        >
+                          Change recipe
+                        </button>
+                      </div>
                     ) : (
                       <button
                         type="button"
@@ -393,7 +410,9 @@ export default function TechnologyCalendar() {
         fullscreen
       >
         <Modal.Header closeButton>
-          <Modal.Title>Select recipe</Modal.Title>
+          <Modal.Title>
+            {recipeBatchHasRecipe ? 'Change recipe' : 'Select recipe'}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {recipeBatchId && (
@@ -649,6 +668,12 @@ const styles = {
     padding: '4px 10px',
     border: 'none',
     cursor: 'pointer',
+  },
+  recipeActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    flexShrink: 0,
   },
   selectRecipeBtn: {
     flexShrink: 0,

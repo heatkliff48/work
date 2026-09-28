@@ -22,6 +22,7 @@ const {
   UPDATE_REMAINING_STOCK_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
   ADD_NEW_WAREHOUSE_SOCKET,
+  DELETE_WAREHOUSE_SOCKET,
   ADD_NEW_RECIPE_SOCKET,
   DELETE_RECIPE_SOCKET,
   ADD_NEW_FILES_WAREHOUSE_SOCKET,
@@ -649,6 +650,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_SOCKET,
           payload: new_warehouse,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_WAREHOUSE_SOCKET, (warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_WAREHOUSE_SOCKET,
+          payload: warehouse_id,
         }),
       );
     }

@@ -5,6 +5,7 @@ const {
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   UPDATE_REMAINING_STOCK_SOCKET,
   ADD_NEW_WAREHOUSE_SOCKET,
+  DELETE_WAREHOUSE_SOCKET,
   GET_NEW_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   GET_UPDATE_PRODUCT_FROM_RESERVED_LIST_SOCKET,
   GET_NEW_DRY_MIXED_PRODUCT_FROM_RESERVED_LIST_SOCKET,
@@ -102,6 +103,19 @@ class WarehouseController {
 
       myEmitter.emit(ADD_NEW_WAREHOUSE_SOCKET, new_warehouse);
       return res.status(200).json({ new_warehouse });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async deleteWarehouse(req, res) {
+    const { warehouse_id } = req.body;
+
+    try {
+      const deleted_id = await WarehouseService.deleteWarehouse(warehouse_id);
+
+      myEmitter.emit(DELETE_WAREHOUSE_SOCKET, deleted_id);
+      return res.status(200).json({ warehouse_id: deleted_id });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

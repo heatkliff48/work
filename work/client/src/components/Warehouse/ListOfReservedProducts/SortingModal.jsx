@@ -208,8 +208,11 @@ function SortingModal(props) {
       await dispatch(updListOfOrderedProduction(ordered_production));
     }
 
-    const not_ok_warehouse_entrie = warehouse_entries.find((el) =>
-      el.type?.includes('NOT OK'),
+    // NOT OK паллеты ведутся по партиям: batch_id переносится с Sorting
+    const not_ok_warehouse_entrie = warehouse_entries.find(
+      (el) =>
+        el.type?.includes('NOT OK') &&
+        (el.batch_id ?? null) === (curr_warehouse?.batch_id ?? null),
     );
 
     if (not_ok_warehouse_entrie) {
@@ -234,6 +237,7 @@ function SortingModal(props) {
           total_quantity: sortingInput.not_ok,
           type: 'NOT OK',
           sorting: 0,
+          batch_id: curr_warehouse?.batch_id ?? null,
         }),
       );
     }

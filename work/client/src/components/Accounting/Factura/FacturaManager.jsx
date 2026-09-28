@@ -2,7 +2,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import Table from '#components/Table/Table';
 import { useEffect, useMemo, useState } from 'react';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   getAllWarehouse,
   getListOfAnchorReservedProducts,
@@ -306,6 +306,7 @@ function FacturaManager() {
   } = useWarehouseContext();
   const { list_of_orders, deliveryAddresses, getCurrentOrderInfoHandler } =
     useOrderContext();
+  const clients = useSelector((state) => state.clients);
 
   const { latestProducts } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
@@ -393,6 +394,7 @@ function FacturaManager() {
       const delivery = deliveryAddresses.find(
         (d) => d.id === order?.del_adr_id,
       );
+      const client = clients?.find((c) => c.id === order?.owner);
 
       // Формируем productLists для этого заказа
       const productLists = buildProductLists(
@@ -410,6 +412,7 @@ function FacturaManager() {
       return {
         order_id: group.orderId,
         orders_article: order?.article || '',
+        company_name: client?.c_name || '',
         projects_name: delivery?.project_name || '',
         fecha: group.fecha || order?.due_date || '',
         orders_products: group.products,
@@ -428,6 +431,7 @@ function FacturaManager() {
     order_dispatch_data,
     list_of_orders,
     deliveryAddresses,
+    clients,
     latestProducts,
     latestDryMix,
     latestAnchors,
@@ -448,6 +452,11 @@ function FacturaManager() {
         accessor: 'orders_article',
         disableSortBy: true,
         Cell: ArticleMonoCell,
+      },
+      {
+        Header: 'Company',
+        accessor: 'company_name',
+        disableSortBy: true,
       },
       {
         Header: 'Project',
@@ -502,7 +511,7 @@ function FacturaManager() {
         variant="card"
         hideTitle
         emptyTitle="No dispatches match your search"
-        emptySubtitle="Try a different order number, trailer or project name."
+        emptySubtitle="Try a different order number, company, trailer or project name."
         handleRowClick={(row) => {
           getCurrentOrderInfoHandler({ order_id: row.original.order_id });
           setSelectedOrder({
@@ -531,7 +540,7 @@ function FacturaManager() {
               <input
                 type="text"
                 className="fac-search__input"
-                placeholder="Search by order, trailer or project…"
+                placeholder="Search by order, company, trailer or project…"
                 value={globalFilter || ''}
                 onChange={(e) => setGlobalFilter(e.target.value)}
               />

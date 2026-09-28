@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
+import {
+  extractProductTitle,
+  useProductsContext,
+} from '#components/contexts/ProductContext.js';
 import { updateAccountingApproved } from '#components/redux/actions/ordersAction.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
@@ -10,47 +13,79 @@ import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import AccountingInvoiceModal from './AccountingInvoiceModal.jsx';
 import { makeStatusPillCell } from '#components/Orders/ordersCells';
+import {
+  calcBlockPriceWithDelivery,
+  getDeliveryPricePerM2,
+} from '#components/Orders/blockDeliveryPrice.js';
 
 import '#components/Styles/order-card.css';
 import '#components/Orders/ordersView.css';
 import './accountingView.css';
 
-function ProductCategoryTable({ title, rows, qtyField, priceField }) {
+const articleColumn = {
+  key: 'product_article',
+  label: 'Article',
+  render: (row) => <span className="ord-mono">{row.product_article}</span>,
+};
+
+const BLOCK_COLUMNS = [
+  articleColumn,
+  { key: 'trademark', label: 'Trademark' },
+  { key: 'quantity_palet', label: 'Pallets, qty' },
+  { key: 'quantity_m2', label: 'Quantity, m²' },
+  { key: 'quantity_real', label: 'Real quantity, m²' },
+  { key: 'quantity_pcs', label: 'Blocks, pcs' },
+  { key: 'price_m2_with_delivery', label: 'Price incl. delivery, €/m²' },
+  { key: 'final_price', label: 'Total, €' },
+];
+
+const unitColumns = (unitPlural, unit) => [
+  articleColumn,
+  { key: 'product_name', label: 'Product name' },
+  { key: 'quantity_ud', label: `Quantity, ${unitPlural}` },
+  { key: 'pvp', label: `Price, €/${unit}` },
+  { key: 'final_price', label: 'Total, €' },
+];
+
+const DRY_MIX_COLUMNS = unitColumns('bags', 'bag');
+const PIECE_COLUMNS = unitColumns('pcs', 'pc');
+
+function ProductCategoryTable({ title, rows, columns }) {
   return (
     <div className="ord-prod-card">
       <div className="ord-prod-card__head">
         <span className="ord-prod-card__title">{title}</span>
       </div>
-      <table className="ord-prod-table">
-        <thead>
-          <tr>
-            <th>Article</th>
-            <th>Qty</th>
-            <th>Unit price</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.isArray(rows) && rows.length > 0 ? (
-            rows.map((row) => (
-              <tr key={row?.id || row?.product_article}>
-                <td>
-                  <span className="ord-mono">{row.product_article}</span>
-                </td>
-                <td>{row[qtyField]}</td>
-                <td>{row[priceField]}</td>
-                <td>{row.final_price}</td>
-              </tr>
-            ))
-          ) : (
+      <div className="ord-prod-table-wrap">
+        <table className="ord-prod-table">
+          <thead>
             <tr>
-              <td colSpan={4} className="ord-empty-products">
-                No items in this category.
-              </td>
+              {columns.map((col) => (
+                <th key={col.key}>{col.label}</th>
+              ))}
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {Array.isArray(rows) && rows.length > 0 ? (
+              rows.map((row) => (
+                <tr key={row?.id || row?.product_article}>
+                  {columns.map((col) => (
+                    <td key={col.key}>
+                      {col.render ? col.render(row) : (row[col.key] ?? '—')}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length} className="ord-empty-products">
+                  No items in this category.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -155,7 +190,11 @@ const AccountngOrderCard = React.memo(() => {
           );
 
           return product
-            ? { product_article: product.article, ...orderProduct }
+            ? {
+                product_article: product.article,
+                product_name: product.name,
+                ...orderProduct,
+              }
             : { ...orderProduct, product_article: 'Unknown' };
         });
 
@@ -172,14 +211,47 @@ const AccountngOrderCard = React.memo(() => {
     );
   }, [productListOrder, latestProducts, addProductArticleToOrderList]);
 
+  // orderCartData is built without delivery_m2, so read it from the order.
+  const deliveryM2 = useMemo(
+    () =>
+      list_of_orders?.find((order) => order.id === orderCartData?.id)
+        ?.delivery_m2,
+    [list_of_orders, orderCartData?.id],
+  );
+
+  // Blocks are priced with the order's delivery_m2 spread over their m2, the
+  // same way the order card does, so the VAT summary and the factura include it.
+  const blocksListWithDelivery = useMemo(() => {
+    const deliveryPricePerM2 = getDeliveryPricePerM2(
+      updatedProductListOrder,
+      deliveryM2,
+    );
+
+    return updatedProductListOrder.map((product) => {
+      const catalog = latestProducts?.find((p) => p.id === product.product_id);
+      const blocksPerPallet = Number(catalog?.quantityBlockOnPallet) || 0;
+
+      return {
+        ...product,
+        // Trademark with size, as in the technology calendar: "TERMECO 36.5".
+        trademark:
+          extractProductTitle(catalog?.description) || catalog?.tradingMark,
+        quantity_pcs: blocksPerPallet
+          ? Math.round(Number(product.quantity_palet || 0) * blocksPerPallet)
+          : null,
+        ...calcBlockPriceWithDelivery(product, deliveryPricePerM2),
+      };
+    });
+  }, [updatedProductListOrder, latestProducts, deliveryM2]);
+
   useEffect(() => {
-    if (updatedProductListOrder.length > 0) {
+    if (blocksListWithDelivery.length > 0) {
       setProductLists((prevState) => ({
         ...prevState,
-        products: updatedProductListOrder,
+        products: blocksListWithDelivery,
       }));
     }
-  }, [updatedProductListOrder]);
+  }, [blocksListWithDelivery]);
 
   const updatedDryMixesListOrder = useMemo(() => {
     return addProductArticleToOrderList(
@@ -406,33 +478,28 @@ const AccountngOrderCard = React.memo(() => {
           <div>
             <ProductCategoryTable
               title="Products"
-              rows={updatedProductListOrder}
-              qtyField="quantity_real"
-              priceField="price_m2"
+              rows={blocksListWithDelivery}
+              columns={BLOCK_COLUMNS}
             />
             <ProductCategoryTable
               title="Dry mixes"
               rows={updatedDryMixesListOrder}
-              qtyField="quantity_ud"
-              priceField="pvp"
+              columns={DRY_MIX_COLUMNS}
             />
             <ProductCategoryTable
               title="Fastners"
               rows={updatedAnchorsListOrder}
-              qtyField="quantity_ud"
-              priceField="pvp"
+              columns={PIECE_COLUMNS}
             />
             <ProductCategoryTable
               title="Tools"
               rows={updatedToolsListOrder}
-              qtyField="quantity_ud"
-              priceField="pvp"
+              columns={PIECE_COLUMNS}
             />
             <ProductCategoryTable
               title="Related materials"
               rows={updatedRelatedMaterialsListOrder}
-              qtyField="quantity_ud"
-              priceField="pvp"
+              columns={PIECE_COLUMNS}
             />
 
             <div className="ord-summary-card">

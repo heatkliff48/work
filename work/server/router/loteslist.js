@@ -3,6 +3,8 @@ const { Op, where } = require('sequelize');
 const {
   LotesListsBatches,
   LotesListsCakes,
+  RawMaterialsWarehouse,
+  Recipe,
   sequelize,
 } = require('../db/models/index.js');
 const myEmitter = require('../src/ee.js');
@@ -14,6 +16,7 @@ const {
   UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
   UPDATE_LOTES_LIST_NOTE_SOCKET,
   DELETE_LOTES_LIST_CAKES_SOCKET,
+  UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 
@@ -73,6 +76,118 @@ const hasSameRecipe = (existingRecord, incomingRecord) =>
       getRecipeQuantity(existingRecord, fieldNames) ===
       getRecipeQuantity(incomingRecord, fieldNames),
   );
+
+const RETURN_SLURRY_TYPE = 'Return slurry (dry)';
+
+// Everything except the return slurry itself; aluminum is counted too,
+// as the old "All to return slurry" write-off did.
+const SLURRIED_MATERIAL_FIELDS = [
+  'sand_dry',
+  'sand_slurry_dry',
+  'lime',
+  'cement',
+  'gypsum_dry',
+  'gypsum_stone',
+  'aluminum_paste',
+  'aluminum_paste_2',
+];
+
+const round2 = (value) =>
+  Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+
+const createHttpError = (status, message) => {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+};
+
+// Return slurry a cake adds to the warehouse once it is slurried. Casting
+// already wrote off return_dry minus the recipe's produced_return_dry, while a
+// slurried cake gives back all its other materials and consumes no return, so
+// the correction is the sum of the materials plus return_dry minus the
+// produced return.
+const getSlurriedReturnQuantity = async (cakeId, transaction) => {
+  const batchRecord = await LotesListsBatches.findOne({
+    where: {
+      cake_id_start: { [Op.lte]: cakeId },
+      cake_id_finish: { [Op.gte]: cakeId },
+    },
+    order: [['id', 'DESC']],
+    transaction,
+  });
+
+  if (!batchRecord) {
+    throw createHttpError(
+      404,
+      `Materials of cake ${cakeId} not found, cannot change Slurried`,
+    );
+  }
+
+  const materialsTotal = SLURRIED_MATERIAL_FIELDS.reduce(
+    (total, field) => total + round2(Number(batchRecord[field]) || 0),
+    0,
+  );
+
+  const recipe = batchRecord.recipe
+    ? await Recipe.findOne({
+        where: { article: batchRecord.recipe },
+        transaction,
+      })
+    : null;
+
+  const producedReturn = Number(recipe?.produced_return_dry);
+
+  return round2(
+    materialsTotal +
+      round2(Number(batchRecord.return_dry) || 0) -
+      (producedReturn > 0 ? round2(producedReturn) : 0),
+  );
+};
+
+const applySlurriedReturn = async (cakeId, slurried, transaction) => {
+  const quantity = await getSlurriedReturnQuantity(cakeId, transaction);
+
+  if (!quantity) return null;
+
+  const record = await RawMaterialsWarehouse.findOne({
+    where: { material_type: RETURN_SLURRY_TYPE },
+    transaction,
+    lock: transaction.LOCK.UPDATE,
+  });
+
+  if (!record) {
+    throw createHttpError(
+      409,
+      `"${RETURN_SLURRY_TYPE}" is not configured in the warehouse`,
+    );
+  }
+
+  const currentRemaining = round2(Number(record.remaining_quantity) || 0);
+  const newRemaining = round2(
+    currentRemaining + (slurried ? quantity : -quantity),
+  );
+
+  if (newRemaining < 0) {
+    throw createHttpError(
+      409,
+      `There is not enough "${RETURN_SLURRY_TYPE}" in the warehouse: ` +
+        `required ${quantity}, available ${currentRemaining}`,
+    );
+  }
+
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+
+  return record.update(
+    {
+      remaining_quantity: newRemaining,
+      last_updated: `${day}.${month}.${now.getFullYear()}`,
+      updatedAt: now,
+    },
+    { transaction },
+  );
+};
 
 lotesListRouter.get('/batches', async (req, res) => {
   try {
@@ -326,7 +441,7 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes', async (req, res) => {
   try {
-    const { id, note, casting_temp_c, flowability } = req.body;
+    const { id, note, casting_temp_c, flowability, slurried } = req.body;
     const numericId = Number(id);
 
     if (!Number.isFinite(numericId)) {
@@ -340,27 +455,55 @@ lotesListRouter.post('/cakes', async (req, res) => {
       updates.casting_temp_c = casting_temp_c;
     }
     if (flowability !== undefined) updates.flowability = flowability;
+    if (slurried !== undefined) updates.slurried = Boolean(slurried);
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'No fields to update' });
     }
 
-    const [count, rows] = await LotesListsCakes.update(updates, {
-      where: { id: numericId },
-      returning: true,
-    });
+    // The flag and its return slurry correction are saved together, and the
+    // correction runs only when the stored flag actually changes.
+    const { updatedCake, updatedWarehouseRecord } = await sequelize.transaction(
+      async (transaction) => {
+        const cake = await LotesListsCakes.findByPk(numericId, {
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        });
 
-    if (count === 0) {
-      return res.status(404).json({ error: `Cake ${numericId} not found` });
-    }
+        if (!cake) {
+          throw createHttpError(404, `Cake ${numericId} not found`);
+        }
 
-    const updatedCake = rows[0];
+        const slurriedChanged =
+          updates.slurried !== undefined &&
+          updates.slurried !== Boolean(cake.slurried);
+
+        const updatedWarehouseRecord = slurriedChanged
+          ? await applySlurriedReturn(numericId, updates.slurried, transaction)
+          : null;
+
+        return {
+          updatedCake: await cake.update(updates, { transaction }),
+          updatedWarehouseRecord,
+        };
+      },
+    );
+
     myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, [updatedCake]);
+
+    if (updatedWarehouseRecord) {
+      myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, [
+        updatedWarehouseRecord.toJSON(),
+      ]);
+    }
 
     return res.status(200).json(updatedCake);
   } catch (err) {
-    console.error(err.message);
-    return res.status(500).json({ error: err.message });
+    const status = Number(err.status) || 500;
+
+    if (status >= 500) console.error(err.message);
+
+    return res.status(status).json({ error: err.message });
   }
 });
 
@@ -386,6 +529,9 @@ lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
     delete out.id;
     delete out.createdAt;
     delete out.updatedAt;
+    // Slurried moves return slurry in the warehouse, so it changes only via
+    // POST /cakes, never by copying one cake's data onto others
+    delete out.slurried;
     return out;
   };
 

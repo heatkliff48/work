@@ -39,6 +39,12 @@ class WarehouseService {
     return new_warehouse;
   }
 
+  static async deleteWarehouse(warehouse_id) {
+    const deleted_id = await WarehouseRepository.deleteWarehouse(warehouse_id);
+
+    return deleted_id;
+  }
+
   static async addNewListOfOrderedProduction({ orderedProduction }) {
     const new_ordered_production =
       await WarehouseRepository.addNewListOfOrderedProduction(orderedProduction);

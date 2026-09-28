@@ -68,6 +68,7 @@ function CakeFillUp() {
   const [cakeNotes, setCakeNotes] = useState({});
   const [cakeCastingTemperatures, setCakeCastingTemperatures] = useState({});
   const [cakeFlowabilities, setCakeFlowabilities] = useState({});
+  const [cakeSlurried, setCakeSlurried] = useState({});
 
   const production_plan_table = [
     { Header: 'Date', accessor: 'date', Filter: TextSearchFilter },
@@ -247,6 +248,7 @@ function CakeFillUp() {
     setCakeNotes({});
     setCakeCastingTemperatures({});
     setCakeFlowabilities({});
+    setCakeSlurried({});
   }, []);
 
   useEffect(() => {
@@ -369,6 +371,7 @@ function CakeFillUp() {
                 : '',
             castingTemperature: record?.casting_temp_c ?? '',
             flowability: savedCake?.flowability ?? '',
+            slurried: Boolean(savedCake?.slurried),
           };
         });
       })
@@ -390,6 +393,7 @@ function CakeFillUp() {
     const castingTemperature =
       cakeCastingTemperatures[cake.id] ?? cake.castingTemperature ?? '';
     const flowability = cakeFlowabilities[cake.id] ?? cake.flowability ?? '';
+    const slurried = cakeSlurried[cake.id] ?? cake.slurried;
 
     const normalizeOptionalNumber = (value) => {
       if (value === '' || value == null) return null;
@@ -405,6 +409,7 @@ function CakeFillUp() {
           note,
           casting_temp_c: normalizeOptionalNumber(castingTemperature),
           flowability: normalizeOptionalNumber(flowability),
+          slurried,
         })
       );
 
@@ -420,6 +425,13 @@ function CakeFillUp() {
         ...previousValues,
         [cake.id]: flowability,
       }));
+      // The server may refuse the warehouse correction, so show the stored
+      // flag instead of keeping the local one
+      setCakeSlurried((previousValues) => {
+        const nextValues = { ...previousValues };
+        delete nextValues[cake.id];
+        return nextValues;
+      });
       setActiveCakeId(null);
     } catch (error) {
       console.error('Failed to save cake note:', error);
@@ -563,6 +575,7 @@ function CakeFillUp() {
     setCakeNotes({});
     setCakeCastingTemperatures({});
     setCakeFlowabilities({});
+    setCakeSlurried({});
   };
 
   const hasCakeFillUp = cakeFillUp && Object.keys(cakeFillUp).length > 0;
@@ -1010,6 +1023,29 @@ function CakeFillUp() {
                                   border: '1px solid rgba(0,0,0,0.25)',
                                 }}
                               />
+                            </label>
+                          </div>
+
+                          <div className="form-check" style={{ marginBottom: 8 }}>
+                            <input
+                              id={`cake-slurried-${activeCake.id}`}
+                              className="form-check-input"
+                              type="checkbox"
+                              checked={
+                                cakeSlurried[activeCake.id] ?? activeCake.slurried
+                              }
+                              onChange={(event) =>
+                                setCakeSlurried((previousValues) => ({
+                                  ...previousValues,
+                                  [activeCake.id]: event.target.checked,
+                                }))
+                              }
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={`cake-slurried-${activeCake.id}`}
+                            >
+                              Slurried
                             </label>
                           </div>
 

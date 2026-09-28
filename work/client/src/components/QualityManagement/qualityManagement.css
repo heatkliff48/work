@@ -218,6 +218,8 @@
 .qm-field {
   display: flex;
   flex-direction: column;
+  /* подписи разной длины переносятся по-разному — поля прижаты к низу */
+  justify-content: space-between;
   gap: 6px;
   min-width: 0;
 }
@@ -357,6 +359,10 @@
 .qm-page .qm-date__input:focus {
   border-color: var(--cl-red);
   box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+
+.qm-page .qm-date__input.qm-date__input--num {
+  width: 110px;
 }
 
 .qm-date--required .qm-date__input {

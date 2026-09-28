@@ -1,6 +1,7 @@
 import {
   NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
   NEW_WAREHOUSE_SOCKET,
+  NEED_DELETE_WAREHOUSE_SOCKET,
   REMAINING_STOCK_SOCKET,
   WAREHOUSE_QUANTITYS_SOCKET,
 } from '../types/socketTypes/socket';
@@ -20,6 +21,10 @@ export const warehouseReducer = (warehouse = [], action) => {
 
     case NEW_WAREHOUSE_SOCKET: {
       return [...warehouse, payload];
+    }
+
+    case NEED_DELETE_WAREHOUSE_SOCKET: {
+      return warehouse.filter((el) => el.id != payload);
     }
 
     case WAREHOSE_QUANTITYS:

@@ -123,11 +123,19 @@ qualityManagementRouter.post('/delete', async (req, res) => {
   const { qualityManagementDataID } = req.body;
   const id = qualityManagementDataID.id || qualityManagementDataID;
   const quantity = qualityManagementDataID.quantity || req.body.quantity;
+  // Пластик (использовано + отходы, kg) вводится вручную и приходит только с одной партией
+  const plasticQuantity =
+    Number(
+      qualityManagementDataID.plastic_quantity ?? req.body.plastic_quantity,
+    ) || 0;
 
-  const material_types = [
-    { material_type: 'Pallets', quantity: quantity },
-    { material_type: 'Plastics', quantity: quantity * 0.45 },
-  ];
+  const material_types = [{ material_type: 'Pallets', quantity: quantity }];
+  if (plasticQuantity > 0) {
+    material_types.push({
+      material_type: 'Plastics',
+      quantity: plasticQuantity,
+    });
+  }
 
   const t = await sequelize.transaction();
 

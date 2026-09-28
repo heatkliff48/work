@@ -93,7 +93,8 @@ function Main() {
   const { warehouse_sand_slurry } = useWarehouseContext();
 
   useEffect(() => {
-    if (!user || !localStorage.getItem('user')) {
+    // та же проверка, что и в LoginForm — иначе редиректы зациклятся
+    if (!user?.id) {
       navigate('/sign-in');
     }
   }, [user]);

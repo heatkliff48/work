@@ -44,21 +44,15 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
     'aluminum_paste_2',
   ];
 
-  // Raw materials already reserved by batches planned elsewhere (i.e. not part
-  // of this view) must be deducted from warehouse stock, so "remaining" here
-  // reflects free stock rather than total stock. Batches shown in the current
-  // view are excluded from this deduction since their own need is already
-  // accounted for separately in the "Total"/"Requirement" rows below.
-  const currentBatchIds = new Set(
-    productsArray.map((product) => product.id_batch),
-  );
-
+  // Raw materials already reserved by every saved recipe order are deducted
+  // from warehouse stock, so "remaining" here reflects free stock rather than
+  // total stock. That includes batches shown in this view: when one of them
+  // already has a recipe, only the difference between the selected and the
+  // previous recipe is taken from the free stock (see getDifference below).
   const reservedByTitle = {};
   const reservedAluminumByType = {};
 
   (recipeOrders || []).forEach((order) => {
-    if (currentBatchIds.has(order.id_batch)) return;
-
     const recipe = (list_of_recipes || []).find(
       (r) => r.id === order.id_recipe,
     );
@@ -136,25 +130,47 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
         ...productsArray.flatMap((product) => [
           product.current_recipe?.aluminum_type,
           product.current_recipe?.aluminum_2_type,
+          product.previous_recipe?.aluminum_type,
+          product.previous_recipe?.aluminum_2_type,
         ]),
       ].filter(Boolean),
     ),
   );
 
-  const getAluminumAmount = (type, product) => {
-    if (!product.current_recipe) return 0;
-    const recipe = product.current_recipe;
+  const getRecipeAluminumAmount = (type, recipe, volume) => {
+    if (!recipe) return 0;
     let amount = 0;
-    if (recipe.aluminum_type === type) amount += recipe.aluminum_paste || 0;
-    if (recipe.aluminum_2_type === type) amount += recipe.aluminum_paste_2 || 0;
-    return (amount * product.quantity).toFixed(2);
+    if (recipe.aluminum_type === type)
+      amount += Number(recipe.aluminum_paste) || 0;
+    if (recipe.aluminum_2_type === type)
+      amount += Number(recipe.aluminum_paste_2) || 0;
+    return amount * volume;
   };
 
+  const getAluminumAmount = (type, product) => {
+    if (!product.current_recipe) return 0;
+    return getRecipeAluminumAmount(
+      type,
+      product.current_recipe,
+      product.quantity,
+    ).toFixed(2);
+  };
+
+  // What is already reserved for this batch by its saved recipe order is
+  // already out of "remaining", so only the difference counts against it.
+  const getAluminumDifference = (type, product) =>
+    (parseFloat(getAluminumAmount(type, product)) || 0) -
+    getRecipeAluminumAmount(
+      type,
+      product.previous_recipe,
+      product.previous_volume,
+    );
+
   const calculateAluminumTotal = (type) => {
-    return productsArray.reduce((sum, product) => {
-      const amount = parseFloat(getAluminumAmount(type, product)) || 0;
-      return sum + amount;
-    }, 0);
+    return productsArray.reduce(
+      (sum, product) => sum + getAluminumDifference(type, product),
+      0,
+    );
   };
 
   const handleOrderShareChange = (name, value) => {
@@ -165,10 +181,10 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
   };
 
   const calculateTotal = (material) => {
-    return productsArray.reduce((sum, product) => {
-      const amount = parseFloat(mathFunc(material.title, product)) || 0;
-      return sum + amount;
-    }, 0);
+    return productsArray.reduce(
+      (sum, product) => sum + getDifference(material.title, product),
+      0,
+    );
   };
 
   const calculateNeed = (total) => {
@@ -182,6 +198,20 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
   const mathFunc = (mat_num, product) => {
     if (!product.current_recipe) return 0;
     return (product.current_recipe[mat_num] * product.quantity).toFixed(2);
+  };
+
+  const getDifference = (mat_num, product) => {
+    const current = parseFloat(mathFunc(mat_num, product)) || 0;
+    if (!product.previous_recipe) return current;
+    const previous =
+      (Number(product.previous_recipe[mat_num]) || 0) *
+      product.previous_volume;
+    return current - previous;
+  };
+
+  const formatDifference = (value) => {
+    const rounded = Math.round(value * 100) / 100;
+    return rounded > 0 ? `+${rounded.toFixed(2)}` : rounded.toFixed(2);
   };
 
   const handlerSave = () => {
@@ -253,13 +283,32 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
           /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/,
         );
 
+        // A batch that already has a saved recipe order starts from that
+        // recipe, and keeps it (with the volume it was reserved for) as the
+        // baseline the new selection is compared against.
+        const savedOrder = (recipeOrders || []).find(
+          (order) => order.id_batch === batch.id,
+        );
+        const previousVolume = Number(savedOrder?.production_volume) || 0;
+        const previousRecipe =
+          savedOrder && previousVolume
+            ? list_of_recipes.find(
+                (recipe) => recipe.id === savedOrder.id_recipe,
+              ) || null
+            : null;
+
         return {
           id_batch: batch.id,
           product_article: productArticle,
           quantity,
           recipeArray,
           recipeOptions,
-          current_recipe: recipeArray[0],
+          current_recipe:
+            (previousRecipe &&
+              recipeArray.find((recipe) => recipe.id === previousRecipe.id)) ||
+            recipeArray[0],
+          previous_recipe: previousRecipe,
+          previous_volume: previousVolume,
           description: prodDescription ? prodDescription[1] : '',
           date: batch.date,
         };
@@ -273,6 +322,7 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
     list_of_recipes,
     latestProducts,
     batchId,
+    recipeOrders,
   ]);
 
   useEffect(() => {
@@ -417,71 +467,97 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
           </tr>
 
           {productsArray?.map((product, index) => (
-            <tr>
-              <th key={index} className="product-column">
-                <div>Product: {product?.description}</div>
-                <div>Date: {product.date}</div>
-                <div>
-                  Recipe:
-                  {product?.current_recipe ? (
-                    <Select
-                      onChange={(selectedOption) =>
-                        handleRecipeChange(index, selectedOption)
-                      }
-                      options={product.recipeOptions}
-                      value={{
-                        value: product.current_recipe?.id,
-                        label: product.current_recipe?.description,
-                      }}
-                      styles={{
-                        singleValue: (provided) => ({
-                          ...provided,
-                          color: 'black', // цвет текста выбранного значения
-                        }),
-                        option: (provided, state) => ({
-                          ...provided,
-                          color: state.isSelected ? 'white' : 'black', // выбранная белая, остальные чёрные
-                          backgroundColor: state.isSelected
-                            ? '#2684FF'
-                            : state.isFocused
-                              ? '#e6f0ff' // подсветка при наведении
-                              : 'white',
-                        }),
-                        control: (provided) => ({
-                          ...provided,
-                          backgroundColor: 'white',
-                          color: 'black',
-                        }),
-                      }}
-                    />
-                  ) : (
-                    <> No recipes</>
-                  )}
-                </div>
-                <div>Cake amount: {product.quantity}</div>
-                <div>Description: {product?.current_recipe?.description}</div>
-              </th>
+            <React.Fragment key={product.id_batch}>
+              <tr>
+                <th key={index} className="product-column">
+                  <div>Product: {product?.description}</div>
+                  <div>Date: {product.date}</div>
+                  <div>
+                    Recipe:
+                    {product?.current_recipe ? (
+                      <Select
+                        onChange={(selectedOption) =>
+                          handleRecipeChange(index, selectedOption)
+                        }
+                        options={product.recipeOptions}
+                        value={{
+                          value: product.current_recipe?.id,
+                          label: product.current_recipe?.description,
+                        }}
+                        styles={{
+                          singleValue: (provided) => ({
+                            ...provided,
+                            color: 'black', // цвет текста выбранного значения
+                          }),
+                          option: (provided, state) => ({
+                            ...provided,
+                            color: state.isSelected ? 'white' : 'black', // выбранная белая, остальные чёрные
+                            backgroundColor: state.isSelected
+                              ? '#2684FF'
+                              : state.isFocused
+                                ? '#e6f0ff' // подсветка при наведении
+                                : 'white',
+                          }),
+                          control: (provided) => ({
+                            ...provided,
+                            backgroundColor: 'white',
+                            color: 'black',
+                          }),
+                        }}
+                      />
+                    ) : (
+                      <> No recipes</>
+                    )}
+                  </div>
+                  <div>Cake amount: {product.quantity}</div>
+                  <div>Description: {product?.current_recipe?.description}</div>
+                </th>
 
-              {
-                // productsArray?.map((product, i) =>
-                rawMaterials.map((material) => (
-                  <td className="product-data">
-                    {mathFunc(material.title, product)}
+                {
+                  // productsArray?.map((product, i) =>
+                  rawMaterials.map((material) => (
+                    <td className="product-data">
+                      {mathFunc(material.title, product)}
+                    </td>
+                  ))
+                  // )
+                }
+                {aluminumTypes.map((type) => (
+                  <td key={`alu-${type}`} className="product-data">
+                    {getAluminumAmount(type, product)}
                   </td>
-                ))
-                // )
-              }
-              {aluminumTypes.map((type) => (
-                <td key={`alu-${type}`} className="product-data">
-                  {getAluminumAmount(type, product)}
-                </td>
-              ))}
-              {aluminumTypes.map((type) => (
-                <td key={`alu-${type}`} className="product-data">
-                  {getAluminumAmount(type, product)}
-                </td>
-              ))}
-            </tr>
+                ))}
+                {aluminumTypes.map((type) => (
+                  <td key={`alu-${type}`} className="product-data">
+                    {getAluminumAmount(type, product)}
+                  </td>
+                ))}
+              </tr>
+
+              {product.previous_recipe && (
+                <tr className="difference-row">
+                  <th>
+                    <div>Difference with previous recipe</div>
+                    <div>Previous: {product.previous_recipe.description}</div>
+                  </th>
+                  {rawMaterials.map((material) => (
+                    <td key={material.title}>
+                      {formatDifference(getDifference(material.title, product))}
+                    </td>
+                  ))}
+                  {aluminumTypes.map((type) => (
+                    <td key={`alu-${type}`}>
+                      {formatDifference(getAluminumDifference(type, product))}
+                    </td>
+                  ))}
+                  {aluminumTypes.map((type) => (
+                    <td key={`alu-${type}`}>
+                      {formatDifference(getAluminumDifference(type, product))}
+                    </td>
+                  ))}
+                </tr>
+              )}
+            </React.Fragment>
           ))}
 
           <tr>

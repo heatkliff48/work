@@ -58,6 +58,10 @@ import RelatedMaterialJournalTableOrder from './product_table_order/RelatedMater
 import LiberarModal from './modal/LiberarModal.jsx';
 import RoundPalletsModal from './modal/RoundPalletsModal.jsx';
 import { statusThemeFor } from './ordersCells.jsx';
+import {
+  calcBlockPriceWithDelivery,
+  getDeliveryPricePerM2,
+} from './blockDeliveryPrice.js';
 
 import '#components/Styles/order-card.css';
 import './ordersView.css';
@@ -371,22 +375,13 @@ const OrderCart = React.memo(() => {
     );
   }, [productsOfOrders, latestProducts, addProductArticleToOrderList]);
 
-  const blocksTotalQuantityRealM2 = useMemo(() => {
-    return (updatedProductListOrder || []).reduce(
-      (acc, el) => acc + (Number(el?.quantity_real) || 0),
-      0
-    );
-  }, [updatedProductListOrder]);
-
-  const deliveryPricePerM2 = useMemo(() => {
-    const deliveryM2Total = Number(orderCartData?.delivery_m2 || 0);
-    if (!deliveryM2Total || !blocksTotalQuantityRealM2) return 0;
-    return deliveryM2Total / blocksTotalQuantityRealM2;
-  }, [orderCartData?.delivery_m2, blocksTotalQuantityRealM2]);
+  const deliveryPricePerM2 = useMemo(
+    () => getDeliveryPricePerM2(updatedProductListOrder, orderCartData?.delivery_m2),
+    [updatedProductListOrder, orderCartData?.delivery_m2]
+  );
 
   const blocksListWithDeliveryM2 = useMemo(() => {
     return (updatedProductListOrder || []).map((product) => {
-      const price_m2 = Number(product?.price_m2 || 0);
       const quantity_m2 = Number(product?.quantity_m2 || 0);
       const quantity_real = Number(product?.quantity_real || 0);
       const discount = Number(product?.discount || 0);
@@ -394,10 +389,8 @@ const OrderCart = React.memo(() => {
       const delivery_m2_share =
         (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
 
-      const price_m2_with_delivery = price_m2 + deliveryPricePerM2;
-
-      const final_price =
-        (price_m2_with_delivery * quantity_m2 * (100 - discount)) / 100;
+      const { price_m2_with_delivery, final_price } =
+        calcBlockPriceWithDelivery(product, deliveryPricePerM2);
 
       // Liberar debits this line by area, so quantity_liberated can hold
       // fractional pallets when a child order shipped the same block in
@@ -411,8 +404,8 @@ const OrderCart = React.memo(() => {
       return {
         ...product,
         quantity_liberated_m2: Number(quantity_liberated_m2.toFixed(2)),
-        price_m2_with_delivery: Number(price_m2_with_delivery.toFixed(2)),
-        final_price: Number(final_price.toFixed(2)),
+        price_m2_with_delivery,
+        final_price,
         delivery_m2_share: Number(delivery_m2_share.toFixed(2)),
         final_price_with_delivery: Number(
           (final_price + delivery_m2_share).toFixed(2)

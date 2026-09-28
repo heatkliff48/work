@@ -1,8 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { clearAccountingDataList } from '#components/redux/actions/ordersAction.js';
-import { delUser } from '#components/redux/actions/userAction';
+import { useSelector } from 'react-redux';
+import useLogout from '#utils/useLogout.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import TabsBar from '#components/Main/TabsBar';
@@ -40,7 +39,6 @@ import accountingIcon from '#components/Styles/mainpageing/accounting.svg';
 export default function NavBar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user);
   const accountingDataList = useSelector((state) => state.accountingDataList);
@@ -77,13 +75,7 @@ export default function NavBar() {
     }
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    dispatch(clearAccountingDataList());
-    dispatch(delUser());
-    window.localStorage.clear();
-    localStorage.clear();
-    navigate('/sign-in');
-  };
+  const handleLogout = useLogout();
 
   const username =
     user?.username || user?.login || user?.name || user?.email || 'USER';

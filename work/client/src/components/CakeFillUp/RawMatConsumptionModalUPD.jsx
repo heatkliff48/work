@@ -55,7 +55,6 @@ const RawMaterialsConsumptionModal = React.memo(
 
     const [form, setForm] = useState({});
     const [availableRecipes, setAvailableRecipes] = useState([]);
-    const [govno, setGovno] = useState(false);
     const [confirmFlag, setConfirmFlag] = useState(false);
     const [recipeArticle, setRecipeArticle] = useState('');
     const [selectedRecipe, setSelectedRecipe] = useState(null);
@@ -76,7 +75,6 @@ const RawMaterialsConsumptionModal = React.memo(
       setForm({});
       setConfirmFlag(false);
       // setLotesListCheck(true);
-      setGovno(false);
     }, []);
 
     const previousBatchRecord = useMemo(() => {
@@ -145,6 +143,10 @@ const RawMaterialsConsumptionModal = React.memo(
       return '';
     }, [lotesListCakes, batchCakeIdsDesc]);
 
+    const previousWs =
+      previousCakeWs ||
+      (previousBatchRecord?.w_s != null ? String(previousBatchRecord.w_s) : '');
+
     const wasOpenRef = useRef(false);
 
     // Seed once per opening, so a redraw of the parent does not wipe user input
@@ -164,13 +166,7 @@ const RawMaterialsConsumptionModal = React.memo(
           ? String(previousBatchRecord.mold_id)
           : '',
       );
-      setWs(
-        previousCakeWs ||
-          (previousBatchRecord?.w_s != null
-            ? String(previousBatchRecord.w_s)
-            : ''),
-      );
-    }, [selectedRow, isOpen, previousBatchRecord, previousCakeWs]);
+    }, [selectedRow, isOpen, previousBatchRecord]);
 
     useEffect(() => {
       if (!isOpen) return;
@@ -320,6 +316,21 @@ const RawMaterialsConsumptionModal = React.memo(
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, selectedRecipe?.id, materialsMap, previousBatchRecord]);
+
+    // W/S of the previous cake wins on opening; without it, and after a
+    // recipe change, it comes from the recipe
+    useEffect(() => {
+      if (!isOpen) return;
+
+      const recipeWs = Number(recipeForUI?.water_solids);
+      const fromRecipe =
+        recipeForUI?.water_solids != null && recipeWs > 0
+          ? String(recipeWs)
+          : '';
+
+      setWs((seedFromPrevRef.current && previousWs) || fromRecipe);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, selectedRecipe?.id]);
 
     const resetToDef = (key) => {
       const baseVal = Number(recipeForUI?.[key]);
@@ -623,34 +634,9 @@ const RawMaterialsConsumptionModal = React.memo(
       }
       let result_materials = [...materials];
 
-      if (govno) {
-        const totalConsumedRaw = result_materials
-          .filter(
-            (m) =>
-              m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
-          )
-          .reduce((sum, m) => sum + (Number(m.quantity) || 0), 0);
-
-        if (Number.isFinite(totalConsumedRaw) && totalConsumedRaw > 0) {
-          const idx = result_materials.findIndex(
-            (m) =>
-              m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
-          );
-
-          if (idx >= 0) {
-            result_materials[idx] = {
-              ...result_materials[idx],
-              type: 'Return slurry (dry)',
-              quantity: -totalConsumedRaw.toFixed(2),
-            };
-          } else {
-            result_materials.push({
-              type: 'Return slurry (dry)',
-              quantity: -totalConsumedRaw.toFixed(2),
-            });
-          }
-        }
-      } else if (selectedRecipe?.produced_return_dry) {
+      // A slurried cake is marked later in the note area of Casting; its
+      // return slurry correction is made on the server then
+      if (selectedRecipe?.produced_return_dry) {
         const producedReturn = Number(selectedRecipe.produced_return_dry);
 
         if (Number.isFinite(Number(producedReturn)) && producedReturn > 0) {
@@ -789,7 +775,7 @@ const RawMaterialsConsumptionModal = React.memo(
           product: currentProductName,
           quantity_cakes: 1,
           custom_recipe: materialsMap.some(({ key }) => isRecipeModified(key)),
-          slurried: govno,
+          slurried: false,
           recipe:
             selectedRecipe?.article ||
             recipeArticle ||
@@ -1290,23 +1276,7 @@ const RawMaterialsConsumptionModal = React.memo(
               </table>
             </ModalBody>
 
-            <ModalFooter className="d-flex justify-content-between">
-              <div className="d-flex align-items-center gap-2">
-                <input
-                  id="warehouse-checkbox"
-                  className="form-check-input"
-                  type="checkbox"
-                  checked={govno}
-                  onChange={(e) => setGovno(e.target.checked)}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="warehouse-checkbox"
-                >
-                  All to return slurry
-                </label>
-              </div>
-
+            <ModalFooter>
               <div className="d-flex gap-2">
                 <button
                   className="btn btn-outline-secondary"
