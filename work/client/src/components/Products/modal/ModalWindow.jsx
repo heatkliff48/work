@@ -322,16 +322,21 @@ const ModalWindow = React.memo(
       }
 
       // Определение высоты паллета
+      // При редактировании приходит label ('Std' / 'Marine' / 'High'), при создании — value (0 / 1 / 2)
       const palletHeightMap = {
         0: 1150,
         1: 1000,
         2: 1500,
         std: 1150,
         marine: 1000,
-        height: 1500,
+        high: 1500,
       };
 
-      const palletHeightValue = palletHeightMap[palletHeight] ?? 1140;
+      const palletHeightKey =
+        typeof palletHeight === 'string'
+          ? palletHeight.toLowerCase()
+          : palletHeight;
+      const palletHeightValue = palletHeightMap[palletHeightKey] ?? 1140;
 
       return {
         palletWidth: palletWidthValue,
@@ -359,29 +364,40 @@ const ModalWindow = React.memo(
           palletLength &&
           palletHeight
         ) {
+          const blocksAlongLength = Math.floor(palletLength / formInput?.lengths);
+          const blocksInHeight = Math.floor(palletHeight / formInput?.width);
+          const blocksAlongWidth = Math.floor(palletWidth / formInput?.height);
+
           values.quantityBlockOnPallet =
-            Math.floor(palletLength / formInput?.lengths) *
-            Math.floor(palletHeight / formInput?.width) *
-            Math.floor(palletWidth / formInput?.height);
+            blocksAlongLength * blocksInHeight * blocksAlongWidth;
+
+          console.log('Pallet calc', {
+            'Паллета, мм (Д x Ш x макс. В)': `${palletLength}x${palletWidth}x${palletHeight}`,
+            'Блоков на паллете, шт': values.quantityBlockOnPallet,
+            'Блоков в высоту, шт': blocksInHeight,
+            'Высота паллеты (блоки), см': (blocksInHeight * formInput?.width) / 10,
+          });
 
           updateFuncs.quantityBlockOnPallet = (value) =>
             setFormInput((prev) => ({ ...prev, quantityBlockOnPallet: value }));
         }
 
+        // Объём блока без округления — для расчёта m3 на паллете
+        let volumeBlockExact;
         if (formInput?.lengths && formInput?.height && formInput?.width) {
-          values.volumeBlock = Number(
+          volumeBlockExact =
             (formInput?.lengths * formInput?.height * formInput?.width) /
-              1000000000,
-          ).toFixed(3);
+            1000000000;
+          values.volumeBlock = volumeBlockExact.toFixed(3);
 
           updateFuncs.volumeBlock = (value) =>
             setFormInput((prev) => ({ ...prev, volumeBlock: value }));
         }
 
         // Вычисление m3
-        if (values.quantityBlockOnPallet && values.volumeBlock) {
+        if (values.quantityBlockOnPallet && volumeBlockExact) {
           values.volumeBlockOnPallet = (
-            values.quantityBlockOnPallet * values.volumeBlock
+            values.quantityBlockOnPallet * volumeBlockExact
           ).toFixed(3);
 
           updateFuncs.volumeBlockOnPallet = (value) =>
