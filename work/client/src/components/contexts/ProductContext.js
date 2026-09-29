@@ -410,21 +410,11 @@ export const ProductsContextProvider = ({ children }) => {
     [],
   );
 
-  const latestProducts = useMemo(() => {
-    const newProductList = products?.reduce((acc, product) => {
-      const { article, version } = product;
-      const existingProduct = acc.find((p) => p.article === article);
-      if (!existingProduct) {
-        acc.push(product);
-      } else if (version > existingProduct.version) {
-        acc = acc.map((p) => (p.article === article ? product : p));
-      }
-      return acc;
-    }, []);
-
-    newProductList?.sort((a, b) => a.id - b.id);
-
-    const newlatestProducts = newProductList.map((prod) => {
+  // Все версии карточек, с подписями опций вместо кодов (как в latestProducts).
+  // Строка заказа ссылается по product_id на версию, с которой её оформили,
+  // и остаётся на ней после правки карточки — искать её нужно здесь по id
+  const productVersions = useMemo(() => {
+    return (products || []).map((prod) => {
       const newPlaceOfProduction = selectOptions.placeOfProduction.find(
         (opt) => opt.value == prod.placeOfProduction,
       );
@@ -446,9 +436,24 @@ export const ProductsContextProvider = ({ children }) => {
         palletHeight: newPalletHeight?.label,
       };
     });
-
-    return newlatestProducts;
   }, [products]);
+
+  const latestProducts = useMemo(() => {
+    const newProductList = productVersions.reduce((acc, product) => {
+      const { article, version } = product;
+      const existingProduct = acc.find((p) => p.article === article);
+      if (!existingProduct) {
+        acc.push(product);
+      } else if (version > existingProduct.version) {
+        acc = acc.map((p) => (p.article === article ? product : p));
+      }
+      return acc;
+    }, []);
+
+    newProductList.sort((a, b) => a.id - b.id);
+
+    return newProductList;
+  }, [productVersions]);
 
   const getOptionValue = (category, inputValue) => {
     if (typeof inputValue === 'number') {
@@ -549,6 +554,7 @@ export const ProductsContextProvider = ({ children }) => {
         TABLE_COLUMNS,
         COLUMNS,
         latestProducts,
+        productVersions,
         products,
         selectOptions,
         getOptionValue,

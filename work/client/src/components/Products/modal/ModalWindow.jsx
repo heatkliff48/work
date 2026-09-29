@@ -144,10 +144,12 @@ const ModalWindow = React.memo(
       //   formInput.width ?? '-'
       // }x${formInput.height ?? '-'}mm ${formInput.density ?? '-'}kg/m³`;
 
-      let parsedRC = parseFloat(
-        formInput.resistenciaCompresion.toString()?.replace(',', '.')
-      );
-      if (isNaN(parsedRC)) parsedRC = null;
+      // Поля вводятся текстом и могут содержать запятую ("111,1").
+      // Строку с запятой Sequelize пишет в FLOAT-колонку как NaN, поэтому парсим сами
+      const parseDecimal = (value) => {
+        const parsed = parseFloat(String(value ?? '').replace(',', '.'));
+        return isNaN(parsed) ? null : parsed;
+      };
 
       const updatedProduct = {
         ...formInput,
@@ -156,7 +158,11 @@ const ModalWindow = React.memo(
         product_code_pall: fullPalletProductCode,
         activeStatus: true,
         description,
-        resistenciaCompresion: parsedRC,
+        resistenciaCompresion: parseDecimal(formInput.resistenciaCompresion),
+        price: parseDecimal(formInput.price),
+        coefficientOfFree: parseDecimal(formInput.coefficientOfFree),
+        normOfBrack: parseDecimal(formInput.normOfBrack),
+        humidity: parseDecimal(formInput.humidity),
       };
 
       const isExistingProduct = products.some(

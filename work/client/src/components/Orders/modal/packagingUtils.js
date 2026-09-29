@@ -19,13 +19,18 @@ export const isSameBlockOtherPackaging = (a = '', b = '') =>
 // Catalog entry a block order line points at, and every package the same block
 // is available in (the line's own package included, so the list doubles as the
 // options of a "ship as" selector).
-export const findBlockPackaging = (orderRow, catalogProducts) => {
+// The line keeps the product version it was ordered with, so the origin is
+// looked up by id among all versions, and it stands in for its own package in
+// the variants; other packages are offered in their latest version.
+export const findBlockPackaging = (orderRow, catalogProducts, productVersions) => {
   const catalog = catalogProducts || [];
   const origin =
-    catalog.find((c) => c.id === orderRow?.product_id) ||
+    (productVersions || catalog).find((c) => c.id === orderRow?.product_id) ||
     catalog.find((c) => c.article === orderRow?.product_article);
   const variants = origin
-    ? catalog.filter((c) => isSameBlockOtherPackaging(c.article, origin.article))
+    ? catalog
+        .filter((c) => isSameBlockOtherPackaging(c.article, origin.article))
+        .map((c) => (c.article === origin.article ? origin : c))
     : [];
 
   return { origin, variants };

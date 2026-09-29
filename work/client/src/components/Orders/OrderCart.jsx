@@ -95,7 +95,7 @@ const OrderCart = React.memo(() => {
   const { displayNames, user } = useProjectContext();
 
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-  const { latestProducts } = useProductsContext();
+  const { productVersions } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
   const {
@@ -370,10 +370,10 @@ const OrderCart = React.memo(() => {
     console.log(productsOfOrders, 'productsOfOrders OrderCart.jsx line 325');
     return addProductArticleToOrderList(
       productsOfOrders,
-      latestProducts,
+      productVersions,
       'products'
     );
-  }, [productsOfOrders, latestProducts, addProductArticleToOrderList]);
+  }, [productsOfOrders, productVersions, addProductArticleToOrderList]);
 
   const deliveryPricePerM2 = useMemo(
     () => getDeliveryPricePerM2(updatedProductListOrder, orderCartData?.delivery_m2),
@@ -497,9 +497,11 @@ const OrderCart = React.memo(() => {
 
   const onProductClickHandler = (sel_prod) => {
     if (orderCartData?.status < 3) {
+      // Блок берём той версии, что в строке заказа, чтобы при сохранении
+      // строка не переехала на последнюю версию карточки
       const product =
         sel_prod.product_article.slice(2, 3) == 'N'
-          ? latestProducts.find((el) => el.article === sel_prod.product_article)
+          ? productVersions.find((el) => el.id === sel_prod.product_id)
           : sel_prod.product_article.slice(2, 3) == 'M'
           ? latestDryMix.find((el) => el.article === sel_prod.product_article)
           : sel_prod.product_article.slice(2, 3) == 'P'
@@ -572,8 +574,8 @@ const OrderCart = React.memo(() => {
 
     // blocks
     updatedProductListOrder?.forEach((product) => {
-      const loc = latestProducts.find(
-        (el) => el.article == product.product_article
+      const loc = productVersions.find(
+        (el) => el.id === product.product_id
       )?.placeOfProduction;
 
       const haveProductReserve = list_of_reserved_products.find(

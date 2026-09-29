@@ -19,7 +19,7 @@ const loadImage = () => {
 };
 
 const PDFGenerator = ({ orderData, productList, vatValue }) => {
-  const { latestProducts } = useProductsContext();
+  const { productVersions } = useProductsContext();
   const { dryMixesJournal, anchor, tool, relatedMaterialsJournal } =
     useProductsTypeJournalContext();
 
@@ -786,9 +786,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       'BAUBLOCK MATERIALES AVANZADOS DE CONSTRUCCIÓN S.L.U. inscrita en el Registro Mercantil de Cádiz el 21 de septiembre de 2021, en el diario 219, asiento 75, al Tomo 2410, folio 49, inscripción 1 con hoja CA-59071 , con domicilio social en Avneida Isaac Newton, num 17,  C.P. 11500, provincia de Cádiz, con N.I.F.  B-16868028. Actualizacion febrero de 2025. Estas CGV pueden verse modificadas o ampliadas por Condiciones Particulares que se negocien entre las Partes.';
 
     const pdfProducts = productList?.products?.map((prod) => {
-      const product = latestProducts.find(
-        (el) => el.article == prod.product_article,
-      );
+      // Версия карточки, с которой оформлена строка заказа
+      const product = productVersions.find((el) => el.id === prod.product_id);
 
       const descripcion = `BAUBLOCK®${
         product?.tradingMark

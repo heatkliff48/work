@@ -107,7 +107,7 @@ const AccountngOrderCard = React.memo(() => {
     filterKeysOrder,
   } = useOrderContext();
   const { displayNames } = useProjectContext();
-  const { latestProducts } = useProductsContext();
+  const { latestProducts, productVersions } = useProductsContext();
   const { latestDryMix, latestRelatedMaterials, latestAnchors, latestTools } =
     useProductsTypeJournalContext();
   const { userAccess } = useUsersContext();
@@ -206,10 +206,10 @@ const AccountngOrderCard = React.memo(() => {
   const updatedProductListOrder = useMemo(() => {
     return addProductArticleToOrderList(
       productListOrder,
-      latestProducts,
+      productVersions,
       'products',
     );
-  }, [productListOrder, latestProducts, addProductArticleToOrderList]);
+  }, [productListOrder, productVersions, addProductArticleToOrderList]);
 
   // orderCartData is built without delivery_m2, so read it from the order.
   const deliveryM2 = useMemo(
@@ -228,7 +228,7 @@ const AccountngOrderCard = React.memo(() => {
     );
 
     return updatedProductListOrder.map((product) => {
-      const catalog = latestProducts?.find((p) => p.id === product.product_id);
+      const catalog = productVersions?.find((p) => p.id === product.product_id);
       const blocksPerPallet = Number(catalog?.quantityBlockOnPallet) || 0;
 
       return {
@@ -242,7 +242,7 @@ const AccountngOrderCard = React.memo(() => {
         ...calcBlockPriceWithDelivery(product, deliveryPricePerM2),
       };
     });
-  }, [updatedProductListOrder, latestProducts, deliveryM2]);
+  }, [updatedProductListOrder, productVersions, deliveryM2]);
 
   useEffect(() => {
     if (blocksListWithDelivery.length > 0) {
@@ -603,6 +603,7 @@ const AccountngOrderCard = React.memo(() => {
         productLists={productLists}
         vatValue={vatValue}
         latestProducts={latestProducts}
+        productVersions={productVersions}
         latestDryMix={latestDryMix}
         latestAnchors={latestAnchors}
         latestTools={latestTools}

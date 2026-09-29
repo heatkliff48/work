@@ -136,7 +136,7 @@ const getQuantityKey = (type, id) => `${type}_${id}`;
 
 function LiberarModal({ show, onHide, orderCartData, productLists }) {
   const { list_of_orders } = useOrderContext();
-  const { latestProducts } = useProductsContext();
+  const { latestProducts, productVersions } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
   const dispatch = useDispatch();
@@ -159,7 +159,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
 
     const blocks = (productLists.products || []).map((p) => {
       const _key = getQuantityKey('product', p.id);
-      const { origin, variants } = findBlockPackaging(p, catalog);
+      const { origin, variants } = findBlockPackaging(p, catalog, productVersions);
       const shipped =
         variants.find((c) => c.id === Number(replacements[_key])) || origin;
 
@@ -217,7 +217,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       ...simple(productLists.tools, 'tool', 'quantity_ud'),
       ...simple(productLists.related_materials, 'relmat', 'quantity_ud'),
     ];
-  }, [productLists, latestProducts, replacements]);
+  }, [productLists, latestProducts, productVersions, replacements]);
 
   const rowsByKey = useMemo(
     () => new Map(allProducts.map((row) => [row._key, row])),
