@@ -303,7 +303,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   ]);
 
   // Прайсовая цена в том виде, в каком её хранит строка заказа:
-  // корзина считает итог как price_m2 × quantity_m2 × (100 − discount) / 100
+  // корзина считает итог как price_m2 × quantity_real × (100 − discount) / 100
   const listPriceM2 = Number.isFinite(Number(price_m2_value))
     ? Number(price_m2_value)
     : 0;
@@ -324,11 +324,12 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   const final_price_value = useMemo(() => {
     const discount = discountValue;
-    const quantity_m2 = parseLocalNumber(productOfOrder.quantity_m2) || 0;
+    // Блоки оплачиваются по реально отгружаемым м² (целые паллеты)
+    const quantity_real = Number(quantity_real_value) || 0;
 
     const result =
       selectedProduct.article.slice(2, 3) == 'N'
-        ? (listPriceM2 * quantity_m2 * (100 - discount)) / 100
+        ? (listPriceM2 * quantity_real * (100 - discount)) / 100
         : selectedProduct.article.slice(2, 3) == 'M'
           ? (selectedProduct?.price_per_unit *
               quantity_real_value *
@@ -358,7 +359,6 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     return finalResult.toFixed(2);
   }, [
     listPriceM2,
-    productOfOrder.quantity_m2,
     quantity_real_value,
     productOfOrder?.discount,
     selectedProduct?.price_per_unit,

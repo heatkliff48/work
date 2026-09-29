@@ -230,20 +230,6 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     return formatFixed(result, 2, ',');
   }, [selectedProduct]);
 
-  const final_price_value = useMemo(() => {
-    const m2 = quantityM2Num;
-    const priceM2 = parseLocalNumber(price_m2_value) || 0;
-    const discount = discountNum;
-    const result = (priceM2 * m2 * (100 - discount)) / 100;
-
-    setProductOfOrder((prev) => ({
-      ...prev,
-      final_price: result?.toFixed(2),
-    }));
-
-    return formatFixed(result, 2, ',');
-  }, [quantityM2Num, price_m2_value, discountNum]);
-
   const quantity_real_value = useMemo(() => {
     if (!selectedProduct) return '0,00';
     const real = productOfOrder?.quantity_palet * m2PerPallet(selectedProduct);
@@ -255,6 +241,21 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
     return formatFixed(real, 2, ',');
   }, [quantityM2Num, selectedProduct, productOfOrder?.quantity_palet]);
+
+  // Клиент платит за реально отгружаемые м² (целые паллеты) — quantity_real
+  const final_price_value = useMemo(() => {
+    const m2 = parseLocalNumber(quantity_real_value) || 0;
+    const priceM2 = parseLocalNumber(price_m2_value) || 0;
+    const discount = discountNum;
+    const result = (priceM2 * m2 * (100 - discount)) / 100;
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      final_price: result?.toFixed(2),
+    }));
+
+    return formatFixed(result, 2, ',');
+  }, [quantity_real_value, price_m2_value, discountNum]);
 
   const addProductOrder = async () => {
     const quantityM2 = parseLocalNumber(productOfOrder.quantity_m2) || 0;
@@ -276,7 +277,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       price_m3: parseFloat(priceM3?.toFixed(2)),
       discount: parseFloat(discount?.toFixed(2)),
       quantity_palet: parseInt(quantity_palet, 10) || 0,
-      quantity_real: parseInt(quantity_real, 10) || 0,
+      quantity_real: parseFloat(quantity_real?.toFixed(2)),
       price_m2: parseFloat(price_m2?.toFixed(2)),
       final_price: parseFloat(final_price?.toFixed(2)),
     };
