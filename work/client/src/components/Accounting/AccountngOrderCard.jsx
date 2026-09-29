@@ -14,6 +14,7 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import AccountingInvoiceModal from './AccountingInvoiceModal.jsx';
 import { makeStatusPillCell } from '#components/Orders/ordersCells';
 import {
+  applyDiscount,
   calcBlockPriceWithDelivery,
   getDeliveryPricePerM2,
 } from '#components/Orders/blockDeliveryPrice.js';
@@ -35,7 +36,12 @@ const BLOCK_COLUMNS = [
   { key: 'quantity_m2', label: 'Quantity, m²' },
   { key: 'quantity_real', label: 'Real quantity, m²' },
   { key: 'quantity_pcs', label: 'Blocks, pcs' },
-  { key: 'price_m2_with_delivery', label: 'Price incl. delivery, €/m²' },
+  {
+    key: 'price_m2_with_delivery',
+    label: 'Price incl. delivery, €/m²',
+    // Stored as list price; the discount is applied only to the total
+    render: (row) => applyDiscount(row.price_m2_with_delivery, row.discount),
+  },
   { key: 'final_price', label: 'Total, €' },
 ];
 

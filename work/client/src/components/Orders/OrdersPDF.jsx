@@ -7,6 +7,7 @@ import { useProductsTypeJournalContext } from '#components/contexts/ProductsType
 
 import '#components/Styles/pdf.css';
 import { getApiUrl } from '#utils/getApiUrl.js';
+import { applyDiscount } from './blockDeliveryPrice.js';
 import './ordersView.css';
 
 const loadImage = () => {
@@ -810,7 +811,11 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         m2_pal: product.m2.toFixed(2),
         blq_pal: product.quantityBlockOnPallet,
         total_m2: prod.quantity_real.toFixed(2),
-        pvp_neto_m2: prod.price_m2_with_delivery.toFixed(2),
+        // Колонки скидки в PDF нет — цена за м² должна быть уже со скидкой
+        pvp_neto_m2: applyDiscount(
+          prod.price_m2_with_delivery,
+          prod.discount,
+        ).toFixed(2),
         total,
         pvp_neto_ud,
         subtotal: prod.final_price.toFixed(2),

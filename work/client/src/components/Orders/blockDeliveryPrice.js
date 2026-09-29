@@ -13,7 +13,12 @@ export const getDeliveryPricePerM2 = (blocks, deliveryM2Total) => {
   return delivery / totalRealM2;
 };
 
-export const calcBlockPriceWithDelivery = (product, deliveryPricePerM2) => {
+// price_m2 and price_m2_with_delivery are list prices: the line's discount is
+// applied only to final_price. This is the price per m2 the client pays.
+export const applyDiscount = (price, discount) =>
+  Math.round(Number(price || 0) * (100 - Number(discount || 0))) / 100;
+
+export const calcBlockPriceWithDelivery =(product, deliveryPricePerM2) => {
   const price_m2 = Number(product?.price_m2 || 0);
   const quantity_m2 = Number(product?.quantity_m2 || 0);
   const discount = Number(product?.discount || 0);
