@@ -1031,6 +1031,29 @@
   text-align: right;
   color: var(--ord-text-2);
 }
+.ord-liberar-table td.ord-liberar-table__cont {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.ord-liberar-package {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ord-liberar-add {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ord-red);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.ord-liberar-add:hover {
+  text-decoration: underline;
+}
 .ord-liberar-qty {
   width: 76px;
   height: 34px;

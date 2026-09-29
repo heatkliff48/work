@@ -5,7 +5,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import {
   findBlockPackaging,
   m2PerPallet,
-  packagingLabel,
+  packageOptionLabel,
   round2,
 } from './packagingUtils.js';
 import '../ordersView.css';
@@ -237,11 +237,7 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
                           >
                             {row.variants.map((variant) => (
                               <option key={variant.id} value={variant.id}>
-                                {variant.article}
-                                {packagingLabel(variant)
-                                  ? ` — ${packagingLabel(variant)}`
-                                  : ''}
-                                {` (${m2PerPallet(variant)} m²/pal)`}
+                                {packageOptionLabel(variant)}
                               </option>
                             ))}
                           </select>

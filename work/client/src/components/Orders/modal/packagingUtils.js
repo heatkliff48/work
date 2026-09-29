@@ -1,3 +1,8 @@
+import {
+  blocksInHeight,
+  calculatePalletDimensions,
+} from '#utils/palletDimensions.js';
+
 export const round2 = (n) => parseFloat(Number(n).toFixed(2));
 
 // Blocks are sold by area, except U-blocks which are sold by linear meter —
@@ -36,8 +41,36 @@ export const findBlockPackaging = (orderRow, catalogProducts, productVersions) =
   return { origin, variants };
 };
 
-// Short human label for a package, e.g. "Disposable · 1200x800 · Spain".
+// Short human label for a package, e.g. "Disposable · 1200x800 · Marine · Spain".
 export const packagingLabel = (catalog) =>
-  [catalog?.typeOfPackaging, catalog?.palletSize, catalog?.placeOfProduction]
+  [
+    catalog?.typeOfPackaging,
+    catalog?.palletSize,
+    catalog?.palletHeight,
+    catalog?.placeOfProduction,
+  ]
     .filter(Boolean)
     .join(' · ');
+
+// Height of the block stack on one pallet, in cm, with the rows counted the
+// way the product card counts them for blocks per pallet.
+export const palletHeightCm = (catalog) => {
+  const width = Number(catalog?.width);
+  if (!width) return null;
+  const { palletHeight, extraRows } = calculatePalletDimensions(
+    catalog.palletSize,
+    catalog.palletHeight,
+  );
+  return round2((blocksInHeight(palletHeight, extraRows, width) * width) / 10);
+};
+
+// One option of a "ship as" selector, e.g.
+// "T.NBD30W30C — Disposable · 1200x800 · Marine · Spain (1.44 m²/pal · 90 cm)".
+export const packageOptionLabel = (catalog) => {
+  const label = packagingLabel(catalog);
+  const height = palletHeightCm(catalog);
+  const specs = [`${m2PerPallet(catalog)} m²/pal`, height && `${height} cm`]
+    .filter(Boolean)
+    .join(' · ');
+  return `${catalog.article}${label ? ` — ${label}` : ''} (${specs})`;
+};
