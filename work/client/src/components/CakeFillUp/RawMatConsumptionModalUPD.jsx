@@ -1004,7 +1004,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
     return (
       <div>
-        <Modal isOpen={isOpen} toggle={toggle} size="xl">
+        <Modal isOpen={isOpen} toggle={toggle} size="xl" fullscreen="md">
           <ModalHeader toggle={toggle} className="rmc-modal-header">
             <div className="rmc-header">
               <div className="rmc-header-field" style={{ minWidth: 220 }}>
@@ -1017,7 +1017,7 @@ const RawMaterialsConsumptionModal = React.memo(
               </div>
 
               <div
-                className="rmc-header-field"
+                className="rmc-header-field rmc-header-field--wide"
                 style={{ flex: 1, minWidth: 260 }}
               >
                 <span className="rmc-header-label">Recipe</span>
@@ -1068,21 +1068,10 @@ const RawMaterialsConsumptionModal = React.memo(
               className="rmc-modal-body"
               style={{ overflow: 'auto', maxHeight: '70vh' }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 16,
-                  flexWrap: 'wrap',
-                  marginBottom: 12,
-                }}
-              >
-                <label style={{ margin: 0, minWidth: 200 }}>
-                  <span
-                    className="fw-semibold"
-                    style={{ display: 'block', marginBottom: 4 }}
-                  >
-                    Mold id
-                  </span>
+              <div className="rmc-section-title d-md-none">Casting</div>
+              <div className="rmc-fields">
+                <label className="rmc-field">
+                  <span className="rmc-field-label">Mold id</span>
                   <input
                     className="form-control"
                     value={moldId}
@@ -1090,13 +1079,8 @@ const RawMaterialsConsumptionModal = React.memo(
                   />
                 </label>
 
-                <label style={{ margin: 0, minWidth: 200 }}>
-                  <span
-                    className="fw-semibold"
-                    style={{ display: 'block', marginBottom: 4 }}
-                  >
-                    W/S
-                  </span>
+                <label className="rmc-field">
+                  <span className="rmc-field-label">W/S</span>
                   <input
                     className="form-control"
                     inputMode="decimal"
@@ -1119,13 +1103,8 @@ const RawMaterialsConsumptionModal = React.memo(
                   />
                 </label>
 
-                <label style={{ margin: 0, minWidth: 200 }}>
-                  <span
-                    className="fw-semibold"
-                    style={{ display: 'block', marginBottom: 4 }}
-                  >
-                    Casting time
-                  </span>
+                <label className="rmc-field">
+                  <span className="rmc-field-label">Casting time</span>
                   <input
                     className="form-control"
                     type="time"
@@ -1135,6 +1114,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 </label>
               </div>
 
+              <div className="rmc-section-title d-md-none">Raw materials</div>
               <table className="table-waste">
                 <thead>
                   <tr>
@@ -1210,7 +1190,7 @@ const RawMaterialsConsumptionModal = React.memo(
                           </div>
                         </td>
 
-                        <td>
+                        <td data-label="Modified recipe">
                           <div className="modified-recipe-cell">
                             <input
                               className={
@@ -1246,20 +1226,20 @@ const RawMaterialsConsumptionModal = React.memo(
                           </div>
                         </td>
 
-                        <td className="td-consumed">
+                        <td className="td-consumed" data-label="Consumed">
                           {consumed === null ? '—' : consumed}
                         </td>
                       </tr>
                     );
                   })}
 
-                  <tr>
+                  <tr className="rmc-total-row">
                     <td>
                       <div className="fw-semibold">Aluminum total, kg</div>
                       <div className="text-muted-small">Sum of aluminums</div>
                     </td>
 
-                    <td>
+                    <td data-label="Modified recipe">
                       <div className="modified-recipe-cell">
                         <input
                           className="form-control"
@@ -1270,14 +1250,16 @@ const RawMaterialsConsumptionModal = React.memo(
                       </div>
                     </td>
 
-                    <td className="td-consumed">{+aluminumTotal.toFixed(2)}</td>
+                    <td className="td-consumed" data-label="Consumed">
+                      {+aluminumTotal.toFixed(2)}
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </ModalBody>
 
-            <ModalFooter>
-              <div className="d-flex gap-2">
+            <ModalFooter className="rmc-modal-footer">
+              <div className="rmc-footer-actions d-flex gap-2">
                 <button
                   className="btn btn-outline-secondary"
                   onClick={toggle}
