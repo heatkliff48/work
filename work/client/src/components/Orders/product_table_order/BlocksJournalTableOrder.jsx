@@ -85,6 +85,10 @@ const BlocksJournalTableOrder = ({
                       if (value && typeof value === 'object') {
                         value = JSON.stringify(value);
                       }
+                      // Скидка, посчитанная из цены, хранится без округления
+                      if (key === 'discount' && typeof value === 'number') {
+                        value = Math.round(value * 100) / 100;
+                      }
                       return <td key={key}>{value ?? ''}</td>;
                     })}
 

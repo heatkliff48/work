@@ -5,6 +5,7 @@ import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_PRODUCT,
   ALL_PRODUCTS,
+  CHANGE_PRODUCT_PRICES,
   FIX_PRODUCT_ARTICLES,
   GET_ALL_PRODUCTS,
   NEED_UPDATE_PRODUCT,
@@ -48,6 +49,18 @@ const updateProducts = (product) => {
 const fixProductArticles = (changes) => {
   return url
     .post('/products/fix-articles', { changes })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const changeProductPrices = (changes) => {
+  return url
+    .post('/products/change-prices', { changes })
     .then((res) => {
       return res.data;
     })
@@ -126,12 +139,23 @@ function* fixProductArticlesWatcher(action) {
   }
 }
 
+// Новые версии продуктов приходят всем клиентам через ADD_NEW_PRODUCT_SOCKET
+function* changeProductPricesWatcher(action) {
+  try {
+    const { created } = yield call(changeProductPrices, action.payload);
+    showMessage(`New product versions: ${created}`, 'success');
+  } catch (err) {
+    console.error('Error in changeProductPricesWatcher:', err);
+  }
+}
+
 function* productsWatcher() {
   yield takeLatest(GET_ALL_PRODUCTS, getAllProductsWatcher);
   yield takeLatest(ADD_NEW_PRODUCT, addNewProductWatcher);
   yield takeLatest(NEED_UPDATE_PRODUCT, updateProductWatcher);
   yield takeLatest(REPAIR_PRODUCT, repairProductWatcher);
   yield takeLatest(FIX_PRODUCT_ARTICLES, fixProductArticlesWatcher);
+  yield takeLatest(CHANGE_PRODUCT_PRICES, changeProductPricesWatcher);
 }
 
 export default productsWatcher;

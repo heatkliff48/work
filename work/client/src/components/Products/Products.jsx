@@ -16,6 +16,7 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import PreviewProductCardModal from './modal/PreviewProductCardModal';
 import ArticleCheckModal from './modal/ArticleCheckModal';
+import ChangePriceModal from './modal/ChangePriceModal';
 import { updateProduct } from '#components/redux/actions/productsAction.js';
 
 function Products() {
@@ -34,6 +35,7 @@ function Products() {
 
   const [data, setData] = useState([]);
   const [articleCheckModal, setArticleCheckModal] = useState(false);
+  const [changePriceModal, setChangePriceModal] = useState(false);
   const columns = useMemo(() => TABLE_COLUMNS, []);
   // const data = useMemo(() => latestProducts ?? [], [latestProducts, products]);
 
@@ -155,6 +157,12 @@ function Products() {
           canFix={userAccess?.canWrite}
         />
       )}
+      {changePriceModal && (
+        <ChangePriceModal
+          isOpen={changePriceModal}
+          toggle={() => setChangePriceModal(!changePriceModal)}
+        />
+      )}
       <h1>HCCA Blocks</h1>
       {userAccess?.canWrite && (
         <button
@@ -175,6 +183,9 @@ function Products() {
         Fix width in cakes
       </button>
       <button onClick={() => setArticleCheckModal(true)}>Check articles</button>
+      {userAccess?.canWrite && (
+        <button onClick={() => setChangePriceModal(true)}>Change price</button>
+      )}
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}
         <GlobalFilterInput

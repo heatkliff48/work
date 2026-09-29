@@ -23,6 +23,10 @@ class ProductService {
     return ProductsRepository.fixProductArticles(changes);
   }
 
+  static async changeProductPrices(changes) {
+    return ProductsRepository.changeProductPrices(changes);
+  }
+
   static async repairProductData(repProduct) {
     const products = await ProductsRepository.repairProductData(repProduct);
 
