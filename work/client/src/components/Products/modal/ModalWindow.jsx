@@ -20,7 +20,7 @@ const ModalWindow = React.memo(
 
     const { setModalProductCard, previewProductModal, setPreviewProductModal } =
       useModalContext();
-    const { selectOptions, getOptionValue } = useProductsContext();
+    const { selectOptions, buildProductArticle } = useProductsContext();
 
     const [formInput, setFormInput] = useState({});
     const [haveMath, setHaveMath] = useState({});
@@ -80,75 +80,26 @@ const ModalWindow = React.memo(
     };
 
     const updateProductHandler = () => {
-      const {
-        form,
-        certificate,
-        width,
-        density,
-        placeOfProduction,
-        typeOfPackaging,
-        palletSize,
-      } = formInput;
+      const { density } = formInput;
 
-      const rightPlaceOfProduction = getOptionValue(
-        'placeOfProduction',
-        placeOfProduction,
-      );
-      const rightTypeOfPackaging = getOptionValue(
-        'typeOfPackaging',
-        typeOfPackaging,
-      );
-
-      const rightPalletSize = getOptionValue('palletSize', palletSize);
-      const combinationMap = {
-        '0-0-0': 'A',
-        '0-0-1': 'B',
-        '0-0-2': 'C',
-        '0-1-0': 'D',
-        '0-1-1': 'E',
-        '0-1-2': 'F',
-        '1-0-0': 'G',
-        '1-0-1': 'H',
-        '1-0-2': 'I',
-        '1-1-0': 'J',
-        '1-1-1': 'K',
-        '1-1-2': 'L',
-      };
-
-      const combinationKey = `${rightPlaceOfProduction}-${rightTypeOfPackaging}-${rightPalletSize}`;
-      const combinationLetter = combinationMap[combinationKey];
-
-      if (!combinationLetter) {
-        console.warn('Unknown combination for prodArticle:', combinationKey);
-      }
-
-      const prodArticle = `T.${form
-        ?.toUpperCase()
-        .slice(
-          0,
-          1,
-        )}${combinationLetter}D${density.toString().slice(0, 2)}W${width
-        .toString()
-        .slice(0, 2)}${certificate?.substr(0, 1)}`;
+      const prodArticle = buildProductArticle(formInput);
 
       const productCode = calculateEAN13Checksum(
         '84' +
           '36626' +
           '34' +
-          (
-            '00' +
-            ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
-          ).slice(-3),
+          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+            -3
+          )
       );
       // const articleId = products.length === 0 ? 1 : products.length + 1;
       const fullPorductCode =
         '84' +
         '36626' +
         '34' +
-        (
-          '00' +
-          ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
-        ).slice(-3) +
+        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+          -3
+        ) +
         productCode;
 
       const palletProductCode = calculateEAN14Checksum(
@@ -156,10 +107,9 @@ const ModalWindow = React.memo(
           '84' +
           '36626' +
           '34' +
-          (
-            '00' +
-            ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
-          ).slice(-3),
+          ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+            -3
+          )
       );
 
       const fullPalletProductCode =
@@ -167,10 +117,9 @@ const ModalWindow = React.memo(
         '84' +
         '36626' +
         '34' +
-        (
-          '00' +
-          ((parseInt(product_code[0].product_code, 10) + 1) % 1000)
-        ).slice(-3) +
+        ('00' + ((parseInt(product_code[0].product_code, 10) + 1) % 1000)).slice(
+          -3
+        ) +
         palletProductCode;
 
       //description
@@ -196,7 +145,7 @@ const ModalWindow = React.memo(
       // }x${formInput.height ?? '-'}mm ${formInput.density ?? '-'}kg/m³`;
 
       let parsedRC = parseFloat(
-        formInput.resistenciaCompresion.toString()?.replace(',', '.'),
+        formInput.resistenciaCompresion.toString()?.replace(',', '.')
       );
       if (isNaN(parsedRC)) parsedRC = null;
 
@@ -211,21 +160,19 @@ const ModalWindow = React.memo(
       };
 
       const isExistingProduct = products.some(
-        (product) =>
-          product.article === prodArticle && product.density == density,
+        (product) => product.article === prodArticle && product.density == density
       ); // добавить проверку выс шир длин
 
       const existingProduct = products.find(
-        (product) => product.article === prodArticle,
+        (product) => product.article === prodArticle
       );
 
       const lastVersion = products.findLast(
-        (el) => el.article === prodArticle,
+        (el) => el.article === prodArticle
       )?.version;
 
       const needRepair = products.some(
-        (product) =>
-          product.article === prodArticle && product.density != density,
+        (product) => product.article === prodArticle && product.density != density
       ); // добавить проверку выс шир длин
 
       if (isExistingProduct) {
@@ -322,21 +269,34 @@ const ModalWindow = React.memo(
       }
 
       // Определение высоты паллета
+      // При редактировании приходит label ('Std' / 'Marine' / 'High' / 'Std+1'), при создании — value (0 / 1 / 2 / 3)
       const palletHeightMap = {
         0: 1150,
-        1: 1000,
+        1: 950,
         2: 1500,
+        3: 1150,
         std: 1150,
-        marine: 1000,
-        height: 1500,
+        marine: 950,
+        high: 1500,
+        'std+1': 1150,
       };
 
-      const palletHeightValue = palletHeightMap[palletHeight] ?? 1140;
+      // Std+1 — как Std, но с дополнительным рядом блоков сверху
+      const extraRowsMap = {
+        3: 1,
+        'std+1': 1,
+      };
+
+      const palletHeightKey =
+        typeof palletHeight === 'string' ? palletHeight.toLowerCase() : palletHeight;
+      const palletHeightValue = palletHeightMap[palletHeightKey] ?? 1140;
+      const extraRowsValue = extraRowsMap[palletHeightKey] ?? 0;
 
       return {
         palletWidth: palletWidthValue,
         palletLength: palletLengthValue,
         palletHeight: palletHeightValue,
+        extraRows: extraRowsValue,
       };
     };
 
@@ -345,11 +305,8 @@ const ModalWindow = React.memo(
         const values = {};
         const updateFuncs = {};
 
-        const { palletWidth, palletLength, palletHeight } =
-          calculatePalletDimensions(
-            formInput?.palletSize,
-            formInput?.palletHeight,
-          );
+        const { palletWidth, palletLength, palletHeight, extraRows } =
+          calculatePalletDimensions(formInput?.palletSize, formInput?.palletHeight);
 
         if (
           formInput?.lengths &&
@@ -359,29 +316,40 @@ const ModalWindow = React.memo(
           palletLength &&
           palletHeight
         ) {
+          const blocksAlongLength = Math.floor(palletLength / formInput?.lengths);
+          const blocksInHeight =
+            Math.floor(palletHeight / formInput?.width) + extraRows;
+          const blocksAlongWidth = Math.floor(palletWidth / formInput?.height);
+
           values.quantityBlockOnPallet =
-            Math.floor(palletLength / formInput?.lengths) *
-            Math.floor(palletHeight / formInput?.width) *
-            Math.floor(palletWidth / formInput?.height);
+            blocksAlongLength * blocksInHeight * blocksAlongWidth;
+
+          console.log('Pallet calc', {
+            'Паллета, мм (Д x Ш x макс. В)': `${palletLength}x${palletWidth}x${palletHeight}`,
+            'Блоков на паллете, шт': values.quantityBlockOnPallet,
+            'Блоков в высоту, шт': blocksInHeight,
+            'Высота паллеты (блоки), см': (blocksInHeight * formInput?.width) / 10,
+          });
 
           updateFuncs.quantityBlockOnPallet = (value) =>
             setFormInput((prev) => ({ ...prev, quantityBlockOnPallet: value }));
         }
 
+        // Объём блока без округления — для расчёта m3 на паллете
+        let volumeBlockExact;
         if (formInput?.lengths && formInput?.height && formInput?.width) {
-          values.volumeBlock = Number(
-            (formInput?.lengths * formInput?.height * formInput?.width) /
-              1000000000,
-          ).toFixed(3);
+          volumeBlockExact =
+            (formInput?.lengths * formInput?.height * formInput?.width) / 1000000000;
+          values.volumeBlock = volumeBlockExact.toFixed(3);
 
           updateFuncs.volumeBlock = (value) =>
             setFormInput((prev) => ({ ...prev, volumeBlock: value }));
         }
 
         // Вычисление m3
-        if (values.quantityBlockOnPallet && values.volumeBlock) {
+        if (values.quantityBlockOnPallet && volumeBlockExact) {
           values.volumeBlockOnPallet = (
-            values.quantityBlockOnPallet * values.volumeBlock
+            values.quantityBlockOnPallet * volumeBlockExact
           ).toFixed(3);
 
           updateFuncs.volumeBlockOnPallet = (value) =>
@@ -395,9 +363,7 @@ const ModalWindow = React.memo(
           values.quantityBlockOnPallet
         ) {
           values.m2 = (
-            (formInput?.lengths *
-              values.quantityBlockOnPallet *
-              formInput?.height) /
+            (formInput?.lengths * values.quantityBlockOnPallet * formInput?.height) /
             1000000
           ).toFixed(2);
           updateFuncs.m2 = (value) =>
@@ -407,8 +373,7 @@ const ModalWindow = React.memo(
         // Вычисление m
         if (values.m2 && formInput?.height) {
           values.m = (values.m2 / (formInput?.height / 1000)).toFixed(2);
-          updateFuncs.m = (value) =>
-            setFormInput((prev) => ({ ...prev, m: value }));
+          updateFuncs.m = (value) => setFormInput((prev) => ({ ...prev, m: value }));
         }
         // Вычисление widthInArray
         if (formInput?.width) {
@@ -427,9 +392,7 @@ const ModalWindow = React.memo(
             divisor = 1400;
           }
 
-          values.widthInArray = Math.floor(divisor / formInput?.width).toFixed(
-            2,
-          );
+          values.widthInArray = Math.floor(divisor / formInput?.width).toFixed(2);
           updateFuncs.widthInArray = (value) =>
             setFormInput((prev) => ({ ...prev, widthInArray: value }));
         }
@@ -524,18 +487,14 @@ const ModalWindow = React.memo(
 
         // Вычисление qty_per_truck
         if (values.weightDef) {
-          values.qty_per_truck = Math.floor(24000 / values.weightDef).toFixed(
-            2,
-          );
+          values.qty_per_truck = Math.floor(24000 / values.weightDef).toFixed(2);
           updateFuncs.qty_per_truck = (value) =>
             setFormInput((prev) => ({ ...prev, qty_per_truck: value }));
         }
 
         // Вычисление qty_per_contendor
         if (values.weightDef) {
-          values.qty_per_contendor = Math.floor(
-            25000 / values.weightDef,
-          ).toFixed(2);
+          values.qty_per_contendor = Math.floor(25000 / values.weightDef).toFixed(2);
           updateFuncs.qty_per_contendor = (value) =>
             setFormInput((prev) => ({ ...prev, qty_per_contendor: value }));
         }
@@ -551,14 +510,14 @@ const ModalWindow = React.memo(
         formInput.palletSize,
         formInput.palletHeight,
         formInput.certificate,
-      ],
+      ]
     );
 
     const memoizedUpdateFuncs = useMemo(() => {
       const resultOfValues = memoizedCalculateValues(formInput);
       const { updateFuncs } = resultOfValues;
       return Object.fromEntries(
-        Object.entries(updateFuncs).map(([key, func]) => [key, func]),
+        Object.entries(updateFuncs).map(([key, func]) => [key, func])
       );
     }, [
       formInput.lengths,
@@ -608,7 +567,7 @@ const ModalWindow = React.memo(
             acc[key] = value;
             return acc;
           },
-          {},
+          {}
         );
         setFormInput((prev) => ({
           ...prev,
@@ -632,7 +591,7 @@ const ModalWindow = React.memo(
           acc[key] = value;
           return acc;
         },
-        {},
+        {}
       );
       setFormInput((prev) => ({
         ...prev,
@@ -673,8 +632,7 @@ const ModalWindow = React.memo(
           </ModalHeader>
           <div className="item_content">
             {list.map((el) => {
-              const isDisabled =
-                isEdit && !editableAccessors.includes(el.accessor);
+              const isDisabled = isEdit && !editableAccessors.includes(el.accessor);
 
               if (
                 el.accessor === 'id' ||
@@ -721,7 +679,7 @@ const ModalWindow = React.memo(
                         selectOptions[el.accessor].find(
                           (opt) =>
                             opt.value == formInput[el.accessor] ||
-                            opt.label == formInput[el.accessor],
+                            opt.label == formInput[el.accessor]
                         ) || null
                       }
                       onChange={(option) => {
@@ -733,10 +691,7 @@ const ModalWindow = React.memo(
                             option.value === 'O-block' ? prev.diametro : null,
                         }));
 
-                        if (
-                          el.accessor == 'form' &&
-                          option.value == 'FORJADO'
-                        ) {
+                        if (el.accessor == 'form' && option.value == 'FORJADO') {
                           setFormInput((prev) => ({
                             ...prev,
                             lengths: 600,
@@ -817,7 +772,7 @@ const ModalWindow = React.memo(
         </Modal>
       </div>
     );
-  },
+  }
 );
 
 export default ModalWindow;

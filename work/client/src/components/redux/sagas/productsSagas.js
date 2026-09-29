@@ -5,6 +5,7 @@ import { errorToText } from '../../Utils/errorToText';
 import {
   ADD_NEW_PRODUCT,
   ALL_PRODUCTS,
+  FIX_PRODUCT_ARTICLES,
   GET_ALL_PRODUCTS,
   NEED_UPDATE_PRODUCT,
   NEW_PRODUCT,
@@ -35,6 +36,18 @@ const getAllProducts = () => {
 const updateProducts = (product) => {
   return url
     .post('/products/upd', product)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const fixProductArticles = (changes) => {
+  return url
+    .post('/products/fix-articles', { changes })
     .then((res) => {
       return res.data;
     })
@@ -103,11 +116,22 @@ function* addNewProductWatcher(action) {
   }
 }
 
+function* fixProductArticlesWatcher(action) {
+  try {
+    yield call(fixProductArticles, action.payload);
+    showMessage(`Articles fixed: ${action.payload.length}`, 'success');
+    yield put({ type: GET_ALL_PRODUCTS });
+  } catch (err) {
+    console.error('Error in fixProductArticlesWatcher:', err);
+  }
+}
+
 function* productsWatcher() {
   yield takeLatest(GET_ALL_PRODUCTS, getAllProductsWatcher);
   yield takeLatest(ADD_NEW_PRODUCT, addNewProductWatcher);
   yield takeLatest(NEED_UPDATE_PRODUCT, updateProductWatcher);
   yield takeLatest(REPAIR_PRODUCT, repairProductWatcher);
+  yield takeLatest(FIX_PRODUCT_ARTICLES, fixProductArticlesWatcher);
 }
 
 export default productsWatcher;

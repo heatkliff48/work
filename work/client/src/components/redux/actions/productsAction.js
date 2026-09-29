@@ -1,5 +1,6 @@
 import {
   ADD_NEW_PRODUCT,
+  FIX_PRODUCT_ARTICLES,
   GET_ALL_PRODUCTS,
   NEED_UPDATE_PRODUCT,
   REPAIR_PRODUCT,
@@ -38,5 +39,13 @@ export const repProduct = (repProduct) => {
   return {
     type: REPAIR_PRODUCT,
     payload: repProduct,
+  };
+};
+
+// changes: [{ from, to }]
+export const fixProductArticles = (changes) => {
+  return {
+    type: FIX_PRODUCT_ARTICLES,
+    payload: changes,
   };
 };
