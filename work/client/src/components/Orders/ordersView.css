@@ -726,6 +726,10 @@
   width: 760px;
   max-width: 95vw;
 }
+.ord-modal-card--xl {
+  width: 1200px;
+  max-width: 95vw;
+}
 .ord-modal-head {
   padding: 20px 24px;
   border-bottom: 1px solid var(--ord-border-3);
@@ -1108,6 +1112,34 @@
 }
 .ord-liberar-date:focus {
   border-color: var(--ord-red);
+}
+.ord-liberar-toprow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 13px;
+}
+.ord-liberar-toprow .ord-field {
+  margin-bottom: 0;
+}
+.ord-liberar-trucks {
+  text-align: right;
+}
+.ord-liberar-trucks__value {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.ord-liberar-trucks__value .ord-liberar-sub {
+  margin-top: 0;
+}
+.ord-liberar-trucks__count {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ord-text);
 }
 
 /* responsive */
