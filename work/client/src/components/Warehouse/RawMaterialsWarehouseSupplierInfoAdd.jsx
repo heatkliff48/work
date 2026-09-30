@@ -8,9 +8,11 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useNavigate } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import * as warehouseActions from '#components/redux/actions/warehouseRawMaterialsAction.js';
+import { useTranslation } from 'react-i18next';
 
 function RawMaterialsWarehouseSupplierInfoAdd(props) {
   const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState({});
+  // ключ перевода, переводится при рендере
   const [inputError, setInputError] = useState('');
 
   const user = useSelector((state) => state.user);
@@ -19,10 +21,11 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useTranslation('rawMaterialsWarehouse');
 
   const raw_material_table = [
     {
-      Header: 'Enter % from 0 to 100',
+      Header: t('quality.inputLabel'),
       accessor: 'quality',
       Filter: TextSearchFilter,
     },
@@ -46,7 +49,7 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
 
       // Проверяем формат числа
       if (!/^-?\d*\.?\d*$/.test(value)) {
-        setInputError('Please enter a valid number (0-100)');
+        setInputError('quality.invalidNumberRange');
         return;
       }
 
@@ -54,9 +57,9 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
 
       // Проверяем диапазон
       if (isNaN(floatValue)) {
-        setInputError('Please enter a valid number');
+        setInputError('quality.invalidNumber');
       } else if (floatValue < 0 || floatValue > 100) {
-        setInputError('Value must be between 0 and 100');
+        setInputError('quality.outOfRange');
       } else {
         setRawMaterialWarehouseInput((prev) => ({
           ...prev,
@@ -154,9 +157,11 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
             onSubmit={onSubmitForm}
           >
             {props?.material_type != 'Sand slurry (dry)' ? (
-              <h3>Add quality to {props?.supplierInfo.supplier}</h3>
+              <h3>
+                {t('quality.title', { supplier: props?.supplierInfo.supplier })}
+              </h3>
             ) : (
-              <h3>Change residue on the sieve</h3>
+              <h3>{t('quality.residueTitle')}</h3>
             )}
             <Row>
               {raw_material_table.map((el) =>
@@ -186,7 +191,9 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
                           onChange={handleRawMaterialWarehouseInputChange}
                         />
                         {inputError && el.accessor === 'quality' && (
-                          <p className="text-red-500 text-xs mt-1">{inputError}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {t(inputError)}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -200,14 +207,14 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
       <Modal.Footer>
         {props?.material_type != 'Sand slurry (dry)' ? (
           <Button form="rawMaterialWarehouseQualityChange" type="submit">
-            Add quality to {props?.supplierInfo.supplier}
+            {t('quality.submit', { supplier: props?.supplierInfo.supplier })}
           </Button>
         ) : (
           <Button form="rawMaterialWarehouseQualityChange" type="submit">
-            Accept change
+            {t('quality.acceptChange')}
           </Button>
         )}
-        <Button onClick={props.onHide}>Close</Button>
+        <Button onClick={props.onHide}>{t('close', { ns: 'common' })}</Button>
       </Modal.Footer>
     </Modal>
   );

@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   WarehousePallet.init({
     supplier: DataTypes.STRING,
     quantity: DataTypes.FLOAT,
+    consumed_quantity: DataTypes.FLOAT,
     type: DataTypes.STRING,
     quality: DataTypes.FLOAT,
     date: DataTypes.STRING,

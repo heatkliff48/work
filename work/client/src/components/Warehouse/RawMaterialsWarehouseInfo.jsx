@@ -6,6 +6,8 @@ import { useSelector } from 'react-redux';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import Select from 'react-select';
+import { useTranslation } from 'react-i18next';
+import { translateMaterial } from '#i18n/index.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useNavigate } from 'react-router-dom';
 import RawMaterialsWarehouseAdd from './RawMaterialsWarehouseAdd';
@@ -28,6 +30,8 @@ function RawMaterialsWarehouseInfo(props) {
     useUsersContext();
 
   const navigate = useNavigate();
+  const { t } = useTranslation('rawMaterialsWarehouse');
+  const materialLabel = translateMaterial(t, props?.material_type);
 
   const useRawMaterialSelector = (materialType) => {
     return useSelector((state) => {
@@ -68,15 +72,15 @@ function RawMaterialsWarehouseInfo(props) {
 
   const raw_material_table = [
     {
-      Header: 'Supplier',
+      Header: t('columns.supplier'),
       accessor: 'supplier',
       Filter: TextSearchFilter,
     },
     {
       Header:
         props?.material_type === 'Pallets'
-          ? 'Quantity, pieces'
-          : 'Quantity, kg',
+          ? t('columns.quantityPieces')
+          : t('columns.quantityKg'),
       accessor: 'quantity',
       Filter: TextSearchFilter,
     },
@@ -84,29 +88,35 @@ function RawMaterialsWarehouseInfo(props) {
       props?.material_type === 'Aluminum' ||
       props?.material_type === 'Aluminum 2' ||
       props?.material_type === 'Lime' ||
+      props?.material_type === 'Pallets' ||
       props?.material_type === 'Sand (dry)') && {
-      Header: 'Type',
+      Header: t('columns.type'),
       accessor: 'type',
       Filter: TextSearchFilter,
     },
+    props?.material_type === 'Pallets' && {
+      Header: t('columns.consumedPieces'),
+      accessor: 'consumed_quantity',
+      Filter: TextSearchFilter,
+    },
     props?.material_type === 'Grinding Balls' && {
-      Header: 'Diametro, mm',
+      Header: t('columns.diameterMm'),
       accessor: 'diameter',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Date',
+      Header: t('columns.date'),
       accessor: 'date',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Quality',
+      Header: t('columns.quality'),
       accessor: 'quality',
       Filter: TextSearchFilter,
     },
     checkUserAccess(user, roles, 'raw_materials_warehouse_files_actions')
       ?.canRead && {
-      Header: 'File',
+      Header: t('columns.file'),
       accessor: 'file_name',
       Cell: ({ value, row }) => (
         <div onClick={(e) => e.stopPropagation()}>
@@ -141,7 +151,7 @@ function RawMaterialsWarehouseInfo(props) {
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
-            <p>No file</p>
+            <p>{t('noFile')}</p>
           )}
         </div>
       ),
@@ -150,42 +160,42 @@ function RawMaterialsWarehouseInfo(props) {
 
   const sand_slurry_table = [
     {
-      Header: 'Sand (dry)',
+      Header: t('sandSlurry.columns.sand'),
       accessor: 'sand',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Gypsum stone',
+      Header: t('sandSlurry.columns.gypsumStone'),
       accessor: 'gypsum_stone',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Water',
+      Header: t('sandSlurry.columns.water'),
       accessor: 'water',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Grinding balls',
+      Header: t('sandSlurry.columns.grindingBalls'),
       accessor: 'grinding_balls',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'AAC scrap',
+      Header: t('sandSlurry.columns.aacScrap'),
       accessor: 'aac_scrap',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Residue on the sieve',
+      Header: t('sandSlurry.columns.residue'),
       accessor: 'portion_size',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Date',
+      Header: t('columns.date'),
       accessor: 'date',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'File',
+      Header: t('columns.file'),
       accessor: 'file_name',
       Cell: ({ value, row }) => (
         <div onClick={(e) => e.stopPropagation()}>
@@ -224,13 +234,13 @@ function RawMaterialsWarehouseInfo(props) {
     ];
 
     return [
-      { value: '', label: 'All types' }, // Опция для отображения всех данных
+      { value: '', label: t('allTypes') }, // Опция для отображения всех данных
       ...uniqueTypes.filter(Boolean).map((type) => ({
         value: type,
         label: type,
       })),
     ];
-  }, [raw_material_warehouse]);
+  }, [raw_material_warehouse, t]);
 
   // Функция для фильтрации данных
   const getFilteredData = () => {
@@ -308,12 +318,12 @@ function RawMaterialsWarehouseInfo(props) {
                   roles,
                   'raw_materials_warehouse_add',
                 )}
-                tableName={props?.material_type}
+                tableName={materialLabel}
                 handleRowClick={handleRowClick}
                 onClickButton={() => {
                   setAddModalShow(!addModalShow);
                 }}
-                buttonText={`Add new ${props?.material_type.toLowerCase()}`}
+                buttonText={t('addNew', { material: materialLabel })}
               />
             )}
           {props?.material_type === 'Aluminum' && (
@@ -329,13 +339,18 @@ function RawMaterialsWarehouseInfo(props) {
               >
                 <div style={{ minWidth: '250px' }}>
                   <label style={{ marginBottom: '8px', display: 'block' }}>
-                    Filter by type:
+                    {t('filterByType')}
                   </label>
                   <Select
                     options={typeOptions}
-                    value={selectedType}
+                    // берём опцию из typeOptions, чтобы подпись «All types» менялась вместе с языком
+                    value={
+                      typeOptions.find(
+                        (option) => option.value === selectedType?.value,
+                      ) || selectedType
+                    }
                     onChange={(option) => setSelectedType(option)}
-                    placeholder="Select type..."
+                    placeholder={t('selectType')}
                     isClearable={false}
                     styles={{
                       control: (base) => ({
@@ -356,11 +371,11 @@ function RawMaterialsWarehouseInfo(props) {
                   }}
                 >
                   <div>
-                    <strong>Total Quantity:</strong>{' '}
+                    <strong>{t('totalQuantity')}</strong>{' '}
                     {getQuantitiesSum().totalQuantity}
                   </div>
                   <div>
-                    <strong>Total Available:</strong>{' '}
+                    <strong>{t('totalAvailable')}</strong>{' '}
                     {getQuantitiesSum().totalAvailable}
                   </div>
                 </div>
@@ -375,12 +390,12 @@ function RawMaterialsWarehouseInfo(props) {
                   roles,
                   'raw_materials_warehouse_add',
                 )}
-                tableName={props?.material_type}
+                tableName={materialLabel}
                 handleRowClick={handleRowClick}
                 onClickButton={() => {
                   setAddModalShow(!addModalShow);
                 }}
-                buttonText={`Add new ${props?.material_type.toLowerCase()}`}
+                buttonText={t('addNew', { material: materialLabel })}
               />
             </div>
           )}
@@ -393,12 +408,12 @@ function RawMaterialsWarehouseInfo(props) {
                 roles,
                 'raw_materials_warehouse_add_sand_slurry',
               )}
-              tableName={props?.material_type}
+              tableName={materialLabel}
               handleRowClick={handleRowClick}
               onClickButton={() => {
                 setSandSlurryModal(!sandSlurryModal);
               }}
-              buttonText={'Add sand slurry (dry)'}
+              buttonText={t('sandSlurry.addButton')}
             />
           )}
         </Modal.Body>

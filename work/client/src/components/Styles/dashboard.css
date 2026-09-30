@@ -263,6 +263,40 @@
   background: rgba(255, 255, 255, 0.5);
 }
 
+/* language switcher */
+.bb-lang {
+  display: inline-flex;
+  height: 40px;
+  padding: 3px;
+  gap: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+}
+
+.bb-lang-btn {
+  min-width: 36px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+
+  background: transparent;
+  color: #fff;
+
+  font-family: Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bb-lang-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.bb-lang-btn.bb-active {
+  background: #ffffff;
+  color: var(--bb-red);
+}
+
 /* burger button */
 .bb-menu-btn {
   height: 40px;

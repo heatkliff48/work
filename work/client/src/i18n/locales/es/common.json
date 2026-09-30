@@ -1,0 +1,43 @@
+{
+  "language": "Idioma",
+  "logout": "Cerrar sesión",
+  "close": "Cerrar",
+  "pageTitles": {
+    "warehouse_raw_materials": "Almacén de materias primas"
+  },
+  "table": {
+    "globalSearch": "Búsqueda global:",
+    "records": "{{count}} registros...",
+    "search": "Buscar..."
+  },
+  "files": {
+    "upload": "Subir",
+    "delete": "Eliminar",
+    "download": "Descargar",
+    "existingFile": "Archivo actual: {{name}}",
+    "noFileSelected": "¡No se ha seleccionado ningún archivo!",
+    "uploaded": "Archivo subido: {{name}}",
+    "serverError": "Se ha producido un error en el servidor",
+    "downloadError": "Error al descargar el archivo"
+  },
+  "units": {
+    "kg": "kg",
+    "pieces": "uds."
+  },
+  "materials": {
+    "Sand (dry)": "Arena (seca)",
+    "Lime": "Cal",
+    "Cement": "Cemento",
+    "Gypsum (dry)": "Yeso (seco)",
+    "Gypsum stone": "Piedra de yeso",
+    "Aluminum": "Aluminio",
+    "Aluminum 2": "Aluminio 2",
+    "Grinding Balls": "Bolas de molienda",
+    "AAC": "HCCA",
+    "Sand slurry (dry)": "Lodo de arena (seco)",
+    "Return slurry (dry)": "Lodo de retorno (seco)",
+    "Pallets": "Palés",
+    "Plastics": "Plásticos",
+    "Sand powder (dry)": "Arena en polvo (seca)"
+  }
+}

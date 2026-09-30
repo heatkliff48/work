@@ -1,11 +1,13 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import useLogout from '#utils/useLogout.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import TabsBar from '#components/Main/TabsBar';
 import RequireAccess from '#components/ProtectRoute/RequireAccess.jsx';
+import LanguageSwitcher from '#components/LanguageSwitcher/LanguageSwitcher.jsx';
 import '#components/Styles/dashboard.css';
 
 // Импортируем все иконки
@@ -39,6 +41,7 @@ import accountingIcon from '#components/Styles/mainpageing/accounting.svg';
 export default function NavBar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const user = useSelector((state) => state.user);
   const accountingDataList = useSelector((state) => state.accountingDataList);
@@ -80,7 +83,10 @@ export default function NavBar() {
   const username =
     user?.username || user?.login || user?.name || user?.email || 'USER';
   const userrole = user ? getRoleName(user?.role) : '';
-  const title = getPageTitleByPath(location.pathname);
+  // страницы без перевода показывают английский заголовок из pageTitles
+  const title = t(`pageTitles.${location.pathname.slice(1) || 'home'}`, {
+    defaultValue: getPageTitleByPath(location.pathname),
+  });
 
   const menuItems = useMemo(
     () => [
@@ -468,12 +474,13 @@ export default function NavBar() {
           <div className="bb-topbar-center">{title}</div>
 
           <div className="bb-topbar-right">
+            <LanguageSwitcher />
             <div className="bb-userbox">
               <div className="bb-username">{username}</div>
               <div className="bb-userrole">{userrole}</div>
             </div>
             <button className="bb-logout" onClick={handleLogout} type="button">
-              Logout
+              {t('logout')}
             </button>
           </div>
         </header>

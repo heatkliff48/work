@@ -1,0 +1,69 @@
+{
+  "title": "Almacén de materias primas",
+  "columns": {
+    "materialType": "Tipo de material",
+    "remainingQuantity": "Cantidad restante",
+    "lastUpdated": "Última actualización",
+    "supplier": "Proveedor",
+    "quantityKg": "Cantidad, kg",
+    "quantityPieces": "Cantidad, uds.",
+    "type": "Tipo",
+    "consumedPieces": "Consumido, uds.",
+    "diameterMm": "Diámetro, mm",
+    "date": "Fecha",
+    "quality": "Calidad",
+    "file": "Archivo"
+  },
+  "noFile": "Sin archivo",
+  "filterByType": "Filtrar por tipo:",
+  "selectType": "Seleccione el tipo...",
+  "allTypes": "Todos los tipos",
+  "totalQuantity": "Cantidad total:",
+  "totalAvailable": "Total disponible:",
+  "addNew": "Añadir {{material}}",
+  "add": {
+    "title": "Añadir {{material}}",
+    "submit": "Añadir {{material}}"
+  },
+  "errors": {
+    "supplierRequired": "El proveedor es obligatorio",
+    "quantityRequired": "La cantidad es obligatoria",
+    "quantityPositive": "La cantidad debe ser un número positivo",
+    "dateRequired": "La fecha es obligatoria",
+    "diameterRequired": "El diámetro es obligatorio",
+    "typeRequired": "El tipo de {{material}} es obligatorio",
+    "fieldRequired": "Este campo es obligatorio",
+    "fieldNonNegative": "Este campo debe contener un número no negativo"
+  },
+  "quality": {
+    "title": "Añadir calidad a {{supplier}}",
+    "submit": "Añadir calidad a {{supplier}}",
+    "inputLabel": "Introduzca un % de 0 a 100",
+    "invalidNumberRange": "Introduzca un número válido (0-100)",
+    "invalidNumber": "Introduzca un número válido",
+    "outOfRange": "El valor debe estar entre 0 y 100",
+    "residueTitle": "Cambiar el residuo en el tamiz",
+    "acceptChange": "Aceptar cambio"
+  },
+  "sandSlurry": {
+    "addButton": "Añadir lodo de arena (seco)",
+    "title": "Añadir lodo de arena",
+    "submit": "Añadir lodo de arena",
+    "total": "Total, kg",
+    "columns": {
+      "sand": "Arena (seca)",
+      "gypsumStone": "Piedra de yeso",
+      "water": "Agua",
+      "grindingBalls": "Bolas de molienda",
+      "aacScrap": "Recortes de HCCA",
+      "residue": "Residuo en el tamiz"
+    },
+    "fields": {
+      "sand": "Arena (seca), kg en total",
+      "gypsumStone": "Piedra de yeso, kg en total",
+      "water": "Agua, m3 en total",
+      "grindingBalls": "Bolas de molienda, kg en total",
+      "aacScrap": "Recortes de HCCA, kg en total"
+    }
+  }
+}
