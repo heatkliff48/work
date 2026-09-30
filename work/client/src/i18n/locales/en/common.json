@@ -1,0 +1,43 @@
+{
+  "language": "Language",
+  "logout": "Logout",
+  "close": "Close",
+  "pageTitles": {
+    "warehouse_raw_materials": "Raw Materials Warehouse"
+  },
+  "table": {
+    "globalSearch": "Global search:",
+    "records": "{{count}} records...",
+    "search": "Search..."
+  },
+  "files": {
+    "upload": "Upload",
+    "delete": "Delete",
+    "download": "Download",
+    "existingFile": "Existing file: {{name}}",
+    "noFileSelected": "No file selected!",
+    "uploaded": "File uploaded: {{name}}",
+    "serverError": "There was a problem with the server",
+    "downloadError": "Error downloading the file"
+  },
+  "units": {
+    "kg": "kg",
+    "pieces": "pieces"
+  },
+  "materials": {
+    "Sand (dry)": "Sand (dry)",
+    "Lime": "Lime",
+    "Cement": "Cement",
+    "Gypsum (dry)": "Gypsum (dry)",
+    "Gypsum stone": "Gypsum stone",
+    "Aluminum": "Aluminum",
+    "Aluminum 2": "Aluminum 2",
+    "Grinding Balls": "Grinding Balls",
+    "AAC": "AAC",
+    "Sand slurry (dry)": "Sand slurry (dry)",
+    "Return slurry (dry)": "Return slurry (dry)",
+    "Pallets": "Pallets",
+    "Plastics": "Plastics",
+    "Sand powder (dry)": "Sand powder (dry)"
+  }
+}

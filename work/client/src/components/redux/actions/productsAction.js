@@ -1,5 +1,6 @@
 import {
   ADD_NEW_PRODUCT,
+  CHANGE_PRODUCT_PRICES,
   FIX_PRODUCT_ARTICLES,
   GET_ALL_PRODUCTS,
   NEED_UPDATE_PRODUCT,
@@ -46,6 +47,14 @@ export const repProduct = (repProduct) => {
 export const fixProductArticles = (changes) => {
   return {
     type: FIX_PRODUCT_ARTICLES,
+    payload: changes,
+  };
+};
+
+// changes: [{ tradingMark, density, price }]
+export const changeProductPrices = (changes) => {
+  return {
+    type: CHANGE_PRODUCT_PRICES,
     payload: changes,
   };
 };

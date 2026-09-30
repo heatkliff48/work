@@ -5,7 +5,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import {
   findBlockPackaging,
   m2PerPallet,
-  packagingLabel,
+  packageOptionLabel,
   round2,
 } from './packagingUtils.js';
 import '../ordersView.css';
@@ -20,7 +20,7 @@ import '../ordersView.css';
 // What was already liberated is a fact and stays untouched; the line's total
 // quantity_palet is what gets adjusted to fit the whole remainder.
 function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
-  const { latestProducts } = useProductsContext();
+  const { latestProducts, productVersions } = useProductsContext();
   const dispatch = useDispatch();
   // Order line id -> catalog id of the package chosen for it.
   const [packages, setPackages] = useState({});
@@ -31,7 +31,11 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
 
   const rows = useMemo(() => {
     return (blocks || []).map((line) => {
-      const { origin, variants } = findBlockPackaging(line, latestProducts || []);
+      const { origin, variants } = findBlockPackaging(
+        line,
+        latestProducts || [],
+        productVersions
+      );
       const chosen = variants.find((c) => c.id === Number(packages[line.id])) || origin;
 
       const ordered = Number(line.quantity_palet) || 0;
@@ -64,7 +68,7 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
         needsFix: !Number.isInteger(remaining),
       };
     });
-  }, [blocks, latestProducts, packages]);
+  }, [blocks, latestProducts, productVersions, packages]);
 
   const remainderValue = (row) =>
     remainders[row.line.id] ?? (row.needsFix ? '' : String(row.remaining));
@@ -233,11 +237,7 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
                           >
                             {row.variants.map((variant) => (
                               <option key={variant.id} value={variant.id}>
-                                {variant.article}
-                                {packagingLabel(variant)
-                                  ? ` — ${packagingLabel(variant)}`
-                                  : ''}
-                                {` (${m2PerPallet(variant)} m²/pal)`}
+                                {packageOptionLabel(variant)}
                               </option>
                             ))}
                           </select>

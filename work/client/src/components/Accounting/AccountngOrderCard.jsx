@@ -14,6 +14,7 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import AccountingInvoiceModal from './AccountingInvoiceModal.jsx';
 import { makeStatusPillCell } from '#components/Orders/ordersCells';
 import {
+  applyDiscount,
   calcBlockPriceWithDelivery,
   getDeliveryPricePerM2,
 } from '#components/Orders/blockDeliveryPrice.js';
@@ -35,7 +36,12 @@ const BLOCK_COLUMNS = [
   { key: 'quantity_m2', label: 'Quantity, m²' },
   { key: 'quantity_real', label: 'Real quantity, m²' },
   { key: 'quantity_pcs', label: 'Blocks, pcs' },
-  { key: 'price_m2_with_delivery', label: 'Price incl. delivery, €/m²' },
+  {
+    key: 'price_m2_with_delivery',
+    label: 'Price incl. delivery, €/m²',
+    // Stored as list price; the discount is applied only to the total
+    render: (row) => applyDiscount(row.price_m2_with_delivery, row.discount),
+  },
   { key: 'final_price', label: 'Total, €' },
 ];
 
@@ -107,7 +113,7 @@ const AccountngOrderCard = React.memo(() => {
     filterKeysOrder,
   } = useOrderContext();
   const { displayNames } = useProjectContext();
-  const { latestProducts } = useProductsContext();
+  const { latestProducts, productVersions } = useProductsContext();
   const { latestDryMix, latestRelatedMaterials, latestAnchors, latestTools } =
     useProductsTypeJournalContext();
   const { userAccess } = useUsersContext();
@@ -206,10 +212,10 @@ const AccountngOrderCard = React.memo(() => {
   const updatedProductListOrder = useMemo(() => {
     return addProductArticleToOrderList(
       productListOrder,
-      latestProducts,
+      productVersions,
       'products',
     );
-  }, [productListOrder, latestProducts, addProductArticleToOrderList]);
+  }, [productListOrder, productVersions, addProductArticleToOrderList]);
 
   // orderCartData is built without delivery_m2, so read it from the order.
   const deliveryM2 = useMemo(
@@ -228,7 +234,7 @@ const AccountngOrderCard = React.memo(() => {
     );
 
     return updatedProductListOrder.map((product) => {
-      const catalog = latestProducts?.find((p) => p.id === product.product_id);
+      const catalog = productVersions?.find((p) => p.id === product.product_id);
       const blocksPerPallet = Number(catalog?.quantityBlockOnPallet) || 0;
 
       return {
@@ -242,7 +248,7 @@ const AccountngOrderCard = React.memo(() => {
         ...calcBlockPriceWithDelivery(product, deliveryPricePerM2),
       };
     });
-  }, [updatedProductListOrder, latestProducts, deliveryM2]);
+  }, [updatedProductListOrder, productVersions, deliveryM2]);
 
   useEffect(() => {
     if (blocksListWithDelivery.length > 0) {
@@ -603,6 +609,7 @@ const AccountngOrderCard = React.memo(() => {
         productLists={productLists}
         vatValue={vatValue}
         latestProducts={latestProducts}
+        productVersions={productVersions}
         latestDryMix={latestDryMix}
         latestAnchors={latestAnchors}
         latestTools={latestTools}

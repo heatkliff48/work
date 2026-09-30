@@ -2262,12 +2262,14 @@ rawMaterialsWarehouseRouter.get('/pallets', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.post('/pallets', async (req, res) => {
-  const { supplier, quantity, date } = req.body;
+  const { supplier, type, quantity, date } = req.body;
 
   try {
     const warehousePallets = await WarehousePallet.create({
       supplier,
       quantity,
+      consumed_quantity: 0,
+      type,
       date: formatDate(date),
     });
 
@@ -2381,7 +2383,7 @@ rawMaterialsWarehouseRouter.post('/pallets/delete', async (req, res) => {
   const { pallets_warehouse_id } = req.body;
 
   try {
-    await WarehouseAAC.destroy({ where: { id: pallets_warehouse_id } });
+    await WarehousePallet.destroy({ where: { id: pallets_warehouse_id } });
 
     myEmitter.emit(DELETE_WAREHOUSE_PALLETS_SOCKET, pallets_warehouse_id);
     return res.json(pallets_warehouse_id).status(200);

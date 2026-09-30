@@ -2,6 +2,10 @@ import { useProjectContext } from '#components/contexts/Context.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import InputField from '../../InputField/InputField';
+import {
+  blocksInHeight,
+  calculatePalletDimensions,
+} from '#utils/palletDimensions.js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
@@ -144,10 +148,12 @@ const ModalWindow = React.memo(
       //   formInput.width ?? '-'
       // }x${formInput.height ?? '-'}mm ${formInput.density ?? '-'}kg/m³`;
 
-      let parsedRC = parseFloat(
-        formInput.resistenciaCompresion.toString()?.replace(',', '.')
-      );
-      if (isNaN(parsedRC)) parsedRC = null;
+      // Поля вводятся текстом и могут содержать запятую ("111,1").
+      // Строку с запятой Sequelize пишет в FLOAT-колонку как NaN, поэтому парсим сами
+      const parseDecimal = (value) => {
+        const parsed = parseFloat(String(value ?? '').replace(',', '.'));
+        return isNaN(parsed) ? null : parsed;
+      };
 
       const updatedProduct = {
         ...formInput,
@@ -156,7 +162,11 @@ const ModalWindow = React.memo(
         product_code_pall: fullPalletProductCode,
         activeStatus: true,
         description,
-        resistenciaCompresion: parsedRC,
+        resistenciaCompresion: parseDecimal(formInput.resistenciaCompresion),
+        price: parseDecimal(formInput.price),
+        coefficientOfFree: parseDecimal(formInput.coefficientOfFree),
+        normOfBrack: parseDecimal(formInput.normOfBrack),
+        humidity: parseDecimal(formInput.humidity),
       };
 
       const isExistingProduct = products.some(
@@ -254,52 +264,6 @@ const ModalWindow = React.memo(
       return newDefaultValues;
     }, [list]);
 
-    const calculatePalletDimensions = (palletSize, palletHeight) => {
-      // Определение ширины и длины паллета
-      let palletLengthValue;
-      let palletWidthValue;
-
-      if (typeof palletSize === 'string' && palletSize.includes('x')) {
-        const [lengthStr, widthStr] = palletSize.split('x');
-        palletLengthValue = parseInt(lengthStr) || 1200;
-        palletWidthValue = parseInt(widthStr) || 800;
-      } else {
-        palletWidthValue = parseInt(palletSize) === 0 ? 1000 : 800;
-        palletLengthValue = 1200;
-      }
-
-      // Определение высоты паллета
-      // При редактировании приходит label ('Std' / 'Marine' / 'High' / 'Std+1'), при создании — value (0 / 1 / 2 / 3)
-      const palletHeightMap = {
-        0: 1150,
-        1: 950,
-        2: 1500,
-        3: 1150,
-        std: 1150,
-        marine: 950,
-        high: 1500,
-        'std+1': 1150,
-      };
-
-      // Std+1 — как Std, но с дополнительным рядом блоков сверху
-      const extraRowsMap = {
-        3: 1,
-        'std+1': 1,
-      };
-
-      const palletHeightKey =
-        typeof palletHeight === 'string' ? palletHeight.toLowerCase() : palletHeight;
-      const palletHeightValue = palletHeightMap[palletHeightKey] ?? 1140;
-      const extraRowsValue = extraRowsMap[palletHeightKey] ?? 0;
-
-      return {
-        palletWidth: palletWidthValue,
-        palletLength: palletLengthValue,
-        palletHeight: palletHeightValue,
-        extraRows: extraRowsValue,
-      };
-    };
-
     const memoizedCalculateValues = useCallback(
       (formInput) => {
         const values = {};
@@ -317,18 +281,17 @@ const ModalWindow = React.memo(
           palletHeight
         ) {
           const blocksAlongLength = Math.floor(palletLength / formInput?.lengths);
-          const blocksInHeight =
-            Math.floor(palletHeight / formInput?.width) + extraRows;
+          const rows = blocksInHeight(palletHeight, extraRows, formInput?.width);
           const blocksAlongWidth = Math.floor(palletWidth / formInput?.height);
 
           values.quantityBlockOnPallet =
-            blocksAlongLength * blocksInHeight * blocksAlongWidth;
+            blocksAlongLength * rows * blocksAlongWidth;
 
           console.log('Pallet calc', {
             'Паллета, мм (Д x Ш x макс. В)': `${palletLength}x${palletWidth}x${palletHeight}`,
             'Блоков на паллете, шт': values.quantityBlockOnPallet,
-            'Блоков в высоту, шт': blocksInHeight,
-            'Высота паллеты (блоки), см': (blocksInHeight * formInput?.width) / 10,
+            'Блоков в высоту, шт': rows,
+            'Высота паллеты (блоки), см': (rows * formInput?.width) / 10,
           });
 
           updateFuncs.quantityBlockOnPallet = (value) =>

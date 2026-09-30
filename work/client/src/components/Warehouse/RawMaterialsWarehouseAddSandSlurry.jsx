@@ -10,11 +10,13 @@ import { Container } from 'reactstrap';
 import { updateRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
 import { addNewWarehouseSandSlurry } from '#components/redux/actions/warehouseRawMaterialsAction.js';
 import DatePicker from 'react-datepicker';
+import { useTranslation } from 'react-i18next';
 
 function RawMaterialsWarehouseAddSandSlurry(props) {
   const [sandSlurryWarehouseInput, setSandSlurryWarehouseInput] = useState({
     portion_size: 100,
   });
+  // значения — ключи перевода, переводятся при рендере
   const [errors, setErrors] = useState({});
   const [dateValue, setDateValue] = useState(null);
 
@@ -24,30 +26,31 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t, i18n } = useTranslation('rawMaterialsWarehouse');
 
   const sand_slurry = [
     {
-      Header: 'Sand (dry), kg total',
+      Header: t('sandSlurry.fields.sand'),
       accessor: 'sand',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Gypsum stone, kg total',
+      Header: t('sandSlurry.fields.gypsumStone'),
       accessor: 'gypsum_stone',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Water, m3 total',
+      Header: t('sandSlurry.fields.water'),
       accessor: 'water',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Grinding balls, kg total',
+      Header: t('sandSlurry.fields.grindingBalls'),
       accessor: 'grinding_balls',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'AAC scrap, kg total',
+      Header: t('sandSlurry.fields.aacScrap'),
       accessor: 'aac',
       Filter: TextSearchFilter,
     },
@@ -135,13 +138,13 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       const value = sandSlurryWarehouseInput?.[accessor];
 
       if (value === null || value === undefined || String(value).trim() === '') {
-        newErrors[accessor] = `This field is required`;
+        newErrors[accessor] = 'errors.fieldRequired';
         return;
       }
 
       const num = Number(value);
       if (isNaN(num) || num < 0) {
-        newErrors[accessor] = `This field must contain a non-negative number`;
+        newErrors[accessor] = 'errors.fieldNonNegative';
       }
     });
 
@@ -165,7 +168,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       dateValue === undefined ||
       String(dateValue).trim() === ''
     ) {
-      newErrors.date = `This field is required`;
+      newErrors.date = 'errors.fieldRequired';
     }
 
     setErrors(newErrors);
@@ -245,7 +248,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       dialogClassName="modal-auto-size"
       onExited={resetModal}
     >
-      <Modal.Header closeButton>Add sand slurry</Modal.Header>
+      <Modal.Header closeButton>{t('sandSlurry.title')}</Modal.Header>
       <Modal.Body>
         <Container>
           <form
@@ -253,7 +256,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
             className="w-full max-w-sm"
             onSubmit={onSubmitForm}
           >
-            <h3>Add sand slurry</h3>
+            <h3>{t('sandSlurry.title')}</h3>
 
             {/* <div className="md:flex md:items-center mb-6 pb-5 border-b border-gray-300">
               <div className="md:w-1/3">
@@ -301,7 +304,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                     />
                     {errors[el.accessor] && (
                       <p className="text-red-500 text-xs mt-1">
-                        {errors[el.accessor]}
+                        {t(errors[el.accessor])}
                       </p>
                     )}
                   </div>
@@ -340,7 +343,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                 className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
                 htmlFor="cementType"
               >
-                Date
+                {t('columns.date')}
               </label>
               <DatePicker
                 id="data_pcker"
@@ -348,9 +351,10 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
                 selected={dateValue}
                 onChange={(date) => handleDateChange(date)}
                 dateFormat="dd.MM.yyyy"
+                locale={i18n.resolvedLanguage}
               />
               {errors.date && (
-                <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+                <p className="text-red-500 text-xs mt-1">{t(errors.date)}</p>
               )}
             </div>
 
@@ -358,7 +362,7 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
             <div className="md:flex md:items-center mb-6 p-4 bg-gray-100 rounded-lg">
               <div className="md:w-1/3">
                 <label className="block text-gray-700 font-bold md:text-right mb-1 md:mb-0 pr-4">
-                  Total, kg
+                  {t('sandSlurry.total')}
                 </label>
               </div>
               <div className="md:w-2/3">
@@ -373,9 +377,9 @@ function RawMaterialsWarehouseAddSandSlurry(props) {
       </Modal.Body>
       <Modal.Footer>
         <Button form="addClientModel" type="submit">
-          Add sand slurry
+          {t('sandSlurry.submit')}
         </Button>
-        <Button onClick={handleHide}>Close</Button>
+        <Button onClick={handleHide}>{t('close', { ns: 'common' })}</Button>
       </Modal.Footer>
     </Modal>
   );

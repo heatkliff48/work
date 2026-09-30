@@ -125,6 +125,68 @@ class ProductsRepository {
     });
   }
 
+  // changes: [{ tradingMark, density, price }] — новая цена за м³ для всех продуктов
+  // с такой маркой и плотностью. Каждый изменённый продукт получает новую версию
+  static async changeProductPrices(changes) {
+    const groupKey = (tradingMark, density) =>
+      `${tradingMark ?? ''}|${Number(density)}`;
+    const keys = changes.map(({ tradingMark, density }) =>
+      groupKey(tradingMark, density),
+    );
+
+    if (
+      !changes.length ||
+      changes.some(
+        ({ density, price }) =>
+          !Number.isFinite(Number(density)) ||
+          typeof price !== 'number' ||
+          !Number.isFinite(price) ||
+          price < 0,
+      ) ||
+      new Set(keys).size !== keys.length
+    ) {
+      throw new BadRequest('Invalid list of price changes');
+    }
+
+    const priceByKey = new Map(
+      changes.map(({ tradingMark, density, price }) => [
+        groupKey(tradingMark, density),
+        price,
+      ]),
+    );
+
+    return sequelize.transaction(async (transaction) => {
+      const products = await Products.findAll({ raw: true, transaction });
+
+      // Последняя версия каждого артикула — как latestProducts на клиенте
+      const latest = new Map();
+      for (const product of products) {
+        const current = latest.get(product.article);
+        if (!current || (product.version ?? 1) > (current.version ?? 1)) {
+          latest.set(product.article, product);
+        }
+      }
+
+      const created = [];
+      for (const product of latest.values()) {
+        const price = priceByKey.get(
+          groupKey(product.tradingMark, product.density),
+        );
+        if (price === undefined || product.price === price) continue;
+
+        const { id, createdAt, updatedAt, ...rest } = product;
+        created.push(
+          await Products.create(
+            { ...rest, version: (product.version ?? 1) + 1, price },
+            { transaction },
+          ),
+        );
+      }
+
+      return created;
+    });
+  }
+
   //PRODUCTION QUALITY
   static async getAllProductionQuality() {
     const products = await ProductionQualities.findAll();

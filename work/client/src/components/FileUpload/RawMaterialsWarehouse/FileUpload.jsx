@@ -4,10 +4,12 @@ import { useDispatch } from 'react-redux';
 import { useFileContext } from '#components/contexts/FileContext.js';
 import { useCallback } from 'react';
 import * as warehouseActions from '#components/redux/actions/warehouseRawMaterialsAction.js';
+import { useTranslation } from 'react-i18next';
 
 const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
   const [file, setFile] = useState(null);
   const { setMessage } = useFileContext();
+  const { t } = useTranslation();
 
   const dispatch = useDispatch();
 
@@ -40,7 +42,7 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
     const updateRawMaterialAction = getUpdateAction(material_type);
 
     if (!file) {
-      setMessage('No file selected!');
+      setMessage(t('files.noFileSelected'));
       return;
     }
 
@@ -66,13 +68,13 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
         }),
       );
 
-      setMessage(`File uploaded: ${res.data.filename}`);
+      setMessage(t('files.uploaded', { name: res.data.filename }));
       setFile(null);
     } catch (err) {
       if (err.response) {
         setMessage(err.response.data);
       } else {
-        setMessage('There was a problem with the server');
+        setMessage(t('files.serverError'));
       }
     }
   };
@@ -99,12 +101,12 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
             onChange={onChange}
             accept=".pdf,.txt,.doc,.docx.,jpg,.jpeg,.png,.gif,.bmp,.svg"
           />
-          <button onClick={handleUpload}>Upload</button>
+          <button onClick={handleUpload}>{t('files.upload')}</button>
         </>
       )}
       {deleteCheck && (
         <>
-          <button onClick={handleDelete}>Delete</button>
+          <button onClick={handleDelete}>{t('files.delete')}</button>
         </>
       )}
     </div>

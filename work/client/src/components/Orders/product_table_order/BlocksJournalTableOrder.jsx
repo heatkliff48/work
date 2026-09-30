@@ -3,6 +3,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { Button } from 'reactstrap';
 import AddProductOrderModal from '../modal/addProductModal/AddProductOrderModal';
+import { applyDiscount } from '../blockDeliveryPrice.js';
 import '../ordersView.css';
 
 const BlocksJournalTableOrder = ({
@@ -84,6 +85,20 @@ const BlocksJournalTableOrder = ({
                       let value = product[key];
                       if (value && typeof value === 'object') {
                         value = JSON.stringify(value);
+                      }
+                      // Скидка, посчитанная из цены, хранится без округления
+                      if (key === 'discount' && typeof value === 'number') {
+                        value = Math.round(value * 100) / 100;
+                      }
+                      // В строке хранится прайсовая цена, а скидка применяется
+                      // только в итоге — показываем цену, которую платит клиент
+                      if (
+                        (key === 'price_m2' ||
+                          key === 'price_m2_with_delivery') &&
+                        value != null &&
+                        value !== ''
+                      ) {
+                        value = applyDiscount(value, product.discount);
                       }
                       return <td key={key}>{value ?? ''}</td>;
                     })}

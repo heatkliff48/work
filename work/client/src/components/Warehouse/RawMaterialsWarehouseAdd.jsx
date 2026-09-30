@@ -9,12 +9,16 @@ import { useNavigate } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import * as warehouseActions from '#components/redux/actions/warehouseRawMaterialsAction.js';
 import DatePicker from 'react-datepicker';
-// import Select from 'react-select';
+import Select from 'react-select';
+import { useTranslation } from 'react-i18next';
+import { translateMaterial } from '#i18n/index.js';
+import { PALLET_TYPES, PALLET_TYPE_OPTIONS } from '#utils/palletTypes.js';
 
 function RawMaterialsWarehouseAdd(props) {
   const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState(
     {},
   );
+  // значения — ключи перевода, переводятся при рендере
   const [errors, setErrors] = useState({});
   const [dataValue, setDataValue] = useState(null);
 
@@ -24,6 +28,8 @@ function RawMaterialsWarehouseAdd(props) {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t, i18n } = useTranslation('rawMaterialsWarehouse');
+  const materialLabel = translateMaterial(t, props?.material_type);
 
   // const cementTypeOptions = [
   //   { value: 'type 1', label: 'Type 1' },
@@ -33,50 +39,56 @@ function RawMaterialsWarehouseAdd(props) {
 
   const raw_material_table = [
     {
-      Header: 'Supplier',
+      Header: t('columns.supplier'),
       accessor: 'supplier',
       Filter: TextSearchFilter,
     },
     {
       Header:
         props?.material_type === 'Pallets'
-          ? 'Quantity, pieces'
-          : 'Quantity, kg',
+          ? t('columns.quantityPieces')
+          : t('columns.quantityKg'),
       accessor: 'quantity',
       Filter: TextSearchFilter,
     },
     props?.material_type === 'Lime' && {
-      Header: 'Type',
+      Header: t('columns.type'),
       accessor: 'typeLime',
       Filter: TextSearchFilter,
     },
+    props?.material_type === 'Pallets' && {
+      Header: t('columns.type'),
+      accessor: 'typePallet',
+      Filter: TextSearchFilter,
+      options: PALLET_TYPE_OPTIONS,
+    },
     props?.material_type === 'Aluminum' && {
-      Header: 'Type',
+      Header: t('columns.type'),
       accessor: 'typeAlum1',
       Filter: TextSearchFilter,
     },
     props?.material_type === 'Aluminum 2' && {
-      Header: 'Type',
+      Header: t('columns.type'),
       accessor: 'typeAlum2',
       Filter: TextSearchFilter,
     },
     props?.material_type === 'Cement' && {
-      Header: 'Type',
+      Header: t('columns.type'),
       accessor: 'typeCement',
       Filter: TextSearchFilter,
     },
     props?.material_type === 'Sand (dry)' && {
-      Header: 'Type',
+      Header: t('columns.type'),
       accessor: 'typeSand',
       Filter: TextSearchFilter,
     },
     props?.material_type === 'Grinding Balls' && {
-      Header: 'Diametro, mm',
+      Header: t('columns.diameterMm'),
       accessor: 'diameter',
       Filter: TextSearchFilter,
     },
     {
-      Header: 'Date',
+      Header: t('columns.date'),
       accessor: 'date',
       Filter: TextSearchFilter,
     },
@@ -88,6 +100,7 @@ function RawMaterialsWarehouseAdd(props) {
     typeLime: 'CL 90Q',
     typeAlum1: '7040-10/70WB28',
     typeAlum2: '7100-30/70WB28',
+    typePallet: PALLET_TYPES.EUROPEO,
     diameter: 30,
   };
 
@@ -118,12 +131,16 @@ function RawMaterialsWarehouseAdd(props) {
   //   return null;
   // };
 
-  // const handleSelectChange = (selectedOption, fieldName) => {
-  //   setRawMaterialWarehouseInput((prev) => ({
-  //     ...prev,
-  //     [fieldName]: selectedOption.value,
-  //   }));
-  // };
+  const handleSelectChange = useCallback((selectedOption, fieldName) => {
+    setRawMaterialWarehouseInput((prev) => ({
+      ...prev,
+      [fieldName]: selectedOption?.value,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      [fieldName]: '',
+    }));
+  }, []);
 
   const handleDateChange = useCallback((date) => {
     setRawMaterialWarehouseInput((prev) => ({
@@ -179,6 +196,12 @@ function RawMaterialsWarehouseAdd(props) {
         typeAlum2: initState.typeAlum2,
       }));
     }
+    if (props?.material_type === 'Pallets') {
+      setRawMaterialWarehouseInput((prev) => ({
+        ...prev,
+        typePallet: initState.typePallet,
+      }));
+    }
     if (props?.material_type === 'Grinding Balls') {
       setRawMaterialWarehouseInput((prev) => ({
         ...prev,
@@ -210,56 +233,62 @@ function RawMaterialsWarehouseAdd(props) {
     const newErrors = {};
 
     if (!rawMaterialWarehouseInput?.supplier?.trim()) {
-      newErrors.supplier = 'Supplier is required';
+      newErrors.supplier = 'errors.supplierRequired';
     }
 
     if (!rawMaterialWarehouseInput?.quantity?.trim()) {
-      newErrors.quantity = 'Quantity is required';
+      newErrors.quantity = 'errors.quantityRequired';
     } else if (
       isNaN(rawMaterialWarehouseInput.quantity) ||
       parseFloat(rawMaterialWarehouseInput.quantity) <= 0
     ) {
-      newErrors.quantity = 'Quantity must be a positive number';
+      newErrors.quantity = 'errors.quantityPositive';
     }
 
     if (
       props?.material_type === 'Cement' &&
       !rawMaterialWarehouseInput?.typeCement
     ) {
-      newErrors.typeCement = 'Cement type is required';
+      newErrors.typeCement = 'errors.typeRequired';
     }
     if (
       props?.material_type === 'Sand (dry)' &&
       !rawMaterialWarehouseInput?.typeSand
     ) {
-      newErrors.typeSand = 'Sand type is required';
+      newErrors.typeSand = 'errors.typeRequired';
     }
     if (
       props?.material_type === 'Grinding Balls' &&
       !rawMaterialWarehouseInput?.diameter
     ) {
-      newErrors.diameter = 'Diameter is required';
+      newErrors.diameter = 'errors.diameterRequired';
     }
     if (!rawMaterialWarehouseInput?.date?.trim()) {
-      newErrors.supplier = 'Date is required';
+      newErrors.supplier = 'errors.dateRequired';
     }
     if (
       props?.material_type === 'Lime' &&
       !rawMaterialWarehouseInput?.typeLime
     ) {
-      newErrors.typeLime = 'Lime type is required';
+      newErrors.typeLime = 'errors.typeRequired';
     }
     if (
       props?.material_type === 'Aluminum' &&
       !rawMaterialWarehouseInput?.typeAlum1
     ) {
-      newErrors.typeAlum1 = 'Aluminum type is required';
+      newErrors.typeAlum1 = 'errors.typeRequired';
     }
     if (
       props?.material_type === 'Aluminum 2' &&
       !rawMaterialWarehouseInput?.typeAlum2
     ) {
-      newErrors.typeAlum2 = 'Aluminum 2 type is required';
+      newErrors.typeAlum2 = 'errors.typeRequired';
+    }
+    if (
+      props?.material_type === 'Pallets' &&
+      !rawMaterialWarehouseInput?.typePallet
+    ) {
+      newErrors.typePallet = 'errors.typeRequired';
     }
 
     setErrors(newErrors);
@@ -334,11 +363,18 @@ function RawMaterialsWarehouseAdd(props) {
                       date: rawMaterialWarehouseInput?.date,
                       type: rawMaterialWarehouseInput?.typeAlum2,
                     }
-                  : {
-                      supplier: rawMaterialWarehouseInput?.supplier,
-                      quantity: rawMaterialWarehouseInput?.quantity,
-                      date: rawMaterialWarehouseInput?.date,
-                    };
+                  : props?.material_type === 'Pallets'
+                    ? {
+                        supplier: rawMaterialWarehouseInput?.supplier,
+                        quantity: rawMaterialWarehouseInput?.quantity,
+                        date: rawMaterialWarehouseInput?.date,
+                        type: rawMaterialWarehouseInput?.typePallet,
+                      }
+                    : {
+                        supplier: rawMaterialWarehouseInput?.supplier,
+                        quantity: rawMaterialWarehouseInput?.quantity,
+                        date: rawMaterialWarehouseInput?.date,
+                      };
 
     dispatch(addAction(formData));
     setRawMaterialWarehouseInput({ ...initState });
@@ -364,7 +400,7 @@ function RawMaterialsWarehouseAdd(props) {
             className="w-full max-w-sm"
             onSubmit={onSubmitForm}
           >
-            <h3>Add {props?.material_type}</h3>
+            <h3>{t('add.title', { material: materialLabel })}</h3>
             <Row>
               {raw_material_table.map((el) =>
                 el.accessor === 'date' || !el.accessor ? null : (
@@ -379,21 +415,40 @@ function RawMaterialsWarehouseAdd(props) {
                         </label>
                       </div>
                       <div className="md:w-2/3">
-                        <input
-                          className={`bg-gray-200 appearance-none border-2 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500 ${
-                            errors[el.accessor]
-                              ? 'border-red-500'
-                              : 'border-gray-300'
-                          }`}
-                          id={el.accessor}
-                          name={el.accessor}
-                          type="text"
-                          value={rawMaterialWarehouseInput[el.accessor] || ''}
-                          onChange={handleRawMaterialWarehouseInputChange}
-                        />
+                        {el.options ? (
+                          <Select
+                            inputId={el.accessor}
+                            name={el.accessor}
+                            options={el.options}
+                            value={
+                              el.options.find(
+                                (option) =>
+                                  option.value ===
+                                  rawMaterialWarehouseInput[el.accessor],
+                              ) || null
+                            }
+                            onChange={(option) =>
+                              handleSelectChange(option, el.accessor)
+                            }
+                            isSearchable={false}
+                          />
+                        ) : (
+                          <input
+                            className={`bg-gray-200 appearance-none border-2 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500 ${
+                              errors[el.accessor]
+                                ? 'border-red-500'
+                                : 'border-gray-300'
+                            }`}
+                            id={el.accessor}
+                            name={el.accessor}
+                            type="text"
+                            value={rawMaterialWarehouseInput[el.accessor] || ''}
+                            onChange={handleRawMaterialWarehouseInputChange}
+                          />
+                        )}
                         {errors[el.accessor] && (
                           <p className="text-red-500 text-xs mt-1">
-                            {errors[el.accessor]}
+                            {t(errors[el.accessor], { material: materialLabel })}
                           </p>
                         )}
                       </div>
@@ -437,7 +492,7 @@ function RawMaterialsWarehouseAdd(props) {
                 className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
                 htmlFor="cementType"
               >
-                Date
+                {t('columns.date')}
               </label>
               <DatePicker
                 id="data_pcker"
@@ -445,6 +500,7 @@ function RawMaterialsWarehouseAdd(props) {
                 selected={dataValue}
                 onChange={(date) => handleDateChange(date)}
                 dateFormat="dd.MM.yyyy"
+                locale={i18n.resolvedLanguage}
               />
             </div>
           </form>
@@ -452,9 +508,9 @@ function RawMaterialsWarehouseAdd(props) {
       </Modal.Body>
       <Modal.Footer>
         <Button form="addClientModel" type="submit">
-          Add {props?.material_type.toLowerCase()}
+          {t('add.submit', { material: materialLabel })}
         </Button>
-        <Button onClick={handleHide}>Close</Button>
+        <Button onClick={handleHide}>{t('close', { ns: 'common' })}</Button>
       </Modal.Footer>
     </Modal>
   );

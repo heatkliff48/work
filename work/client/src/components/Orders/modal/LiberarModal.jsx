@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useDispatch } from 'react-redux';
@@ -17,7 +17,9 @@ import { useProductsTypeJournalContext } from '#components/contexts/ProductsType
 import {
   findBlockPackaging,
   m2PerPallet,
+  packageOptionLabel,
   packagingLabel,
+  palletHeightCm,
   round2,
 } from './packagingUtils.js';
 import '../ordersView.css';
@@ -134,37 +136,79 @@ function calcRelMatFields(orderRow, newUd, catalogRelMats) {
 
 const getQuantityKey = (type, id) => `${type}_${id}`;
 
+const enteredQty = (quantities, key) => parseFloat(quantities[key]) || 0;
+
+// Square meters the package lines of a block row ship, leaving `exceptKey`
+// out when given.
+const shippedM2 = (row, quantities, exceptKey) =>
+  row._lines.reduce(
+    (acc, line) =>
+      line.key === exceptKey
+        ? acc
+        : acc + enteredQty(quantities, line.key) * line.m2PerPallet,
+    0,
+  );
+
+// Most pallets one package line can take: whatever area of the parent line
+// the row's other package lines have not claimed yet.
+const lineMax = (row, line, quantities) => {
+  const leftM2 =
+    row._available * row._originM2PerPallet -
+    shippedM2(row, quantities, line.key);
+  return Math.max(0, round2(leftM2 / line.m2PerPallet));
+};
+
+// How much of the parent line the entered quantities eat, expressed in the
+// PARENT line's own pallets. For blocks every package line is converted
+// through square meters, which is what makes shipping another package debit
+// the main order by area instead of by pallet count.
+const consumedFromParent = (row, quantities) => {
+  if (row._type !== 'product') return enteredQty(quantities, row._key);
+  const deduction = shippedM2(row, quantities) / row._originM2PerPallet;
+  // Guard against rounding pushing the line past what is left, which the
+  // server rejects outright.
+  return Math.min(round2(deduction), row._available);
+};
+
 function LiberarModal({ show, onHide, orderCartData, productLists }) {
   const { list_of_orders } = useOrderContext();
-  const { latestProducts } = useProductsContext();
+  const { latestProducts, productVersions } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
+  // Line key -> quantity as typed. A block row has one line per package it
+  // ships as, every other row is a single line keyed by the row itself.
   const [quantities, setQuantities] = useState({});
-  // Row key -> id of the catalog product to actually ship for that line.
-  // Only blocks can be swapped, and only for another package of the same block.
-  const [replacements, setReplacements] = useState({});
+  // Row key -> package lines a block row ships as, each { key, productId }.
+  // Every line picks one package of the same block and takes its own pallet
+  // count, so one parent line can go out in several packages at once. Rows
+  // missing here ship as a single line in the parent's own package.
+  const [packageLines, setPackageLines] = useState({});
+  const lineSeq = useRef(0);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
 
   const handleDateChange = (date) => setSelectedDate(date);
 
   // Blocks carry the packaging swap and are therefore debited from the parent
   // order by square meters; every other product type keeps the plain
-  // pallet/unit accounting, so `_shipped` stays empty for them.
+  // pallet/unit accounting and carries no `_lines`.
   const allProducts = useMemo(() => {
     const catalog = latestProducts || [];
 
     const blocks = (productLists.products || []).map((p) => {
       const _key = getQuantityKey('product', p.id);
-      const { origin, variants } = findBlockPackaging(p, catalog);
-      const shipped =
-        variants.find((c) => c.id === Number(replacements[_key])) || origin;
+      const { origin, variants } = findBlockPackaging(p, catalog, productVersions);
+      const lines = (
+        packageLines[_key] || [{ key: `${_key}:0`, productId: origin?.id }]
+      ).map((line) => {
+        const shipped =
+          variants.find((c) => c.id === Number(line.productId)) || origin;
+        return { key: line.key, shipped, m2PerPallet: m2PerPallet(shipped) };
+      });
 
       const originM2 = m2PerPallet(origin);
-      const shippedM2 = m2PerPallet(shipped);
       const quantity = Number(p.quantity_palet) || 0;
       const liberated = Number(p[QTY_LIBERATED_FIELD]) || 0;
       const availablePalets = round2(quantity - liberated);
@@ -184,11 +228,8 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
         _availableM2: round2(availablePalets * originM2),
         _origin: origin,
         _variants: variants,
-        _shipped: shipped,
+        _lines: lines,
         _originM2PerPallet: originM2,
-        _shippedM2PerPallet: shippedM2,
-        // Input is in pallets of whatever package is being shipped.
-        _max: shippedM2 > 0 ? round2((availablePalets * originM2) / shippedM2) : 0,
       };
     });
 
@@ -217,56 +258,73 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       ...simple(productLists.tools, 'tool', 'quantity_ud'),
       ...simple(productLists.related_materials, 'relmat', 'quantity_ud'),
     ];
-  }, [productLists, latestProducts, replacements]);
+  }, [productLists, latestProducts, productVersions, packageLines]);
 
   const rowsByKey = useMemo(
     () => new Map(allProducts.map((row) => [row._key, row])),
     [allProducts],
   );
 
-  // How much of the parent line one entered quantity eats, expressed in the
-  // PARENT line's own pallets. For blocks the entered pallets are converted
-  // through square meters, which is what makes a swap to another package
-  // debit the main order by area instead of by pallet count.
-  const consumedFromParent = (row, qty) => {
-    if (row._type !== 'product') return qty;
-    const deduction = (qty * row._shippedM2PerPallet) / row._originM2PerPallet;
-    // Guard against rounding pushing the line past what is left, which the
-    // server rejects outright.
-    return Math.min(round2(deduction), row._available);
-  };
+  // Line key -> why its quantity cannot go into the child order. Package
+  // lines of one block row share what is left of the parent line, so typing
+  // into one of them changes how much the others may take.
+  const errors = useMemo(() => {
+    const result = {};
+    const check = (key, max) => {
+      const value = parseFloat(quantities[key]);
+      if (value < 0) result[key] = 'Value cannot be negative';
+      else if (value > max) result[key] = `Maximum allowed is ${max}`;
+    };
 
-  const handleReplacementChange = (key, productId) => {
-    setReplacements((prev) => ({ ...prev, [key]: productId }));
+    for (const row of allProducts) {
+      if (row._type === 'product') {
+        row._lines.forEach((line) =>
+          check(line.key, lineMax(row, line, quantities)),
+        );
+      } else {
+        check(row._key, row._max);
+      }
+    }
+    return result;
+  }, [allProducts, quantities]);
+
+  // Rewrites the package lines of one block row, starting from the ones it
+  // shows right now.
+  const updateLines = (row, update) =>
+    setPackageLines((prev) => ({
+      ...prev,
+      [row._key]: update(
+        row._lines.map(({ key, shipped }) => ({ key, productId: shipped?.id })),
+      ),
+    }));
+
+  const handlePackageChange = (row, lineKey, productId) => {
+    updateLines(row, (lines) =>
+      lines.map((line) => (line.key === lineKey ? { ...line, productId } : line)),
+    );
     // The entered amount was in pallets of the previous package, so it no
     // longer means anything once another package is picked.
-    setQuantities((prev) => ({ ...prev, [key]: '' }));
-    setErrors((prev) => ({ ...prev, [key]: '' }));
+    setQuantities((prev) => ({ ...prev, [lineKey]: '' }));
+  };
+
+  // Adds a line in the first package of the block the row does not ship yet.
+  const handleAddPackage = (row) => {
+    const used = new Set(row._lines.map((line) => line.shipped?.id));
+    const next = row._variants.find((variant) => !used.has(variant.id));
+    if (!next) return;
+
+    lineSeq.current += 1;
+    const key = `${row._key}:${lineSeq.current}`;
+    updateLines(row, (lines) => [...lines, { key, productId: next.id }]);
+  };
+
+  const handleRemovePackage = (row, lineKey) => {
+    updateLines(row, (lines) => lines.filter((line) => line.key !== lineKey));
+    setQuantities((prev) => ({ ...prev, [lineKey]: '' }));
   };
 
   const handleQuantityChange = (key, value) => {
-    const product = rowsByKey.get(key);
-    if (!product) return;
-
-    const numValue = Number(value);
-    const maxQuantity = product._max;
-
-    setErrors((prev) => ({ ...prev, [key]: '' }));
     setQuantities((prev) => ({ ...prev, [key]: value }));
-
-    if (value === '') return;
-
-    if (numValue < 0) {
-      setErrors((prev) => ({ ...prev, [key]: 'Value cannot be negative' }));
-      return;
-    }
-
-    if (numValue > maxQuantity) {
-      setErrors((prev) => ({
-        ...prev,
-        [key]: `Maximum allowed is ${maxQuantity}`,
-      }));
-    }
   };
 
   const isTotalQuantityFullyLiberated = () => {
@@ -274,11 +332,9 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     let totalEntered = 0;
 
     for (const product of allProducts) {
-      const enteredQty = parseFloat(quantities[product._key]) || 0;
-
       if (product._available > 0) {
         totalAvailable += product._available;
-        totalEntered += consumedFromParent(product, enteredQty);
+        totalEntered += consumedFromParent(product, quantities);
       }
     }
 
@@ -291,7 +347,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       return;
     }
 
-    const hasErrors = Object.values(errors).some((error) => error !== '');
+    const hasErrors = Object.keys(errors).length > 0;
     if (hasErrors) {
       alert('Please fix all quantity errors before confirming.');
       return;
@@ -315,22 +371,31 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     // that was included below (one entry per product type).
     const parentUpdates = [];
 
-    const products = (productLists.products || [])
-      .map((p) => {
-        const row = rowsByKey.get(getQuantityKey('product', p.id));
-        const qty = parseFloat(quantities[row?._key]);
-        if (!row || !qty || qty <= 0) return null;
-        const calc = calcProductFields(p, qty, row._shipped);
-        if (!calc) return null;
+    const products = (productLists.products || []).flatMap((p) => {
+      const row = rowsByKey.get(getQuantityKey('product', p.id));
+      if (!row) return [];
+      // Every package line becomes its own line of the child order, shipping
+      // `line.shipped`: the parent's product unless another package of the
+      // same block was picked for it.
+      const lines = row._lines
+        .map((line) => {
+          const qty = enteredQty(quantities, line.key);
+          if (qty <= 0) return null;
+          const calc = calcProductFields(p, qty, line.shipped);
+          if (!calc) return null;
+          return { product_id: line.shipped.id, quantity_palet: qty, ...calc };
+        })
+        .filter(Boolean);
+      if (lines.length > 0) {
+        // A single update per parent line: the server adds the amount to
+        // what was liberated before, so one update per package would race.
         parentUpdates.push({
           action: getUpdateProductInfoOfOrders,
-          payload: buildLiberatedUpdate(p, consumedFromParent(row, qty)),
+          payload: buildLiberatedUpdate(p, consumedFromParent(row, quantities)),
         });
-        // The child order ships `row._shipped`, which is the parent's product
-        // unless another package of the same block was picked for this line.
-        return { product_id: row._shipped.id, quantity_palet: qty, ...calc };
-      })
-      .filter(Boolean);
+      }
+      return lines;
+    });
 
     // "Delivery price for m2 full" для дочернего заказа: доставка на m2
     // (price_m2_with_delivery - price_m2) одинакова для всех позиций
@@ -555,91 +620,188 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
                 <tbody>
                   {allProducts.map((p) => {
                     const isBlock = p._type === 'product';
-                    const entered = parseFloat(quantities[p._key]) || 0;
-                    const showDeduction = isBlock && entered > 0;
-                    const shippedM2 = showDeduction
-                      ? round2(entered * p._shippedM2PerPallet)
-                      : 0;
+                    // Blocks get one table row per package line; the cells
+                    // describing the parent line span all of them.
+                    const lines = isBlock ? p._lines : [{ key: p._key }];
+                    const span = lines.length;
+                    const canSwap = isBlock && p._variants.length > 1;
 
-                    return (
-                      <tr key={p._key}>
-                        <td className="ord-liberar-table__article">
-                          {p._label}
-                        </td>
-                        <td>{p._desc}</td>
-                        <td>
-                          {isBlock && p._variants.length > 1 ? (
-                            <select
-                              className="ord-liberar-select"
-                              value={p._shipped?.id ?? ''}
-                              onChange={(e) =>
-                                handleReplacementChange(p._key, e.target.value)
+                    return lines.map((line, i) => {
+                      const isLast = i === span - 1;
+                      // Package lines of one product read as a group, so only
+                      // the last one is ruled off.
+                      const lineCell = isLast ? '' : ' ord-liberar-table__cont';
+                      const entered = enteredQty(quantities, line.key);
+                      const showDeduction = isBlock && entered > 0;
+                      const height = isBlock && palletHeightCm(line.shipped);
+
+                      return (
+                        <tr key={line.key}>
+                          {i === 0 && (
+                            <>
+                              <td
+                                rowSpan={span}
+                                className="ord-liberar-table__article"
+                              >
+                                {p._label}
+                              </td>
+                              <td rowSpan={span}>{p._desc}</td>
+                            </>
+                          )}
+                          <td className={lineCell}>
+                            {canSwap ? (
+                              <>
+                                <div className="ord-liberar-package">
+                                  <select
+                                    className="ord-liberar-select"
+                                    value={line.shipped?.id ?? ''}
+                                    onChange={(e) =>
+                                      handlePackageChange(
+                                        p,
+                                        line.key,
+                                        e.target.value,
+                                      )
+                                    }
+                                  >
+                                    {p._variants.map((variant) => (
+                                      <option
+                                        key={variant.id}
+                                        value={variant.id}
+                                        // One line per package: the same
+                                        // package twice would only split it.
+                                        disabled={lines.some(
+                                          (other) =>
+                                            other.key !== line.key &&
+                                            other.shipped?.id === variant.id,
+                                        )}
+                                      >
+                                        {packageOptionLabel(variant)}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  {i > 0 && (
+                                    <button
+                                      type="button"
+                                      className="ord-iconbtn"
+                                      title="Remove package"
+                                      onClick={() =>
+                                        handleRemovePackage(p, line.key)
+                                      }
+                                    >
+                                      <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="#565d6d"
+                                        strokeWidth="2.1"
+                                        strokeLinecap="round"
+                                      >
+                                        <path d="M6 6l12 12" />
+                                        <path d="M18 6 6 18" />
+                                      </svg>
+                                    </button>
+                                  )}
+                                </div>
+                                {/* The select is too narrow for the whole
+                                    option, so repeat what tells packages apart. */}
+                                <div className="ord-liberar-sub">
+                                  {[
+                                    packagingLabel(line.shipped),
+                                    height && `${height} cm`,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' · ')}
+                                </div>
+                                {isLast && span < p._variants.length && (
+                                  <button
+                                    type="button"
+                                    className="ord-liberar-add"
+                                    onClick={() => handleAddPackage(p)}
+                                  >
+                                    + Add package
+                                  </button>
+                                )}
+                              </>
+                            ) : (
+                              <span className="ord-liberar-sub">—</span>
+                            )}
+                          </td>
+                          {i === 0 && (
+                            <>
+                              <td
+                                rowSpan={span}
+                                className="ord-liberar-table__num"
+                              >
+                                {p._quantity}
+                                {isBlock && (
+                                  <div className="ord-liberar-sub">
+                                    {p._quantityM2} m²
+                                  </div>
+                                )}
+                              </td>
+                              <td
+                                rowSpan={span}
+                                className="ord-liberar-table__num"
+                              >
+                                {p._liberated}
+                                {isBlock && (
+                                  <div className="ord-liberar-sub">
+                                    {p._liberatedM2} m²
+                                  </div>
+                                )}
+                              </td>
+                              <td
+                                rowSpan={span}
+                                className="ord-liberar-table__num"
+                              >
+                                {p._available}
+                                {isBlock && (
+                                  <div className="ord-liberar-sub">
+                                    {p._availableM2} m²
+                                  </div>
+                                )}
+                              </td>
+                            </>
+                          )}
+                          <td className={`ord-liberar-table__num${lineCell}`}>
+                            <input
+                              type="number"
+                              min="0"
+                              max={
+                                isBlock
+                                  ? lineMax(p, line, quantities)
+                                  : p._max
                               }
-                            >
-                              {p._variants.map((variant) => (
-                                <option key={variant.id} value={variant.id}>
-                                  {variant.article}
-                                  {packagingLabel(variant)
-                                    ? ` — ${packagingLabel(variant)}`
-                                    : ''}
-                                  {` (${m2PerPallet(variant)} m²/pal)`}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <span className="ord-liberar-sub">—</span>
-                          )}
-                        </td>
-                        <td className="ord-liberar-table__num">
-                          {p._quantity}
-                          {isBlock && (
-                            <div className="ord-liberar-sub">
-                              {p._quantityM2} m²
-                            </div>
-                          )}
-                        </td>
-                        <td className="ord-liberar-table__num">
-                          {p._liberated}
-                          {isBlock && (
-                            <div className="ord-liberar-sub">
-                              {p._liberatedM2} m²
-                            </div>
-                          )}
-                        </td>
-                        <td className="ord-liberar-table__num">
-                          {p._available}
-                          {isBlock && (
-                            <div className="ord-liberar-sub">
-                              {p._availableM2} m²
-                            </div>
-                          )}
-                        </td>
-                        <td className="ord-liberar-table__num">
-                          <input
-                            type="number"
-                            min="0"
-                            max={p._max}
-                            step="1"
-                            value={quantities[p._key] ?? ''}
-                            onChange={(e) =>
-                              handleQuantityChange(p._key, e.target.value)
-                            }
-                            className="ord-liberar-qty"
-                          />
-                          {showDeduction && (
-                            <div className="ord-liberar-sub">
-                              = {shippedM2} m² · −{consumedFromParent(p, entered)}{' '}
-                              pal from main
-                            </div>
-                          )}
-                          {errors[p._key] && (
-                            <div className="ord-liberar-error">
-                              {errors[p._key]}
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    );
+                              step="1"
+                              value={quantities[line.key] ?? ''}
+                              onChange={(e) =>
+                                handleQuantityChange(line.key, e.target.value)
+                              }
+                              className="ord-liberar-qty"
+                            />
+                            {showDeduction && (
+                              <div className="ord-liberar-sub">
+                                = {round2(entered * line.m2PerPallet)} m² · −
+                                {Math.min(
+                                  round2(
+                                    (entered * line.m2PerPallet) /
+                                      p._originM2PerPallet,
+                                  ),
+                                  p._available,
+                                )}{' '}
+                                pal from main
+                              </div>
+                            )}
+                            {errors[line.key] && (
+                              <div className="ord-liberar-error">
+                                {errors[line.key]}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    });
                   })}
                 </tbody>
               </table>

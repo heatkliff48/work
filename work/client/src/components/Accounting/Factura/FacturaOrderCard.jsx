@@ -38,7 +38,7 @@ const FacturaOrderCard = React.memo(() => {
     filterKeysOrder,
   } = useOrderContext();
 
-  const { latestProducts } = useProductsContext();
+  const { latestProducts, productVersions } = useProductsContext();
   const { latestDryMix, latestRelatedMaterials, latestAnchors, latestTools } =
     useProductsTypeJournalContext();
 
@@ -149,10 +149,10 @@ const FacturaOrderCard = React.memo(() => {
   const updatedProductListOrder = useMemo(() => {
     return addProductArticleToOrderList(
       productListOrder,
-      latestProducts,
+      productVersions,
       'products',
     );
-  }, [productListOrder, latestProducts, addProductArticleToOrderList]);
+  }, [productListOrder, productVersions, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedProductListOrder.length > 0) {
@@ -446,6 +446,7 @@ const FacturaOrderCard = React.memo(() => {
         productLists={selectedOrder?.productLists}
         vatValue={selectedOrder?.vatData}
         latestProducts={latestProducts}
+        productVersions={productVersions}
         latestDryMix={latestDryMix}
         latestAnchors={latestAnchors}
         latestTools={latestTools}

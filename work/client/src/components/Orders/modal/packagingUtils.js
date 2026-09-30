@@ -1,3 +1,8 @@
+import {
+  blocksInHeight,
+  calculatePalletDimensions,
+} from '#utils/palletDimensions.js';
+
 export const round2 = (n) => parseFloat(Number(n).toFixed(2));
 
 // Blocks are sold by area, except U-blocks which are sold by linear meter —
@@ -19,20 +24,53 @@ export const isSameBlockOtherPackaging = (a = '', b = '') =>
 // Catalog entry a block order line points at, and every package the same block
 // is available in (the line's own package included, so the list doubles as the
 // options of a "ship as" selector).
-export const findBlockPackaging = (orderRow, catalogProducts) => {
+// The line keeps the product version it was ordered with, so the origin is
+// looked up by id among all versions, and it stands in for its own package in
+// the variants; other packages are offered in their latest version.
+export const findBlockPackaging = (orderRow, catalogProducts, productVersions) => {
   const catalog = catalogProducts || [];
   const origin =
-    catalog.find((c) => c.id === orderRow?.product_id) ||
+    (productVersions || catalog).find((c) => c.id === orderRow?.product_id) ||
     catalog.find((c) => c.article === orderRow?.product_article);
   const variants = origin
-    ? catalog.filter((c) => isSameBlockOtherPackaging(c.article, origin.article))
+    ? catalog
+        .filter((c) => isSameBlockOtherPackaging(c.article, origin.article))
+        .map((c) => (c.article === origin.article ? origin : c))
     : [];
 
   return { origin, variants };
 };
 
-// Short human label for a package, e.g. "Disposable · 1200x800 · Spain".
+// Short human label for a package, e.g. "Disposable · 1200x800 · Marine · Spain".
 export const packagingLabel = (catalog) =>
-  [catalog?.typeOfPackaging, catalog?.palletSize, catalog?.placeOfProduction]
+  [
+    catalog?.typeOfPackaging,
+    catalog?.palletSize,
+    catalog?.palletHeight,
+    catalog?.placeOfProduction,
+  ]
     .filter(Boolean)
     .join(' · ');
+
+// Height of the block stack on one pallet, in cm, with the rows counted the
+// way the product card counts them for blocks per pallet.
+export const palletHeightCm = (catalog) => {
+  const width = Number(catalog?.width);
+  if (!width) return null;
+  const { palletHeight, extraRows } = calculatePalletDimensions(
+    catalog.palletSize,
+    catalog.palletHeight,
+  );
+  return round2((blocksInHeight(palletHeight, extraRows, width) * width) / 10);
+};
+
+// One option of a "ship as" selector, e.g.
+// "T.NBD30W30C — Disposable · 1200x800 · Marine · Spain (1.44 m²/pal · 90 cm)".
+export const packageOptionLabel = (catalog) => {
+  const label = packagingLabel(catalog);
+  const height = palletHeightCm(catalog);
+  const specs = [`${m2PerPallet(catalog)} m²/pal`, height && `${height} cm`]
+    .filter(Boolean)
+    .join(' · ');
+  return `${catalog.article}${label ? ` — ${label}` : ''} (${specs})`;
+};

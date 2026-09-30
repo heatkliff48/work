@@ -10,7 +10,7 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import '../warehouseManagerView.css';
 
 function WMModalTrailer({ setTrailerOrder }) {
-  const { latestProducts } = useProductsContext();
+  const { productVersions } = useProductsContext();
   const { order_dispatch_data, normalizeProductType } = useWarehouseContext();
   const {
     wmmodalTrailer,
@@ -162,7 +162,8 @@ function WMModalTrailer({ setTrailerOrder }) {
       {
         type: 'product',
         orderRows: productsOfOrders,
-        productTable: latestProducts,
+        // Строка заказа ссылается на свою версию карточки
+        productTable: productVersions,
         orderProductIdKey: 'product_id',
         quantityKey: 'quantity_palet',
       },

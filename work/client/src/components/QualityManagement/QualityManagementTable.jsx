@@ -27,6 +27,11 @@ import {
 } from '#components/redux/actions/recipeAction.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { updateOrderToWarehouse } from '#components/redux/actions/orderToWarehouseAction.js';
+import { getWarehousePallets } from '#components/redux/actions/warehouseRawMaterialsAction.js';
+import {
+  getPalletTypeByPalletSize,
+  getPalletsAvailableByType,
+} from '#utils/palletTypes.js';
 import DatePicker from 'react-datepicker';
 import ModalTable from './ModalTable';
 import '#components/Clients/ClientsInfo/clientsDrawer.css';
@@ -80,6 +85,7 @@ const QualityManagementTable = () => {
     (state) => state.qualityManagementData,
   );
   const batchOutside = useSelector((state) => state.batchOutside);
+  const warehousePallets = useSelector((state) => state.warehousePallets);
 
   const [qualityManagementDataList, setQualityManagementDataList] = useState(
     [],
@@ -154,6 +160,11 @@ const QualityManagementTable = () => {
     const warehouseArticle = `S${type}0${certificate}${density}${dateStr}${versionNumber}`;
     return warehouseArticle;
   };
+
+  // Поступления паллет нужны для проверки остатка по типу
+  useEffect(() => {
+    dispatch(getWarehousePallets());
+  }, []);
 
   useEffect(() => {
     if (qualityManagementData) {
@@ -304,7 +315,13 @@ const QualityManagementTable = () => {
 
   // Обработка одной записи (вызывается в цикле)
   // plasticQuantity > 0 только у одной партии — пластик списывается один раз
-  const processSingleBatch = async (currentData, count, plasticQuantity = 0) => {
+  // palletsAvailableByType общий на весь цикл: уменьшается после каждой партии
+  const processSingleBatch = async (
+    currentData,
+    count,
+    palletsAvailableByType,
+    plasticQuantity = 0,
+  ) => {
     const {
       id,
       batch_id,
@@ -373,22 +390,19 @@ const QualityManagementTable = () => {
       (remainingFreeQty ?? 0) +
       (sorting ?? 0);
 
-    const checkPallets = raw_materials_warehouse.some(
-      (item) =>
-        item.material_type == 'Pallets' &&
-        item.remaining_quantity >= totalQuantityForRawMatWarehouse,
-    );
+    const product = latestProducts.find((el) => el.article == product_article);
 
-    if (!checkPallets) {
-      const pallets =
-        raw_materials_warehouse.find((item) => item.material_type == 'Pallets')
-          ?.remaining_quantity || 0;
+    // 1200x800 — EUROPEO, 1200x1000 — AMERICANO
+    const palletType = getPalletTypeByPalletSize(product?.palletSize);
+    const pallets = palletsAvailableByType[palletType] || 0;
+
+    if (pallets < totalQuantityForRawMatWarehouse) {
       throw new Error(
-        `Not enough pallets in the warehouse for batch ${batch_id}. Available: ${pallets}, need: ${totalQuantityForRawMatWarehouse}.`,
+        `Not enough ${palletType} pallets in the warehouse for batch ${batch_id}. Available: ${pallets}, need: ${totalQuantityForRawMatWarehouse}.`,
       );
     }
-
-    const product = latestProducts.find((el) => el.article == product_article);
+    palletsAvailableByType[palletType] =
+      pallets - totalQuantityForRawMatWarehouse;
     const warehouse_article = getWarehouseArticle(product, count);
 
     console.log(
@@ -581,12 +595,14 @@ const QualityManagementTable = () => {
     let count = 0;
     // Пластик списывается вместе с первой успешно обработанной партией
     let plasticToWriteOff = plasticTotal;
+    const palletsAvailableByType = getPalletsAvailableByType(warehousePallets);
 
     for (const record of qualityManagementDataList) {
       try {
         const result = await processSingleBatch(
           record,
           count,
+          palletsAvailableByType,
           plasticToWriteOff,
         );
         processedBatches.push(result);
