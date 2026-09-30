@@ -1,0 +1,69 @@
+{
+  "title": "Raw Materials Warehouse",
+  "columns": {
+    "materialType": "Material type",
+    "remainingQuantity": "Remaining quantity",
+    "lastUpdated": "Last updated",
+    "supplier": "Supplier",
+    "quantityKg": "Quantity, kg",
+    "quantityPieces": "Quantity, pieces",
+    "type": "Type",
+    "consumedPieces": "Consumed, pieces",
+    "diameterMm": "Diameter, mm",
+    "date": "Date",
+    "quality": "Quality",
+    "file": "File"
+  },
+  "noFile": "No file",
+  "filterByType": "Filter by type:",
+  "selectType": "Select type...",
+  "allTypes": "All types",
+  "totalQuantity": "Total Quantity:",
+  "totalAvailable": "Total Available:",
+  "addNew": "Add new {{material}}",
+  "add": {
+    "title": "Add {{material}}",
+    "submit": "Add {{material}}"
+  },
+  "errors": {
+    "supplierRequired": "Supplier is required",
+    "quantityRequired": "Quantity is required",
+    "quantityPositive": "Quantity must be a positive number",
+    "dateRequired": "Date is required",
+    "diameterRequired": "Diameter is required",
+    "typeRequired": "{{material}} type is required",
+    "fieldRequired": "This field is required",
+    "fieldNonNegative": "This field must contain a non-negative number"
+  },
+  "quality": {
+    "title": "Add quality to {{supplier}}",
+    "submit": "Add quality to {{supplier}}",
+    "inputLabel": "Enter % from 0 to 100",
+    "invalidNumberRange": "Please enter a valid number (0-100)",
+    "invalidNumber": "Please enter a valid number",
+    "outOfRange": "Value must be between 0 and 100",
+    "residueTitle": "Change residue on the sieve",
+    "acceptChange": "Accept change"
+  },
+  "sandSlurry": {
+    "addButton": "Add sand slurry (dry)",
+    "title": "Add sand slurry",
+    "submit": "Add sand slurry",
+    "total": "Total, kg",
+    "columns": {
+      "sand": "Sand (dry)",
+      "gypsumStone": "Gypsum stone",
+      "water": "Water",
+      "grindingBalls": "Grinding balls",
+      "aacScrap": "AAC scrap",
+      "residue": "Residue on the sieve"
+    },
+    "fields": {
+      "sand": "Sand (dry), kg total",
+      "gypsumStone": "Gypsum stone, kg total",
+      "water": "Water, m3 total",
+      "grindingBalls": "Grinding balls, kg total",
+      "aacScrap": "AAC scrap, kg total"
+    }
+  }
+}

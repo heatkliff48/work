@@ -1,11 +1,13 @@
 import React from 'react';
 import { useAsyncDebounce } from 'react-table';
+import { useTranslation } from 'react-i18next';
 
 export function GlobalFilterInput({
   preGlobalFilteredRows,
   globalFilter,
   setGlobalFilter,
 }) {
+  const { t } = useTranslation();
   const count = preGlobalFilteredRows.length;
   const onChange = useAsyncDebounce((value) => {
     setGlobalFilter(value || undefined);
@@ -13,13 +15,13 @@ export function GlobalFilterInput({
 
   return (
     <span>
-      Global search: {''}
+      {t('table.globalSearch')} {''}
       <input
         value={globalFilter || ''}
         onChange={(e) => {
           onChange(e.target.value);
         }}
-        placeholder={`${count} records...`}
+        placeholder={t('table.records', { count })}
       />
     </span>
   );

@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import Table from '../Table/Table';
+import { translateMaterial } from '#i18n/index.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { getRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
@@ -21,11 +23,18 @@ import {
   getWarehouseSandSlurry,
 } from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
+const COLUMN_TITLE_KEYS = {
+  material_type: 'columns.materialType',
+  remaining_quantity: 'columns.remainingQuantity',
+  last_updated: 'columns.lastUpdated',
+};
+
 function Warehouse() {
   const { COLUMNS_RAW_MATERIALS_WAREHOUSE, raw_materials_warehouse } =
     useWarehouseContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } =
     useUsersContext();
+  const { t } = useTranslation('rawMaterialsWarehouse');
 
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -33,12 +42,23 @@ function Warehouse() {
   const [modalShow, setModalShow] = useState(false);
   const [materialType, setMaterialType] = useState('');
 
+  const columns = useMemo(
+    () =>
+      COLUMNS_RAW_MATERIALS_WAREHOUSE.map((col) => ({
+        ...col,
+        Header: COLUMN_TITLE_KEYS[col.accessor]
+          ? t(COLUMN_TITLE_KEYS[col.accessor])
+          : col.Header,
+      })),
+    [COLUMNS_RAW_MATERIALS_WAREHOUSE, t],
+  );
+
   const handleRowClick = useCallback((row) => {
-    setMaterialType(row.original.material_type.replace(/, .*$/, '').trim());
+    // material_key — исходное (английское) название, material_type — переведённое для отображения
+    setMaterialType(row.original.material_key);
     // setWarehouseInfoCurIdModal(row.original.id);
     // setWarehouseInfoModal(!warehouseInfoModal);
-    row.original.material_type !== 'Return slurry (dry), kg' &&
-      setModalShow(true);
+    row.original.material_key !== 'Return slurry (dry)' && setModalShow(true);
     const access = checkUserAccess(user, roles, 'raw_materials_warehouse_add');
     console.log(access);
   }, []);
@@ -72,10 +92,11 @@ function Warehouse() {
 
   const modifiedData = raw_materials_warehouse.map((item) => ({
     ...item,
-    material_type:
-      item.material_type == 'Pallets'
-        ? `${item.material_type}, pieces`
-        : `${item.material_type}, kg`,
+    material_key: item.material_type,
+    material_type: `${translateMaterial(t, item.material_type)}, ${t(
+      item.material_type == 'Pallets' ? 'units.pieces' : 'units.kg',
+      { ns: 'common' },
+    )}`,
   }));
 
   return (
@@ -85,10 +106,10 @@ function Warehouse() {
       )} */}
 
       <Table
-        COLUMN_DATA={COLUMNS_RAW_MATERIALS_WAREHOUSE}
+        COLUMN_DATA={columns}
         dataOfTable={modifiedData}
         userAccess={userAccess}
-        tableName={'Raw Materials Warehouse'}
+        tableName={t('title')}
         handleRowClick={handleRowClick}
       />
       <RawMaterialsWarehouseInfo
