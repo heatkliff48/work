@@ -84,9 +84,15 @@ function RawMaterialsWarehouseInfo(props) {
       props?.material_type === 'Aluminum' ||
       props?.material_type === 'Aluminum 2' ||
       props?.material_type === 'Lime' ||
+      props?.material_type === 'Pallets' ||
       props?.material_type === 'Sand (dry)') && {
       Header: 'Type',
       accessor: 'type',
+      Filter: TextSearchFilter,
+    },
+    props?.material_type === 'Pallets' && {
+      Header: 'Consumed, pieces',
+      accessor: 'consumed_quantity',
       Filter: TextSearchFilter,
     },
     props?.material_type === 'Grinding Balls' && {
