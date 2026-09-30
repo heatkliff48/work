@@ -7,6 +7,7 @@ import {
   ALL_PRODUCTS,
   CHANGE_PRODUCT_PRICES,
   FIX_PRODUCT_ARTICLES,
+  FIX_PRODUCT_DESCRIPTIONS,
   GET_ALL_PRODUCTS,
   NEED_UPDATE_PRODUCT,
   NEW_PRODUCT,
@@ -49,6 +50,18 @@ const updateProducts = (product) => {
 const fixProductArticles = (changes) => {
   return url
     .post('/products/fix-articles', { changes })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const fixProductDescriptions = (changes) => {
+  return url
+    .post('/products/fix-descriptions', { changes })
     .then((res) => {
       return res.data;
     })
@@ -139,6 +152,16 @@ function* fixProductArticlesWatcher(action) {
   }
 }
 
+function* fixProductDescriptionsWatcher(action) {
+  try {
+    const { updated } = yield call(fixProductDescriptions, action.payload);
+    showMessage(`Descriptions fixed: ${updated}`, 'success');
+    yield put({ type: GET_ALL_PRODUCTS });
+  } catch (err) {
+    console.error('Error in fixProductDescriptionsWatcher:', err);
+  }
+}
+
 // Новые версии продуктов приходят всем клиентам через ADD_NEW_PRODUCT_SOCKET
 function* changeProductPricesWatcher(action) {
   try {
@@ -155,6 +178,7 @@ function* productsWatcher() {
   yield takeLatest(NEED_UPDATE_PRODUCT, updateProductWatcher);
   yield takeLatest(REPAIR_PRODUCT, repairProductWatcher);
   yield takeLatest(FIX_PRODUCT_ARTICLES, fixProductArticlesWatcher);
+  yield takeLatest(FIX_PRODUCT_DESCRIPTIONS, fixProductDescriptionsWatcher);
   yield takeLatest(CHANGE_PRODUCT_PRICES, changeProductPricesWatcher);
 }
 

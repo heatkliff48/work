@@ -23,6 +23,10 @@ class ProductService {
     return ProductsRepository.fixProductArticles(changes);
   }
 
+  static async fixProductDescriptions(changes) {
+    return ProductsRepository.fixProductDescriptions(changes);
+  }
+
   static async changeProductPrices(changes) {
     return ProductsRepository.changeProductPrices(changes);
   }

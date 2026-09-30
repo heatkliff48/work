@@ -1,6 +1,9 @@
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
+import {
+  useProductsContext,
+  widthToTitleCm,
+} from '#components/contexts/ProductContext.js';
 import InputField from '../../InputField/InputField';
 import {
   blocksInHeight,
@@ -128,17 +131,18 @@ const ModalWindow = React.memo(
 
       //description
       let description;
+      const titleWidth = widthToTitleCm(formInput.width);
 
       if (formInput.form === 'O-block') {
         // Если выбран O-block
-        description = `BAUBLOCK® ${trMark} ${formInput.width ?? '-'} (Ø${
+        description = `BAUBLOCK® ${trMark} ${titleWidth} (Ø${
           formInput.diametro ?? '-'
         }) Medidas ${formInput.lengths ?? '-'}x${formInput.width ?? '-'}x${
           formInput.height ?? '-'
         } mm Densidad ${formInput.density ?? '-'} kg/m3`;
       } else {
         // Для всех остальных блоков
-        description = `BAUBLOCK® ${trMark} ${formInput.width ?? '-'} Medidas ${
+        description = `BAUBLOCK® ${trMark} ${titleWidth} Medidas ${
           formInput.lengths ?? '-'
         }x${formInput.width ?? '-'}x${formInput.height ?? '-'} mm Densidad ${
           formInput.density ?? '-'

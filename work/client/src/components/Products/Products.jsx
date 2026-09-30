@@ -17,6 +17,7 @@ import { useProjectContext } from '#components/contexts/Context.js';
 import PreviewProductCardModal from './modal/PreviewProductCardModal';
 import ArticleCheckModal from './modal/ArticleCheckModal';
 import ChangePriceModal from './modal/ChangePriceModal';
+import DescriptionFixModal from './modal/DescriptionFixModal';
 import { updateProduct } from '#components/redux/actions/productsAction.js';
 
 function Products() {
@@ -36,6 +37,7 @@ function Products() {
   const [data, setData] = useState([]);
   const [articleCheckModal, setArticleCheckModal] = useState(false);
   const [changePriceModal, setChangePriceModal] = useState(false);
+  const [descriptionFixModal, setDescriptionFixModal] = useState(false);
   const columns = useMemo(() => TABLE_COLUMNS, []);
   // const data = useMemo(() => latestProducts ?? [], [latestProducts, products]);
 
@@ -163,6 +165,12 @@ function Products() {
           toggle={() => setChangePriceModal(!changePriceModal)}
         />
       )}
+      {descriptionFixModal && (
+        <DescriptionFixModal
+          isOpen={descriptionFixModal}
+          toggle={() => setDescriptionFixModal(!descriptionFixModal)}
+        />
+      )}
       <h1>HCCA Blocks</h1>
       {userAccess?.canWrite && (
         <button
@@ -185,6 +193,11 @@ function Products() {
       <button onClick={() => setArticleCheckModal(true)}>Check articles</button>
       {userAccess?.canWrite && (
         <button onClick={() => setChangePriceModal(true)}>Change price</button>
+      )}
+      {userAccess?.canWrite && (
+        <button onClick={() => setDescriptionFixModal(true)}>
+          Fix descriptions
+        </button>
       )}
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}

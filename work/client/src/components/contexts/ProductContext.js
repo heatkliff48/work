@@ -20,6 +20,32 @@ export const extractProductTitle = (value = '') => {
     .trim();
 };
 
+// Номер в названии — ширина в см: 100 мм -> "10", 365 мм -> "36.5"
+export const widthToTitleCm = (width) => {
+  const cm = Number(width) / 10;
+  return width == null || width === '' || !Number.isFinite(cm)
+    ? '-'
+    : String(cm);
+};
+
+// Номер перед "Medidas" (или перед "(Ø..)" у O-block)
+const DESCRIPTION_TITLE_WIDTH =
+  /^(BAUBLOCK®.*?\s)(\d+(?:\.\d+)?)(\s+(?:\(Ø[^)]*\)\s+)?Medidas\b)/i;
+
+// Раньше в название писалась ширина в мм: "TERMECO 100 Medidas 600x100x250" -> "TERMECO 10 Medidas ...".
+// Возвращает исправленное описание или null, если в описании этой ошибки нет
+export const fixDescriptionTitleWidth = (description, width) => {
+  const match = String(description ?? '').match(DESCRIPTION_TITLE_WIDTH);
+  const widthMm = Number(width);
+
+  if (!match || !widthMm || Number(match[2]) !== widthMm) return null;
+
+  return description.replace(
+    DESCRIPTION_TITLE_WIDTH,
+    `$1${widthToTitleCm(widthMm)}$3`,
+  );
+};
+
 export const ProductsContextProvider = ({ children }) => {
   const products = useSelector((state) => state.products);
 
