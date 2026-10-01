@@ -125,6 +125,37 @@ class ProductsRepository {
     });
   }
 
+  // changes: [{ id, description }] — правит описание в самой записи, без новой версии
+  static async fixProductDescriptions(changes) {
+    const ids = changes.map(({ id }) => id);
+
+    if (
+      !changes.length ||
+      changes.some(
+        ({ id, description }) =>
+          !Number.isInteger(id) ||
+          typeof description !== 'string' ||
+          !description.trim(),
+      ) ||
+      new Set(ids).size !== ids.length
+    ) {
+      throw new BadRequest('Invalid list of description changes');
+    }
+
+    return sequelize.transaction(async (transaction) => {
+      let updated = 0;
+      for (const { id, description } of changes) {
+        const [count] = await Products.update(
+          { description },
+          { where: { id }, transaction },
+        );
+        updated += count;
+      }
+
+      return updated;
+    });
+  }
+
   // changes: [{ tradingMark, density, price }] — новая цена за м³ для всех продуктов
   // с такой маркой и плотностью. Каждый изменённый продукт получает новую версию
   static async changeProductPrices(changes) {

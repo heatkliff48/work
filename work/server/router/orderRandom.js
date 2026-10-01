@@ -35,7 +35,7 @@ orderRandomProductsRouter.post('/add_random', async (req, res) => {
     });
 
     if (!products || products.length === 0) {
-      return res.status(404).json({ error: 'Нет доступных продуктов' });
+      return res.status(404).json({ error: 'No products available' });
     }
 
     const randomCount = Math.floor(Math.random() * 4) + 2; // от 2 до 5 менять здесь

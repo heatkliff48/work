@@ -2,6 +2,7 @@ import {
   ADD_NEW_PRODUCT,
   CHANGE_PRODUCT_PRICES,
   FIX_PRODUCT_ARTICLES,
+  FIX_PRODUCT_DESCRIPTIONS,
   GET_ALL_PRODUCTS,
   NEED_UPDATE_PRODUCT,
   REPAIR_PRODUCT,
@@ -47,6 +48,14 @@ export const repProduct = (repProduct) => {
 export const fixProductArticles = (changes) => {
   return {
     type: FIX_PRODUCT_ARTICLES,
+    payload: changes,
+  };
+};
+
+// changes: [{ id, description }]
+export const fixProductDescriptions = (changes) => {
+  return {
+    type: FIX_PRODUCT_DESCRIPTIONS,
     payload: changes,
   };
 };

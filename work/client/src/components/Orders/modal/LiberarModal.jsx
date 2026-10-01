@@ -30,6 +30,10 @@ import '../ordersView.css';
 // anchors, tools, related materials) for simplicity.
 const QTY_LIBERATED_FIELD = 'quantity_liberated';
 
+// Most one truck may carry, in kg — the same limit the product journals use
+// for their pallets-per-truck figure.
+const TRUCK_CAPACITY_KG = 24000;
+
 // Builds the payload used to update the parent order's row for a single
 // product line, incrementing quantity_liberated by the amount just sent to
 // the child order. `row` is the parent-order product record (must carry its
@@ -287,6 +291,45 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     }
     return result;
   }, [allProducts, quantities]);
+
+  // Weight of what the child order ships and the trucks it takes. Catalog
+  // weights are per pallet, except tools, which are entered by the unit and
+  // weighed by the piece. Lines whose product carries no weight (related
+  // materials never do) are counted apart, so the total is not taken for
+  // complete.
+  const shipment = useMemo(() => {
+    const weightSources = {
+      drymix: [latestDryMix, 'dry_mixed_id', 'pallet_weight'],
+      anchor: [latestAnchors, 'anchor_id', 'pallet_weight'],
+      tool: [latestTools, 'tool_id', 'piece_weight'],
+    };
+    let weightKg = 0;
+    let unweighed = 0;
+    const add = (qty, unitWeight) => {
+      if (qty <= 0) return;
+      if (Number(unitWeight) > 0) weightKg += qty * Number(unitWeight);
+      else unweighed += 1;
+    };
+
+    for (const row of allProducts) {
+      if (row._type === 'product') {
+        row._lines.forEach((line) =>
+          add(enteredQty(quantities, line.key), line.shipped?.weightDef),
+        );
+      } else {
+        const [list, idField, weightField] = weightSources[row._type] || [];
+        const catalog = list?.find((c) => c.id === row[idField]);
+        add(enteredQty(quantities, row._key), catalog?.[weightField]);
+      }
+    }
+
+    weightKg = Math.round(weightKg);
+    return {
+      weightKg,
+      trucks: Math.ceil(weightKg / TRUCK_CAPACITY_KG),
+      unweighed,
+    };
+  }, [allProducts, quantities, latestDryMix, latestAnchors, latestTools]);
 
   // Rewrites the package lines of one block row, starting from the ones it
   // shows right now.
@@ -553,7 +596,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
   return (
     <div className="ord-modal-root">
       <div className="ord-modal-overlay" onClick={onHide} />
-      <div className="ord-modal-card ord-modal-card--lg">
+      <div className="ord-modal-card ord-modal-card--xl">
         <div className="ord-modal-head">
           <div>
             <div className="ord-modal-head__title">
@@ -579,14 +622,34 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
           </button>
         </div>
         <div className="ord-modal-body">
-          <div className="ord-field">
-            <label className="ord-field__label">Shipping date</label>
-            <DatePicker
-              className="ord-liberar-date"
-              selected={selectedDate}
-              onChange={handleDateChange}
-              dateFormat="dd.MM.yyyy"
-            />
+          <div className="ord-liberar-toprow">
+            <div className="ord-field">
+              <label className="ord-field__label">Shipping date</label>
+              <DatePicker
+                className="ord-liberar-date"
+                selected={selectedDate}
+                onChange={handleDateChange}
+                dateFormat="dd.MM.yyyy"
+              />
+            </div>
+            <div className="ord-field ord-liberar-trucks">
+              <label className="ord-field__label">Trucks needed</label>
+              <div className="ord-liberar-trucks__value">
+                <span className="ord-liberar-sub">
+                  {shipment.weightKg.toLocaleString('es-ES')} kg /{' '}
+                  {TRUCK_CAPACITY_KG.toLocaleString('es-ES')} kg per truck
+                </span>
+                <span className="ord-liberar-trucks__count">
+                  {shipment.trucks}
+                </span>
+              </div>
+              {shipment.unweighed > 0 && (
+                <div className="ord-liberar-sub">
+                  {shipment.unweighed} selected item(s) have no weight and are
+                  not counted
+                </div>
+              )}
+            </div>
           </div>
 
           <div>

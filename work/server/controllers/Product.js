@@ -77,6 +77,18 @@ class ProductController {
     }
   }
 
+  static async fixProductDescriptions(req, res) {
+    const { changes = [] } = req.body;
+
+    try {
+      const updated = await ProductService.fixProductDescriptions(changes);
+
+      return res.status(200).json({ updated });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async changeProductPrices(req, res) {
     const { changes = [] } = req.body;
 

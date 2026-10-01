@@ -3,7 +3,8 @@ import '#components/Styles/autoclave.css';
 import { useAutoclaveContext } from '#components/contexts/AutoclaveContext.js';
 
 function Autoclave() {
-  const { autoclave, setSelectedCell } = useAutoclaveContext();
+  const { autoclave, selectedCell, setSelectedCell } = useAutoclaveContext();
+  const selectedArticle = selectedCell?.article || null;
 
   const [idColorMap, setIdColorMap] = useState({});
 
@@ -53,7 +54,13 @@ function Autoclave() {
                 key={cellIndex}
                 className={`autoclave-cell ${getClassForAutoclave(
                   assignColorToId(el?.id),
-                )}`}
+                )}${
+                  selectedArticle
+                    ? el?.article === selectedArticle
+                      ? ' autoclave-cell--selected'
+                      : ' autoclave-cell--dimmed'
+                    : ''
+                }`}
                 onClick={() => {
                   if (!el) return;
 

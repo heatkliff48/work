@@ -310,6 +310,7 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
           previous_recipe: previousRecipe,
           previous_volume: previousVolume,
           description: prodDescription ? prodDescription[1] : '',
+          density: productDetails.density,
           date: batch.date,
         };
       })
@@ -471,6 +472,7 @@ function RawMaterialsPlan({ batchId, onSaved } = {}) {
               <tr>
                 <th key={index} className="product-column">
                   <div>Product: {product?.description}</div>
+                  <div>Density: {product.density}</div>
                   <div>Date: {product.date}</div>
                   <div>
                     Recipe:

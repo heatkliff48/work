@@ -8,6 +8,7 @@ router.post('/add', ProductController.addProduct);
 router.post('/upd', ProductController.updateProduct);
 router.post('/rep', ProductController.repairProductData);
 router.post('/fix-articles', ProductController.fixProductArticles);
+router.post('/fix-descriptions', ProductController.fixProductDescriptions);
 router.post('/change-prices', ProductController.changeProductPrices);
 
 module.exports = router;
