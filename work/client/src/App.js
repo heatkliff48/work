@@ -89,13 +89,13 @@ function App() {
       url,
       socketOnMessageFunc,
       onUnauthorized: () => {
-        showMessage('Сессия истекла, войдите снова', 'warning');
+        showMessage('Session expired, please sign in again', 'warning');
         logoutRef.current();
       },
       // Пока соединения не было, сообщения сервера не доходили —
       // данные на странице могли устареть
       onReconnect: () => {
-        showMessage('Соединение восстановлено. Данные могли устареть', 'info', {
+        showMessage('Connection restored. Data may be outdated', 'info', {
           key: 'ws-reconnected',
           preventDuplicate: true,
           persist: true,
@@ -104,7 +104,7 @@ function App() {
               className="table_button"
               onClick={() => window.location.reload()}
             >
-              Обновить
+              Refresh
             </button>
           ),
         });

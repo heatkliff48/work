@@ -443,12 +443,12 @@ function CakeFillUp() {
   const handleNewBatch = () => {
     if (isFullyAllocated) {
       const shouldContinue = window.confirm(
-        'Все массивы залиты, желаете продолжить?'
+        'All cakes are filled, do you want to continue?'
       );
 
       if (!shouldContinue) return;
 
-      const isConfirmed = window.confirm('Вы уверены, что хотите продолжить?');
+      const isConfirmed = window.confirm('Are you sure you want to continue?');
 
       if (!isConfirmed) return;
     }

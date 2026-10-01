@@ -28,6 +28,20 @@
   width: 120px;
   height: 40px;
   border: 1px solid gray;
+  cursor: pointer;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Выделение ячеек выбранного продукта */
+.autoclave-cell--selected {
+  position: relative;
+  z-index: 1;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 5px #1976d2;
+}
+
+.autoclave-cell--dimmed {
+  opacity: 0.4;
 }
 
 .autoclave-buttons-container {
