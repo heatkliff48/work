@@ -10,19 +10,28 @@ const FileDownload = ({ type, lotesList_id }) => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    if (!selectedFile) return;
+
     try {
-      const res = await urlAxios.get(
-        `${process.env.REACT_APP_URL}/files/download/${selectedFile}`,
+      const response = await urlAxios.get(
+        `/files/download/${encodeURIComponent(selectedFile)}`,
         {
           responseType: 'blob',
         },
       );
-      const url = window.URL.createObjectURL(new Blob([res.data]));
+
+      const downloadUrl = window.URL.createObjectURL(response.data);
       const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', selectedFile);
+
+      link.href = downloadUrl;
+      link.download = selectedFile;
+
       document.body.appendChild(link);
       link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(downloadUrl);
     } catch (err) {
       setMessage('Error downloading the file');
     }

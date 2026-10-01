@@ -4,6 +4,7 @@ import autoTable from 'jspdf-autotable';
 import image from './headerPDF.jpg';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
+import urlAxios from '../../api/axiosConfig.js';
 
 import '#components/Styles/pdf.css';
 import { getApiUrl } from '#utils/getApiUrl.js';
@@ -959,10 +960,12 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         // а бэкенд уже сам кодирует файл в base64 и пересылает в Bitrix
         // вместе с секретным ключом, который не должен светиться на фронте.
         const baseURL = getApiUrl();
-        const response = await fetch(`${baseURL}/clients/bitrix-send-offer`, {
-          method: 'POST',
-          body: formData,
-        });
+        const response = await urlAxios.post(
+          `${baseURL}/clients/bitrix-send-offer`,
+          {
+            body: formData,
+          },
+        );
 
         const result = await response.json().catch(() => null);
 

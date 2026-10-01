@@ -12,20 +12,28 @@ const FileDownload = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await urlAxios.get(
-        `${process.env.REACT_APP_URL}/files/download/${selectedFile}`,
+      const response = await urlAxios.get(
+        `/files/download/${encodeURIComponent(selectedFile)}`,
         {
           responseType: 'blob',
         },
       );
-      const url = window.URL.createObjectURL(new Blob([res.data]));
+
+      const downloadUrl = window.URL.createObjectURL(response.data);
       const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', selectedFile);
+
+      link.href = downloadUrl;
+      link.download = selectedFile;
+
       document.body.appendChild(link);
       link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(downloadUrl);
     } catch (err) {
+      console.error('Ошибка скачивания файла:', err);
       setMessage('Error downloading the file');
     }
   };
@@ -61,7 +69,11 @@ const FileDownload = () => {
           Download
         </button>
       </form>
-      {message ? <div className="ord-muted" style={{ marginTop: 6 }}>{message}</div> : null}
+      {message ? (
+        <div className="ord-muted" style={{ marginTop: 6 }}>
+          {message}
+        </div>
+      ) : null}
     </div>
   );
 };

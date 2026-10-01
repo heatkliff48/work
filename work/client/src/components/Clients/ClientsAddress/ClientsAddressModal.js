@@ -1,7 +1,7 @@
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import React, { Fragment, useEffect, useState } from 'react';
-import Select from 'react-select';
+import React, { useState } from 'react';
+import api from '../../../api/axiosConfig.js';
 
 function ClientsAddressModal(props) {
   const [street, setStreet] = useState('');
@@ -32,11 +32,8 @@ function ClientsAddressModal(props) {
         web_link,
         email,
       };
-      const response = await fetch('http://localhost:5000/clientsAddress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+      const response = await api.post('/clientsAddress', body);
+      const data = response.data;
       window.location = '/';
     } catch (err) {
       console.error(err.message);
