@@ -84,12 +84,15 @@ import {
 import '#components/Styles/Main.css';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
+// Отдельное право на кнопку, сама страница открывается и из меню склада
+const RAW_MATERIALS_WAREHOUSE_BUTTON_ACCESS = 'main_raw_materials_warehouse_button';
+
 function Main() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const { setStoredData } = useOrderContext();
-  const { canOpenPath } = useUsersContext();
+  const { roles, checkUserAccess, canOpenPath } = useUsersContext();
   const { warehouse_sand_slurry } = useWarehouseContext();
 
   useEffect(() => {
@@ -197,6 +200,18 @@ function Main() {
             Update Inventory
           </button>
         )}
+
+        {checkUserAccess(user, roles, RAW_MATERIALS_WAREHOUSE_BUTTON_ACCESS)
+          .canRead &&
+          canOpenPath('/warehouse_raw_materials') && (
+            <button
+              className="bb-action-btn"
+              onClick={() => navigate('/warehouse_raw_materials')}
+              type="button"
+            >
+              Raw Materials Warehouse
+            </button>
+          )}
 
         {canOpenPath('/production_batch_designer_new') && (
           <button

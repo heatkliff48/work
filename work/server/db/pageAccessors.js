@@ -9,8 +9,11 @@ const { QueryTypes } = require('sequelize');
  * inherit — аксессор, от которого новый получает права каждой роли при
  * создании, чтобы после выкатки ни у кого не пропал уже имевшийся доступ.
  * null — страница была открыта всем, поэтому всем ролям даётся read/write.
+ * false — новое право, которого раньше не было: ни у одной роли его нет,
+ * раздаётся на странице Roles.
  *
- * Имена совпадают с путём страницы (см. client/src/utils/pageAccess.js).
+ * Имена совпадают с путём страницы (см. client/src/utils/pageAccess.js),
+ * кроме прав на отдельные кнопки.
  */
 const PAGE_ACCESSORS = [
   { page_name: 'production_quality', inherit: null },
@@ -24,7 +27,12 @@ const PAGE_ACCESSORS = [
   { page_name: 'factura_manager', inherit: 'accounting' },
   { page_name: 'green_line_monitoring', inherit: 'recipe_products' },
   { page_name: 'temperature_data_monitoring', inherit: 'recipe_products' },
+  // кнопка Raw Materials Warehouse на главной (client/src/components/Main/Main.jsx)
+  { page_name: 'main_raw_materials_warehouse_button', inherit: false },
 ];
+
+const NO_PERMISSION = { read: false, write: false };
+const FULL_PERMISSION = { read: true, write: true };
 
 const select = (queryInterface, sql, options = {}) =>
   queryInterface.sequelize.query(sql, { type: QueryTypes.SELECT, ...options });
@@ -40,14 +48,18 @@ const syncIdSequence = (queryInterface, table, transaction) =>
 
 // Добавляет недостающие аксессоры и раздаёт по ним права ролям.
 // Уже существующие аксессоры не трогает, поэтому повторный запуск безопасен.
-async function addPageAccessors(queryInterface, transaction) {
+async function addPageAccessors(
+  queryInterface,
+  transaction,
+  accessors = PAGE_ACCESSORS
+) {
   const now = new Date();
 
   let pages = await select(queryInterface, 'SELECT id, page_name FROM "Pages"', {
     transaction,
   });
   const existing = new Set(pages.map((p) => p.page_name));
-  const missing = PAGE_ACCESSORS.filter((a) => !existing.has(a.page_name));
+  const missing = accessors.filter((a) => !existing.has(a.page_name));
   if (!missing.length) return;
 
   await syncIdSequence(queryInterface, 'Pages', transaction);
@@ -80,12 +92,16 @@ async function addPageAccessors(queryInterface, transaction) {
   const findPermission = (page_id, role_id) =>
     permissions.find((p) => p.page_id === page_id && p.role_id === role_id);
 
+  const getDefaultPermission = (inherit, role_id) => {
+    if (inherit === false) return NO_PERMISSION;
+    if (inherit === null) return FULL_PERMISSION;
+    return findPermission(pageIdByName.get(inherit), role_id);
+  };
+
   const rows = [];
   for (const { page_name, inherit } of missing) {
     for (const { id: role_id } of roles) {
-      const source = inherit
-        ? findPermission(pageIdByName.get(inherit), role_id)
-        : { read: true, write: true };
+      const source = getDefaultPermission(inherit, role_id);
 
       rows.push({
         page_id: pageIdByName.get(page_name),
@@ -104,12 +120,16 @@ async function addPageAccessors(queryInterface, transaction) {
   }
 }
 
-async function removePageAccessors(queryInterface, transaction) {
+async function removePageAccessors(
+  queryInterface,
+  transaction,
+  accessors = PAGE_ACCESSORS
+) {
   const pages = await select(
     queryInterface,
     'SELECT id FROM "Pages" WHERE page_name IN (:names)',
     {
-      replacements: { names: PAGE_ACCESSORS.map((a) => a.page_name) },
+      replacements: { names: accessors.map((a) => a.page_name) },
       transaction,
     }
   );
