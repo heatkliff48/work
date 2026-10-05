@@ -6,8 +6,10 @@ import { enUS, es as esDateLocale } from 'date-fns/locale';
 
 import enCommon from './locales/en/common.json';
 import enRawMaterialsWarehouse from './locales/en/rawMaterialsWarehouse.json';
+import enCasting from './locales/en/casting.json';
 import esCommon from './locales/es/common.json';
 import esRawMaterialsWarehouse from './locales/es/rawMaterialsWarehouse.json';
+import esCasting from './locales/es/casting.json';
 
 // Языки интерфейса. Чтобы добавить новый — положить переводы в locales/<code>
 // и дописать язык сюда
@@ -31,13 +33,15 @@ i18n
       en: {
         common: enCommon,
         rawMaterialsWarehouse: enRawMaterialsWarehouse,
+        casting: enCasting,
       },
       es: {
         common: esCommon,
         rawMaterialsWarehouse: esRawMaterialsWarehouse,
+        casting: esCasting,
       },
     },
-    ns: ['common', 'rawMaterialsWarehouse'],
+    ns: ['common', 'rawMaterialsWarehouse', 'casting'],
     defaultNS: 'common',
     fallbackLng: DEFAULT_LANGUAGE,
     supportedLngs: SUPPORTED_LANGUAGES.map((l) => l.code),
@@ -61,10 +65,15 @@ syncHtmlLang(i18n.language);
 i18n.on('languageChanged', syncHtmlLang);
 
 // Названия сырья приходят с сервера на английском и используются как ключи
-// (material_type), поэтому переводим только при отображении
-export const translateMaterial = (t, materialType) =>
-  materialType
-    ? t(`materials.${materialType}`, { ns: 'common', defaultValue: materialType })
-    : '';
+// (material_type), поэтому переводим только при отображении.
+// Тип с подтипом склада ('Aluminum|7040-10/70WB28') показываем как 'Aluminio (7040-10/70WB28)'
+export const translateMaterial = (t, materialType) => {
+  if (!materialType) return '';
+
+  const [base, subtype] = String(materialType).split('|');
+  const label = t(`materials.${base}`, { ns: 'common', defaultValue: base });
+
+  return subtype ? `${label} (${subtype})` : label;
+};
 
 export default i18n;

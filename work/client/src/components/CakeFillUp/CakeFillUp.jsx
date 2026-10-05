@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'reactstrap';
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
@@ -50,6 +51,7 @@ const limitWholeDigits = (rawValue) => {
 
 function CakeFillUp() {
   const dispatch = useDispatch();
+  const { t } = useTranslation('casting');
 
   const { batchOutside, autoclave_calendar, raw_materials_warehouse } =
     useWarehouseContext();
@@ -71,15 +73,19 @@ function CakeFillUp() {
   const [cakeSlurried, setCakeSlurried] = useState({});
 
   const production_plan_table = [
-    { Header: 'Date', accessor: 'date', Filter: TextSearchFilter },
+    { Header: t('columns.date'), accessor: 'date', Filter: TextSearchFilter },
     {
-      Header: 'Product article',
+      Header: t('columns.productArticle'),
       accessor: 'product_article',
       Filter: TextSearchFilter,
     },
-    { Header: 'Cakes, qty', accessor: 'quantity_arrays', Filter: TextSearchFilter },
     {
-      Header: 'Position in autoclave',
+      Header: t('columns.cakesQty'),
+      accessor: 'quantity_arrays',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: t('columns.positionInAutoclave'),
       accessor: 'position_in_autoclave',
       Filter: TextSearchFilter,
     },
@@ -442,13 +448,11 @@ function CakeFillUp() {
 
   const handleNewBatch = () => {
     if (isFullyAllocated) {
-      const shouldContinue = window.confirm(
-        'All cakes are filled, do you want to continue?'
-      );
+      const shouldContinue = window.confirm(t('confirm.allCakesFilled'));
 
       if (!shouldContinue) return;
 
-      const isConfirmed = window.confirm('Are you sure you want to continue?');
+      const isConfirmed = window.confirm(t('confirm.areYouSure'));
 
       if (!isConfirmed) return;
     }
@@ -494,7 +498,7 @@ function CakeFillUp() {
   };
 
   const handleFinish = async () => {
-    if (!window.confirm('Do you want to continue?')) {
+    if (!window.confirm(t('confirm.finishBatch'))) {
       return;
     }
     const {
@@ -613,10 +617,10 @@ function CakeFillUp() {
             dataOfTable={productionPlanDataList}
             onClickButton={() => {}}
             buttonText={''}
-            tableName={'Casting'}
+            tableName={t('title')}
             handleRowClick={(e) => {
               if (cakeFillUp && Object.keys(cakeFillUp).length > 0) {
-                alert('Please finish the current batch before selecting a new one.');
+                alert(t('finishCurrentBatchFirst'));
                 return;
               }
               handleProductionPlanRowClick(e);
@@ -658,7 +662,7 @@ function CakeFillUp() {
                   boxShadow: '0 2px 5px rgba(0,0,0,0.16)',
                 }}
               >
-                <span style={{ opacity: 0.75 }}>Date</span>
+                <span style={{ opacity: 0.75 }}>{t('date')}</span>
                 <span>{batchCalDate}</span>
               </div>
 
@@ -684,7 +688,7 @@ function CakeFillUp() {
                       color: '#6c757d',
                     }}
                   >
-                    Product article
+                    {t('productArticle')}
                   </div>
                   <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                     {currentProduct?.article || '—'}
@@ -699,7 +703,7 @@ function CakeFillUp() {
                       color: '#6c757d',
                     }}
                   >
-                    Product Mark
+                    {t('productMark')}
                   </div>
                   <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                     {currentProduct?.tradingMark || '—'}
@@ -714,7 +718,7 @@ function CakeFillUp() {
                       color: '#6c757d',
                     }}
                   >
-                    Cakes casted / Total qty
+                    {t('cakesCastedTotal')}
                   </div>
                   <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                     {allocated} / {total_cake}
@@ -746,7 +750,7 @@ function CakeFillUp() {
                     letterSpacing: '0.04em',
                   }}
                 >
-                  Next
+                  {t('next')}
                 </div>
 
                 <div
@@ -770,7 +774,7 @@ function CakeFillUp() {
                         color: '#5c636a',
                       }}
                     >
-                      Product article
+                      {t('productArticle')}
                     </div>
                     <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                       {nextProductSummary.article}
@@ -785,7 +789,7 @@ function CakeFillUp() {
                         color: '#5c636a',
                       }}
                     >
-                      Product Mark
+                      {t('productMark')}
                     </div>
                     <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                       {nextProductSummary.mark}
@@ -800,7 +804,7 @@ function CakeFillUp() {
                         color: '#5c636a',
                       }}
                     >
-                      Cakes casted / Total qty
+                      {t('cakesCastedTotal')}
                     </div>
                     <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                       0 / {nextProductSummary.totalQuantity}
@@ -818,7 +822,7 @@ function CakeFillUp() {
           >
             <div>
               <div>
-                <div style={{ fontWeight: 600 }}>Batch id</div>
+                <div style={{ fontWeight: 600 }}>{t('batchId')}</div>
                 <div style={{ marginTop: 6, fontSize: 18 }}>{activeBatchId}</div>
               </div>
             </div>
@@ -831,7 +835,7 @@ function CakeFillUp() {
                 color={isFullyAllocated ? 'danger' : 'success'}
                 onClick={handleNewBatch}
               >
-                New cake
+                {t('newCake')}
               </Button>
 
               <div
@@ -839,17 +843,17 @@ function CakeFillUp() {
                 style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
               >
                 <Button color="success" onClick={handleFinish}>
-                  Finish batch
+                  {t('finishBatch')}
                 </Button>
               </div>
             </div>
 
             <div className="mt-4">
-              <div style={{ fontWeight: 600 }}>Cake id</div>
+              <div style={{ fontWeight: 600 }}>{t('cakeId')}</div>
 
               {productionCakes.length === 0 && (
                 <div style={{ marginTop: 8, color: '#6c757d' }}>
-                  No cakes allocated yet.
+                  {t('noCakes')}
                 </div>
               )}
 
@@ -913,10 +917,13 @@ function CakeFillUp() {
                                   whiteSpace: 'nowrap',
                                 }}
                                 title={
-                                  cake.moldId ? `Mold id ${cake.moldId}` : 'Note'
+                                  cake.moldId
+                                    ? t('moldIdTitle', { id: cake.moldId })
+                                    : t('noteTitle')
                                 }
                               >
-                                {isActive ? '▲' : '▼'} {cake.moldId || 'note'}
+                                {isActive ? '▲' : '▼'}{' '}
+                                {cake.moldId || t('noteShort')}
                               </span>
                             </div>
                           );
@@ -942,7 +949,7 @@ function CakeFillUp() {
                                   fontWeight: 600,
                                 }}
                               >
-                                Casting temperature, C
+                                {t('castingTemperature')}
                               </span>
                               <input
                                 type="number"
@@ -988,7 +995,7 @@ function CakeFillUp() {
                                   fontWeight: 600,
                                 }}
                               >
-                                Flowability, cm
+                                {t('flowability')}
                               </span>
                               <input
                                 type="number"
@@ -1045,13 +1052,13 @@ function CakeFillUp() {
                               className="form-check-label"
                               htmlFor={`cake-slurried-${activeCake.id}`}
                             >
-                              Slurried
+                              {t('slurried')}
                             </label>
                           </div>
 
                           <textarea
                             rows={3}
-                            placeholder={`Note for cake id ${activeCake.id}... Enter to save, Shift+Enter for a new line`}
+                            placeholder={t('notePlaceholder', { id: activeCake.id })}
                             value={cakeNotes[activeCake.id] ?? activeCake.note ?? ''}
                             onChange={(event) =>
                               setCakeNotes((previousNotes) => ({
@@ -1069,7 +1076,7 @@ function CakeFillUp() {
                                 handleSaveCakeNote(activeCake);
                               }
                             }}
-                            title="Enter — save, Shift+Enter — new line"
+                            title={t('noteHint')}
                             style={{
                               width: '100%',
                               borderRadius: 10,
@@ -1086,7 +1093,7 @@ function CakeFillUp() {
                             onClick={() => handleSaveCakeNote(activeCake)}
                             style={{ marginTop: 8 }}
                           >
-                            Save note
+                            {t('saveNote')}
                           </Button>
                         </div>
                       )}

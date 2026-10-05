@@ -64,6 +64,8 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   const [isReturn, setIsReturn] = useState(productOfOrder?.final_price < 0);
   // Что пользователь сейчас набирает в цене за м²; null — показываем расчётную
   const [priceM2Draft, setPriceM2Draft] = useState(null);
+  // То же для PVP
+  const [pvpDraft, setPvpDraft] = useState(null);
 
   const isBlock = selectedProduct?.article?.slice(2, 3) == 'N';
   // U-block продаются погонными метрами, а не площадью
@@ -322,33 +324,28 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       ? String(Math.round(productOfOrder.discount * 100) / 100)
       : productOfOrder.discount;
 
+  // Итог без скидки: от него считается final_price, а по введённой PVP — скидка
+  const list_price_value = useMemo(() => {
+    const type = selectedProduct.article.slice(2, 3);
+    // Блоки оплачиваются по реально отгружаемым м² (целые паллеты)
+    if (type == 'N') return listPriceM2 * (Number(quantity_real_value) || 0);
+    if (type == 'M' || type == 'F')
+      return selectedProduct?.price_per_unit * quantity_real_value;
+    return selectedProduct?.price_per_unit * productOfOrder?.quantity_ud;
+  }, [
+    listPriceM2,
+    quantity_real_value,
+    selectedProduct?.price_per_unit,
+    productOfOrder?.quantity_ud,
+  ]);
+
   const final_price_value = useMemo(() => {
     const discount = discountValue;
-    // Блоки оплачиваются по реально отгружаемым м² (целые паллеты)
-    const quantity_real = Number(quantity_real_value) || 0;
 
     const result =
       selectedProduct.article.slice(2, 3) == 'N'
-        ? (listPriceM2 * quantity_real * (100 - discount)) / 100
-        : selectedProduct.article.slice(2, 3) == 'M'
-          ? (selectedProduct?.price_per_unit *
-              quantity_real_value *
-              Math.abs(100 - discount)) /
-            100
-          : selectedProduct.article.slice(2, 3) == 'P'
-            ? (selectedProduct?.price_per_unit *
-                productOfOrder?.quantity_ud *
-                Math.abs(100 - discount)) /
-              100
-            : selectedProduct.article.slice(2, 3) == 'F'
-              ? (selectedProduct?.price_per_unit *
-                  quantity_real_value *
-                  Math.abs(100 - discount)) /
-                100
-              : (selectedProduct?.price_per_unit *
-                  productOfOrder?.quantity_ud *
-                  Math.abs(100 - discount)) /
-                100;
+        ? (list_price_value * (100 - discount)) / 100
+        : (list_price_value * Math.abs(100 - discount)) / 100;
 
     const finalResult = isReturn ? -Math.abs(result) : Math.abs(result);
 
@@ -357,17 +354,10 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       final_price: finalResult.toFixed(2),
     }));
     return finalResult.toFixed(2);
-  }, [
-    listPriceM2,
-    quantity_real_value,
-    productOfOrder?.discount,
-    selectedProduct?.price_per_unit,
-    productOfOrder?.quantity_ud,
-    isReturn,
-  ]);
+  }, [list_price_value, productOfOrder?.discount, isReturn]);
 
   const pvp_value = useMemo(() => {
-    const result = total_value > 1 ? final_price_value / total_value : 0;
+    const result = total_value > 0 ? final_price_value / total_value : 0;
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -377,22 +367,24 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   }, [final_price_value, total_value]);
 
   const addProductOrder = async () => {
+    // Скидка во время ввода — строка; в FLOAT-колонку пишем число
+    const payload = { ...productOfOrder, discount: discountValue };
+
     selectedProduct.article.slice(2, 3) == 'N'
       ? dispatch(
           getUpdateProductInfoOfOrders({
-            ...productOfOrder,
+            ...payload,
             // Строку с запятой ("90,00") Sequelize пишет в FLOAT-колонку как NaN
             price_m3: parseLocalNumber(productOfOrder.price_m3) || 0,
-            discount: discountValue,
           }),
         )
       : selectedProduct.article.slice(2, 3) == 'M'
-        ? dispatch(getUpdateDryMixedProductsInfoOfOrder(productOfOrder))
+        ? dispatch(getUpdateDryMixedProductsInfoOfOrder(payload))
         : selectedProduct.article.slice(2, 3) == 'P'
-          ? dispatch(getUpdateRelMatProductsInfoOfOrder(productOfOrder))
+          ? dispatch(getUpdateRelMatProductsInfoOfOrder(payload))
           : selectedProduct.article.slice(2, 3) == 'F'
-            ? dispatch(getUpdateAnchorProductsInfoOfOrder(productOfOrder))
-            : dispatch(getUpdateToolProductsInfoOfOrder(productOfOrder));
+            ? dispatch(getUpdateAnchorProductsInfoOfOrder(payload))
+            : dispatch(getUpdateToolProductsInfoOfOrder(payload));
     setProductOfOrder({});
     setSelectedProduct({});
     toggle();
@@ -457,6 +449,29 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     setPriceM2Draft(null);
   };
 
+  // PVP (цена за единицу со скидкой): от неё пересчитываются скидка и цена.
+  // Скидку не округляем, иначе итог не совпадёт с введённой PVP
+  const handlePvpChange = (e) => {
+    const limited = limitDecimalInput(e.target.value, 2);
+    setPvpDraft(limited);
+
+    const pvp = parseLocalNumber(limited) || 0;
+    const total = Number(total_value) || 0;
+    if (!list_price_value || !total) return;
+
+    const discount = (1 - (pvp * total) / list_price_value) * 100;
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      discount,
+      price_m3: formatFixed(originalPrice * (1 - discount / 100), 2, '.'),
+    }));
+  };
+
+  const handlePvpBlur = () => {
+    setPvpDraft(null);
+  };
+
   const handlePriceM3Blur = () => {
     const num = parseLocalNumber(productOfOrder.price_m3);
     if (!isNaN(num)) {
@@ -470,16 +485,16 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   // };
 
   const handleDiscountChange = (e) => {
-    // У блоков скидка в БД — FLOAT, у остальных товаров — INTEGER.
-    // Пока блоку вводят скидку, храним строку, чтобы не терялась запятая
-    const limited = limitDecimalInput(e.target.value, isBlock ? 2 : 0);
+    // Скидка в БД — FLOAT. Пока её вводят, храним строку,
+    // чтобы не терялась запятая
+    const limited = limitDecimalInput(e.target.value, 2);
 
     const discount = parseLocalNumber(limited) || 0;
     const newPrice = originalPrice * (1 - discount / 100);
 
     setProductOfOrder((prev) => ({
       ...prev,
-      discount: isBlock ? limited : Math.round(discount),
+      discount: limited,
       price_m3: formatFixed(newPrice, 2, '.'),
     }));
   };
@@ -491,11 +506,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     const num = parseLocalNumber(productOfOrder.discount);
     setProductOfOrder((prev) => ({
       ...prev,
-      discount: isNaN(num)
-        ? 0
-        : isBlock
-          ? Math.round(num * 100) / 100
-          : Math.round(num),
+      discount: isNaN(num) ? 0 : Math.round(num * 100) / 100,
     }));
   };
 
@@ -521,6 +532,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     if (!isOpen) {
       setIsReturn(false);
       setPriceM2Draft(null);
+      setPvpDraft(null);
     }
   }, [isOpen]);
 
@@ -686,16 +698,14 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                 );
               if (el.accessor === 'pvp')
                 return (
-                  <>
-                    <ModalBody>{el.Header}:</ModalBody>
-                    <input
-                      type="text"
-                      id={el.accessor}
-                      name={el.accessor}
-                      value={pvp_value}
-                      readOnly
-                    />
-                  </>
+                  <InputField
+                    key={el.accessor}
+                    el={el}
+                    inputValue={{ pvp: pvpDraft ?? pvp_value }}
+                    inputValueChange={handlePvpChange}
+                    onBlur={handlePvpBlur}
+                    isDisabled={false}
+                  />
                 );
 
               if (el.accessor === 'discount') {

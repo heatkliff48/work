@@ -11,6 +11,12 @@ import { useNavigate } from 'react-router-dom';
 import RandomAhhOrder from './RandomAhhOrder';
 import { ArticleMonoCell, makeStatusPillCell } from './ordersCells';
 import './ordersView.css';
+import {
+  getAllClients,
+  getAllContactInfo,
+  getAllDeliveryAddresses,
+  getLegalAddress,
+} from '#components/redux/actions/clientAction.js';
 
 function OrdersTable() {
   const {
@@ -76,6 +82,13 @@ function OrdersTable() {
     setCurrentClient({});
     setRandomOrderCheck(false);
   }, [clientModalOrder]);
+
+  useEffect(() => {
+    dispatch(getAllDeliveryAddresses());
+    dispatch(getLegalAddress());
+    dispatch(getAllClients());
+    dispatch(getAllContactInfo());
+  }, []);
 
   return (
     <>
