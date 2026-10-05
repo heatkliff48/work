@@ -64,6 +64,20 @@ export const palletHeightCm = (catalog) => {
   return round2((blocksInHeight(palletHeight, extraRows, width) * width) / 10);
 };
 
+// Pallet a block is packed on: size, stack height and volume, e.g.
+// "1200x800 · 90 cm · 1.44 m3".
+export const palletPackagingLabel = (catalog) => {
+  const height = palletHeightCm(catalog);
+  const m3 = Number(catalog?.volumeBlockOnPallet);
+  return [
+    catalog?.palletSize,
+    height && `${height} cm`,
+    m3 && `${parseFloat(m3.toFixed(3))} m3`,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+};
+
 // One option of a "ship as" selector, e.g.
 // "T.NBD30W30C — Disposable · 1200x800 · Marine · Spain (1.44 m²/pal · 90 cm)".
 export const packageOptionLabel = (catalog) => {

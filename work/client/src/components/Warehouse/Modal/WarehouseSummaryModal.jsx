@@ -1,5 +1,6 @@
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { palletPackagingLabel } from '#components/Orders/modal/packagingUtils.js';
 import { useMemo } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Table from 'react-bootstrap/Table';
@@ -26,6 +27,7 @@ function WarehouseSummaryModal({ isOpen, toggle }) {
         acc[key] = {
           product_article: key,
           trademark: prodDescription ? prodDescription[1] : 'Unknown',
+          packaging: palletPackagingLabel(product),
           free_quantity_remaining: 0,
           total_quantity: 0,
           ordered_quantity: 0,
@@ -56,6 +58,7 @@ function WarehouseSummaryModal({ isOpen, toggle }) {
               <tr>
                 <th>Product ID</th>
                 <th>Trademark</th>
+                <th>Packaging</th>
                 <th>Total free quantity remaining, pallet</th>
                 <th>Total quantity, pallet</th>
                 <th>Total ordered quantity, pallet</th>
@@ -66,6 +69,7 @@ function WarehouseSummaryModal({ isOpen, toggle }) {
                 <tr key={index}>
                   <td>{item.product_article}</td>
                   <td>{item.trademark}</td>
+                  <td>{item.packaging}</td>
                   <td>{item.free_quantity_remaining}</td>
                   <td>{item.total_quantity}</td>
                   <td>{item.ordered_quantity}</td>

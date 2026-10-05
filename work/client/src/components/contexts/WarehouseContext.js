@@ -29,8 +29,8 @@ const WarehouseContextProvider = ({ children }) => {
 
   const COLUMNS_WAREHOUSE = [
     {
-      Header: 'Warehouse ID',
-      accessor: 'article',
+      Header: 'Trademark',
+      accessor: 'trademark',
       sortType: 'string',
     },
     {
@@ -59,8 +59,8 @@ const WarehouseContextProvider = ({ children }) => {
       sortType: 'number',
     },
     {
-      Header: 'Warehouse location',
-      accessor: 'warehouse_loc',
+      Header: 'Packaging',
+      accessor: 'packaging',
       sortType: 'string',
     },
     {
