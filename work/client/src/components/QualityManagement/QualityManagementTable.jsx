@@ -175,14 +175,20 @@ const QualityManagementTable = () => {
           product.article === qualityManagementData[0]?.product_article,
       );
       const targetDensity = targetProduct?.density;
+      const targetForm = targetProduct?.form;
+      const targetPalletSize = targetProduct?.palletSize;
 
       if (!batchID) {
         setBatchID(qualityManagementData[0]?.raw_mat_cons_batch_id);
       }
 
-      // Создаем список всех article с такой же density
+      // Создаем список всех article с такой же density, формой и размером паллеты
+      // (form в БД встречается в разном регистре: 'Normal' и 'normal')
       const filterList = latestProducts.filter(
-        (product) => product.density === targetDensity,
+        (product) =>
+          product.density === targetDensity &&
+          product.form?.toLowerCase() === targetForm?.toLowerCase() &&
+          product.palletSize === targetPalletSize,
       );
 
       setFilteredList(filterList);
@@ -652,7 +658,6 @@ const QualityManagementTable = () => {
       alert(`Successfully processed all ${processedBatches.length} batch(es)!`);
     }
   };
-
 
   // ===== Ниже — только представление. Данные и обработчики не меняются. =====
 

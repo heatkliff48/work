@@ -143,14 +143,18 @@ function CakeFillUp() {
     const prodPlanEntry = batchOutside.find((el) => el.id === row.original.id);
     if (!prodPlanEntry) return;
 
-    setActiveBatchId(nextBatchId);
+    // партия, из которой вернулись кнопкой «Назад», сохраняет свой номер
+    const batchId =
+      prodPlanEntry.batch_id != null ? Number(prodPlanEntry.batch_id) : nextBatchId;
+
+    setActiveBatchId(batchId);
 
     // номер партии сохраняем в строке плана, по нему партия и восстанавливается
     dispatch(
       updateBatchOutside({
         id: prodPlanEntry.id,
         is_prodused: 1,
-        batch_id: nextBatchId,
+        batch_id: batchId,
       })
     );
   };
@@ -283,6 +287,7 @@ function CakeFillUp() {
       setTotalCake(Number.isFinite(full_total_cake) ? full_total_cake : 0);
       setCakeFillUp({ ...batch_in_produce, total_cake });
     } else {
+      setCakeFillUp({});
       setCurrentProduct(null);
       setTotalCake(0);
     }
@@ -571,6 +576,10 @@ function CakeFillUp() {
     dispatch(addNewAutoclaveCalendar(result));
     await dispatch(deleteBatchOutside(id));
 
+    resetActiveBatch();
+  };
+
+  const resetActiveBatch = () => {
     setCakeFillUp({});
     setCurrentProduct(null);
     setActiveBatchId(null);
@@ -580,6 +589,24 @@ function CakeFillUp() {
     setCakeCastingTemperatures({});
     setCakeFlowabilities({});
     setCakeSlurried({});
+  };
+
+  // Возвращает партию в план (is_prodused = 0), чтобы она больше не
+  // открывалась при заходе на страницу. Если торты уже отлиты, номер партии
+  // остаётся в строке плана, чтобы при повторном выборе продолжить ту же партию.
+  const handleBack = () => {
+    const { id } = cakeFillUp;
+    if (id == null) return;
+
+    dispatch(
+      updateBatchOutside({
+        id,
+        is_prodused: 0,
+        batch_id: allocated > 0 ? activeBatchId : null,
+      })
+    );
+
+    resetActiveBatch();
   };
 
   const hasCakeFillUp = cakeFillUp && Object.keys(cakeFillUp).length > 0;
@@ -831,6 +858,10 @@ function CakeFillUp() {
               className="mt-2"
               style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
             >
+              <Button color="secondary" onClick={handleBack}>
+                {t('back')}
+              </Button>
+
               <Button
                 color={isFullyAllocated ? 'danger' : 'success'}
                 onClick={handleNewBatch}
