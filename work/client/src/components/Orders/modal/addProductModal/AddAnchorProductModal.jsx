@@ -45,7 +45,12 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
   }, []);
 
   const handleProductListOrderChange = (e) => {
-    setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    // Скидка может быть дробной: храним с точкой, InputField покажет запятую
+    setProductOfOrder((prev) => ({
+      ...prev,
+      [name]: name === 'discount' ? value.replace(',', '.') : value,
+    }));
   };
 
   const pieces_per_pallet = selectedProduct?.pieces_per_unit ?? 0;
@@ -86,7 +91,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
   }, [productOfOrder?.quantity_palet_anchor]);
 
   const final_price_value = useMemo(() => {
-    const discount = productOfOrder?.discount ?? 0;
+    const discount = Number(productOfOrder?.discount) || 0;
 
     const result =
       (selectedProduct?.price_per_unit *
@@ -128,7 +133,10 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
       }
       const newAnchorProductsOfOrder = {
         order_id: haveOrderClient.id,
-        productOfOrder,
+        productOfOrder: {
+          ...productOfOrder,
+          discount: Number(productOfOrder?.discount) || 0,
+        },
       };
       dispatch(getUpdateAnchorProductOfOrders(newAnchorProductsOfOrder));
       setProductOfOrder({});

@@ -74,7 +74,11 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
       return;
     }
 
-    setProductOfOrder((prev) => ({ ...prev, [name]: value }));
+    // Скидка может быть дробной: храним с точкой, InputField покажет запятую
+    setProductOfOrder((prev) => ({
+      ...prev,
+      [name]: name === 'discount' ? value.replace(',', '.') : value,
+    }));
   };
 
   const quantity_real_value = useMemo(() => {
@@ -147,7 +151,10 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
       }
       const newDryMixedProductsOfOrder = {
         order_id: haveOrderClient.id,
-        productOfOrder,
+        productOfOrder: {
+          ...productOfOrder,
+          discount: Number(productOfOrder?.discount) || 0,
+        },
       };
       dispatch(getUpdateDryMixedProductOfOrders(newDryMixedProductsOfOrder));
       setProductOfOrder({});
@@ -157,8 +164,8 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
   };
 
   useEffect(() => {
-    const rawDiscount = Number(productOfOrder?.discount);
-    const discount = Number.isFinite(rawDiscount) ? rawDiscount : 0;
+    // Не приводим к числу: иначе при вводе "11," запятая сразу пропадает
+    const discount = productOfOrder?.discount ?? 0;
 
     setProductOfOrder((prev) => ({
       ...prev,

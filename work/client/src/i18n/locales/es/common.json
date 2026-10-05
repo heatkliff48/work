@@ -3,7 +3,8 @@
   "logout": "Cerrar sesión",
   "close": "Cerrar",
   "pageTitles": {
-    "warehouse_raw_materials": "Almacén de materias primas"
+    "warehouse_raw_materials": "Almacén de materias primas",
+    "cake_fillup": "Colada"
   },
   "table": {
     "globalSearch": "Búsqueda global:",
@@ -29,9 +30,12 @@
     "Lime": "Cal",
     "Cement": "Cemento",
     "Gypsum (dry)": "Yeso (seco)",
+    "Gypsum": "Yeso",
     "Gypsum stone": "Piedra de yeso",
     "Aluminum": "Aluminio",
+    "Aluminum 1": "Aluminio 1",
     "Aluminum 2": "Aluminio 2",
+    "Aluminum suspension, kg": "Suspensión de aluminio, kg",
     "Grinding Balls": "Bolas de molienda",
     "AAC": "HCCA",
     "Sand slurry (dry)": "Lodo de arena (seco)",

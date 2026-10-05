@@ -3,7 +3,8 @@
   "logout": "Logout",
   "close": "Close",
   "pageTitles": {
-    "warehouse_raw_materials": "Raw Materials Warehouse"
+    "warehouse_raw_materials": "Raw Materials Warehouse",
+    "cake_fillup": "Casting"
   },
   "table": {
     "globalSearch": "Global search:",
@@ -29,9 +30,12 @@
     "Lime": "Lime",
     "Cement": "Cement",
     "Gypsum (dry)": "Gypsum (dry)",
+    "Gypsum": "Gypsum",
     "Gypsum stone": "Gypsum stone",
     "Aluminum": "Aluminum",
+    "Aluminum 1": "Aluminum 1",
     "Aluminum 2": "Aluminum 2",
+    "Aluminum suspension, kg": "Aluminum suspension, kg",
     "Grinding Balls": "Grinding Balls",
     "AAC": "AAC",
     "Sand slurry (dry)": "Sand slurry (dry)",
