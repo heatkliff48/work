@@ -16,6 +16,8 @@ import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { addNewLotesList } from '#components/redux/actions/lotesListAction.js';
 import Select from 'react-select';
+import { useTranslation } from 'react-i18next';
+import { translateMaterial } from '#i18n/index.js';
 import '#components/Styles/table.css';
 
 const getCurrentTime = () => {
@@ -52,6 +54,7 @@ const RawMaterialsConsumptionModal = React.memo(
     } = useWarehouseContext();
 
     const dispatch = useDispatch();
+    const { t } = useTranslation('casting');
 
     const [form, setForm] = useState({});
     const [availableRecipes, setAvailableRecipes] = useState([]);
@@ -552,7 +555,7 @@ const RawMaterialsConsumptionModal = React.memo(
     };
 
     const getWriteOffErrorMessage = (error) => {
-      const message = error?.message || 'Failed to write off raw materials.';
+      const message = error?.message || t('alerts.writeOffFailed');
       const shortageDetails = Array.isArray(error?.shortageDetails)
         ? error.shortageDetails
         : [];
@@ -563,15 +566,19 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const details = shortageDetails
         .map((item) => {
-          const material = item.material || item.subtype || 'Unknown material';
+          const material =
+            translateMaterial(t, item.material || item.subtype) ||
+            t('alerts.unknownMaterial');
           const available = Number(item.available) || 0;
           const required = Number(item.required) || 0;
           const shortage = Number(item.shortage) || 0;
 
-          return (
-            `${material}: required ${required}, available ${available}` +
-            `, shortage ${shortage}`
-          );
+          return t('alerts.serverShortageLine', {
+            material,
+            required,
+            available,
+            shortage,
+          });
         })
         .join('\n');
 
@@ -582,7 +589,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (savingRef.current) return;
 
       if (newBatchMode && !selectedRecipe) {
-        alert('Please select a recipe.');
+        alert(t('alerts.selectRecipe'));
         return;
       }
 
@@ -590,12 +597,12 @@ const RawMaterialsConsumptionModal = React.memo(
       const aluminum2Consumed = computeConsumed('aluminum_paste_2');
 
       if (Number(aluminum1Consumed) > 0 && !selectedAlu1Type?.value) {
-        alert('Select Aluminum 1 type.');
+        alert(t('alerts.selectAlu1Type'));
         return;
       }
 
       if (Number(aluminum2Consumed) > 0 && !selectedAlu2Type?.value) {
-        alert('Select Aluminum 2 type.');
+        alert(t('alerts.selectAlu2Type'));
         return;
       }
 
@@ -629,7 +636,7 @@ const RawMaterialsConsumptionModal = React.memo(
         });
 
       if (!materials.length) {
-        alert('No data to write off materials.');
+        alert(t('alerts.noDataToWriteOff'));
         return;
       }
       let result_materials = [...materials];
@@ -659,9 +666,7 @@ const RawMaterialsConsumptionModal = React.memo(
         (materials.some((m) => m.type === 'Aluminum 2') &&
           !selectedAlu2Type?.value)
       ) {
-        alert(
-          'For aluminum, a type must be selected (7040-10/70WB28, 8040-10/70WB28, etc.)',
-        );
+        alert(t('alerts.aluminumTypeRequired'));
         return;
       }
 
@@ -712,11 +717,15 @@ const RawMaterialsConsumptionModal = React.memo(
 
       if (shortages.length) {
         const msg =
-          'Cannot write off materials — insufficient stock:\n\n' +
+          `${t('alerts.insufficientStock')}\n\n` +
           shortages
-            .map(
-              (s) =>
-                `${s.type}: need ${s.need}, in stock ${s.have} (short by ${s.lack})`,
+            .map((s) =>
+              t('alerts.shortageLine', {
+                material: translateMaterial(t, s.type),
+                need: s.need,
+                have: s.have,
+                lack: s.lack,
+              }),
             )
             .join('\n');
         alert(msg);
@@ -736,8 +745,14 @@ const RawMaterialsConsumptionModal = React.memo(
 
       if (null_arr.length) {
         const msg =
-          'All material quantity fields must be filled in:\n\n' +
-          null_arr.map((s) => `${s.type}: value not specified`).join('\n');
+          `${t('alerts.fillAllQuantities')}\n\n` +
+          null_arr
+            .map((s) =>
+              t('alerts.valueNotSpecified', {
+                material: translateMaterial(t, s.type),
+              }),
+            )
+            .join('\n');
         alert(msg);
         return;
       }
@@ -756,7 +771,7 @@ const RawMaterialsConsumptionModal = React.memo(
       );
 
       if (normMaterials.length === 0) {
-        alert('There are no materials to write off.');
+        alert(t('alerts.nothingToWriteOff'));
         return;
       }
 
@@ -1008,11 +1023,13 @@ const RawMaterialsConsumptionModal = React.memo(
           <ModalHeader toggle={toggle} className="rmc-modal-header">
             <div className="rmc-header">
               <div className="rmc-header-field" style={{ minWidth: 220 }}>
-                <span className="rmc-header-label">Recipe article</span>
+                <span className="rmc-header-label">
+                  {t('modal.recipeArticle')}
+                </span>
                 {recipeArticle ? (
                   <b className="rmc-header-value">{recipeArticle || '—'}</b>
                 ) : (
-                  <span className="text-muted">No recipes</span>
+                  <span className="text-muted">{t('modal.noRecipes')}</span>
                 )}
               </div>
 
@@ -1020,7 +1037,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 className="rmc-header-field rmc-header-field--wide"
                 style={{ flex: 1, minWidth: 260 }}
               >
-                <span className="rmc-header-label">Recipe</span>
+                <span className="rmc-header-label">{t('modal.recipe')}</span>
                 <Select
                   onChange={handleRecipeChange}
                   options={availableRecipes.map((r) => ({
@@ -1068,10 +1085,12 @@ const RawMaterialsConsumptionModal = React.memo(
               className="rmc-modal-body"
               style={{ overflow: 'auto', maxHeight: '70vh' }}
             >
-              <div className="rmc-section-title d-md-none">Casting</div>
+              <div className="rmc-section-title d-md-none">
+                {t('modal.casting')}
+              </div>
               <div className="rmc-fields">
                 <label className="rmc-field">
-                  <span className="rmc-field-label">Mold id</span>
+                  <span className="rmc-field-label">{t('modal.moldId')}</span>
                   <input
                     className="form-control"
                     value={moldId}
@@ -1080,7 +1099,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 </label>
 
                 <label className="rmc-field">
-                  <span className="rmc-field-label">W/S</span>
+                  <span className="rmc-field-label">{t('modal.ws')}</span>
                   <input
                     className="form-control"
                     inputMode="decimal"
@@ -1104,7 +1123,9 @@ const RawMaterialsConsumptionModal = React.memo(
                 </label>
 
                 <label className="rmc-field">
-                  <span className="rmc-field-label">Casting time</span>
+                  <span className="rmc-field-label">
+                    {t('modal.castingTime')}
+                  </span>
                   <input
                     className="form-control"
                     type="time"
@@ -1114,13 +1135,15 @@ const RawMaterialsConsumptionModal = React.memo(
                 </label>
               </div>
 
-              <div className="rmc-section-title d-md-none">Raw materials</div>
+              <div className="rmc-section-title d-md-none">
+                {t('modal.rawMaterials')}
+              </div>
               <table className="table-waste">
                 <thead>
                   <tr>
-                    <th className="th-raw">Raw material</th>
-                    <th className="th-mod-recipe">Modified recipe</th>
-                    <th className="th-consumed">Consumed</th>
+                    <th className="th-raw">{t('modal.rawMaterial')}</th>
+                    <th className="th-mod-recipe">{t('modal.modifiedRecipe')}</th>
+                    <th className="th-consumed">{t('modal.consumed')}</th>
                   </tr>
                 </thead>
 
@@ -1136,7 +1159,10 @@ const RawMaterialsConsumptionModal = React.memo(
                     return (
                       <tr key={key}>
                         <td>
-                          <div className="fw-semibold">{label}</div>
+                          {/* label — ключ материала для склада, переводим только подпись */}
+                          <div className="fw-semibold">
+                            {translateMaterial(t, label)}
+                          </div>
                           {key === 'aluminum_paste' && (
                             <div
                               style={{ marginTop: '4px', minWidth: '150px' }}
@@ -1145,7 +1171,7 @@ const RawMaterialsConsumptionModal = React.memo(
                                 options={aluminum1TypeOptions}
                                 value={selectedAlu1Type}
                                 onChange={setSelectedAlu1Type}
-                                placeholder="Select type..."
+                                placeholder={t('modal.selectType')}
                                 isClearable
                                 styles={{
                                   control: (base) => ({
@@ -1169,7 +1195,7 @@ const RawMaterialsConsumptionModal = React.memo(
                                 options={aluminum1TypeOptions}
                                 value={selectedAlu2Type}
                                 onChange={setSelectedAlu2Type}
-                                placeholder="Select type..."
+                                placeholder={t('modal.selectType')}
                                 isClearable
                                 styles={{
                                   control: (base) => ({
@@ -1186,11 +1212,13 @@ const RawMaterialsConsumptionModal = React.memo(
                             </div>
                           )}
                           <div className="text-muted-small">
-                            def: {isEmptyOrZero(base) ? '—' : base}
+                            {t('modal.def', {
+                              value: isEmptyOrZero(base) ? '—' : base,
+                            })}
                           </div>
                         </td>
 
-                        <td data-label="Modified recipe">
+                        <td data-label={t('modal.modifiedRecipe')}>
                           <div className="modified-recipe-cell">
                             <input
                               className={
@@ -1208,9 +1236,9 @@ const RawMaterialsConsumptionModal = React.memo(
                               className="btn-set-def"
                               onClick={() => resetToDef(key)}
                               disabled={!modified}
-                              title="Set default recipe value"
+                              title={t('modal.setDefTitle')}
                             >
-                              set def
+                              {t('modal.setDef')}
                             </button>
 
                             {hasPrevValue(key) && (
@@ -1218,15 +1246,20 @@ const RawMaterialsConsumptionModal = React.memo(
                                 type="button"
                                 className="btn-set-def"
                                 onClick={() => resetToPrev(key)}
-                                title={`Set previous value: ${previousLotesRecord[key]}`}
+                                title={t('modal.setPrevTitle', {
+                                  value: previousLotesRecord[key],
+                                })}
                               >
-                                set prev
+                                {t('modal.setPrev')}
                               </button>
                             )}
                           </div>
                         </td>
 
-                        <td className="td-consumed" data-label="Consumed">
+                        <td
+                          className="td-consumed"
+                          data-label={t('modal.consumed')}
+                        >
                           {consumed === null ? '—' : consumed}
                         </td>
                       </tr>
@@ -1235,11 +1268,15 @@ const RawMaterialsConsumptionModal = React.memo(
 
                   <tr className="rmc-total-row">
                     <td>
-                      <div className="fw-semibold">Aluminum total, kg</div>
-                      <div className="text-muted-small">Sum of aluminums</div>
+                      <div className="fw-semibold">
+                        {t('modal.aluminumTotal')}
+                      </div>
+                      <div className="text-muted-small">
+                        {t('modal.sumOfAluminums')}
+                      </div>
                     </td>
 
-                    <td data-label="Modified recipe">
+                    <td data-label={t('modal.modifiedRecipe')}>
                       <div className="modified-recipe-cell">
                         <input
                           className="form-control"
@@ -1250,7 +1287,10 @@ const RawMaterialsConsumptionModal = React.memo(
                       </div>
                     </td>
 
-                    <td className="td-consumed" data-label="Consumed">
+                    <td
+                      className="td-consumed"
+                      data-label={t('modal.consumed')}
+                    >
                       {+aluminumTotal.toFixed(2)}
                     </td>
                   </tr>
@@ -1265,14 +1305,14 @@ const RawMaterialsConsumptionModal = React.memo(
                   onClick={toggle}
                   disabled={isSaving}
                 >
-                  Cancel
+                  {t('modal.cancel')}
                 </button>
                 <button
                   className="btn btn-success"
                   onClick={handleSave}
                   disabled={isSaving}
                 >
-                  {isSaving ? 'Saving...' : 'Save'}
+                  {isSaving ? t('modal.saving') : t('modal.save')}
                 </button>
               </div>
             </ModalFooter>

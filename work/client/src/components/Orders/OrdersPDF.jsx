@@ -263,7 +263,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         autoTable(doc, {
           ...baseTableOptions,
 
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
 
           head: [
             [
@@ -300,9 +302,17 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       if (pdfData.pdfTools?.length) {
         autoTable(doc, {
           ...baseTableOptions,
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
-            ['Ref.:', 'Descripción', 'Total, Ud', 'Precio neto €/Ud', 'Subtotal €'],
+            [
+              'Ref.:',
+              'Descripción',
+              'Total, Ud',
+              'Precio neto €/Ud',
+              'Subtotal €',
+            ],
           ],
           body: pdfData.pdfTools?.map((item) => [
             item.ref,
@@ -322,9 +332,17 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       if (pdfData.pdfRelMat?.length) {
         autoTable(doc, {
           ...baseTableOptions,
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
-            ['Ref.:', 'Descripción', 'Total, Ud', 'Precio neto €/Ud', 'Subtotal €'],
+            [
+              'Ref.:',
+              'Descripción',
+              'Total, Ud',
+              'Precio neto €/Ud',
+              'Subtotal €',
+            ],
           ],
           body: pdfData.pdfRelMat?.map((item) => [
             item.ref,
@@ -369,7 +387,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       const totalWithoutVat = toNumber(vatValue?.vat_euro_origin);
 
       // BASE — товары + доставка
-      const baseDisponible = totalWithoutVat + (hasDelivery ? deliveryPrice : 0);
+      const baseDisponible =
+        totalWithoutVat + (hasDelivery ? deliveryPrice : 0);
 
       // IVA
       const ivaAmount = toNumber(vatValue?.vat_euro);
@@ -619,7 +638,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         },
       });
 
-      const startY = doc.lastAutoTable ? doc.lastAutoTable.finalY : yPosition + 50;
+      const startY = doc.lastAutoTable
+        ? doc.lastAutoTable.finalY
+        : yPosition + 50;
       autoTable(doc, {
         ...baseTableOptions,
         startY,
@@ -694,7 +715,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         const lineHeight = 3;
         const textHeight = footerText.length * lineHeight;
 
-        const footerTextY = footerY + (footerHeight - textHeight) / 2 + lineHeight;
+        const footerTextY =
+          footerY + (footerHeight - textHeight) / 2 + lineHeight;
 
         doc.text(footerText, pageWidth / 2, footerTextY, {
           align: 'center',
@@ -796,9 +818,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         product?.density
       }kg/m³`;
 
-      const total = (prod.quantity_palet * product?.quantityBlockOnPallet).toFixed(
-        0,
-      );
+      const total = (
+        prod.quantity_palet * product?.quantityBlockOnPallet
+      ).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
@@ -832,7 +854,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const totalSacos = (quantity * sacos).toFixed(0);
 
-      const totalKg = (prod.quantity_palet_dry * dryMixes?.pallet_weight).toFixed(0);
+      const totalKg = (
+        prod.quantity_palet_dry * dryMixes?.pallet_weight
+      ).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(2);
 
@@ -887,7 +911,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       return {
         ref: pdfTool?.article,
-        descripcion: pdfTool?.description,
+        descripcion: pdfTool?.name,
         total,
         pvp_neto_ud,
         subtotal: prod?.final_price?.toFixed(2),
@@ -905,7 +929,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       return {
         ref: pdfRelMat?.article,
-        descripcion: pdfRelMat?.description,
+        descripcion: pdfRelMat?.name,
         total,
         pvp_neto_ud,
         subtotal: prod.final_price.toFixed(2),
@@ -921,7 +945,11 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         '',
       contact: `${contactInfo?.first_name} ${contactInfo?.last_name}` || '',
       email: contactInfo?.email || '',
-      phone: contactInfo?.phone_number_mobile || '',
+      phone:
+        contactInfo?.phone_number_mobile ||
+        contactInfo?.phone_number_office ||
+        contactInfo?.phone_number_messenger ||
+        '',
       validUntil: formattedValidUntil || '',
       pdfProducts,
       pdfDryMixes,
@@ -977,7 +1005,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           alert('PDF successfully sent to Bitrix24');
         } else {
           console.error('Ошибка ответа сервера:', result);
-          alert(`Error sending to Bitrix24: ${result?.error ?? response.status}`);
+          alert(
+            `Error sending to Bitrix24: ${result?.error ?? response.status}`,
+          );
         }
       }
     } catch (error) {
