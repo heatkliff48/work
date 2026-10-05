@@ -8,6 +8,7 @@ import { useProductsTypeJournalContext } from '#components/contexts/ProductsType
 import '#components/Styles/pdf.css';
 import { getApiUrl } from '#utils/getApiUrl.js';
 import { applyDiscount } from './blockDeliveryPrice.js';
+import { getPaymentMethodLabel } from './paymentMethods.js';
 import './ordersView.css';
 
 const loadImage = () => {
@@ -556,7 +557,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       // Пока оставляем заглушки.
       // Позже подставим сюда конкретные поля из orderData.
       const deliveryTerm = pdfData.address || '[completar]';
-      const paymentMethod = pdfData.payment_method || '[completar]';
+      const paymentMethod =
+        getPaymentMethodLabel(pdfData.payment_method) || '[completar]';
       const otros = pdfData.otros?.trim();
 
       const particularConditionsText = [
@@ -970,7 +972,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
   const downloadPDF = async () => {
     const doc = await generatePDF();
-    if (doc) doc.save('presupuesto.pdf');
+    const fileName =
+      orderData?.description?.trim() || orderData?.article || 'presupuesto';
+    if (doc) doc.save(`${fileName}.pdf`);
   };
 
   const sendToBitrix = async () => {

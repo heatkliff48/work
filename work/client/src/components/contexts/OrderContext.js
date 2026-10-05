@@ -25,6 +25,11 @@ const OrderContextProvider = ({ children }) => {
       disableSortBy: true,
     },
     {
+      Header: 'Description',
+      accessor: 'description',
+      disableSortBy: true,
+    },
+    {
       Header: 'Name of owner',
       accessor: 'owner',
       sortType: 'string',

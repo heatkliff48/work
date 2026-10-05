@@ -5,6 +5,11 @@ const {
   LotesListsCakes,
   RawMaterialsWarehouse,
   Recipe,
+  RawMatConsumptions,
+  RawMatConsumptionsCurrentMolds,
+  BatchOutside,
+  ProductionQualities,
+  QualityManagement,
   sequelize,
 } = require('../db/models/index.js');
 const myEmitter = require('../src/ee.js');
@@ -188,6 +193,148 @@ const applySlurriedReturn = async (cakeId, slurried, transaction) => {
     { transaction },
   );
 };
+
+// Every integer column that holds a Lotes List batch number. Warehouses.batch_id
+// stores a LotesListsBatches row id and QualityManagement.batch_id a warehouse
+// article, so neither is listed.
+const BATCH_ID_COLUMNS = [
+  [LotesListsBatches, 'batch_id'],
+  [RawMatConsumptions, 'batch_id'],
+  [RawMatConsumptionsCurrentMolds, 'batch_id'],
+  [BatchOutside, 'batch_id'],
+  [ProductionQualities, 'batch_id'],
+  [QualityManagement, 'raw_mat_cons_batch_id'],
+];
+
+// Every column that holds a cake number, except LotesListsCakes.id, which is a
+// primary key and is shifted separately.
+const CAKE_ID_COLUMNS = [
+  [LotesListsBatches, 'cake_id_start'],
+  [LotesListsBatches, 'cake_id_finish'],
+  [RawMatConsumptions, 'cake_id_start'],
+  [RawMatConsumptionsCurrentMolds, 'cake_id_start'],
+];
+
+const getLowestValue = async (columns, transaction) => {
+  let lowest = null;
+
+  for (const [model, column] of columns) {
+    const value = await model.min(column, { transaction });
+
+    if (value !== null && (lowest === null || Number(value) < lowest)) {
+      lowest = Number(value);
+    }
+  }
+
+  return lowest;
+};
+
+const shiftColumns = async (columns, shift, transaction) => {
+  for (const [model, column] of columns) {
+    await model.increment(
+      { [column]: shift },
+      { where: {}, silent: true, transaction },
+    );
+  }
+};
+
+const shiftBatchIds = async (shift, transaction) => {
+  const lowestBatchId = await getLowestValue(BATCH_ID_COLUMNS, transaction);
+
+  if (lowestBatchId + shift < 1) {
+    throw createHttpError(
+      409,
+      `Batch ID ${lowestBatchId} would become ${lowestBatchId + shift}, ` +
+        'choose a larger first Batch ID',
+    );
+  }
+
+  await shiftColumns(BATCH_ID_COLUMNS, shift, transaction);
+
+  // Dimension tests keep the batch number as text
+  await sequelize.query(
+    `UPDATE "QualityDimensions"
+     SET batch_id = (batch_id::integer + :shift)::text
+     WHERE batch_id ~ '^[0-9]+$'`,
+    { replacements: { shift }, transaction },
+  );
+};
+
+const shiftCakeIds = async (shift, transaction) => {
+  const lowestColumnCakeId = await getLowestValue(CAKE_ID_COLUMNS, transaction);
+  const lowestCakeRowId = await LotesListsCakes.min('id', { transaction });
+  const lowestCakeId = Math.min(
+    ...[lowestColumnCakeId, lowestCakeRowId].filter((id) => id !== null),
+  );
+
+  if (lowestCakeId + shift < 1) {
+    throw createHttpError(
+      409,
+      `Cake ID ${lowestCakeId} would become ${lowestCakeId + shift}, ` +
+        'choose a larger first Cake ID',
+    );
+  }
+
+  await shiftColumns(CAKE_ID_COLUMNS, shift, transaction);
+
+  // The primary key is checked row by row, so "id + shift" in one pass hits
+  // ids that are not moved yet. Negating first keeps both passes collision free.
+  await sequelize.query('UPDATE "LotesListsCakes" SET id = -id', {
+    transaction,
+  });
+  await sequelize.query('UPDATE "LotesListsCakes" SET id = :shift - id', {
+    replacements: { shift },
+    transaction,
+  });
+  await sequelize.query(
+    `SELECT setval(pg_get_serial_sequence('"LotesListsCakes"', 'id'), COALESCE(MAX(id), 0) + 1, false) FROM "LotesListsCakes"`,
+    { transaction },
+  );
+};
+
+// Shifts batch and cake numbers everywhere so that the first Lotes List batch
+// starts at the given ids, used to line up the numbering with the factory's.
+lotesListRouter.post('/renumber', async (req, res) => {
+  const batchIdStart = Number(req.body?.batch_id_start);
+  const cakeIdStart = Number(req.body?.cake_id_start);
+
+  if (![batchIdStart, cakeIdStart].every((id) => Number.isInteger(id) && id > 0)) {
+    return res
+      .status(400)
+      .json({ error: 'Batch ID and Cake ID must be positive integers' });
+  }
+
+  try {
+    const shifts = await sequelize.transaction(async (transaction) => {
+      const currentBatchIdStart = await LotesListsBatches.min('batch_id', {
+        transaction,
+      });
+      const currentCakeIdStart = await LotesListsBatches.min('cake_id_start', {
+        transaction,
+      });
+
+      if (currentBatchIdStart === null || currentCakeIdStart === null) {
+        throw createHttpError(409, 'Lotes List is empty, nothing to renumber');
+      }
+
+      const batch_shift = batchIdStart - Number(currentBatchIdStart);
+      const cake_shift = cakeIdStart - Number(currentCakeIdStart);
+
+      if (batch_shift) await shiftBatchIds(batch_shift, transaction);
+      if (cake_shift) await shiftCakeIds(cake_shift, transaction);
+
+      return { batch_shift, cake_shift };
+    });
+
+    return res.status(200).json(shifts);
+  } catch (err) {
+    const status = Number(err.status) || 500;
+
+    if (status >= 500) console.error(err.message);
+
+    return res.status(status).json({ error: err.message });
+  }
+});
 
 lotesListRouter.get('/batches', async (req, res) => {
   try {

@@ -28,6 +28,10 @@ import {
   updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
 import PDFgenerate from './OrdersPDF.jsx';
+import {
+  PAYMENT_METHOD_OPTIONS,
+  getPaymentMethodOption,
+} from './paymentMethods.js';
 import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
 import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
 import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
@@ -151,20 +155,6 @@ const OrderCart = React.memo(() => {
     vat_result: 0,
     vat_result_del: 0,
   });
-
-  const PAYMENT_METHOD_OPTIONS = [
-    { value: 'prepayment', label: 'Prepago' },
-    { value: 'bank_transfer', label: 'Transferencia bancaria 30 dias' },
-    { value: 'promissory_note', label: 'Pagaré' },
-    { value: 'confirming', label: 'Confirming 30 dias' },
-    { value: 'confirming', label: 'Confirming 45 dias' },
-    { value: 'confirming', label: 'Confirming 60 dias' },
-    { value: 'confirming', label: 'Confirming 90 dias' },
-    { value: 'confirming', label: 'Confirming 120 dias' },
-    { value: 'confirming', label: 'Confirming 180 dias' },
-    { value: 'confirming', label: 'Confirming 210 dias' },
-    { value: 'confirming_without_recourse', label: 'Confirming sin recurso' },
-  ];
 
   const cardStatusTheme = useMemo(
     () => statusThemeFor(orderCartData?.status),
@@ -1092,6 +1082,7 @@ const OrderCart = React.memo(() => {
       ...prev,
       description: updatedOrderCartData?.description,
       otros: updatedOrderCartData?.otros,
+      payment_method: updatedOrderCartData?.payment_method,
     }));
   }, [list_of_orders]);
 
@@ -1159,10 +1150,10 @@ const OrderCart = React.memo(() => {
   };
 
   const getSelectedPaymentMethodOption = () => {
-    const paymentMethodOption = PAYMENT_METHOD_OPTIONS.find(
-      (option) => option.value == orderCartData?.payment_method
+    return (
+      getPaymentMethodOption(orderCartData?.payment_method) ||
+      PAYMENT_METHOD_OPTIONS[0]
     );
-    return paymentMethodOption || PAYMENT_METHOD_OPTIONS[0];
   };
 
   const productHandler = (product) => {
