@@ -295,6 +295,29 @@ class OrdersService {
     return;
   }
 
+  static async updateAgentCommissionOrder({ order_id, agent_commission }) {
+    const commission = Number(agent_commission);
+    if (!order_id || !Number.isFinite(commission) || commission < 0) {
+      throw new BadRequest(
+        'order_id and non-negative numeric agent_commission are required',
+      );
+    }
+
+    const order = await OrdersRepository.updateAgentCommissionOrder({
+      order_id,
+      agent_commission: commission,
+    });
+
+    if (!order) {
+      throw new NotFound(`Order ${order_id} not found`);
+    }
+
+    return {
+      order_id: order.id,
+      agent_commission: order.agent_commission,
+    };
+  }
+
   static async updateAccountingApprovedOrder({ order_id, accounting_approved }) {
     if (!order_id || typeof accounting_approved !== 'boolean') {
       throw new BadRequest('order_id and boolean accounting_approved are required');

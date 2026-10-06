@@ -1112,6 +1112,15 @@ class OrdersRepository {
     }
   }
 
+  static async updateAgentCommissionOrder({ order_id, agent_commission }) {
+    const [, [order]] = await Orders.update(
+      { agent_commission },
+      { where: { id: order_id }, returning: true },
+    );
+
+    return order;
+  }
+
   static async updateAccountingApprovedOrder({ order_id, accounting_approved }) {
     const [, [order]] = await Orders.update(
       { accounting_approved },
@@ -1153,6 +1162,7 @@ class OrdersRepository {
     delivery_m2,
     region,
     payment_method,
+    agent_commission,
     otros,
   }) {
     try {
@@ -1169,6 +1179,7 @@ class OrdersRepository {
         delivery_m2,
         region,
         payment_method,
+        agent_commission: Number(agent_commission) || 0,
         otros,
       });
 

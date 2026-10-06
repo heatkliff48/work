@@ -47,6 +47,11 @@ module.exports = (sequelize, DataTypes) => {
       uf_number_offer: DataTypes.INTEGER,
       region: DataTypes.STRING,
       payment_method: DataTypes.STRING,
+      agent_commission: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
       otros: DataTypes.TEXT,
       accounting_approved: {
         type: DataTypes.BOOLEAN,

@@ -16,6 +16,13 @@ export const m2PerPallet = (catalog) =>
 // articles differing only there are the same block in a different package.
 const PACKAGING_LETTER_INDEX = 3;
 
+// Order line type by article: 'N' — any block (`T.N…`, `T.O…` O-TEC,
+// `T.U…` U-TEC, …), otherwise the letter after `X.`: 'M' dry mix,
+// 'P' related material, 'F' anchor, 'T' tool. The form letter of a block
+// can't be used for this — it may coincide with another type's letter.
+export const orderProductType = (article = '') =>
+  article.startsWith('T.') ? 'N' : article.slice(2, 3);
+
 export const isSameBlockOtherPackaging = (a = '', b = '') =>
   a.length === b.length &&
   a.slice(0, PACKAGING_LETTER_INDEX) === b.slice(0, PACKAGING_LETTER_INDEX) &&
@@ -62,6 +69,20 @@ export const palletHeightCm = (catalog) => {
     catalog.palletHeight,
   );
   return round2((blocksInHeight(palletHeight, extraRows, width) * width) / 10);
+};
+
+// Pallet a block is packed on: size, stack height and volume, e.g.
+// "1200x800 · 90 cm · 1.44 m3".
+export const palletPackagingLabel = (catalog) => {
+  const height = palletHeightCm(catalog);
+  const m3 = Number(catalog?.volumeBlockOnPallet);
+  return [
+    catalog?.palletSize,
+    height && `${height} cm`,
+    m3 && `${parseFloat(m3.toFixed(3))} m3`,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 };
 
 // One option of a "ship as" selector, e.g.

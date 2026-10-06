@@ -21,6 +21,7 @@ import {
   updateOrderInCharge,
   updateOrderStatus,
   updatePayment,
+  updateAgentCommission,
 } from '#components/redux/actions/ordersAction.js';
 import {
   addNewListOfOrderedProduction,
@@ -61,6 +62,7 @@ import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relat
 import RelatedMaterialJournalTableOrder from './product_table_order/RelatedMaterialJournalTableOrder.jsx';
 import LiberarModal from './modal/LiberarModal.jsx';
 import RoundPalletsModal from './modal/RoundPalletsModal.jsx';
+import { orderProductType } from './modal/packagingUtils.js';
 import { statusThemeFor } from './ordersCells.jsx';
 import {
   calcBlockPriceWithDelivery,
@@ -380,7 +382,11 @@ const OrderCart = React.memo(() => {
         (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
 
       const { price_m2_with_delivery, final_price } =
-        calcBlockPriceWithDelivery(product, deliveryPricePerM2);
+        calcBlockPriceWithDelivery(
+          product,
+          deliveryPricePerM2,
+          orderCartData?.agent_commission
+        );
 
       // Liberar debits this line by area, so quantity_liberated can hold
       // fractional pallets when a child order shipped the same block in
@@ -402,7 +408,7 @@ const OrderCart = React.memo(() => {
         ),
       };
     });
-  }, [updatedProductListOrder, deliveryPricePerM2]);
+  }, [updatedProductListOrder, deliveryPricePerM2, orderCartData?.agent_commission]);
 
   useEffect(() => {
     if (blocksListWithDeliveryM2.length > 0) {
@@ -490,15 +496,15 @@ const OrderCart = React.memo(() => {
       // Блок берём той версии, что в строке заказа, чтобы при сохранении
       // строка не переехала на последнюю версию карточки
       const product =
-        sel_prod.product_article.slice(2, 3) == 'N'
+        orderProductType(sel_prod.product_article) == 'N'
           ? productVersions.find((el) => el.id === sel_prod.product_id)
-          : sel_prod.product_article.slice(2, 3) == 'M'
+          : orderProductType(sel_prod.product_article) == 'M'
           ? latestDryMix.find((el) => el.article === sel_prod.product_article)
-          : sel_prod.product_article.slice(2, 3) == 'P'
+          : orderProductType(sel_prod.product_article) == 'P'
           ? latestRelatedMaterials.find(
               (el) => el.article === sel_prod.product_article
             )
-          : sel_prod.product_article.slice(2, 3) == 'F'
+          : orderProductType(sel_prod.product_article) == 'F'
           ? latestAnchors.find((el) => el.article === sel_prod.product_article)
           : latestTools.find((el) => el.article === sel_prod.product_article);
 
@@ -1083,6 +1089,7 @@ const OrderCart = React.memo(() => {
       description: updatedOrderCartData?.description,
       otros: updatedOrderCartData?.otros,
       payment_method: updatedOrderCartData?.payment_method,
+      agent_commission: updatedOrderCartData?.agent_commission ?? 0,
     }));
   }, [list_of_orders]);
 
@@ -1147,6 +1154,35 @@ const OrderCart = React.memo(() => {
         payment_method: selectedOption.value,
       })
     );
+  };
+
+  const [agentCommissionDraft, setAgentCommissionDraft] = useState(
+    orderCartData?.agent_commission ?? 0
+  );
+
+  useEffect(() => {
+    setAgentCommissionDraft(orderCartData?.agent_commission ?? 0);
+  }, [orderCartData?.agent_commission]);
+
+  // Агентское вознаграждение, %: повышает цену блоков за m2
+  const agentCommissionFunc = () => {
+    const agent_commission =
+      parseFloat(String(agentCommissionDraft).replace(',', '.')) || 0;
+
+    if (agent_commission < 0) {
+      alert('Agent commission cannot be negative');
+      return;
+    }
+
+    dispatch(
+      updateAgentCommission({
+        order_id: orderCartData?.id,
+        agent_commission,
+      })
+    );
+
+    setOrderCartData((prev) => ({ ...prev, agent_commission }));
+    setAgentCommissionDraft(agent_commission);
   };
 
   const getSelectedPaymentMethodOption = () => {
@@ -1828,6 +1864,34 @@ const OrderCart = React.memo(() => {
                     options={PAYMENT_METHOD_OPTIONS}
                     isDisabled={orderCartData?.status < 5 ? false : true}
                   />
+                </span>
+              </div>
+              <div className="ord-summary-row">
+                <span className="ord-summary-row__label">Agent commission, %</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    id="agent_commission"
+                    name="agent_commission"
+                    className="ord-summary-input"
+                    value={agentCommissionDraft}
+                    onChange={(e) => {
+                      setAgentCommissionDraft(
+                        e.target.value.replace(/[^\d.,]/g, '')
+                      );
+                    }}
+                    disabled={orderCartData?.status >= 5}
+                  />
+                  {orderCartData?.status < 5 && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--ghost ord-btn--sm"
+                      onClick={agentCommissionFunc}
+                    >
+                      Save
+                    </button>
+                  )}
                 </span>
               </div>
               <div className="ord-summary-divider" />

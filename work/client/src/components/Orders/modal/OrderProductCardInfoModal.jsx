@@ -14,7 +14,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useState } from 'react';
-import { m2PerPallet } from './packagingUtils.js';
+import { m2PerPallet, orderProductType } from './packagingUtils.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -67,7 +67,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   // То же для PVP
   const [pvpDraft, setPvpDraft] = useState(null);
 
-  const isBlock = selectedProduct?.article?.slice(2, 3) == 'N';
+  const isBlock = orderProductType(selectedProduct?.article) == 'N';
   // U-block продаются погонными метрами, а не площадью
   const isUBlock = isBlock && selectedProduct?.form === 'U-block';
 
@@ -117,13 +117,13 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   }, []);
 
   const COLUMNS_ORDER = useMemo(() => {
-    return selectedProduct.article.slice(2, 3) == 'N'
+    return orderProductType(selectedProduct?.article) == 'N'
       ? COLUMNS_ORDER_PRODUCT
-      : selectedProduct.article.slice(2, 3) == 'M'
+      : orderProductType(selectedProduct?.article) == 'M'
         ? COLUMNS_ORDER_DRY_MIXES
-        : selectedProduct.article.slice(2, 3) == 'P'
+        : orderProductType(selectedProduct?.article) == 'P'
           ? COLUMNS_ORDER_RELATED_MATERIAL
-          : selectedProduct.article.slice(2, 3) == 'F'
+          : orderProductType(selectedProduct?.article) == 'F'
             ? COLUMNS_ORDER_ANCHOR
             : COLUMNS_ORDER_TOOL;
   }, [selectedProduct]);
@@ -131,7 +131,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   const pieces_per_pallet = selectedProduct?.pieces_per_unit ?? 0;
 
   const originalPrice = useMemo(() => {
-    switch (selectedProduct.article.slice(2, 3)) {
+    switch (orderProductType(selectedProduct?.article)) {
       case 'N':
         return Number(selectedProduct?.price || 0);
 
@@ -156,7 +156,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     if (!selectedProduct) return;
     if (!productOfOrder?.quantity_m2) productOfOrder.quantity_m2 = 0;
 
-    if (selectedProduct.article.slice(2, 3) == 'N') {
+    if (orderProductType(selectedProduct?.article) == 'N') {
       const result = Math.ceil(
         productOfOrder?.quantity_m2 / m2PerPallet(selectedProduct),
       );
@@ -166,7 +166,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
         quantity_palet: result,
       }));
       return result;
-    } else if (selectedProduct.article.slice(2, 3) == 'M') {
+    } else if (orderProductType(selectedProduct?.article) == 'M') {
       const result = Math.ceil(
         productOfOrder?.quantity_ud / (selectedProduct?.units_per_pallet || 1),
       );
@@ -176,7 +176,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
         quantity_palet_dry: result,
       }));
       return result;
-    } else if (selectedProduct.article.slice(2, 3) == 'F') {
+    } else if (orderProductType(selectedProduct?.article) == 'F') {
       const result = Math.ceil(
         productOfOrder?.quantity_ud / (pieces_per_pallet || 1),
       );
@@ -197,7 +197,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   ]);
 
   const quantity_real_value = useMemo(() => {
-    if (selectedProduct.article.slice(2, 3) == 'N') {
+    if (orderProductType(selectedProduct?.article) == 'N') {
       const result = (
         quantity_palet_value * m2PerPallet(selectedProduct)
       )?.toFixed(2);
@@ -207,7 +207,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
         quantity_real: result,
       }));
       return result;
-    } else if (selectedProduct.article.slice(2, 3) == 'M') {
+    } else if (orderProductType(selectedProduct?.article) == 'M') {
       const result = Math.ceil(
         quantity_palet_value * (selectedProduct?.units_per_pallet || 1),
       );
@@ -217,7 +217,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
         quantity_real_ud: result,
       }));
       return result;
-    } else if (selectedProduct.article.slice(2, 3) == 'F') {
+    } else if (orderProductType(selectedProduct?.article) == 'F') {
       const result = Math.ceil(quantity_palet_value * (pieces_per_pallet || 1));
 
       setProductOfOrder((prev) => ({
@@ -234,7 +234,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   ]);
 
   const total_value = useMemo(() => {
-    if (selectedProduct.article.slice(2, 3) == 'F') {
+    if (orderProductType(selectedProduct?.article) == 'F') {
       const result = quantity_palet_value * pieces_per_pallet;
 
       setProductOfOrder((prev) => ({
@@ -243,8 +243,8 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       }));
       return result.toFixed(2);
     } else if (
-      selectedProduct.article.slice(2, 3) == 'T' ||
-      selectedProduct.article.slice(2, 3) == 'P'
+      orderProductType(selectedProduct?.article) == 'T' ||
+      orderProductType(selectedProduct?.article) == 'P'
     ) {
       const result = productOfOrder.quantity_ud;
 
@@ -253,7 +253,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
         total: result,
       }));
       return result;
-    } else if (selectedProduct.article.slice(2, 3) == 'N') {
+    } else if (orderProductType(selectedProduct?.article) == 'N') {
       const result =
         quantity_palet_value * selectedProduct?.quantityBlockOnPallet;
 
@@ -291,7 +291,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     setProductOfOrder((prev) => ({
       ...prev,
       price_m2:
-        selectedProduct.article.slice(2, 3) == 'N'
+        orderProductType(selectedProduct?.article) == 'N'
           ? result
           : productOfOrder?.pvp,
     }));
@@ -326,7 +326,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
   // Итог без скидки: от него считается final_price, а по введённой PVP — скидка
   const list_price_value = useMemo(() => {
-    const type = selectedProduct.article.slice(2, 3);
+    const type = orderProductType(selectedProduct?.article);
     // Блоки оплачиваются по реально отгружаемым м² (целые паллеты)
     if (type == 'N') return listPriceM2 * (Number(quantity_real_value) || 0);
     if (type == 'M' || type == 'F')
@@ -343,7 +343,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     const discount = discountValue;
 
     const result =
-      selectedProduct.article.slice(2, 3) == 'N'
+      orderProductType(selectedProduct?.article) == 'N'
         ? (list_price_value * (100 - discount)) / 100
         : (list_price_value * Math.abs(100 - discount)) / 100;
 
@@ -370,7 +370,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     // Скидка во время ввода — строка; в FLOAT-колонку пишем число
     const payload = { ...productOfOrder, discount: discountValue };
 
-    selectedProduct.article.slice(2, 3) == 'N'
+    orderProductType(selectedProduct?.article) == 'N'
       ? dispatch(
           getUpdateProductInfoOfOrders({
             ...payload,
@@ -378,11 +378,11 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
             price_m3: parseLocalNumber(productOfOrder.price_m3) || 0,
           }),
         )
-      : selectedProduct.article.slice(2, 3) == 'M'
+      : orderProductType(selectedProduct?.article) == 'M'
         ? dispatch(getUpdateDryMixedProductsInfoOfOrder(payload))
-        : selectedProduct.article.slice(2, 3) == 'P'
+        : orderProductType(selectedProduct?.article) == 'P'
           ? dispatch(getUpdateRelMatProductsInfoOfOrder(payload))
-          : selectedProduct.article.slice(2, 3) == 'F'
+          : orderProductType(selectedProduct?.article) == 'F'
             ? dispatch(getUpdateAnchorProductsInfoOfOrder(payload))
             : dispatch(getUpdateToolProductsInfoOfOrder(payload));
     setProductOfOrder({});
