@@ -25,6 +25,22 @@
     "title": "Add {{material}}",
     "submit": "Add {{material}}"
   },
+  "confirm": {
+    "title": "Check before adding {{material}}",
+    "progress": "Question {{current}} of {{total}}",
+    "prompt": "Is the following statement true?",
+    "questions": {
+      "unloaded": "The raw material has actually arrived at our warehouse and has been unloaded.",
+      "waybillMatches": "The data in the transport waybill matches the actual quantity and quality of the raw material received.",
+      "waybillConfirmed": "The supplier has confirmed that the waybill under which the raw material was received is current and correct, not preliminary, outdated or erroneous.",
+      "dataChecked": "I have double-checked the entered data and made sure it is correct:"
+    },
+    "fields": {
+      "material": "Material",
+      "quantity": "Quantity"
+    },
+    "cancelled": "The raw material was not added: not all checks were confirmed. Correct the data or add the raw material once everything has been checked."
+  },
   "errors": {
     "supplierRequired": "Supplier is required",
     "quantityRequired": "Quantity is required",

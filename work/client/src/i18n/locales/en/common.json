@@ -2,6 +2,8 @@
   "language": "Language",
   "logout": "Logout",
   "close": "Close",
+  "yes": "Yes",
+  "no": "No",
   "pageTitles": {
     "warehouse_raw_materials": "Raw Materials Warehouse",
     "cake_fillup": "Casting"
@@ -23,7 +25,8 @@
   },
   "units": {
     "kg": "kg",
-    "pieces": "pieces"
+    "pieces": "pieces",
+    "t": "t"
   },
   "materials": {
     "Sand (dry)": "Sand (dry)",

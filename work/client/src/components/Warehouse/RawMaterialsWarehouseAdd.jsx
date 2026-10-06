@@ -11,8 +11,28 @@ import * as warehouseActions from '#components/redux/actions/warehouseRawMateria
 import DatePicker from 'react-datepicker';
 import Select from 'react-select';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 import { translateMaterial } from '#i18n/index.js';
 import { PALLET_TYPES, PALLET_TYPE_OPTIONS } from '#utils/palletTypes.js';
+
+// Проверка на дурака перед добавлением: на каждый вопрос нужно ответить «Да»,
+// иначе сырьё не добавляется. Ключи — confirm.questions.* в переводах
+const CONFIRM_QUESTIONS = [
+  'unloaded',
+  'waybillMatches',
+  'waybillConfirmed',
+  'dataChecked',
+];
+
+// Поле с типом сырья в форме (у остальных материалов типа нет)
+const TYPE_FIELDS = {
+  Lime: 'typeLime',
+  Cement: 'typeCement',
+  'Sand (dry)': 'typeSand',
+  Aluminum: 'typeAlum1',
+  'Aluminum 2': 'typeAlum2',
+  Pallets: 'typePallet',
+};
 
 function RawMaterialsWarehouseAdd(props) {
   const [rawMaterialWarehouseInput, setRawMaterialWarehouseInput] = useState(
@@ -21,6 +41,11 @@ function RawMaterialsWarehouseAdd(props) {
   // значения — ключи перевода, переводятся при рендере
   const [errors, setErrors] = useState({});
   const [dataValue, setDataValue] = useState(null);
+  // индекс текущего вопроса в CONFIRM_QUESTIONS, null — показываем форму
+  const [confirmStep, setConfirmStep] = useState(null);
+  // «Да» и «Нет» меняются местами случайно на каждом вопросе
+  const [isYesFirst, setIsYesFirst] = useState(true);
+  const [isConfirmCancelled, setIsConfirmCancelled] = useState(false);
 
   const user = useSelector((state) => state.user);
 
@@ -299,12 +324,19 @@ function RawMaterialsWarehouseAdd(props) {
     setRawMaterialWarehouseInput({ ...initState });
     setErrors({});
     setDataValue(null);
+    setConfirmStep(null);
+    setIsConfirmCancelled(false);
   }, []);
 
   const handleHide = useCallback(() => {
     props.onHide();
     resetModal();
   }, [props.onHide, resetModal]);
+
+  const showConfirmStep = (step) => {
+    setConfirmStep(step);
+    setIsYesFirst(Math.random() < 0.5);
+  };
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
@@ -313,11 +345,66 @@ function RawMaterialsWarehouseAdd(props) {
       return;
     }
 
-    console.log(
-      props?.material_type,
-      'props?.material_type RawMaterialsWarehouseAdd.jsx line 287',
-    );
+    setIsConfirmCancelled(false);
+    showConfirmStep(0);
+  };
 
+  const handleConfirmYes = () => {
+    if (confirmStep < CONFIRM_QUESTIONS.length - 1) {
+      showConfirmStep(confirmStep + 1);
+      return;
+    }
+    addRawMaterial();
+  };
+
+  // Любое «Нет» — сырьё не добавляем, возвращаемся к форме с введёнными данными
+  const handleConfirmNo = () => {
+    setConfirmStep(null);
+    setIsConfirmCancelled(true);
+  };
+
+  const formatNumber = (value, maximumFractionDigits = 3) =>
+    new Intl.NumberFormat(i18n.resolvedLanguage, {
+      maximumFractionDigits,
+    }).format(value);
+
+  // Введённые данные для последнего вопроса
+  const getEnteredDataSummary = () => {
+    const quantity = parseFloat(rawMaterialWarehouseInput?.quantity) || 0;
+    const typeField = TYPE_FIELDS[props?.material_type];
+    const unitKg = t('units.kg', { ns: 'common' });
+
+    return [
+      { label: t('confirm.fields.material'), value: materialLabel },
+      typeField && {
+        label: t('columns.type'),
+        value: rawMaterialWarehouseInput?.[typeField],
+      },
+      props?.material_type === 'Grinding Balls' && {
+        label: t('columns.diameterMm'),
+        value: rawMaterialWarehouseInput?.diameter,
+      },
+      {
+        label: t('confirm.fields.quantity'),
+        value:
+          props?.material_type === 'Pallets'
+            ? `${formatNumber(quantity)} ${t('units.pieces', { ns: 'common' })}`
+            : `${formatNumber(quantity)} ${unitKg} (${formatNumber(
+                quantity / 1000,
+              )} ${t('units.t', { ns: 'common' })})`,
+      },
+      {
+        label: t('columns.supplier'),
+        value: rawMaterialWarehouseInput?.supplier,
+      },
+      {
+        label: t('columns.date'),
+        value: dataValue ? format(dataValue, 'dd.MM.yyyy') : '',
+      },
+    ].filter(Boolean);
+  };
+
+  const addRawMaterial = () => {
     const addAction = getAddAction(props?.material_type);
 
     const formData =
@@ -377,11 +464,23 @@ function RawMaterialsWarehouseAdd(props) {
                       };
 
     dispatch(addAction(formData));
-    setRawMaterialWarehouseInput({ ...initState });
-    setDataValue(null);
-    setErrors({});
+    resetModal();
     props.onHide();
   };
+
+  const confirmQuestion =
+    confirmStep !== null ? CONFIRM_QUESTIONS[confirmStep] : null;
+
+  // key с номером шага: кнопки перемонтируются и теряют фокус,
+  // чтобы нельзя было пройти все вопросы, просто нажимая Enter
+  const confirmButtons = [
+    <Button key={`yes-${confirmStep}`} onClick={handleConfirmYes}>
+      {t('yes', { ns: 'common' })}
+    </Button>,
+    <Button key={`no-${confirmStep}`} onClick={handleConfirmNo}>
+      {t('no', { ns: 'common' })}
+    </Button>,
+  ];
 
   return (
     <Modal
@@ -395,69 +494,100 @@ function RawMaterialsWarehouseAdd(props) {
       <Modal.Header closeButton></Modal.Header>
       <Modal.Body>
         <Container>
-          <form
-            id="addClientModel"
-            className="w-full max-w-sm"
-            onSubmit={onSubmitForm}
-          >
-            <h3>{t('add.title', { material: materialLabel })}</h3>
-            <Row>
-              {raw_material_table.map((el) =>
-                el.accessor === 'date' || !el.accessor ? null : (
-                  <Col key={el.accessor}>
-                    <div className="md:flex md:items-center mb-6">
-                      <div className="md:w-1/3">
-                        <label
-                          className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
-                          htmlFor={el.accessor}
-                        >
-                          {el.Header}
-                        </label>
-                      </div>
-                      <div className="md:w-2/3">
-                        {el.options ? (
-                          <Select
-                            inputId={el.accessor}
-                            name={el.accessor}
-                            options={el.options}
-                            value={
-                              el.options.find(
-                                (option) =>
-                                  option.value ===
-                                  rawMaterialWarehouseInput[el.accessor],
-                              ) || null
-                            }
-                            onChange={(option) =>
-                              handleSelectChange(option, el.accessor)
-                            }
-                            isSearchable={false}
-                          />
-                        ) : (
-                          <input
-                            className={`bg-gray-200 appearance-none border-2 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500 ${
-                              errors[el.accessor]
-                                ? 'border-red-500'
-                                : 'border-gray-300'
-                            }`}
-                            id={el.accessor}
-                            name={el.accessor}
-                            type="text"
-                            value={rawMaterialWarehouseInput[el.accessor] || ''}
-                            onChange={handleRawMaterialWarehouseInputChange}
-                          />
-                        )}
-                        {errors[el.accessor] && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {t(errors[el.accessor], { material: materialLabel })}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </Col>
-                ),
+          {confirmQuestion ? (
+            <div>
+              <h3>{t('confirm.title', { material: materialLabel })}</h3>
+              <p className="text-gray-500 mb-4">
+                {t('confirm.progress', {
+                  current: confirmStep + 1,
+                  total: CONFIRM_QUESTIONS.length,
+                })}
+                . {t('confirm.prompt')}
+              </p>
+              <p className="font-bold text-lg">
+                {t(`confirm.questions.${confirmQuestion}`)}
+              </p>
+              {confirmQuestion === 'dataChecked' && (
+                <table className="mt-3">
+                  <tbody>
+                    {getEnteredDataSummary().map(({ label, value }) => (
+                      <tr key={label}>
+                        <td className="text-gray-500 pr-4 py-1">{label}</td>
+                        <td className="font-bold py-1">{value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               )}
-            </Row>
-            {/* {props?.material_type === 'Cement' && (
+            </div>
+          ) : (
+            <form
+              id="addClientModel"
+              className="w-full max-w-sm"
+              onSubmit={onSubmitForm}
+            >
+              <h3>{t('add.title', { material: materialLabel })}</h3>
+              <Row>
+                {raw_material_table.map((el) =>
+                  el.accessor === 'date' || !el.accessor ? null : (
+                    <Col key={el.accessor}>
+                      <div className="md:flex md:items-center mb-6">
+                        <div className="md:w-1/3">
+                          <label
+                            className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                            htmlFor={el.accessor}
+                          >
+                            {el.Header}
+                          </label>
+                        </div>
+                        <div className="md:w-2/3">
+                          {el.options ? (
+                            <Select
+                              inputId={el.accessor}
+                              name={el.accessor}
+                              options={el.options}
+                              value={
+                                el.options.find(
+                                  (option) =>
+                                    option.value ===
+                                    rawMaterialWarehouseInput[el.accessor],
+                                ) || null
+                              }
+                              onChange={(option) =>
+                                handleSelectChange(option, el.accessor)
+                              }
+                              isSearchable={false}
+                            />
+                          ) : (
+                            <input
+                              className={`bg-gray-200 appearance-none border-2 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500 ${
+                                errors[el.accessor]
+                                  ? 'border-red-500'
+                                  : 'border-gray-300'
+                              }`}
+                              id={el.accessor}
+                              name={el.accessor}
+                              type="text"
+                              value={
+                                rawMaterialWarehouseInput[el.accessor] || ''
+                              }
+                              onChange={handleRawMaterialWarehouseInputChange}
+                            />
+                          )}
+                          {errors[el.accessor] && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {t(errors[el.accessor], {
+                                material: materialLabel,
+                              })}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Col>
+                  ),
+                )}
+              </Row>
+              {/* {props?.material_type === 'Cement' && (
               <Row>
                 <Col>
                   <div className="md:flex md:items-center mb-6">
@@ -487,30 +617,44 @@ function RawMaterialsWarehouseAdd(props) {
                 </Col>
               </Row>
             )} */}
-            <div>
-              <label
-                className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
-                htmlFor="cementType"
-              >
-                {t('columns.date')}
-              </label>
-              <DatePicker
-                id="data_pcker"
-                type="text"
-                selected={dataValue}
-                onChange={(date) => handleDateChange(date)}
-                dateFormat="dd.MM.yyyy"
-                locale={i18n.resolvedLanguage}
-              />
-            </div>
-          </form>
+              <div>
+                <label
+                  className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                  htmlFor="cementType"
+                >
+                  {t('columns.date')}
+                </label>
+                <DatePicker
+                  id="data_pcker"
+                  type="text"
+                  selected={dataValue}
+                  onChange={(date) => handleDateChange(date)}
+                  dateFormat="dd.MM.yyyy"
+                  locale={i18n.resolvedLanguage}
+                />
+              </div>
+              {isConfirmCancelled && (
+                <p className="text-red-500 mt-3">{t('confirm.cancelled')}</p>
+              )}
+            </form>
+          )}
         </Container>
       </Modal.Body>
       <Modal.Footer>
-        <Button form="addClientModel" type="submit">
-          {t('add.submit', { material: materialLabel })}
-        </Button>
-        <Button onClick={handleHide}>{t('close', { ns: 'common' })}</Button>
+        {confirmQuestion ? (
+          isYesFirst ? (
+            confirmButtons
+          ) : (
+            [...confirmButtons].reverse()
+          )
+        ) : (
+          <>
+            <Button form="addClientModel" type="submit">
+              {t('add.submit', { material: materialLabel })}
+            </Button>
+            <Button onClick={handleHide}>{t('close', { ns: 'common' })}</Button>
+          </>
+        )}
       </Modal.Footer>
     </Modal>
   );
