@@ -493,6 +493,7 @@ const OrderContextProvider = ({ children }) => {
         main_order: order?.main_order ?? null,
         region: order?.region ?? null,
         payment_method: order?.payment_method ?? null,
+        agent_commission: order?.agent_commission ?? 0,
         otros: order?.otros ?? '',
       };
 

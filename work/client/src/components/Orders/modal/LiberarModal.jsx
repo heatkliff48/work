@@ -58,6 +58,7 @@ function calcProductFields(orderRow, newPalets, catalog) {
   const discount = parseFloat(orderRow.discount) || 0;
   const price_m2 = Number(orderRow.price_m2) || 0;
   const price_m3 = Number(orderRow.price_m3) || 0;
+  const price_m2_with_agent = Number(orderRow.price_m2_with_agent ?? price_m2);
   const price_m2_with_delivery = Number(orderRow.price_m2_with_delivery) || 0;
   const quantity_m2 = round2(newPalets * m2PerPallet(catalog));
 
@@ -69,6 +70,7 @@ function calcProductFields(orderRow, newPalets, catalog) {
     quantity_real: quantity_m2,
     price_m2,
     price_m3,
+    price_m2_with_agent,
     price_m2_with_delivery,
     discount,
     final_price: round2(final_price_with_delivery),
@@ -441,7 +443,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     });
 
     // "Delivery price for m2 full" для дочернего заказа: доставка на m2
-    // (price_m2_with_delivery - price_m2) одинакова для всех позиций
+    // (price_m2_with_delivery - price_m2_with_agent) одинакова для всех позиций
     // родительского заказа, но кол-во блоков (quantity_m2) в дочернем заказе
     // у каждой позиции может отличаться — поэтому суммируем долю доставки
     // по каждой попавшей в дочерний заказ позиции, а не берём одно значение.
@@ -450,7 +452,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
         (acc, prod) =>
           acc +
           (Number(prod.price_m2_with_delivery || 0) -
-            Number(prod.price_m2 || 0)) *
+            Number(prod.price_m2_with_agent ?? prod.price_m2 ?? 0)) *
             Number(prod.quantity_m2 || 0),
         0,
       ),
@@ -574,6 +576,8 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       delivery_m2: deliveryM2Full,
       region: orderCartData?.region,
       payment_method: orderCartData?.payment_method,
+      // Цены строк наследуются без вознаграждения — оно применяется по заказу
+      agent_commission: orderCartData?.agent_commission ?? 0,
       otros: orderCartData?.otros,
       products,
       dryMixes,

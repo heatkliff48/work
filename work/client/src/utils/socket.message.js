@@ -160,6 +160,7 @@ import {
   deleteWarehouseManagerTrailerSocket,
   newStatusWarehouseManagerTrailerSocket,
   updPaymentMethodOrderSocket,
+  updAgentCommissionOrderSocket,
   updAccountingApprovedOrderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
@@ -366,6 +367,7 @@ import {
   DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   UPDATE_PAYMENT_METHOD_SOCKET,
+  UPDATE_AGENT_COMMISSION_SOCKET,
   UPDATE_ACCOUNTING_APPROVED_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
@@ -527,6 +529,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case UPDATE_PAYMENT_METHOD_SOCKET:
       dispatch(updPaymentMethodOrderSocket(payload));
+      break;
+
+    case UPDATE_AGENT_COMMISSION_SOCKET:
+      dispatch(updAgentCommissionOrderSocket(payload));
       break;
 
     case UPDATE_ACCOUNTING_APPROVED_SOCKET:

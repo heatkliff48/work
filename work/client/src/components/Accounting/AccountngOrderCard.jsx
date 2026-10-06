@@ -218,12 +218,12 @@ const AccountngOrderCard = React.memo(() => {
   }, [productListOrder, productVersions, addProductArticleToOrderList]);
 
   // orderCartData is built without delivery_m2, so read it from the order.
-  const deliveryM2 = useMemo(
-    () =>
-      list_of_orders?.find((order) => order.id === orderCartData?.id)
-        ?.delivery_m2,
+  const currentOrder = useMemo(
+    () => list_of_orders?.find((order) => order.id === orderCartData?.id),
     [list_of_orders, orderCartData?.id],
   );
+  const deliveryM2 = currentOrder?.delivery_m2;
+  const agentCommission = currentOrder?.agent_commission;
 
   // Blocks are priced with the order's delivery_m2 spread over their m2, the
   // same way the order card does, so the VAT summary and the factura include it.
@@ -245,10 +245,14 @@ const AccountngOrderCard = React.memo(() => {
         quantity_pcs: blocksPerPallet
           ? Math.round(Number(product.quantity_palet || 0) * blocksPerPallet)
           : null,
-        ...calcBlockPriceWithDelivery(product, deliveryPricePerM2),
+        ...calcBlockPriceWithDelivery(
+          product,
+          deliveryPricePerM2,
+          agentCommission,
+        ),
       };
     });
-  }, [updatedProductListOrder, productVersions, deliveryM2]);
+  }, [updatedProductListOrder, productVersions, deliveryM2, agentCommission]);
 
   useEffect(() => {
     if (blocksListWithDelivery.length > 0) {

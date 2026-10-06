@@ -161,6 +161,7 @@ import {
   NEEF_DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   NEW_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   PAYMENT_METHOD_SOCKET,
+  AGENT_COMMISSION_SOCKET,
   ACCOUNTING_APPROVED_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
@@ -428,6 +429,13 @@ export const updPaymentMethodOrderSocket = (payment_method) => {
   return {
     type: PAYMENT_METHOD_SOCKET,
     payload: payment_method,
+  };
+};
+
+export const updAgentCommissionOrderSocket = (commission) => {
+  return {
+    type: AGENT_COMMISSION_SOCKET,
+    payload: commission,
   };
 };
 
