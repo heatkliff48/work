@@ -38,6 +38,7 @@ import {
   ADD_RANDOM_PRODUCTS_OF_ORDER,
   ADD_CHILD_ORDER,
   UPDATE_PAYMENT_METHOD,
+  UPDATE_AGENT_COMMISSION,
   UPDATE_ACCOUNTING_APPROVED,
 } from '../types/ordersTypes';
 
@@ -279,6 +280,13 @@ export const updatePayment = (payment_method) => {
   return {
     type: UPDATE_PAYMENT_METHOD,
     payload: payment_method,
+  };
+};
+
+export const updateAgentCommission = ({ order_id, agent_commission }) => {
+  return {
+    type: UPDATE_AGENT_COMMISSION,
+    payload: { order_id, agent_commission },
   };
 };
 

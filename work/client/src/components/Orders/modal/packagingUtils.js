@@ -16,6 +16,13 @@ export const m2PerPallet = (catalog) =>
 // articles differing only there are the same block in a different package.
 const PACKAGING_LETTER_INDEX = 3;
 
+// Order line type by article: 'N' — any block (`T.N…`, `T.O…` O-TEC,
+// `T.U…` U-TEC, …), otherwise the letter after `X.`: 'M' dry mix,
+// 'P' related material, 'F' anchor, 'T' tool. The form letter of a block
+// can't be used for this — it may coincide with another type's letter.
+export const orderProductType = (article = '') =>
+  article.startsWith('T.') ? 'N' : article.slice(2, 3);
+
 export const isSameBlockOtherPackaging = (a = '', b = '') =>
   a.length === b.length &&
   a.slice(0, PACKAGING_LETTER_INDEX) === b.slice(0, PACKAGING_LETTER_INDEX) &&

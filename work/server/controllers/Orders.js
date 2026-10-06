@@ -30,6 +30,7 @@ const {
   GET_DELETE_ORDER_SOCKET,
   ADD_CHILD_ORDER_SOCKET,
   UPDATE_PAYMENT_METHOD_SOCKET,
+  UPDATE_AGENT_COMMISSION_SOCKET,
   UPDATE_ACCOUNTING_APPROVED_SOCKET,
 } = require('../src/constants/event.js');
 
@@ -619,6 +620,23 @@ class OrdersController {
     }
   }
 
+  static async updateAgentCommissionOrder(req, res) {
+    const { order_id, agent_commission } = req.body;
+
+    try {
+      const commission = await OrdersService.updateAgentCommissionOrder({
+        order_id,
+        agent_commission,
+      });
+
+      myEmitter.emit(UPDATE_AGENT_COMMISSION_SOCKET, commission);
+
+      return res.status(200).json(commission);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   static async updateAccountingApprovedOrder(req, res) {
     const { order_id, accounting_approved } = req.body;
 
@@ -670,6 +688,7 @@ class OrdersController {
       delivery_m2,
       region,
       payment_method,
+      agent_commission,
       otros,
     } = req.body;
 
@@ -691,6 +710,7 @@ class OrdersController {
         delivery_m2,
         region,
         payment_method,
+        agent_commission,
         otros,
       });
 
