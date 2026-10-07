@@ -14,7 +14,11 @@ import {
 import { useDispatch } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useState } from 'react';
-import { m2PerPallet, orderProductType } from './packagingUtils.js';
+import {
+  m2PerPallet,
+  orderProductType,
+  palletsForQuantity,
+} from './packagingUtils.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -157,8 +161,9 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     if (!productOfOrder?.quantity_m2) productOfOrder.quantity_m2 = 0;
 
     if (orderProductType(selectedProduct?.article) == 'N') {
-      const result = Math.ceil(
-        productOfOrder?.quantity_m2 / m2PerPallet(selectedProduct),
+      const result = palletsForQuantity(
+        productOfOrder?.quantity_m2,
+        selectedProduct,
       );
 
       setProductOfOrder((prev) => ({
@@ -519,7 +524,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     const m2 = parseLocalNumber(productOfOrder.quantity_m2);
 
     if (!isNaN(m2) && selectedProduct) {
-      const palets = Math.ceil(m2 / m2PerPallet(selectedProduct));
+      const palets = palletsForQuantity(m2, selectedProduct);
       setProductOfOrder((prev) => ({
         ...prev,
         quantity_m2: m2?.toFixed(2),

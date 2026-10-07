@@ -12,7 +12,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import '#components/Styles/modals.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { set } from 'date-fns';
-import { m2PerPallet } from '../packagingUtils.js';
+import { m2PerPallet, palletsForQuantity } from '../packagingUtils.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -174,7 +174,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     const m2 = parseLocalNumber(productOfOrder.quantity_m2);
 
     if (!isNaN(m2) && selectedProduct) {
-      const palets = Math.ceil(m2 / m2PerPallet(selectedProduct));
+      const palets = palletsForQuantity(m2, selectedProduct);
       setProductOfOrder((prev) => ({
         ...prev,
         quantity_m2: m2?.toFixed(2),

@@ -10,6 +10,12 @@ export const round2 = (n) => parseFloat(Number(n).toFixed(2));
 export const m2PerPallet = (catalog) =>
   catalog?.form === 'U-block' ? catalog?.m || 1 : catalog?.m2 || 1;
 
+// Whole pallets needed for a quantity in m² (linear m for U-blocks). The ratio
+// is trimmed to 6 decimals before rounding up: 3 × 13.2 m² is stored as 39.6,
+// and 39.6 / 13.2 = 3.0000000000000004 would otherwise become 4 pallets.
+export const palletsForQuantity = (quantity, catalog) =>
+  Math.ceil(Number(((Number(quantity) || 0) / m2PerPallet(catalog)).toFixed(6)));
+
 // Block article layout: `T.` + form letter + packaging letter + `D<density>` +
 // `W<width>` + certificate letter, e.g. `T.NAD35W20C`. The letter at index 3
 // encodes place of production / type of packaging / pallet size, so two
