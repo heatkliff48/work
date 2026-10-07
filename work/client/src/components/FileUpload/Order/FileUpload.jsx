@@ -64,7 +64,7 @@ const FileUpload = () => {
         <input
           type="file"
           onChange={onChange}
-          accept=".pdf,.txt,.doc,.docx.,jpg,.jpeg,.png,.gif,.bmp,.svg"
+          accept=".pdf,.txt,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp,.svg"
           className="ord-file-input"
         />
         <button type="submit" className="ord-btn ord-btn--ghost ord-btn--sm">

@@ -62,7 +62,7 @@ const FileUpload = ({ lotesList_id }) => {
         <input
           type="file"
           onChange={onChange}
-          accept=".pdf,.txt,.doc,.docx.,jpg,.jpeg,.png,.gif,.bmp,.svg"
+          accept=".pdf,.txt,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp,.svg"
         />
         <button type="submit">Upload</button>
       </form>
