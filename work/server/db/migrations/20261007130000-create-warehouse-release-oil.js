@@ -13,6 +13,7 @@
  */
 
 const { QueryTypes } = require('sequelize');
+const { syncIdSequence } = require('../pageAccessors.js');
 
 const MATERIAL_TYPE = 'Release oil';
 
@@ -76,6 +77,10 @@ module.exports = {
         },
       );
       if (!total || existing) return;
+
+      // Строки склада могли вставляться с явными id (сидер, дамп), и
+      // последовательность id отстаёт от данных
+      await syncIdSequence(queryInterface, 'RawMaterialsWarehouses', transaction);
 
       const now = new Date();
       await queryInterface.bulkInsert(
