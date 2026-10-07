@@ -23,15 +23,11 @@ const FileUpload = () => {
       formData.append('myFile', file);
 
       try {
-        const res = await url.post(
-          `${process.env.REACT_APP_URL}/files/upload?section=product`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+        const res = await url.post('/files/upload', formData, {
+          params: {
+            section: 'product',
           },
-        );
+        });
 
         dispatch(
           addNewFilesProduct({

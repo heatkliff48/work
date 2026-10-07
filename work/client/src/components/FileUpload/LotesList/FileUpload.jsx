@@ -22,15 +22,11 @@ const FileUpload = ({ lotesList_id }) => {
       formData.append('myFile', file);
 
       try {
-        const res = await url.post(
-          `${process.env.REACT_APP_URL}/files/upload?section=lotesList`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+        const res = await url.post('/files/upload', formData, {
+          params: {
+            section: 'lotesList',
           },
-        );
+        });
 
         dispatch(
           addNewFilesLotesList({

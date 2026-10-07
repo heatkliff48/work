@@ -4,6 +4,7 @@ const { ClientLegalAddresses } = require('../db/models');
 const TokenService = require('../services/Token.js');
 const { ACCESS_TOKEN_EXPIRATION } = require('../constants.js');
 const { COOKIE_SETTINGS } = require('../constants.js');
+
 const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_CLIENT_SOCKET,

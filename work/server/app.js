@@ -165,11 +165,6 @@ app.use('/greenLineMonitoring', greenLineMonitoringRouter);
 app.use('/temperatureDataMonitoring', temperatureDataMonitoringRouter);
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Internal Server Error');
-});
-
-app.use((err, req, res, next) => {
   if (res.headersSent) {
     return next(err);
   }

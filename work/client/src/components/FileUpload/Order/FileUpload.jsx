@@ -24,15 +24,11 @@ const FileUpload = () => {
       formData.append('myFile', file);
 
       try {
-        const res = await url.post(
-          `${process.env.REACT_APP_URL}/files/upload?section=order`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+        const res = await url.post('/files/upload', formData, {
+          params: {
+            section: 'order',
           },
-        );
+        });
 
         dispatch(
           addNewFilesOrder({

@@ -5,12 +5,7 @@ const RefreshSessionRepository = require('../repositories/RefreshSession.js');
 
 dotenv.config();
 
-const PUBLIC_PATHS = new Set([
-  '/auth/sign-up',
-  '/auth/sign-in',
-  '/auth/logout',
-  '/auth/refresh',
-]);
+const PUBLIC_PATHS = new Set(['/auth/sign-in', '/auth/logout', '/auth/refresh']);
 
 class TokenService {
   static generateAccessToken(payload) {

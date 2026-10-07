@@ -1,8 +1,7 @@
-import React, { useState, useContext } from 'react';
+import { useState, useCallback } from 'react';
 import url from '../../../api/axiosConfig.js';
 import { useDispatch } from 'react-redux';
 import { useFileContext } from '#components/contexts/FileContext.js';
-import { useCallback } from 'react';
 import * as warehouseActions from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
 const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
@@ -49,12 +48,13 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
 
     try {
       const folderPath = `rawMaterialsWarehouse/${material_type}`;
+
       const res = await url.post(
-        `${process.env.REACT_APP_URL}/files/upload/${encodeURIComponent(folderPath)}?section=rawMaterialsWarehouse`,
+        `/files/upload/${encodeURIComponent(folderPath)}`,
         formData,
         {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+          params: {
+            section: 'rawMaterialsWarehouse',
           },
         },
       );
@@ -97,7 +97,7 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
           <input
             type="file"
             onChange={onChange}
-            accept=".pdf,.txt,.doc,.docx.,jpg,.jpeg,.png,.gif,.bmp,.svg"
+            accept=".pdf,.txt,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp,.svg"
           />
           <button onClick={handleUpload}>Upload</button>
         </>
