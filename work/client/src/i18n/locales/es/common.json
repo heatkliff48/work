@@ -2,6 +2,8 @@
   "language": "Idioma",
   "logout": "Cerrar sesión",
   "close": "Cerrar",
+  "yes": "Sí",
+  "no": "No",
   "pageTitles": {
     "warehouse_raw_materials": "Almacén de materias primas",
     "cake_fillup": "Colada"
@@ -23,7 +25,8 @@
   },
   "units": {
     "kg": "kg",
-    "pieces": "uds."
+    "pieces": "uds.",
+    "t": "t"
   },
   "materials": {
     "Sand (dry)": "Arena (seca)",

@@ -25,6 +25,22 @@
     "title": "Añadir {{material}}",
     "submit": "Añadir {{material}}"
   },
+  "confirm": {
+    "title": "Comprobación antes de añadir {{material}}",
+    "progress": "Pregunta {{current}} de {{total}}",
+    "prompt": "¿Es cierta la siguiente afirmación?",
+    "questions": {
+      "unloaded": "La materia prima ha llegado realmente a nuestro almacén y ha sido descargada.",
+      "waybillMatches": "Los datos del albarán de transporte coinciden con la cantidad y la calidad reales de la materia prima recibida.",
+      "waybillConfirmed": "El proveedor ha confirmado que el albarán con el que se ha recibido la materia prima es vigente y correcto, y no preliminar, obsoleto ni erróneo.",
+      "dataChecked": "He vuelto a comprobar los datos introducidos y me he asegurado de que son correctos:"
+    },
+    "fields": {
+      "material": "Material",
+      "quantity": "Cantidad"
+    },
+    "cancelled": "La materia prima no se ha añadido: no se han confirmado todas las comprobaciones. Corrija los datos o añada la materia prima cuando todo esté comprobado."
+  },
   "errors": {
     "supplierRequired": "El proveedor es obligatorio",
     "quantityRequired": "La cantidad es obligatoria",
