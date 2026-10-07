@@ -494,6 +494,7 @@ const OrderContextProvider = ({ children }) => {
         region: order?.region ?? null,
         payment_method: order?.payment_method ?? null,
         agent_commission: order?.agent_commission ?? 0,
+        confirming_surcharge: Boolean(order?.confirming_surcharge),
         otros: order?.otros ?? '',
       };
 

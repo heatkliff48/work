@@ -1099,9 +1099,16 @@ class OrdersRepository {
     }
   }
 
-  static async getUpdatePaymentOrder({ order_id, payment_method }) {
+  static async getUpdatePaymentOrder({
+    order_id,
+    payment_method,
+    confirming_surcharge,
+  }) {
     try {
-      await Orders.update({ payment_method }, { where: { id: order_id } });
+      await Orders.update(
+        { payment_method, confirming_surcharge },
+        { where: { id: order_id } },
+      );
       return;
     } catch (error) {
       console.log(
@@ -1163,6 +1170,7 @@ class OrdersRepository {
     region,
     payment_method,
     agent_commission,
+    confirming_surcharge,
     otros,
   }) {
     try {
@@ -1180,6 +1188,7 @@ class OrdersRepository {
         region,
         payment_method,
         agent_commission: Number(agent_commission) || 0,
+        confirming_surcharge: Boolean(confirming_surcharge),
         otros,
       });
 

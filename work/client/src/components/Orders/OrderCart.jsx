@@ -31,6 +31,8 @@ import {
 import PDFgenerate from './OrdersPDF.jsx';
 import {
   PAYMENT_METHOD_OPTIONS,
+  getConfirmingSurchargeRate,
+  getOrderConfirmingSurcharge,
   getPaymentMethodOption,
 } from './paymentMethods.js';
 import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
@@ -65,6 +67,7 @@ import RoundPalletsModal from './modal/RoundPalletsModal.jsx';
 import { orderProductType } from './modal/packagingUtils.js';
 import { statusThemeFor } from './ordersCells.jsx';
 import {
+  applyConfirmingSurchargeToProductLists,
   calcBlockPriceWithDelivery,
   getDeliveryPricePerM2,
 } from './blockDeliveryPrice.js';
@@ -372,6 +375,8 @@ const OrderCart = React.memo(() => {
     [updatedProductListOrder, orderCartData?.delivery_m2]
   );
 
+  const confirmingSurcharge = getOrderConfirmingSurcharge(orderCartData);
+
   const blocksListWithDeliveryM2 = useMemo(() => {
     return (updatedProductListOrder || []).map((product) => {
       const quantity_m2 = Number(product?.quantity_m2 || 0);
@@ -385,7 +390,8 @@ const OrderCart = React.memo(() => {
         calcBlockPriceWithDelivery(
           product,
           deliveryPricePerM2,
-          orderCartData?.agent_commission
+          orderCartData?.agent_commission,
+          confirmingSurcharge
         );
 
       // Liberar debits this line by area, so quantity_liberated can hold
@@ -408,7 +414,12 @@ const OrderCart = React.memo(() => {
         ),
       };
     });
-  }, [updatedProductListOrder, deliveryPricePerM2, orderCartData?.agent_commission]);
+  }, [
+    updatedProductListOrder,
+    deliveryPricePerM2,
+    orderCartData?.agent_commission,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
     if (blocksListWithDeliveryM2.length > 0) {
@@ -483,6 +494,34 @@ const OrderCart = React.memo(() => {
       }));
     }
   }, [updatedRelatedMaterialsListOrder]);
+
+  // Надбавка confirming для остальных товаров: в productLists строки остаются
+  // с ценами из БД, потому что Liberar отправляет их на сервер как есть, а
+  // таблицы, итог и PDF берут цены с надбавкой
+  const linesWithSurcharge = useMemo(
+    () =>
+      applyConfirmingSurchargeToProductLists(
+        {
+          dryMixes: updatedDryMixesListOrder,
+          anchors: updatedAnchorsListOrder,
+          tools: updatedToolsListOrder,
+          related_materials: updatedRelatedMaterialsListOrder,
+        },
+        confirmingSurcharge
+      ),
+    [
+      updatedDryMixesListOrder,
+      updatedAnchorsListOrder,
+      updatedToolsListOrder,
+      updatedRelatedMaterialsListOrder,
+      confirmingSurcharge,
+    ]
+  );
+
+  const pricedProductLists = useMemo(
+    () => applyConfirmingSurchargeToProductLists(productLists, confirmingSurcharge),
+    [productLists, confirmingSurcharge]
+  );
 
   const handleInputChange = (e) => {
     setVatValue((prev) => ({
@@ -913,11 +952,11 @@ const OrderCart = React.memo(() => {
 
   const final_price_product = useMemo(() => {
     const allProducts = [
-      ...productLists['products'],
-      ...productLists['dryMixes'],
-      ...productLists['anchors'],
-      ...productLists['tools'],
-      ...productLists['related_materials'],
+      ...pricedProductLists['products'],
+      ...pricedProductLists['dryMixes'],
+      ...pricedProductLists['anchors'],
+      ...pricedProductLists['tools'],
+      ...pricedProductLists['related_materials'],
     ];
 
     return allProducts.reduce(
@@ -931,13 +970,7 @@ const OrderCart = React.memo(() => {
           0),
       0
     );
-  }, [
-    productLists.products,
-    productLists.dryMixes,
-    productLists.anchors,
-    productLists.tools,
-    productLists.related_materials,
-  ]);
+  }, [pricedProductLists]);
 
   const [deliveryDraft, setDeliveryDraft] = useState(orderCartData?.delivery ?? 0);
   const [deliveryM2Draft, setDeliveryM2Draft] = useState(
@@ -1090,6 +1123,7 @@ const OrderCart = React.memo(() => {
       otros: updatedOrderCartData?.otros,
       payment_method: updatedOrderCartData?.payment_method,
       agent_commission: updatedOrderCartData?.agent_commission ?? 0,
+      confirming_surcharge: Boolean(updatedOrderCartData?.confirming_surcharge),
     }));
   }, [list_of_orders]);
 
@@ -1142,18 +1176,39 @@ const OrderCart = React.memo(() => {
     return personInChargeOption || options[0];
   };
 
-  const handlePaymentMethodChange = (selectedOption) => {
+  const confirmingSurchargeRate = getConfirmingSurchargeRate(
+    orderCartData?.payment_method
+  );
+
+  // Галочка надбавки confirming сохраняется вместе со способом оплаты
+  const savePaymentMethod = (payment_method, confirming_surcharge) => {
     setOrderCartData((prev) => ({
       ...prev,
-      payment_method: selectedOption.value,
+      payment_method,
+      confirming_surcharge,
     }));
 
     dispatch(
       updatePayment({
         order_id: orderCartData?.id,
-        payment_method: selectedOption.value,
+        payment_method,
+        confirming_surcharge,
       })
     );
+  };
+
+  // У способа без надбавки галочка снимается, чтобы надбавка не вернулась
+  // незаметно при повторном выборе confirming
+  const handlePaymentMethodChange = (selectedOption) => {
+    savePaymentMethod(
+      selectedOption.value,
+      Boolean(orderCartData?.confirming_surcharge) &&
+        getConfirmingSurchargeRate(selectedOption.value) > 0
+    );
+  };
+
+  const handleConfirmingSurchargeChange = (e) => {
+    savePaymentMethod(orderCartData?.payment_method, e.target.checked);
   };
 
   const [agentCommissionDraft, setAgentCommissionDraft] = useState(
@@ -1611,7 +1666,7 @@ const OrderCart = React.memo(() => {
             </div>
             <PDFgenerate
               orderData={orderCartData}
-              productList={productLists}
+              productList={pricedProductLists}
               vatValue={vatValue}
             />
           </div>
@@ -1627,7 +1682,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <DryMixesJournalTableOrder
-          productListOrder={updatedDryMixesListOrder}
+          productListOrder={linesWithSurcharge.dryMixes}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1635,7 +1690,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <AnchorJournalTableOrder
-          productListOrder={updatedAnchorsListOrder}
+          productListOrder={linesWithSurcharge.anchors}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1643,7 +1698,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <ToolJournalTableOrder
-          productListOrder={updatedToolsListOrder}
+          productListOrder={linesWithSurcharge.tools}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1651,7 +1706,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <RelatedMaterialJournalTableOrder
-          productListOrder={updatedRelatedMaterialsListOrder}
+          productListOrder={linesWithSurcharge.related_materials}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1866,6 +1921,29 @@ const OrderCart = React.memo(() => {
                   />
                 </span>
               </div>
+              {confirmingSurchargeRate > 0 && (
+                <div className="ord-summary-row">
+                  <span className="ord-summary-row__label">
+                    Confirming surcharge
+                  </span>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      margin: 0,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={Boolean(orderCartData?.confirming_surcharge)}
+                      onChange={handleConfirmingSurchargeChange}
+                      disabled={orderCartData?.status >= 5}
+                    />
+                    +{confirmingSurchargeRate.toFixed(1)}% to all products
+                  </label>
+                </div>
+              )}
               <div className="ord-summary-row">
                 <span className="ord-summary-row__label">Agent commission, %</span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

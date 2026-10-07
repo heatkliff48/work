@@ -602,19 +602,24 @@ class OrdersController {
 
   static async getUpdatePaymentOrder(req, res) {
     const { payment_method, order_id } = req.body;
+    const confirming_surcharge = Boolean(req.body.confirming_surcharge);
 
     try {
       await OrdersService.getUpdatePaymentOrder({
         payment_method,
+        confirming_surcharge,
         order_id,
       });
 
       myEmitter.emit(UPDATE_PAYMENT_METHOD_SOCKET, {
         payment_method,
+        confirming_surcharge,
         order_id,
       });
 
-      return res.json({ payment_method, order_id }).status(200);
+      return res
+        .json({ payment_method, confirming_surcharge, order_id })
+        .status(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -689,6 +694,7 @@ class OrdersController {
       region,
       payment_method,
       agent_commission,
+      confirming_surcharge,
       otros,
     } = req.body;
 
@@ -711,6 +717,7 @@ class OrdersController {
         region,
         payment_method,
         agent_commission,
+        confirming_surcharge,
         otros,
       });
 

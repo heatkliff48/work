@@ -52,6 +52,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 0,
       },
+      confirming_surcharge: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       otros: DataTypes.TEXT,
       accounting_approved: {
         type: DataTypes.BOOLEAN,

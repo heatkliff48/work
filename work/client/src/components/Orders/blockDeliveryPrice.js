@@ -24,27 +24,72 @@ export const applyDiscount = (price, discount) =>
 export const applyAgentCommission = (price, agentCommission) =>
   Number(price || 0) * (1 + Number(agentCommission || 0) / 100);
 
+// The confirming surcharge, % (see getOrderConfirmingSurcharge), raises the
+// price of every product of the order, but not the delivery. Like the agent
+// commission it is layered on top of the stored prices at display time.
+export const applyConfirmingSurcharge = (price, surcharge) =>
+  Number(price || 0) * (1 + Number(surcharge || 0) / 100);
+
+const round2 = (value) => Number(value.toFixed(2));
+
+// Dry mixes, anchors, tools and related materials: pvp and final_price with
+// the surcharge. Only for display — Liberar saves the order's lines back as
+// they are, so the stored prices must stay without it.
+export const applyConfirmingSurchargeToLines = (lines, surcharge) => {
+  if (!Number(surcharge)) return lines;
+
+  return (lines || []).map((line) => ({
+    ...line,
+    pvp:
+      line.pvp == null
+        ? line.pvp
+        : round2(applyConfirmingSurcharge(line.pvp, surcharge)),
+    final_price:
+      line.final_price == null
+        ? line.final_price
+        : round2(applyConfirmingSurcharge(line.final_price, surcharge)),
+  }));
+};
+
+// Blocks get the surcharge in calcBlockPriceWithDelivery
+export const applyConfirmingSurchargeToProductLists = (
+  productLists,
+  surcharge,
+) => ({
+  ...productLists,
+  dryMixes: applyConfirmingSurchargeToLines(productLists.dryMixes, surcharge),
+  anchors: applyConfirmingSurchargeToLines(productLists.anchors, surcharge),
+  tools: applyConfirmingSurchargeToLines(productLists.tools, surcharge),
+  related_materials: applyConfirmingSurchargeToLines(
+    productLists.related_materials,
+    surcharge,
+  ),
+});
+
 // The client pays for the m2 actually shipped (whole pallets), so the line is
 // priced on quantity_real, not on the requested quantity_m2.
+// price_m2_with_markups is the list price_m2 raised by the agent commission
+// and the confirming surcharge, without delivery.
 export const calcBlockPriceWithDelivery = (
   product,
   deliveryPricePerM2,
   agentCommission = 0,
+  confirmingSurcharge = 0,
 ) => {
-  const price_m2_with_agent = applyAgentCommission(
-    product?.price_m2,
-    agentCommission,
+  const price_m2_with_markups = applyConfirmingSurcharge(
+    applyAgentCommission(product?.price_m2, agentCommission),
+    confirmingSurcharge,
   );
   const quantity_real = Number(product?.quantity_real || 0);
   const discount = Number(product?.discount || 0);
 
-  const price_m2_with_delivery = price_m2_with_agent + deliveryPricePerM2;
+  const price_m2_with_delivery = price_m2_with_markups + deliveryPricePerM2;
   const final_price =
     (price_m2_with_delivery * quantity_real * (100 - discount)) / 100;
 
   return {
-    price_m2_with_agent: Number(price_m2_with_agent.toFixed(2)),
-    price_m2_with_delivery: Number(price_m2_with_delivery.toFixed(2)),
-    final_price: Number(final_price.toFixed(2)),
+    price_m2_with_markups: round2(price_m2_with_markups),
+    price_m2_with_delivery: round2(price_m2_with_delivery),
+    final_price: round2(final_price),
   };
 };
