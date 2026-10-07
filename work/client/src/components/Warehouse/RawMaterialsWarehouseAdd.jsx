@@ -12,7 +12,7 @@ import DatePicker from 'react-datepicker';
 import Select from 'react-select';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { translateMaterial } from '#i18n/index.js';
+import { materialUnitKey, translateMaterial } from '#i18n/index.js';
 import { PALLET_TYPES, PALLET_TYPE_OPTIONS } from '#utils/palletTypes.js';
 
 // Проверка на дурака перед добавлением: на каждый вопрос нужно ответить «Да»,
@@ -72,7 +72,9 @@ function RawMaterialsWarehouseAdd(props) {
       Header:
         props?.material_type === 'Pallets'
           ? t('columns.quantityPieces')
-          : t('columns.quantityKg'),
+          : props?.material_type === 'Release oil'
+            ? t('columns.quantityLiters')
+            : t('columns.quantityKg'),
       accessor: 'quantity',
       Filter: TextSearchFilter,
     },
@@ -249,6 +251,7 @@ function RawMaterialsWarehouseAdd(props) {
       Pallets: warehouseActions.addNewWarehousePallets,
       Plastics: warehouseActions.addNewWarehousePlastics,
       'Sand powder (dry)': warehouseActions.addNewWarehouseSandPowder,
+      'Release oil': warehouseActions.addNewWarehouseReleaseOil,
     };
 
     return actionMap[materialType] || warehouseActions.addNewWarehouseSand;
@@ -372,7 +375,7 @@ function RawMaterialsWarehouseAdd(props) {
   const getEnteredDataSummary = () => {
     const quantity = parseFloat(rawMaterialWarehouseInput?.quantity) || 0;
     const typeField = TYPE_FIELDS[props?.material_type];
-    const unitKg = t('units.kg', { ns: 'common' });
+    const unitKey = materialUnitKey(props?.material_type);
 
     return [
       { label: t('confirm.fields.material'), value: materialLabel },
@@ -386,12 +389,13 @@ function RawMaterialsWarehouseAdd(props) {
       },
       {
         label: t('confirm.fields.quantity'),
+        // килограммы дополнительно показываем в тоннах
         value:
-          props?.material_type === 'Pallets'
-            ? `${formatNumber(quantity)} ${t('units.pieces', { ns: 'common' })}`
-            : `${formatNumber(quantity)} ${unitKg} (${formatNumber(
+          unitKey === 'units.kg'
+            ? `${formatNumber(quantity)} ${t(unitKey, { ns: 'common' })} (${formatNumber(
                 quantity / 1000,
-              )} ${t('units.t', { ns: 'common' })})`,
+              )} ${t('units.t', { ns: 'common' })})`
+            : `${formatNumber(quantity)} ${t(unitKey, { ns: 'common' })}`,
       },
       {
         label: t('columns.supplier'),

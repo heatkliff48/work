@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
+import { getApiUrl } from '#utils/getApiUrl.js';
 import { useDispatch } from 'react-redux';
 import { useFileContext } from '#components/contexts/FileContext.js';
 import { addNewFilesLotesList } from '#components/redux/actions/filesLotesListAction.js';
@@ -23,7 +24,7 @@ const FileUpload = ({ lotesList_id }) => {
 
       try {
         const res = await axios.post(
-          `${process.env.REACT_APP_URL}/files/upload?section=lotesList`,
+          `${getApiUrl()}/files/upload?section=lotesList`,
           formData,
           {
             headers: {

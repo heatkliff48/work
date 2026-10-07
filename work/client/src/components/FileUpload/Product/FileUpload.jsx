@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
+import { getApiUrl } from '#utils/getApiUrl.js';
 import { addNewFilesProduct } from '#components/redux/actions/filesProductAction.js';
 import { useDispatch } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
@@ -24,7 +25,7 @@ const FileUpload = () => {
 
       try {
         const res = await axios.post(
-          `${process.env.REACT_APP_URL}/files/upload?section=product`,
+          `${getApiUrl()}/files/upload?section=product`,
           formData,
           {
             headers: {

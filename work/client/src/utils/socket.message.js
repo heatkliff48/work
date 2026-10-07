@@ -156,6 +156,9 @@ import {
   addNewWarehouseSandPowderSocket,
   updateWarehouseSandPowderSocket,
   deleteWarehouseSandPowderSocket,
+  addNewWarehouseReleaseOilSocket,
+  updateWarehouseReleaseOilSocket,
+  deleteWarehouseReleaseOilSocket,
   addNewWarehouseManagerTrailerSocket,
   deleteWarehouseManagerTrailerSocket,
   newStatusWarehouseManagerTrailerSocket,
@@ -363,6 +366,9 @@ import {
   ADD_NEW_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET,
+  UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET,
+  DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
   ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
@@ -1041,6 +1047,18 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case DELETE_WAREHOUSE_SAND_POWDER_SOCKET:
       dispatch(deleteWarehouseSandPowderSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET:
+      dispatch(addNewWarehouseReleaseOilSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET:
+      dispatch(updateWarehouseReleaseOilSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_RELEASE_OIL_SOCKET:
+      dispatch(deleteWarehouseReleaseOilSocket(payload));
       break;
 
     case ADD_NEW_LOTES_LIST_SOCKET:

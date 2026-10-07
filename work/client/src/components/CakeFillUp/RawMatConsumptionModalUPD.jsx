@@ -20,6 +20,9 @@ import { useTranslation } from 'react-i18next';
 import { translateMaterial } from '#i18n/index.js';
 import '#components/Styles/table.css';
 
+// Every poured cake uses release oil for its mold, in liters
+const RELEASE_OIL_WRITE_OFF = { type: 'Release oil', quantity: 2 };
+
 const getCurrentTime = () => {
   const now = new Date();
   const hours = String(now.getHours()).padStart(2, '0');
@@ -670,7 +673,7 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
-      for (const { type, quantity } of materials) {
+      for (const { type, quantity } of [...materials, RELEASE_OIL_WRITE_OFF]) {
         if (type.includes('Return')) continue;
 
         let have;
@@ -775,7 +778,7 @@ const RawMaterialsConsumptionModal = React.memo(
         return;
       }
 
-      const body = { materials: normMaterials };
+      const body = { materials: [...normMaterials, RELEASE_OIL_WRITE_OFF] };
 
       savingRef.current = true;
       setIsSaving(true);

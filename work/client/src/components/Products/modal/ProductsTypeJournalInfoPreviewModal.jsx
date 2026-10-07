@@ -167,21 +167,26 @@ function ProductsTypeJournalInfoPreviewModal(props) {
           })
         );
       } else {
-        const existingProduct = hasMatchingObject(
-          relatedMaterialsJournal,
-          productsTypeJournalPreviewInput,
-          [
-            "id",
-            "price_per_unit",
-            "description",
-            "article",
-            "product_code",
-            "active_status",
-            "version",
-            "createdAt",
-            "updatedAt",
-          ]
-        );
+        // A new product without a barcode has no unique codes to tell it apart,
+        // so it must not be matched to an existing product as its new version
+        const existingProduct =
+          (props.addNewVersion ||
+            productsTypeJournalPreviewInput.product_code) &&
+          hasMatchingObject(
+            relatedMaterialsJournal,
+            productsTypeJournalPreviewInput,
+            [
+              "id",
+              "price_per_unit",
+              "description",
+              "article",
+              "product_code",
+              "active_status",
+              "version",
+              "createdAt",
+              "updatedAt",
+            ]
+          );
 
         if (existingProduct) {
           setSelectedProductsType({
@@ -216,14 +221,16 @@ function ProductsTypeJournalInfoPreviewModal(props) {
               ...productsTypeJournalPreviewInput,
             })
           );
-          dispatch(
-            updateProductCode({
-              id: 1,
-              product_code: productsTypeJournalPreviewInput.product_code
-                .slice(0, -1)
-                .slice(-3),
-            })
-          );
+          if (productsTypeJournalPreviewInput.product_code) {
+            dispatch(
+              updateProductCode({
+                id: 1,
+                product_code: productsTypeJournalPreviewInput.product_code
+                  .slice(0, -1)
+                  .slice(-3),
+              })
+            );
+          }
         }
       }
     } else if (props.target == 3) {
@@ -459,38 +466,44 @@ function ProductsTypeJournalInfoPreviewModal(props) {
                       {productsTypeJournalPreviewInput?.version}
                     </h5>
                   </div>
-                  <ToggleButtonGroup
-                    type="radio"
-                    name="options-preview"
-                    value={selectedBarcodePreviewValue}
-                    onChange={handleChange}
-                  >
-                    <ToggleButton id="tbg-radio-preview-1" value={1}>
-                      Unit barcode
-                    </ToggleButton>
-                    <ToggleButton id="tbg-radio-preview-2" value={2}>
-                      Box barcode
-                    </ToggleButton>
-                    <ToggleButton id="tbg-radio-preview-3" value={3}>
-                      Pallet barcode
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                  <BarcodeGenerator
-                    productCode={
-                      selectedBarcodePreviewValue == 1
-                        ? productsTypeJournalPreviewInput?.product_code
-                        : selectedBarcodePreviewValue == 2
-                        ? productsTypeJournalPreviewInput?.product_code_box.slice(
-                            0,
-                            -1
-                          )
-                        : productsTypeJournalPreviewInput?.product_code_pall.slice(
-                            0,
-                            -1
-                          )
-                    }
-                    chosenBarcodeType={selectedBarcodePreviewValue}
-                  />
+                  {productsTypeJournalPreviewInput?.product_code ? (
+                    <>
+                      <ToggleButtonGroup
+                        type="radio"
+                        name="options-preview"
+                        value={selectedBarcodePreviewValue}
+                        onChange={handleChange}
+                      >
+                        <ToggleButton id="tbg-radio-preview-1" value={1}>
+                          Unit barcode
+                        </ToggleButton>
+                        <ToggleButton id="tbg-radio-preview-2" value={2}>
+                          Box barcode
+                        </ToggleButton>
+                        <ToggleButton id="tbg-radio-preview-3" value={3}>
+                          Pallet barcode
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                      <BarcodeGenerator
+                        productCode={
+                          selectedBarcodePreviewValue == 1
+                            ? productsTypeJournalPreviewInput?.product_code
+                            : selectedBarcodePreviewValue == 2
+                            ? productsTypeJournalPreviewInput?.product_code_box.slice(
+                                0,
+                                -1
+                              )
+                            : productsTypeJournalPreviewInput?.product_code_pall.slice(
+                                0,
+                                -1
+                              )
+                        }
+                        chosenBarcodeType={selectedBarcodePreviewValue}
+                      />
+                    </>
+                  ) : (
+                    <h5>No barcode</h5>
+                  )}
                 </Col>
               </Row>
             </form>

@@ -76,4 +76,11 @@ export const translateMaterial = (t, materialType) => {
   return subtype ? `${label} (${subtype})` : label;
 };
 
+// Единица измерения материала склада сырья — ключ перевода в common
+export const materialUnitKey = (materialType) => {
+  if (materialType === 'Pallets') return 'units.pieces';
+  if (materialType === 'Release oil') return 'units.l';
+  return 'units.kg';
+};
+
 export default i18n;

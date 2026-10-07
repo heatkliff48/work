@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
+import { getApiUrl } from '#utils/getApiUrl.js';
 import { useDispatch } from 'react-redux';
 import { useFileContext } from '#components/contexts/FileContext.js';
 import { useCallback } from 'react';
@@ -32,6 +33,7 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
       Plastics: warehouseActions.updateWarehousePlastics,
       Pallets: warehouseActions.updateWarehousePallets,
       'Sand powder (dry)': warehouseActions.updateWarehouseSandPowder,
+      'Release oil': warehouseActions.updateWarehouseReleaseOil,
     };
 
     return actionMap[materialType] || warehouseActions.updateWarehouseSand;
@@ -52,7 +54,7 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
     try {
       const folderPath = `rawMaterialsWarehouse/${material_type}`;
       const res = await axios.post(
-        `${process.env.REACT_APP_URL}/files/upload/${encodeURIComponent(folderPath)}?section=rawMaterialsWarehouse`,
+        `${getApiUrl()}/files/upload/${encodeURIComponent(folderPath)}?section=rawMaterialsWarehouse`,
         formData,
         {
           headers: {

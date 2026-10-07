@@ -26,6 +26,7 @@
   "units": {
     "kg": "kg",
     "pieces": "pieces",
+    "l": "L",
     "t": "t"
   },
   "materials": {
@@ -45,6 +46,7 @@
     "Return slurry (dry)": "Return slurry (dry)",
     "Pallets": "Pallets",
     "Plastics": "Plastics",
-    "Sand powder (dry)": "Sand powder (dry)"
+    "Sand powder (dry)": "Sand powder (dry)",
+    "Release oil": "Release oil"
   }
 }

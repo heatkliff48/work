@@ -103,6 +103,14 @@ import {
   ADD_NEW_WAREHOUSE_SAND_POWDER,
   DELETE_WAREHOUSE_SAND_POWDER,
   UPDATE_NEW_WAREHOUSE_SAND_POWDER,
+  FULL_WAREHOUSE_RELEASE_OIL,
+  NEW_WAREHOUSE_RELEASE_OIL,
+  NEED_DELETE_WAREHOUSE_RELEASE_OIL,
+  UPDATE_WAREHOUSE_RELEASE_OIL,
+  GET_FULL_WAREHOUSE_RELEASE_OIL,
+  ADD_NEW_WAREHOUSE_RELEASE_OIL,
+  DELETE_WAREHOUSE_RELEASE_OIL,
+  UPDATE_NEW_WAREHOUSE_RELEASE_OIL,
 } from '../types/warehouseRawMaterialsTypes';
 import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
@@ -748,6 +756,57 @@ const updateWarehouseSandPowder = (warehouseSandPowder) => {
     });
 };
 
+// Release Oil API functions
+const getWarehouseReleaseOil = () => {
+  return url
+    .get('/rawMaterialsWarehouse/release-oil')
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const addNewWarehouseReleaseOil = (warehouseReleaseOil) => {
+  return url
+    .post('/rawMaterialsWarehouse/release-oil', warehouseReleaseOil)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const deleteWarehouseReleaseOil = (release_oil_warehouse_id) => {
+  return url
+    .post('/rawMaterialsWarehouse/release-oil/delete', {
+      release_oil_warehouse_id,
+    })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updateWarehouseReleaseOil = (warehouseReleaseOil) => {
+  return url
+    .post('/rawMaterialsWarehouse/release-oil/update', warehouseReleaseOil)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 // Sand Workers
 function* getWarehouseSandWorker(action) {
   try {
@@ -1334,6 +1393,59 @@ function* updateWarehouseSandPowderWorker(action) {
   }
 }
 
+// Release Oil Workers
+function* getWarehouseReleaseOilWorker(action) {
+  try {
+    const { warehouseReleaseOil } = yield call(getWarehouseReleaseOil);
+    yield put({
+      type: FULL_WAREHOUSE_RELEASE_OIL,
+      payload: warehouseReleaseOil,
+    });
+  } catch (err) {
+    yield put({ type: FULL_WAREHOUSE_RELEASE_OIL, payload: [] });
+  }
+}
+
+function* addNewWarehouseReleaseOilWorker(action) {
+  try {
+    const { warehouseReleaseOil } = yield call(
+      addNewWarehouseReleaseOil,
+      action.payload,
+    );
+    yield put({
+      type: NEW_WAREHOUSE_RELEASE_OIL,
+      payload: warehouseReleaseOil,
+    });
+  } catch (err) {
+    yield put({ type: NEW_WAREHOUSE_RELEASE_OIL, payload: [] });
+  }
+}
+
+function* deleteWarehouseReleaseOilWorker(action) {
+  try {
+    const { payload } = action;
+    yield call(deleteWarehouseReleaseOil, payload);
+    yield put({ type: NEED_DELETE_WAREHOUSE_RELEASE_OIL, payload });
+  } catch (err) {
+    yield put({ type: NEED_DELETE_WAREHOUSE_RELEASE_OIL, payload: [] });
+  }
+}
+
+function* updateWarehouseReleaseOilWorker(action) {
+  try {
+    const { warehouseReleaseOil } = yield call(
+      updateWarehouseReleaseOil,
+      action.payload,
+    );
+    yield put({
+      type: UPDATE_WAREHOUSE_RELEASE_OIL,
+      payload: warehouseReleaseOil,
+    });
+  } catch (err) {
+    yield put({ type: UPDATE_WAREHOUSE_RELEASE_OIL, payload: [] });
+  }
+}
+
 // Watchers
 function* warehouseRawMaterialsWatcher() {
   // Sand
@@ -1465,6 +1577,24 @@ function* warehouseRawMaterialsWatcher() {
   yield takeLatest(
     UPDATE_NEW_WAREHOUSE_SAND_POWDER,
     updateWarehouseSandPowderWorker,
+  );
+
+  // ReleaseOil
+  yield takeLatest(
+    GET_FULL_WAREHOUSE_RELEASE_OIL,
+    getWarehouseReleaseOilWorker,
+  );
+  yield takeLatest(
+    ADD_NEW_WAREHOUSE_RELEASE_OIL,
+    addNewWarehouseReleaseOilWorker,
+  );
+  yield takeLatest(
+    DELETE_WAREHOUSE_RELEASE_OIL,
+    deleteWarehouseReleaseOilWorker,
+  );
+  yield takeLatest(
+    UPDATE_NEW_WAREHOUSE_RELEASE_OIL,
+    updateWarehouseReleaseOilWorker,
   );
 }
 

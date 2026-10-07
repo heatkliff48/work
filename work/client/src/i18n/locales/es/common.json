@@ -26,6 +26,7 @@
   "units": {
     "kg": "kg",
     "pieces": "uds.",
+    "l": "L",
     "t": "t"
   },
   "materials": {
@@ -45,6 +46,7 @@
     "Return slurry (dry)": "Lodo de retorno (seco)",
     "Pallets": "Palés",
     "Plastics": "Plásticos",
-    "Sand powder (dry)": "Arena en polvo (seca)"
+    "Sand powder (dry)": "Arena en polvo (seca)",
+    "Release oil": "Aceite desencofrante"
   }
 }

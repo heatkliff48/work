@@ -154,6 +154,9 @@ import {
   NEW_WAREHOUSE_SAND_POWDER_SOCKET,
   NEED_UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   NEED_DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  NEW_WAREHOUSE_RELEASE_OIL_SOCKET,
+  NEED_UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET,
+  NEED_DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
   NEED_UPDATE_WAREHOUSE_PALLETS_SOCKET,
   NEED_DELETE_WAREHOUSE_PALLETS_SOCKET,
   NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
@@ -1267,6 +1270,27 @@ export const deleteWarehouseSandPowderSocket = (sand_powder_warehouse_id) => {
   return {
     type: NEED_DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
     payload: sand_powder_warehouse_id,
+  };
+};
+
+export const addNewWarehouseReleaseOilSocket = (warehouseReleaseOil) => {
+  return {
+    type: NEW_WAREHOUSE_RELEASE_OIL_SOCKET,
+    payload: warehouseReleaseOil,
+  };
+};
+
+export const updateWarehouseReleaseOilSocket = (warehouseReleaseOil) => {
+  return {
+    type: NEED_UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET,
+    payload: warehouseReleaseOil,
+  };
+};
+
+export const deleteWarehouseReleaseOilSocket = (release_oil_warehouse_id) => {
+  return {
+    type: NEED_DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
+    payload: release_oil_warehouse_id,
   };
 };
 

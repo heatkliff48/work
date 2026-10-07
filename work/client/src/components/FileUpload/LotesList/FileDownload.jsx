@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { getApiUrl } from '#utils/getApiUrl.js';
 
 import { useFileContext } from '#components/contexts/FileContext.js';
 
@@ -12,7 +13,7 @@ const FileDownload = ({ type, lotesList_id }) => {
     e.preventDefault();
     try {
       const res = await axios.get(
-        `${process.env.REACT_APP_URL}/files/download/${selectedFile}`,
+        `${getApiUrl()}/files/download/${selectedFile}`,
         {
           responseType: 'blob',
         },
