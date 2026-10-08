@@ -14,8 +14,9 @@ import {
 } from '#components/contexts/ProductContext.js';
 import { fixProductDescriptions } from '#components/redux/actions/productsAction.js';
 
-// Ищет во всех версиях продуктов описания с шириной в мм вместо см
-// ("TERMECO 100" вместо "TERMECO 10") и правит их на месте, без новой версии
+// Ищет во всех версиях продуктов описания, где ширина в названии не в тех единицах
+// ("TERMECO 100" вместо "TERMECO 10", "TERMECO 36.5" вместо "TERMECO 36"),
+// и правит их на месте, без новой версии
 const DescriptionFixModal = ({ isOpen, toggle }) => {
   const dispatch = useDispatch();
   const { products } = useProductsContext();
