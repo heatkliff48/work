@@ -435,7 +435,13 @@ const RawMaterialsConsumptionModal = React.memo(
       } else {
         setSelectedAlu2Type(null);
       }
-    }, [isOpen, selectedRow, latestProducts, list_of_recipes, previousBatchRecord]);
+    }, [
+      isOpen,
+      selectedRow,
+      latestProducts,
+      list_of_recipes,
+      previousBatchRecord,
+    ]);
 
     const handleChange = (key) => (e) => {
       let processedValue = e.target.value;
@@ -486,13 +492,13 @@ const RawMaterialsConsumptionModal = React.memo(
       return +value.toFixed(2);
     };
 
-    const aluminumTotal = [
-      'aluminum_paste',
-      'aluminum_paste_2',
-    ].reduce((sum, key) => {
-      const consumed = computeConsumed(key);
-      return consumed === null ? sum : sum + Number(consumed);
-    }, 0);
+    const aluminumTotal = ['aluminum_paste', 'aluminum_paste_2'].reduce(
+      (sum, key) => {
+        const consumed = computeConsumed(key);
+        return consumed === null ? sum : sum + Number(consumed);
+      },
+      0,
+    );
 
     const shouldShowRow = (label, key) => {
       if (ALWAYS_VISIBLE.has(label)) return true;
@@ -646,8 +652,13 @@ const RawMaterialsConsumptionModal = React.memo(
 
       // A slurried cake is marked later in the note area of Casting; its
       // return slurry correction is made on the server then
-      if (selectedRecipe?.produced_return_dry) {
-        const producedReturn = Number(selectedRecipe.produced_return_dry);
+
+      // --- OLD VERSION USING Produced amount of return (dry), kg ---
+      // if (selectedRecipe?.produced_return_dry) {
+      //   const producedReturn = Number(selectedRecipe.produced_return_dry);
+
+      if (selectedRecipe?.density) {
+        const producedReturn = 0.93 * Number(selectedRecipe.density_recipe);
 
         if (Number.isFinite(Number(producedReturn)) && producedReturn > 0) {
           result_materials = materials.map((el) => {
@@ -1145,7 +1156,9 @@ const RawMaterialsConsumptionModal = React.memo(
                 <thead>
                   <tr>
                     <th className="th-raw">{t('modal.rawMaterial')}</th>
-                    <th className="th-mod-recipe">{t('modal.modifiedRecipe')}</th>
+                    <th className="th-mod-recipe">
+                      {t('modal.modifiedRecipe')}
+                    </th>
                     <th className="th-consumed">{t('modal.consumed')}</th>
                   </tr>
                 </thead>
