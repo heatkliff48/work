@@ -7,6 +7,7 @@
     "supplier": "Proveedor",
     "quantityKg": "Cantidad, kg",
     "quantityPieces": "Cantidad, uds.",
+    "quantityLiters": "Cantidad, L",
     "type": "Tipo",
     "consumedPieces": "Consumido, uds.",
     "diameterMm": "Diámetro, mm",

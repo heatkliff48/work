@@ -140,4 +140,9 @@ async function removePageAccessors(
   await queryInterface.bulkDelete('Pages', { id: ids }, { transaction });
 }
 
-module.exports = { PAGE_ACCESSORS, addPageAccessors, removePageAccessors };
+module.exports = {
+  PAGE_ACCESSORS,
+  addPageAccessors,
+  removePageAccessors,
+  syncIdSequence,
+};

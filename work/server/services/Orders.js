@@ -286,9 +286,14 @@ class OrdersService {
     return;
   }
 
-  static async getUpdatePaymentOrder({ payment_method, order_id }) {
+  static async getUpdatePaymentOrder({
+    payment_method,
+    confirming_surcharge,
+    order_id,
+  }) {
     await OrdersRepository.getUpdatePaymentOrder({
       payment_method,
+      confirming_surcharge,
       order_id,
     });
 

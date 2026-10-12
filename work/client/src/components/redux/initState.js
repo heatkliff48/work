@@ -65,6 +65,7 @@ const initState = {
   warehousePallets: [],
   warehousePlastics: [],
   warehouseSandPowder: [],
+  warehouseReleaseOil: [],
   lotesListBatches: [],
   lotesListCakes: [],
   orderToWarehouse: [],

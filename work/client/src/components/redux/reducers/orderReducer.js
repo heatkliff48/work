@@ -145,9 +145,10 @@ export const ordersReducer = (orders = [], action) => {
     }
 
     case PAYMENT_METHOD_SOCKET: {
-      const { payment_method, order_id } = payload;
+      const { payment_method, confirming_surcharge, order_id } = payload;
       return orders.map((order) => {
-        if (order.id === order_id) return { ...order, payment_method };
+        if (order.id === order_id)
+          return { ...order, payment_method, confirming_surcharge };
         return order;
       });
     }

@@ -14,6 +14,7 @@ const {
   WarehousePallet,
   WarehousePlastic,
   WarehouseSandPowder,
+  WarehouseReleaseOil,
 } = require('../db/models/index.js');
 const { Sequelize } = require('sequelize');
 
@@ -57,6 +58,9 @@ const {
   ADD_NEW_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET,
+  UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET,
+  DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
   UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
   UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
 } = require('../src/constants/event.js');
@@ -2673,6 +2677,151 @@ rawMaterialsWarehouseRouter.post('/sand-powder/delete', async (req, res) => {
 
     myEmitter.emit(DELETE_WAREHOUSE_SAND_POWDER_SOCKET, sand_powder_warehouse_id);
     return res.json(sand_powder_warehouse_id).status(200);
+  } catch (err) {
+    return ErrorUtils.catchError(res, err);
+  }
+});
+
+// Release Oil
+
+rawMaterialsWarehouseRouter.get('/release-oil', async (req, res) => {
+  try {
+    const warehouseReleaseOil = await WarehouseReleaseOil.findAll({
+      order: [['id', 'ASC']],
+    });
+
+    return res.status(200).json({ warehouseReleaseOil });
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/release-oil', async (req, res) => {
+  const { supplier, quantity, date } = req.body;
+
+  try {
+    const warehouseReleaseOil = await WarehouseReleaseOil.create({
+      supplier,
+      quantity,
+      date: formatDate(date),
+    });
+
+    const totalReleaseOilQuantity = await WarehouseReleaseOil.sum('quantity');
+
+    const allRecords = await WarehouseReleaseOil.findAll({
+      attributes: ['date'],
+    });
+
+    const parseDate = (dateStr) => {
+      const [day, month, year] = dateStr.split('.');
+      return new Date(`${year}-${month}-${day}`);
+    };
+
+    const latestRecord = allRecords
+      .filter((record) => record.date != null)
+      .sort((a, b) => parseDate(b.date) - parseDate(a.date))[0];
+
+    // Используем дату из последней записи или текущую дату, если записей нет
+    const lastUpdated = latestRecord ? latestRecord.date : new Date();
+
+    const record = await RawMaterialsWarehouse.findOne({
+      where: {
+        material_type: 'Release oil',
+      },
+    });
+
+    await RawMaterialsWarehouse.update(
+      {
+        remaining_quantity: totalReleaseOilQuantity - record.consumed_quantity,
+        last_updated: lastUpdated,
+      },
+      {
+        where: {
+          material_type: 'Release oil',
+        },
+      },
+    );
+
+    myEmitter.emit(ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET, warehouseReleaseOil);
+    const updatedWarehouse = await RawMaterialsWarehouse.findOne({
+      where: { material_type: 'Release oil' },
+    });
+    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, updatedWarehouse);
+    return res.json(warehouseReleaseOil).status(200);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/release-oil/update', async (req, res) => {
+  const { id, file_name, supplier, ...updateFields } = req.body;
+
+  try {
+    if (!file_name) {
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier is required' });
+      }
+
+      const updateData = Object.fromEntries(
+        Object.entries(updateFields).filter(
+          ([_, value]) => value !== undefined && value !== null,
+        ),
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const warehouseReleaseOil = await WarehouseReleaseOil.update(updateData, {
+        where: { supplier },
+        returning: true,
+        plain: true,
+      });
+
+      myEmitter.emit(UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET, warehouseReleaseOil);
+      return res.json(warehouseReleaseOil).status(200);
+    } else {
+      if (file_name != '-1') {
+        const warehouseReleaseOil = await WarehouseReleaseOil.update(
+          { file_name },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET, warehouseReleaseOil);
+        return res.json(warehouseReleaseOil).status(200);
+      } else {
+        const warehouseReleaseOil = await WarehouseReleaseOil.update(
+          { file_name: null },
+          {
+            where: { id },
+            returning: true,
+            plain: true,
+          },
+        );
+        myEmitter.emit(UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET, warehouseReleaseOil);
+        return res.json(warehouseReleaseOil).status(200);
+      }
+    }
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
+rawMaterialsWarehouseRouter.post('/release-oil/delete', async (req, res) => {
+  const { release_oil_warehouse_id } = req.body;
+
+  try {
+    await WarehouseReleaseOil.destroy({
+      where: { id: release_oil_warehouse_id },
+    });
+
+    myEmitter.emit(DELETE_WAREHOUSE_RELEASE_OIL_SOCKET, release_oil_warehouse_id);
+    return res.json(release_oil_warehouse_id).status(200);
   } catch (err) {
     return ErrorUtils.catchError(res, err);
   }

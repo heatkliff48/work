@@ -168,6 +168,9 @@ const {
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_PALLETS_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET,
+  UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET,
+  DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
   ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
@@ -2167,6 +2170,44 @@ function registerWsEmitter(map) {
           JSON.stringify({
             type: DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
             payload: sand_powder_warehouse_id,
+          }),
+        );
+      }
+    },
+  );
+
+  // Release Oil
+
+  myEmitter.on(ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET, (warehouseReleaseOil) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET,
+          payload: warehouseReleaseOil,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET, (warehouseReleaseOil) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET,
+          payload: warehouseReleaseOil,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(
+    DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
+    (release_oil_warehouse_id) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
+            payload: release_oil_warehouse_id,
           }),
         );
       }

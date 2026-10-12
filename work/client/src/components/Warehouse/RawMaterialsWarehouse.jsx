@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import Table from '../Table/Table';
-import { translateMaterial } from '#i18n/index.js';
+import { materialUnitKey, translateMaterial } from '#i18n/index.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { getRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
@@ -18,6 +18,7 @@ import {
   getWarehouseLime,
   getWarehousePallets,
   getWarehousePlastics,
+  getWarehouseReleaseOil,
   getWarehouseSand,
   getWarehouseSandPowder,
   getWarehouseSandSlurry,
@@ -88,13 +89,14 @@ function Warehouse() {
     dispatch(getWarehousePallets());
     dispatch(getWarehousePlastics());
     dispatch(getWarehouseSandPowder());
+    dispatch(getWarehouseReleaseOil());
   }, []);
 
   const modifiedData = raw_materials_warehouse.map((item) => ({
     ...item,
     material_key: item.material_type,
     material_type: `${translateMaterial(t, item.material_type)}, ${t(
-      item.material_type == 'Pallets' ? 'units.pieces' : 'units.kg',
+      materialUnitKey(item.material_type),
       { ns: 'common' },
     )}`,
   }));

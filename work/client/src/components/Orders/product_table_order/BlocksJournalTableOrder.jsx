@@ -90,13 +90,13 @@ const BlocksJournalTableOrder = ({
                       if (key === 'discount' && typeof value === 'number') {
                         value = Math.round(value * 100) / 100;
                       }
-                      // Агентское вознаграждение заказа повышает цену за m2,
-                      // но в строке хранится цена без него
+                      // Агентское вознаграждение и надбавка confirming заказа
+                      // повышают цену за m2, но в строке хранится цена без них
                       if (
                         key === 'price_m2' &&
-                        product.price_m2_with_agent != null
+                        product.price_m2_with_markups != null
                       ) {
-                        value = product.price_m2_with_agent;
+                        value = product.price_m2_with_markups;
                       }
                       // В строке хранится прайсовая цена, а скидка применяется
                       // только в итоге — показываем цену, которую платит клиент

@@ -9,7 +9,7 @@ import { FaCheck, FaTimes } from 'react-icons/fa';
 
 const ProductsContext = createContext();
 
-// "BAUBLOCK® TERMECO 36.5 Medidas 600x365x250 mm ..." -> "TERMECO 36.5"
+// "BAUBLOCK® TERMECO 36 Medidas 600x365x250 mm ..." -> "TERMECO 36"
 export const extractProductTitle = (value = '') => {
   if (!value) return '';
 
@@ -20,30 +20,34 @@ export const extractProductTitle = (value = '') => {
     .trim();
 };
 
-// Номер в названии — ширина в см: 100 мм -> "10", 365 мм -> "36.5"
+// Номер в названии — ширина в целых см: 100 мм -> "10", 365 мм -> "36", 75 мм -> "7"
 export const widthToTitleCm = (width) => {
-  const cm = Number(width) / 10;
-  return width == null || width === '' || !Number.isFinite(cm)
-    ? '-'
-    : String(cm);
+  const mm = Number(width);
+  if (width == null || width === '' || !Number.isFinite(mm)) return '-';
+
+  return String(Math.floor(mm / 10));
 };
 
 // Номер перед "Medidas" (или перед "(Ø..)" у O-block)
 const DESCRIPTION_TITLE_WIDTH =
-  /^(BAUBLOCK®.*?\s)(\d+(?:\.\d+)?)(\s+(?:\(Ø[^)]*\)\s+)?Medidas\b)/i;
+  /^(BAUBLOCK®.*?\s)(\d+(?:[.,]\d+)?)(\s+(?:\(Ø[^)]*\)\s+)?Medidas\b)/i;
 
-// Раньше в название писалась ширина в мм: "TERMECO 100 Medidas 600x100x250" -> "TERMECO 10 Medidas ...".
+// Номер в названии записан не в тех единицах:
+// мм вместо см — "TERMECO 100 Medidas 600x100x250" -> "TERMECO 10 Medidas ...",
+// дробные см — "TERMECO 36.5 Medidas 600x365x250" -> "TERMECO 36 Medidas ...".
 // Возвращает исправленное описание или null, если в описании этой ошибки нет
 export const fixDescriptionTitleWidth = (description, width) => {
   const match = String(description ?? '').match(DESCRIPTION_TITLE_WIDTH);
   const widthMm = Number(width);
+  if (!match || !widthMm) return null;
 
-  if (!match || !widthMm || Number(match[2]) !== widthMm) return null;
+  const current = Number(match[2].replace(',', '.'));
+  const expected = widthToTitleCm(widthMm);
+  const isWidthInOtherUnits = current === widthMm || current === widthMm / 10;
 
-  return description.replace(
-    DESCRIPTION_TITLE_WIDTH,
-    `$1${widthToTitleCm(widthMm)}$3`,
-  );
+  if (!isWidthInOtherUnits || match[2] === expected) return null;
+
+  return description.replace(DESCRIPTION_TITLE_WIDTH, `$1${expected}$3`);
 };
 
 export const ProductsContextProvider = ({ children }) => {

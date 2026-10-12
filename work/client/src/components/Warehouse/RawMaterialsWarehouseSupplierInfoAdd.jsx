@@ -100,6 +100,7 @@ function RawMaterialsWarehouseSupplierInfoAdd(props) {
       Plastics: warehouseActions.updateWarehousePlastics,
       Pallets: warehouseActions.updateWarehousePallets,
       'Sand powder': warehouseActions.updateWarehouseSandPowder,
+      'Release oil': warehouseActions.updateWarehouseReleaseOil,
       'Sand slurry (dry)': warehouseActions.updateWarehouseSandSlurry,
     };
 

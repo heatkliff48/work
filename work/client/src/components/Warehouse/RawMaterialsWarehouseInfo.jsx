@@ -62,6 +62,8 @@ function RawMaterialsWarehouseInfo(props) {
           return state.warehousePlastics;
         case 'Sand powder (dry)':
           return state.warehouseSandPowder;
+        case 'Release oil':
+          return state.warehouseReleaseOil;
         default:
           return state.warehouseSand;
       }
@@ -80,7 +82,9 @@ function RawMaterialsWarehouseInfo(props) {
       Header:
         props?.material_type === 'Pallets'
           ? t('columns.quantityPieces')
-          : t('columns.quantityKg'),
+          : props?.material_type === 'Release oil'
+            ? t('columns.quantityLiters')
+            : t('columns.quantityKg'),
       accessor: 'quantity',
       Filter: TextSearchFilter,
     },

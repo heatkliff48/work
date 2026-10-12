@@ -12,6 +12,7 @@ import {
   FULL_WAREHOUSE_PALLETS,
   FULL_WAREHOUSE_PLASTICS,
   FULL_WAREHOUSE_SAND_POWDER,
+  FULL_WAREHOUSE_RELEASE_OIL,
 } from '../types/warehouseRawMaterialsTypes';
 import {
   NEED_DELETE_WAREHOUSE_SAND_SOCKET,
@@ -52,6 +53,9 @@ import {
   NEW_WAREHOUSE_SAND_POWDER_SOCKET,
   NEED_UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   NEED_DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  NEW_WAREHOUSE_RELEASE_OIL_SOCKET,
+  NEED_UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET,
+  NEED_DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
 } from '../types/socketTypes/socket';
 import showMessage from '#components/Utils/showMessage.js';
 
@@ -392,5 +396,31 @@ export const warehouseSandPowderReducer = (warehouseSandPowder = [], action) => 
     }
     default:
       return warehouseSandPowder;
+  }
+};
+
+// Release Oil
+export const warehouseReleaseOilReducer = (warehouseReleaseOil = [], action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case FULL_WAREHOUSE_RELEASE_OIL: {
+      return payload;
+    }
+    case NEW_WAREHOUSE_RELEASE_OIL_SOCKET: {
+      return [...warehouseReleaseOil, payload];
+    }
+    case NEED_DELETE_WAREHOUSE_RELEASE_OIL_SOCKET: {
+      const result = warehouseReleaseOil.filter((el) => el.id !== payload);
+      return result;
+    }
+    case NEED_UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET: {
+      const result = warehouseReleaseOil.map((el) => {
+        if (el.id === payload[1]?.id) return payload[1];
+        return el;
+      });
+      return result;
+    }
+    default:
+      return warehouseReleaseOil;
   }
 };

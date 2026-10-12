@@ -7,6 +7,7 @@
     "supplier": "Supplier",
     "quantityKg": "Quantity, kg",
     "quantityPieces": "Quantity, pieces",
+    "quantityLiters": "Quantity, L",
     "type": "Type",
     "consumedPieces": "Consumed, pieces",
     "diameterMm": "Diameter, mm",

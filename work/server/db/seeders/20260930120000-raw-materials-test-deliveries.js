@@ -116,6 +116,14 @@ const MATERIALS = [
       { supplier: 'Silices Levante', quantity: 8500, date: daysAgo(7) },
     ],
   },
+  {
+    table: 'WarehouseReleaseOils',
+    material_type: 'Release oil',
+    rows: [
+      { supplier: 'Desencofrantes Iberia', quantity: 1000, date: daysAgo(24) },
+      { supplier: 'Desencofrantes Iberia', quantity: 1000, date: daysAgo(6) },
+    ],
+  },
 ];
 
 // Same logic as POST /raw-materials-warehouse/<material> in the router:

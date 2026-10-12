@@ -14,10 +14,12 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import AccountingInvoiceModal from './AccountingInvoiceModal.jsx';
 import { makeStatusPillCell } from '#components/Orders/ordersCells';
 import {
+  applyConfirmingSurchargeToLines,
   applyDiscount,
   calcBlockPriceWithDelivery,
   getDeliveryPricePerM2,
 } from '#components/Orders/blockDeliveryPrice.js';
+import { getOrderConfirmingSurcharge } from '#components/Orders/paymentMethods.js';
 
 import '#components/Styles/order-card.css';
 import '#components/Orders/ordersView.css';
@@ -224,6 +226,7 @@ const AccountngOrderCard = React.memo(() => {
   );
   const deliveryM2 = currentOrder?.delivery_m2;
   const agentCommission = currentOrder?.agent_commission;
+  const confirmingSurcharge = getOrderConfirmingSurcharge(currentOrder);
 
   // Blocks are priced with the order's delivery_m2 spread over their m2, the
   // same way the order card does, so the VAT summary and the factura include it.
@@ -249,10 +252,17 @@ const AccountngOrderCard = React.memo(() => {
           product,
           deliveryPricePerM2,
           agentCommission,
+          confirmingSurcharge,
         ),
       };
     });
-  }, [updatedProductListOrder, productVersions, deliveryM2, agentCommission]);
+  }, [
+    updatedProductListOrder,
+    productVersions,
+    deliveryM2,
+    agentCommission,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
     if (blocksListWithDelivery.length > 0) {
@@ -263,13 +273,23 @@ const AccountngOrderCard = React.memo(() => {
     }
   }, [blocksListWithDelivery]);
 
+  // The card only reads the lines, so the confirming surcharge is applied
+  // to their prices right away (blocks get it in calcBlockPriceWithDelivery)
   const updatedDryMixesListOrder = useMemo(() => {
-    return addProductArticleToOrderList(
-      dryMixedProductsOfOrders,
-      latestDryMix,
-      'dryMixes',
+    return applyConfirmingSurchargeToLines(
+      addProductArticleToOrderList(
+        dryMixedProductsOfOrders,
+        latestDryMix,
+        'dryMixes',
+      ),
+      confirmingSurcharge,
     );
-  }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
+  }, [
+    dryMixedProductsOfOrders,
+    latestDryMix,
+    addProductArticleToOrderList,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
     if (updatedDryMixesListOrder.length > 0) {
@@ -281,12 +301,20 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedDryMixesListOrder]);
 
   const updatedAnchorsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(
-      anchorProductsOfOrders,
-      latestAnchors,
-      'anchors',
+    return applyConfirmingSurchargeToLines(
+      addProductArticleToOrderList(
+        anchorProductsOfOrders,
+        latestAnchors,
+        'anchors',
+      ),
+      confirmingSurcharge,
     );
-  }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
+  }, [
+    anchorProductsOfOrders,
+    latestAnchors,
+    addProductArticleToOrderList,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
     if (updatedAnchorsListOrder.length > 0) {
@@ -298,12 +326,16 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(
-      toolProductsOfOrders,
-      latestTools,
-      'tools',
+    return applyConfirmingSurchargeToLines(
+      addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools'),
+      confirmingSurcharge,
     );
-  }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
+  }, [
+    toolProductsOfOrders,
+    latestTools,
+    addProductArticleToOrderList,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
     if (updatedToolsListOrder.length > 0) {
@@ -315,15 +347,19 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedToolsListOrder]);
 
   const updatedRelatedMaterialsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(
-      relMatProductsOfOrders,
-      latestRelatedMaterials,
-      'related_materials',
+    return applyConfirmingSurchargeToLines(
+      addProductArticleToOrderList(
+        relMatProductsOfOrders,
+        latestRelatedMaterials,
+        'related_materials',
+      ),
+      confirmingSurcharge,
     );
   }, [
     relMatProductsOfOrders,
     latestRelatedMaterials,
     addProductArticleToOrderList,
+    confirmingSurcharge,
   ]);
 
   useEffect(() => {
