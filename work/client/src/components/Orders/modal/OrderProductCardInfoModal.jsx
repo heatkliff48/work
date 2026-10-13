@@ -267,6 +267,15 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
         total: result.toFixed(2),
       }));
       return result.toFixed(2);
+    } else if (orderProductType(selectedProduct?.article) == 'M') {
+      // У сухих смесей total — вес строки, кг (паллеты × вес паллеты)
+      const result = quantity_palet_value * (selectedProduct?.pallet_weight || 0);
+
+      setProductOfOrder((prev) => ({
+        ...prev,
+        total: result.toFixed(2),
+      }));
+      return result.toFixed(2);
     } else {
       const result = quantity_palet_value * selectedProduct?.units_per_pallet;
 
@@ -280,10 +289,18 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     quantity_palet_value,
     selectedProduct?.units_per_pallet,
     selectedProduct?.quantityBlockOnPallet,
+    selectedProduct?.pallet_weight,
     productOfOrder?.quantity_palet_anchor,
     productOfOrder?.quantity_ud,
     selectedProduct?.piece_weight,
   ]);
+
+  // Сколько единиц делит итог в PVP. У сухих смесей total — это вес,
+  // а PVP — цена за мешок, поэтому берём реальное число мешков
+  const pvp_units =
+    orderProductType(selectedProduct?.article) == 'M'
+      ? quantity_real_value
+      : total_value;
 
   // Прайсовая цена за м², а у U-block — за погонный метр:
   // в тех же единицах, что и quantity_m2
@@ -362,14 +379,14 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   }, [list_price_value, productOfOrder?.discount, isReturn]);
 
   const pvp_value = useMemo(() => {
-    const result = total_value > 0 ? final_price_value / total_value : 0;
+    const result = pvp_units > 0 ? final_price_value / pvp_units : 0;
 
     setProductOfOrder((prev) => ({
       ...prev,
       pvp: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [final_price_value, total_value]);
+  }, [final_price_value, pvp_units]);
 
   const addProductOrder = async () => {
     // Скидка во время ввода — строка; в FLOAT-колонку пишем число
@@ -461,7 +478,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     setPvpDraft(limited);
 
     const pvp = parseLocalNumber(limited) || 0;
-    const total = Number(total_value) || 0;
+    const total = Number(pvp_units) || 0;
     if (!list_price_value || !total) return;
 
     const discount = (1 - (pvp * total) / list_price_value) * 100;

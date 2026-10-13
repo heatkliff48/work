@@ -854,7 +854,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const sacos = dryMixes?.units_per_pallet;
 
-      const totalSacos = (quantity * sacos).toFixed(0);
+      // quantity_ud уже в мешках, поэтому считаем от паллет
+      const totalSacos = (prod.quantity_palet_dry * sacos).toFixed(0);
 
       const totalKg = (
         prod.quantity_palet_dry * dryMixes?.pallet_weight

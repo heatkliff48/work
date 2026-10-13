@@ -87,11 +87,12 @@ function calcDryMixFields(orderRow, newPalets, catalogDryMix) {
   const unitsPerPallet = catalog.units_per_pallet || 1;
   const quantity_ud = round2(newPalets * unitsPerPallet);
   const quantity_real_ud = Math.ceil(newPalets * unitsPerPallet);
-  const total = round2(quantity_real_ud);
+  // total — вес строки в кг, PVP — цена за мешок
+  const total = round2(newPalets * (catalog.pallet_weight || 0));
   const final_price = round2(
     (catalog.price_per_unit * quantity_real_ud * (100 - discount)) / 100,
   );
-  const pvp = total > 0 ? round2(final_price / total) : 0;
+  const pvp = quantity_real_ud > 0 ? round2(final_price / quantity_real_ud) : 0;
 
   return { quantity_ud, quantity_real_ud, total, discount, pvp, final_price };
 }
