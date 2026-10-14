@@ -187,18 +187,18 @@ function Products() {
           Add product new
         </button>
       )}
-      <button onClick={() => dispatch(updateProduct())}>
+      {/* <button onClick={() => dispatch(updateProduct())}>
         Fix width in cakes
       </button>
-      <button onClick={() => setArticleCheckModal(true)}>Check articles</button>
+      <button onClick={() => setArticleCheckModal(true)}>Check articles</button> */}
       {userAccess?.canWrite && (
         <button onClick={() => setChangePriceModal(true)}>Change price</button>
       )}
-      {userAccess?.canWrite && (
+      {/* {userAccess?.canWrite && (
         <button onClick={() => setDescriptionFixModal(true)}>
           Fix descriptions
         </button>
-      )}
+      )} */}
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}
         <GlobalFilterInput
