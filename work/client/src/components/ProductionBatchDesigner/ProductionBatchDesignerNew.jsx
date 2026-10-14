@@ -55,9 +55,6 @@ function ProductionBatchDesignerNew() {
   } = useOrderContext();
 
   const batchDesigner = useSelector((state) => state.batchDesigner) || [];
-  const list_of_orders_to_warehouse = useSelector(
-    (state) => state.orderToWarehouse,
-  );
   const batchOutsideRedux = useSelector((state) => state.batchOutside) || [];
 
   // Дата и режим редактирования приходят из Batch calendar (клик по ячейке
