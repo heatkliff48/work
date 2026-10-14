@@ -1,4 +1,10 @@
 const OrdersRepository = require('../repositories/Orders.js');
+const { BadRequest, NotFound } = require('../utils/Errors.js');
+
+// Statuses at which the order waits for accounting approval:
+// 5 - contracted (before production), 7 - produced (before shipping),
+// 9 - shipped (before closing).
+const ACCOUNTING_CHECKPOINT_STATUSES = [5, 7, 9];
 
 class OrdersService {
   static async getOrdersList() {
@@ -249,10 +255,26 @@ class OrdersService {
     return;
   }
 
+  // Returns the accounting approval reset ({ order_id, article, accounting_approved })
+  // when the order has entered an accounting checkpoint status, otherwise null.
   static async getUpdateStatusOrder({ status, order_id }) {
-    await OrdersRepository.getUpdateStatusOrder({ status, order_id });
+    if (!ACCOUNTING_CHECKPOINT_STATUSES.includes(Number(status))) {
+      await OrdersRepository.getUpdateStatusOrder({ status, order_id });
+      return null;
+    }
 
-    return;
+    const order = await OrdersRepository.updateStatusAndResetAccountingApproved({
+      status,
+      order_id,
+    });
+
+    if (!order) return null;
+
+    return {
+      order_id: order.id,
+      article: order.article,
+      accounting_approved: order.accounting_approved,
+    };
   }
 
   static async getUpdateInChargeOrder({ person_in_charge, order_id }) {
@@ -264,13 +286,62 @@ class OrdersService {
     return;
   }
 
-  static async getUpdatePaymentOrder({ payment_method, order_id }) {
+  static async getUpdatePaymentOrder({
+    payment_method,
+    confirming_surcharge,
+    order_id,
+  }) {
     await OrdersRepository.getUpdatePaymentOrder({
       payment_method,
+      confirming_surcharge,
       order_id,
     });
 
     return;
+  }
+
+  static async updateAgentCommissionOrder({ order_id, agent_commission }) {
+    const commission = Number(agent_commission);
+    if (!order_id || !Number.isFinite(commission) || commission < 0) {
+      throw new BadRequest(
+        'order_id and non-negative numeric agent_commission are required',
+      );
+    }
+
+    const order = await OrdersRepository.updateAgentCommissionOrder({
+      order_id,
+      agent_commission: commission,
+    });
+
+    if (!order) {
+      throw new NotFound(`Order ${order_id} not found`);
+    }
+
+    return {
+      order_id: order.id,
+      agent_commission: order.agent_commission,
+    };
+  }
+
+  static async updateAccountingApprovedOrder({ order_id, accounting_approved }) {
+    if (!order_id || typeof accounting_approved !== 'boolean') {
+      throw new BadRequest('order_id and boolean accounting_approved are required');
+    }
+
+    const order = await OrdersRepository.updateAccountingApprovedOrder({
+      order_id,
+      accounting_approved,
+    });
+
+    if (!order) {
+      throw new NotFound(`Order ${order_id} not found`);
+    }
+
+    return {
+      order_id: order.id,
+      article: order.article,
+      accounting_approved: order.accounting_approved,
+    };
   }
 
   static async getDeleteOrder({ order_id }) {

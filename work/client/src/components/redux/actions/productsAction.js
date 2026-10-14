@@ -1,5 +1,8 @@
 import {
   ADD_NEW_PRODUCT,
+  CHANGE_PRODUCT_PRICES,
+  FIX_PRODUCT_ARTICLES,
+  FIX_PRODUCT_DESCRIPTIONS,
   GET_ALL_PRODUCTS,
   NEED_UPDATE_PRODUCT,
   REPAIR_PRODUCT,
@@ -38,5 +41,29 @@ export const repProduct = (repProduct) => {
   return {
     type: REPAIR_PRODUCT,
     payload: repProduct,
+  };
+};
+
+// changes: [{ from, to }]
+export const fixProductArticles = (changes) => {
+  return {
+    type: FIX_PRODUCT_ARTICLES,
+    payload: changes,
+  };
+};
+
+// changes: [{ id, description }]
+export const fixProductDescriptions = (changes) => {
+  return {
+    type: FIX_PRODUCT_DESCRIPTIONS,
+    payload: changes,
+  };
+};
+
+// changes: [{ tradingMark, density, price }]
+export const changeProductPrices = (changes) => {
+  return {
+    type: CHANGE_PRODUCT_PRICES,
+    payload: changes,
   };
 };

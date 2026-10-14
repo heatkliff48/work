@@ -56,6 +56,23 @@
   padding: 1.25rem 1.5rem;
 }
 
+/* ------  ПОЛЯ НАД ТАБЛИЦЕЙ (Mold id / W/S / Casting time)  ------ */
+.rmc-fields {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.rmc-field {
+  margin: 0;
+  min-width: 200px;
+}
+.rmc-field-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
 /* ======  САМА ТАБЛИЦА ====== */
 .table-waste {
   width: 100%;
@@ -165,6 +182,221 @@
 .text-muted-small {
   font-size: 12px;
   color: var(--color-text-muted);
+}
+
+/* ------  ЗАГОЛОВОК СЕКЦИИ (только телефон — в разметке .d-md-none)  ------ */
+.rmc-section-title {
+  margin: 0 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+/* ======  ТЕЛЕФОН: модалка на весь экран, строки таблицы -> карточки  ====== */
+@media (max-width: 767.98px) {
+  /* ---- шапка ---- */
+  .rmc-modal-header {
+    align-items: flex-start;
+    padding: 12px 16px;
+  }
+  /* h5 по умолчанию 20px; 16px компактнее и iOS не зумит select на фокусе */
+  .rmc-modal-header .modal-title {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+  .rmc-header {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 12px;
+  }
+  .rmc-header-field {
+    min-width: 0 !important; /* перебиваем inline minWidth */
+  }
+  .rmc-header-field--wide {
+    grid-column: 1 / -1;
+  }
+
+  /* ---- тело: серый фон, белые карточки ---- */
+  /* fullscreen-модалка сама скроллит body — снимаем inline maxHeight: 70vh */
+  .modal-fullscreen-md-down .rmc-modal-body {
+    max-height: none !important;
+  }
+  .rmc-modal-body {
+    padding: 14px 12px;
+    background: #f4f6f9;
+  }
+
+  /* ---- поля Mold id / W/S / Casting time ---- */
+  .rmc-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(20, 23, 33, 0.04);
+  }
+  .rmc-field {
+    min-width: 0;
+  }
+  .rmc-field:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .rmc-field-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+  .rmc-field .form-control {
+    height: 40px;
+    border-radius: 8px;
+    border-color: var(--color-border);
+  }
+
+  /* ---- таблица -> список карточек ---- */
+  .table-waste,
+  .table-waste td {
+    display: block;
+  }
+  .table-waste {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+  }
+  .table-waste thead {
+    display: none;
+  }
+  .table-waste tbody {
+    display: grid;
+    gap: 8px;
+  }
+  .table-waste tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 12px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(20, 23, 33, 0.04);
+  }
+  .table-waste tbody tr:nth-child(even),
+  .table-waste tbody tr:hover {
+    background-color: #fff;
+  }
+  /* рецепт изменён — синяя полоска слева */
+  .table-waste tbody tr:has(.is-modified) {
+    border-color: #c7dafc;
+    box-shadow:
+      inset 3px 0 0 var(--color-accent),
+      0 1px 2px rgba(20, 23, 33, 0.04);
+  }
+  .table-waste td {
+    padding: 0;
+  }
+  .table-waste tbody tr:not(:last-child) td {
+    border-bottom: 0;
+  }
+  .table-waste td:first-child .fw-semibold {
+    font-size: 15px;
+    line-height: 1.3;
+  }
+  .table-waste td:first-child .text-muted-small {
+    margin-top: 2px;
+  }
+
+  /* подписи ячеек из data-label */
+  .table-waste td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  /* Consumed — плашка справа от названия */
+  .table-waste td.td-consumed {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    min-width: 76px;
+    padding: 6px 10px;
+    background: var(--color-header-bg);
+    border-radius: 8px;
+    font-size: 16px;
+    line-height: 1.2;
+  }
+  .table-waste td.td-consumed::before {
+    margin-bottom: 2px;
+  }
+
+  /* Modified recipe — во всю ширину снизу */
+  .table-waste td:nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .modified-recipe-cell {
+    gap: 6px;
+  }
+  .table-waste .form-control {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+    height: 40px;
+  }
+  .btn-set-def {
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  /* итог по алюминию — сводная карточка, дублирующий disabled-инпут скрыт */
+  .table-waste tbody tr.rmc-total-row {
+    background: var(--color-accent-soft);
+    border-color: #c7dafc;
+  }
+  .table-waste .rmc-total-row td:nth-child(2) {
+    display: none;
+  }
+  .table-waste .rmc-total-row td.td-consumed {
+    background: #fff;
+  }
+
+  /* ---- футер ---- */
+  .rmc-modal-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -4px 16px rgba(20, 23, 33, 0.06);
+  }
+  .rmc-modal-footer > * {
+    margin: 0;
+  }
+  .rmc-footer-check .form-check-input {
+    width: 1.25em;
+    height: 1.25em;
+    margin: 0;
+  }
+  .rmc-footer-actions {
+    width: 100%;
+  }
+  .rmc-footer-actions .btn {
+    flex: 1;
+    min-height: 44px;
+    font-weight: 600;
+  }
 }
 
 /* =====================================================================

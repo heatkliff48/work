@@ -84,16 +84,20 @@ import {
 import '#components/Styles/Main.css';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 
+// Отдельное право на кнопку, сама страница открывается и из меню склада
+const RAW_MATERIALS_WAREHOUSE_BUTTON_ACCESS = 'main_raw_materials_warehouse_button';
+
 function Main() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const { setStoredData } = useOrderContext();
-  const { roles, checkUserAccess } = useUsersContext();
+  const { roles, checkUserAccess, canOpenPath } = useUsersContext();
   const { warehouse_sand_slurry } = useWarehouseContext();
 
   useEffect(() => {
-    if (!user || !localStorage.getItem('user')) {
+    // та же проверка, что и в LoginForm — иначе редиректы зациклятся
+    if (!user?.id) {
       navigate('/sign-in');
     }
   }, [user]);
@@ -157,34 +161,27 @@ function Main() {
     setStoredData(null);
   }, [dispatch, setStoredData]);
 
-  const [isTaskBoardVisible, setIsTaskBoardVisible] = useState(false);
   const [taskBoardData, setTaskBoardData] = useState(0);
 
   useEffect(() => {
-    const userAccess = checkUserAccess(user, roles, 'TaskBoard');
-
-    if (!userAccess?.canRead || user.role !== 3) {
-      setIsTaskBoardVisible(false);
-    }
-
-    setIsTaskBoardVisible(true);
-
     const tasks = warehouse_sand_slurry.filter((el) => el.isNeedCheck).length;
     setTaskBoardData(tasks);
-  }, [user, roles, warehouse_sand_slurry]);
+  }, [warehouse_sand_slurry]);
 
   return (
     <>
       <div className="bb-section-title">Quick Actions</div>
 
       <div className="bb-actions">
-        <button
-          className="bb-action-btn bb-primary"
-          onClick={() => navigate('/orders')}
-          type="button"
-        >
-          Add New Order
-        </button>
+        {canOpenPath('/orders') && (
+          <button
+            className="bb-action-btn bb-primary"
+            onClick={() => navigate('/orders')}
+            type="button"
+          >
+            Add New Order
+          </button>
+        )}
 
         {/* <button
           className="bb-action-btn"
@@ -194,23 +191,39 @@ function Main() {
           Add New Client
         </button> */}
 
-        <button
-          className="bb-action-btn"
-          onClick={() => navigate('/warehouse_products_type')}
-          type="button"
-        >
-          Update Inventory
-        </button>
+        {canOpenPath('/warehouse_products_type') && (
+          <button
+            className="bb-action-btn"
+            onClick={() => navigate('/warehouse_products_type')}
+            type="button"
+          >
+            Update Inventory
+          </button>
+        )}
 
-        <button
-          className="bb-action-btn"
-          onClick={() => navigate('/production_batch_designer_new')}
-          type="button"
-        >
-          Batch Plan
-        </button>
+        {checkUserAccess(user, roles, RAW_MATERIALS_WAREHOUSE_BUTTON_ACCESS)
+          .canRead &&
+          canOpenPath('/warehouse_raw_materials') && (
+            <button
+              className="bb-action-btn"
+              onClick={() => navigate('/warehouse_raw_materials')}
+              type="button"
+            >
+              Raw Materials Warehouse
+            </button>
+          )}
 
-        {isTaskBoardVisible && (
+        {canOpenPath('/production_batch_designer_new') && (
+          <button
+            className="bb-action-btn"
+            onClick={() => navigate('/production_batch_designer_new')}
+            type="button"
+          >
+            Batch Plan
+          </button>
+        )}
+
+        {canOpenPath('/task_board') && (
           <button
             className="bb-action-btn"
             onClick={() => navigate('/task_board')}

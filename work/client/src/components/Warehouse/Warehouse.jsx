@@ -6,7 +6,11 @@ import WarehouseAddModal from './WarehouseAddModal';
 import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
+import {
+  extractProductTitle,
+  useProductsContext,
+} from '#components/contexts/ProductContext.js';
+import { palletPackagingLabel } from '#components/Orders/modal/packagingUtils.js';
 import { useMemo } from 'react';
 import { getAllWarehouse } from '#components/redux/actions/warehouseAction.js';
 import { Switch, FormControlLabel } from '@mui/material';
@@ -71,6 +75,8 @@ function Warehouse() {
 
       return {
         ...item,
+        trademark: extractProductTitle(product?.description),
+        packaging: palletPackagingLabel(product),
         total_m3,
         production_date,
       };

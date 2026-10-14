@@ -1,16 +1,18 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 // text search input
 export function TextSearchFilter({
   column: { filterValue, preFilteredRows, setFilter },
 }) {
+  const { t } = useTranslation();
   return (
     <input
       value={filterValue || ''}
       onChange={(e) => {
         setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
       }}
-      placeholder={`Search...`}
+      placeholder={t('table.search')}
     />
   );
 }

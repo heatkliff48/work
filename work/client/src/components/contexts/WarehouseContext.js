@@ -1,7 +1,4 @@
-import {
-  updAccountingDataList,
-  updateOrderStatus,
-} from '#components/redux/actions/ordersAction.js';
+import { updateOrderStatus } from '#components/redux/actions/ordersAction.js';
 import {
   addNewAnchorReservedProducts,
   addNewDryMixedReservedProducts,
@@ -32,8 +29,8 @@ const WarehouseContextProvider = ({ children }) => {
 
   const COLUMNS_WAREHOUSE = [
     {
-      Header: 'Warehouse ID',
-      accessor: 'article',
+      Header: 'Trademark',
+      accessor: 'trademark',
       sortType: 'string',
     },
     {
@@ -62,8 +59,8 @@ const WarehouseContextProvider = ({ children }) => {
       sortType: 'number',
     },
     {
-      Header: 'Warehouse location',
-      accessor: 'warehouse_loc',
+      Header: 'Packaging',
+      accessor: 'packaging',
       sortType: 'string',
     },
     {
@@ -1032,13 +1029,6 @@ const WarehouseContextProvider = ({ children }) => {
         );
 
         await dispatch(
-          updAccountingDataList({
-            orders_article: article,
-            aproved: false,
-          }),
-        );
-
-        await dispatch(
           changeStatusWarehouseManagerTrailer({
             orderId,
             status: 4,
@@ -1194,12 +1184,6 @@ const WarehouseContextProvider = ({ children }) => {
           updateOrderStatus({
             order_id: currOrder.id,
             status: 7,
-          }),
-        );
-        dispatch(
-          updAccountingDataList({
-            orders_article: order_article,
-            aproved: false,
           }),
         );
       }

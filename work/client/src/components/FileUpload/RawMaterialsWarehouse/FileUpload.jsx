@@ -1,18 +1,23 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
+import { getApiUrl } from '#utils/getApiUrl.js';
 import { useDispatch } from 'react-redux';
-import { useFileContext } from '#components/contexts/FileContext.js';
 import { useCallback } from 'react';
 import * as warehouseActions from '#components/redux/actions/warehouseRawMaterialsAction.js';
+import { useTranslation } from 'react-i18next';
 
 const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
   const [file, setFile] = useState(null);
-  const { setMessage } = useFileContext();
+  const [uploading, setUploading] = useState(false);
+  // Сообщение показываем у своей строки: общий message из FileContext в окне склада не выводится
+  const [message, setMessage] = useState('');
+  const { t } = useTranslation();
 
   const dispatch = useDispatch();
 
   const onChange = (e) => {
     setFile(e.target.files[0]);
+    setMessage('');
   };
 
   const getUpdateAction = useCallback((materialType) => {
@@ -22,7 +27,7 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
       Cement: warehouseActions.updateWarehouseCement,
       'Gypsum (dry)': warehouseActions.updateWarehouseGypsum,
       'Gypsum stone': warehouseActions.updateWarehouseGypsumStone,
-      'Aluminum 1': warehouseActions.updateWarehouseAluminum1,
+      Aluminum: warehouseActions.updateWarehouseAluminum1,
       'Aluminum 2': warehouseActions.updateWarehouseAluminum2,
       'Grinding Balls': warehouseActions.updateWarehouseGrindingBalls,
       AAC: warehouseActions.updateWarehouseAAC,
@@ -30,27 +35,35 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
       Plastics: warehouseActions.updateWarehousePlastics,
       Pallets: warehouseActions.updateWarehousePallets,
       'Sand powder (dry)': warehouseActions.updateWarehouseSandPowder,
+      'Release oil': warehouseActions.updateWarehouseReleaseOil,
     };
 
-    return actionMap[materialType] || warehouseActions.updateWarehouseSand;
+    // Без запасного варианта: иначе файл молча записывался бы в чужую таблицу
+    return actionMap[materialType];
   }, []);
 
   const handleUpload = async () => {
-    console.log(material_type, 'material_type FileUpload.jsx line 38');
     const updateRawMaterialAction = getUpdateAction(material_type);
 
+    if (!updateRawMaterialAction) {
+      console.error(`No file update action for material "${material_type}"`);
+      setMessage(t('files.serverError'));
+      return;
+    }
+
     if (!file) {
-      setMessage('No file selected!');
+      setMessage(t('files.noFileSelected'));
       return;
     }
 
     const formData = new FormData();
     formData.append('myFile', file);
 
+    setUploading(true);
     try {
       const folderPath = `rawMaterialsWarehouse/${material_type}`;
       const res = await axios.post(
-        `${process.env.REACT_APP_URL}/files/upload/${encodeURIComponent(folderPath)}?section=rawMaterialsWarehouse`,
+        `${getApiUrl()}/files/upload/${encodeURIComponent(folderPath)}?section=rawMaterialsWarehouse`,
         formData,
         {
           headers: {
@@ -66,21 +79,28 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
         }),
       );
 
-      setMessage(`File uploaded: ${res.data.filename}`);
+      setMessage(t('files.uploaded', { name: res.data.filename }));
       setFile(null);
     } catch (err) {
-      if (err.response) {
-        setMessage(err.response.data);
-      } else {
-        setMessage('There was a problem with the server');
-      }
+      const data = err.response?.data;
+      setMessage(
+        typeof data === 'string'
+          ? data
+          : data?.error || data?.message || t('files.serverError'),
+      );
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleDelete = async () => {
     const updateRawMaterialAction = getUpdateAction(material_type);
 
-    console.log(rowData);
+    if (!updateRawMaterialAction) {
+      console.error(`No file update action for material "${material_type}"`);
+      setMessage(t('files.serverError'));
+      return;
+    }
 
     dispatch(
       updateRawMaterialAction({
@@ -97,16 +117,19 @@ const FileUpload = ({ rowData, material_type, deleteCheck = false }) => {
           <input
             type="file"
             onChange={onChange}
-            accept=".pdf,.txt,.doc,.docx.,jpg,.jpeg,.png,.gif,.bmp,.svg"
+            accept=".pdf,.txt,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp,.svg"
           />
-          <button onClick={handleUpload}>Upload</button>
+          <button onClick={handleUpload} disabled={uploading}>
+            {t('files.upload')}
+          </button>
         </>
       )}
       {deleteCheck && (
         <>
-          <button onClick={handleDelete}>Delete</button>
+          <button onClick={handleDelete}>{t('files.delete')}</button>
         </>
       )}
+      {message ? <p>{message}</p> : null}
     </div>
   );
 };

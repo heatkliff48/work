@@ -12,6 +12,7 @@ import {
   addNewRecipeSocket,
   addNewStockBalanceSocket,
   addNewWarehouseSocket,
+  deleteWarehouseSocket,
   deeleteProductOfOrderSocket,
   deleteFilesOrderSocket,
   deleteFilesProductSocket,
@@ -156,11 +157,16 @@ import {
   addNewWarehouseSandPowderSocket,
   updateWarehouseSandPowderSocket,
   deleteWarehouseSandPowderSocket,
+  addNewWarehouseReleaseOilSocket,
+  updateWarehouseReleaseOilSocket,
+  deleteWarehouseReleaseOilSocket,
   addNewWarehouseManagerTrailerSocket,
   deleteWarehouseManagerTrailerSocket,
   newStatusWarehouseManagerTrailerSocket,
   updPaymentMethodOrderSocket,
   updateOrderPdfDateSocket,
+  updAgentCommissionOrderSocket,
+  updAccountingApprovedOrderSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -202,6 +208,7 @@ import {
   UPDATE_ROLE_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
   ADD_NEW_WAREHOUSE_SOCKET,
+  DELETE_WAREHOUSE_SOCKET,
   DELETE_BATCH_OUTSIDE_SOCKET,
   ADD_NEW_RECIPE_SOCKET,
   DELETE_RECIPE_SOCKET,
@@ -361,11 +368,16 @@ import {
   ADD_NEW_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET,
+  UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET,
+  DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
   ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   UPDATE_PAYMENT_METHOD_SOCKET,
   UPDATE_ORDER_PDF_DATE_SOCKET,
+  UPDATE_AGENT_COMMISSION_SOCKET,
+  UPDATE_ACCOUNTING_APPROVED_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -532,8 +544,20 @@ export const createSocketOnMessage = (dispatch) => (event) => {
       dispatch(updPaymentMethodOrderSocket(payload));
       break;
 
+    case UPDATE_AGENT_COMMISSION_SOCKET:
+      dispatch(updAgentCommissionOrderSocket(payload));
+      break;
+
+    case UPDATE_ACCOUNTING_APPROVED_SOCKET:
+      dispatch(updAccountingApprovedOrderSocket(payload));
+      break;
+
     case ADD_NEW_WAREHOUSE_SOCKET:
       dispatch(addNewWarehouseSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_SOCKET:
+      dispatch(deleteWarehouseSocket(payload));
       break;
 
     case ADD_NEW_CLIENT_SOCKET:
@@ -1030,6 +1054,18 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case DELETE_WAREHOUSE_SAND_POWDER_SOCKET:
       dispatch(deleteWarehouseSandPowderSocket(payload));
+      break;
+
+    case ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET:
+      dispatch(addNewWarehouseReleaseOilSocket(payload));
+      break;
+
+    case UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET:
+      dispatch(updateWarehouseReleaseOilSocket(payload));
+      break;
+
+    case DELETE_WAREHOUSE_RELEASE_OIL_SOCKET:
+      dispatch(deleteWarehouseReleaseOilSocket(payload));
       break;
 
     case ADD_NEW_LOTES_LIST_SOCKET:

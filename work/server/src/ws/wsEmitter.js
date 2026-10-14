@@ -22,6 +22,7 @@ const {
   UPDATE_REMAINING_STOCK_SOCKET,
   UPDATE_STATUS_OF_ORDER_SOCKET,
   ADD_NEW_WAREHOUSE_SOCKET,
+  DELETE_WAREHOUSE_SOCKET,
   ADD_NEW_RECIPE_SOCKET,
   DELETE_RECIPE_SOCKET,
   ADD_NEW_FILES_WAREHOUSE_SOCKET,
@@ -167,11 +168,16 @@ const {
   UPDATE_WAREHOUSE_SAND_POWDER_SOCKET,
   UPDATE_WAREHOUSE_PALLETS_SOCKET,
   DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
+  ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET,
+  UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET,
+  DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
   ADD_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   UPDATE_PAYMENT_METHOD_SOCKET,
   UPDATE_ORDER_PDF_DATE_SOCKET,
+  UPDATE_AGENT_COMMISSION_SOCKET,
+  UPDATE_ACCOUNTING_APPROVED_SOCKET,
 } = require('../constants/event');
 const myEmitter = require('../ee');
 
@@ -435,6 +441,28 @@ function registerWsEmitter(map) {
     }
   });
 
+  myEmitter.on(UPDATE_AGENT_COMMISSION_SOCKET, (commission) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_AGENT_COMMISSION_SOCKET,
+          payload: commission,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_ACCOUNTING_APPROVED_SOCKET, (approval) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_ACCOUNTING_APPROVED_SOCKET,
+          payload: approval,
+        }),
+      );
+    }
+  });
+
   myEmitter.on(UPDATE_PRODUCT_OF_ORDER_SOCKET, (newProductsOfOrder) => {
     for (let [id, userConnect] of map) {
       userConnect.send(
@@ -637,6 +665,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: ADD_NEW_WAREHOUSE_SOCKET,
           payload: new_warehouse,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_WAREHOUSE_SOCKET, (warehouse_id) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_WAREHOUSE_SOCKET,
+          payload: warehouse_id,
         }),
       );
     }
@@ -2103,6 +2142,44 @@ function registerWsEmitter(map) {
       );
     }
   });
+
+  // Release Oil
+
+  myEmitter.on(ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET, (warehouseReleaseOil) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_NEW_WAREHOUSE_RELEASE_OIL_SOCKET,
+          payload: warehouseReleaseOil,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET, (warehouseReleaseOil) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET,
+          payload: warehouseReleaseOil,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(
+    DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
+    (release_oil_warehouse_id) => {
+      for (let [id, userConnect] of map) {
+        userConnect.send(
+          JSON.stringify({
+            type: DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
+            payload: release_oil_warehouse_id,
+          }),
+        );
+      }
+    },
+  );
 
   myEmitter.on(ADD_NEW_LOTES_LIST_SOCKET, (lotesListBatches) => {
     for (let [id, userConnect] of map) {

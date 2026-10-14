@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'reactstrap';
 import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
@@ -25,8 +26,32 @@ import {
   getWarehouseAluminum2,
 } from '#components/redux/actions/warehouseRawMaterialsAction.js';
 
+const MAX_WHOLE_DIGITS = 2;
+
+// Casting temperature and flowability keep at most two digits before the
+// decimal separator, so typing "295" turns into "29.5".
+const limitWholeDigits = (rawValue) => {
+  const cleanedValue = String(rawValue ?? '')
+    .replace(',', '.')
+    .replace(/[^\d.]/g, '');
+
+  if (!cleanedValue) return '';
+
+  const [wholePart = '', ...restParts] = cleanedValue.split('.');
+  const fractionPart = restParts.join('');
+
+  if (wholePart.length <= MAX_WHOLE_DIGITS) {
+    return fractionPart ? `${wholePart}.${fractionPart}` : wholePart;
+  }
+
+  return `${wholePart.slice(0, MAX_WHOLE_DIGITS)}.${wholePart.slice(
+    MAX_WHOLE_DIGITS
+  )}${fractionPart}`;
+};
+
 function CakeFillUp() {
   const dispatch = useDispatch();
+  const { t } = useTranslation('casting');
 
   const { batchOutside, autoclave_calendar, raw_materials_warehouse } =
     useWarehouseContext();
@@ -45,17 +70,22 @@ function CakeFillUp() {
   const [cakeNotes, setCakeNotes] = useState({});
   const [cakeCastingTemperatures, setCakeCastingTemperatures] = useState({});
   const [cakeFlowabilities, setCakeFlowabilities] = useState({});
+  const [cakeSlurried, setCakeSlurried] = useState({});
 
   const production_plan_table = [
-    { Header: 'Date', accessor: 'date', Filter: TextSearchFilter },
+    { Header: t('columns.date'), accessor: 'date', Filter: TextSearchFilter },
     {
-      Header: 'Product article',
+      Header: t('columns.productArticle'),
       accessor: 'product_article',
       Filter: TextSearchFilter,
     },
-    { Header: 'Cakes, qty', accessor: 'quantity_arrays', Filter: TextSearchFilter },
     {
-      Header: 'Position in autoclave',
+      Header: t('columns.cakesQty'),
+      accessor: 'quantity_arrays',
+      Filter: TextSearchFilter,
+    },
+    {
+      Header: t('columns.positionInAutoclave'),
       accessor: 'position_in_autoclave',
       Filter: TextSearchFilter,
     },
@@ -113,12 +143,18 @@ function CakeFillUp() {
     const prodPlanEntry = batchOutside.find((el) => el.id === row.original.id);
     if (!prodPlanEntry) return;
 
-    setActiveBatchId(nextBatchId);
+    // партия, из которой вернулись кнопкой «Назад», сохраняет свой номер
+    const batchId =
+      prodPlanEntry.batch_id != null ? Number(prodPlanEntry.batch_id) : nextBatchId;
 
+    setActiveBatchId(batchId);
+
+    // номер партии сохраняем в строке плана, по нему партия и восстанавливается
     dispatch(
       updateBatchOutside({
         id: prodPlanEntry.id,
         is_prodused: 1,
+        batch_id: batchId,
       })
     );
   };
@@ -143,6 +179,14 @@ function CakeFillUp() {
       return;
     }
 
+    if (batchInProduce.batch_id != null) {
+      setActiveBatchId(Number(batchInProduce.batch_id));
+      return;
+    }
+
+    // Ниже — прежний подбор партии для строк, открытых до появления
+    // BatchOutsides.batch_id. Он угадывает партию по заказу или продукту и
+    // может подхватить уже закрытую партию, поэтому для новых строк не нужен.
     const list = Array.isArray(lotesListBatches) ? lotesListBatches : [];
     const consumptions = Array.isArray(raw_mat_consumption)
       ? raw_mat_consumption
@@ -214,6 +258,7 @@ function CakeFillUp() {
     setCakeNotes({});
     setCakeCastingTemperatures({});
     setCakeFlowabilities({});
+    setCakeSlurried({});
   }, []);
 
   useEffect(() => {
@@ -242,6 +287,7 @@ function CakeFillUp() {
       setTotalCake(Number.isFinite(full_total_cake) ? full_total_cake : 0);
       setCakeFillUp({ ...batch_in_produce, total_cake });
     } else {
+      setCakeFillUp({});
       setCurrentProduct(null);
       setTotalCake(0);
     }
@@ -336,6 +382,7 @@ function CakeFillUp() {
                 : '',
             castingTemperature: record?.casting_temp_c ?? '',
             flowability: savedCake?.flowability ?? '',
+            slurried: Boolean(savedCake?.slurried),
           };
         });
       })
@@ -357,6 +404,7 @@ function CakeFillUp() {
     const castingTemperature =
       cakeCastingTemperatures[cake.id] ?? cake.castingTemperature ?? '';
     const flowability = cakeFlowabilities[cake.id] ?? cake.flowability ?? '';
+    const slurried = cakeSlurried[cake.id] ?? cake.slurried;
 
     const normalizeOptionalNumber = (value) => {
       if (value === '' || value == null) return null;
@@ -372,6 +420,7 @@ function CakeFillUp() {
           note,
           casting_temp_c: normalizeOptionalNumber(castingTemperature),
           flowability: normalizeOptionalNumber(flowability),
+          slurried,
         })
       );
 
@@ -387,6 +436,13 @@ function CakeFillUp() {
         ...previousValues,
         [cake.id]: flowability,
       }));
+      // The server may refuse the warehouse correction, so show the stored
+      // flag instead of keeping the local one
+      setCakeSlurried((previousValues) => {
+        const nextValues = { ...previousValues };
+        delete nextValues[cake.id];
+        return nextValues;
+      });
       setActiveCakeId(null);
     } catch (error) {
       console.error('Failed to save cake note:', error);
@@ -397,13 +453,11 @@ function CakeFillUp() {
 
   const handleNewBatch = () => {
     if (isFullyAllocated) {
-      const shouldContinue = window.confirm(
-        'Все массивы залиты, желаете продолжить?'
-      );
+      const shouldContinue = window.confirm(t('confirm.allCakesFilled'));
 
       if (!shouldContinue) return;
 
-      const isConfirmed = window.confirm('Вы уверены, что хотите продолжить?');
+      const isConfirmed = window.confirm(t('confirm.areYouSure'));
 
       if (!isConfirmed) return;
     }
@@ -449,7 +503,7 @@ function CakeFillUp() {
   };
 
   const handleFinish = async () => {
-    if (!window.confirm('Do you want to continue?')) {
+    if (!window.confirm(t('confirm.finishBatch'))) {
       return;
     }
     const {
@@ -522,6 +576,10 @@ function CakeFillUp() {
     dispatch(addNewAutoclaveCalendar(result));
     await dispatch(deleteBatchOutside(id));
 
+    resetActiveBatch();
+  };
+
+  const resetActiveBatch = () => {
     setCakeFillUp({});
     setCurrentProduct(null);
     setActiveBatchId(null);
@@ -530,6 +588,25 @@ function CakeFillUp() {
     setCakeNotes({});
     setCakeCastingTemperatures({});
     setCakeFlowabilities({});
+    setCakeSlurried({});
+  };
+
+  // Возвращает партию в план (is_prodused = 0), чтобы она больше не
+  // открывалась при заходе на страницу. Если торты уже отлиты, номер партии
+  // остаётся в строке плана, чтобы при повторном выборе продолжить ту же партию.
+  const handleBack = () => {
+    const { id } = cakeFillUp;
+    if (id == null) return;
+
+    dispatch(
+      updateBatchOutside({
+        id,
+        is_prodused: 0,
+        batch_id: allocated > 0 ? activeBatchId : null,
+      })
+    );
+
+    resetActiveBatch();
   };
 
   const hasCakeFillUp = cakeFillUp && Object.keys(cakeFillUp).length > 0;
@@ -567,10 +644,10 @@ function CakeFillUp() {
             dataOfTable={productionPlanDataList}
             onClickButton={() => {}}
             buttonText={''}
-            tableName={'Casting'}
+            tableName={t('title')}
             handleRowClick={(e) => {
               if (cakeFillUp && Object.keys(cakeFillUp).length > 0) {
-                alert('Please finish the current batch before selecting a new one.');
+                alert(t('finishCurrentBatchFirst'));
                 return;
               }
               handleProductionPlanRowClick(e);
@@ -612,7 +689,7 @@ function CakeFillUp() {
                   boxShadow: '0 2px 5px rgba(0,0,0,0.16)',
                 }}
               >
-                <span style={{ opacity: 0.75 }}>Date</span>
+                <span style={{ opacity: 0.75 }}>{t('date')}</span>
                 <span>{batchCalDate}</span>
               </div>
 
@@ -638,7 +715,7 @@ function CakeFillUp() {
                       color: '#6c757d',
                     }}
                   >
-                    Product article
+                    {t('productArticle')}
                   </div>
                   <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                     {currentProduct?.article || '—'}
@@ -653,7 +730,7 @@ function CakeFillUp() {
                       color: '#6c757d',
                     }}
                   >
-                    Product Mark
+                    {t('productMark')}
                   </div>
                   <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                     {currentProduct?.tradingMark || '—'}
@@ -668,7 +745,7 @@ function CakeFillUp() {
                       color: '#6c757d',
                     }}
                   >
-                    Cakes casted / Total qty
+                    {t('cakesCastedTotal')}
                   </div>
                   <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                     {allocated} / {total_cake}
@@ -700,7 +777,7 @@ function CakeFillUp() {
                     letterSpacing: '0.04em',
                   }}
                 >
-                  Next
+                  {t('next')}
                 </div>
 
                 <div
@@ -724,7 +801,7 @@ function CakeFillUp() {
                         color: '#5c636a',
                       }}
                     >
-                      Product article
+                      {t('productArticle')}
                     </div>
                     <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                       {nextProductSummary.article}
@@ -739,7 +816,7 @@ function CakeFillUp() {
                         color: '#5c636a',
                       }}
                     >
-                      Product Mark
+                      {t('productMark')}
                     </div>
                     <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                       {nextProductSummary.mark}
@@ -754,7 +831,7 @@ function CakeFillUp() {
                         color: '#5c636a',
                       }}
                     >
-                      Cakes casted / Total qty
+                      {t('cakesCastedTotal')}
                     </div>
                     <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                       0 / {nextProductSummary.totalQuantity}
@@ -772,7 +849,7 @@ function CakeFillUp() {
           >
             <div>
               <div>
-                <div style={{ fontWeight: 600 }}>Batch id</div>
+                <div style={{ fontWeight: 600 }}>{t('batchId')}</div>
                 <div style={{ marginTop: 6, fontSize: 18 }}>{activeBatchId}</div>
               </div>
             </div>
@@ -781,11 +858,15 @@ function CakeFillUp() {
               className="mt-2"
               style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
             >
+              <Button color="secondary" onClick={handleBack}>
+                {t('back')}
+              </Button>
+
               <Button
                 color={isFullyAllocated ? 'danger' : 'success'}
                 onClick={handleNewBatch}
               >
-                New cake
+                {t('newCake')}
               </Button>
 
               <div
@@ -793,17 +874,17 @@ function CakeFillUp() {
                 style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
               >
                 <Button color="success" onClick={handleFinish}>
-                  Finish batch
+                  {t('finishBatch')}
                 </Button>
               </div>
             </div>
 
             <div className="mt-4">
-              <div style={{ fontWeight: 600 }}>Cake id</div>
+              <div style={{ fontWeight: 600 }}>{t('cakeId')}</div>
 
               {productionCakes.length === 0 && (
                 <div style={{ marginTop: 8, color: '#6c757d' }}>
-                  No cakes allocated yet.
+                  {t('noCakes')}
                 </div>
               )}
 
@@ -867,10 +948,13 @@ function CakeFillUp() {
                                   whiteSpace: 'nowrap',
                                 }}
                                 title={
-                                  cake.moldId ? `Mold id ${cake.moldId}` : 'Note'
+                                  cake.moldId
+                                    ? t('moldIdTitle', { id: cake.moldId })
+                                    : t('noteTitle')
                                 }
                               >
-                                {isActive ? '▲' : '▼'} {cake.moldId || 'note'}
+                                {isActive ? '▲' : '▼'}{' '}
+                                {cake.moldId || t('noteShort')}
                               </span>
                             </div>
                           );
@@ -896,22 +980,28 @@ function CakeFillUp() {
                                   fontWeight: 600,
                                 }}
                               >
-                                Casting temperature, C
+                                {t('castingTemperature')}
                               </span>
                               <input
                                 type="number"
-                                step="0.01"
+                                step="0.1"
+                                min="0"
+                                max="99.9"
                                 value={
                                   cakeCastingTemperatures[activeCake.id] ??
                                   activeCake.castingTemperature ??
                                   ''
                                 }
-                                onChange={(event) =>
+                                onChange={(event) => {
+                                  const nextValue = limitWholeDigits(
+                                    event.target.value
+                                  );
+
                                   setCakeCastingTemperatures((previousValues) => ({
                                     ...previousValues,
-                                    [activeCake.id]: event.target.value,
-                                  }))
-                                }
+                                    [activeCake.id]: nextValue,
+                                  }));
+                                }}
                                 onKeyDown={(event) => {
                                   if (event.key === 'Enter') {
                                     event.preventDefault();
@@ -936,22 +1026,28 @@ function CakeFillUp() {
                                   fontWeight: 600,
                                 }}
                               >
-                                Flowability, cm
+                                {t('flowability')}
                               </span>
                               <input
                                 type="number"
                                 step="0.1"
+                                min="0"
+                                max="99.9"
                                 value={
                                   cakeFlowabilities[activeCake.id] ??
                                   activeCake.flowability ??
                                   ''
                                 }
-                                onChange={(event) =>
+                                onChange={(event) => {
+                                  const nextValue = limitWholeDigits(
+                                    event.target.value
+                                  );
+
                                   setCakeFlowabilities((previousValues) => ({
                                     ...previousValues,
-                                    [activeCake.id]: event.target.value,
-                                  }))
-                                }
+                                    [activeCake.id]: nextValue,
+                                  }));
+                                }}
                                 onKeyDown={(event) => {
                                   if (event.key === 'Enter') {
                                     event.preventDefault();
@@ -968,9 +1064,32 @@ function CakeFillUp() {
                             </label>
                           </div>
 
+                          <div className="form-check" style={{ marginBottom: 8 }}>
+                            <input
+                              id={`cake-slurried-${activeCake.id}`}
+                              className="form-check-input"
+                              type="checkbox"
+                              checked={
+                                cakeSlurried[activeCake.id] ?? activeCake.slurried
+                              }
+                              onChange={(event) =>
+                                setCakeSlurried((previousValues) => ({
+                                  ...previousValues,
+                                  [activeCake.id]: event.target.checked,
+                                }))
+                              }
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor={`cake-slurried-${activeCake.id}`}
+                            >
+                              {t('slurried')}
+                            </label>
+                          </div>
+
                           <textarea
                             rows={3}
-                            placeholder={`Note for cake id ${activeCake.id}... Enter to save, Shift+Enter for a new line`}
+                            placeholder={t('notePlaceholder', { id: activeCake.id })}
                             value={cakeNotes[activeCake.id] ?? activeCake.note ?? ''}
                             onChange={(event) =>
                               setCakeNotes((previousNotes) => ({
@@ -988,7 +1107,7 @@ function CakeFillUp() {
                                 handleSaveCakeNote(activeCake);
                               }
                             }}
-                            title="Enter — save, Shift+Enter — new line"
+                            title={t('noteHint')}
                             style={{
                               width: '100%',
                               borderRadius: 10,
@@ -1005,7 +1124,7 @@ function CakeFillUp() {
                             onClick={() => handleSaveCakeNote(activeCake)}
                             style={{ marginTop: 8 }}
                           >
-                            Save note
+                            {t('saveNote')}
                           </Button>
                         </div>
                       )}

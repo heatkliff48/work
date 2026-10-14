@@ -289,32 +289,38 @@ function ProductsTypeJournalInfoModal(props) {
                       />
                     </div>
                   )}
-                  <ToggleButtonGroup
-                    type="radio"
-                    name="options"
-                    value={selectedBarcodeValue}
-                    onChange={handleChange}
-                  >
-                    <ToggleButton id="tbg-radio-1" value={1}>
-                      Unit barcode
-                    </ToggleButton>
-                    <ToggleButton id="tbg-radio-2" value={2}>
-                      Box barcode
-                    </ToggleButton>
-                    <ToggleButton id="tbg-radio-3" value={3}>
-                      Pallet barcode
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                  <BarcodeGenerator
-                    productCode={
-                      selectedBarcodeValue == 1
-                        ? selectedProductsType?.product_code
-                        : selectedBarcodeValue == 2
-                        ? selectedProductsType?.product_code_box.slice(0, -1)
-                        : selectedProductsType?.product_code_pall.slice(0, -1)
-                    }
-                    chosenBarcodeType={selectedBarcodeValue}
-                  />
+                  {selectedProductsType?.product_code ? (
+                    <>
+                      <ToggleButtonGroup
+                        type="radio"
+                        name="options"
+                        value={selectedBarcodeValue}
+                        onChange={handleChange}
+                      >
+                        <ToggleButton id="tbg-radio-1" value={1}>
+                          Unit barcode
+                        </ToggleButton>
+                        <ToggleButton id="tbg-radio-2" value={2}>
+                          Box barcode
+                        </ToggleButton>
+                        <ToggleButton id="tbg-radio-3" value={3}>
+                          Pallet barcode
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                      <BarcodeGenerator
+                        productCode={
+                          selectedBarcodeValue == 1
+                            ? selectedProductsType?.product_code
+                            : selectedBarcodeValue == 2
+                            ? selectedProductsType?.product_code_box.slice(0, -1)
+                            : selectedProductsType?.product_code_pall.slice(0, -1)
+                        }
+                        chosenBarcodeType={selectedBarcodeValue}
+                      />
+                    </>
+                  ) : (
+                    <h5>No barcode</h5>
+                  )}
                 </Col>
               </Row>
             </form>

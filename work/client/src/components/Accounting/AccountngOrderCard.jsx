@@ -2,55 +2,98 @@ import React, { useEffect, useMemo, useCallback, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
-import { useProductsContext } from '#components/contexts/ProductContext.js';
-import { updAccountingDataList } from '#components/redux/actions/ordersAction.js';
+import {
+  extractProductTitle,
+  useProductsContext,
+} from '#components/contexts/ProductContext.js';
+import { updateAccountingApproved } from '#components/redux/actions/ordersAction.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import FilesMain from '#components/FileUpload/Order/FilesMain.jsx';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import AccountingInvoiceModal from './AccountingInvoiceModal.jsx';
 import { makeStatusPillCell } from '#components/Orders/ordersCells';
+import {
+  applyConfirmingSurchargeToLines,
+  applyDiscount,
+  calcBlockPriceWithDelivery,
+  getDeliveryPricePerM2,
+} from '#components/Orders/blockDeliveryPrice.js';
+import { getOrderConfirmingSurcharge } from '#components/Orders/paymentMethods.js';
 
 import '#components/Styles/order-card.css';
 import '#components/Orders/ordersView.css';
 import './accountingView.css';
 
-function ProductCategoryTable({ title, rows, qtyField, priceField }) {
+const articleColumn = {
+  key: 'product_article',
+  label: 'Article',
+  render: (row) => <span className="ord-mono">{row.product_article}</span>,
+};
+
+const BLOCK_COLUMNS = [
+  articleColumn,
+  { key: 'trademark', label: 'Trademark' },
+  { key: 'quantity_palet', label: 'Pallets, qty' },
+  { key: 'quantity_m2', label: 'Quantity, m²' },
+  { key: 'quantity_real', label: 'Real quantity, m²' },
+  { key: 'quantity_pcs', label: 'Blocks, pcs' },
+  {
+    key: 'price_m2_with_delivery',
+    label: 'Price incl. delivery, €/m²',
+    // Stored as list price; the discount is applied only to the total
+    render: (row) => applyDiscount(row.price_m2_with_delivery, row.discount),
+  },
+  { key: 'final_price', label: 'Total, €' },
+];
+
+const unitColumns = (unitPlural, unit) => [
+  articleColumn,
+  { key: 'product_name', label: 'Product name' },
+  { key: 'quantity_ud', label: `Quantity, ${unitPlural}` },
+  { key: 'pvp', label: `Price, €/${unit}` },
+  { key: 'final_price', label: 'Total, €' },
+];
+
+const DRY_MIX_COLUMNS = unitColumns('bags', 'bag');
+const PIECE_COLUMNS = unitColumns('pcs', 'pc');
+
+function ProductCategoryTable({ title, rows, columns }) {
   return (
     <div className="ord-prod-card">
       <div className="ord-prod-card__head">
         <span className="ord-prod-card__title">{title}</span>
       </div>
-      <table className="ord-prod-table">
-        <thead>
-          <tr>
-            <th>Article</th>
-            <th>Qty</th>
-            <th>Unit price</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.isArray(rows) && rows.length > 0 ? (
-            rows.map((row) => (
-              <tr key={row?.id || row?.product_article}>
-                <td>
-                  <span className="ord-mono">{row.product_article}</span>
-                </td>
-                <td>{row[qtyField]}</td>
-                <td>{row[priceField]}</td>
-                <td>{row.final_price}</td>
-              </tr>
-            ))
-          ) : (
+      <div className="ord-prod-table-wrap">
+        <table className="ord-prod-table">
+          <thead>
             <tr>
-              <td colSpan={4} className="ord-empty-products">
-                No items in this category.
-              </td>
+              {columns.map((col) => (
+                <th key={col.key}>{col.label}</th>
+              ))}
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {Array.isArray(rows) && rows.length > 0 ? (
+              rows.map((row) => (
+                <tr key={row?.id || row?.product_article}>
+                  {columns.map((col) => (
+                    <td key={col.key}>
+                      {col.render ? col.render(row) : (row[col.key] ?? '—')}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length} className="ord-empty-products">
+                  No items in this category.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -72,7 +115,7 @@ const AccountngOrderCard = React.memo(() => {
     filterKeysOrder,
   } = useOrderContext();
   const { displayNames } = useProjectContext();
-  const { latestProducts } = useProductsContext();
+  const { latestProducts, productVersions } = useProductsContext();
   const { latestDryMix, latestRelatedMaterials, latestAnchors, latestTools } =
     useProductsTypeJournalContext();
   const { userAccess } = useUsersContext();
@@ -155,7 +198,11 @@ const AccountngOrderCard = React.memo(() => {
           );
 
           return product
-            ? { product_article: product.article, ...orderProduct }
+            ? {
+                product_article: product.article,
+                product_name: product.name,
+                ...orderProduct,
+              }
             : { ...orderProduct, product_article: 'Unknown' };
         });
 
@@ -167,27 +214,82 @@ const AccountngOrderCard = React.memo(() => {
   const updatedProductListOrder = useMemo(() => {
     return addProductArticleToOrderList(
       productListOrder,
-      latestProducts,
+      productVersions,
       'products',
     );
-  }, [productListOrder, latestProducts, addProductArticleToOrderList]);
+  }, [productListOrder, productVersions, addProductArticleToOrderList]);
+
+  // orderCartData is built without delivery_m2, so read it from the order.
+  const currentOrder = useMemo(
+    () => list_of_orders?.find((order) => order.id === orderCartData?.id),
+    [list_of_orders, orderCartData?.id],
+  );
+  const deliveryM2 = currentOrder?.delivery_m2;
+  const agentCommission = currentOrder?.agent_commission;
+  const confirmingSurcharge = getOrderConfirmingSurcharge(currentOrder);
+
+  // Blocks are priced with the order's delivery_m2 spread over their m2, the
+  // same way the order card does, so the VAT summary and the factura include it.
+  const blocksListWithDelivery = useMemo(() => {
+    const deliveryPricePerM2 = getDeliveryPricePerM2(
+      updatedProductListOrder,
+      deliveryM2,
+    );
+
+    return updatedProductListOrder.map((product) => {
+      const catalog = productVersions?.find((p) => p.id === product.product_id);
+      const blocksPerPallet = Number(catalog?.quantityBlockOnPallet) || 0;
+
+      return {
+        ...product,
+        // Trademark with size, as in the technology calendar: "TERMECO 36.5".
+        trademark:
+          extractProductTitle(catalog?.description) || catalog?.tradingMark,
+        quantity_pcs: blocksPerPallet
+          ? Math.round(Number(product.quantity_palet || 0) * blocksPerPallet)
+          : null,
+        ...calcBlockPriceWithDelivery(
+          product,
+          deliveryPricePerM2,
+          agentCommission,
+          confirmingSurcharge,
+        ),
+      };
+    });
+  }, [
+    updatedProductListOrder,
+    productVersions,
+    deliveryM2,
+    agentCommission,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
-    if (updatedProductListOrder.length > 0) {
+    if (blocksListWithDelivery.length > 0) {
       setProductLists((prevState) => ({
         ...prevState,
-        products: updatedProductListOrder,
+        products: blocksListWithDelivery,
       }));
     }
-  }, [updatedProductListOrder]);
+  }, [blocksListWithDelivery]);
 
+  // The card only reads the lines, so the confirming surcharge is applied
+  // to their prices right away (blocks get it in calcBlockPriceWithDelivery)
   const updatedDryMixesListOrder = useMemo(() => {
-    return addProductArticleToOrderList(
-      dryMixedProductsOfOrders,
-      latestDryMix,
-      'dryMixes',
+    return applyConfirmingSurchargeToLines(
+      addProductArticleToOrderList(
+        dryMixedProductsOfOrders,
+        latestDryMix,
+        'dryMixes',
+      ),
+      confirmingSurcharge,
     );
-  }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
+  }, [
+    dryMixedProductsOfOrders,
+    latestDryMix,
+    addProductArticleToOrderList,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
     if (updatedDryMixesListOrder.length > 0) {
@@ -199,12 +301,20 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedDryMixesListOrder]);
 
   const updatedAnchorsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(
-      anchorProductsOfOrders,
-      latestAnchors,
-      'anchors',
+    return applyConfirmingSurchargeToLines(
+      addProductArticleToOrderList(
+        anchorProductsOfOrders,
+        latestAnchors,
+        'anchors',
+      ),
+      confirmingSurcharge,
     );
-  }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
+  }, [
+    anchorProductsOfOrders,
+    latestAnchors,
+    addProductArticleToOrderList,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
     if (updatedAnchorsListOrder.length > 0) {
@@ -216,12 +326,16 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(
-      toolProductsOfOrders,
-      latestTools,
-      'tools',
+    return applyConfirmingSurchargeToLines(
+      addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools'),
+      confirmingSurcharge,
     );
-  }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
+  }, [
+    toolProductsOfOrders,
+    latestTools,
+    addProductArticleToOrderList,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
     if (updatedToolsListOrder.length > 0) {
@@ -233,15 +347,19 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedToolsListOrder]);
 
   const updatedRelatedMaterialsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(
-      relMatProductsOfOrders,
-      latestRelatedMaterials,
-      'related_materials',
+    return applyConfirmingSurchargeToLines(
+      addProductArticleToOrderList(
+        relMatProductsOfOrders,
+        latestRelatedMaterials,
+        'related_materials',
+      ),
+      confirmingSurcharge,
     );
   }, [
     relMatProductsOfOrders,
     latestRelatedMaterials,
     addProductArticleToOrderList,
+    confirmingSurcharge,
   ]);
 
   useEffect(() => {
@@ -271,9 +389,9 @@ const AccountngOrderCard = React.memo(() => {
     }
 
     dispatch(
-      updAccountingDataList({
-        orders_article: orderCartData?.article,
-        aproved: true,
+      updateAccountingApproved({
+        order_id: orderCartData?.id,
+        accounting_approved: true,
       }),
     );
     setStoredData(null);
@@ -406,33 +524,28 @@ const AccountngOrderCard = React.memo(() => {
           <div>
             <ProductCategoryTable
               title="Products"
-              rows={updatedProductListOrder}
-              qtyField="quantity_real"
-              priceField="price_m2"
+              rows={blocksListWithDelivery}
+              columns={BLOCK_COLUMNS}
             />
             <ProductCategoryTable
               title="Dry mixes"
               rows={updatedDryMixesListOrder}
-              qtyField="quantity_ud"
-              priceField="pvp"
+              columns={DRY_MIX_COLUMNS}
             />
             <ProductCategoryTable
               title="Fastners"
               rows={updatedAnchorsListOrder}
-              qtyField="quantity_ud"
-              priceField="pvp"
+              columns={PIECE_COLUMNS}
             />
             <ProductCategoryTable
               title="Tools"
               rows={updatedToolsListOrder}
-              qtyField="quantity_ud"
-              priceField="pvp"
+              columns={PIECE_COLUMNS}
             />
             <ProductCategoryTable
               title="Related materials"
               rows={updatedRelatedMaterialsListOrder}
-              qtyField="quantity_ud"
-              priceField="pvp"
+              columns={PIECE_COLUMNS}
             />
 
             <div className="ord-summary-card">
@@ -470,47 +583,60 @@ const AccountngOrderCard = React.memo(() => {
             <div className="ord-status-card">
               <div className="ord-status-card__title">Approval status</div>
               <div className="ord-steps">
-                {accountingStatusList.map((item) => {
-                  const isDone = item.accessor < status;
-                  const isCurrent = item.accessor == status;
-                  return (
-                    <div key={item.accessor} className="ord-step">
-                      <div className="ord-step__rail">
-                        <input
-                          id={item.accessor}
-                          type="checkbox"
-                          className={
-                            'ord-step__checkbox' +
-                            (isDone ? ' ord-step__checkbox--done' : '') +
-                            (isCurrent ? ' ord-step__checkbox--current' : '')
-                          }
-                          checked={item.accessor == status}
-                          onChange={() => {
-                            statusChangeHandler(item.accessor);
-                          }}
-                        />
+                {(() => {
+                  // status 0 = nothing approved yet → index -1, so the first step is next
+                  const currentStatusIndex = accountingStatusList.findIndex(
+                    (item) => item.accessor == status,
+                  );
+                  return accountingStatusList.map((item, idx) => {
+                    const isDone = item.accessor < status;
+                    const isCurrent = item.accessor == status;
+                    const isNext =
+                      status != null && idx === currentStatusIndex + 1;
+                    return (
+                      <div key={item.accessor} className="ord-step">
+                        <div className="ord-step__rail">
+                          <input
+                            id={item.accessor}
+                            type="checkbox"
+                            className={
+                              'ord-step__checkbox' +
+                              (isDone ? ' ord-step__checkbox--done' : '') +
+                              (isCurrent ? ' ord-step__checkbox--current' : '') +
+                              (isNext ? ' ord-step__checkbox--next' : '')
+                            }
+                            checked={item.accessor == status}
+                            onChange={() => {
+                              statusChangeHandler(item.accessor);
+                            }}
+                          />
+                          {idx < accountingStatusList.length - 1 && (
+                            <div
+                              className={
+                                'ord-step__line' +
+                                (isDone ? ' ord-step__line--done' : '')
+                              }
+                            />
+                          )}
+                        </div>
                         <div
                           className={
-                            'ord-step__line' +
-                            (isDone ? ' ord-step__line--done' : '')
+                            'ord-step__label' +
+                            (isCurrent
+                              ? ' ord-step__label--current'
+                              : isDone
+                                ? ' ord-step__label--done'
+                                : isNext
+                                  ? ' ord-step__label--next'
+                                  : '')
                           }
-                        />
+                        >
+                          {item.Header}
+                        </div>
                       </div>
-                      <div
-                        className={
-                          'ord-step__label' +
-                          (isCurrent
-                            ? ' ord-step__label--current'
-                            : isDone
-                              ? ' ord-step__label--done'
-                              : '')
-                        }
-                      >
-                        {item.Header}
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  });
+                })()}
               </div>
             </div>
           </div>
@@ -523,6 +649,7 @@ const AccountngOrderCard = React.memo(() => {
         productLists={productLists}
         vatValue={vatValue}
         latestProducts={latestProducts}
+        productVersions={productVersions}
         latestDryMix={latestDryMix}
         latestAnchors={latestAnchors}
         latestTools={latestTools}

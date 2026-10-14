@@ -80,5 +80,13 @@ router.post('/update/status', OrdersController.getUpdateStatusOrder);
 router.post('/update/in_charge', OrdersController.getUpdateInChargeOrder);
 router.post('/child/add', OrdersController.addChildOrder);
 router.post('/update/payment_method', OrdersController.getUpdatePaymentOrder);
+router.post(
+  '/update/agent_commission',
+  OrdersController.updateAgentCommissionOrder,
+);
+router.post(
+  '/update/accounting_approved',
+  OrdersController.updateAccountingApprovedOrder,
+);
 
 module.exports = router;

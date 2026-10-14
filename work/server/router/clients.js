@@ -333,17 +333,17 @@ clientsRouter.post(
 
       if (!req.file) {
         await t.rollback();
-        return res.status(400).json({ error: 'Файл не был передан' });
+        return res.status(400).json({ error: 'No file was provided' });
       }
 
       if (!deal_id) {
         await t.rollback();
-        return res.status(400).json({ error: 'Обязательное поле: deal_id' });
+        return res.status(400).json({ error: 'Required field: deal_id' });
       }
 
       if (!id) {
         await t.rollback();
-        return res.status(400).json({ error: 'Обязательное поле: id' });
+        return res.status(400).json({ error: 'Required field: id' });
       }
 
       // Блокируем строку заказа на время инкремента —
@@ -356,7 +356,7 @@ clientsRouter.post(
 
       if (!order) {
         await t.rollback();
-        return res.status(404).json({ error: 'Заказ не найден' });
+        return res.status(404).json({ error: 'Order not found' });
       }
 
       // Инкрементируем номер, который лежит в БД

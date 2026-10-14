@@ -19,10 +19,10 @@ import {
   getDeleteProductOfOrder,
   getOrders,
   getDeleteRelMatProductOfOrder,
-  updAccountingDataList,
   updateOrderInCharge,
   updateOrderStatus,
   updatePayment,
+  updateAgentCommission,
 } from '#components/redux/actions/ordersAction.js';
 import {
   addNewListOfOrderedProduction,
@@ -30,6 +30,12 @@ import {
   updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
 import PDFgenerate from './OrdersPDF.jsx';
+import {
+  PAYMENT_METHOD_OPTIONS,
+  getConfirmingSurchargeRate,
+  getOrderConfirmingSurcharge,
+  getPaymentMethodOption,
+} from './paymentMethods.js';
 import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
 import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
 import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
@@ -58,7 +64,14 @@ import {
 import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 import RelatedMaterialJournalTableOrder from './product_table_order/RelatedMaterialJournalTableOrder.jsx';
 import LiberarModal from './modal/LiberarModal.jsx';
+import RoundPalletsModal from './modal/RoundPalletsModal.jsx';
+import { orderProductType } from './modal/packagingUtils.js';
 import { statusThemeFor } from './ordersCells.jsx';
+import {
+  applyConfirmingSurchargeToProductLists,
+  calcBlockPriceWithDelivery,
+  getDeliveryPricePerM2,
+} from './blockDeliveryPrice.js';
 
 import '#components/Styles/order-card.css';
 import './ordersView.css';
@@ -92,7 +105,7 @@ const OrderCart = React.memo(() => {
   const { displayNames, user } = useProjectContext();
 
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-  const { latestProducts } = useProductsContext();
+  const { productVersions } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
   const {
@@ -123,6 +136,7 @@ const OrderCart = React.memo(() => {
   const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
   const [dataValue, setDataValue] = useState(new Date());
   const [newDescription, setNewDescription] = useState('');
+  const [newOtros, setNewOtros] = useState('');
   const [formatDataValue, setFormatDataValue] = useState(() =>
     new Date().toLocaleDateString('ru-RU', {
       year: 'numeric',
@@ -131,10 +145,14 @@ const OrderCart = React.memo(() => {
     }),
   );
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingOtros, setIsEditingOtros] = useState(false);
   const [isAddSecCont, setIsAddSecCont] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
   const [liberarModalShow, setLiberarModalShow] = useState(false);
+  const [roundPalletsShow, setRoundPalletsShow] = useState(false);
+  // Status the order is on its way to once fractional pallets are squared up.
+  const [pendingStatus, setPendingStatus] = useState(null);
   const [ordersStatus, setOrdersStatus] = useState([]);
   const [orderStatusAccess, setOrderStatusAccess] = useState({
     canRead: true,
@@ -151,14 +169,6 @@ const OrderCart = React.memo(() => {
     vat_result: 0,
     vat_result_del: 0,
   });
-
-  const PAYMENT_METHOD_OPTIONS = [
-    { value: 'prepayment', label: 'Prepago' },
-    { value: 'bank_transfer', label: 'Transferencia bancaria' },
-    { value: 'promissory_note', label: 'Pagaré' },
-    { value: 'confirming', label: 'Confirming' },
-    { value: 'confirming_without_recourse', label: 'Confirming sin recurso' },
-  ];
 
   const cardStatusTheme = useMemo(
     () => statusThemeFor(orderCartData?.status),
@@ -292,6 +302,17 @@ const OrderCart = React.memo(() => {
     setIsEditing(false);
   };
 
+  const onEditOtrosHandler = () => {
+    setNewOtros(orderCartData?.otros);
+    setIsEditingOtros(true);
+  };
+
+  // Otros попадает в PDF (presupuesto) в блок condiciones particulares
+  const onSaveOtros = (str) => {
+    dispatch(addDescription({ order_id: orderCartData.id, otros: str }));
+    setIsEditingOtros(false);
+  };
+
   const addSecondaryContactHandler = () => {
     setIsAddSecCont(true);
   };
@@ -353,27 +374,20 @@ const OrderCart = React.memo(() => {
     console.log(productsOfOrders, 'productsOfOrders OrderCart.jsx line 325');
     return addProductArticleToOrderList(
       productsOfOrders,
-      latestProducts,
-      'products',
+      productVersions,
+      'products'
     );
-  }, [productsOfOrders, latestProducts, addProductArticleToOrderList]);
+  }, [productsOfOrders, productVersions, addProductArticleToOrderList]);
 
-  const blocksTotalQuantityRealM2 = useMemo(() => {
-    return (updatedProductListOrder || []).reduce(
-      (acc, el) => acc + (Number(el?.quantity_real) || 0),
-      0,
-    );
-  }, [updatedProductListOrder]);
+  const deliveryPricePerM2 = useMemo(
+    () => getDeliveryPricePerM2(updatedProductListOrder, orderCartData?.delivery_m2),
+    [updatedProductListOrder, orderCartData?.delivery_m2]
+  );
 
-  const deliveryPricePerM2 = useMemo(() => {
-    const deliveryM2Total = Number(orderCartData?.delivery_m2 || 0);
-    if (!deliveryM2Total || !blocksTotalQuantityRealM2) return 0;
-    return deliveryM2Total / blocksTotalQuantityRealM2;
-  }, [orderCartData?.delivery_m2, blocksTotalQuantityRealM2]);
+  const confirmingSurcharge = getOrderConfirmingSurcharge(orderCartData);
 
   const blocksListWithDeliveryM2 = useMemo(() => {
     return (updatedProductListOrder || []).map((product) => {
-      const price_m2 = Number(product?.price_m2 || 0);
       const quantity_m2 = Number(product?.quantity_m2 || 0);
       const quantity_real = Number(product?.quantity_real || 0);
       const discount = Number(product?.discount || 0);
@@ -381,22 +395,40 @@ const OrderCart = React.memo(() => {
       const delivery_m2_share =
         (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
 
-      const price_m2_with_delivery = price_m2 + deliveryPricePerM2;
+      const { price_m2_with_delivery, final_price } =
+        calcBlockPriceWithDelivery(
+          product,
+          deliveryPricePerM2,
+          orderCartData?.agent_commission,
+          confirmingSurcharge
+        );
 
-      const final_price =
-        (price_m2_with_delivery * quantity_m2 * (100 - discount)) / 100;
+      // Liberar debits this line by area, so quantity_liberated can hold
+      // fractional pallets when a child order shipped the same block in
+      // another package. Showing the m2 equivalent keeps that readable.
+      const quantity_palet = Number(product?.quantity_palet || 0);
+      const quantity_liberated = Number(product?.quantity_liberated || 0);
+      const quantity_liberated_m2 = quantity_palet
+        ? (quantity_liberated * quantity_m2) / quantity_palet
+        : 0;
 
       return {
         ...product,
-        price_m2_with_delivery: Number(price_m2_with_delivery.toFixed(2)),
-        final_price: Number(final_price.toFixed(2)),
+        quantity_liberated_m2: Number(quantity_liberated_m2.toFixed(2)),
+        price_m2_with_delivery,
+        final_price,
         delivery_m2_share: Number(delivery_m2_share.toFixed(2)),
         final_price_with_delivery: Number(
           (final_price + delivery_m2_share).toFixed(2),
         ),
       };
     });
-  }, [updatedProductListOrder, deliveryPricePerM2]);
+  }, [
+    updatedProductListOrder,
+    deliveryPricePerM2,
+    orderCartData?.agent_commission,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
     if (blocksListWithDeliveryM2.length > 0) {
@@ -472,6 +504,34 @@ const OrderCart = React.memo(() => {
     }
   }, [updatedRelatedMaterialsListOrder]);
 
+  // Надбавка confirming для остальных товаров: в productLists строки остаются
+  // с ценами из БД, потому что Liberar отправляет их на сервер как есть, а
+  // таблицы, итог и PDF берут цены с надбавкой
+  const linesWithSurcharge = useMemo(
+    () =>
+      applyConfirmingSurchargeToProductLists(
+        {
+          dryMixes: updatedDryMixesListOrder,
+          anchors: updatedAnchorsListOrder,
+          tools: updatedToolsListOrder,
+          related_materials: updatedRelatedMaterialsListOrder,
+        },
+        confirmingSurcharge
+      ),
+    [
+      updatedDryMixesListOrder,
+      updatedAnchorsListOrder,
+      updatedToolsListOrder,
+      updatedRelatedMaterialsListOrder,
+      confirmingSurcharge,
+    ]
+  );
+
+  const pricedProductLists = useMemo(
+    () => applyConfirmingSurchargeToProductLists(productLists, confirmingSurcharge),
+    [productLists, confirmingSurcharge]
+  );
+
   const handleInputChange = (e) => {
     setVatValue((prev) => ({
       ...prev,
@@ -481,18 +541,20 @@ const OrderCart = React.memo(() => {
 
   const onProductClickHandler = (sel_prod) => {
     if (orderCartData?.status < 3) {
+      // Блок берём той версии, что в строке заказа, чтобы при сохранении
+      // строка не переехала на последнюю версию карточки
       const product =
-        sel_prod.product_article.slice(2, 3) == 'N'
-          ? latestProducts.find((el) => el.article === sel_prod.product_article)
-          : sel_prod.product_article.slice(2, 3) == 'M'
-            ? latestDryMix.find((el) => el.article === sel_prod.product_article)
-            : sel_prod.product_article.slice(2, 3) == 'P'
-              ? latestRelatedMaterials.find(
-                  (el) => el.article === sel_prod.product_article,
-                )
-              : sel_prod.product_article.slice(2, 3) == 'F'
-                ? latestAnchors.find((el) => el.article === sel_prod.product_article)
-                : latestTools.find((el) => el.article === sel_prod.product_article);
+        orderProductType(sel_prod.product_article) == 'N'
+          ? productVersions.find((el) => el.id === sel_prod.product_id)
+          : orderProductType(sel_prod.product_article) == 'M'
+          ? latestDryMix.find((el) => el.article === sel_prod.product_article)
+          : orderProductType(sel_prod.product_article) == 'P'
+          ? latestRelatedMaterials.find(
+              (el) => el.article === sel_prod.product_article
+            )
+          : orderProductType(sel_prod.product_article) == 'F'
+          ? latestAnchors.find((el) => el.article === sel_prod.product_article)
+          : latestTools.find((el) => el.article === sel_prod.product_article);
 
       setSelectedProduct(product);
       setProductOfOrder({ ...sel_prod, product_id: product?.id });
@@ -506,7 +568,7 @@ const OrderCart = React.memo(() => {
     [status_list],
   );
 
-  const statusChangeHandler = (status) => {
+  const statusChangeHandler = (status, skipPalletCheck = false) => {
     const currentStatusIndex = status_list.findIndex(
       (item) => item.accessor === orderCartData?.status,
     );
@@ -535,10 +597,29 @@ const OrderCart = React.memo(() => {
       return;
     }
 
+    // Liberar debits a line by square meters, so quantity_liberated comes out
+    // fractional whenever a child order shipped the block in another package,
+    // and the pallets left to ship along with it. That has to be squared up
+    // before the order is contracted and goes near production or reserves.
+    if (
+      !skipPalletCheck &&
+      status.accessor === statusByAccessor[5].accessor &&
+      productLists.products.some((product) => {
+        const remaining =
+          (Number(product.quantity_palet) || 0) -
+          (Number(product.quantity_liberated) || 0);
+        return !Number.isInteger(parseFloat(remaining.toFixed(2)));
+      })
+    ) {
+      setPendingStatus(status);
+      setRoundPalletsShow(true);
+      return;
+    }
+
     // blocks
     updatedProductListOrder?.forEach((product) => {
-      const loc = latestProducts.find(
-        (el) => el.article == product.product_article,
+      const loc = productVersions.find(
+        (el) => el.id === product.product_id
       )?.placeOfProduction;
 
       const haveProductReserve = list_of_reserved_products.find(
@@ -843,14 +924,6 @@ const OrderCart = React.memo(() => {
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
 
-    if (status.accessor == 7 || status.accessor == 9) {
-      dispatch(
-        updAccountingDataList({
-          orders_article: orderCartData?.article,
-          aproved: false,
-        }),
-      );
-    }
     if (status.accessor == 10) {
       dispatch(deleteAccountingData(orderCartData?.article));
     }
@@ -888,11 +961,11 @@ const OrderCart = React.memo(() => {
 
   const final_price_product = useMemo(() => {
     const allProducts = [
-      ...productLists['products'],
-      ...productLists['dryMixes'],
-      ...productLists['anchors'],
-      ...productLists['tools'],
-      ...productLists['related_materials'],
+      ...pricedProductLists['products'],
+      ...pricedProductLists['dryMixes'],
+      ...pricedProductLists['anchors'],
+      ...pricedProductLists['tools'],
+      ...pricedProductLists['related_materials'],
     ];
 
     return allProducts.reduce(
@@ -906,13 +979,7 @@ const OrderCart = React.memo(() => {
           0),
       0,
     );
-  }, [
-    productLists.products,
-    productLists.dryMixes,
-    productLists.anchors,
-    productLists.tools,
-    productLists.related_materials,
-  ]);
+  }, [pricedProductLists]);
 
   const [deliveryDraft, setDeliveryDraft] = useState(orderCartData?.delivery ?? 0);
   const [deliveryM2Draft, setDeliveryM2Draft] = useState(
@@ -1074,6 +1141,10 @@ const OrderCart = React.memo(() => {
     setOrderCartData((prev) => ({
       ...prev,
       description: updatedOrderCartData?.description,
+      otros: updatedOrderCartData?.otros,
+      payment_method: updatedOrderCartData?.payment_method,
+      agent_commission: updatedOrderCartData?.agent_commission ?? 0,
+      confirming_surcharge: Boolean(updatedOrderCartData?.confirming_surcharge),
     }));
   }, [list_of_orders]);
 
@@ -1126,25 +1197,75 @@ const OrderCart = React.memo(() => {
     return personInChargeOption || options[0];
   };
 
-  const handlePaymentMethodChange = (selectedOption) => {
+  const confirmingSurchargeRate = getConfirmingSurchargeRate(
+    orderCartData?.payment_method
+  );
+
+  // Галочка надбавки confirming сохраняется вместе со способом оплаты
+  const savePaymentMethod = (payment_method, confirming_surcharge) => {
     setOrderCartData((prev) => ({
       ...prev,
-      payment_method: selectedOption.value,
+      payment_method,
+      confirming_surcharge,
     }));
 
     dispatch(
       updatePayment({
         order_id: orderCartData?.id,
-        payment_method: selectedOption.value,
-      }),
+        payment_method,
+        confirming_surcharge,
+      })
     );
   };
 
-  const getSelectedPaymentMethodOption = () => {
-    const paymentMethodOption = PAYMENT_METHOD_OPTIONS.find(
-      (option) => option.value == orderCartData?.payment_method,
+  // У способа без надбавки галочка снимается, чтобы надбавка не вернулась
+  // незаметно при повторном выборе confirming
+  const handlePaymentMethodChange = (selectedOption) => {
+    savePaymentMethod(
+      selectedOption.value,
+      Boolean(orderCartData?.confirming_surcharge) &&
+        getConfirmingSurchargeRate(selectedOption.value) > 0
     );
-    return paymentMethodOption || PAYMENT_METHOD_OPTIONS[0];
+  };
+
+  const handleConfirmingSurchargeChange = (e) => {
+    savePaymentMethod(orderCartData?.payment_method, e.target.checked);
+  };
+
+  const [agentCommissionDraft, setAgentCommissionDraft] = useState(
+    orderCartData?.agent_commission ?? 0
+  );
+
+  useEffect(() => {
+    setAgentCommissionDraft(orderCartData?.agent_commission ?? 0);
+  }, [orderCartData?.agent_commission]);
+
+  // Агентское вознаграждение, %: повышает цену блоков за m2
+  const agentCommissionFunc = () => {
+    const agent_commission =
+      parseFloat(String(agentCommissionDraft).replace(',', '.')) || 0;
+
+    if (agent_commission < 0) {
+      alert('Agent commission cannot be negative');
+      return;
+    }
+
+    dispatch(
+      updateAgentCommission({
+        order_id: orderCartData?.id,
+        agent_commission,
+      })
+    );
+
+    setOrderCartData((prev) => ({ ...prev, agent_commission }));
+    setAgentCommissionDraft(agent_commission);
+  };
+
+  const getSelectedPaymentMethodOption = () => {
+    return (
+      getPaymentMethodOption(orderCartData?.payment_method) ||
+      PAYMENT_METHOD_OPTIONS[0]
+    );
   };
 
   const productHandler = (product) => {
@@ -1269,6 +1390,22 @@ const OrderCart = React.memo(() => {
           orderCartData={orderCartData}
           productLists={productLists}
           onSuccess={() => navigate('/orders')}
+        />
+      )}
+      {roundPalletsShow && (
+        <RoundPalletsModal
+          show={roundPalletsShow}
+          onHide={() => {
+            setRoundPalletsShow(false);
+            setPendingStatus(null);
+          }}
+          orderCartData={orderCartData}
+          blocks={productLists.products}
+          onConfirm={() => {
+            setRoundPalletsShow(false);
+            setPendingStatus(null);
+            if (pendingStatus) statusChangeHandler(pendingStatus, true);
+          }}
         />
       )}
       {reserveModalShow && (
@@ -1407,6 +1544,45 @@ const OrderCart = React.memo(() => {
                   )}
                 </div>
               )}
+
+              <div className="ord-tile__label" style={{ marginTop: 16 }}>
+                Otros
+              </div>
+              {orderCartData?.otros && !isEditingOtros ? (
+                <>
+                  <div className="ord-tile__body-text">{orderCartData.otros}</div>
+                  <button
+                    type="button"
+                    className="ord-btn ord-btn--ghost ord-btn--sm"
+                    style={{ marginTop: 10 }}
+                    onClick={onEditOtrosHandler}
+                  >
+                    Edit
+                  </button>
+                </>
+              ) : (
+                <div className="ord-desc-edit">
+                  <textarea
+                    placeholder="Enter otros..."
+                    value={newOtros}
+                    disabled={
+                      !checkUserAccess(user, roles, 'orders_description_edit')
+                        ?.canWrite
+                    }
+                    onChange={(e) => setNewOtros(e.target.value)}
+                  />
+                  {checkUserAccess(user, roles, 'orders_description_edit')
+                    ?.canWrite && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--primary ord-btn--sm"
+                      onClick={() => onSaveOtros(newOtros)}
+                    >
+                      Save
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -1511,7 +1687,7 @@ const OrderCart = React.memo(() => {
             </div>
             <PDFgenerate
               orderData={orderCartData}
-              productList={productLists}
+              productList={pricedProductLists}
               vatValue={vatValue}
             />
           </div>
@@ -1527,7 +1703,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <DryMixesJournalTableOrder
-          productListOrder={updatedDryMixesListOrder}
+          productListOrder={linesWithSurcharge.dryMixes}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1535,7 +1711,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <AnchorJournalTableOrder
-          productListOrder={updatedAnchorsListOrder}
+          productListOrder={linesWithSurcharge.anchors}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1543,7 +1719,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <ToolJournalTableOrder
-          productListOrder={updatedToolsListOrder}
+          productListOrder={linesWithSurcharge.tools}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1551,7 +1727,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <RelatedMaterialJournalTableOrder
-          productListOrder={updatedRelatedMaterialsListOrder}
+          productListOrder={linesWithSurcharge.related_materials}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1764,6 +1940,57 @@ const OrderCart = React.memo(() => {
                     options={PAYMENT_METHOD_OPTIONS}
                     isDisabled={orderCartData?.status < 5 ? false : true}
                   />
+                </span>
+              </div>
+              {confirmingSurchargeRate > 0 && (
+                <div className="ord-summary-row">
+                  <span className="ord-summary-row__label">
+                    Confirming surcharge
+                  </span>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      margin: 0,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={Boolean(orderCartData?.confirming_surcharge)}
+                      onChange={handleConfirmingSurchargeChange}
+                      disabled={orderCartData?.status >= 5}
+                    />
+                    +{confirmingSurchargeRate.toFixed(1)}% to all products
+                  </label>
+                </div>
+              )}
+              <div className="ord-summary-row">
+                <span className="ord-summary-row__label">Agent commission, %</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    id="agent_commission"
+                    name="agent_commission"
+                    className="ord-summary-input"
+                    value={agentCommissionDraft}
+                    onChange={(e) => {
+                      setAgentCommissionDraft(
+                        e.target.value.replace(/[^\d.,]/g, '')
+                      );
+                    }}
+                    disabled={orderCartData?.status >= 5}
+                  />
+                  {orderCartData?.status < 5 && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--ghost ord-btn--sm"
+                      onClick={agentCommissionFunc}
+                    >
+                      Save
+                    </button>
+                  )}
                 </span>
               </div>
               <div className="ord-summary-divider" />

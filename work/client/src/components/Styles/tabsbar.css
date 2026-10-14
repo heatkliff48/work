@@ -1,91 +1,197 @@
-/* tabsbar.css */
-.tabsbar-container {
+/* tabsbar.css — полоса вкладок под topbar (стили в духе сайдбара) */
+.bb-tabs {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
-  background: #f6f7f9;
-  border-bottom: 1px solid #e3e6ea;
-  min-height: 44px;
+  height: 48px;
+  padding: 0 32px;
+
+  background: var(--bb-white);
+  border-bottom: 1px solid var(--bb-border);
+
+  font-family: Lato, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-.tabsbar-left {
-  display: flex;
+/* Back */
+.bb-tabs-back {
   flex: 0 0 auto;
-  gap: 12px;
-  align-items: center;
-}
-
-.tabsbar-right {
-  flex: 0 0 auto;
-}
-
-.tabsbar-add-current {
-  background: #fff;
-  border: 1px solid #cdd4db;
-  padding: 6px 10px;
-  border-radius: 4px;
+  height: 32px;
+  padding: 0 10px 0 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
   cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bb-muted);
 }
 
-.tabsbar-scroll {
+.bb-tabs-back:hover {
+  background: #f1f3f7;
+  color: #1e2128;
+}
+
+.bb-tabs-divider {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 20px;
+  background: var(--bb-border);
+}
+
+/* tabs strip: scrolls horizontally, scrollbar hidden */
+.bb-tabs-scroll {
+  position: relative;
+  flex: 0 1 auto;
+  min-width: 0;
+  height: 100%;
+
   display: flex;
-  gap: 6px;
+  align-items: stretch;
+  gap: 2px;
+
   overflow-x: auto;
-  padding: 2px 6px;
-  flex: 1 1 auto;
-  align-items: center;
+  overflow-y: hidden;
+  scrollbar-width: none;
 }
 
-.tab-item {
+.bb-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.bb-tab {
+  position: relative;
+  flex: 0 0 auto;
+  max-width: 220px;
+  padding: 0 6px 0 12px;
+
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
-  background: #fff;
-  border: 1px solid transparent;
-  border-radius: 4px;
+
   cursor: pointer;
-  min-width: 100px;
+  user-select: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bb-muted);
 }
 
-.tab-item.active {
-  background: #f5f5f5;
-  border-color: #828080;
+.bb-tab:hover {
+  color: #1e2128;
 }
 
-.tab-title {
+.bb-tab::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: transparent;
+}
+
+.bb-tab:hover::after {
+  background: var(--bb-border);
+}
+
+.bb-tab.bb-tab-active {
+  color: var(--bb-text);
+}
+
+.bb-tab.bb-tab-active::after {
+  background: var(--bb-red);
+}
+
+.bb-tab-title {
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 13px;
 }
 
-.tab-close {
-  border: none;
+.bb-tab-close {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
   background: transparent;
   cursor: pointer;
-  font-size: 14px;
-  padding: 0 4px;
-  color: #666;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--bb-muted);
+  opacity: 0;
 }
-.dropdown-quick select {
-  padding: 6px;
-  border-radius: 4px;
-  border: 1px solid #cdd4db;
+
+.bb-tab:hover .bb-tab-close,
+.bb-tab.bb-tab-active .bb-tab-close,
+.bb-tab-close:focus-visible {
+  opacity: 1;
 }
-.quick-label {
-  margin-right: 6px;
-  font-size: 13px;
-  color: #333;
-  margin-left: 8px;
+
+.bb-tab-close:hover {
+  background: #eef0f5;
+  color: var(--bb-text);
 }
-@media (max-width: 900px) {
-  .tabsbar-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+
+/* duplicate current tab */
+.bb-tabs-add {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--bb-muted);
+}
+
+.bb-tabs-add:hover {
+  background: #f1f3f7;
+  color: #1e2128;
+}
+
+.bb-tabs-back:focus-visible,
+.bb-tabs-add:focus-visible,
+.bb-tab-close:focus-visible {
+  outline: 2px solid rgba(188, 18, 18, 0.35);
+  outline-offset: 1px;
+}
+
+/* touch screens: no hover, so close buttons are always visible */
+@media (hover: none) {
+  .bb-tab-close {
+    opacity: 1;
   }
-  .tabsbar-scroll {
-    min-width: max-content;
+}
+
+@media (max-width: 900px) {
+  .bb-tabs {
+    padding: 0 12px;
+    gap: 6px;
+  }
+
+  .bb-tabs-back {
+    padding: 0 6px;
+  }
+
+  .bb-tabs-back-label {
+    display: none;
   }
 }

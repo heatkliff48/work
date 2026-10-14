@@ -48,7 +48,12 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
   }, []);
 
   const handleProductListOrderChange = (e) => {
-    setProductOfOrder((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    // Скидка может быть дробной: храним с точкой, InputField покажет запятую
+    setProductOfOrder((prev) => ({
+      ...prev,
+      [name]: name === 'discount' ? value.replace(',', '.') : value,
+    }));
   };
 
   const total_value = useMemo(() => {
@@ -62,7 +67,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
   }, [productOfOrder.quantity_ud, selectedProduct?.piece_weight]);
 
   const final_price_value = useMemo(() => {
-    const discount = productOfOrder?.discount ?? 0;
+    const discount = Number(productOfOrder?.discount) || 0;
 
     const result =
       (selectedProduct?.price_per_unit *
@@ -104,7 +109,10 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
       }
       const newToolProductsOfOrder = {
         order_id: haveOrderClient.id,
-        productOfOrder,
+        productOfOrder: {
+          ...productOfOrder,
+          discount: Number(productOfOrder?.discount) || 0,
+        },
       };
       dispatch(getUpdateToolProductOfOrders(newToolProductsOfOrder));
       setProductOfOrder({});

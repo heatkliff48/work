@@ -81,19 +81,23 @@ const UsersInfo = () => {
   } = useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
+  const usersList = Array.isArray(usersInfoDataList) ? usersInfoDataList : [];
+
   const user = useSelector((state) => state.user);
   const usersInfo = useSelector((state) => state.usersInfo);
   const usersMainInfo = useSelector((state) => state.usersMainInfo);
 
   const clientHandler = (id) => {
-    const u = usersInfoDataList.find((el) => el.id === id);
+    const u = usersList.find((el) => el.id === id);
     setCurrentUsersInfo(u);
     setModalShow(true);
   };
 
+  const toArray = (v) => (Array.isArray(v) ? v : []);
+
   const combine = (a, b, prop) =>
     Object.values(
-      [...a, ...b].reduce((acc, v) => {
+      [...toArray(a), ...toArray(b)].reduce((acc, v) => {
         if (v[prop])
           acc[v[prop]] = acc[v[prop]] ? { ...acc[v[prop]], ...v } : { ...v };
         return acc;
@@ -114,13 +118,13 @@ const UsersInfo = () => {
 
   const subdivisions = useMemo(() => {
     const seen = new Set();
-    usersInfoDataList.forEach((u) => { if (u.subdivision) seen.add(u.subdivision); });
+    usersList.forEach((u) => { if (u.subdivision) seen.add(u.subdivision); });
     return Array.from(seen).sort();
-  }, [usersInfoDataList]);
+  }, [usersList]);
 
   const filteredUsers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return usersInfoDataList.filter((u) => {
+    return usersList.filter((u) => {
       const matchQ =
         !q ||
         (u.fullName || '').toLowerCase().includes(q) ||
@@ -130,7 +134,7 @@ const UsersInfo = () => {
         subdivisionFilter === 'all' || u.subdivision === subdivisionFilter;
       return matchQ && matchSub;
     });
-  }, [usersInfoDataList, searchQuery, subdivisionFilter]);
+  }, [usersList, searchQuery, subdivisionFilter]);
 
   return (
     <Fragment>
@@ -265,7 +269,7 @@ const UsersInfo = () => {
 
           <div className="usr-footer">
             <span>
-              Showing {filteredUsers.length} of {usersInfoDataList.length} users
+              Showing {filteredUsers.length} of {usersList.length} users
             </span>
           </div>
         </div>

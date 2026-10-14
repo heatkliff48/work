@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const {
   Orders,
   OrdersProducts,
@@ -248,9 +249,13 @@ class OrdersRepository {
     }
   }
 
-  static async addDescriptionOrder({ order_id, description }) {
+  // Сохраняет description и/или otros — обновляется только переданное поле
+  static async addDescriptionOrder({ order_id, description, otros }) {
     try {
-      await updateOrderFields(order_id, { description });
+          await updateOrderFields(order_id, {
+            ...(description !== undefined && { description }),
+            ...(otros !== undefined && { otros }),
+          });
 
       const order_desc = await Orders.findOne({ where: { id: order_id } });
 
@@ -1111,6 +1116,17 @@ class OrdersRepository {
     }
   }
 
+  // Updates status and resets accounting approval in one query.
+  // Returns undefined when the order already has this status (nothing is reset).
+  static async updateStatusAndResetAccountingApproved({ order_id, status }) {
+    const [, [order]] = await Orders.update(
+      { status, accounting_approved: false },
+      { where: { id: order_id, status: { [Op.ne]: status } }, returning: true },
+    );
+
+    return order;
+  }
+
   static async getUpdateInChargeOrder({ order_id, person_in_charge }) {
     try {
       await updateOrderFields(order_id, { person_in_charge });
@@ -1124,9 +1140,16 @@ class OrdersRepository {
     }
   }
 
-  static async getUpdatePaymentOrder({ order_id, payment_method }) {
+  static async getUpdatePaymentOrder({
+    order_id,
+    payment_method,
+    confirming_surcharge,
+  }) {
     try {
-      await updateOrderFields(order_id, { payment_method });
+      await updateOrderFields(order_id, {
+        payment_method,
+        confirming_surcharge,
+      });
       return;
     } catch (error) {
       console.log(
@@ -1135,6 +1158,24 @@ class OrdersRepository {
       );
       throw error;
     }
+  }
+
+  static async updateAgentCommissionOrder({ order_id, agent_commission }) {
+    const [, [order]] = await Orders.update(
+      { agent_commission },
+      { where: { id: order_id }, returning: true },
+    );
+
+    return order;
+  }
+
+  static async updateAccountingApprovedOrder({ order_id, accounting_approved }) {
+    const [, [order]] = await Orders.update(
+      { accounting_approved },
+      { where: { id: order_id }, returning: true },
+    );
+
+    return order;
   }
 
   static async getDeleteOrder({ order_id }) {
@@ -1169,6 +1210,9 @@ class OrdersRepository {
     delivery_m2,
     region,
     payment_method,
+    agent_commission,
+    confirming_surcharge,
+    otros,
   }) {
     try {
       const { childOrder, createdProducts } = await Orders.sequelize.transaction(async (transaction) => {
@@ -1186,6 +1230,9 @@ class OrdersRepository {
           region,
           payment_method,
           pdf_updated_at: new Date(),
+          agent_commission: Number(agent_commission) || 0,
+          confirming_surcharge: Boolean(confirming_surcharge),
+          otros,
         }, { transaction });
 
         const order_id = childOrder.id;

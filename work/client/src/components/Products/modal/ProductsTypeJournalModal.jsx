@@ -30,6 +30,11 @@ function ProductsTypeJournalModal(props) {
   const [productsTypeJournalInput, setProductsTypeJournalInput] = useState({});
   const product_code = useSelector((state) => state.productCode);
 
+  // Related materials can be created without a barcode (only when a new article is created)
+  const canSkipBarcode =
+    props.target == 2 && !props.addNewVersion && !props.repair;
+  const [withBarcode, setWithBarcode] = useState(true);
+
   const requiredFieldsDryMix = [
     "name",
     "place_of_production",
@@ -238,6 +243,7 @@ function ProductsTypeJournalModal(props) {
     const defaultCountry = placeOfProductionOptions.find(
       (opt) => opt.value === "ES"
     );
+    setWithBarcode(true);
     if (props.addNewVersion || props.repair) {
       setProductsTypeJournalInput({ ...selectedProductsType });
     } else if (props.duplicate) {
@@ -525,7 +531,16 @@ function ProductsTypeJournalModal(props) {
       }
     }
 
-    setProductsTypeJournalPreviewIInput(productsTypeJournalInput);
+    setProductsTypeJournalPreviewIInput(
+      canSkipBarcode && !withBarcode
+        ? {
+            ...productsTypeJournalInput,
+            product_code: null,
+            product_code_box: null,
+            product_code_pall: null,
+          }
+        : productsTypeJournalInput
+    );
 
     setPreviewModalShow(true);
     props.onHide();
@@ -701,6 +716,26 @@ function ProductsTypeJournalModal(props) {
                     </div>
                   </div>
                 ))}
+                {canSkipBarcode && (
+                  <div className="md:flex md:items-center mb-6">
+                    <div className="md:w-1/3">
+                      <label
+                        className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+                        htmlFor="with_barcode"
+                      >
+                        Generate barcode
+                      </label>
+                    </div>
+                    <div className="md:w-2/3">
+                      <input
+                        id="with_barcode"
+                        type="checkbox"
+                        checked={withBarcode}
+                        onChange={(e) => setWithBarcode(e.target.checked)}
+                      />
+                    </div>
+                  </div>
+                )}
               </Row>
             </form>
           </Container>

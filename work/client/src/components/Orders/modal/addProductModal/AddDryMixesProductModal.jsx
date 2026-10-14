@@ -74,7 +74,11 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
       return;
     }
 
-    setProductOfOrder((prev) => ({ ...prev, [name]: value }));
+    // Скидка может быть дробной: храним с точкой, InputField покажет запятую
+    setProductOfOrder((prev) => ({
+      ...prev,
+      [name]: name === 'discount' ? value.replace(',', '.') : value,
+    }));
   };
 
   const quantity_real_value = useMemo(() => {
@@ -91,17 +95,17 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
     return result;
   }, [productOfOrder.quantity_palet_dry, selectedProduct?.units_per_pallet]);
 
+  // Вес строки, кг: в справочнике pallet_weight — вес паллеты с поддоном
   const total_value = useMemo(() => {
     const quantity_palet_dry = Number(productOfOrder?.quantity_palet_dry || 0);
-    const result =
-      quantity_palet_dry * (selectedProduct?.units_per_pallet || 0);
+    const result = quantity_palet_dry * (selectedProduct?.pallet_weight || 0);
 
     setProductOfOrder((prev) => ({
       ...prev,
       total: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [productOfOrder.quantity_palet_dry, selectedProduct?.units_per_pallet]);
+  }, [productOfOrder.quantity_palet_dry, selectedProduct?.pallet_weight]);
 
   const final_price_value = useMemo(() => {
     const rawDiscount = Number(productOfOrder?.discount);
@@ -124,15 +128,17 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
     productOfOrder?.discount,
   ]);
 
+  // PVP — цена за мешок, поэтому делим на мешки, а не на вес из total
   const pvp_value = useMemo(() => {
-    const result = total_value > 1 ? final_price_value / total_value : 0;
+    const result =
+      quantity_real_value > 0 ? final_price_value / quantity_real_value : 0;
 
     setProductOfOrder((prev) => ({
       ...prev,
       pvp: result.toFixed(2),
     }));
     return result.toFixed(2);
-  }, [final_price_value, total_value]);
+  }, [final_price_value, quantity_real_value]);
 
   const addProductOrder = async () => {
     if (haveOrderClient) {
@@ -147,7 +153,10 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
       }
       const newDryMixedProductsOfOrder = {
         order_id: haveOrderClient.id,
-        productOfOrder,
+        productOfOrder: {
+          ...productOfOrder,
+          discount: Number(productOfOrder?.discount) || 0,
+        },
       };
       dispatch(getUpdateDryMixedProductOfOrders(newDryMixedProductsOfOrder));
       setProductOfOrder({});
@@ -157,8 +166,8 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
   };
 
   useEffect(() => {
-    const rawDiscount = Number(productOfOrder?.discount);
-    const discount = Number.isFinite(rawDiscount) ? rawDiscount : 0;
+    // Не приводим к числу: иначе при вводе "11," запятая сразу пропадает
+    const discount = productOfOrder?.discount ?? 0;
 
     setProductOfOrder((prev) => ({
       ...prev,

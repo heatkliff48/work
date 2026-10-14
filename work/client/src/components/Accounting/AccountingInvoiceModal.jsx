@@ -16,6 +16,7 @@ const AccountingInvoiceModal = ({
   productLists,
   vatValue,
   latestProducts,
+  productVersions,
   latestDryMix,
   latestAnchors,
   latestTools,
@@ -71,6 +72,7 @@ const AccountingInvoiceModal = ({
       const invoiceLines = buildInvoiceLines({
         productLists,
         latestProducts,
+        productVersions,
         latestDryMix,
         latestAnchors,
         latestTools,

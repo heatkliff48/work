@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Table from '../Table/Table';
 import { useUsersContext } from '#components/contexts/UserContext.js';
@@ -6,8 +6,10 @@ import { getLotesList } from '#components/redux/actions/lotesListAction.js';
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import LotesListModal from './LotesListModal';
+import RenumberLotesListModal from './RenumberLotesListModal';
 
 function LotesList() {
+  const [renumberModal, setRenumberModal] = useState(false);
   const {
     list_of_recipes = [],
     selectedLotesRecipe,
@@ -148,6 +150,8 @@ function LotesList() {
         dataOfTable={groupedLotesList}
         userAccess={userAccess}
         tableName={'Lotes List'}
+        buttonText={'Set first Batch / Cake ID'}
+        onClickButton={() => setRenumberModal(true)}
         handleRowClick={(row) => {
           console.log('row.original LotesList.jsx line 152', row.original)
           openModal(row.original);
@@ -159,6 +163,11 @@ function LotesList() {
         selectedRecipe={selectedLotesRecipe}
         lotesListBatches={lotesListBatches}
         lotesListCakes={lotesListCakes}
+      />
+      <RenumberLotesListModal
+        show={renumberModal}
+        onHide={() => setRenumberModal(false)}
+        lotesListBatches={lotesListBatches}
       />
     </>
   );

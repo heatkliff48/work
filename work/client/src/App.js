@@ -27,10 +27,7 @@ import NavBar from './components/NavBar/NavBar';
 import Products from './components/Products/Products';
 import Roles from './components/Roles/Roles';
 import { SnackbarProvider } from 'notistack';
-import {
-  useEffect,
-  // useRef
-} from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 // import { useNavigate } from 'react-router-dom';
@@ -59,6 +56,8 @@ import GreenLineMonitoring from '#components/GreenLineMonitoring/GreenLineMonito
 import TemperatureDataMonitoring from '#components/GreenLineMonitoring/TemperatureDataMonitoring.jsx';
 
 import { getWebSocketUrl } from '#utils/getApiUrl.js';
+import useLogout from '#utils/useLogout.js';
+import showMessage from '#components/Utils/showMessage.js';
 import WMOrderCard from '#components/WarehouseManager/WMOrderCard/WMOrderCard.jsx';
 import FacturaManager from '#components/Accounting/Factura/FacturaManager.jsx';
 import FacturaOrderCard from '#components/Accounting/Factura/FacturaOrderCard.jsx';
@@ -74,14 +73,48 @@ function App() {
   const user = useSelector((state) => state.user);
   // const isCheckedAuth = useRef(false);
 
+  const logout = useLogout();
+  // navigate внутри logout меняется при смене страницы — держим актуальную
+  // версию в ref, чтобы не пересоздавать подключение
+  const logoutRef = useRef(logout);
+  logoutRef.current = logout;
+
+  // Одно подключение на вкладку: переподключаемся только при смене пользователя,
+  // старое подключение закрываем, иначе сообщения будут приходить дважды.
   useEffect(() => {
-    if (user) {
-      const socketOnMessageFunc = createSocketOnMessage(dispatch);
-      new WebSocketClient({ url, socketOnMessageFunc });
-    }
+    if (!user?.id) return;
+
+    const socketOnMessageFunc = createSocketOnMessage(dispatch);
+    const socketClient = new WebSocketClient({
+      url,
+      socketOnMessageFunc,
+      onUnauthorized: () => {
+        showMessage('Session expired, please sign in again', 'warning');
+        logoutRef.current();
+      },
+      // Пока соединения не было, сообщения сервера не доходили —
+      // данные на странице могли устареть
+      onReconnect: () => {
+        showMessage('Connection restored. Data may be outdated', 'info', {
+          key: 'ws-reconnected',
+          preventDuplicate: true,
+          persist: true,
+          action: () => (
+            <button
+              className="table_button"
+              onClick={() => window.location.reload()}
+            >
+              Refresh
+            </button>
+          ),
+        });
+      },
+    });
+
+    return () => socketClient.close();
 
     // if (isCheckedAuth && !user) navigate('/sign-in');
-  }, [user]);
+  }, [user?.id]);
 
   return (
     <MainContextProvider>

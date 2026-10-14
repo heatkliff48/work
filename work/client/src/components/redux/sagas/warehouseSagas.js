@@ -6,6 +6,7 @@ import {
   ADD_NEW_ORDERED_PRODUCTION,
   ADD_NEW_RESERVED_PRODUCT,
   ADD_NEW_WAREHOUSE,
+  DELETE_WAREHOUSE,
   ALL_WAREHOUSE,
   LIST_OF_ORDERED_PRODUCTION,
   GET_ALL_WAREHOUSE,
@@ -119,6 +120,22 @@ const getAllWarehouse = () => {
 const addNewWarehouse = (new_warehouse) => {
   return url
     .post('/warehouse/add', new_warehouse)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const deleteWarehouse = (warehouse_id) => {
+  return url
+    .delete('/warehouse/delete', {
+      data: {
+        warehouse_id,
+      },
+    })
     .then((res) => {
       return res.data;
     })
@@ -648,6 +665,15 @@ function* addNewWarehouseWatcher(action) {
   }
 }
 
+// Запись удаляется из стора по сокету DELETE_WAREHOUSE_SOCKET
+function* deleteWarehouseWatcher(action) {
+  try {
+    yield call(deleteWarehouse, action.payload);
+  } catch (err) {
+    // ошибка уже показана в deleteWarehouse
+  }
+}
+
 function* updRemainingStockWatcher(action) {
   try {
     const { payload } = action;
@@ -1128,6 +1154,7 @@ function* deleteWarehouseManagerTrailerWatcher(action) {
 function* warehouseWatcher() {
   yield takeLatest(GET_ALL_WAREHOUSE, getAllWarehouseWatcher);
   yield takeLatest(ADD_NEW_WAREHOUSE, addNewWarehouseWatcher);
+  yield takeLatest(DELETE_WAREHOUSE, deleteWarehouseWatcher);
 
   yield takeLatest(UPDATE_REMAINING_STOCK, updRemainingStockWatcher);
   yield takeLatest(UPDATE_WAREHOSE_QUANTITYS, updateWhQuantitysWatcher);

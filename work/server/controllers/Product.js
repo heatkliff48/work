@@ -65,6 +65,46 @@ class ProductController {
     }
   }
 
+  static async fixProductArticles(req, res) {
+    const { changes = [] } = req.body;
+
+    try {
+      const updated = await ProductService.fixProductArticles(changes);
+
+      return res.status(200).json({ updated });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async fixProductDescriptions(req, res) {
+    const { changes = [] } = req.body;
+
+    try {
+      const updated = await ProductService.fixProductDescriptions(changes);
+
+      return res.status(200).json({ updated });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async changeProductPrices(req, res) {
+    const { changes = [] } = req.body;
+
+    try {
+      const created = await ProductService.changeProductPrices(changes);
+
+      created.forEach((product) =>
+        myEmitter.emit(ADD_NEW_PRODUCT_SOCKET, product),
+      );
+
+      return res.status(200).json({ created: created.length });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
   //PRODUCTION QUALITY
   static async getAllProductionQuality(req, res) {
     try {

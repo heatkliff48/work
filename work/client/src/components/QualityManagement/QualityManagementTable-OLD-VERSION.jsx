@@ -486,14 +486,14 @@ const QualityManagementTable = () => {
 
       if (reserved_quantity_allocated < 0) {
         alert(
-          'Ошибка: reserved_quantity_allocated не может быть отрицательным.',
+          'Error: reserved_quantity_allocated cannot be negative.',
         );
 
         return;
       }
 
       if (summReserve < 0) {
-        alert('Ошибка: summReserve не может быть отрицательным.');
+        alert('Error: summReserve cannot be negative.');
 
         return;
       }

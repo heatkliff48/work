@@ -9,6 +9,47 @@ import { FaCheck, FaTimes } from 'react-icons/fa';
 
 const ProductsContext = createContext();
 
+// "BAUBLOCK® TERMECO 36 Medidas 600x365x250 mm ..." -> "TERMECO 36"
+export const extractProductTitle = (value = '') => {
+  if (!value) return '';
+
+  return String(value)
+    .replace(/BAUBLOCK®/gi, '')
+    .replace(/\s*Medidas[\s\S]*$/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+// Номер в названии — ширина в целых см: 100 мм -> "10", 365 мм -> "36", 75 мм -> "7"
+export const widthToTitleCm = (width) => {
+  const mm = Number(width);
+  if (width == null || width === '' || !Number.isFinite(mm)) return '-';
+
+  return String(Math.floor(mm / 10));
+};
+
+// Номер перед "Medidas" (или перед "(Ø..)" у O-block)
+const DESCRIPTION_TITLE_WIDTH =
+  /^(BAUBLOCK®.*?\s)(\d+(?:[.,]\d+)?)(\s+(?:\(Ø[^)]*\)\s+)?Medidas\b)/i;
+
+// Номер в названии записан не в тех единицах:
+// мм вместо см — "TERMECO 100 Medidas 600x100x250" -> "TERMECO 10 Medidas ...",
+// дробные см — "TERMECO 36.5 Medidas 600x365x250" -> "TERMECO 36 Medidas ...".
+// Возвращает исправленное описание или null, если в описании этой ошибки нет
+export const fixDescriptionTitleWidth = (description, width) => {
+  const match = String(description ?? '').match(DESCRIPTION_TITLE_WIDTH);
+  const widthMm = Number(width);
+  if (!match || !widthMm) return null;
+
+  const current = Number(match[2].replace(',', '.'));
+  const expected = widthToTitleCm(widthMm);
+  const isWidthInOtherUnits = current === widthMm || current === widthMm / 10;
+
+  if (!isWidthInOtherUnits || match[2] === expected) return null;
+
+  return description.replace(DESCRIPTION_TITLE_WIDTH, `$1${expected}$3`);
+};
+
 export const ProductsContextProvider = ({ children }) => {
   const products = useSelector((state) => state.products);
 
@@ -393,26 +434,17 @@ export const ProductsContextProvider = ({ children }) => {
         { value: 0, label: 'Std' },
         { value: 1, label: 'Marine' },
         { value: 2, label: 'High' },
+        { value: 3, label: 'Std+1' },
       ],
     }),
     [],
   );
 
-  const latestProducts = useMemo(() => {
-    const newProductList = products?.reduce((acc, product) => {
-      const { article, version } = product;
-      const existingProduct = acc.find((p) => p.article === article);
-      if (!existingProduct) {
-        acc.push(product);
-      } else if (version > existingProduct.version) {
-        acc = acc.map((p) => (p.article === article ? product : p));
-      }
-      return acc;
-    }, []);
-
-    newProductList?.sort((a, b) => a.id - b.id);
-
-    const newlatestProducts = newProductList.map((prod) => {
+  // Все версии карточек, с подписями опций вместо кодов (как в latestProducts).
+  // Строка заказа ссылается по product_id на версию, с которой её оформили,
+  // и остаётся на ней после правки карточки — искать её нужно здесь по id
+  const productVersions = useMemo(() => {
+    return (products || []).map((prod) => {
       const newPlaceOfProduction = selectOptions.placeOfProduction.find(
         (opt) => opt.value == prod.placeOfProduction,
       );
@@ -434,9 +466,24 @@ export const ProductsContextProvider = ({ children }) => {
         palletHeight: newPalletHeight?.label,
       };
     });
-
-    return newlatestProducts;
   }, [products]);
+
+  const latestProducts = useMemo(() => {
+    const newProductList = productVersions.reduce((acc, product) => {
+      const { article, version } = product;
+      const existingProduct = acc.find((p) => p.article === article);
+      if (!existingProduct) {
+        acc.push(product);
+      } else if (version > existingProduct.version) {
+        acc = acc.map((p) => (p.article === article ? product : p));
+      }
+      return acc;
+    }, []);
+
+    newProductList.sort((a, b) => a.id - b.id);
+
+    return newProductList;
+  }, [productVersions]);
 
   const getOptionValue = (category, inputValue) => {
     if (typeof inputValue === 'number') {
@@ -461,14 +508,74 @@ export const ProductsContextProvider = ({ children }) => {
     return matchedOption ? matchedOption.value : null;
   };
 
-  const extractProductTitle = (value = '') => {
-    if (!value) return '';
+  // Буква комбинации в артикуле: место-упаковка-размер-высота;
+  // после Z идут цифры 2–7 (без 0/1, чтобы не путать с O/I)
+  const articleCombinationMap = {
+    '0-0-0-0': 'A',
+    '0-0-0-1': 'B',
+    '0-0-0-2': 'C',
+    '0-0-0-3': 'D',
+    '0-0-1-0': 'E',
+    '0-0-1-1': 'F',
+    '0-0-1-2': 'G',
+    '0-0-1-3': 'H',
+    '0-1-0-0': 'I',
+    '0-1-0-1': 'J',
+    '0-1-0-2': 'K',
+    '0-1-0-3': 'L',
+    '0-1-1-0': 'M',
+    '0-1-1-1': 'N',
+    '0-1-1-2': 'O',
+    '0-1-1-3': 'P',
+    '1-0-0-0': 'Q',
+    '1-0-0-1': 'R',
+    '1-0-0-2': 'S',
+    '1-0-0-3': 'T',
+    '1-0-1-0': 'U',
+    '1-0-1-1': 'V',
+    '1-0-1-2': 'W',
+    '1-0-1-3': 'X',
+    '1-1-0-0': 'Y',
+    '1-1-0-1': 'Z',
+    '1-1-0-2': '2',
+    '1-1-0-3': '3',
+    '1-1-1-0': '4',
+    '1-1-1-1': '5',
+    '1-1-1-2': '6',
+    '1-1-1-3': '7',
+  };
 
-    return String(value)
-      .replace(/BAUBLOCK®/gi, '')
-      .replace(/\s*Medidas[\s\S]*$/i, '')
-      .replace(/\s+/g, ' ')
-      .trim();
+  // Принимает как value (при создании), так и label (из latestProducts)
+  const buildProductArticle = ({
+    form,
+    certificate,
+    width,
+    density,
+    placeOfProduction,
+    typeOfPackaging,
+    palletSize,
+    palletHeight,
+  }) => {
+    const combinationKey = [
+      getOptionValue('placeOfProduction', placeOfProduction),
+      getOptionValue('typeOfPackaging', typeOfPackaging),
+      getOptionValue('palletSize', palletSize),
+      getOptionValue('palletHeight', palletHeight),
+    ].join('-');
+    const combinationLetter = articleCombinationMap[combinationKey];
+
+    if (!combinationLetter) {
+      console.warn('Unknown combination for prodArticle:', combinationKey);
+    }
+
+    return `T.${form
+      ?.toUpperCase()
+      .slice(
+        0,
+        1,
+      )}${combinationLetter}D${density.toString().slice(0, 2)}W${width
+      .toString()
+      .slice(0, 2)}${certificate?.substr(0, 1)}`;
   };
 
   return (
@@ -477,9 +584,11 @@ export const ProductsContextProvider = ({ children }) => {
         TABLE_COLUMNS,
         COLUMNS,
         latestProducts,
+        productVersions,
         products,
         selectOptions,
         getOptionValue,
+        buildProductArticle,
         extractProductTitle,
       }}
     >

@@ -1,10 +1,9 @@
-import showMessage from '#components/Utils/showMessage.js';
 import {
   ADD_ACCOUTING_DATA_LIST,
   DELETE_ACCOUTING_DATA_LIST,
-  UPD_ACCOUTING_DATA_LIST,
   CLEAR_ACCOUTING_DATA_LIST,
 } from '../types/ordersTypes';
+import { ACCOUNTING_APPROVED_SOCKET } from '../types/socketTypes/socket';
 
 export const accountingReducer = (accountingDataList = [], action) => {
   const { type, payload } = action;
@@ -16,20 +15,13 @@ export const accountingReducer = (accountingDataList = [], action) => {
       return [...accountingDataList, payload];
     }
 
-    case UPD_ACCOUTING_DATA_LIST: {
-      const { orders_article, aproved } = payload;
-      return accountingDataList.map((el) => {
-        if (el.orders_article === orders_article) {
-          showMessage(
-            `Accounting data for order ${orders_article} has been ${
-              aproved ? 'approved' : 'unapproved'
-            }`,
-            aproved ? 'success' : 'info'
-          );
-          return { ...el, aproved };
-        }
-        return el;
-      });
+    case ACCOUNTING_APPROVED_SOCKET: {
+      const { article, accounting_approved } = payload;
+      return accountingDataList.map((el) =>
+        el.orders_article === article
+          ? { ...el, aproved: accounting_approved }
+          : el
+      );
     }
 
     case DELETE_ACCOUTING_DATA_LIST: {

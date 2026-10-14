@@ -3,6 +3,19 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+// Папка загрузок считается от расположения кода, а не от текущей директории
+// процесса: иначе при запуске сервера не из server/ файлы сохранялись бы в
+// одну папку, а скачивались из другой
+const UPLOADS_DIR = path.resolve(__dirname, '..', 'uploads');
+
+// Абсолютный путь внутри UPLOADS_DIR или null, если путь выходит за её пределы
+function resolveInsideUploads(relativePath) {
+  const resolved = path.resolve(UPLOADS_DIR, relativePath);
+  const isInside =
+    resolved === UPLOADS_DIR || resolved.startsWith(UPLOADS_DIR + path.sep);
+  return isInside ? resolved : null;
+}
+
 // Экранирование спецсимволов regexp
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -54,9 +67,9 @@ function buildFileName(section, originalName, dir) {
 
 // Set up storage engine
 const storage = multer.diskStorage({
-  destination: './uploads',
+  destination: UPLOADS_DIR,
   filename: (req, file, cb) => {
-    cb(null, buildFileName(req.query.section, file.originalname, './uploads'));
+    cb(null, buildFileName(req.query.section, file.originalname, UPLOADS_DIR));
   },
 });
 
@@ -96,8 +109,8 @@ function checkFileType(file, cb) {
 fileUpload.post('/upload', (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>fileUpload upload');
 
-  if (!fs.existsSync('./uploads')) {
-    fs.mkdirSync('./uploads');
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
   }
 
   upload(req, res, (err) => {
@@ -129,7 +142,10 @@ fileUpload.post('/upload/:filePath', (req, res) => {
   const safePath = folderPath.replace(/[<>:"|?*]|[.]{2,}/g, '');
 
   // Полный путь к папке
-  const fullPath = path.join('./uploads', safePath);
+  const fullPath = resolveInsideUploads(safePath);
+  if (!fullPath) {
+    return res.status(400).json({ error: 'Invalid upload path' });
+  }
 
   // Создаём папку рекурсивно, если не существует
   if (!fs.existsSync(fullPath)) {
@@ -172,13 +188,14 @@ fileUpload.post('/upload/:filePath', (req, res) => {
 fileUpload.get('/download/:filename', (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>fileUpload download/:filename');
 
-  const filePath = path.resolve(
-    __dirname,
-    '..',
-    'uploads',
-    req.params.filename,
-  );
+  const filePath = resolveInsideUploads(req.params.filename);
+  if (!filePath) {
+    return res.status(400).send({ message: 'Invalid file path' });
+  }
   console.log(`Attempting to download file: ${filePath}`);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send({ message: 'File not found' });
+  }
   res.download(filePath, (err) => {
     if (err) {
       console.error(`Error downloading file: ${err}`);
@@ -193,7 +210,7 @@ fileUpload.get('/download/:filename', (req, res) => {
 fileUpload.get('/files', (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>fileUpload files');
 
-  fs.readdir('./uploads', (err, files) => {
+  fs.readdir(UPLOADS_DIR, (err, files) => {
     if (err) {
       return res.status(500).send('Unable to scan directory: ' + err);
     }

@@ -30,6 +30,8 @@ const {
   GET_DELETE_ORDER_SOCKET,
   ADD_CHILD_ORDER_SOCKET,
   UPDATE_PAYMENT_METHOD_SOCKET,
+  UPDATE_AGENT_COMMISSION_SOCKET,
+  UPDATE_ACCOUNTING_APPROVED_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -122,7 +124,7 @@ class OrdersController {
       await OrdersService.addDescriptionOrder(desc);
 
       myEmitter.emit(ADD_DESCRIPTIOM_ORDER_SOCKET, desc);
-      return res.status(200).json({ success: true });
+      return res.sendStatus(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -561,12 +563,16 @@ class OrdersController {
     const { status, order_id } = req.body;
 
     try {
-      await OrdersService.getUpdateStatusOrder({
+      const accountingReset = await OrdersService.getUpdateStatusOrder({
         status,
         order_id,
       });
 
       myEmitter.emit(UPDATE_STATUS_OF_ORDER_SOCKET, { status, order_id });
+
+      if (accountingReset) {
+        myEmitter.emit(UPDATE_ACCOUNTING_APPROVED_SOCKET, accountingReset);
+      }
 
       return res.json({ status, order_id }).status(200);
     } catch (err) {
@@ -596,19 +602,58 @@ class OrdersController {
 
   static async getUpdatePaymentOrder(req, res) {
     const { payment_method, order_id } = req.body;
+    const confirming_surcharge = Boolean(req.body.confirming_surcharge);
 
     try {
       await OrdersService.getUpdatePaymentOrder({
         payment_method,
+        confirming_surcharge,
         order_id,
       });
 
       myEmitter.emit(UPDATE_PAYMENT_METHOD_SOCKET, {
         payment_method,
+        confirming_surcharge,
         order_id,
       });
 
-      return res.json({ payment_method, order_id }).status(200);
+      return res
+        .json({ payment_method, confirming_surcharge, order_id })
+        .status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async updateAgentCommissionOrder(req, res) {
+    const { order_id, agent_commission } = req.body;
+
+    try {
+      const commission = await OrdersService.updateAgentCommissionOrder({
+        order_id,
+        agent_commission,
+      });
+
+      myEmitter.emit(UPDATE_AGENT_COMMISSION_SOCKET, commission);
+
+      return res.status(200).json(commission);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async updateAccountingApprovedOrder(req, res) {
+    const { order_id, accounting_approved } = req.body;
+
+    try {
+      const approval = await OrdersService.updateAccountingApprovedOrder({
+        order_id,
+        accounting_approved,
+      });
+
+      myEmitter.emit(UPDATE_ACCOUNTING_APPROVED_SOCKET, approval);
+
+      return res.status(200).json(approval);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -648,6 +693,9 @@ class OrdersController {
       delivery_m2,
       region,
       payment_method,
+      agent_commission,
+      confirming_surcharge,
+      otros,
     } = req.body;
 
     try {
@@ -668,6 +716,9 @@ class OrdersController {
         delivery_m2,
         region,
         payment_method,
+        agent_commission,
+        confirming_surcharge,
+        otros,
       });
 
       myEmitter.emit(ADD_CHILD_ORDER_SOCKET, childOrder);
