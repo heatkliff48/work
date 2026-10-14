@@ -155,11 +155,11 @@ import {
   NEED_DELETE_WAREHOUSE_SAND_POWDER_SOCKET,
   NEED_UPDATE_WAREHOUSE_PALLETS_SOCKET,
   NEED_DELETE_WAREHOUSE_PALLETS_SOCKET,
-  NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
   ADD_NEW_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   NEEF_DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   NEW_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   PAYMENT_METHOD_SOCKET,
+  ORDER_PDF_DATE_UPDATED_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const updateRolesSocket = (updRoleData) => {
@@ -625,13 +625,8 @@ export const deleteRawMatConsumptionSocket = (rawMatConsumption) => {
   };
 };
 
-export const addNewRawMatConsumptionCurrentMoldsSocket = (
-  rawMatConsumption,
-) => {
-  console.log(
-    'NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET',
-    rawMatConsumption,
-  );
+export const addNewRawMatConsumptionCurrentMoldsSocket = (rawMatConsumption) => {
+  console.log('NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET', rawMatConsumption);
   return {
     type: NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
     payload: rawMatConsumption,
@@ -645,9 +640,7 @@ export const addNewRawMatConsumptionCurrentMoldsSocket = (
 //   };
 // };
 
-export const deleteRawMatConsumptionCurrentMoldsSocket = (
-  rawMatConsumption,
-) => {
+export const deleteRawMatConsumptionCurrentMoldsSocket = (rawMatConsumption) => {
   return {
     type: DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
     payload: rawMatConsumption,
@@ -752,18 +745,14 @@ export const updateDryMixesJournalSocket = (dryMixesJournal) => {
   };
 };
 
-export const addNewRelatedMaterialsJournalSocket = (
-  relatedMaterialsJournal,
-) => {
+export const addNewRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
   return {
     type: NEW_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
   };
 };
 
-export const updateRelatedMaterialsJournalSocket = (
-  relatedMaterialsJournal,
-) => {
+export const updateRelatedMaterialsJournalSocket = (relatedMaterialsJournal) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_JOURNAL_SOCKET,
     payload: relatedMaterialsJournal,
@@ -812,18 +801,14 @@ export const updateDryMixesWarehouseSocket = (dryMixesWarehouse) => {
   };
 };
 
-export const addNewRelatedMaterialsWarehouseSocket = (
-  relatedMaterialsWarehouse,
-) => {
+export const addNewRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
   return {
     type: NEW_RELATED_MATERIALS_WAREHOUSE_SOCKET,
     payload: relatedMaterialsWarehouse,
   };
 };
 
-export const updateRelatedMaterialsWarehouseSocket = (
-  relatedMaterialsWarehouse,
-) => {
+export const updateRelatedMaterialsWarehouseSocket = (relatedMaterialsWarehouse) => {
   return {
     type: NEED_UPDATE_RELATED_MATERIALS_WAREHOUSE_SOCKET,
     payload: relatedMaterialsWarehouse,
@@ -1139,9 +1124,7 @@ export const updateWarehouseGrindingBallsSocket = (warehouseGrindingBalls) => {
   };
 };
 
-export const deleteWarehouseGrindingBallsSocket = (
-  grinding_balls_warehouse_id,
-) => {
+export const deleteWarehouseGrindingBallsSocket = (grinding_balls_warehouse_id) => {
   return {
     type: NEED_DELETE_WAREHOUSE_GRINDING_BALLS_SOCKET,
     payload: grinding_balls_warehouse_id,
@@ -1315,3 +1298,8 @@ export const deleteOrderToWarehouseSocket = (order_id) => {
     payload: order_id,
   };
 };
+
+export const updateOrderPdfDateSocket= (payload) => ({
+  type: ORDER_PDF_DATE_UPDATED_SOCKET,
+  payload,
+});

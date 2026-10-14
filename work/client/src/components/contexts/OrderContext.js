@@ -306,6 +306,7 @@ const OrderContextProvider = ({ children }) => {
       'product_id',
       'createdAt',
       'updatedAt',
+      'pdf_updated_at',
       'bitrix_id',
       'bitrix_client_id',
     ],
@@ -473,6 +474,20 @@ const OrderContextProvider = ({ children }) => {
     });
   }, [list_of_orders]);
 
+  useEffect(() => {
+    if (!orderCartData?.id || !Array.isArray(list_of_orders)) return;
+    const savedOrder = list_of_orders.find(
+      (order) => String(order.id) === String(orderCartData.id),
+    );
+    if (savedOrder?.pdf_updated_at === undefined) return;
+
+    setOrderCartData((previous) => {
+      if (String(previous?.id) !== String(savedOrder.id)) return previous;
+      if (previous.pdf_updated_at === savedOrder.pdf_updated_at) return previous;
+      return { ...previous, pdf_updated_at: savedOrder.pdf_updated_at };
+    });
+  }, [list_of_orders, orderCartData?.id]);
+
   const getCurrentOrderInfoHandler = useCallback(
     (order_info) => {
       if (
@@ -513,6 +528,8 @@ const OrderContextProvider = ({ children }) => {
         shipping_date: order?.shipping_date,
         person_in_charge: order?.person_in_charge,
         delivery: order?.delivery,
+        delivery_m2: order?.delivery_m2,
+        pdf_updated_at: order?.pdf_updated_at ?? null,
         main_order: order?.main_order ?? null,
         region: order?.region ?? null,
         payment_method: order?.payment_method ?? null,
@@ -521,7 +538,7 @@ const OrderContextProvider = ({ children }) => {
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
       setOrderCartData(currentOrder);
     },
-    [list_of_orders, clients, deliveryAddresses],
+    [list_of_orders, clients, deliveryAddresses, contactInfos],
   );
 
   useEffect(() => {

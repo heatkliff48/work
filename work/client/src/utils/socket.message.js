@@ -1,3 +1,4 @@
+import { updateOrderPdfDate } from '#components/redux/actions/ordersAction.js';
 import {
   addDatashipOrderSocket,
   addNewDryMixesJournalSocket,
@@ -159,6 +160,7 @@ import {
   deleteWarehouseManagerTrailerSocket,
   newStatusWarehouseManagerTrailerSocket,
   updPaymentMethodOrderSocket,
+  updateOrderPdfDateSocket,
 } from '#components/redux/actions/socketActions/socketAction.js';
 
 import {
@@ -363,6 +365,7 @@ import {
   DELETE_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
   UPDATE_PAYMENT_METHOD_SOCKET,
+  UPDATE_ORDER_PDF_DATE_SOCKET,
 } from '#components/redux/types/socketTypes/socket.js';
 
 export const createSocketOnMessage = (dispatch) => (event) => {
@@ -371,6 +374,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
   console.log('createSocketOnMessage, parsedData', parsedData);
 
   switch (type) {
+    case UPDATE_ORDER_PDF_DATE_SOCKET:
+      dispatch(updateOrderPdfDateSocket(payload));
+      break;
+
     case ADD_NEW_PRODUCT_SOCKET:
       dispatch(addNewProductSocket(payload));
       break;
