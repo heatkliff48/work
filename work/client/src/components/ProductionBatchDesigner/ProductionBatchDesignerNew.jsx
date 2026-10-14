@@ -65,6 +65,7 @@ function ProductionBatchDesignerNew() {
   // (после подтверждения) -> полноценное редактирование.
   const targetDate = location.state?.date ?? null;
   const editModeRequested = Boolean(location.state?.editMode);
+  const list_of_orders_to_warehouse = useSelector((state) => state.orderToWarehouse);
 
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [autoclaveCount, setAutoclaveCount] = useState(0);

@@ -7,6 +7,7 @@ import {
   DESCRIPTIOM_ORDER_SOCKET,
   NEW_DELIVERY_PRICE_SOCKET,
   NEW_ORDER_SOCKET,
+  ORDER_PDF_DATE_UPDATED_SOCKET,
   PAYMENT_METHOD_SOCKET,
   AGENT_COMMISSION_SOCKET,
   PERSON_IN_CHARGE_OF_ORDER_SOCKET,
@@ -20,13 +21,31 @@ import {
 export const ordersReducer = (orders = [], action) => {
   const { type, payload } = action;
   switch (type) {
+    case ORDER_PDF_DATE_UPDATED_SOCKET: {
+      if (payload?.order_id == null || typeof payload.pdf_updated_at !== 'string') {
+        return orders;
+      }
+      const incomingTime = Date.parse(payload.pdf_updated_at);
+      if (!Number.isFinite(incomingTime)) return orders;
+
+      let changed = false;
+      const result = orders.map((order) => {
+        if (String(order.id) !== String(payload.order_id)) return order;
+        const currentTime = Date.parse(order.pdf_updated_at);
+
+        if (Number.isFinite(currentTime) && currentTime >= incomingTime)
+          return order;
+        changed = true;
+        return { ...order, pdf_updated_at: payload.pdf_updated_at };
+      });
+      return changed ? result : orders;
+    }
+
     case ORDERS_LIST: {
-      return payload;
+      return Array.isArray(payload) ? payload : orders;
     }
 
     case NEW_ORDER_SOCKET: {
-      // if (orders.find((order) => order.id === payload.id)) return orders;
-
       return [...orders, payload];
     }
 

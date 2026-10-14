@@ -31,6 +31,11 @@ module.exports = (sequelize, DataTypes) => {
   }
   Orders.init(
     {
+      pdf_updated_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: DataTypes.NOW,
+      },
       article: DataTypes.STRING,
       owner: DataTypes.INTEGER,
       del_adr_id: DataTypes.INTEGER,

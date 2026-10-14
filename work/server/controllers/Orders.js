@@ -111,7 +111,7 @@ class OrdersController {
       });
 
       myEmitter.emit(ADD_DATASHIP_ORDER_SOCKET, date);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -137,7 +137,7 @@ class OrdersController {
       await OrdersService.addSecondaryContact(sec_cnt);
 
       myEmitter.emit(ADD_SECONDARY_CONTACT_ORDER_SOCKET, sec_cnt);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -150,7 +150,7 @@ class OrdersController {
       await OrdersService.deleteSecondaryContact(order_id);
 
       myEmitter.emit(DELETE_SECONDARY_CONTACT_ORDER_SOCKET, order_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -242,7 +242,7 @@ class OrdersController {
 
       myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
 
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -337,7 +337,7 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -352,7 +352,7 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -367,7 +367,7 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -382,7 +382,7 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -397,7 +397,7 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -534,7 +534,7 @@ class OrdersController {
         order_id,
       });
 
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -553,7 +553,7 @@ class OrdersController {
         address_id,
         order_id,
       });
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -669,7 +669,7 @@ class OrdersController {
 
       myEmitter.emit(GET_DELETE_ORDER_SOCKET, order_id);
 
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }

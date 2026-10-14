@@ -726,6 +726,58 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       };
 
       addFinalPageFooter();
+
+      // Дата последнего сохранённого изменения заказа приходит из БД.
+      // Скачивание PDF само по себе не изменяет эту дату.
+      let formattedDate = null;
+      if (orderData.pdf_updated_at) {
+        const modifiedAt = new Date(orderData.pdf_updated_at);
+
+        if (!Number.isNaN(modifiedAt.getTime())) {
+          // Единая дата для всех пользователей: часовой пояс завода в Испании.
+          const parts = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Europe/Madrid',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          }).formatToParts(modifiedAt);
+          const dateParts = Object.fromEntries(
+            parts.map(({ type, value }) => [type, value]),
+          );
+          formattedDate = `${dateParts.day}.${dateParts.month}.${dateParts.year}`;
+        }
+      }
+      // TODO: добавить ref_id в БД и API заказа; пока используем номер заказа (article).
+      const refId = orderData.ref_id ?? orderData.article ?? orderData.id ?? '';
+
+      // Нумерация всех страниц после формирования содержимого PDF.
+      const pageCount = doc.getNumberOfPages();
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(0, 0, 0);
+
+      for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
+        doc.setPage(pageNumber);
+        // Дата слева на каждой странице, номер страницы по центру, ref_id справа.
+        if (formattedDate) {
+          doc.text(formattedDate, 10, doc.internal.pageSize.getHeight() - 5, {
+            align: 'left',
+          });
+        }
+        doc.text(
+          `Pág. ${pageNumber}`,
+          doc.internal.pageSize.getWidth() / 2,
+          doc.internal.pageSize.getHeight() - 5,
+          { align: 'center' },
+        );
+        doc.text(
+          String(refId),
+          doc.internal.pageSize.getWidth() - 10,
+          doc.internal.pageSize.getHeight() - 5,
+          { align: 'right' },
+        );
+      }
+
       // Генерация PDF URL
       const pdfBlob = doc.output('blob');
       const pdfUrl = URL.createObjectURL(pdfBlob);
