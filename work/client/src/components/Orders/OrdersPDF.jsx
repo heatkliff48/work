@@ -380,27 +380,29 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       };
 
       const deliveryPrice = toNumber(pdfData.delivery);
+      const deliveryPriceM2 = toNumber(pdfData.delivery_m2);
 
-      // Считаем, что доставка указана, только если цена больше нуля
-      const hasDelivery = deliveryPrice > 0 || pdfData.delivery_m2 > 0;
+      const hasDelivery = deliveryPrice > 0 || deliveryPriceM2 > 0;
+      const hasBothDeliveryPrices = deliveryPrice > 0 && deliveryPriceM2 > 0;
 
-      // TOTAL — сумма товаров без НДС и без доставки
       const totalWithoutVat = toNumber(vatValue?.vat_euro_origin);
 
-      // BASE — товары + доставка
       const baseDisponible =
         totalWithoutVat + (hasDelivery ? deliveryPrice : 0);
 
-      // IVA
       const ivaAmount = toNumber(vatValue?.vat_euro);
 
-      // Итоговая сумма
       const totalPresupuesto = baseDisponible + ivaAmount;
 
-      // Показываем только одну из двух жёлтых строк
-      const transportText = hasDelivery
-        ? 'Transporte incluido (sin descarga) - Trailer con descarga lateral de 13,6m de 24tn'
-        : 'Transporte no está incluido en precio';
+      let transportText = 'Transporte no está incluido en precio';
+
+      if (hasBothDeliveryPrices) {
+        transportText =
+          'Transporte sin descarga está incluido en precio. Trailer de lona de 13,6m de 24tn. La entrega se efectúa en camiones completos. Si el camión no va completo, se aplicará un recargo.';
+      } else if (hasDelivery) {
+        transportText =
+          'Transporte incluido (sin descarga) - Trailer con descarga lateral de 13,6m de 24tn';
+      }
 
       const summaryStartY = doc.lastAutoTable
         ? doc.lastAutoTable.finalY + 5
