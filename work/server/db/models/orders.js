@@ -36,6 +36,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: DataTypes.NOW,
       },
+      pdf_version: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+      },
       article: DataTypes.STRING,
       owner: DataTypes.INTEGER,
       del_adr_id: DataTypes.INTEGER,

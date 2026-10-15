@@ -36,7 +36,11 @@ export const ordersReducer = (orders = [], action) => {
         if (Number.isFinite(currentTime) && currentTime >= incomingTime)
           return order;
         changed = true;
-        return { ...order, pdf_updated_at: payload.pdf_updated_at };
+        return {
+          ...order,
+          pdf_updated_at: payload.pdf_updated_at,
+          ...(payload.pdf_version != null && { pdf_version: payload.pdf_version }),
+        };
       });
       return changed ? result : orders;
     }

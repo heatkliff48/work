@@ -1107,7 +1107,11 @@ const OrderCart = React.memo(() => {
     if (updatedOrderCartData?.pdf_updated_at !== undefined) {
       setOrderCartData((prev) =>
         String(prev?.id) === String(updatedOrderCartData.id)
-          ? { ...prev, pdf_updated_at: updatedOrderCartData.pdf_updated_at }
+          ? {
+              ...prev,
+              pdf_updated_at: updatedOrderCartData.pdf_updated_at,
+              pdf_version: updatedOrderCartData.pdf_version,
+            }
           : prev,
       );
     }

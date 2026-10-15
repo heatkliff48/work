@@ -21,12 +21,13 @@ const UPDATE_ORDER_PDF_DATE_SOCKET = 'UPDATE_ORDER_PDF_DATE_SOCKET';
 const notifyPdfDateAfterCommit = async (order, transaction) => {
   // Читаем именно сохранённое значение: точность DATE зависит от диалекта БД.
   const savedOrder = await Orders.findByPk(order.id, {
-    attributes: ['id', 'pdf_updated_at'],
+    attributes: ['id', 'pdf_updated_at', 'pdf_version'],
     transaction,
   });
   const payload = {
     order_id: savedOrder.id,
     pdf_updated_at: savedOrder.pdf_updated_at,
+    pdf_version: savedOrder.pdf_version,
   };
   transaction.afterCommit(() => {
     // Ошибка доставки сообщения не должна превращать выполненное сохранение в ошибку.
@@ -37,6 +38,13 @@ const notifyPdfDateAfterCommit = async (order, transaction) => {
     }
   });
 };
+
+// Новая дата PDF и следующий порядковый номер версии.
+// Заказ заблокирован (lockOrder), поэтому номер не теряется при параллельных изменениях.
+const nextPdfRevision = (order, modifiedAt = new Date()) => ({
+  pdf_updated_at: modifiedAt,
+  pdf_version: order.pdf_version + 1,
+});
 
 // Все изменения заказа и его даты сохраняются в одной транзакции.
 // Блокировка заказа сериализует одновременные изменения его товаров.
@@ -95,7 +103,7 @@ const updateOrderFields = async (orderId, values) => Orders.sequelize.transactio
 
     await order.update({
       ...changes,
-      pdf_updated_at: new Date(),
+      ...nextPdfRevision(order),
     }, { transaction });
     await notifyPdfDateAfterCommit(order, transaction);
     return order;
@@ -106,7 +114,7 @@ const createOrderProduct = async (Model, values) => Orders.sequelize.transaction
   async (transaction) => {
     const order = await lockOrder(values.order_id, transaction);
     const product = await Model.create(values, { transaction });
-    await order.update({ pdf_updated_at: new Date() }, { transaction });
+    await order.update(nextPdfRevision(order), { transaction });
     await notifyPdfDateAfterCommit(order, transaction);
     return product;
   },
@@ -128,7 +136,7 @@ const deleteOrderProduct = async (Model, productId) => Orders.sequelize.transact
     }
 
     await product.destroy({ transaction });
-    await order.update({ pdf_updated_at: new Date() }, { transaction });
+    await order.update(nextPdfRevision(order), { transaction });
     await notifyPdfDateAfterCommit(order, transaction);
   },
 );
@@ -178,7 +186,7 @@ const updateOrderProduct = async (
   await product.update(changes, { transaction });
   const modifiedAt = new Date();
   for (const order of orders) {
-    await order.update({ pdf_updated_at: modifiedAt }, { transaction });
+    await order.update(nextPdfRevision(order, modifiedAt), { transaction });
     await notifyPdfDateAfterCommit(order, transaction);
   }
   return product;
