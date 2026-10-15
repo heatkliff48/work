@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import useLogout from '#utils/useLogout.js';
@@ -305,7 +305,9 @@ export default function NavBar() {
     if (isMobile()) closeDrawer();
   };
 
-  if (!user) return <Outlet />;
+  // Без пользователя не открывается WebSocket-соединение: страница бы работала,
+  // но изменения по сокетам не приходили бы. Отправляем на вход.
+  if (!user?.id) return <Navigate to="/sign-in" replace />;
 
   const sidebarClassName = [
     'bb-sidebar',
