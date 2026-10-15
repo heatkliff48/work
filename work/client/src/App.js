@@ -20,13 +20,14 @@ import RawMaterialsWarehouse from '#components/Warehouse/RawMaterialsWarehouse.j
 import MainContextProvider from '#components/contexts/MainContex.js';
 import WebSocketClient from '#utils/WebSockeetClient.js';
 import { createSocketOnMessage } from '#utils/socket.message.js';
+import loadAppData from '#utils/loadAppData.js';
 import ClientsInfo from './components/Clients/ClientsInfo/ClientsInfo';
 import LoginForm from './components/LoginForm/LoginForm';
 import Main from './components/Main/Main';
 import NavBar from './components/NavBar/NavBar';
 import Products from './components/Products/Products';
 import Roles from './components/Roles/Roles';
-import { SnackbarProvider } from 'notistack';
+import { SnackbarProvider, closeSnackbar } from 'notistack';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
@@ -89,12 +90,16 @@ function App() {
       url,
       socketOnMessageFunc,
       onUnauthorized: () => {
+        // Кнопка Refresh из старого уведомления сессию уже не вернёт
+        closeSnackbar('ws-reconnected');
         showMessage('Session expired, please sign in again', 'warning');
         logoutRef.current();
       },
       // Пока соединения не было, сообщения сервера не доходили —
-      // данные на странице могли устареть
+      // перезагружаем общие данные. Данные, скопированные страницей
+      // в своё состояние, могли устареть — их обновит только Refresh
       onReconnect: () => {
+        loadAppData(dispatch);
         showMessage('Connection restored. Data may be outdated', 'info', {
           key: 'ws-reconnected',
           preventDuplicate: true,
@@ -110,6 +115,10 @@ function App() {
         });
       },
     });
+
+    // Не только с главной: после перезагрузки на любой странице иначе
+    // остались бы данные из прошлой сессии, сохранённые redux-persist
+    loadAppData(dispatch);
 
     return () => socketClient.close();
 

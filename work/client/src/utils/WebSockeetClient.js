@@ -46,13 +46,19 @@ class WebSocketClient {
     socket.onopen = () => {
       if (!isCurrent()) return;
       console.log("WebSocket connection established");
-      this.reconnectInterval = 1000; // Сброс интервала при успешном подключении
-      if (this.hasConnected) this.onReconnect?.();
-      this.hasConnected = true;
     };
 
     socket.onmessage = (event) => {
       if (!isCurrent()) return;
+      // onopen срабатывает и тогда, когда сервер сразу закроет соединение
+      // из-за истёкшей сессии — подключённым считаемся только после "ready"
+      if (event.data === "ready") {
+        console.log("WebSocket authorized (ready)");
+        this.reconnectInterval = 1000; // Сброс интервала при успешном подключении
+        if (this.hasConnected) this.onReconnect?.();
+        this.hasConnected = true;
+        return;
+      }
       if (event.data === "pong") {
         clearTimeout(this.pongTimer);
         this.pongTimer = null;

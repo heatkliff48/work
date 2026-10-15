@@ -133,15 +133,16 @@ function* checkUserWatcher(action) {
 }
 
 function* delUserWatcher() {
+  // Пользователя убираем сразу, не дожидаясь ответа сервера: иначе страница
+  // входа успевает увидеть «живого» пользователя и уводит обратно в систему,
+  // а redux-persist снова сохраняет его после очистки localStorage
+  yield put({ type: DEL_USER, payload: null });
   try {
     // accessTokenFront = yield select((state) => state.jwt);
 
     yield call(delUser);
-    yield put({ type: DEL_USER, payload: null });
     // yield put(deleteToken());
-  } catch (err) {
-    yield put({ type: DEL_USER, payload: null });
-  }
+  } catch (err) {}
 }
 
 function* userWatcher() {

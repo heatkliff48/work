@@ -203,6 +203,10 @@ wss.on('connection', function (ws, request) {
   const connectionId = `${userId}:${randomUUID()}`;
   map.set(connectionId, ws);
 
+  // Браузер вызывает onopen и для подключения, которое тут же закроется
+  // с кодом 4401, поэтому успешную авторизацию подтверждаем явно
+  ws.send('ready');
+
   ws.isAlive = true;
   ws.on('pong', function () {
     ws.isAlive = true;
