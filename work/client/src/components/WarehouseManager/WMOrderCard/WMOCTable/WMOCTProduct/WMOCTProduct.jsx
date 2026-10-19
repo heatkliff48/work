@@ -1,7 +1,47 @@
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import {
+  extractProductTitle,
+  useProductsContext,
+} from '#components/contexts/ProductContext.js';
+import {
+  blocksInHeight,
+  calculatePalletDimensions,
+} from '#utils/palletDimensions.js';
 import { Fragment } from 'react';
 import '../../../warehouseManagerView.css';
+
+// Block on its pallet, e.g. "TERMECO 30. Pall 1200*800. Height 90cm (3 blocks)."
+// Height is the block stack only: rows counted the way the product card
+// counts them for blocks per pallet.
+const blockDescription = (catalog) => {
+  if (!catalog) return '';
+
+  const parts = [
+    extractProductTitle(catalog.description) || catalog.tradingMark,
+    catalog.palletSize && `Pall ${catalog.palletSize.replace('x', '*')}`,
+  ];
+
+  const width = Number(catalog.width);
+  if (width) {
+    const { palletHeight, extraRows } = calculatePalletDimensions(
+      catalog.palletSize,
+      catalog.palletHeight,
+    );
+    const rows = blocksInHeight(palletHeight, extraRows, width);
+    const heightCm = parseFloat(((rows * width) / 10).toFixed(2));
+
+    parts.push(
+      `Height ${heightCm}cm (${rows} ${rows === 1 ? 'block' : 'blocks'})`,
+    );
+  }
+
+  return parts
+    .filter(Boolean)
+    .map((part) => `${part}.`)
+    .join(' ');
+};
 
 const WMOCTProduct = ({
   orderId,
@@ -20,6 +60,23 @@ const WMOCTProduct = ({
     wmoctPdfAddDataModal,
     setWmoctPdfAddDataModal,
   } = useModalContext();
+  const { productsOfOrders } = useOrderContext();
+  const { latestProducts, productVersions } = useProductsContext();
+
+  // The order line keeps the product version it was ordered with; if the line
+  // isn't loaded, the latest card of the same article has the same packaging.
+  const getDescription = (product) => {
+    if (product.product_type !== 'product') return product.product_name;
+
+    const orderLine = (productsOfOrders || []).find(
+      (line) => Number(line.id) === Number(product.orders_products_id),
+    );
+    const catalog =
+      (productVersions || []).find((c) => c.id === orderLine?.product_id) ||
+      (latestProducts || []).find((c) => c.article === product.article);
+
+    return blockDescription(catalog) || product.product_name;
+  };
 
   const isSaveButtonVisible = () => {
     if (!Array.isArray(wmoctProduct) || wmoctProduct.length === 0) {
@@ -86,6 +143,7 @@ const WMOCTProduct = ({
           <thead>
             <tr>
               <th>Product article</th>
+              <th>Description</th>
               <th>Qty total, pallet</th>
               <th>Qty shipped, pallet</th>
               <th>Qty remaining, pallet</th>
@@ -101,6 +159,7 @@ const WMOCTProduct = ({
                 {/* Основная строка продукта */}
                 <tr>
                   <td className="wm-mono">{product.article}</td>
+                  <td>{getDescription(product)}</td>
                   <td>{product.qty_total}</td>
                   <td>{product.shipped}</td>
                   <td>{product.qty_rem}</td>
@@ -157,6 +216,7 @@ const WMOCTProduct = ({
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                     <td className="wm-mono">{batch.batchId}</td>
                     <td>{batch.remainingInBatch}</td>
                     <td>
@@ -182,6 +242,7 @@ const WMOCTProduct = ({
                 ))}
                 {haveBatches(productIndex) ? (
                   <tr>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>

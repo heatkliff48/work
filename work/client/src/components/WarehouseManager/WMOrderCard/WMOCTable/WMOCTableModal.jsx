@@ -85,6 +85,9 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
       .map((el) => ({
         warehouse_id: el.id,
         batch_article: el.article,
+        // Only block batches have a batch_id; the other warehouses are
+        // still told apart by their article
+        batch_id: el.batch_id ?? el.article,
         free_quantity_remaining: el.free_quantity_remaining,
         quantity: el.ordered_quantity,
         total_quantity: el.total_quantity,
@@ -99,7 +102,10 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
         toggle={() => {
           toggle();
         }}
-        contentClassName="wm-modal-card wm-modal-card--sm"
+        centered
+        scrollable
+        className="wm-modal-dialog--batch"
+        contentClassName="wm-modal-card"
         backdropClassName="wm-modal-backdrop"
       >
         <ModalHeader
@@ -111,36 +117,40 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
         </ModalHeader>
         <Fragment>
           <ModalBody>
-            <table className="wm-prod-table">
-              <thead>
-                <tr>
-                  <th>Batch article</th>
-                  <th>Free quantity remaining</th>
-                  <th>Ordered quantity</th>
-                </tr>
-              </thead>
+            <div className="overflow-auto">
+              <table className="wm-prod-table">
+                <thead>
+                  <tr>
+                    <th>Batch ID</th>
+                    <th>Free quantity remaining</th>
+                    <th>Ordered quantity</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {wmoctmodalData?.map((product, productIndex) => (
-                  <Fragment key={productIndex}>
-                    <tr
-                      className="tbl-row--click"
-                      onClick={() => {
-                        onClickHandler(product);
-                      }}
-                    >
-                      <td className="wm-mono" rowSpan={product?.length || 1}>
-                        {product.batch_article}
-                      </td>
-                      <td rowSpan={product?.length || 1}>
-                        {product.free_quantity_remaining}
-                      </td>
-                      <td rowSpan={product?.length || 1}>{product.quantity}</td>
-                    </tr>
-                  </Fragment>
-                ))}
-              </tbody>
-            </table>
+                <tbody>
+                  {wmoctmodalData?.map((product, productIndex) => (
+                    <Fragment key={productIndex}>
+                      <tr
+                        className="tbl-row--click"
+                        onClick={() => {
+                          onClickHandler(product);
+                        }}
+                      >
+                        <td className="wm-mono" rowSpan={product?.length || 1}>
+                          {product.batch_id}
+                        </td>
+                        <td rowSpan={product?.length || 1}>
+                          {product.free_quantity_remaining}
+                        </td>
+                        <td rowSpan={product?.length || 1}>
+                          {product.quantity}
+                        </td>
+                      </tr>
+                    </Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </ModalBody>
         </Fragment>
         <ModalFooter></ModalFooter>

@@ -241,6 +241,11 @@
 .wm-modal-card--xs {
   max-width: 460px;
 }
+/* Batch picker: Bootstrap's 500px dialog is narrower than its table, and the
+   card's overflow: hidden cut the table off */
+.modal-dialog.wm-modal-dialog--batch {
+  max-width: 600px;
+}
 .wm-modal-card .modal-header {
   padding: 20px 24px;
   border-bottom: 1px solid var(--wm-border-3);

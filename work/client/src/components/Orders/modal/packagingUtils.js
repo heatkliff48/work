@@ -10,6 +10,11 @@ export const round2 = (n) => parseFloat(Number(n).toFixed(2));
 export const m2PerPallet = (catalog) =>
   catalog?.form === 'U-block' ? catalog?.m || 1 : catalog?.m2 || 1;
 
+// Blocks in one m² (one linear m for U-blocks): turns a price per m² into a
+// price per piece.
+export const piecesPerQuantityUnit = (catalog) =>
+  (Number(catalog?.quantityBlockOnPallet) || 0) / m2PerPallet(catalog);
+
 // Whole pallets needed for a quantity in m² (linear m for U-blocks). The ratio
 // is trimmed to 6 decimals before rounding up: 3 × 13.2 m² is stored as 39.6,
 // and 39.6 / 13.2 = 3.0000000000000004 would otherwise become 4 pallets.

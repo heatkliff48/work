@@ -21,6 +21,14 @@ module.exports = (sequelize, DataTypes) => {
   }
   OrdersProducts.init(
     {
+      // Объявлен явно: иначе belongsToMany Orders ↔ Products через эту таблицу
+      // заменяет его составным ключом (order_id, product_id), и findByPk(id)
+      // ищет строку по order_id
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       order_id: DataTypes.INTEGER,
       product_id: DataTypes.INTEGER,
       quantity_m2: DataTypes.FLOAT,
