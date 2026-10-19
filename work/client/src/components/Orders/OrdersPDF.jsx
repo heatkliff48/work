@@ -399,6 +399,10 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       if (hasBothDeliveryPrices) {
         transportText =
           'Transporte sin descarga está incluido en precio. Trailer de lona de 13,6m de 24tn. La entrega se efectúa en camiones completos. Si el camión no va completo, se aplicará un recargo.';
+      } else if (deliveryPrice > 0) {
+        transportText = `El coste del transporte es de ${formatMoney(
+          deliveryPrice
+        )} €. Incluido en el importe total del presupuesto.`;
       } else if (hasDelivery) {
         transportText =
           'Transporte incluido (sin descarga) - Trailer con descarga lateral de 13,6m de 24tn';
