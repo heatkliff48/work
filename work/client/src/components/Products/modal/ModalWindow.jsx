@@ -337,8 +337,18 @@ const ModalWindow = React.memo(
             setFormInput((prev) => ({ ...prev, m2: value }));
         }
 
-        // Вычисление m
-        if (values.m2 && formInput?.height) {
+        // Вычисление m: O-block считаем по высоте блока, остальные — по длине
+        if (
+          formInput?.form === 'O-block' &&
+          values.quantityBlockOnPallet &&
+          formInput?.height
+        ) {
+          values.m = (
+            (values.quantityBlockOnPallet * formInput?.height) /
+            1000
+          ).toFixed(2);
+          updateFuncs.m = (value) => setFormInput((prev) => ({ ...prev, m: value }));
+        } else if (values.m2 && formInput?.height) {
           values.m = (values.m2 / (formInput?.height / 1000)).toFixed(2);
           updateFuncs.m = (value) => setFormInput((prev) => ({ ...prev, m: value }));
         }

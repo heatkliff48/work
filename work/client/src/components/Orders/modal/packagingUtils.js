@@ -5,12 +5,40 @@ import {
 
 export const round2 = (n) => parseFloat(Number(n).toFixed(2));
 
-// Blocks are sold by area, except U-blocks which are sold by linear meter —
-// both live in the same quantity_m2 / m2 fields across the order tables.
-export const m2PerPallet = (catalog) =>
-  catalog?.form === 'U-block' ? catalog?.m || 1 : catalog?.m2 || 1;
+// Blocks are sold by area, except U- and O-blocks which are sold by linear
+// meter — both live in the same quantity_m2 / m2 fields across the order tables.
+export const isLinearBlock = (catalog) =>
+  catalog?.form === 'U-block' || catalog?.form === 'O-block';
 
-// Whole pallets needed for a quantity in m² (linear m for U-blocks). The ratio
+// Linear metres one block covers: a U-block is counted along its length
+// (600 mm), an O-block along its height (250 mm).
+export const linearMetresPerBlock = (catalog) =>
+  (Number(catalog?.form === 'O-block' ? catalog?.height : catalog?.lengths) ||
+    0) / 1000;
+
+// The stored `m` of a product is counted along the block length, which is
+// right for U-blocks only, so for O-blocks it's derived from the block height.
+export const m2PerPallet = (catalog) => {
+  if (catalog?.form === 'O-block') {
+    const m = round2(
+      (Number(catalog?.quantityBlockOnPallet) || 0) *
+        linearMetresPerBlock(catalog),
+    );
+    return m || catalog?.m || 1;
+  }
+  return catalog?.form === 'U-block' ? catalog?.m || 1 : catalog?.m2 || 1;
+};
+
+// Linear metres for a number of U-/O-blocks, and back to whole pieces.
+export const linearMetresForPieces = (pieces, catalog) =>
+  round2((Number(pieces) || 0) * linearMetresPerBlock(catalog));
+
+export const piecesForLinearMetres = (metres, catalog) => {
+  const perBlock = linearMetresPerBlock(catalog);
+  return perBlock ? Math.round((Number(metres) || 0) / perBlock) : 0;
+};
+
+// Whole pallets needed for a quantity in m² (linear m for U-/O-blocks). The ratio
 // is trimmed to 6 decimals before rounding up: 3 × 13.2 m² is stored as 39.6,
 // and 39.6 / 13.2 = 3.0000000000000004 would otherwise become 4 pallets.
 export const palletsForQuantity = (quantity, catalog) =>
