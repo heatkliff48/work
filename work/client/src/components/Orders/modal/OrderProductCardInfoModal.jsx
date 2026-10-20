@@ -15,9 +15,12 @@ import { useDispatch } from 'react-redux';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useState } from 'react';
 import {
+  isLinearBlock,
+  linearMetresForPieces,
   m2PerPallet,
   orderProductType,
   palletsForQuantity,
+  piecesForLinearMetres,
 } from './packagingUtils.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
@@ -47,6 +50,9 @@ const formatFixed = (num, decimals = 2, separator = ',') => {
   return separator === ',' ? fixed.replace('.', ',') : fixed;
 };
 
+// Поле поштучного ввода для U-/O-block, в БД не хранится
+const QUANTITY_PIECES_FIELD = { Header: 'Quantity, pcs', accessor: 'quantity_pcs' };
+
 const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   const {
     COLUMNS_ORDER_PRODUCT,
@@ -70,10 +76,12 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   const [priceM2Draft, setPriceM2Draft] = useState(null);
   // То же для PVP
   const [pvpDraft, setPvpDraft] = useState(null);
+  // То же для количества в штуках (U-/O-block)
+  const [piecesDraft, setPiecesDraft] = useState(null);
 
   const isBlock = orderProductType(selectedProduct?.article) == 'N';
-  // U-block продаются погонными метрами, а не площадью
-  const isUBlock = isBlock && selectedProduct?.form === 'U-block';
+  // U-block и O-block продаются погонными метрами, а не площадью
+  const isLinear = isBlock && isLinearBlock(selectedProduct);
 
   // useEffect(() => {
   //   console.log(
@@ -550,11 +558,42 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     }
   };
 
+  // Поштучный ввод U-/O-block: штуки переводим в погонные метры и паллеты
+  const handleQuantityPiecesChange = (e) => {
+    setPiecesDraft(e.target.value.replace(/\D/g, ''));
+  };
+
+  const handleQuantityPiecesBlur = () => {
+    const pieces = parseInt(piecesDraft, 10);
+    setPiecesDraft(null);
+
+    if (!isNaN(pieces) && selectedProduct) {
+      const metres = linearMetresForPieces(pieces, selectedProduct);
+      setProductOfOrder((prev) => ({
+        ...prev,
+        quantity_m2: metres.toFixed(2),
+        quantity_palet: String(palletsForQuantity(metres, selectedProduct)),
+      }));
+    }
+  };
+
+  const quantityPiecesDisplay =
+    piecesDraft ??
+    (productOfOrder.quantity_m2
+      ? String(
+          piecesForLinearMetres(
+            parseLocalNumber(productOfOrder.quantity_m2),
+            selectedProduct,
+          ),
+        )
+      : '');
+
   useEffect(() => {
     if (!isOpen) {
       setIsReturn(false);
       setPriceM2Draft(null);
       setPvpDraft(null);
+      setPiecesDraft(null);
     }
   }, [isOpen]);
 
@@ -662,7 +701,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                 return (
                   <>
                     <ModalBody>
-                      {isUBlock && el.accessor === 'quantity_real'
+                      {isLinear && el.accessor === 'quantity_real'
                         ? 'Real quantity, linear metre'
                         : el.Header}
                       :
@@ -683,7 +722,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                       key={el.accessor}
                       el={el}
                       uBlockHeader={
-                        isUBlock ? 'Price, EURO per linear metre' : ''
+                        isLinear ? 'Price, EURO per linear metre' : ''
                       }
                       inputValue={{ price_m2: priceM2Display }}
                       inputValueChange={handlePriceM2Change}
@@ -768,15 +807,25 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
 
               if (el.accessor === 'quantity_m2') {
                 return (
-                  <InputField
-                    key={el.accessor}
-                    el={el}
-                    uBlockHeader={isUBlock ? 'Quantity, linear metre' : ''}
-                    inputValue={productOfOrder}
-                    inputValueChange={handleQuantityM2Change}
-                    onBlur={handleQuantityM2Blur}
-                    isDisabled={false}
-                  />
+                  <React.Fragment key={el.accessor}>
+                    <InputField
+                      el={el}
+                      uBlockHeader={isLinear ? 'Quantity, linear metre' : ''}
+                      inputValue={productOfOrder}
+                      inputValueChange={handleQuantityM2Change}
+                      onBlur={handleQuantityM2Blur}
+                      isDisabled={false}
+                    />
+                    {isLinear && (
+                      <InputField
+                        el={QUANTITY_PIECES_FIELD}
+                        inputValue={{ quantity_pcs: quantityPiecesDisplay }}
+                        inputValueChange={handleQuantityPiecesChange}
+                        onBlur={handleQuantityPiecesBlur}
+                        isDisabled={false}
+                      />
+                    )}
+                  </React.Fragment>
                 );
               }
 
