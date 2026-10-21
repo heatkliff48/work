@@ -5,10 +5,7 @@ import {
   extractProductTitle,
   useProductsContext,
 } from '#components/contexts/ProductContext.js';
-import {
-  blocksInHeight,
-  calculatePalletDimensions,
-} from '#utils/palletDimensions.js';
+import { palletRows } from '#utils/palletDimensions.js';
 import { Fragment } from 'react';
 import '../../../warehouseManagerView.css';
 
@@ -24,12 +21,8 @@ const blockDescription = (catalog) => {
   ];
 
   const width = Number(catalog.width);
-  if (width) {
-    const { palletHeight, extraRows } = calculatePalletDimensions(
-      catalog.palletSize,
-      catalog.palletHeight,
-    );
-    const rows = blocksInHeight(palletHeight, extraRows, width);
+  const rows = palletRows(catalog);
+  if (width && rows) {
     const heightCm = parseFloat(((rows * width) / 10).toFixed(2));
 
     parts.push(

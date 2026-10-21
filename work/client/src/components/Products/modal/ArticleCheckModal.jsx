@@ -24,7 +24,7 @@ const ArticleCheckModal = ({ isOpen, toggle, canFix }) => {
       } catch (err) {
         // Нет плотности или ширины — артикул не собрать
       }
-      // 'undefined' в артикуле — неизвестная комбинация, нет формы или сертификата
+      // 'undefined' в артикуле — неизвестная комбинация, нет формы, сертификата или высоты паллеты
       if (expected?.includes('undefined')) expected = null;
 
       return { product, expected };
@@ -85,7 +85,7 @@ const ArticleCheckModal = ({ isOpen, toggle, canFix }) => {
                 <th>Place</th>
                 <th>Packaging</th>
                 <th>Pallet size</th>
-                <th>Pallet height</th>
+                <th>Pallet height, blocks</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -97,7 +97,10 @@ const ArticleCheckModal = ({ isOpen, toggle, canFix }) => {
                   <td>{product.placeOfProduction ?? '—'}</td>
                   <td>{product.typeOfPackaging ?? '—'}</td>
                   <td>{product.palletSize ?? '—'}</td>
-                  <td>{product.palletHeight ?? '—'}</td>
+                  <td>
+                    {product.palletHeightBlocks ?? '—'}
+                    {product.palletHeight && ` (${product.palletHeight})`}
+                  </td>
                   <td>{status}</td>
                 </tr>
               ))}

@@ -1,26 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Modal, ModalHeader, ModalBody, Input } from 'reactstrap';
 import { Switch, FormControlLabel } from '@mui/material';
-import {
-  blocksInHeight,
-  calculatePalletDimensions,
-} from '#utils/palletDimensions.js';
-
-// Rows of blocks on the product's pallet, counted as the product card does
-const getBlocksInHeight = (product) => {
-  const width = Number(product?.width);
-
-  if (!width || product?.palletHeight == null || product.palletHeight === '') {
-    return null;
-  }
-
-  const { palletHeight, extraRows } = calculatePalletDimensions(
-    product.palletSize,
-    product.palletHeight,
-  );
-
-  return blocksInHeight(palletHeight, extraRows, width);
-};
+import { palletRows } from '#utils/palletDimensions.js';
 
 const ModalTable = ({ isOpen, toggle, data = [], onClickRow = null }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,7 +15,7 @@ const ModalTable = ({ isOpen, toggle, data = [], onClickRow = null }) => {
     return data
       .filter((item) => item?.article?.startsWith('T'))
       .map((item) => {
-        const blocks = getBlocksInHeight(item);
+        const blocks = palletRows(item) ?? null;
 
         return {
           id: item.id,

@@ -1,7 +1,4 @@
-import {
-  blocksInHeight,
-  calculatePalletDimensions,
-} from '#utils/palletDimensions.js';
+import { palletRows } from '#utils/palletDimensions.js';
 
 export const round2 = (n) => parseFloat(Number(n).toFixed(2));
 
@@ -49,11 +46,14 @@ export const piecesPerQuantityUnit = (catalog) =>
 export const palletsForQuantity = (quantity, catalog) =>
   Math.ceil(Number(((Number(quantity) || 0) / m2PerPallet(catalog)).toFixed(6)));
 
-// Block article layout: `T.` + form letter + packaging letter + `D<density>` +
-// `W<width>` + certificate letter, e.g. `T.NAD35W20C`. The letter at index 3
-// encodes place of production / type of packaging / pallet size, so two
-// articles differing only there are the same block in a different package.
-const PACKAGING_LETTER_INDEX = 3;
+// Block article layout: `T.` + form letter + packaging letter + `H<rows>` +
+// `D<density>` + `W<width>` + certificate letter, e.g. `T.NAH5D35W20C`;
+// articles made before rows were stored have no `H<rows>`: `T.NAD35W20C`.
+// The packaging letter (place of production / type of packaging / pallet size)
+// and the rows of blocks make the package, so two articles differing only
+// there are the same block in a different package.
+const BLOCK_PACKAGING = /^(T\..)(.)(H\d+)?/;
+const withoutPackaging = (article) => article.replace(BLOCK_PACKAGING, '$1');
 
 // Order line type by article: 'N' — any block (`T.N…`, `T.O…` O-TEC,
 // `T.U…` U-TEC, …), otherwise the letter after `X.`: 'M' dry mix,
@@ -63,9 +63,7 @@ export const orderProductType = (article = '') =>
   article.startsWith('T.') ? 'N' : article.slice(2, 3);
 
 export const isSameBlockOtherPackaging = (a = '', b = '') =>
-  a.length === b.length &&
-  a.slice(0, PACKAGING_LETTER_INDEX) === b.slice(0, PACKAGING_LETTER_INDEX) &&
-  a.slice(PACKAGING_LETTER_INDEX + 1) === b.slice(PACKAGING_LETTER_INDEX + 1);
+  withoutPackaging(a) === withoutPackaging(b);
 
 // Catalog entry a block order line points at, and every package the same block
 // is available in (the line's own package included, so the list doubles as the
@@ -87,27 +85,26 @@ export const findBlockPackaging = (orderRow, catalogProducts, productVersions) =
   return { origin, variants };
 };
 
-// Short human label for a package, e.g. "Disposable · 1200x800 · Marine · Spain".
-export const packagingLabel = (catalog) =>
-  [
+// Short human label for a package, e.g. "Disposable · 1200x800 · 5 blocks · Spain".
+export const packagingLabel = (catalog) => {
+  const rows = palletRows(catalog);
+  return [
     catalog?.typeOfPackaging,
     catalog?.palletSize,
-    catalog?.palletHeight,
+    rows && `${rows} ${rows === 1 ? 'block' : 'blocks'}`,
     catalog?.placeOfProduction,
   ]
     .filter(Boolean)
     .join(' · ');
+};
 
 // Height of the block stack on one pallet, in cm, with the rows counted the
 // way the product card counts them for blocks per pallet.
 export const palletHeightCm = (catalog) => {
   const width = Number(catalog?.width);
-  if (!width) return null;
-  const { palletHeight, extraRows } = calculatePalletDimensions(
-    catalog.palletSize,
-    catalog.palletHeight,
-  );
-  return round2((blocksInHeight(palletHeight, extraRows, width) * width) / 10);
+  const rows = palletRows(catalog);
+  if (!width || !rows) return null;
+  return round2((rows * width) / 10);
 };
 
 // Pallet a block is packed on: size, stack height and volume, e.g.
@@ -125,7 +122,7 @@ export const palletPackagingLabel = (catalog) => {
 };
 
 // One option of a "ship as" selector, e.g.
-// "T.NBD30W30C — Disposable · 1200x800 · Marine · Spain (1.44 m²/pal · 90 cm)".
+// "T.NDH3D30W30C — Disposable · 1200x800 · 3 blocks · Spain (1.44 m²/pal · 90 cm)".
 export const packageOptionLabel = (catalog) => {
   const label = packagingLabel(catalog);
   const height = palletHeightCm(catalog);

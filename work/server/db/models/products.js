@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       typeOfPackaging: DataTypes.STRING,
       palletSize: DataTypes.TEXT,
       palletHeight: DataTypes.STRING,
+      palletHeightBlocks: DataTypes.INTEGER,
       width: DataTypes.FLOAT,
       lengths: DataTypes.FLOAT,
       height: DataTypes.FLOAT,
