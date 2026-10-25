@@ -1009,13 +1009,17 @@ const WarehouseContextProvider = ({ children }) => {
       `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
       `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
+    // Transport data and the trailer are kept, so a loaded trailer can
+    // download the same albaran again
     const aldabaran_data = {
+      ...additionalInfoPDF,
       num: aldabaranNum,
       data: dateTimeStr,
-      ...additionalInfoPDF,
+      order_id: orderId,
+      trailer,
     };
 
-    dispatch(addNewAldabaran({ num: aldabaranNum, data: dateTimeStr }));
+    dispatch(addNewAldabaran(aldabaran_data));
 
     if (allOrderReserved) {
       const order = list_of_orders.find(

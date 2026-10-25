@@ -27,7 +27,9 @@ const getTypeByArticle = (article = '') => {
   return 'product';
 };
 
-const WMOPdf = ({ orderCartData, toggle }) => {
+// reprint: albaran saved earlier ({ num, data, agencia, matricula, referencia }),
+// downloaded again from a loaded trailer
+const WMOPdf = ({ orderCartData, toggle, reprint }) => {
   const {
     wmoctProduct,
     wmoctProductShippedBD,
@@ -66,10 +68,15 @@ const WMOPdf = ({ orderCartData, toggle }) => {
 
     const { article: orderArticle, contactInfo, owner } = orderCartData;
 
+    const albaranInfo = reprint ?? additionalInfoPDF;
+
     let pallet_sum = 0;
     let pallet_weight = 0;
 
-    const today = new Date();
+    // A reprint is dated from the day the albaran was saved
+    const savedAt = reprint?.data && new Date(reprint.data.replace(' ', 'T'));
+    const today =
+      savedAt && !Number.isNaN(savedAt.getTime()) ? savedAt : new Date();
     const nextMonthDate = new Date(today);
     nextMonthDate.setMonth(today.getMonth() + 1);
 
@@ -104,10 +111,14 @@ const WMOPdf = ({ orderCartData, toggle }) => {
             }kg/m³`;
 
         const deltaRow = (wmoctProductDeltaForPdf || []).find(
-          (x) => x.article === article,
+          (x) => x.order_dispatch_id === prod.order_dispatch_id,
         );
 
-        const palet = Number(deltaRow?.delta ?? deltaRow?.palet ?? 0) || 0;
+        // A reprint lists everything loaded on the trailer, a new albaran
+        // only what is loaded now
+        const palet = reprint
+          ? Number(prod.shipped) || 0
+          : Number(deltaRow?.delta ?? deltaRow?.palet ?? 0) || 0;
 
         pallet_sum += palet;
 
@@ -137,7 +148,7 @@ const WMOPdf = ({ orderCartData, toggle }) => {
       cif: owner?.cif_vat ?? '',
       telefono: contactInfo?.phone_number_mobile ?? '',
       pedido: orderArticle ?? '',
-      referencia: additionalInfoPDF?.referencia ?? '',
+      referencia: albaranInfo?.referencia ?? '',
     };
 
     const lugar = {
@@ -150,13 +161,14 @@ const WMOPdf = ({ orderCartData, toggle }) => {
     };
 
     const transporte = {
-      agencia: additionalInfoPDF?.agencia ?? '',
-      matricula: additionalInfoPDF?.matricula ?? '',
+      agencia: albaranInfo?.agencia ?? '',
+      matricula: albaranInfo?.matricula ?? '',
     };
 
     const peso = (Number(pallet_sum) || 0) * (Number(pallet_weight) || 0);
 
     return {
+      num: reprint ? reprint.num ?? '' : aldabaranNum,
       cliente,
       lugar,
       transporte,
@@ -171,6 +183,8 @@ const WMOPdf = ({ orderCartData, toggle }) => {
     wmoctProductShippedBD,
     productMap,
     additionalInfoPDF,
+    aldabaranNum,
+    reprint,
   ]);
 
   const generatePDF = async () => {
@@ -206,7 +220,7 @@ const WMOPdf = ({ orderCartData, toggle }) => {
       doc.setFont(undefined, `bold`);
       doc.text(`ALBARAN DE SALIDA `, 140, yPosition);
       doc.setFont(undefined, `normal`);
-      doc.text(`Nº ALBARAN: ${aldabaranNum}`, 140, yPosition + 6);
+      doc.text(`Nº ALBARAN: ${pdfData?.num}`, 140, yPosition + 6);
       doc.text(`FECHA: ${pdfData?.formattedDate}`, 140, yPosition + 20);
 
       yPosition += 50;
@@ -290,15 +304,17 @@ const WMOPdf = ({ orderCartData, toggle }) => {
             <button className="wm-btn wm-btn--ghost" onClick={downloadPDF}>
               Download PDF
             </button>
-            <button
-              className="wm-btn wm-btn--primary"
-              onClick={async () => {
-                await saveHandler();
-                toggle();
-              }}
-            >
-              Save
-            </button>
+            {!reprint && (
+              <button
+                className="wm-btn wm-btn--primary"
+                onClick={async () => {
+                  await saveHandler();
+                  toggle();
+                }}
+              >
+                Save
+              </button>
+            )}
           </div>
         </div>
       )}

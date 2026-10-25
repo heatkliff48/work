@@ -4,11 +4,12 @@ import { Fragment, useState } from 'react';
 import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from 'reactstrap';
 import '../../warehouseManagerView.css';
 
-const WMOCTableDataModal = ({ isOpen, toggle }) => {
+const WMOCTableDataModal = ({ isOpen, toggle, reprint, onReprint }) => {
   const {
     setAdditionalInfoPDF,
     setWmoctProductDeltaForPdf,
     wmoctProduct,
+    aldabaran,
   } = useWarehouseContext();
   const { setWmoctPdfModal, wmoctPdfModal } = useModalContext();
 
@@ -17,12 +18,24 @@ const WMOCTableDataModal = ({ isOpen, toggle }) => {
     matricula: '',
     agencia: '',
   });
+  const [albaranNum, setAlbaranNum] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSave = () => {
+    if (reprint) {
+      // Albaran saved before it was linked to its trailer: the number is
+      // typed in, and the albaran with that number gives its date
+      const saved = (aldabaran || []).find(
+        (item) => albaranNum && Number(item.num) === Number(albaranNum),
+      );
+
+      onReprint({ ...formData, num: albaranNum, data: saved?.data });
+      return;
+    }
+
     const deltaForPdf = (wmoctProduct || []).map((p) => {
       const delta = (p.batches || []).reduce((sum, b) => {
         const prev = Number(b.minAllocated || 0);
@@ -31,6 +44,7 @@ const WMOCTableDataModal = ({ isOpen, toggle }) => {
       }, 0);
 
       return {
+        order_dispatch_id: p.order_dispatch_id,
         article: p.article,
         product_name: p.product_name,
         delta,
@@ -57,6 +71,17 @@ const WMOCTableDataModal = ({ isOpen, toggle }) => {
         </ModalHeader>
         <Fragment>
           <ModalBody>
+            {reprint && (
+              <div className="wm-field">
+                <label htmlFor="albaranNum">Nº Albaran:</label>
+                <input
+                  id="albaranNum"
+                  name="albaranNum"
+                  value={albaranNum}
+                  onChange={(e) => setAlbaranNum(e.target.value)}
+                />
+              </div>
+            )}
             <div className="wm-field">
               <label htmlFor="agencia">Agencia Transporte:</label>
               <input

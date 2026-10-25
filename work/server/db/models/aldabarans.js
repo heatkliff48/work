@@ -18,6 +18,8 @@ module.exports = (sequelize, DataTypes) => {
       agencia: DataTypes.STRING,
       matricula: DataTypes.STRING,
       referencia: DataTypes.STRING,
+      order_id: DataTypes.INTEGER,
+      trailer: DataTypes.INTEGER,
     },
     {
       sequelize,
