@@ -15,7 +15,7 @@ export const FileContextProvider = ({ children }) => {
 
   const refreshFiles = async () => {
     try {
-      const res = url.get('http://localhost:3001/files/files');
+      const res = await url.get('http://localhost:3001/files/files');
       setFiles(res.data);
     } catch (err) {
       setMessage('Error fetching files');
