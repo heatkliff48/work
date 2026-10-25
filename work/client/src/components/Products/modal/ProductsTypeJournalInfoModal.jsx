@@ -77,7 +77,7 @@ function ProductsTypeJournalInfoModal(props) {
       props.target == 1
         ? dryMixedProductsOfOrders.find((el) => el.product_id == id)
         : props.target == 2
-        ? relMatProductsOfOrders.find((el) => el.product_id == id)
+        ? relMatProductsOfOrders.find((el) => el.rel_mat_id == id)
         : props.target == 3
         ? anchorProductsOfOrders.find((el) => el.product_id == id)
         : toolProductsOfOrders.find((el) => el.product_id == id);

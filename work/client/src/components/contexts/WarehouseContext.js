@@ -918,8 +918,16 @@ const WarehouseContextProvider = ({ children }) => {
         };
       });
 
+    // Related materials не отгружаются через dispatch: старые строки relMat
+    // не должны блокировать резерв трейлера и статус Order shipped
+    const isShippableDispatchRow = (item) =>
+      normalizeProductType(item.product_table) !== 'relMat';
+
     const dispatchRowsForTrailer = (order_dispatch_data || []).filter(
-      (item) => Number(item.orderId) === orderId && Number(item.trailer) === trailer,
+      (item) =>
+        Number(item.orderId) === orderId &&
+        Number(item.trailer) === trailer &&
+        isShippableDispatchRow(item),
     );
 
     const trailerReservationCheck = createReservationCheck(dispatchRowsForTrailer);
@@ -950,7 +958,7 @@ const WarehouseContextProvider = ({ children }) => {
     }
 
     const dispatchRowsForOrder = (order_dispatch_data || []).filter(
-      (item) => Number(item.orderId) === Number(orderId),
+      (item) => Number(item.orderId) === Number(orderId) && isShippableDispatchRow(item),
     );
 
     const reservationCheck = dispatchRowsForOrder.map((dispatchRow) => {
@@ -1107,8 +1115,15 @@ const WarehouseContextProvider = ({ children }) => {
     });
 
     setListOfOrderedCakes(data);
-    const dryMixOrderedData = related_materials_backorder_list
-      ?.filter((el) => {
+
+    // Строки related materials (X.P) могли остаться от старой логики резерва —
+    // они не участвуют ни в backorder, ни в смене статуса на Order produced
+    const auxBackorderList = (related_materials_backorder_list || []).filter(
+      (el) => !el.product_article?.startsWith('X.P'),
+    );
+
+    const dryMixOrderedData = auxBackorderList
+      .filter((el) => {
         const orderStatus = list_of_orders?.find(
           (order) => order.article === el.order_article,
         )?.status;
@@ -1152,10 +1167,7 @@ const WarehouseContextProvider = ({ children }) => {
 
     setListOfOrderedAuxilary(dryMixOrderedData);
 
-    const combinedList = [
-      ...related_materials_backorder_list,
-      ...list_of_ordered_production,
-    ];
+    const combinedList = [...auxBackorderList, ...list_of_ordered_production];
 
     // Группируем все позиции по order_article
     const ordersMap = combinedList.reduce((acc, item) => {
