@@ -19,7 +19,7 @@ function WMModalTrailer({ setTrailerOrder }) {
     setwmmodalTrailerModal,
   } = useModalContext();
   const { WAREHOUSE_MANAGER_TRAILER_TABLE } = useProjectContext();
-  const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
+  const { latestDryMix, latestAnchors, latestTools } =
     useProductsTypeJournalContext();
   const {
     list_of_orders,
@@ -29,7 +29,6 @@ function WMModalTrailer({ setTrailerOrder }) {
     anchorProductsOfOrders,
     toolProductsOfOrders,
     getCurrentOrderInfoHandler,
-    relMatProductsOfOrders,
   } = useOrderContext();
 
   const [warehouse_trailer_data, setWarehouseTrailerData] = useState([]);
@@ -99,19 +98,9 @@ function WMModalTrailer({ setTrailerOrder }) {
           'anchor',
           'quantity_palet_anchor',
         );
-        const order_rel_mats = getRemainingQuantityOfPallets(
-          relMatProductsOfOrders,
-          id,
-          'relMat',
-          'quantity_ud',
-        );
-
+        // Related materials не отгружаются через dispatch
         const remaining_quantity_of_pallets =
-          order_products +
-          order_dry_mixes +
-          order_anchors +
-          order_tools +
-          order_rel_mats;
+          order_products + order_dry_mixes + order_anchors + order_tools;
 
         if (remaining_quantity_of_pallets <= 0) {
           return acc;
@@ -141,7 +130,6 @@ function WMModalTrailer({ setTrailerOrder }) {
     dryMixedProductsOfOrders,
     anchorProductsOfOrders,
     toolProductsOfOrders,
-    relMatProductsOfOrders,
     deliveryAddresses,
   ]);
 
@@ -188,13 +176,6 @@ function WMModalTrailer({ setTrailerOrder }) {
         orderProductIdKey: 'tool_id',
         quantityKey: 'quantity_ud',
       },
-      {
-        type: 'relMat',
-        orderRows: relMatProductsOfOrders,
-        productTable: latestRelatedMaterials,
-        orderProductIdKey: 'rel_mat_id',
-        quantityKey: 'quantity_ud',
-      },
     ];
 
     return sources.flatMap(
@@ -209,15 +190,6 @@ function WMModalTrailer({ setTrailerOrder }) {
             );
 
             if (!productInfo) return null;
-
-            if (type === 'relMat') {
-              const finalPrice =
-                orderProductRow?.final_price ?? productInfo?.final_price;
-
-              if (finalPrice < 0) {
-                return null;
-              }
-            }
 
             const fullDescription =
               productInfo.description ||

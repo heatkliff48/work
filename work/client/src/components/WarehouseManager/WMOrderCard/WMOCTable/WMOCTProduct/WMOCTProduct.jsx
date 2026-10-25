@@ -1,6 +1,7 @@
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { Fragment } from 'react';
+import { useLineDescription } from '../../useLineDescription.js';
 import '../../../warehouseManagerView.css';
 
 const WMOCTProduct = ({
@@ -20,6 +21,7 @@ const WMOCTProduct = ({
     wmoctPdfAddDataModal,
     setWmoctPdfAddDataModal,
   } = useModalContext();
+  const getDescription = useLineDescription();
 
   const isSaveButtonVisible = () => {
     if (!Array.isArray(wmoctProduct) || wmoctProduct.length === 0) {
@@ -86,6 +88,7 @@ const WMOCTProduct = ({
           <thead>
             <tr>
               <th>Product article</th>
+              <th>Description</th>
               <th>Qty total, pallet</th>
               <th>Qty shipped, pallet</th>
               <th>Qty remaining, pallet</th>
@@ -97,10 +100,11 @@ const WMOCTProduct = ({
           </thead>
           <tbody>
             {wmoctProduct?.map((product, productIndex) => (
-              <Fragment key={product.article}>
+              <Fragment key={product.order_dispatch_id}>
                 {/* Основная строка продукта */}
                 <tr>
                   <td className="wm-mono">{product.article}</td>
+                  <td>{getDescription(product)}</td>
                   <td>{product.qty_total}</td>
                   <td>{product.shipped}</td>
                   <td>{product.qty_rem}</td>
@@ -112,17 +116,14 @@ const WMOCTProduct = ({
                         <div className="wm-prod-table__controls">
                           <button
                             className="wm-round-btn"
-                            disabled={isDisablePlus(product.article)}
+                            disabled={isDisablePlus(product)}
                             onClick={() => handlePlus(product, 0)}
                           >
                             ＋
                           </button>
                           <button
                             className="wm-round-btn"
-                            disabled={isDisableMinus(
-                              product.article,
-                              product.batches[0],
-                            )}
+                            disabled={isDisableMinus(product.batches[0])}
                             onClick={() => handleMinus(product, 0)}
                           >
                             －
@@ -152,7 +153,8 @@ const WMOCTProduct = ({
                 </tr>
                 {/* Дополнительные строки для батчей */}
                 {product.batches?.slice(1).map((batch, batchIndex) => (
-                  <tr key={`${product.article}__${batch.batchId}`}>
+                  <tr key={`${product.order_dispatch_id}__${batch.warehouseId}`}>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -163,14 +165,14 @@ const WMOCTProduct = ({
                       <div className="wm-prod-table__controls">
                         <button
                           className="wm-round-btn"
-                          disabled={isDisablePlus(product.article)}
+                          disabled={isDisablePlus(product)}
                           onClick={() => handlePlus(product, batchIndex + 1)}
                         >
                           ＋
                         </button>
                         <button
                           className="wm-round-btn"
-                          disabled={isDisableMinus(product.article, batch)}
+                          disabled={isDisableMinus(batch)}
                           onClick={() => handleMinus(product, batchIndex + 1)}
                         >
                           －
@@ -182,6 +184,7 @@ const WMOCTProduct = ({
                 ))}
                 {haveBatches(productIndex) ? (
                   <tr>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>

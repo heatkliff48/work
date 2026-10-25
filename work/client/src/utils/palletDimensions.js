@@ -13,7 +13,7 @@ export const calculatePalletDimensions = (palletSize, palletHeight) => {
     palletLengthValue = 1200;
   }
 
-  // Определение высоты паллета
+  // Определение высоты паллета — только для прежних карточек, новые хранят ряды блоков (palletRows)
   // При редактировании приходит label ('Std' / 'Marine' / 'High' / 'Std+1'), при создании — value (0 / 1 / 2 / 3)
   const palletHeightMap = {
     0: 1150,
@@ -49,3 +49,22 @@ export const calculatePalletDimensions = (palletSize, palletHeight) => {
 // as fit under the pallet's maximum height, plus the extra row of Std+1.
 export const blocksInHeight = (palletHeight, extraRows, blockWidth) =>
   Math.floor(palletHeight / blockWidth) + extraRows;
+
+// Rows of blocks on a product's pallet. Cards store them in palletHeightBlocks;
+// older cards have only the pallet height option (palletHeight: code or label),
+// and their rows are counted from its height. undefined if neither is known.
+export const palletRows = (product) => {
+  const storedRows = Number(product?.palletHeightBlocks);
+  if (storedRows > 0) return storedRows;
+
+  const width = Number(product?.width);
+  if (!width || product?.palletHeight == null || product.palletHeight === '') {
+    return undefined;
+  }
+
+  const { palletHeight, extraRows } = calculatePalletDimensions(
+    product.palletSize,
+    product.palletHeight,
+  );
+  return blocksInHeight(palletHeight, extraRows, width);
+};

@@ -18,6 +18,7 @@ import {
   m2PerPallet,
   palletsForQuantity,
   piecesForLinearMetres,
+  piecesPerQuantityUnit,
 } from '../packagingUtils.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
@@ -47,6 +48,11 @@ const formatFixed = (num, decimals = 2, separator = ',') => {
   return separator === ',' ? fixed.replace('.', ',') : fixed;
 };
 
+const PRICE_PIECE_COLUMN = {
+  Header: 'Price, EURO per piece',
+  accessor: 'price_piece',
+};
+
 // Поле поштучного ввода для U-/O-block, в БД не хранится
 const QUANTITY_PIECES_FIELD = { Header: 'Quantity, pcs', accessor: 'quantity_pcs' };
 
@@ -68,6 +74,11 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const { clientPriceInfo } = useProjectContext();
 
   const dispatch = useDispatch();
+
+  // Что пользователь сейчас набирает в цене за м² / за штуку;
+  // null — показываем расчётную
+  const [priceM2Draft, setPriceM2Draft] = useState(null);
+  const [pricePieceDraft, setPricePieceDraft] = useState(null);
 
   function extractProductTitle(description) {
     if (!description) return '';
@@ -139,11 +150,14 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
 
     const discount =
       originalPrice === 0 ? 0 : ((originalPrice - price) / originalPrice) * 100;
+    // Не округляем: у блоков скидка в БД — FLOAT, и округлённая
+    // дала бы итог, не совпадающий с введённой ценой
+    const safeDiscount = Number.isFinite(discount) ? discount : 0;
 
     setProductOfOrder((prev) => ({
       ...prev,
       price_m3: limited,
-      discount: discount.toFixed(2),
+      discount: safeDiscount,
     }));
   };
 
@@ -170,6 +184,9 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const handleDiscountBlur = () => {
+    // Число — посчитано из цены, его не округляем
+    if (typeof productOfOrder.discount === 'number') return;
+
     const num = parseLocalNumber(productOfOrder.discount);
     if (!isNaN(num)) {
       setProductOfOrder((prev) => ({ ...prev, discount: num?.toFixed(2) }));
@@ -271,6 +288,52 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     return formatFixed(result, 2, ',');
   }, [selectedProduct]);
 
+  const listPriceM2 = parseLocalNumber(price_m2_value) || 0;
+
+  // Прайсовая цена за штуку — от сохраняемой price_m2, чтобы итог строки
+  // совпал с введённой ценой за штуку
+  const piecesPerUnit = isLinear ? piecesPerQuantityUnit(selectedProduct) : 0;
+  const listPricePiece = piecesPerUnit ? listPriceM2 / piecesPerUnit : 0;
+
+  // Цены со скидкой — то, что платит клиент
+  const priceM2Display =
+    priceM2Draft ??
+    formatFixed(listPriceM2 * (1 - discountNum / 100), 2, '.');
+  const pricePieceDisplay =
+    pricePieceDraft ??
+    formatFixed(listPricePiece * (1 - discountNum / 100), 2, '.');
+
+  // Скидка, посчитанная из цены, хранится без округления; показываем 2 знака
+  const discountDisplay =
+    typeof productOfOrder.discount === 'number'
+      ? String(Math.round(productOfOrder.discount * 100) / 100)
+      : productOfOrder.discount;
+
+  // Цена со скидкой (за м², пог. м или штуку): от неё пересчитываются
+  // скидка и цена за м³. Скидку не округляем, иначе итог не совпадёт с ценой
+  const applyDiscountFromPrice = (price, listPrice) => {
+    const discount = listPrice ? (1 - price / listPrice) * 100 : 0;
+    const originalPrice = Number(productOfOrder.originalPrice || 0);
+
+    setProductOfOrder((prev) => ({
+      ...prev,
+      discount,
+      price_m3: formatFixed(originalPrice * (1 - discount / 100), 2, '.'),
+    }));
+  };
+
+  const handlePriceM2Change = (e) => {
+    const limited = limitDecimalInput(e.target.value, 2);
+    setPriceM2Draft(limited);
+    applyDiscountFromPrice(parseLocalNumber(limited) || 0, listPriceM2);
+  };
+
+  const handlePricePieceChange = (e) => {
+    const limited = limitDecimalInput(e.target.value, 2);
+    setPricePieceDraft(limited);
+    applyDiscountFromPrice(parseLocalNumber(limited) || 0, listPricePiece);
+  };
+
   const quantity_real_value = useMemo(() => {
     if (!selectedProduct) return '0,00';
     const real = productOfOrder?.quantity_palet * m2PerPallet(selectedProduct);
@@ -316,7 +379,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
       ...productOfOrder,
       quantity_m2: parseFloat(quantityM2?.toFixed(2)),
       price_m3: parseFloat(priceM3?.toFixed(2)),
-      discount: parseFloat(discount?.toFixed(2)),
+      discount,
       quantity_palet: parseInt(quantity_palet, 10) || 0,
       quantity_real: parseFloat(quantity_real?.toFixed(2)),
       price_m2: parseFloat(price_m2?.toFixed(2)),
@@ -394,16 +457,25 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                 if (el.accessor === 'price_m2') {
                   return (
                     <React.Fragment key={el.accessor}>
-                      <ModalBody>
-                        {isLinear ? 'Price, EURO per linear metre' : el.Header}:
-                      </ModalBody>
-                      <input
-                        type="text"
-                        id={el.accessor}
-                        name={el.accessor}
-                        value={price_m2_value}
-                        readOnly
+                      <InputField
+                        el={el}
+                        uBlockHeader={
+                          isLinear ? 'Price, EURO per linear metre' : ''
+                        }
+                        inputValue={{ price_m2: priceM2Display }}
+                        inputValueChange={handlePriceM2Change}
+                        onBlur={() => setPriceM2Draft(null)}
+                        isDisabled={false}
                       />
+                      {piecesPerUnit > 0 && (
+                        <InputField
+                          el={PRICE_PIECE_COLUMN}
+                          inputValue={{ price_piece: pricePieceDisplay }}
+                          inputValueChange={handlePricePieceChange}
+                          onBlur={() => setPricePieceDraft(null)}
+                          isDisabled={false}
+                        />
+                      )}
                     </React.Fragment>
                   );
                 }
@@ -495,7 +567,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                     <InputField
                       key={el.accessor}
                       el={el}
-                      inputValue={productOfOrder}
+                      inputValue={{ discount: discountDisplay }}
                       inputValueChange={handleDiscountChange}
                       onBlur={handleDiscountBlur}
                       isDisabled={false}

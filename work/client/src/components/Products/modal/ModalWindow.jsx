@@ -6,8 +6,8 @@ import {
 } from '#components/contexts/ProductContext.js';
 import InputField from '../../InputField/InputField';
 import {
-  blocksInHeight,
   calculatePalletDimensions,
+  palletRows,
 } from '#utils/palletDimensions.js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -38,7 +38,7 @@ const ModalWindow = React.memo(
     const product_code = useSelector((state) => state.productCode);
 
     const editableAccessors = [
-      'palletHeight',
+      'palletHeightBlocks',
       'price',
       'coefficientOfFree',
       'normOfBrack',
@@ -273,8 +273,10 @@ const ModalWindow = React.memo(
         const values = {};
         const updateFuncs = {};
 
-        const { palletWidth, palletLength, palletHeight, extraRows } =
-          calculatePalletDimensions(formInput?.palletSize, formInput?.palletHeight);
+        const { palletWidth, palletLength } = calculatePalletDimensions(
+          formInput?.palletSize
+        );
+        const rows = palletRows(formInput);
 
         if (
           formInput?.lengths &&
@@ -282,17 +284,16 @@ const ModalWindow = React.memo(
           formInput?.width &&
           palletWidth &&
           palletLength &&
-          palletHeight
+          rows
         ) {
           const blocksAlongLength = Math.floor(palletLength / formInput?.lengths);
-          const rows = blocksInHeight(palletHeight, extraRows, formInput?.width);
           const blocksAlongWidth = Math.floor(palletWidth / formInput?.height);
 
           values.quantityBlockOnPallet =
             blocksAlongLength * rows * blocksAlongWidth;
 
           console.log('Pallet calc', {
-            'Паллета, мм (Д x Ш x макс. В)': `${palletLength}x${palletWidth}x${palletHeight}`,
+            'Паллета, мм (Д x Ш)': `${palletLength}x${palletWidth}`,
             'Блоков на паллете, шт': values.quantityBlockOnPallet,
             'Блоков в высоту, шт': rows,
             'Высота паллеты (блоки), см': (rows * formInput?.width) / 10,
@@ -485,7 +486,7 @@ const ModalWindow = React.memo(
         formInput.density,
         formInput.humidity,
         formInput.palletSize,
-        formInput.palletHeight,
+        formInput.palletHeightBlocks,
         formInput.certificate,
       ]
     );

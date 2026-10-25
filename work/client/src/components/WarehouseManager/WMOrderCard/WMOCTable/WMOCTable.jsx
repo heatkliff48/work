@@ -74,15 +74,17 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   //   relMat: [latestRelatedMaterials, relMatProductsOfOrders],
   // };
 
+  // Lines are told apart by order_dispatch_id: one order can ship the same
+  // article on several lines
   const handlePlusBatch = (product) => {
-    setSelectedProduct(product.article);
+    setSelectedProduct(product.order_dispatch_id);
     setWmoctModal(true);
   };
 
   const handlePlus = (productObj, batchIndex) => {
     setWmoctProduct((prev) =>
       prev.map((wmoctItem) => {
-        if (wmoctItem.article === productObj.article) {
+        if (wmoctItem.order_dispatch_id === productObj.order_dispatch_id) {
           let { shipped, qty_rem, qty_total } = wmoctItem;
 
           const newBatches = wmoctItem.batches.map((el, i) => {
@@ -124,10 +126,11 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     );
   };
 
-  const handleMinus = (batch, batchIndex) => {
+  const handleMinus = (productObj, batchIndex) => {
     setWmoctProduct((prev) =>
       prev.map((wmoctItem) => {
-        if (wmoctItem.article !== batch.article) return wmoctItem;
+        if (wmoctItem.order_dispatch_id !== productObj.order_dispatch_id)
+          return wmoctItem;
 
         let { shipped, qty_rem } = wmoctItem;
 
@@ -163,24 +166,12 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     return wmoctProduct[i]?.batches?.length > 0;
   };
 
-  const isDisablePlus = (article) => {
-    const result = wmoctProduct.some((el) => {
-      if (el.article !== article) return false;
-      const shouldDisable = el.qty_total === el.shipped || el.qty_rem === 0;
+  const isDisablePlus = (product) =>
+    product.qty_total === product.shipped || product.qty_rem === 0;
 
-      return shouldDisable;
-    });
-    return result;
-  };
-
-  const isDisableMinus = (article, batch) => {
-    const result = wmoctProduct.some((el) => {
-      const shouldDisable = el.article === article && batch.allocated === 0;
-
-      return shouldDisable;
-    });
-    return result;
-  };
+  // What is already reserved in the DB (minAllocated) can't be taken back here
+  const isDisableMinus = (batch) =>
+    Number(batch.allocated || 0) <= Number(batch.minAllocated || 0);
 
   useEffect(() => {
     if (

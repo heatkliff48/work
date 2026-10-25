@@ -460,8 +460,17 @@ const OrderContextProvider = ({ children }) => {
 
     setOrderCartData((previous) => {
       if (String(previous?.id) !== String(savedOrder.id)) return previous;
-      if (previous.pdf_updated_at === savedOrder.pdf_updated_at) return previous;
-      return { ...previous, pdf_updated_at: savedOrder.pdf_updated_at };
+      if (
+        previous.pdf_updated_at === savedOrder.pdf_updated_at &&
+        previous.pdf_version === savedOrder.pdf_version
+      ) {
+        return previous;
+      }
+      return {
+        ...previous,
+        pdf_updated_at: savedOrder.pdf_updated_at,
+        pdf_version: savedOrder.pdf_version,
+      };
     });
   }, [list_of_orders, orderCartData?.id]);
 
@@ -507,6 +516,7 @@ const OrderContextProvider = ({ children }) => {
         delivery: order?.delivery,
         delivery_m2: order?.delivery_m2,
         pdf_updated_at: order?.pdf_updated_at ?? null,
+        pdf_version: order?.pdf_version ?? null,
         main_order: order?.main_order ?? null,
         region: order?.region ?? null,
         payment_method: order?.payment_method ?? null,

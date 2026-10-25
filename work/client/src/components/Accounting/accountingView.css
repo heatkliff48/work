@@ -127,6 +127,49 @@
   flex: 1;
 }
 
+/* ---------- toggle switch ("Show all orders") ---------- */
+.acc-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px;
+}
+.acc-toggle__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--acc-text-2);
+  white-space: nowrap;
+}
+.acc-toggle__switch {
+  width: 40px;
+  height: 24px;
+  flex: 0 0 40px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  background: var(--acc-border-2);
+  position: relative;
+  padding: 0;
+  transition: background 0.15s;
+}
+.acc-toggle__switch--on {
+  background: var(--acc-red);
+}
+.acc-toggle__knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: left 0.15s;
+}
+.acc-toggle__knob--on {
+  left: 18px;
+}
+
 /* ---------- order-card (detail) page shell ---------- */
 .acc-card {
   font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;

@@ -20,6 +20,7 @@ import { useUsersContext } from "#components/contexts/UserContext.js";
 import { useOrderContext } from "#components/contexts/OrderContext.js";
 import { useWarehouseContext } from "#components/contexts/WarehouseContext.js";
 import { useStatisticContext } from "#components/contexts/StatisticContext.js";
+import { palletRows } from "#utils/palletDimensions.js";
 import ModalWindow from "./ModalWindow";
 import BarcodeGenerator from "./BarcodeGenerator";
 import ToggleButton from "react-bootstrap/ToggleButton";
@@ -29,7 +30,7 @@ const ProductCardModal = React.memo(() => {
   const { userAccess } = useUsersContext();
   const { productsOfOrders } = useOrderContext();
   const { stock_balance } = useStatisticContext();
-  const { COLUMNS, selectOptions, getOptionValue } = useProductsContext();
+  const { COLUMNS, selectOptions, buildProductArticle } = useProductsContext();
   const {
     productCardData,
     setProductCardData,
@@ -61,66 +62,9 @@ const ProductCardModal = React.memo(() => {
   const products = useSelector((state) => state.products);
   const [selectedBarcodeValue, setSelectedBarcodeValue] = useState(1);
 
-  const memoizedArticle = (prod) => {
-    const {
-      form,
-      certificate,
-      width,
-      height,
-      lengths,
-      density,
-      version,
-      placeOfProduction,
-      typeOfPackaging,
-      palletSize,
-    } = prod;
-
-    let versionNumber = "0001";
-    versionNumber = `000${version}`.slice(-4);
-
-    const rightPlaceOfProduction = getOptionValue(
-      "placeOfProduction",
-      placeOfProduction
-    );
-    const rightTypeOfPackaging = getOptionValue(
-      "typeOfPackaging",
-      typeOfPackaging
-    );
-
-    const rightPalletSize = getOptionValue("palletSize", palletSize);
-    const combinationMap = {
-      "0-0-0": "A",
-      "0-0-1": "B",
-      "0-0-2": "C",
-      "0-1-0": "D",
-      "0-1-1": "E",
-      "0-1-2": "F",
-      "1-0-0": "G",
-      "1-0-1": "H",
-      "1-0-2": "I",
-      "1-1-0": "J",
-      "1-1-1": "K",
-      "1-1-2": "L",
-    };
-
-    const combinationKey = `${rightPlaceOfProduction}-${rightTypeOfPackaging}-${rightPalletSize}`;
-    const combinationLetter = combinationMap[combinationKey];
-
-    if (!combinationLetter) {
-      console.warn("Unknown combination for prodArticle:", combinationKey);
-    }
-
-    const prodArticle = `T.${form
-      ?.toUpperCase()
-      .slice(0, 1)}${combinationLetter}D${density
-      .toString()
-      .slice(0, 2)}W${width.toString().slice(0, 2)}${certificate?.substr(
-      0,
-      1
-    )}${versionNumber}`;
-
-    return prodArticle;
-  };
+  // Артикул с номером версии, например T.NAH5D35W20C0001
+  const memoizedArticle = (prod) =>
+    `${buildProductArticle(prod)}${`000${prod.version}`.slice(-4)}`;
 
   const handleSelectChange = (selectedOption) => {
     // Найти продукт с выбранной версией
@@ -155,6 +99,7 @@ const ProductCardModal = React.memo(() => {
             el.label == selectedProduct.palletHeight ||
             el.value == selectedProduct.palletHeight
         )?.label,
+        palletHeightBlocks: palletRows(selectedProduct),
       });
     }
   };

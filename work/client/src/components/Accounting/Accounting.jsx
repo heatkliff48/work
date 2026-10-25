@@ -9,6 +9,11 @@ import { ArticleMonoCell, makeStatusPillCell } from '../Orders/ordersCells';
 import './accountingView.css';
 // import { useNavigate } from 'react-router-dom';
 
+// Диапазон статусов для переключателя "Show all orders":
+// от 'Contracted order' (5) до 'Order shipped' (9) включительно.
+const ALL_ORDERS_STATUS_FROM = 5;
+const ALL_ORDERS_STATUS_TO = 9;
+
 function DateCell({ value }) {
   if (!value) return <span className="ord-muted">—</span>;
   const d = new Date(value);
@@ -75,21 +80,47 @@ function Accounting() {
   }, [accountingDataList, ordersDataList, status_list]);
 
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showAllOrders, setShowAllOrders] = useState(false);
+
+  const allOrdersData = useMemo(
+    () =>
+      (ordersDataList || [])
+        .filter((o) => {
+          const statusDef = status_list.find((s) => s.Header === o.status);
+          return (
+            statusDef &&
+            statusDef.accessor >= ALL_ORDERS_STATUS_FROM &&
+            statusDef.accessor <= ALL_ORDERS_STATUS_TO
+          );
+        })
+        .map((o) => ({
+          orders_article: o.article,
+          orders_status: o.status,
+          owner: o.owner || '',
+          shipping_date: o.shipping_date || '',
+        })),
+    [ordersDataList, status_list]
+  );
+
+  const baseData = useMemo(
+    () => (showAllOrders ? allOrdersData : accDataList || []),
+    [showAllOrders, allOrdersData, accDataList]
+  );
 
   const statusChoices = useMemo(() => {
     const labels = Array.from(
-      new Set((accDataList || []).map((o) => o.orders_status).filter(Boolean))
+      new Set(baseData.map((o) => o.orders_status).filter(Boolean))
     );
     return [
       { value: 'all', label: 'All statuses' },
       ...labels.map((label) => ({ value: label, label })),
     ];
-  }, [accDataList]);
+  }, [baseData]);
 
   const visibleData = useMemo(() => {
-    if (statusFilter === 'all') return accDataList || [];
-    return (accDataList || []).filter((o) => o.orders_status === statusFilter);
-  }, [accDataList, statusFilter]);
+    if (statusFilter === 'all') return baseData;
+    return baseData.filter((o) => o.orders_status === statusFilter);
+  }, [baseData, statusFilter]);
 
   const displayColumns = useMemo(() => {
     const StatusPillCell = makeStatusPillCell(status_list);
@@ -131,8 +162,10 @@ function Accounting() {
             </div>
             <div className="acc-page__stats">
               <div className="acc-stat">
-                <div className="acc-stat__num">{accDataList?.length ?? 0}</div>
-                <div className="acc-stat__label">Pending review</div>
+                <div className="acc-stat__num">{baseData.length}</div>
+                <div className="acc-stat__label">
+                  {showAllOrders ? 'Contracted → shipped' : 'Pending review'}
+                </div>
               </div>
             </div>
           </div>
@@ -187,6 +220,27 @@ function Accounting() {
                     </option>
                   ))}
                 </select>
+                <div className="acc-toggle">
+                  <span className="acc-toggle__label">Show all orders</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={showAllOrders}
+                    className={`acc-toggle__switch${
+                      showAllOrders ? ' acc-toggle__switch--on' : ''
+                    }`}
+                    onClick={() => {
+                      setShowAllOrders((prev) => !prev);
+                      setStatusFilter('all');
+                    }}
+                  >
+                    <span
+                      className={`acc-toggle__knob${
+                        showAllOrders ? ' acc-toggle__knob--on' : ''
+                      }`}
+                    />
+                  </button>
+                </div>
                 <div className="acc-toolbar__spacer" />
               </div>
             )}

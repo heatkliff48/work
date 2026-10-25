@@ -21,6 +21,7 @@ import {
   orderProductType,
   palletsForQuantity,
   piecesForLinearMetres,
+  piecesPerQuantityUnit,
 } from './packagingUtils.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
@@ -50,6 +51,11 @@ const formatFixed = (num, decimals = 2, separator = ',') => {
   return separator === ',' ? fixed.replace('.', ',') : fixed;
 };
 
+const PRICE_PIECE_COLUMN = {
+  Header: 'Price, EURO per piece',
+  accessor: 'price_piece',
+};
+
 // Поле поштучного ввода для U-/O-block, в БД не хранится
 const QUANTITY_PIECES_FIELD = { Header: 'Quantity, pcs', accessor: 'quantity_pcs' };
 
@@ -76,6 +82,8 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   const [priceM2Draft, setPriceM2Draft] = useState(null);
   // То же для PVP
   const [pvpDraft, setPvpDraft] = useState(null);
+  // То же для цены за штуку у U-/O-block
+  const [pricePieceDraft, setPricePieceDraft] = useState(null);
   // То же для количества в штуках (U-/O-block)
   const [piecesDraft, setPiecesDraft] = useState(null);
 
@@ -348,6 +356,15 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     priceM2Draft ??
     formatFixed(listPriceM2 * (1 - discountValue / 100), 2, '.');
 
+  // Прайсовая цена за штуку — от сохраняемой price_m2, чтобы итог строки
+  // совпал с введённой ценой за штуку
+  const piecesPerUnit = isLinear ? piecesPerQuantityUnit(selectedProduct) : 0;
+  const listPricePiece = piecesPerUnit ? listPriceM2 / piecesPerUnit : 0;
+
+  const pricePieceDisplay =
+    pricePieceDraft ??
+    formatFixed(listPricePiece * (1 - discountValue / 100), 2, '.');
+
   // Скидка, посчитанная из цены, хранится без округления; показываем 2 знака
   const discountDisplay =
     typeof productOfOrder.discount === 'number'
@@ -460,14 +477,11 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     }));
   };
 
-  // Цена за м² со скидкой: от неё пересчитываются скидка и цена за м³
-  const handlePriceM2Change = (e) => {
-    const limited = limitDecimalInput(e.target.value, 2);
+  // Цена со скидкой (за м², пог. м или штуку): от неё пересчитываются
+  // скидка и цена за м³. Скидку не округляем, иначе итог не совпадёт с ценой
+  const applyDiscountFromPrice = (price, listPrice) => {
+    const discount = listPrice ? (1 - price / listPrice) * 100 : 0;
 
-    const price = parseLocalNumber(limited) || 0;
-    const discount = listPriceM2 ? (1 - price / listPriceM2) * 100 : 0;
-
-    setPriceM2Draft(limited);
     setProductOfOrder((prev) => ({
       ...prev,
       discount,
@@ -475,8 +489,24 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
     }));
   };
 
+  const handlePriceM2Change = (e) => {
+    const limited = limitDecimalInput(e.target.value, 2);
+    setPriceM2Draft(limited);
+    applyDiscountFromPrice(parseLocalNumber(limited) || 0, listPriceM2);
+  };
+
   const handlePriceM2Blur = () => {
     setPriceM2Draft(null);
+  };
+
+  const handlePricePieceChange = (e) => {
+    const limited = limitDecimalInput(e.target.value, 2);
+    setPricePieceDraft(limited);
+    applyDiscountFromPrice(parseLocalNumber(limited) || 0, listPricePiece);
+  };
+
+  const handlePricePieceBlur = () => {
+    setPricePieceDraft(null);
   };
 
   // PVP (цена за единицу со скидкой): от неё пересчитываются скидка и цена.
@@ -593,6 +623,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       setIsReturn(false);
       setPriceM2Draft(null);
       setPvpDraft(null);
+      setPricePieceDraft(null);
       setPiecesDraft(null);
     }
   }, [isOpen]);
@@ -718,17 +749,27 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
               if (el.accessor === 'price_m2') {
                 if (isBlock)
                   return (
-                    <InputField
-                      key={el.accessor}
-                      el={el}
-                      uBlockHeader={
-                        isLinear ? 'Price, EURO per linear metre' : ''
-                      }
-                      inputValue={{ price_m2: priceM2Display }}
-                      inputValueChange={handlePriceM2Change}
-                      onBlur={handlePriceM2Blur}
-                      isDisabled={false}
-                    />
+                    <React.Fragment key={el.accessor}>
+                      <InputField
+                        el={el}
+                        uBlockHeader={
+                          isLinear ? 'Price, EURO per linear metre' : ''
+                        }
+                        inputValue={{ price_m2: priceM2Display }}
+                        inputValueChange={handlePriceM2Change}
+                        onBlur={handlePriceM2Blur}
+                        isDisabled={false}
+                      />
+                      {piecesPerUnit > 0 && (
+                        <InputField
+                          el={PRICE_PIECE_COLUMN}
+                          inputValue={{ price_piece: pricePieceDisplay }}
+                          inputValueChange={handlePricePieceChange}
+                          onBlur={handlePricePieceBlur}
+                          isDisabled={false}
+                        />
+                      )}
+                    </React.Fragment>
                   );
 
                 return (

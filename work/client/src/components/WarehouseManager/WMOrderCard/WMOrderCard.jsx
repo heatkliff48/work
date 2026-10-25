@@ -7,6 +7,7 @@ import WMOCTable from './WMOCTable/WMOCTable';
 import '#components/Styles/order-card.css';
 import '../warehouseManagerView.css';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useLineDescription } from './useLineDescription.js';
 
 const escapeHtml = (value) =>
   String(value ?? '').replace(
@@ -27,6 +28,7 @@ const WMOrderCard = React.memo(() => {
     useOrderContext();
 
   const { displayNames } = useProjectContext();
+  const getDescription = useLineDescription();
   const [ordersStatus, setOrdersStatus] = useState([]);
 
   const filterAndMapData = useCallback(
@@ -83,7 +85,7 @@ const WMOrderCard = React.memo(() => {
       .map(
         (product) => `
           <tr>
-            <td>${escapeHtml(product.article)}</td>
+            <td>${escapeHtml(getDescription(product))}</td>
             <td class="qty-cell">${escapeHtml(product.qty_total)}</td>
             <td class="notes-cell"></td>
             <td class="check-cell"><span class="checkbox"></span></td>
@@ -162,7 +164,7 @@ const WMOrderCard = React.memo(() => {
     <table>
       <thead>
         <tr>
-          <th>Product article</th>
+          <th>Description</th>
           <th>Qty total, pallet</th>
           <th>Notes</th>
           <th>&#10003;</th>
@@ -184,7 +186,7 @@ const WMOrderCard = React.memo(() => {
       printWindow.focus();
       printWindow.print();
     };
-  }, [wmoctProduct, orderCartData]);
+  }, [wmoctProduct, orderCartData, getDescription]);
 
   return (
     <div className="wm-card-page">

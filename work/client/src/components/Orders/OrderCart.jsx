@@ -58,7 +58,6 @@ import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsCo
 import {
   updateAnchorsWarehouse,
   updateDryMixesWarehouse,
-  updateRelatedMaterialsWarehouse,
   updateToolsWarehouse,
 } from '#components/redux/actions/productsTypeWarehouseAction.js';
 import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
@@ -111,7 +110,6 @@ const OrderCart = React.memo(() => {
   const {
     warehouse_data,
     dry_mixes_warehouse_data,
-    related_materials_warehouse_data,
     anchors_warehouse_data,
     tools_warehouse_data,
     list_of_reserved_products,
@@ -864,62 +862,8 @@ const OrderCart = React.memo(() => {
       }
     });
 
-    // related material
-    updatedRelatedMaterialsListOrder?.forEach((product) => {
-      const loc = latestRelatedMaterials.find(
-        (el) => el.article == product.product_article,
-      )?.place_of_production;
-
-      if (status.accessor === statusByAccessor[6].accessor && loc === 'ES') {
-        const reservedProduct = relMatProductsOfOrders.find(
-          (orderedProduct) =>
-            orderedProduct.order_id === product.order_id &&
-            orderedProduct.rel_mat_id === product.rel_mat_id,
-        );
-
-        let remainingToAllocate = reservedProduct.quantity_ud || 0; // Сколько нужно зарезервировать для этого товара
-
-        const matchingWarehouseProducts =
-          related_materials_warehouse_data?.filter(
-            (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article,
-          ) || []; // Если related_materials_warehouse_data undefined, используем пустой массив
-
-        // Проходим по складу и "забираем" остатки
-        for (const warehouseItem of matchingWarehouseProducts) {
-          if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
-            const taken = Math.min(
-              warehouseItem.free_quantity_remaining,
-              remainingToAllocate,
-            );
-
-            // Обновляем данные склада
-            dispatch(
-              updateRelatedMaterialsWarehouse({
-                id: warehouseItem?.id,
-                free_quantity_remaining:
-                  warehouseItem.free_quantity_remaining - taken,
-                ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              }),
-            );
-            remainingToAllocate -= taken;
-          }
-        }
-
-        const quantity_in_warehouse =
-          reservedProduct.quantity_ud - remainingToAllocate; // Сколько реально зарезервировали
-
-        dispatch(
-          addNewRelatedMaterialsBackorder({
-            shipping_date: orderCartData?.shipping_date,
-            product_article: product?.product_article,
-            order_article: orderCartData?.article,
-            quantity: product?.quantity_ud,
-            quantity_in_warehouse,
-          }),
-        );
-      }
-    });
+    // related materials не резервируются и не попадают в backorder:
+    // они влияют только на цену заказа, PDF, accounting и factura
 
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
@@ -1107,7 +1051,11 @@ const OrderCart = React.memo(() => {
     if (updatedOrderCartData?.pdf_updated_at !== undefined) {
       setOrderCartData((prev) =>
         String(prev?.id) === String(updatedOrderCartData.id)
-          ? { ...prev, pdf_updated_at: updatedOrderCartData.pdf_updated_at }
+          ? {
+              ...prev,
+              pdf_updated_at: updatedOrderCartData.pdf_updated_at,
+              pdf_version: updatedOrderCartData.pdf_version,
+            }
           : prev,
       );
     }

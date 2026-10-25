@@ -189,8 +189,8 @@ function Products() {
       )}
       {/* <button onClick={() => dispatch(updateProduct())}>
         Fix width in cakes
-      </button>
-      <button onClick={() => setArticleCheckModal(true)}>Check articles</button> */}
+      </button> */}
+      <button onClick={() => setArticleCheckModal(true)}>Check articles</button>
       {userAccess?.canWrite && (
         <button onClick={() => setChangePriceModal(true)}>Change price</button>
       )}

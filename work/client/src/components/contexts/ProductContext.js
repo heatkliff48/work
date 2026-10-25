@@ -6,6 +6,7 @@ import {
   TextSearchFilter,
 } from '#components/Table/filters.js';
 import { FaCheck, FaTimes } from 'react-icons/fa';
+import { palletRows } from '#utils/palletDimensions.js';
 
 const ProductsContext = createContext();
 
@@ -20,12 +21,13 @@ export const extractProductTitle = (value = '') => {
     .trim();
 };
 
-// Номер в названии — ширина в целых см: 100 мм -> "10", 365 мм -> "36", 75 мм -> "7"
+// Номер в названии — ширина в см: у блоков тоньше 10 см точная (75 мм -> "7.5"),
+// у остальных в целых см (100 мм -> "10", 365 мм -> "36")
 export const widthToTitleCm = (width) => {
   const mm = Number(width);
   if (width == null || width === '' || !Number.isFinite(mm)) return '-';
 
-  return String(Math.floor(mm / 10));
+  return String(mm < 100 ? mm / 10 : Math.floor(mm / 10));
 };
 
 // Номер перед "Medidas" (или перед "(Ø..)" у O-block)
@@ -34,7 +36,8 @@ const DESCRIPTION_TITLE_WIDTH =
 
 // Номер в названии записан не в тех единицах:
 // мм вместо см — "TERMECO 100 Medidas 600x100x250" -> "TERMECO 10 Medidas ...",
-// дробные см — "TERMECO 36.5 Medidas 600x365x250" -> "TERMECO 36 Medidas ...".
+// дробные см — "TERMECO 36.5 Medidas 600x365x250" -> "TERMECO 36 Medidas ...",
+// целые см у тонкого блока — "SILENSO 7 Medidas 600x75x250" -> "SILENSO 7.5 Medidas ...".
 // Возвращает исправленное описание или null, если в описании этой ошибки нет
 export const fixDescriptionTitleWidth = (description, width) => {
   const match = String(description ?? '').match(DESCRIPTION_TITLE_WIDTH);
@@ -43,7 +46,10 @@ export const fixDescriptionTitleWidth = (description, width) => {
 
   const current = Number(match[2].replace(',', '.'));
   const expected = widthToTitleCm(widthMm);
-  const isWidthInOtherUnits = current === widthMm || current === widthMm / 10;
+  const isWidthInOtherUnits =
+    current === widthMm ||
+    current === widthMm / 10 ||
+    current === Math.floor(widthMm / 10);
 
   if (!isWidthInOtherUnits || match[2] === expected) return null;
 
@@ -104,11 +110,12 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Pallet Height',
-      accessor: 'palletHeight',
-      defaultValue: '0',
+      Header: 'Pallet Height, blocks',
+      accessor: 'palletHeightBlocks',
+      defaultValue: 5,
       Filter: DropdownFilter,
-      sortType: 'string',
+      filter: 'exactText',
+      sortType: 'number',
     },
     {
       Header: 'Form',
@@ -244,11 +251,12 @@ export const ProductsContextProvider = ({ children }) => {
       sortType: 'string',
     },
     {
-      Header: 'Pallet Height',
-      accessor: 'palletHeight',
-      defaultValue: '0',
+      Header: 'Pallet Height, blocks',
+      accessor: 'palletHeightBlocks',
+      defaultValue: 5,
       Filter: DropdownFilter,
-      sortType: 'string',
+      filter: 'exactText',
+      sortType: 'number',
     },
     {
       Header: 'Form',
@@ -430,12 +438,17 @@ export const ProductsContextProvider = ({ children }) => {
         { value: 0, label: '1200x1000' },
         { value: 1, label: '1200x800' },
       ],
+      // Высота паллеты прежних карточек; новые хранят ряды блоков в palletHeightBlocks
       palletHeight: [
         { value: 0, label: 'Std' },
         { value: 1, label: 'Marine' },
         { value: 2, label: 'High' },
         { value: 3, label: 'Std+1' },
       ],
+      palletHeightBlocks: Array.from({ length: 30 }, (_, i) => ({
+        value: i + 1,
+        label: `${i + 1}`,
+      })),
     }),
     [],
   );
@@ -464,6 +477,8 @@ export const ProductsContextProvider = ({ children }) => {
         typeOfPackaging: newTypeOfPackaging?.label,
         palletSize: newPalletSize?.label,
         palletHeight: newPalletHeight?.label,
+        // У прежних карточек рядов нет — считаем их из высоты паллеты
+        palletHeightBlocks: palletRows(prod),
       };
     });
   }, [products]);
@@ -508,61 +523,39 @@ export const ProductsContextProvider = ({ children }) => {
     return matchedOption ? matchedOption.value : null;
   };
 
-  // Буква комбинации в артикуле: место-упаковка-размер-высота;
-  // после Z идут цифры 2–7 (без 0/1, чтобы не путать с O/I)
+  // Буква комбинации в артикуле: место-упаковка-размер паллеты.
+  // Высота паллеты идёт следом, рядами блоков: H<ряды>
   const articleCombinationMap = {
-    '0-0-0-0': 'A',
-    '0-0-0-1': 'B',
-    '0-0-0-2': 'C',
-    '0-0-0-3': 'D',
-    '0-0-1-0': 'E',
-    '0-0-1-1': 'F',
-    '0-0-1-2': 'G',
-    '0-0-1-3': 'H',
-    '0-1-0-0': 'I',
-    '0-1-0-1': 'J',
-    '0-1-0-2': 'K',
-    '0-1-0-3': 'L',
-    '0-1-1-0': 'M',
-    '0-1-1-1': 'N',
-    '0-1-1-2': 'O',
-    '0-1-1-3': 'P',
-    '1-0-0-0': 'Q',
-    '1-0-0-1': 'R',
-    '1-0-0-2': 'S',
-    '1-0-0-3': 'T',
-    '1-0-1-0': 'U',
-    '1-0-1-1': 'V',
-    '1-0-1-2': 'W',
-    '1-0-1-3': 'X',
-    '1-1-0-0': 'Y',
-    '1-1-0-1': 'Z',
-    '1-1-0-2': '2',
-    '1-1-0-3': '3',
-    '1-1-1-0': '4',
-    '1-1-1-1': '5',
-    '1-1-1-2': '6',
-    '1-1-1-3': '7',
+    '0-0-0': 'A',
+    '0-0-1': 'B',
+    '0-1-0': 'C',
+    '0-1-1': 'D',
+    '1-0-0': 'E',
+    '1-0-1': 'F',
+    '1-1-0': 'G',
+    '1-1-1': 'H',
   };
 
-  // Принимает как value (при создании), так и label (из latestProducts)
-  const buildProductArticle = ({
-    form,
-    certificate,
-    width,
-    density,
-    placeOfProduction,
-    typeOfPackaging,
-    palletSize,
-    palletHeight,
-  }) => {
+  // T.<форма><комбинация>H<ряды>D<плотность>W<ширина><сертификат>, например T.NAH5D35W20C.
+  // Принимает как value (при создании), так и label (из latestProducts);
+  // у прежних карточек ряды считаются из высоты паллеты (Std / Marine / High / Std+1)
+  const buildProductArticle = (product) => {
+    const {
+      form,
+      certificate,
+      width,
+      density,
+      placeOfProduction,
+      typeOfPackaging,
+      palletSize,
+    } = product;
     const combinationKey = [
       getOptionValue('placeOfProduction', placeOfProduction),
       getOptionValue('typeOfPackaging', typeOfPackaging),
       getOptionValue('palletSize', palletSize),
-      getOptionValue('palletHeight', palletHeight),
     ].join('-');
     const combinationLetter = articleCombinationMap[combinationKey];
+    const rows = palletRows(product);
 
     if (!combinationLetter) {
       console.warn('Unknown combination for prodArticle:', combinationKey);
@@ -573,7 +566,7 @@ export const ProductsContextProvider = ({ children }) => {
       .slice(
         0,
         1,
-      )}${combinationLetter}D${density.toString().slice(0, 2)}W${width
+      )}${combinationLetter}H${rows}D${density.toString().slice(0, 2)}W${width
       .toString()
       .slice(0, 2)}${certificate?.substr(0, 1)}`;
   };

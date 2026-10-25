@@ -399,6 +399,10 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       if (hasBothDeliveryPrices) {
         transportText =
           'Transporte sin descarga está incluido en precio. Trailer de lona de 13,6m de 24tn. La entrega se efectúa en camiones completos. Si el camión no va completo, se aplicará un recargo.';
+      } else if (deliveryPrice > 0) {
+        transportText = `El coste del transporte es de ${formatMoney(
+          deliveryPrice
+        )} €. Incluido en el importe total del presupuesto.`;
       } else if (hasDelivery) {
         transportText =
           'Transporte incluido (sin descarga) - Trailer con descarga lateral de 13,6m de 24tn';
@@ -732,6 +736,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       // Дата последнего сохранённого изменения заказа приходит из БД.
       // Скачивание PDF само по себе не изменяет эту дату.
       let formattedDate = null;
+      let compactDate = null;
       if (orderData.pdf_updated_at) {
         const modifiedAt = new Date(orderData.pdf_updated_at);
 
@@ -747,10 +752,17 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
             parts.map(({ type, value }) => [type, value]),
           );
           formattedDate = `${dateParts.day}.${dateParts.month}.${dateParts.year}`;
+          compactDate = `${dateParts.year}${dateParts.month}${dateParts.day}`;
         }
       }
-      // TODO: добавить ref_id в БД и API заказа; пока используем номер заказа (article).
-      const refId = orderData.ref_id ?? orderData.article ?? orderData.id ?? '';
+      // ref_id: <bitrix_id адреса доставки>_<ГГГГММДД pdf_updated_at>_<номер версии PDF>.
+      // Если чего-то нет (например, адрес создан не из Bitrix) — номер заказа.
+      const bitrixAddressId = orderData.deliveryAddress?.bitrix_id;
+      const pdfVersion = orderData.pdf_version;
+      const refId =
+        bitrixAddressId && compactDate && pdfVersion
+          ? `${bitrixAddressId}_${compactDate}_${pdfVersion}`
+          : (orderData.article ?? orderData.id ?? '');
 
       // Нумерация всех страниц после формирования содержимого PDF.
       const pageCount = doc.getNumberOfPages();
