@@ -31,6 +31,9 @@ function ProductsTypeWarehouseModal(props) {
   const {
     COLUMNS_WAREHOUSE_AUX,
     dry_mixes_warehouse_data,
+    related_materials_warehouse_data,
+    anchors_warehouse_data,
+    tools_warehouse_data,
     related_materials_backorder_list,
   } = useWarehouseContext();
   const [warehouseData, setWarehouseData] = useState([]);
@@ -43,6 +46,15 @@ function ProductsTypeWarehouseModal(props) {
       : props.target == 3
       ? latestAnchors
       : latestTools;
+
+  const targetWarehouse =
+    props.target == 1
+      ? dry_mixes_warehouse_data
+      : props.target == 2
+      ? related_materials_warehouse_data
+      : props.target == 3
+      ? anchors_warehouse_data
+      : tools_warehouse_data;
 
   const haveProduct = useMemo(() => {
     return warehouseData?.product_article ?? false;
@@ -71,16 +83,17 @@ function ProductsTypeWarehouseModal(props) {
   const dispatch = useDispatch();
 
   const getWarehouseArticle = (product) => {
-    let versionNumber = '0001';
     const year = new Date().getFullYear().toString().slice(-2);
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
     const day = new Date().getDate();
 
-    const articleId =
-      dry_mixes_warehouse_data.length === 0
-        ? 1
-        : dry_mixes_warehouse_data.length + 1;
-    versionNumber = `0000000${articleId}`.slice(-6);
+    // Continue after the highest number in this warehouse, so the article
+    // stays unique even after rows are deleted
+    const lastNumber = (targetWarehouse || []).reduce(
+      (max, el) => Math.max(max, Number(String(el.article ?? '').slice(-6)) || 0),
+      0,
+    );
+    const versionNumber = `${lastNumber + 1}`.padStart(6, '0');
 
     const warehouseArticle = `S00X.${
       props.target == 1
@@ -106,7 +119,7 @@ function ProductsTypeWarehouseModal(props) {
         article: warehouse_article,
       }));
     },
-    [latestProductsType]
+    [latestProductsType, targetWarehouse]
   );
 
   const handleWareHouseInput = (e) => {

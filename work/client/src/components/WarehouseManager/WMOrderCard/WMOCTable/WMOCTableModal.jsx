@@ -8,7 +8,6 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
   const {
     wmoctProduct,
     setWmoctProduct,
-    getProductType,
     warehouse_data,
     dry_mixes_warehouse_data,
     anchors_warehouse_data,
@@ -29,7 +28,7 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
       const remainingInBatch = Number(batch.total_quantity || 0);
 
       return prev.map((product) => {
-        if (product.article !== selectedProduct) {
+        if (product.order_dispatch_id !== selectedProduct) {
           return product;
         }
 
@@ -60,8 +59,25 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
 
   useEffect(() => {
     if (!selectedProduct) return;
-    const type = getProductType(selectedProduct);
-    const wh_arr = warehouseMap[type];
+    const line = (wmoctProduct || []).find(
+      (product) => product.order_dispatch_id === selectedProduct,
+    );
+    if (!line) return;
+
+    const type = line.product_type;
+    const wh_arr = warehouseMap[type] || [];
+
+    // A batch already taken by a line is matched by its warehouse row, not by
+    // article: articles of auxiliary warehouses aren't unique, and ids only
+    // mean something within one warehouse type.
+    const takenWarehouseIds = new Set(
+      wmoctProduct
+        .filter((product) => product.product_type === type)
+        .flatMap((product) =>
+          (product.batches || []).map((batch) => Number(batch.warehouseId)),
+        ),
+    );
+
     const result = wh_arr
       .filter((el) => {
         const product_article =
@@ -70,23 +86,15 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
           el.anchor_article ||
           el.tool_article ||
           el.rel_mat_article;
-        return product_article == selectedProduct;
+        return product_article == line.article;
       })
-      .filter((warehouseItem) => {
-        const isArticleInAnyWMOCTBatches = wmoctProduct.some((wmoctItem) => {
-          return wmoctItem.batches.some((batchItem) => {
-            return batchItem.batchId == warehouseItem.article;
-          });
-        });
-
-        return !isArticleInAnyWMOCTBatches;
-      })
+      .filter((warehouseItem) => !takenWarehouseIds.has(Number(warehouseItem.id)))
       .filter((el) => el.ordered_quantity > 0 || el.free_quantity_remaining > 0)
       .map((el) => ({
         warehouse_id: el.id,
         batch_article: el.article,
-        // Only block batches have a batch_id; the other warehouses are
-        // still told apart by their article
+        // Only block batches have a batch_id; the other warehouses show
+        // their article
         batch_id: el.batch_id ?? el.article,
         free_quantity_remaining: el.free_quantity_remaining,
         quantity: el.ordered_quantity,

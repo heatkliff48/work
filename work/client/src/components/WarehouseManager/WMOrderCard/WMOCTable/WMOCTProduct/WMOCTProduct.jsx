@@ -1,40 +1,8 @@
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
-import {
-  extractProductTitle,
-  useProductsContext,
-} from '#components/contexts/ProductContext.js';
-import { palletRows } from '#utils/palletDimensions.js';
 import { Fragment } from 'react';
+import { useLineDescription } from '../../useLineDescription.js';
 import '../../../warehouseManagerView.css';
-
-// Block on its pallet, e.g. "TERMECO 30. Pall 1200*800. Height 90cm (3 blocks)."
-// Height is the block stack only: rows counted the way the product card
-// counts them for blocks per pallet.
-const blockDescription = (catalog) => {
-  if (!catalog) return '';
-
-  const parts = [
-    extractProductTitle(catalog.description) || catalog.tradingMark,
-    catalog.palletSize && `Pall ${catalog.palletSize.replace('x', '*')}`,
-  ];
-
-  const width = Number(catalog.width);
-  const rows = palletRows(catalog);
-  if (width && rows) {
-    const heightCm = parseFloat(((rows * width) / 10).toFixed(2));
-
-    parts.push(
-      `Height ${heightCm}cm (${rows} ${rows === 1 ? 'block' : 'blocks'})`,
-    );
-  }
-
-  return parts
-    .filter(Boolean)
-    .map((part) => `${part}.`)
-    .join(' ');
-};
 
 const WMOCTProduct = ({
   orderId,
@@ -53,23 +21,7 @@ const WMOCTProduct = ({
     wmoctPdfAddDataModal,
     setWmoctPdfAddDataModal,
   } = useModalContext();
-  const { productsOfOrders } = useOrderContext();
-  const { latestProducts, productVersions } = useProductsContext();
-
-  // The order line keeps the product version it was ordered with; if the line
-  // isn't loaded, the latest card of the same article has the same packaging.
-  const getDescription = (product) => {
-    if (product.product_type !== 'product') return product.product_name;
-
-    const orderLine = (productsOfOrders || []).find(
-      (line) => Number(line.id) === Number(product.orders_products_id),
-    );
-    const catalog =
-      (productVersions || []).find((c) => c.id === orderLine?.product_id) ||
-      (latestProducts || []).find((c) => c.article === product.article);
-
-    return blockDescription(catalog) || product.product_name;
-  };
+  const getDescription = useLineDescription();
 
   const isSaveButtonVisible = () => {
     if (!Array.isArray(wmoctProduct) || wmoctProduct.length === 0) {
@@ -148,7 +100,7 @@ const WMOCTProduct = ({
           </thead>
           <tbody>
             {wmoctProduct?.map((product, productIndex) => (
-              <Fragment key={product.article}>
+              <Fragment key={product.order_dispatch_id}>
                 {/* Основная строка продукта */}
                 <tr>
                   <td className="wm-mono">{product.article}</td>
@@ -164,17 +116,14 @@ const WMOCTProduct = ({
                         <div className="wm-prod-table__controls">
                           <button
                             className="wm-round-btn"
-                            disabled={isDisablePlus(product.article)}
+                            disabled={isDisablePlus(product)}
                             onClick={() => handlePlus(product, 0)}
                           >
                             ＋
                           </button>
                           <button
                             className="wm-round-btn"
-                            disabled={isDisableMinus(
-                              product.article,
-                              product.batches[0],
-                            )}
+                            disabled={isDisableMinus(product.batches[0])}
                             onClick={() => handleMinus(product, 0)}
                           >
                             －
@@ -204,7 +153,7 @@ const WMOCTProduct = ({
                 </tr>
                 {/* Дополнительные строки для батчей */}
                 {product.batches?.slice(1).map((batch, batchIndex) => (
-                  <tr key={`${product.article}__${batch.batchId}`}>
+                  <tr key={`${product.order_dispatch_id}__${batch.warehouseId}`}>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -216,14 +165,14 @@ const WMOCTProduct = ({
                       <div className="wm-prod-table__controls">
                         <button
                           className="wm-round-btn"
-                          disabled={isDisablePlus(product.article)}
+                          disabled={isDisablePlus(product)}
                           onClick={() => handlePlus(product, batchIndex + 1)}
                         >
                           ＋
                         </button>
                         <button
                           className="wm-round-btn"
-                          disabled={isDisableMinus(product.article, batch)}
+                          disabled={isDisableMinus(batch)}
                           onClick={() => handleMinus(product, batchIndex + 1)}
                         >
                           －
