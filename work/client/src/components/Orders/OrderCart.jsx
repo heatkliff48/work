@@ -17,11 +17,12 @@ import {
   deleteOrder,
   delSecondaryContact,
   getDeleteProductOfOrder,
+  getOrders,
   getDeleteRelMatProductOfOrder,
-  updAccountingDataList,
   updateOrderInCharge,
   updateOrderStatus,
   updatePayment,
+  updateAgentCommission,
 } from '#components/redux/actions/ordersAction.js';
 import {
   addNewListOfOrderedProduction,
@@ -29,6 +30,12 @@ import {
   updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
 import PDFgenerate from './OrdersPDF.jsx';
+import {
+  PAYMENT_METHOD_OPTIONS,
+  getConfirmingSurchargeRate,
+  getOrderConfirmingSurcharge,
+  getPaymentMethodOption,
+} from './paymentMethods.js';
 import ShowOrderContactEditModal from './modal/OrderCartContactEditModal.jsx';
 import ShowOrderDeliveryEditModal from './modal/OrderCartDeliveryEditModal.jsx';
 import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
@@ -57,7 +64,14 @@ import {
 import { addNewRelatedMaterialsBackorder } from '#components/redux/actions/relatedMaterialsBackorderListAction.js';
 import RelatedMaterialJournalTableOrder from './product_table_order/RelatedMaterialJournalTableOrder.jsx';
 import LiberarModal from './modal/LiberarModal.jsx';
+import RoundPalletsModal from './modal/RoundPalletsModal.jsx';
+import { orderProductType } from './modal/packagingUtils.js';
 import { statusThemeFor } from './ordersCells.jsx';
+import {
+  applyConfirmingSurchargeToProductLists,
+  calcBlockPriceWithDelivery,
+  getDeliveryPricePerM2,
+} from './blockDeliveryPrice.js';
 
 import '#components/Styles/order-card.css';
 import './ordersView.css';
@@ -91,7 +105,7 @@ const OrderCart = React.memo(() => {
   const { displayNames, user } = useProjectContext();
 
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
-  const { latestProducts } = useProductsContext();
+  const { productVersions } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
   const {
@@ -107,6 +121,14 @@ const OrderCart = React.memo(() => {
   } = useWarehouseContext();
 
   const dispatch = useDispatch();
+
+  // При открытии карточки перечитываем БД: прямое изменение в DBeaver
+  // не создаёт сообщение WebSocket и не меняет уже загруженный Redux.
+  useEffect(() => {
+    if (!orderCartData?.id) return;
+    dispatch(getOrders());
+  }, [dispatch, orderCartData?.id]);
+
   const navigate = useNavigate();
 
   const reservedProducts = useSelector((state) => state.reservedProducts);
@@ -114,18 +136,23 @@ const OrderCart = React.memo(() => {
   const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
   const [dataValue, setDataValue] = useState(new Date());
   const [newDescription, setNewDescription] = useState('');
+  const [newOtros, setNewOtros] = useState('');
   const [formatDataValue, setFormatDataValue] = useState(() =>
     new Date().toLocaleDateString('ru-RU', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
-    })
+    }),
   );
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingOtros, setIsEditingOtros] = useState(false);
   const [isAddSecCont, setIsAddSecCont] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
   const [liberarModalShow, setLiberarModalShow] = useState(false);
+  const [roundPalletsShow, setRoundPalletsShow] = useState(false);
+  // Status the order is on its way to once fractional pallets are squared up.
+  const [pendingStatus, setPendingStatus] = useState(null);
   const [ordersStatus, setOrdersStatus] = useState([]);
   const [orderStatusAccess, setOrderStatusAccess] = useState({
     canRead: true,
@@ -143,22 +170,14 @@ const OrderCart = React.memo(() => {
     vat_result_del: 0,
   });
 
-  const PAYMENT_METHOD_OPTIONS = [
-    { value: 'prepayment', label: 'Prepago' },
-    { value: 'bank_transfer', label: 'Transferencia bancaria' },
-    { value: 'promissory_note', label: 'Pagaré' },
-    { value: 'confirming', label: 'Confirming' },
-    { value: 'confirming_without_recourse', label: 'Confirming sin recurso' },
-  ];
-
   const cardStatusTheme = useMemo(
     () => statusThemeFor(orderCartData?.status),
-    [orderCartData?.status]
+    [orderCartData?.status],
   );
   const cardStatusLabel = useMemo(
     () =>
       status_list.find((s) => s.accessor === orderCartData?.status)?.Header || '',
-    [status_list, orderCartData?.status]
+    [status_list, orderCartData?.status],
   );
 
   const [currentOrderedProduct, setCurrentOrderedProduct] = useState({});
@@ -218,7 +237,7 @@ const OrderCart = React.memo(() => {
             </div>
           );
         }),
-    [orderCartData]
+    [orderCartData],
   );
 
   const handleDateChange = useCallback((date) => {
@@ -258,7 +277,7 @@ const OrderCart = React.memo(() => {
       addDataShipOrder({
         order_id: orderCartData?.id,
         shipping_date: formatDataValue,
-      })
+      }),
     );
   };
 
@@ -283,6 +302,17 @@ const OrderCart = React.memo(() => {
     setIsEditing(false);
   };
 
+  const onEditOtrosHandler = () => {
+    setNewOtros(orderCartData?.otros);
+    setIsEditingOtros(true);
+  };
+
+  // Otros попадает в PDF (presupuesto) в блок condiciones particulares
+  const onSaveOtros = (str) => {
+    dispatch(addDescription({ order_id: orderCartData.id, otros: str }));
+    setIsEditingOtros(false);
+  };
+
   const addSecondaryContactHandler = () => {
     setIsAddSecCont(true);
   };
@@ -296,7 +326,7 @@ const OrderCart = React.memo(() => {
       addSecondaryContact({
         secondary_contact: secCnt,
         order_id: orderCartData.id,
-      })
+      }),
     );
 
     setIsAddSecCont(false);
@@ -326,10 +356,10 @@ const OrderCart = React.memo(() => {
                   arrayName == 'products'
                     ? product.description
                     : arrayName == 'tools' || arrayName == 'related_materials'
-                    ? `${product?.name}`
-                    : arrayName == 'anchors'
-                    ? `${product?.name} Sacos de ${product?.pallet_weight}kg`
-                    : `${product?.name} BAUBLOCK Sacos de ${product?.pallet_weight}kg`,
+                      ? `${product?.name}`
+                      : arrayName == 'anchors'
+                        ? `${product?.name} Sacos de ${product?.pallet_weight}kg`
+                        : `${product?.name} BAUBLOCK Sacos de ${product?.pallet_weight}kg`,
                 ...orderProduct,
               }
             : { ...orderProduct, product_article: 'Unknown' };
@@ -337,34 +367,27 @@ const OrderCart = React.memo(() => {
 
       return updatedOrderProducts;
     },
-    [orderCartData?.id] // Добавляем зависимость
+    [orderCartData?.id], // Добавляем зависимость
   );
 
   const updatedProductListOrder = useMemo(() => {
     console.log(productsOfOrders, 'productsOfOrders OrderCart.jsx line 325');
     return addProductArticleToOrderList(
       productsOfOrders,
-      latestProducts,
+      productVersions,
       'products'
     );
-  }, [productsOfOrders, latestProducts, addProductArticleToOrderList]);
+  }, [productsOfOrders, productVersions, addProductArticleToOrderList]);
 
-  const blocksTotalQuantityRealM2 = useMemo(() => {
-    return (updatedProductListOrder || []).reduce(
-      (acc, el) => acc + (Number(el?.quantity_real) || 0),
-      0
-    );
-  }, [updatedProductListOrder]);
+  const deliveryPricePerM2 = useMemo(
+    () => getDeliveryPricePerM2(updatedProductListOrder, orderCartData?.delivery_m2),
+    [updatedProductListOrder, orderCartData?.delivery_m2]
+  );
 
-  const deliveryPricePerM2 = useMemo(() => {
-    const deliveryM2Total = Number(orderCartData?.delivery_m2 || 0);
-    if (!deliveryM2Total || !blocksTotalQuantityRealM2) return 0;
-    return deliveryM2Total / blocksTotalQuantityRealM2;
-  }, [orderCartData?.delivery_m2, blocksTotalQuantityRealM2]);
+  const confirmingSurcharge = getOrderConfirmingSurcharge(orderCartData);
 
   const blocksListWithDeliveryM2 = useMemo(() => {
     return (updatedProductListOrder || []).map((product) => {
-      const price_m2 = Number(product?.price_m2 || 0);
       const quantity_m2 = Number(product?.quantity_m2 || 0);
       const quantity_real = Number(product?.quantity_real || 0);
       const discount = Number(product?.discount || 0);
@@ -372,22 +395,40 @@ const OrderCart = React.memo(() => {
       const delivery_m2_share =
         (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
 
-      const price_m2_with_delivery = price_m2 + deliveryPricePerM2;
+      const { price_m2_with_delivery, final_price } =
+        calcBlockPriceWithDelivery(
+          product,
+          deliveryPricePerM2,
+          orderCartData?.agent_commission,
+          confirmingSurcharge
+        );
 
-      const final_price =
-        (price_m2_with_delivery * quantity_m2 * (100 - discount)) / 100;
+      // Liberar debits this line by area, so quantity_liberated can hold
+      // fractional pallets when a child order shipped the same block in
+      // another package. Showing the m2 equivalent keeps that readable.
+      const quantity_palet = Number(product?.quantity_palet || 0);
+      const quantity_liberated = Number(product?.quantity_liberated || 0);
+      const quantity_liberated_m2 = quantity_palet
+        ? (quantity_liberated * quantity_m2) / quantity_palet
+        : 0;
 
       return {
         ...product,
-        price_m2_with_delivery: Number(price_m2_with_delivery.toFixed(2)),
-        final_price: Number(final_price.toFixed(2)),
+        quantity_liberated_m2: Number(quantity_liberated_m2.toFixed(2)),
+        price_m2_with_delivery,
+        final_price,
         delivery_m2_share: Number(delivery_m2_share.toFixed(2)),
         final_price_with_delivery: Number(
-          (final_price + delivery_m2_share).toFixed(2)
+          (final_price + delivery_m2_share).toFixed(2),
         ),
       };
     });
-  }, [updatedProductListOrder, deliveryPricePerM2]);
+  }, [
+    updatedProductListOrder,
+    deliveryPricePerM2,
+    orderCartData?.agent_commission,
+    confirmingSurcharge,
+  ]);
 
   useEffect(() => {
     if (blocksListWithDeliveryM2.length > 0) {
@@ -402,7 +443,7 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       dryMixedProductsOfOrders,
       latestDryMix,
-      'dryMixes'
+      'dryMixes',
     );
   }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
 
@@ -420,7 +461,7 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       anchorProductsOfOrders,
       latestAnchors,
-      'anchors'
+      'anchors',
     );
   }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
 
@@ -450,7 +491,7 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       relMatProductsOfOrders,
       latestRelatedMaterials,
-      'related_materials'
+      'related_materials',
     );
   }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
 
@@ -463,6 +504,34 @@ const OrderCart = React.memo(() => {
     }
   }, [updatedRelatedMaterialsListOrder]);
 
+  // Надбавка confirming для остальных товаров: в productLists строки остаются
+  // с ценами из БД, потому что Liberar отправляет их на сервер как есть, а
+  // таблицы, итог и PDF берут цены с надбавкой
+  const linesWithSurcharge = useMemo(
+    () =>
+      applyConfirmingSurchargeToProductLists(
+        {
+          dryMixes: updatedDryMixesListOrder,
+          anchors: updatedAnchorsListOrder,
+          tools: updatedToolsListOrder,
+          related_materials: updatedRelatedMaterialsListOrder,
+        },
+        confirmingSurcharge
+      ),
+    [
+      updatedDryMixesListOrder,
+      updatedAnchorsListOrder,
+      updatedToolsListOrder,
+      updatedRelatedMaterialsListOrder,
+      confirmingSurcharge,
+    ]
+  );
+
+  const pricedProductLists = useMemo(
+    () => applyConfirmingSurchargeToProductLists(productLists, confirmingSurcharge),
+    [productLists, confirmingSurcharge]
+  );
+
   const handleInputChange = (e) => {
     setVatValue((prev) => ({
       ...prev,
@@ -472,16 +541,18 @@ const OrderCart = React.memo(() => {
 
   const onProductClickHandler = (sel_prod) => {
     if (orderCartData?.status < 3) {
+      // Блок берём той версии, что в строке заказа, чтобы при сохранении
+      // строка не переехала на последнюю версию карточки
       const product =
-        sel_prod.product_article.slice(2, 3) == 'N'
-          ? latestProducts.find((el) => el.article === sel_prod.product_article)
-          : sel_prod.product_article.slice(2, 3) == 'M'
+        orderProductType(sel_prod.product_article) == 'N'
+          ? productVersions.find((el) => el.id === sel_prod.product_id)
+          : orderProductType(sel_prod.product_article) == 'M'
           ? latestDryMix.find((el) => el.article === sel_prod.product_article)
-          : sel_prod.product_article.slice(2, 3) == 'P'
+          : orderProductType(sel_prod.product_article) == 'P'
           ? latestRelatedMaterials.find(
               (el) => el.article === sel_prod.product_article
             )
-          : sel_prod.product_article.slice(2, 3) == 'F'
+          : orderProductType(sel_prod.product_article) == 'F'
           ? latestAnchors.find((el) => el.article === sel_prod.product_article)
           : latestTools.find((el) => el.article === sel_prod.product_article);
 
@@ -494,16 +565,16 @@ const OrderCart = React.memo(() => {
   const statusByAccessor = useMemo(
     () =>
       Object.fromEntries((status_list ?? []).map((item) => [item.accessor, item])),
-    [status_list]
+    [status_list],
   );
 
-  const statusChangeHandler = (status) => {
+  const statusChangeHandler = (status, skipPalletCheck = false) => {
     const currentStatusIndex = status_list.findIndex(
-      (item) => item.accessor === orderCartData?.status
+      (item) => item.accessor === orderCartData?.status,
     );
 
     const newStatusIndex = status_list.findIndex(
-      (item) => item.accessor === status.accessor
+      (item) => item.accessor === status.accessor,
     );
 
     if (currentStatusIndex === -1 || newStatusIndex === -1) {
@@ -526,14 +597,33 @@ const OrderCart = React.memo(() => {
       return;
     }
 
+    // Liberar debits a line by square meters, so quantity_liberated comes out
+    // fractional whenever a child order shipped the block in another package,
+    // and the pallets left to ship along with it. That has to be squared up
+    // before the order is contracted and goes near production or reserves.
+    if (
+      !skipPalletCheck &&
+      status.accessor === statusByAccessor[5].accessor &&
+      productLists.products.some((product) => {
+        const remaining =
+          (Number(product.quantity_palet) || 0) -
+          (Number(product.quantity_liberated) || 0);
+        return !Number.isInteger(parseFloat(remaining.toFixed(2)));
+      })
+    ) {
+      setPendingStatus(status);
+      setRoundPalletsShow(true);
+      return;
+    }
+
     // blocks
     updatedProductListOrder?.forEach((product) => {
-      const loc = latestProducts.find(
-        (el) => el.article == product.product_article
+      const loc = productVersions.find(
+        (el) => el.id === product.product_id
       )?.placeOfProduction;
 
       const haveProductReserve = list_of_reserved_products.find(
-        (el) => el.orders_products_id == product.id
+        (el) => el.orders_products_id == product.id,
       );
       if (
         status.accessor === statusByAccessor[6].accessor &&
@@ -543,14 +633,14 @@ const OrderCart = React.memo(() => {
         const reservedProduct = productsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
-            orderedProduct.product_id === product.product_id
+            orderedProduct.product_id === product.product_id,
         );
 
         let remainingToAllocate = reservedProduct.quantity_palet || 0; // Сколько нужно зарезервировать для этого товара
         const matchingWarehouseProducts =
           warehouse_data?.filter(
             (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article
+              warehouseItem.product_article === product?.product_article,
           ) || []; // Если warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
@@ -558,7 +648,7 @@ const OrderCart = React.memo(() => {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
-              remainingToAllocate
+              remainingToAllocate,
             );
 
             // Обновляем данные склада
@@ -568,7 +658,7 @@ const OrderCart = React.memo(() => {
                 free_quantity_remaining:
                   warehouseItem.free_quantity_remaining - taken,
                 ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              })
+              }),
             );
             remainingToAllocate -= taken;
           }
@@ -582,7 +672,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_palet,
             quantity_in_warehouse,
-          })
+          }),
         );
       } else if (
         status.accessor === statusByAccessor[6].accessor &&
@@ -595,7 +685,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_palet,
             status: ordered_production_oem_status[0].accessor,
-          })
+          }),
         );
       }
     });
@@ -604,14 +694,14 @@ const OrderCart = React.memo(() => {
 
     updatedDryMixesListOrder?.forEach((product) => {
       const loc = latestDryMix.find(
-        (el) => el.article == product.product_article
+        (el) => el.article == product.product_article,
       )?.place_of_production;
 
       if (status.accessor === statusByAccessor[6].accessor && loc === 'ES') {
         const reservedProduct = dryMixedProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
-            orderedProduct.dry_mixed_id === product.dry_mixed_id
+            orderedProduct.dry_mixed_id === product.dry_mixed_id,
         );
 
         let remainingToAllocate = reservedProduct.quantity_palet_dry || 0; // Сколько нужно зарезервировать для этого товара
@@ -619,7 +709,7 @@ const OrderCart = React.memo(() => {
         const matchingWarehouseProducts =
           dry_mixes_warehouse_data?.filter(
             (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article
+              warehouseItem.product_article === product?.product_article,
           ) || []; // Если dry_mixes_warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
@@ -627,7 +717,7 @@ const OrderCart = React.memo(() => {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
-              remainingToAllocate
+              remainingToAllocate,
             );
 
             // Обновляем данные склада
@@ -637,7 +727,7 @@ const OrderCart = React.memo(() => {
                 free_quantity_remaining:
                   warehouseItem.free_quantity_remaining - taken,
                 ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              })
+              }),
             );
             remainingToAllocate -= taken;
           }
@@ -653,7 +743,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_palet_dry,
             quantity_in_warehouse,
-          })
+          }),
         );
       }
     });
@@ -662,14 +752,14 @@ const OrderCart = React.memo(() => {
 
     updatedAnchorsListOrder?.forEach((product) => {
       const loc = latestAnchors.find(
-        (el) => el.article == product.product_article
+        (el) => el.article == product.product_article,
       )?.place_of_production;
 
       if (status.accessor === statusByAccessor[6].accessor && loc === 'ES') {
         const reservedProduct = anchorProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
-            orderedProduct.anchor_id === product.anchor_id
+            orderedProduct.anchor_id === product.anchor_id,
         );
 
         let remainingToAllocate = reservedProduct.quantity_palet_anchor || 0; // Сколько нужно зарезервировать для этого товара
@@ -677,7 +767,7 @@ const OrderCart = React.memo(() => {
         const matchingWarehouseProducts =
           anchors_warehouse_data?.filter(
             (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article
+              warehouseItem.product_article === product?.product_article,
           ) || []; // Если anchors_warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
@@ -685,7 +775,7 @@ const OrderCart = React.memo(() => {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
-              remainingToAllocate
+              remainingToAllocate,
             );
 
             // Обновляем данные склада
@@ -695,7 +785,7 @@ const OrderCart = React.memo(() => {
                 free_quantity_remaining:
                   warehouseItem.free_quantity_remaining - taken,
                 ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              })
+              }),
             );
             remainingToAllocate -= taken;
           }
@@ -711,7 +801,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_palet_anchor,
             quantity_in_warehouse,
-          })
+          }),
         );
       }
     });
@@ -720,14 +810,14 @@ const OrderCart = React.memo(() => {
 
     updatedToolsListOrder?.forEach((product) => {
       const loc = latestTools.find(
-        (el) => el.article == product.product_article
+        (el) => el.article == product.product_article,
       )?.place_of_production;
 
       if (status.accessor === statusByAccessor[6].accessor && loc === 'ES') {
         const reservedProduct = toolProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
-            orderedProduct.tool_id === product.tool_id
+            orderedProduct.tool_id === product.tool_id,
         );
 
         let remainingToAllocate = reservedProduct.quantity_ud || 0; // Сколько нужно зарезервировать для этого товара
@@ -735,7 +825,7 @@ const OrderCart = React.memo(() => {
         const matchingWarehouseProducts =
           tools_warehouse_data?.filter(
             (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article
+              warehouseItem.product_article === product?.product_article,
           ) || []; // Если tools_warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
@@ -743,7 +833,7 @@ const OrderCart = React.memo(() => {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
-              remainingToAllocate
+              remainingToAllocate,
             );
 
             // Обновляем данные склада
@@ -753,7 +843,7 @@ const OrderCart = React.memo(() => {
                 free_quantity_remaining:
                   warehouseItem.free_quantity_remaining - taken,
                 ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              })
+              }),
             );
             remainingToAllocate -= taken;
           }
@@ -769,7 +859,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_ud,
             quantity_in_warehouse,
-          })
+          }),
         );
       }
     });
@@ -777,14 +867,14 @@ const OrderCart = React.memo(() => {
     // related material
     updatedRelatedMaterialsListOrder?.forEach((product) => {
       const loc = latestRelatedMaterials.find(
-        (el) => el.article == product.product_article
+        (el) => el.article == product.product_article,
       )?.place_of_production;
 
       if (status.accessor === statusByAccessor[6].accessor && loc === 'ES') {
         const reservedProduct = relMatProductsOfOrders.find(
           (orderedProduct) =>
             orderedProduct.order_id === product.order_id &&
-            orderedProduct.rel_mat_id === product.rel_mat_id
+            orderedProduct.rel_mat_id === product.rel_mat_id,
         );
 
         let remainingToAllocate = reservedProduct.quantity_ud || 0; // Сколько нужно зарезервировать для этого товара
@@ -792,7 +882,7 @@ const OrderCart = React.memo(() => {
         const matchingWarehouseProducts =
           related_materials_warehouse_data?.filter(
             (warehouseItem) =>
-              warehouseItem.product_article === product?.product_article
+              warehouseItem.product_article === product?.product_article,
           ) || []; // Если related_materials_warehouse_data undefined, используем пустой массив
 
         // Проходим по складу и "забираем" остатки
@@ -800,7 +890,7 @@ const OrderCart = React.memo(() => {
           if (remainingToAllocate > 0 && warehouseItem.free_quantity_remaining > 0) {
             const taken = Math.min(
               warehouseItem.free_quantity_remaining,
-              remainingToAllocate
+              remainingToAllocate,
             );
 
             // Обновляем данные склада
@@ -810,7 +900,7 @@ const OrderCart = React.memo(() => {
                 free_quantity_remaining:
                   warehouseItem.free_quantity_remaining - taken,
                 ordered_quantity: (warehouseItem.ordered_quantity || 0) + taken,
-              })
+              }),
             );
             remainingToAllocate -= taken;
           }
@@ -826,7 +916,7 @@ const OrderCart = React.memo(() => {
             order_article: orderCartData?.article,
             quantity: product?.quantity_ud,
             quantity_in_warehouse,
-          })
+          }),
         );
       }
     });
@@ -834,14 +924,6 @@ const OrderCart = React.memo(() => {
     // Добавляем новый статус в массив
     setOrdersStatus((prev) => [...prev, status.accessor]);
 
-    if (status.accessor == 7 || status.accessor == 9) {
-      dispatch(
-        updAccountingDataList({
-          orders_article: orderCartData?.article,
-          aproved: false,
-        })
-      );
-    }
     if (status.accessor == 10) {
       dispatch(deleteAccountingData(orderCartData?.article));
     }
@@ -850,17 +932,17 @@ const OrderCart = React.memo(() => {
       updateOrderStatus({
         order_id,
         status: status.accessor,
-      })
+      }),
     );
   };
 
   const deleteHandler = (product) => {
     const res_prod = list_of_reserved_products.find(
-      (el) => el.orders_products_id === product.id
+      (el) => el.orders_products_id === product.id,
     );
     if (res_prod) {
       const confirmed = window.confirm(
-        'This product is reserved in the warehouse. Delete anyway?'
+        'This product is reserved in the warehouse. Delete anyway?',
       );
       if (!confirmed) return;
     }
@@ -879,11 +961,11 @@ const OrderCart = React.memo(() => {
 
   const final_price_product = useMemo(() => {
     const allProducts = [
-      ...productLists['products'],
-      ...productLists['dryMixes'],
-      ...productLists['anchors'],
-      ...productLists['tools'],
-      ...productLists['related_materials'],
+      ...pricedProductLists['products'],
+      ...pricedProductLists['dryMixes'],
+      ...pricedProductLists['anchors'],
+      ...pricedProductLists['tools'],
+      ...pricedProductLists['related_materials'],
     ];
 
     return allProducts.reduce(
@@ -895,19 +977,13 @@ const OrderCart = React.memo(() => {
           el?.final_price_tool ||
           el?.final_price_rel_mat ||
           0),
-      0
+      0,
     );
-  }, [
-    productLists.products,
-    productLists.dryMixes,
-    productLists.anchors,
-    productLists.tools,
-    productLists.related_materials,
-  ]);
+  }, [pricedProductLists]);
 
   const [deliveryDraft, setDeliveryDraft] = useState(orderCartData?.delivery ?? 0);
   const [deliveryM2Draft, setDeliveryM2Draft] = useState(
-    orderCartData?.delivery_m2 ?? 0
+    orderCartData?.delivery_m2 ?? 0,
   );
 
   useEffect(() => {
@@ -948,7 +1024,7 @@ const OrderCart = React.memo(() => {
         vat_result_del,
       };
     },
-    [final_price_product, vatValue.vat_procent, orderCartData?.region]
+    [final_price_product, vatValue.vat_procent, orderCartData?.region],
   );
 
   // Итог заказа не пересчитывается автоматически при вводе новой стоимости
@@ -971,7 +1047,7 @@ const OrderCart = React.memo(() => {
       addNewDeliveryPrice({
         order_id: orderCartData.id,
         delivery,
-      })
+      }),
     );
 
     setOrderCartData((prev) => ({ ...prev, delivery }));
@@ -985,7 +1061,7 @@ const OrderCart = React.memo(() => {
       addNewDeliveryPrice({
         order_id: orderCartData.id,
         delivery_m2,
-      })
+      }),
     );
 
     setOrderCartData((prev) => ({ ...prev, delivery_m2 }));
@@ -1005,7 +1081,7 @@ const OrderCart = React.memo(() => {
     if (!storedData?.id) return;
 
     const updatedOrderCartData = list_of_orders.find(
-      (order) => order.id === storedData.id
+      (order) => String(order.id) === String(storedData.id),
     );
 
     // Подтягиваем сохранённые данные из localStorage только один раз
@@ -1022,6 +1098,18 @@ const OrderCart = React.memo(() => {
         ...prev,
         shipping_date: updatedOrderCartData.shipping_date,
       }));
+    }
+    console.log(
+      'updatedOrderCartData OrderCart.jsx line 1026',
+      updatedOrderCartData,
+    );
+    // Дата берётся из сохранённого заказа, а не из часов браузера.
+    if (updatedOrderCartData?.pdf_updated_at !== undefined) {
+      setOrderCartData((prev) =>
+        String(prev?.id) === String(updatedOrderCartData.id)
+          ? { ...prev, pdf_updated_at: updatedOrderCartData.pdf_updated_at }
+          : prev,
+      );
     }
 
     // delivery и delivery_m2 всегда синхронизируем из свежих данных Redux
@@ -1053,6 +1141,10 @@ const OrderCart = React.memo(() => {
     setOrderCartData((prev) => ({
       ...prev,
       description: updatedOrderCartData?.description,
+      otros: updatedOrderCartData?.otros,
+      payment_method: updatedOrderCartData?.payment_method,
+      agent_commission: updatedOrderCartData?.agent_commission ?? 0,
+      confirming_surcharge: Boolean(updatedOrderCartData?.confirming_surcharge),
     }));
   }, [list_of_orders]);
 
@@ -1092,7 +1184,7 @@ const OrderCart = React.memo(() => {
       updateOrderInCharge({
         order_id,
         person_in_charge: selectedOption.value,
-      })
+      }),
     );
   };
 
@@ -1100,47 +1192,97 @@ const OrderCart = React.memo(() => {
     const options = personsInChargeList;
     if (!options) return null;
     const personInChargeOption = options.find(
-      (option) => option.value === orderCartData?.person_in_charge
+      (option) => option.value === orderCartData?.person_in_charge,
     );
     return personInChargeOption || options[0];
   };
 
-  const handlePaymentMethodChange = (selectedOption) => {
+  const confirmingSurchargeRate = getConfirmingSurchargeRate(
+    orderCartData?.payment_method
+  );
+
+  // Галочка надбавки confirming сохраняется вместе со способом оплаты
+  const savePaymentMethod = (payment_method, confirming_surcharge) => {
     setOrderCartData((prev) => ({
       ...prev,
-      payment_method: selectedOption.value,
+      payment_method,
+      confirming_surcharge,
     }));
 
     dispatch(
       updatePayment({
         order_id: orderCartData?.id,
-        payment_method: selectedOption.value,
+        payment_method,
+        confirming_surcharge,
       })
     );
   };
 
-  const getSelectedPaymentMethodOption = () => {
-    const paymentMethodOption = PAYMENT_METHOD_OPTIONS.find(
-      (option) => option.value == orderCartData?.payment_method
+  // У способа без надбавки галочка снимается, чтобы надбавка не вернулась
+  // незаметно при повторном выборе confirming
+  const handlePaymentMethodChange = (selectedOption) => {
+    savePaymentMethod(
+      selectedOption.value,
+      Boolean(orderCartData?.confirming_surcharge) &&
+        getConfirmingSurchargeRate(selectedOption.value) > 0
     );
-    return paymentMethodOption || PAYMENT_METHOD_OPTIONS[0];
+  };
+
+  const handleConfirmingSurchargeChange = (e) => {
+    savePaymentMethod(orderCartData?.payment_method, e.target.checked);
+  };
+
+  const [agentCommissionDraft, setAgentCommissionDraft] = useState(
+    orderCartData?.agent_commission ?? 0
+  );
+
+  useEffect(() => {
+    setAgentCommissionDraft(orderCartData?.agent_commission ?? 0);
+  }, [orderCartData?.agent_commission]);
+
+  // Агентское вознаграждение, %: повышает цену блоков за m2
+  const agentCommissionFunc = () => {
+    const agent_commission =
+      parseFloat(String(agentCommissionDraft).replace(',', '.')) || 0;
+
+    if (agent_commission < 0) {
+      alert('Agent commission cannot be negative');
+      return;
+    }
+
+    dispatch(
+      updateAgentCommission({
+        order_id: orderCartData?.id,
+        agent_commission,
+      })
+    );
+
+    setOrderCartData((prev) => ({ ...prev, agent_commission }));
+    setAgentCommissionDraft(agent_commission);
+  };
+
+  const getSelectedPaymentMethodOption = () => {
+    return (
+      getPaymentMethodOption(orderCartData?.payment_method) ||
+      PAYMENT_METHOD_OPTIONS[0]
+    );
   };
 
   const productHandler = (product) => {
     const reservedProduct = productsOfOrders.find(
       (orderedProduct) =>
         orderedProduct.order_id === product.order_id &&
-        orderedProduct.product_id === product.product_id
+        orderedProduct.product_id === product.product_id,
     );
 
     if (reservedProduct) {
       const filteredWarehouseID = reservedProducts.filter(
-        (entry) => entry.orders_products_id === reservedProduct.id
+        (entry) => entry.orders_products_id === reservedProduct.id,
       );
       const filteredWarehouse = warehouse_data.filter((entry) =>
         filteredWarehouseID.some(
-          (warehouseIDs) => warehouseIDs.warehouse_id === entry.id
-        )
+          (warehouseIDs) => warehouseIDs.warehouse_id === entry.id,
+        ),
       );
       const articles = {
         product_article: product.product_article,
@@ -1154,7 +1296,7 @@ const OrderCart = React.memo(() => {
 
   useEffect(() => {
     const result = accountingDataList.find(
-      (el) => el.orders_article == orderCartData?.article
+      (el) => el.orders_article == orderCartData?.article,
     )?.aproved;
 
     setAproveAccounting(result ?? true);
@@ -1163,7 +1305,7 @@ const OrderCart = React.memo(() => {
   useEffect(() => {
     if (orderCartData?.id) {
       const updatedOrder = list_of_orders.find(
-        (order) => order.id === orderCartData.id
+        (order) => order.id === orderCartData.id,
       );
       if (updatedOrder?.secondaryContact) {
         setOrderCartData((prev) => ({
@@ -1250,6 +1392,22 @@ const OrderCart = React.memo(() => {
           onSuccess={() => navigate('/orders')}
         />
       )}
+      {roundPalletsShow && (
+        <RoundPalletsModal
+          show={roundPalletsShow}
+          onHide={() => {
+            setRoundPalletsShow(false);
+            setPendingStatus(null);
+          }}
+          orderCartData={orderCartData}
+          blocks={productLists.products}
+          onConfirm={() => {
+            setRoundPalletsShow(false);
+            setPendingStatus(null);
+            if (pendingStatus) statusChangeHandler(pendingStatus, true);
+          }}
+        />
+      )}
       {reserveModalShow && (
         <ListOfOrderedProductionReserveModal
           show={reserveModalShow}
@@ -1287,7 +1445,7 @@ const OrderCart = React.memo(() => {
                   <span style={{ minWidth: 200, display: 'inline-block' }}>
                     <Select
                       defaultValue={getSelectedOption(
-                        orderCartData?.person_in_charge
+                        orderCartData?.person_in_charge,
                       )}
                       onChange={(v) => {
                         handleSelectChange(v);
@@ -1386,6 +1544,45 @@ const OrderCart = React.memo(() => {
                   )}
                 </div>
               )}
+
+              <div className="ord-tile__label" style={{ marginTop: 16 }}>
+                Otros
+              </div>
+              {orderCartData?.otros && !isEditingOtros ? (
+                <>
+                  <div className="ord-tile__body-text">{orderCartData.otros}</div>
+                  <button
+                    type="button"
+                    className="ord-btn ord-btn--ghost ord-btn--sm"
+                    style={{ marginTop: 10 }}
+                    onClick={onEditOtrosHandler}
+                  >
+                    Edit
+                  </button>
+                </>
+              ) : (
+                <div className="ord-desc-edit">
+                  <textarea
+                    placeholder="Enter otros..."
+                    value={newOtros}
+                    disabled={
+                      !checkUserAccess(user, roles, 'orders_description_edit')
+                        ?.canWrite
+                    }
+                    onChange={(e) => setNewOtros(e.target.value)}
+                  />
+                  {checkUserAccess(user, roles, 'orders_description_edit')
+                    ?.canWrite && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--primary ord-btn--sm"
+                      onClick={() => onSaveOtros(newOtros)}
+                    >
+                      Save
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -1398,7 +1595,7 @@ const OrderCart = React.memo(() => {
               <div className="ord-steps">
                 {(() => {
                   const currentStatusIndex = status_list.findIndex(
-                    (item) => item.accessor === orderCartData?.status
+                    (item) => item.accessor === orderCartData?.status,
                   );
                   return status_list.map((item, idx) => {
                     const isDone = item.accessor < orderCartData?.status;
@@ -1444,10 +1641,10 @@ const OrderCart = React.memo(() => {
                             (isCurrent
                               ? ' ord-step__label--current'
                               : isDone
-                              ? ' ord-step__label--done'
-                              : isNext
-                              ? ' ord-step__label--next'
-                              : '')
+                                ? ' ord-step__label--done'
+                                : isNext
+                                  ? ' ord-step__label--next'
+                                  : '')
                           }
                         >
                           {item.Header}
@@ -1490,7 +1687,7 @@ const OrderCart = React.memo(() => {
             </div>
             <PDFgenerate
               orderData={orderCartData}
-              productList={productLists}
+              productList={pricedProductLists}
               vatValue={vatValue}
             />
           </div>
@@ -1506,7 +1703,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <DryMixesJournalTableOrder
-          productListOrder={updatedDryMixesListOrder}
+          productListOrder={linesWithSurcharge.dryMixes}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1514,7 +1711,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <AnchorJournalTableOrder
-          productListOrder={updatedAnchorsListOrder}
+          productListOrder={linesWithSurcharge.anchors}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1522,7 +1719,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <ToolJournalTableOrder
-          productListOrder={updatedToolsListOrder}
+          productListOrder={linesWithSurcharge.tools}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1530,7 +1727,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <RelatedMaterialJournalTableOrder
-          productListOrder={updatedRelatedMaterialsListOrder}
+          productListOrder={linesWithSurcharge.related_materials}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1735,7 +1932,7 @@ const OrderCart = React.memo(() => {
                 <span style={{ minWidth: 220 }}>
                   <Select
                     value={getSelectedPaymentMethodOption(
-                      orderCartData?.payment_method
+                      orderCartData?.payment_method,
                     )}
                     onChange={(v) => {
                       handlePaymentMethodChange(v);
@@ -1743,6 +1940,57 @@ const OrderCart = React.memo(() => {
                     options={PAYMENT_METHOD_OPTIONS}
                     isDisabled={orderCartData?.status < 5 ? false : true}
                   />
+                </span>
+              </div>
+              {confirmingSurchargeRate > 0 && (
+                <div className="ord-summary-row">
+                  <span className="ord-summary-row__label">
+                    Confirming surcharge
+                  </span>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      margin: 0,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={Boolean(orderCartData?.confirming_surcharge)}
+                      onChange={handleConfirmingSurchargeChange}
+                      disabled={orderCartData?.status >= 5}
+                    />
+                    +{confirmingSurchargeRate.toFixed(1)}% to all products
+                  </label>
+                </div>
+              )}
+              <div className="ord-summary-row">
+                <span className="ord-summary-row__label">Agent commission, %</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    id="agent_commission"
+                    name="agent_commission"
+                    className="ord-summary-input"
+                    value={agentCommissionDraft}
+                    onChange={(e) => {
+                      setAgentCommissionDraft(
+                        e.target.value.replace(/[^\d.,]/g, '')
+                      );
+                    }}
+                    disabled={orderCartData?.status >= 5}
+                  />
+                  {orderCartData?.status < 5 && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--ghost ord-btn--sm"
+                      onClick={agentCommissionFunc}
+                    >
+                      Save
+                    </button>
+                  )}
                 </span>
               </div>
               <div className="ord-summary-divider" />

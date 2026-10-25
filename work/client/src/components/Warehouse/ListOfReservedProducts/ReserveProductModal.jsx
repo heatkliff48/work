@@ -18,7 +18,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
     list_of_ordered_production,
     list_of_ordered_production_oem,
   } = useWarehouseContext();
-  const { latestProducts } = useProductsContext();
+  const { productVersions } = useProductsContext();
   const { list_of_orders } = useOrderContext();
   const dispatch = useDispatch();
   const batchOutside = useSelector((state) => state.batchOutside);
@@ -60,7 +60,7 @@ const ReservedProductModal = ({ isOpen, toggle, warehouse }) => {
     );
 
     if (
-      latestProducts.find((el) => el.id === warehouse.product_id)
+      productVersions.find((el) => el.id === warehouse.product_id)
         ?.placeOfProduction !== 'Spain'
     ) {
       const list_of_order_oem_id = list_of_ordered_production_oem.find(

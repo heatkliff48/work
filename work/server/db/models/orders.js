@@ -31,6 +31,11 @@ module.exports = (sequelize, DataTypes) => {
   }
   Orders.init(
     {
+      pdf_updated_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: DataTypes.NOW,
+      },
       article: DataTypes.STRING,
       owner: DataTypes.INTEGER,
       del_adr_id: DataTypes.INTEGER,
@@ -47,6 +52,22 @@ module.exports = (sequelize, DataTypes) => {
       uf_number_offer: DataTypes.INTEGER,
       region: DataTypes.STRING,
       payment_method: DataTypes.STRING,
+      agent_commission: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      confirming_surcharge: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      otros: DataTypes.TEXT,
+      accounting_approved: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       sequelize,

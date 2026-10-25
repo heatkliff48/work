@@ -1,7 +1,4 @@
-import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import Table from '#components/Table/Table';
 import Select from 'react-select';
 import { TextSearchFilter } from '#components/Table/filters.js';
@@ -12,6 +9,9 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import { updateRawMatConsumption } from '#components/redux/actions/recipeAction.js';
+import '#components/Clients/ClientsInfo/clientsDrawer.css';
+import '#components/Styles/table.css';
+import './qualityManagement.css';
 
 function QualityManagementAddModal(props) {
   const { latestProducts } = useProductsContext();
@@ -430,7 +430,7 @@ function QualityManagementAddModal(props) {
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
-      dialogClassName="modal-auto-size"
+      dialogClassName="modal-auto-size qm-modal"
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
@@ -438,70 +438,43 @@ function QualityManagementAddModal(props) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {customBatchSelect ? (
-          <>
+        <div className="cl-page qm-modal-scope">
+          {customBatchSelect ? (
             <form
               id="qualityManagementAddCustomBatch"
-              className="w-full max-w-sm"
+              className="qm-form"
               onSubmit={(e) => {
                 onSubmitForm(e);
               }}
             >
-              <Row>
-                {add_batch_dialog.map((el) => (
-                  <Col key={el.id}>
-                    <div className="md:flex md:items-center mb-6">
-                      <div className="md:w-1/3">
-                        <label
-                          className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
-                          // for="version"
-                        >
-                          {el.Header}
-                        </label>
-                      </div>
-                      <div className="md:w-2/3">
-                        {el.accessor === 'product_article' ? (
-                          <Select
-                            defaultValue={getSelectedProductArticleOption(
-                              el.accessor,
-                            )}
-                            onChange={(v) => {
-                              handleProductArticleSelectChange(v, el.accessor);
-                            }}
-                            options={productArticleOptions}
-                          />
-                        ) : (
-                          <input
-                            className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                            id={el.accessor}
-                            name={el.accessor}
-                            type="text"
-                            value={customBatchSelectInput[el.accessor] || ''}
-                            onChange={(e) =>
-                              handleCustomBatchSelectInputChange(e)
-                            }
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </Col>
-                ))}
-              </Row>
+              {add_batch_dialog.map((el) => (
+                <div className="qm-form__field" key={el.accessor}>
+                  <label className="qm-form__label" htmlFor={el.accessor}>
+                    {el.Header}
+                  </label>
+                  {el.accessor === 'product_article' ? (
+                    <Select
+                      inputId={el.accessor}
+                      defaultValue={getSelectedProductArticleOption(el.accessor)}
+                      onChange={(v) => {
+                        handleProductArticleSelectChange(v, el.accessor);
+                      }}
+                      options={productArticleOptions}
+                    />
+                  ) : (
+                    <input
+                      className="qm-form__input"
+                      id={el.accessor}
+                      name={el.accessor}
+                      type="text"
+                      value={customBatchSelectInput[el.accessor] || ''}
+                      onChange={(e) => handleCustomBatchSelectInputChange(e)}
+                    />
+                  )}
+                </div>
+              ))}
             </form>
-          </>
-        ) : (
-          <>
-            {/* <Table
-              COLUMN_DATA={production_plan_table}
-              dataOfTable={productionPlanDataList}
-              // userAccess={userAccess}
-              onClickButton={() => {}}
-              buttonText={''}
-              tableName={'Batch calendar'}
-              handleRowClick={(row) => {
-                handlerAddProductionPlanEntry(row);
-              }}
-            /> */}
+          ) : (
             <Table
               COLUMN_DATA={COLUMNS_RAW_MAT_CONSUMPTION}
               dataOfTable={
@@ -509,38 +482,52 @@ function QualityManagementAddModal(props) {
                 raw_mat_consumption.filter((item) => !item.used)
               }
               tableName={'Raw materials consumption'}
+              variant="card"
+              hideTitle
+              emptyTitle="Nothing to start a batch from"
+              emptySubtitle="Calculated raw materials consumption entries appear here once they are ready."
               handleRowClick={(row) => {
                 handlerAddProductionPlanEntry(row);
               }}
             />
-          </>
-        )}
+          )}
+        </div>
       </Modal.Body>
       <Modal.Footer>
         {customBatchSelect ? (
           <>
-            <Button
-              variant="info"
-              className="me-auto"
+            <button
+              type="button"
+              className="cl-btn cl-btn--ghost me-auto"
               onClick={() => setCustomBatchSelect(false)}
             >
               Return
-            </Button>
-            <Button form="qualityManagementAddCustomBatch" type="submit">
+            </button>
+            <button
+              type="submit"
+              className="cl-btn cl-btn--primary"
+              form="qualityManagementAddCustomBatch"
+            >
               Add batch
-            </Button>
+            </button>
           </>
         ) : (
-          <Button
-            variant="info"
-            className="me-auto"
+          <button
+            type="button"
+            className="cl-btn cl-btn--ghost me-auto"
             onClick={() => setCustomBatchSelect(true)}
           >
             Add custom batch dialog
-          </Button>
+          </button>
         )}
 
-        <Button onClick={props.onHide}>Close</Button>
+        <button
+          type="button"
+          className="cl-btn cl-btn--primary"
+          onClick={props.onHide}
+        >
+          Close
+        </button>
       </Modal.Footer>
     </Modal>
   );
@@ -551,14 +538,15 @@ function ShowQualityManagementAddModal({ setConsumptionCalculated }) {
 
   return (
     <>
-      <Button
-        variant="primary"
+      <button
+        type="button"
+        className="cl-btn cl-btn--primary"
         onClick={() => {
           setModalShow(true);
         }}
       >
         Start new batch
-      </Button>
+      </button>
 
       <QualityManagementAddModal
         show={modalShow}

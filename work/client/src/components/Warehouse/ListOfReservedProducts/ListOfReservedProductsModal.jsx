@@ -7,6 +7,7 @@ import ReservedProductModal from './ReserveProductModal';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import {
   deleteReservedProducts,
+  deleteWarehouse,
   updateRemainingStock,
 } from '#components/redux/actions/warehouseAction.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
@@ -86,15 +87,34 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
     );
   };
 
+  const deleteWarehouseHandler = () => {
+    const isConfirmed = window.confirm(
+      `Are you sure you want to delete warehouse entry ${curr_warehouse.article} (NOT OK)?\n` +
+        `Press 'OK' to confirm or 'Cancel' to exit.`,
+    );
+
+    if (!isConfirmed) return;
+
+    dispatch(deleteWarehouse(curr_warehouse.id));
+    toggle();
+  };
+
+  // Запись могли удалить (в т.ч. другой пользователь) — закрываем модалку
+  useEffect(() => {
+    if (!curr_warehouse) toggle();
+  }, [curr_warehouse]);
+
   useEffect(() => {
     const curr_res_prod_list = list_of_reserved_products.filter(
-      (el) => el?.warehouse_id == curr_warehouse.id,
+      (el) => el?.warehouse_id == curr_warehouse?.id,
     );
 
     setCurrentListOfResProd(curr_res_prod_list);
   }, [list_of_reserved_products]);
 
   useEffect(() => {
+    if (!curr_warehouse) return;
+
     const wh = getWarehouse();
 
     const result = productsOfOrders
@@ -130,6 +150,8 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
       }
     }
   }, [user, roles]);
+
+  if (!curr_warehouse) return null;
 
   return (
     <div>
@@ -173,6 +195,11 @@ const ListOfReservedProductsModal = React.memo(({ isOpen, toggle }) => {
           )} */}
           {curr_warehouse.type === 'Sorting' && <ShowSortingModal />}
           <ShowAddBatchID />
+          {curr_warehouse.type === 'NOT OK' && userAccess?.canWrite && (
+            <Button color="danger" onClick={deleteWarehouseHandler}>
+              Delete
+            </Button>
+          )}
           <FilesMain type={0} />
           <Table>
             <thead>

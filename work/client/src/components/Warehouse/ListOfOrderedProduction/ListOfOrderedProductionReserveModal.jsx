@@ -29,7 +29,7 @@ function ListOfOrderedProductionReserveModal({
   } = useWarehouseContext();
   const { list_of_orders, list_of_ordered_production_oem, productsOfOrders } =
     useOrderContext();
-  const { latestProducts } = useProductsContext();
+  const { productVersions } = useProductsContext();
   const dispatch = useDispatch();
   const [remainsToReserve, setRemainsToReserve] = useState(-1);
 
@@ -40,10 +40,11 @@ function ListOfOrderedProductionReserveModal({
       (warehouse) => warehouse.article === product.article
     );
 
-    const product_id = latestProducts.find((el) => el.article === product_article);
-
+    // Строки заказов ссылаются на разные версии карточки — сравниваем по артикулу версии
     const filteredProductsOfOrders = productsOfOrders.filter(
-      (item) => item.product_id === product_id.id
+      (item) =>
+        productVersions.find((el) => el.id === item.product_id)?.article ===
+        product_article
     );
 
     const ordersWithProduct = filteredProductsOfOrders.map((product) => {
@@ -99,7 +100,7 @@ function ListOfOrderedProductionReserveModal({
       );
 
       if (
-        latestProducts.find((el) => el.id === warehouse.product_id)
+        productVersions.find((el) => el.id === warehouse.product_id)
           ?.placeOfProduction !== 'Spain'
       ) {
         const list_of_order_oem_id = list_of_ordered_production_oem?.find(
@@ -149,12 +150,11 @@ function ListOfOrderedProductionReserveModal({
       (order) => order.article === currentOrderedProduct.order_article
     ).id;
 
-    const product_id = latestProducts.find(
-      (el) => el.article === currentOrderedProduct.product_article
-    ).id;
-
     const checkReserve = productsOfOrders.find(
-      (prod) => prod.order_id === order_id && prod.product_id === product_id
+      (prod) =>
+        prod.order_id === order_id &&
+        productVersions.find((el) => el.id === prod.product_id)?.article ===
+          currentOrderedProduct.product_article
     );
 
     if (checkReserve?.warehouse_id !== null) {

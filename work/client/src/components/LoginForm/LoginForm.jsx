@@ -22,7 +22,10 @@ function LoginForm() {
   const returnPath = location.state?.from?.pathname || '/';
 
   useEffect(() => {
-    if (authChecked && user) {
+    // Пустой объект {} тоже является truthy,
+    // поэтому проверяем наличие идентификатора пользователя.
+    // Одновременно ждём завершения проверки токенов.
+    if (authChecked && user?.id) {
       navigate(returnPath, {
         replace: true,
       });

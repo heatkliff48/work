@@ -84,6 +84,7 @@ import {
   warehousePalletsReducer,
   warehousePlasticsReducer,
   warehouseSandPowderReducer,
+  warehouseReleaseOilReducer,
   warehouseSandReducer,
   warehouseSandSlurryReducer,
 } from './warehouseRawMaterialsReducer';
@@ -158,6 +159,7 @@ const appReducer = combineReducers({
   warehousePallets: warehousePalletsReducer,
   warehousePlastics: warehousePlasticsReducer,
   warehouseSandPowder: warehouseSandPowderReducer,
+  warehouseReleaseOil: warehouseReleaseOilReducer,
   lotesListBatches: lotesListBatchesReducer,
   lotesListCakes: lotesListCakesReducer,
   contactPriceInfo: contactPriceInfoReducer,

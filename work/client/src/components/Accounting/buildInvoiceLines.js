@@ -12,6 +12,7 @@ const pushLine = (lines, line) => {
 export const buildInvoiceLines = ({
   productLists,
   latestProducts,
+  productVersions,
   latestDryMix,
   latestAnchors,
   latestTools,
@@ -20,9 +21,10 @@ export const buildInvoiceLines = ({
   const lines = [];
 
   productLists?.products?.forEach((prod) => {
-    const product = latestProducts?.find(
-      (el) => el.id === prod.product_id || el.article === prod.product_article,
-    );
+    // Версия карточки, с которой оформлена строка заказа
+    const product =
+      productVersions?.find((el) => el.id === prod.product_id) ||
+      latestProducts?.find((el) => el.article === prod.product_article);
 
     const quantity = Number(prod.quantity_real ?? prod.quantity_m2 ?? 0);
     const importe = Number(prod.final_price ?? 0);

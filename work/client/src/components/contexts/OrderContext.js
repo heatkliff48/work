@@ -4,7 +4,6 @@ import { TextSearchFilter } from '#components/Table/filters.js';
 import {
   addAccountingDataList,
   getOrders,
-  updAccountingDataList,
 } from '#components/redux/actions/ordersAction.js';
 import {
   createContext,
@@ -23,6 +22,11 @@ const OrderContextProvider = ({ children }) => {
     {
       Header: 'Order number',
       accessor: 'article',
+      disableSortBy: true,
+    },
+    {
+      Header: 'Description',
+      accessor: 'description',
       disableSortBy: true,
     },
     {
@@ -306,6 +310,7 @@ const OrderContextProvider = ({ children }) => {
       'product_id',
       'createdAt',
       'updatedAt',
+      'pdf_updated_at',
       'bitrix_id',
       'bitrix_client_id',
     ],
@@ -407,33 +412,6 @@ const OrderContextProvider = ({ children }) => {
   }, [isOrderReady]);
 
   useEffect(() => {
-    if (
-      !list_of_orders ||
-      list_of_orders?.length == 0 ||
-      !Array.isArray(list_of_orders)
-    )
-      return;
-
-    list_of_orders?.forEach((el) => {
-      const haveAproved = accDataList?.find(
-        (acc) => acc.orders_article == el.article,
-      );
-
-      if (
-        (el.status == 7 || el.status == 10 || el.status == 9) &&
-        haveAproved?.aproved
-      ) {
-        dispatch(
-          updAccountingDataList({
-            orders_article: el?.article,
-            aproved: false,
-          }),
-        );
-      }
-    });
-  }, [list_of_orders, accDataList]);
-
-  useEffect(() => {
     const filteredUsersList = usersMainInfo.filter(
       (user) => user.role === 2 || user.role === 16 || user.role === 17,
     );
@@ -472,6 +450,20 @@ const OrderContextProvider = ({ children }) => {
       return { ...prev, secondaryContact };
     });
   }, [list_of_orders]);
+
+  useEffect(() => {
+    if (!orderCartData?.id || !Array.isArray(list_of_orders)) return;
+    const savedOrder = list_of_orders.find(
+      (order) => String(order.id) === String(orderCartData.id),
+    );
+    if (savedOrder?.pdf_updated_at === undefined) return;
+
+    setOrderCartData((previous) => {
+      if (String(previous?.id) !== String(savedOrder.id)) return previous;
+      if (previous.pdf_updated_at === savedOrder.pdf_updated_at) return previous;
+      return { ...previous, pdf_updated_at: savedOrder.pdf_updated_at };
+    });
+  }, [list_of_orders, orderCartData?.id]);
 
   const getCurrentOrderInfoHandler = useCallback(
     (order_info) => {
@@ -513,15 +505,20 @@ const OrderContextProvider = ({ children }) => {
         shipping_date: order?.shipping_date,
         person_in_charge: order?.person_in_charge,
         delivery: order?.delivery,
+        delivery_m2: order?.delivery_m2,
+        pdf_updated_at: order?.pdf_updated_at ?? null,
         main_order: order?.main_order ?? null,
         region: order?.region ?? null,
         payment_method: order?.payment_method ?? null,
+        agent_commission: order?.agent_commission ?? 0,
+        confirming_surcharge: Boolean(order?.confirming_surcharge),
+        otros: order?.otros ?? '',
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));
       setOrderCartData(currentOrder);
     },
-    [list_of_orders, clients, deliveryAddresses],
+    [list_of_orders, clients, deliveryAddresses, contactInfos],
   );
 
   useEffect(() => {
@@ -540,7 +537,7 @@ const OrderContextProvider = ({ children }) => {
           addAccountingDataList({
             orders_article: order.article,
             orders_status: order.status,
-            aproved: false,
+            aproved: Boolean(order.accounting_approved),
           }),
         );
       }

@@ -726,6 +726,10 @@
   width: 760px;
   max-width: 95vw;
 }
+.ord-modal-card--xl {
+  width: 1200px;
+  max-width: 95vw;
+}
 .ord-modal-head {
   padding: 20px 24px;
   border-bottom: 1px solid var(--ord-border-3);
@@ -1031,6 +1035,29 @@
   text-align: right;
   color: var(--ord-text-2);
 }
+.ord-liberar-table td.ord-liberar-table__cont {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.ord-liberar-package {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ord-liberar-add {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ord-red);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.ord-liberar-add:hover {
+  text-decoration: underline;
+}
 .ord-liberar-qty {
   width: 76px;
   height: 34px;
@@ -1045,6 +1072,27 @@
 }
 .ord-liberar-qty:focus {
   border-color: var(--ord-red);
+}
+.ord-liberar-select {
+  max-width: 260px;
+  height: 34px;
+  border: 1px solid var(--ord-border-2);
+  border-radius: 8px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--ord-text);
+  background: #fff;
+  outline: none;
+}
+.ord-liberar-select:focus {
+  border-color: var(--ord-red);
+}
+.ord-liberar-sub {
+  color: var(--ord-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-top: 3px;
 }
 .ord-liberar-error {
   color: #bc1212;
@@ -1064,6 +1112,34 @@
 }
 .ord-liberar-date:focus {
   border-color: var(--ord-red);
+}
+.ord-liberar-toprow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 13px;
+}
+.ord-liberar-toprow .ord-field {
+  margin-bottom: 0;
+}
+.ord-liberar-trucks {
+  text-align: right;
+}
+.ord-liberar-trucks__value {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.ord-liberar-trucks__value .ord-liberar-sub {
+  margin-top: 0;
+}
+.ord-liberar-trucks__count {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ord-text);
 }
 
 /* responsive */

@@ -1,15 +1,20 @@
 require('dotenv').config();
+
 const express = require('express');
 const session = require('express-session');
 const WebSocket = require('ws');
+const { randomUUID } = require('crypto');
 const http = require('http');
 const cors = require('cors');
 const morgan = require('morgan');
 const redis = require('redis');
+
 const redisClient = redis.createClient();
+
 redisClient.on('error', (err) => {
   console.error('Redis error:', err);
 });
+
 const RedisStore = require('connect-redis')(session);
 const TokenService = require('./services/Token.js');
 const { COOKIE_SETTINGS } = require('./constants.js');
@@ -61,30 +66,44 @@ const greenLineMonitoringRouter = require('./router/greenLineMonitoring.js');
 const temperatureDataMonitoringRouter = require('./router/temperatureDataMonitoring.js');
 
 const app = express();
+
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
+
 const map = new Map();
 
 const sessionParser = session({
   name: 'sesid',
+
   store: new RedisStore({
     client: redisClient,
   }),
+
   secret: process.env.SECRET,
+
   resave: false,
   saveUninitialized: false,
+
+  // Каждый запрос продлевает сессию.
   rolling: true,
-  cookie: COOKIE_SETTINGS.SESSION,
+
+  cookie: {
+    ...COOKIE_SETTINGS.SESSION,
+
+    // Сессия завершится после 12 часов бездействия.
+    maxAge: 12 * 60 * 60 * 1000,
+  },
 });
 
 app.use(
   cors({
     credentials: true,
+
     origin: (origin, callback) => {
       const allowedOrigins = process.env.ORIGIN.split(',');
 
-      // Добавляем проверку для Tailscale
+      // Разрешаем указанные origin и адреса Tailscale.
       if (
         !origin ||
         allowedOrigins.includes(origin) ||
@@ -97,6 +116,7 @@ app.use(
     },
   }),
 );
+
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.json());
@@ -111,16 +131,29 @@ app.use(
 
 app.use((req, res, next) => {
   console.log('Запрос пришел с Origin:', req.headers.origin);
-  // res.locals.token = process.env.API;
+
   if (req.session.user) {
     res.locals.user = req.session.user;
   }
+
   next();
 });
+
 app.use(TokenService.checkAccess);
 
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
+
+const wss = new WebSocket.Server({
+  clientTracking: false,
+  noServer: true,
+});
+
+// Сервер отправляет этот код клиенту,
+// если WebSocket-сессия недействительна.
+const WS_UNAUTHORIZED_CLOSE_CODE = 4401;
+
+// Как часто сервер проверяет активность соединений.
+const WS_HEARTBEAT_INTERVAL = 30e3;
 
 app.use('/aldabaran', AldabaranRootRouter);
 app.use('/auth', AuthRootRouter);
@@ -172,7 +205,6 @@ app.use((err, req, res, next) => {
   return ErrorUtils.catchError(res, err);
 });
 
-// Обработка WebSocket соединений
 const handleUpgradeSocketError = (error) => {
   console.error('WebSocket upgrade error:', error);
 };
@@ -180,12 +212,24 @@ const handleUpgradeSocketError = (error) => {
 server.on('upgrade', (req, socket, head) => {
   socket.on('error', handleUpgradeSocketError);
 
-  sessionParser(req, {}, () => {
+  sessionParser(req, {}, (error) => {
+    if (error) {
+      console.error('WebSocket session error:', error);
+      socket.destroy();
+      return;
+    }
+
     const userId = req.session?.user?.id;
 
     if (!userId) {
-      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-      socket.destroy();
+      socket.removeListener('error', handleUpgradeSocketError);
+
+      // Сначала завершаем WebSocket-handshake,
+      // чтобы браузер получил код закрытия 4401.
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        ws.close(WS_UNAUTHORIZED_CLOSE_CODE, 'Unauthorized');
+      });
+
       return;
     }
 
@@ -196,32 +240,42 @@ server.on('upgrade', (req, socket, head) => {
     });
   });
 });
+
 registerWsEmitter(map);
 
-// Обработка соединения WebSocket
 wss.on('connection', (ws, request) => {
   const userId = request.session.user.id;
-  const connectionId = Symbol(`websocket-user-${userId}`);
 
-  const connection = {
-    userId,
+  // У одного пользователя одновременно может быть несколько вкладок.
+  const connectionId = `${userId}:${randomUUID()}`;
 
-    send(data) {
-      if (ws.readyState !== WebSocket.OPEN) {
-        return;
-      }
+  // Оставляем userId непосредственно на сокете:
+  // он может понадобиться wsEmitter для адресной отправки.
+  ws.userId = userId;
+  ws.isAlive = true;
 
-      ws.send(data, (error) => {
-        if (error) {
-          console.error(`WebSocket send error for user ${userId}:`, error);
-        }
-      });
-    },
-  };
-
-  map.set(connectionId, connection);
+  // В map должен находиться сам WebSocket.
+  // Heartbeat ниже вызывает у него ping() и terminate().
+  map.set(connectionId, ws);
 
   console.log(`WebSocket connected: user=${userId}, total=${map.size}`);
+
+  // Клиент считает соединение авторизованным
+  // только после получения ready.
+  ws.send('ready');
+
+  // Браузер автоматически отвечает pong
+  // на системное WebSocket-сообщение ping.
+  ws.on('pong', () => {
+    ws.isAlive = true;
+  });
+
+  // Дополнительная проверка со стороны клиента.
+  ws.on('message', (data) => {
+    if (data.toString() === 'ping' && ws.readyState === WebSocket.OPEN) {
+      ws.send('pong');
+    }
+  });
 
   ws.on('close', () => {
     map.delete(connectionId);
@@ -234,6 +288,27 @@ wss.on('connection', (ws, request) => {
 
     console.error(`WebSocket error for user ${userId}:`, error);
   });
+});
+
+// Соединения, оборванные без события close
+// (сон ноутбука, пропала сеть), не присылают pong.
+const heartbeatInterval = setInterval(() => {
+  for (const ws of map.values()) {
+    if (!ws.isAlive) {
+      ws.terminate();
+      continue;
+    }
+
+    ws.isAlive = false;
+
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.ping();
+    }
+  }
+}, WS_HEARTBEAT_INTERVAL);
+
+server.on('close', () => {
+  clearInterval(heartbeatInterval);
 });
 
 server.listen(process.env.PORT, '0.0.0.0', () => {

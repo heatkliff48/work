@@ -3,6 +3,13 @@ const { Op, where } = require('sequelize');
 const {
   LotesListsBatches,
   LotesListsCakes,
+  RawMaterialsWarehouse,
+  Recipe,
+  RawMatConsumptions,
+  RawMatConsumptionsCurrentMolds,
+  BatchOutside,
+  ProductionQualities,
+  QualityManagement,
   sequelize,
 } = require('../db/models/index.js');
 const myEmitter = require('../src/ee.js');
@@ -14,6 +21,7 @@ const {
   UPDATE_LOTES_LIST_CAKES_BOOLEAN_SOCKET,
   UPDATE_LOTES_LIST_NOTE_SOCKET,
   DELETE_LOTES_LIST_CAKES_SOCKET,
+  UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 
@@ -73,6 +81,260 @@ const hasSameRecipe = (existingRecord, incomingRecord) =>
       getRecipeQuantity(existingRecord, fieldNames) ===
       getRecipeQuantity(incomingRecord, fieldNames),
   );
+
+const RETURN_SLURRY_TYPE = 'Return slurry (dry)';
+
+// Everything except the return slurry itself; aluminum is counted too,
+// as the old "All to return slurry" write-off did.
+const SLURRIED_MATERIAL_FIELDS = [
+  'sand_dry',
+  'sand_slurry_dry',
+  'lime',
+  'cement',
+  'gypsum_dry',
+  'gypsum_stone',
+  'aluminum_paste',
+  'aluminum_paste_2',
+];
+
+const round2 = (value) =>
+  Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+
+const createHttpError = (status, message) => {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+};
+
+// Return slurry a cake adds to the warehouse once it is slurried. Casting
+// already wrote off return_dry minus the recipe's produced_return_dry, while a
+// slurried cake gives back all its other materials and consumes no return, so
+// the correction is the sum of the materials plus return_dry minus the
+// produced return.
+const getSlurriedReturnQuantity = async (cakeId, transaction) => {
+  const batchRecord = await LotesListsBatches.findOne({
+    where: {
+      cake_id_start: { [Op.lte]: cakeId },
+      cake_id_finish: { [Op.gte]: cakeId },
+    },
+    order: [['id', 'DESC']],
+    transaction,
+  });
+
+  if (!batchRecord) {
+    throw createHttpError(
+      404,
+      `Materials of cake ${cakeId} not found, cannot change Slurried`,
+    );
+  }
+
+  const materialsTotal = SLURRIED_MATERIAL_FIELDS.reduce(
+    (total, field) => total + round2(Number(batchRecord[field]) || 0),
+    0,
+  );
+
+  const recipe = batchRecord.recipe
+    ? await Recipe.findOne({
+        where: { article: batchRecord.recipe },
+        transaction,
+      })
+    : null;
+
+  const producedReturn = Number(recipe?.produced_return_dry);
+
+  return round2(
+    materialsTotal +
+      round2(Number(batchRecord.return_dry) || 0) -
+      (producedReturn > 0 ? round2(producedReturn) : 0),
+  );
+};
+
+const applySlurriedReturn = async (cakeId, slurried, transaction) => {
+  const quantity = await getSlurriedReturnQuantity(cakeId, transaction);
+
+  if (!quantity) return null;
+
+  const record = await RawMaterialsWarehouse.findOne({
+    where: { material_type: RETURN_SLURRY_TYPE },
+    transaction,
+    lock: transaction.LOCK.UPDATE,
+  });
+
+  if (!record) {
+    throw createHttpError(
+      409,
+      `"${RETURN_SLURRY_TYPE}" is not configured in the warehouse`,
+    );
+  }
+
+  const currentRemaining = round2(Number(record.remaining_quantity) || 0);
+  const newRemaining = round2(
+    currentRemaining + (slurried ? quantity : -quantity),
+  );
+
+  if (newRemaining < 0) {
+    throw createHttpError(
+      409,
+      `There is not enough "${RETURN_SLURRY_TYPE}" in the warehouse: ` +
+        `required ${quantity}, available ${currentRemaining}`,
+    );
+  }
+
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+
+  return record.update(
+    {
+      remaining_quantity: newRemaining,
+      last_updated: `${day}.${month}.${now.getFullYear()}`,
+      updatedAt: now,
+    },
+    { transaction },
+  );
+};
+
+// Every integer column that holds a Lotes List batch number. Warehouses.batch_id
+// stores a LotesListsBatches row id and QualityManagement.batch_id a warehouse
+// article, so neither is listed.
+const BATCH_ID_COLUMNS = [
+  [LotesListsBatches, 'batch_id'],
+  [RawMatConsumptions, 'batch_id'],
+  [RawMatConsumptionsCurrentMolds, 'batch_id'],
+  [BatchOutside, 'batch_id'],
+  [ProductionQualities, 'batch_id'],
+  [QualityManagement, 'raw_mat_cons_batch_id'],
+];
+
+// Every column that holds a cake number, except LotesListsCakes.id, which is a
+// primary key and is shifted separately.
+const CAKE_ID_COLUMNS = [
+  [LotesListsBatches, 'cake_id_start'],
+  [LotesListsBatches, 'cake_id_finish'],
+  [RawMatConsumptions, 'cake_id_start'],
+  [RawMatConsumptionsCurrentMolds, 'cake_id_start'],
+];
+
+const getLowestValue = async (columns, transaction) => {
+  let lowest = null;
+
+  for (const [model, column] of columns) {
+    const value = await model.min(column, { transaction });
+
+    if (value !== null && (lowest === null || Number(value) < lowest)) {
+      lowest = Number(value);
+    }
+  }
+
+  return lowest;
+};
+
+const shiftColumns = async (columns, shift, transaction) => {
+  for (const [model, column] of columns) {
+    await model.increment(
+      { [column]: shift },
+      { where: {}, silent: true, transaction },
+    );
+  }
+};
+
+const shiftBatchIds = async (shift, transaction) => {
+  const lowestBatchId = await getLowestValue(BATCH_ID_COLUMNS, transaction);
+
+  if (lowestBatchId + shift < 1) {
+    throw createHttpError(
+      409,
+      `Batch ID ${lowestBatchId} would become ${lowestBatchId + shift}, ` +
+        'choose a larger first Batch ID',
+    );
+  }
+
+  await shiftColumns(BATCH_ID_COLUMNS, shift, transaction);
+
+  // Dimension tests keep the batch number as text
+  await sequelize.query(
+    `UPDATE "QualityDimensions"
+     SET batch_id = (batch_id::integer + :shift)::text
+     WHERE batch_id ~ '^[0-9]+$'`,
+    { replacements: { shift }, transaction },
+  );
+};
+
+const shiftCakeIds = async (shift, transaction) => {
+  const lowestColumnCakeId = await getLowestValue(CAKE_ID_COLUMNS, transaction);
+  const lowestCakeRowId = await LotesListsCakes.min('id', { transaction });
+  const lowestCakeId = Math.min(
+    ...[lowestColumnCakeId, lowestCakeRowId].filter((id) => id !== null),
+  );
+
+  if (lowestCakeId + shift < 1) {
+    throw createHttpError(
+      409,
+      `Cake ID ${lowestCakeId} would become ${lowestCakeId + shift}, ` +
+        'choose a larger first Cake ID',
+    );
+  }
+
+  await shiftColumns(CAKE_ID_COLUMNS, shift, transaction);
+
+  // The primary key is checked row by row, so "id + shift" in one pass hits
+  // ids that are not moved yet. Negating first keeps both passes collision free.
+  await sequelize.query('UPDATE "LotesListsCakes" SET id = -id', {
+    transaction,
+  });
+  await sequelize.query('UPDATE "LotesListsCakes" SET id = :shift - id', {
+    replacements: { shift },
+    transaction,
+  });
+  await sequelize.query(
+    `SELECT setval(pg_get_serial_sequence('"LotesListsCakes"', 'id'), COALESCE(MAX(id), 0) + 1, false) FROM "LotesListsCakes"`,
+    { transaction },
+  );
+};
+
+// Shifts batch and cake numbers everywhere so that the first Lotes List batch
+// starts at the given ids, used to line up the numbering with the factory's.
+lotesListRouter.post('/renumber', async (req, res) => {
+  const batchIdStart = Number(req.body?.batch_id_start);
+  const cakeIdStart = Number(req.body?.cake_id_start);
+
+  if (![batchIdStart, cakeIdStart].every((id) => Number.isInteger(id) && id > 0)) {
+    return res
+      .status(400)
+      .json({ error: 'Batch ID and Cake ID must be positive integers' });
+  }
+
+  try {
+    const shifts = await sequelize.transaction(async (transaction) => {
+      const currentBatchIdStart = await LotesListsBatches.min('batch_id', {
+        transaction,
+      });
+      const currentCakeIdStart = await LotesListsBatches.min('cake_id_start', {
+        transaction,
+      });
+
+      if (currentBatchIdStart === null || currentCakeIdStart === null) {
+        throw createHttpError(409, 'Lotes List is empty, nothing to renumber');
+      }
+
+      const batch_shift = batchIdStart - Number(currentBatchIdStart);
+      const cake_shift = cakeIdStart - Number(currentCakeIdStart);
+
+      if (batch_shift) await shiftBatchIds(batch_shift, transaction);
+      if (cake_shift) await shiftCakeIds(cake_shift, transaction);
+
+      return { batch_shift, cake_shift };
+    });
+
+    return res.status(200).json(shifts);
+  } catch (err) {
+    const status = Number(err.status) || 500;
+
+    if (status >= 500) console.error(err.message);
+
+    return res.status(status).json({ error: err.message });
+  }
+});
 
 lotesListRouter.get('/batches', async (req, res) => {
   try {
@@ -326,7 +588,7 @@ lotesListRouter.get('/cakes', async (req, res) => {
 
 lotesListRouter.post('/cakes', async (req, res) => {
   try {
-    const { id, note, casting_temp_c, flowability } = req.body;
+    const { id, note, casting_temp_c, flowability, slurried } = req.body;
     const numericId = Number(id);
 
     if (!Number.isFinite(numericId)) {
@@ -340,27 +602,55 @@ lotesListRouter.post('/cakes', async (req, res) => {
       updates.casting_temp_c = casting_temp_c;
     }
     if (flowability !== undefined) updates.flowability = flowability;
+    if (slurried !== undefined) updates.slurried = Boolean(slurried);
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'No fields to update' });
     }
 
-    const [count, rows] = await LotesListsCakes.update(updates, {
-      where: { id: numericId },
-      returning: true,
-    });
+    // The flag and its return slurry correction are saved together, and the
+    // correction runs only when the stored flag actually changes.
+    const { updatedCake, updatedWarehouseRecord } = await sequelize.transaction(
+      async (transaction) => {
+        const cake = await LotesListsCakes.findByPk(numericId, {
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        });
 
-    if (count === 0) {
-      return res.status(404).json({ error: `Cake ${numericId} not found` });
-    }
+        if (!cake) {
+          throw createHttpError(404, `Cake ${numericId} not found`);
+        }
 
-    const updatedCake = rows[0];
+        const slurriedChanged =
+          updates.slurried !== undefined &&
+          updates.slurried !== Boolean(cake.slurried);
+
+        const updatedWarehouseRecord = slurriedChanged
+          ? await applySlurriedReturn(numericId, updates.slurried, transaction)
+          : null;
+
+        return {
+          updatedCake: await cake.update(updates, { transaction }),
+          updatedWarehouseRecord,
+        };
+      },
+    );
+
     myEmitter.emit(UPDATE_LOTES_LIST_CAKES_SOCKET, [updatedCake]);
+
+    if (updatedWarehouseRecord) {
+      myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, [
+        updatedWarehouseRecord.toJSON(),
+      ]);
+    }
 
     return res.status(200).json(updatedCake);
   } catch (err) {
-    console.error(err.message);
-    return res.status(500).json({ error: err.message });
+    const status = Number(err.status) || 500;
+
+    if (status >= 500) console.error(err.message);
+
+    return res.status(status).json({ error: err.message });
   }
 });
 
@@ -386,6 +676,9 @@ lotesListRouter.post('/cakes/update/recipe', async (req, res) => {
     delete out.id;
     delete out.createdAt;
     delete out.updatedAt;
+    // Slurried moves return slurry in the warehouse, so it changes only via
+    // POST /cakes, never by copying one cake's data onto others
+    delete out.slurried;
     return out;
   };
 

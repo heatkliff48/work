@@ -4,7 +4,23 @@ const {
   QualityDimensions,
   QualityCompressions,
 } = require('../db/models');
+const models = require('../db/models');
 const { sequelize } = require('../db/models');
+const { Op } = require('sequelize');
+const { Conflict, BadRequest } = require('../utils/Errors.js');
+
+// Колонки, в которых хранится артикул продукта (строкой, без связи по id)
+const PRODUCT_ARTICLE_REFERENCES = [
+  ['Warehouses', 'product_article'],
+  ['StockBalances', 'product_article'],
+  ['OrderToWarehouse', 'product_article'],
+  ['ListOfOrderedProductions', 'product_article'],
+  ['ListOfOrderedProductionOEMs', 'product_article'],
+  ['BatchOutside', 'product_article'],
+  ['QualityManagement', 'product_article'],
+  ['ProductionQualities', 'product_article'],
+  ['ProductionBatchLog', 'products_article'],
+];
 
 class ProductsRepository {
   static async getAllProductsData() {
@@ -54,6 +70,152 @@ class ProductsRepository {
     });
 
     return repProduct;
+  }
+
+  // changes: [{ from, to }] — переименовывает артикул во всех версиях продукта
+  // и во всех таблицах, где он упоминается
+  static async fixProductArticles(changes) {
+    const froms = changes.map(({ from }) => from);
+    const tos = changes.map(({ to }) => to);
+
+    if (
+      !changes.length ||
+      [...froms, ...tos].some((article) => !article) ||
+      new Set(froms).size !== froms.length ||
+      new Set(tos).size !== tos.length
+    ) {
+      throw new BadRequest('Invalid list of article changes');
+    }
+
+    // Все замены применяются одним CASE, поэтому цепочки (A→B, B→C) не мешают друг другу
+    const articleCase = (column) =>
+      sequelize.literal(
+        `CASE "${column}" ${changes
+          .map(
+            ({ from, to }) =>
+              `WHEN ${sequelize.escape(from)} THEN ${sequelize.escape(to)}`,
+          )
+          .join(' ')} ELSE "${column}" END`,
+      );
+
+    return sequelize.transaction(async (transaction) => {
+      const taken = await Products.findOne({
+        where: { article: { [Op.in]: tos, [Op.notIn]: froms } },
+        transaction,
+      });
+      if (taken) {
+        throw new Conflict(
+          `Article ${taken.article} is already used by another product`,
+        );
+      }
+
+      const updated = {};
+      for (const [modelName, column] of [
+        ['Products', 'article'],
+        ...PRODUCT_ARTICLE_REFERENCES,
+      ]) {
+        const [count] = await models[modelName].update(
+          { [column]: articleCase(column) },
+          { where: { [column]: { [Op.in]: froms } }, transaction },
+        );
+        updated[modelName] = count;
+      }
+
+      return updated;
+    });
+  }
+
+  // changes: [{ id, description }] — правит описание в самой записи, без новой версии
+  static async fixProductDescriptions(changes) {
+    const ids = changes.map(({ id }) => id);
+
+    if (
+      !changes.length ||
+      changes.some(
+        ({ id, description }) =>
+          !Number.isInteger(id) ||
+          typeof description !== 'string' ||
+          !description.trim(),
+      ) ||
+      new Set(ids).size !== ids.length
+    ) {
+      throw new BadRequest('Invalid list of description changes');
+    }
+
+    return sequelize.transaction(async (transaction) => {
+      let updated = 0;
+      for (const { id, description } of changes) {
+        const [count] = await Products.update(
+          { description },
+          { where: { id }, transaction },
+        );
+        updated += count;
+      }
+
+      return updated;
+    });
+  }
+
+  // changes: [{ tradingMark, density, price }] — новая цена за м³ для всех продуктов
+  // с такой маркой и плотностью. Каждый изменённый продукт получает новую версию
+  static async changeProductPrices(changes) {
+    const groupKey = (tradingMark, density) =>
+      `${tradingMark ?? ''}|${Number(density)}`;
+    const keys = changes.map(({ tradingMark, density }) =>
+      groupKey(tradingMark, density),
+    );
+
+    if (
+      !changes.length ||
+      changes.some(
+        ({ density, price }) =>
+          !Number.isFinite(Number(density)) ||
+          typeof price !== 'number' ||
+          !Number.isFinite(price) ||
+          price < 0,
+      ) ||
+      new Set(keys).size !== keys.length
+    ) {
+      throw new BadRequest('Invalid list of price changes');
+    }
+
+    const priceByKey = new Map(
+      changes.map(({ tradingMark, density, price }) => [
+        groupKey(tradingMark, density),
+        price,
+      ]),
+    );
+
+    return sequelize.transaction(async (transaction) => {
+      const products = await Products.findAll({ raw: true, transaction });
+
+      // Последняя версия каждого артикула — как latestProducts на клиенте
+      const latest = new Map();
+      for (const product of products) {
+        const current = latest.get(product.article);
+        if (!current || (product.version ?? 1) > (current.version ?? 1)) {
+          latest.set(product.article, product);
+        }
+      }
+
+      const created = [];
+      for (const product of latest.values()) {
+        const price = priceByKey.get(
+          groupKey(product.tradingMark, product.density),
+        );
+        if (price === undefined || product.price === price) continue;
+
+        const { id, createdAt, updatedAt, ...rest } = product;
+        created.push(
+          await Products.create(
+            { ...rest, version: (product.version ?? 1) + 1, price },
+            { transaction },
+          ),
+        );
+      }
+
+      return created;
+    });
   }
 
   //PRODUCTION QUALITY

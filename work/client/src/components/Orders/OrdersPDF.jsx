@@ -8,6 +8,8 @@ import urlAxios from '../../api/axiosConfig.js';
 
 import '#components/Styles/pdf.css';
 import { getApiUrl } from '#utils/getApiUrl.js';
+import { applyDiscount } from './blockDeliveryPrice.js';
+import { getPaymentMethodLabel } from './paymentMethods.js';
 import './ordersView.css';
 
 const loadImage = () => {
@@ -20,7 +22,7 @@ const loadImage = () => {
 };
 
 const PDFGenerator = ({ orderData, productList, vatValue }) => {
-  const { latestProducts } = useProductsContext();
+  const { productVersions } = useProductsContext();
   const { dryMixesJournal, anchor, tool, relatedMaterialsJournal } =
     useProductsTypeJournalContext();
 
@@ -182,9 +184,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
               'm2/pal',
               'blq/pal, Ud',
               'Total m2',
-              'PVP neto € / m2',
+              'Precio neto € / m2',
               'Total, Ud',
-              'PVP neto €/Ud',
+              'Precio neto €/Ud',
               'Subtotal €',
             ],
           ],
@@ -231,7 +233,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
               'sacos/pal',
               'Total sacos, Ud',
               'Total, kg',
-              'PVP neto €/Ud',
+              'Precio neto €/Ud',
               'Subtotal €',
             ],
           ],
@@ -263,7 +265,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         autoTable(doc, {
           ...baseTableOptions,
 
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
 
           head: [
             [
@@ -274,7 +278,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
               'sacos/pal',
               'Total sacos, Ud',
               'Total, kg',
-              'PVP neto €/Ud',
+              'Precio neto €/Ud',
               'Subtotal €',
             ],
           ],
@@ -300,9 +304,17 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       if (pdfData.pdfTools?.length) {
         autoTable(doc, {
           ...baseTableOptions,
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
-            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
+            [
+              'Ref.:',
+              'Descripción',
+              'Total, Ud',
+              'Precio neto €/Ud',
+              'Subtotal €',
+            ],
           ],
           body: pdfData.pdfTools?.map((item) => [
             item.ref,
@@ -322,9 +334,17 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       if (pdfData.pdfRelMat?.length) {
         autoTable(doc, {
           ...baseTableOptions,
-          startY: doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : yPosition + 50, // Отступ от информации о заказе
+          startY: doc.lastAutoTable
+            ? doc.lastAutoTable.finalY + 10
+            : yPosition + 50, // Отступ от информации о заказе
           head: [
-            ['Ref.:', 'Descripción', 'Total, Ud', 'PVP neto €/Ud', 'Subtotal €'],
+            [
+              'Ref.:',
+              'Descripción',
+              'Total, Ud',
+              'Precio neto €/Ud',
+              'Subtotal €',
+            ],
           ],
           body: pdfData.pdfRelMat?.map((item) => [
             item.ref,
@@ -361,26 +381,29 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       };
 
       const deliveryPrice = toNumber(pdfData.delivery);
+      const deliveryPriceM2 = toNumber(pdfData.delivery_m2);
 
-      // Считаем, что доставка указана, только если цена больше нуля
-      const hasDelivery = deliveryPrice > 0 || pdfData.delivery_m2 > 0;
+      const hasDelivery = deliveryPrice > 0 || deliveryPriceM2 > 0;
+      const hasBothDeliveryPrices = deliveryPrice > 0 && deliveryPriceM2 > 0;
 
-      // TOTAL — сумма товаров без НДС и без доставки
       const totalWithoutVat = toNumber(vatValue?.vat_euro_origin);
 
-      // BASE — товары + доставка
-      const baseDisponible = totalWithoutVat + (hasDelivery ? deliveryPrice : 0);
+      const baseDisponible =
+        totalWithoutVat + (hasDelivery ? deliveryPrice : 0);
 
-      // IVA
       const ivaAmount = toNumber(vatValue?.vat_euro);
 
-      // Итоговая сумма
       const totalPresupuesto = baseDisponible + ivaAmount;
 
-      // Показываем только одну из двух жёлтых строк
-      const transportText = hasDelivery
-        ? 'Transporte incluido (sin descarga) - Trailer con descarga lateral de 13,6m de 24tn'
-        : 'Transporte no está incluido en precio';
+      let transportText = 'Transporte no está incluido en precio';
+
+      if (hasBothDeliveryPrices) {
+        transportText =
+          'Transporte sin descarga está incluido en precio. Trailer de lona de 13,6m de 24tn. La entrega se efectúa en camiones completos. Si el camión no va completo, se aplicará un recargo.';
+      } else if (hasDelivery) {
+        transportText =
+          'Transporte incluido (sin descarga) - Trailer con descarga lateral de 13,6m de 24tn';
+      }
 
       const summaryStartY = doc.lastAutoTable
         ? doc.lastAutoTable.finalY + 5
@@ -537,14 +560,16 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       // Пока оставляем заглушки.
       // Позже подставим сюда конкретные поля из orderData.
       const deliveryTerm = pdfData.address || '[completar]';
-      const paymentMethod = pdfData.payment_method || '[completar]';
+      const paymentMethod =
+        getPaymentMethodLabel(pdfData.payment_method) || '[completar]';
+      const otros = pdfData.otros?.trim();
 
       const particularConditionsText = [
         'Las partes acuerdan de forma expresa las siguientes condiciones aplicables al presente Presupuesto/Pedido:',
         `Plazo de entrega: ${deliveryTerm}`,
         `Forma de pago: ${paymentMethod}`,
         'Los importes reflejados en este presupuesto se calculan conforme a las condiciones económicas vigentes en la fecha de emisión. Cualquier incremento excepcional y acreditado en el coste del combustible que afecte de forma directa a la ejecución del servicio dará lugar a una revisión del precio, previa notificación.',
-        'Otros:',
+        otros ? `Otros: ${otros}` : 'Otros:',
       ].join('\n');
 
       const particularConditionsStartY = doc.lastAutoTable
@@ -618,7 +643,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         },
       });
 
-      const startY = doc.lastAutoTable ? doc.lastAutoTable.finalY : yPosition + 50;
+      const startY = doc.lastAutoTable
+        ? doc.lastAutoTable.finalY
+        : yPosition + 50;
       autoTable(doc, {
         ...baseTableOptions,
         startY,
@@ -693,7 +720,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         const lineHeight = 3;
         const textHeight = footerText.length * lineHeight;
 
-        const footerTextY = footerY + (footerHeight - textHeight) / 2 + lineHeight;
+        const footerTextY =
+          footerY + (footerHeight - textHeight) / 2 + lineHeight;
 
         doc.text(footerText, pageWidth / 2, footerTextY, {
           align: 'center',
@@ -701,6 +729,58 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       };
 
       addFinalPageFooter();
+
+      // Дата последнего сохранённого изменения заказа приходит из БД.
+      // Скачивание PDF само по себе не изменяет эту дату.
+      let formattedDate = null;
+      if (orderData.pdf_updated_at) {
+        const modifiedAt = new Date(orderData.pdf_updated_at);
+
+        if (!Number.isNaN(modifiedAt.getTime())) {
+          // Единая дата для всех пользователей: часовой пояс завода в Испании.
+          const parts = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Europe/Madrid',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          }).formatToParts(modifiedAt);
+          const dateParts = Object.fromEntries(
+            parts.map(({ type, value }) => [type, value]),
+          );
+          formattedDate = `${dateParts.day}.${dateParts.month}.${dateParts.year}`;
+        }
+      }
+      // TODO: добавить ref_id в БД и API заказа; пока используем номер заказа (article).
+      const refId = orderData.ref_id ?? orderData.article ?? orderData.id ?? '';
+
+      // Нумерация всех страниц после формирования содержимого PDF.
+      const pageCount = doc.getNumberOfPages();
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(0, 0, 0);
+
+      for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
+        doc.setPage(pageNumber);
+        // Дата слева на каждой странице, номер страницы по центру, ref_id справа.
+        if (formattedDate) {
+          doc.text(formattedDate, 10, doc.internal.pageSize.getHeight() - 5, {
+            align: 'left',
+          });
+        }
+        doc.text(
+          `Pág. ${pageNumber}`,
+          doc.internal.pageSize.getWidth() / 2,
+          doc.internal.pageSize.getHeight() - 5,
+          { align: 'center' },
+        );
+        doc.text(
+          String(refId),
+          doc.internal.pageSize.getWidth() - 10,
+          doc.internal.pageSize.getHeight() - 5,
+          { align: 'right' },
+        );
+      }
+
       // Генерация PDF URL
       const pdfBlob = doc.output('blob');
       const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -722,6 +802,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       delivery,
       delivery_m2,
       payment_method,
+      otros,
     } = orderData;
 
     const VALIDITY_DAYS = 30;
@@ -785,9 +866,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       'BAUBLOCK MATERIALES AVANZADOS DE CONSTRUCCIÓN S.L.U. inscrita en el Registro Mercantil de Cádiz el 21 de septiembre de 2021, en el diario 219, asiento 75, al Tomo 2410, folio 49, inscripción 1 con hoja CA-59071 , con domicilio social en Avneida Isaac Newton, num 17,  C.P. 11500, provincia de Cádiz, con N.I.F.  B-16868028. Actualizacion febrero de 2025. Estas CGV pueden verse modificadas o ampliadas por Condiciones Particulares que se negocien entre las Partes.';
 
     const pdfProducts = productList?.products?.map((prod) => {
-      const product = latestProducts.find(
-        (el) => el.article == prod.product_article,
-      );
+      // Версия карточки, с которой оформлена строка заказа
+      const product = productVersions.find((el) => el.id === prod.product_id);
 
       const descripcion = `BAUBLOCK®${
         product?.tradingMark
@@ -795,9 +875,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         product?.density
       }kg/m³`;
 
-      const total = (prod.quantity_palet * product?.quantityBlockOnPallet).toFixed(
-        0,
-      );
+      const total = (
+        prod.quantity_palet * product?.quantityBlockOnPallet
+      ).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / total).toFixed(2);
 
@@ -810,7 +890,11 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         m2_pal: product.m2.toFixed(2),
         blq_pal: product.quantityBlockOnPallet,
         total_m2: prod.quantity_real.toFixed(2),
-        pvp_neto_m2: prod.price_m2_with_delivery.toFixed(2),
+        // Колонки скидки в PDF нет — цена за м² должна быть уже со скидкой
+        pvp_neto_m2: applyDiscount(
+          prod.price_m2_with_delivery,
+          prod.discount,
+        ).toFixed(2),
         total,
         pvp_neto_ud,
         subtotal: prod.final_price.toFixed(2),
@@ -825,9 +909,12 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       const sacos = dryMixes?.units_per_pallet;
 
-      const totalSacos = (quantity * sacos).toFixed(0);
+      // quantity_ud уже в мешках, поэтому считаем от паллет
+      const totalSacos = (prod.quantity_palet_dry * sacos).toFixed(0);
 
-      const totalKg = (prod.quantity_palet_dry * dryMixes?.pallet_weight).toFixed(0);
+      const totalKg = (
+        prod.quantity_palet_dry * dryMixes?.pallet_weight
+      ).toFixed(0);
 
       const pvp_neto_ud = (prod.final_price / totalSacos).toFixed(2);
 
@@ -882,7 +969,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       return {
         ref: pdfTool?.article,
-        descripcion: pdfTool?.description,
+        descripcion: pdfTool?.name,
         total,
         pvp_neto_ud,
         subtotal: prod?.final_price?.toFixed(2),
@@ -900,7 +987,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
       return {
         ref: pdfRelMat?.article,
-        descripcion: pdfRelMat?.description,
+        descripcion: pdfRelMat?.name,
         total,
         pvp_neto_ud,
         subtotal: prod.final_price.toFixed(2),
@@ -916,7 +1003,11 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         '',
       contact: `${contactInfo?.first_name} ${contactInfo?.last_name}` || '',
       email: contactInfo?.email || '',
-      phone: contactInfo?.phone_number_mobile || '',
+      phone:
+        contactInfo?.phone_number_mobile ||
+        contactInfo?.phone_number_office ||
+        contactInfo?.phone_number_messenger ||
+        '',
       validUntil: formattedValidUntil || '',
       pdfProducts,
       pdfDryMixes,
@@ -930,13 +1021,16 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       delivery_m2,
       footer,
       payment_method,
+      otros,
     });
     setPdfUrl(null);
   }, [orderData, productList]);
 
   const downloadPDF = async () => {
     const doc = await generatePDF();
-    if (doc) doc.save('presupuesto.pdf');
+    const fileName =
+      orderData?.description?.trim() || orderData?.article || 'presupuesto';
+    if (doc) doc.save(`${fileName}.pdf`);
   };
 
   const sendToBitrix = async () => {
@@ -973,7 +1067,9 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           alert('PDF successfully sent to Bitrix24');
         } else {
           console.error('Ошибка ответа сервера:', result);
-          alert(`Error sending to Bitrix24: ${result?.error ?? response.status}`);
+          alert(
+            `Error sending to Bitrix24: ${result?.error ?? response.status}`,
+          );
         }
       }
     } catch (error) {

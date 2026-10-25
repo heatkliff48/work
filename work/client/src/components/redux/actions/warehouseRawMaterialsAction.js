@@ -50,6 +50,10 @@ import {
   ADD_NEW_WAREHOUSE_SAND_POWDER,
   UPDATE_NEW_WAREHOUSE_SAND_POWDER,
   DELETE_WAREHOUSE_SAND_POWDER,
+  GET_FULL_WAREHOUSE_RELEASE_OIL,
+  ADD_NEW_WAREHOUSE_RELEASE_OIL,
+  UPDATE_NEW_WAREHOUSE_RELEASE_OIL,
+  DELETE_WAREHOUSE_RELEASE_OIL,
 } from '../types/warehouseRawMaterialsTypes';
 
 // Sand
@@ -406,5 +410,33 @@ export const deleteWarehouseSandPowder = (sand_powder_warehouse_id) => {
   return {
     type: DELETE_WAREHOUSE_SAND_POWDER,
     payload: sand_powder_warehouse_id,
+  };
+};
+
+// Release Oil
+export const getWarehouseReleaseOil = () => {
+  return {
+    type: GET_FULL_WAREHOUSE_RELEASE_OIL,
+  };
+};
+
+export const addNewWarehouseReleaseOil = (warehouseReleaseOil) => {
+  return {
+    type: ADD_NEW_WAREHOUSE_RELEASE_OIL,
+    payload: warehouseReleaseOil,
+  };
+};
+
+export const updateWarehouseReleaseOil = (warehouseReleaseOil) => {
+  return {
+    type: UPDATE_NEW_WAREHOUSE_RELEASE_OIL,
+    payload: warehouseReleaseOil,
+  };
+};
+
+export const deleteWarehouseReleaseOil = (release_oil_warehouse_id) => {
+  return {
+    type: DELETE_WAREHOUSE_RELEASE_OIL,
+    payload: release_oil_warehouse_id,
   };
 };

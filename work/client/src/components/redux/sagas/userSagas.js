@@ -159,6 +159,10 @@ function* checkUserWatcher() {
 }
 
 function* delUserWatcher() {
+  // Пользователя убираем сразу, не дожидаясь ответа сервера: иначе страница
+  // входа успевает увидеть «живого» пользователя и уводит обратно в систему,
+  // а redux-persist снова сохраняет его после очистки localStorage
+  yield put({ type: DEL_USER, payload: null });
   try {
     yield call(logoutUserRequest);
   } catch (error) {

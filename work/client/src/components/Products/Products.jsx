@@ -15,6 +15,9 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import PreviewProductCardModal from './modal/PreviewProductCardModal';
+import ArticleCheckModal from './modal/ArticleCheckModal';
+import ChangePriceModal from './modal/ChangePriceModal';
+import DescriptionFixModal from './modal/DescriptionFixModal';
 import { updateProduct } from '#components/redux/actions/productsAction.js';
 
 function Products() {
@@ -32,6 +35,9 @@ function Products() {
   const { setProductCardData, previewOperationName } = useProjectContext();
 
   const [data, setData] = useState([]);
+  const [articleCheckModal, setArticleCheckModal] = useState(false);
+  const [changePriceModal, setChangePriceModal] = useState(false);
+  const [descriptionFixModal, setDescriptionFixModal] = useState(false);
   const columns = useMemo(() => TABLE_COLUMNS, []);
   // const data = useMemo(() => latestProducts ?? [], [latestProducts, products]);
 
@@ -146,6 +152,25 @@ function Products() {
       )}
 
       {modalProductCard && <ProductCardModal />}
+      {articleCheckModal && (
+        <ArticleCheckModal
+          isOpen={articleCheckModal}
+          toggle={() => setArticleCheckModal(!articleCheckModal)}
+          canFix={userAccess?.canWrite}
+        />
+      )}
+      {changePriceModal && (
+        <ChangePriceModal
+          isOpen={changePriceModal}
+          toggle={() => setChangePriceModal(!changePriceModal)}
+        />
+      )}
+      {descriptionFixModal && (
+        <DescriptionFixModal
+          isOpen={descriptionFixModal}
+          toggle={() => setDescriptionFixModal(!descriptionFixModal)}
+        />
+      )}
       <h1>HCCA Blocks</h1>
       {userAccess?.canWrite && (
         <button
@@ -162,9 +187,18 @@ function Products() {
           Add product new
         </button>
       )}
-      <button onClick={() => dispatch(updateProduct())}>
+      {/* <button onClick={() => dispatch(updateProduct())}>
         Fix width in cakes
       </button>
+      <button onClick={() => setArticleCheckModal(true)}>Check articles</button> */}
+      {userAccess?.canWrite && (
+        <button onClick={() => setChangePriceModal(true)}>Change price</button>
+      )}
+      {/* {userAccess?.canWrite && (
+        <button onClick={() => setDescriptionFixModal(true)}>
+          Fix descriptions
+        </button>
+      )} */}
       <div className="table-wrapper">
         {/* к разметке надо привыкнуть :) */}
         <GlobalFilterInput

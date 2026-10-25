@@ -26,6 +26,7 @@ router.get(
   WarehouseController.getListOfReservedProductsOEM,
 );
 router.post('/add', WarehouseController.addNewWarehouse);
+router.delete('/delete', WarehouseController.deleteWarehouse);
 router.post('/upd/remaining_stock', WarehouseController.updateRemainingStock);
 router.post('/upd/quantitys', WarehouseController.updateWarehouseQuantitys);
 router.post(

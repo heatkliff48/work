@@ -826,7 +826,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
     return (
       <div>
-        <Modal isOpen={isOpen} toggle={toggle} size="xl">
+        <Modal isOpen={isOpen} toggle={toggle} size="xl" fullscreen="md">
           <ModalHeader toggle={toggle} className="rmc-modal-header">
             <div className="rmc-header">
               <div className="rmc-header-field" style={{ minWidth: 220 }}>
@@ -849,7 +849,10 @@ const RawMaterialsConsumptionModal = React.memo(
                 />
               </div>
 
-              <div className="rmc-header-field" style={{ flex: 1, minWidth: 260 }}>
+              <div
+                className="rmc-header-field rmc-header-field--wide"
+                style={{ flex: 1, minWidth: 260 }}
+              >
                 <span className="rmc-header-label">Recipe</span>
                 <Select
                   onChange={handleRecipeChange}
@@ -895,6 +898,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
           <Fragment>
             <ModalBody className="rmc-modal-body" style={{ overflow: 'auto', maxHeight: '70vh' }}>
+              <div className="rmc-section-title d-md-none">Raw materials</div>
               <table className="table-waste">
                 <thead>
                   <tr>
@@ -960,7 +964,7 @@ const RawMaterialsConsumptionModal = React.memo(
                           </div>
                         </td>
 
-                        <td>
+                        <td data-label="Modified recipe">
                           <div className="modified-recipe-cell">
                             <input
                               className={
@@ -983,7 +987,7 @@ const RawMaterialsConsumptionModal = React.memo(
                           </div>
                         </td>
 
-                        <td className="td-consumed">
+                        <td className="td-consumed" data-label="Consumed">
                           {consumed === null ? '—' : consumed}
                         </td>
                       </tr>
@@ -993,7 +997,7 @@ const RawMaterialsConsumptionModal = React.memo(
               </table>
             </ModalBody>
 
-            <ModalFooter className="d-flex justify-content-between">
+            <ModalFooter className="rmc-modal-footer justify-content-between">
               {/* <div className="d-flex align-items-center gap-2">
                 <input
                   id="confirm-checkbox"
@@ -1006,7 +1010,7 @@ const RawMaterialsConsumptionModal = React.memo(
                   Production batch completed
                 </label>
               </div> */}
-              <div className="d-flex align-items-center gap-2">
+              <div className="rmc-footer-check d-flex align-items-center gap-2">
                 <input
                   id="warehouse-checkbox"
                   className="form-check-input"
@@ -1031,7 +1035,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 </label>
               </div> */}
 
-              <div className="d-flex gap-2">
+              <div className="rmc-footer-actions d-flex gap-2">
                 <button className="btn btn-outline-secondary" onClick={toggle}>
                   Cancel
                 </button>

@@ -82,6 +82,7 @@ module.exports = (sequelize, DataTypes) => {
       form_number: DataTypes.TEXT,
       mold_id: DataTypes.TEXT,
       flowability: DataTypes.TEXT,
+      slurried: DataTypes.BOOLEAN,
 
       temperature_ferm: DataTypes.TEXT,
       precuring_time: DataTypes.TEXT,

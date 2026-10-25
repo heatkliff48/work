@@ -1,6 +1,7 @@
 import {
   ADD_NEW_RESERVED_PRODUCT,
   ADD_NEW_WAREHOUSE,
+  DELETE_WAREHOUSE,
   GET_DELETE_PRODUCT_FROM_RESERVED_LIST,
   GET_ALL_WAREHOUSE,
   GET_LIST_OF_RESERVED_PRODUCTS,
@@ -54,6 +55,13 @@ export const addNewWarehouse = (warehouse) => {
   return {
     type: ADD_NEW_WAREHOUSE,
     payload: warehouse,
+  };
+};
+
+export const deleteWarehouse = (warehouse_id) => {
+  return {
+    type: DELETE_WAREHOUSE,
+    payload: warehouse_id,
   };
 };
 

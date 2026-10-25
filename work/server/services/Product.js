@@ -19,6 +19,18 @@ class ProductService {
     return products;
   }
 
+  static async fixProductArticles(changes) {
+    return ProductsRepository.fixProductArticles(changes);
+  }
+
+  static async fixProductDescriptions(changes) {
+    return ProductsRepository.fixProductDescriptions(changes);
+  }
+
+  static async changeProductPrices(changes) {
+    return ProductsRepository.changeProductPrices(changes);
+  }
+
   static async repairProductData(repProduct) {
     const products = await ProductsRepository.repairProductData(repProduct);
 

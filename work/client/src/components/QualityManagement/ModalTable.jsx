@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Modal, ModalHeader, ModalBody, Input } from 'reactstrap';
-import { Switch, FormControlLabel } from '@mui/material';
+import { Modal, ModalHeader, ModalBody } from 'reactstrap';
+import '#components/Clients/ClientsInfo/clientsDrawer.css';
+import './qualityManagement.css';
 
 const ModalTable = ({ isOpen, toggle, data = [], onClickRow = null }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,128 +71,127 @@ const ModalTable = ({ isOpen, toggle, data = [], onClickRow = null }) => {
     <Modal
       isOpen={isOpen}
       toggle={handleToggle}
-      className="modal-products-table"
+      className="modal-products-table qm-modal"
       scrollable={true}
     >
       <ModalHeader toggle={handleToggle}>Select product</ModalHeader>
       <ModalBody>
-        {/* Панель поиска с toggle */}
-        <div className="mb-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <div className="flex-1 w-full">
-              <Input
+        <div className="qm-modal-scope">
+          {/* Панель поиска */}
+          <div className="qm-modal-toolbar">
+            <div className="qm-modal-search">
+              <span className="qm-modal-search__ic">🔍</span>
+              <input
                 type="text"
+                className="qm-modal-search__input"
                 placeholder={
                   searchMode === 'article'
-                    ? '🔍 Search by article...'
-                    : '🔍 Search in all fields...'
+                    ? 'Search by article…'
+                    : 'Search in all fields…'
                 }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
               />
             </div>
 
-            {/* Toggle */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span
-                className={`text-sm whitespace-nowrap ${
-                  searchMode === 'article'
-                    ? 'text-blue-600 font-semibold'
-                    : 'text-gray-400'
+            <div className="qm-seg">
+              <button
+                type="button"
+                className={`qm-seg__btn ${
+                  searchMode === 'article' ? 'qm-seg__btn--active' : ''
                 }`}
+                onClick={() => {
+                  if (searchMode !== 'article') toggleSearchMode();
+                }}
               >
-                Search by Article
-              </span>
-
-              <Switch
-                checked={searchMode === 'all'}
-                onChange={toggleSearchMode}
-                size="small"
-              />
-
-              <span
-                className={`text-sm whitespace-nowrap ${
-                  searchMode === 'all'
-                    ? 'text-blue-600 font-semibold'
-                    : 'text-gray-400'
+                By article
+              </button>
+              <button
+                type="button"
+                className={`qm-seg__btn ${
+                  searchMode === 'all' ? 'qm-seg__btn--active' : ''
                 }`}
+                onClick={() => {
+                  if (searchMode !== 'all') toggleSearchMode();
+                }}
               >
-                Search in All Fields
-              </span>
+                All fields
+              </button>
             </div>
           </div>
-        </div>
 
-        {/* Подсказка о текущем режиме */}
-        {searchTerm && (
-          <div className="mb-2 text-xs text-gray-500">
-            Searching in:{' '}
-            <span className="font-medium">
-              {searchMode === 'article'
-                ? 'article field only'
-                : 'all fields (article, density, width)'}
-            </span>
+          {/* Подсказка о текущем режиме */}
+          {searchTerm && (
+            <div className="qm-modal-hint">
+              Searching in{' '}
+              <b>
+                {searchMode === 'article'
+                  ? 'article field only'
+                  : 'all fields (article, density, width)'}
+              </b>
+            </div>
+          )}
+
+          <div className="qm-picker">
+            <div className="qm-picker__scroll">
+              {right_data.length > 0 ? (
+                <table>
+                  <thead>
+                    <tr>
+                      {Object.keys(right_data[0]).map((key) => {
+                        if (hiddenKeys.includes(key)) return null;
+                        return <th key={key}>{key}</th>;
+                      })}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {right_data.map((row, index) => (
+                      <tr key={index}>
+                        {Object.entries(row).map(([key, value]) => {
+                          if (hiddenKeys.includes(key)) return null;
+                          return (
+                            <td
+                              key={key}
+                              onClick={() => {
+                                if (onClickRow) {
+                                  onClickRow(row);
+                                  handleToggle();
+                                }
+                              }}
+                            >
+                              {value}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="qm-picker__empty">
+                  <div className="qm-picker__empty-title">
+                    {searchTerm.trim()
+                      ? 'No products found'
+                      : 'No data available for you'}
+                  </div>
+                  <div className="qm-picker__empty-sub">
+                    {searchTerm.trim()
+                      ? 'Try a different article, density or width.'
+                      : 'Related products of the same density will appear here.'}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        )}
 
-        <div className="overflow-x-auto">
-          {right_data.length > 0 ? (
-            <table className="w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-100">
-                  {Object.keys(right_data[0]).map((key) => {
-                    if (hiddenKeys.includes(key)) return null;
-                    return (
-                      <th
-                        key={key}
-                        className="border border-gray-300 px-4 py-2 text-left"
-                      >
-                        {key}
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {right_data.map((row, index) => (
-                  <tr key={index} className="odd:bg-white even:bg-gray-50">
-                    {Object.entries(row).map(([key, value]) => {
-                      if (hiddenKeys.includes(key)) return null;
-                      return (
-                        <td
-                          key={key}
-                          className="border border-gray-300 px-4 py-2 cursor-pointer hover:bg-gray-100 transition-colors"
-                          onClick={() => {
-                            if (onClickRow) {
-                              onClickRow(row);
-                              handleToggle();
-                            }
-                          }}
-                        >
-                          {value}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="text-center text-gray-500">
-              {searchTerm.trim()
-                ? 'No products found matching your search'
-                : 'No data available for you'}
-            </p>
+          {/* Информация о количестве результатов */}
+          {right_data.length > 0 && (
+            <div className="qm-modal-count">
+              Found {right_data.length} product
+              {right_data.length > 1 ? 's' : ''}
+            </div>
           )}
         </div>
-
-        {/* Информация о количестве результатов */}
-        {right_data.length > 0 && (
-          <div className="mt-2 text-sm text-gray-500">
-            Found {right_data.length} product{right_data.length > 1 ? 's' : ''}
-          </div>
-        )}
       </ModalBody>
     </Modal>
   );

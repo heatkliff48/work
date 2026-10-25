@@ -3,6 +3,7 @@ import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { Button } from 'reactstrap';
 import AddProductOrderModal from '../modal/addProductModal/AddProductOrderModal';
+import { applyDiscount } from '../blockDeliveryPrice.js';
 import '../ordersView.css';
 
 const BlocksJournalTableOrder = ({
@@ -29,6 +30,7 @@ const BlocksJournalTableOrder = ({
     'discount',
     'final_price',
     'quantity_liberated',
+    'quantity_liberated_m2',
   ];
 
   // const columns = Object.keys(productListOrder?.[0] || {}).filter(
@@ -36,7 +38,9 @@ const BlocksJournalTableOrder = ({
   // );
 
   const columns = orderCartData?.main_order
-    ? allColumns.filter((col) => col !== 'quantity_liberated')
+    ? allColumns.filter(
+        (col) => !['quantity_liberated', 'quantity_liberated_m2'].includes(col),
+      )
     : allColumns;
 
   return (
@@ -82,6 +86,28 @@ const BlocksJournalTableOrder = ({
                       if (value && typeof value === 'object') {
                         value = JSON.stringify(value);
                       }
+                      // Скидка, посчитанная из цены, хранится без округления
+                      if (key === 'discount' && typeof value === 'number') {
+                        value = Math.round(value * 100) / 100;
+                      }
+                      // Агентское вознаграждение и надбавка confirming заказа
+                      // повышают цену за m2, но в строке хранится цена без них
+                      if (
+                        key === 'price_m2' &&
+                        product.price_m2_with_markups != null
+                      ) {
+                        value = product.price_m2_with_markups;
+                      }
+                      // В строке хранится прайсовая цена, а скидка применяется
+                      // только в итоге — показываем цену, которую платит клиент
+                      if (
+                        (key === 'price_m2' ||
+                          key === 'price_m2_with_delivery') &&
+                        value != null &&
+                        value !== ''
+                      ) {
+                        value = applyDiscount(value, product.discount);
+                      }
                       return <td key={key}>{value ?? ''}</td>;
                     })}
 
@@ -110,7 +136,8 @@ const BlocksJournalTableOrder = ({
                   </tr>
                 ))}
 
-              {userAccess?.canWrite && orderCartData?.status < 3 && (
+              {/* Добавлять товары можно до Proposal accepted by client, удалять — только на Initial contact */}
+              {userAccess?.canWrite && orderCartData?.status <= 4 && (
                 <tr>
                   <td colSpan={columns.length + 1}>
                     <Button

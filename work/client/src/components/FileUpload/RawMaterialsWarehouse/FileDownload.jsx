@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import urlAxios from '../../../api/axiosConfig.js';
-import { useFileContext } from '#components/contexts/FileContext.js';
+import { useTranslation } from 'react-i18next';
 
 const FileDownload = ({ rowData, material_type }) => {
-  const { message, setMessage } = useFileContext();
+  const [message, setMessage] = useState('');
+  const { t } = useTranslation();
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -33,16 +34,17 @@ const FileDownload = ({ rowData, material_type }) => {
 
       window.URL.revokeObjectURL(downloadUrl);
     } catch (err) {
-      setMessage('Error downloading the file');
+      setMessage(t('files.downloadError'));
     }
   };
 
   return (
     <div className="fileDownload">
       <form onSubmit={onSubmit}>
-        <p>Existing file: {rowData?.file_name}</p>
-        <button type="submit">Download</button>
+        <p>{t('files.existingFile', { name: rowData?.file_name })}</p>
+        <button type="submit">{t('files.download')}</button>
       </form>
+      {message ? <p>{message}</p> : null}
     </div>
   );
 };

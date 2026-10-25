@@ -1,4 +1,4 @@
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { put, call, takeLatest, takeEvery } from 'redux-saga/effects';
 import showMessage from '../../Utils/showMessage';
 import { errorToText } from '../../Utils/errorToText';
 
@@ -74,6 +74,8 @@ import {
   ADD_CHILD_ORDER,
   PAYMENT_METHOD,
   UPDATE_PAYMENT_METHOD,
+  UPDATE_AGENT_COMMISSION,
+  UPDATE_ACCOUNTING_APPROVED,
 } from '../types/ordersTypes';
 import url from '../../../api/axiosConfig.js';
 
@@ -477,6 +479,30 @@ const updateInChargeOfOrder = (orderInCharge) => {
 const updatePayment = (payment_method) => {
   return url
     .post('/orders/update/payment_method', payment_method)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updateAgentCommission = (commission) => {
+  return url
+    .post('/orders/update/agent_commission', commission)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const updateAccountingApproved = (approval) => {
+  return url
+    .post('/orders/update/accounting_approved', approval)
     .then((res) => {
       return res.data;
     })
@@ -922,6 +948,28 @@ function* updatePaymentWorker(action) {
   }
 }
 
+// The order list is updated by the socket broadcast, as for payment_method
+function* updateAgentCommissionWorker(action) {
+  try {
+    yield call(updateAgentCommission, action.payload);
+  } catch (err) {}
+}
+
+function* updateAccountingApprovedWorker(action) {
+  try {
+    const { article, accounting_approved } = yield call(
+      updateAccountingApproved,
+      action.payload,
+    );
+    showMessage(
+      `Accounting data for order ${article} has been ${
+        accounting_approved ? 'approved' : 'unapproved'
+      }`,
+      accounting_approved ? 'success' : 'info',
+    );
+  } catch (err) {}
+}
+
 function* addOrderRandomProductsWorker(action) {
   try {
     const { payload } = action;
@@ -1011,6 +1059,8 @@ function* ordersWatcher() {
   yield takeLatest(UPDATE_STATUS_OF_ORDER, updateStatusOfOrderWorker);
   yield takeLatest(UPDATE_PERSON_IN_CHARGE_OF_ORDER, updateInChargeOfOrderWorker);
   yield takeLatest(UPDATE_PAYMENT_METHOD, updatePaymentWorker);
+  yield takeLatest(UPDATE_AGENT_COMMISSION, updateAgentCommissionWorker);
+  yield takeEvery(UPDATE_ACCOUNTING_APPROVED, updateAccountingApprovedWorker);
   yield takeLatest(ADD_RANDOM_PRODUCTS_OF_ORDER, addOrderRandomProductsWorker);
   yield takeLatest(ADD_CHILD_ORDER, addChildOrderWatcher);
 }

@@ -30,6 +30,8 @@ const {
   GET_DELETE_ORDER_SOCKET,
   ADD_CHILD_ORDER_SOCKET,
   UPDATE_PAYMENT_METHOD_SOCKET,
+  UPDATE_AGENT_COMMISSION_SOCKET,
+  UPDATE_ACCOUNTING_APPROVED_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -109,7 +111,7 @@ class OrdersController {
       });
 
       myEmitter.emit(ADD_DATASHIP_ORDER_SOCKET, date);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -122,7 +124,7 @@ class OrdersController {
       await OrdersService.addDescriptionOrder(desc);
 
       myEmitter.emit(ADD_DESCRIPTIOM_ORDER_SOCKET, desc);
-      return res.status(200);
+      return res.sendStatus(200);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -135,7 +137,7 @@ class OrdersController {
       await OrdersService.addSecondaryContact(sec_cnt);
 
       myEmitter.emit(ADD_SECONDARY_CONTACT_ORDER_SOCKET, sec_cnt);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -148,7 +150,7 @@ class OrdersController {
       await OrdersService.deleteSecondaryContact(order_id);
 
       myEmitter.emit(DELETE_SECONDARY_CONTACT_ORDER_SOCKET, order_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -240,7 +242,7 @@ class OrdersController {
 
       myEmitter.emit(UPDATE_PRODUCT_OF_ORDER_SOCKET, product_of_order);
 
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -335,7 +337,7 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -350,7 +352,7 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -365,7 +367,7 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_ANCHOR_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -380,7 +382,7 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_TOOL_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -395,7 +397,7 @@ class OrdersController {
       });
 
       myEmitter.emit(GET_DELETE_REL_MAT_PRODUCT_OF_ORDER_SOCKET, product_id);
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -532,7 +534,7 @@ class OrdersController {
         order_id,
       });
 
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -551,7 +553,7 @@ class OrdersController {
         address_id,
         order_id,
       });
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -561,12 +563,16 @@ class OrdersController {
     const { status, order_id } = req.body;
 
     try {
-      await OrdersService.getUpdateStatusOrder({
+      const accountingReset = await OrdersService.getUpdateStatusOrder({
         status,
         order_id,
       });
 
       myEmitter.emit(UPDATE_STATUS_OF_ORDER_SOCKET, { status, order_id });
+
+      if (accountingReset) {
+        myEmitter.emit(UPDATE_ACCOUNTING_APPROVED_SOCKET, accountingReset);
+      }
 
       return res.json({ status, order_id }).status(200);
     } catch (err) {
@@ -596,19 +602,58 @@ class OrdersController {
 
   static async getUpdatePaymentOrder(req, res) {
     const { payment_method, order_id } = req.body;
+    const confirming_surcharge = Boolean(req.body.confirming_surcharge);
 
     try {
       await OrdersService.getUpdatePaymentOrder({
         payment_method,
+        confirming_surcharge,
         order_id,
       });
 
       myEmitter.emit(UPDATE_PAYMENT_METHOD_SOCKET, {
         payment_method,
+        confirming_surcharge,
         order_id,
       });
 
-      return res.json({ payment_method, order_id }).status(200);
+      return res
+        .json({ payment_method, confirming_surcharge, order_id })
+        .status(200);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async updateAgentCommissionOrder(req, res) {
+    const { order_id, agent_commission } = req.body;
+
+    try {
+      const commission = await OrdersService.updateAgentCommissionOrder({
+        order_id,
+        agent_commission,
+      });
+
+      myEmitter.emit(UPDATE_AGENT_COMMISSION_SOCKET, commission);
+
+      return res.status(200).json(commission);
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async updateAccountingApprovedOrder(req, res) {
+    const { order_id, accounting_approved } = req.body;
+
+    try {
+      const approval = await OrdersService.updateAccountingApprovedOrder({
+        order_id,
+        accounting_approved,
+      });
+
+      myEmitter.emit(UPDATE_ACCOUNTING_APPROVED_SOCKET, approval);
+
+      return res.status(200).json(approval);
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -624,7 +669,7 @@ class OrdersController {
 
       myEmitter.emit(GET_DELETE_ORDER_SOCKET, order_id);
 
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (err) {
       return ErrorUtils.catchError(res, err);
     }
@@ -648,6 +693,9 @@ class OrdersController {
       delivery_m2,
       region,
       payment_method,
+      agent_commission,
+      confirming_surcharge,
+      otros,
     } = req.body;
 
     try {
@@ -668,6 +716,9 @@ class OrdersController {
         delivery_m2,
         region,
         payment_method,
+        agent_commission,
+        confirming_surcharge,
+        otros,
       });
 
       myEmitter.emit(ADD_CHILD_ORDER_SOCKET, childOrder);

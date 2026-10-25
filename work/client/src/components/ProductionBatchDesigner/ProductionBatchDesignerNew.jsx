@@ -20,6 +20,7 @@ import {
   computeQuantityArrays,
   getBatchOutsideRowsForDate,
   getFilledAutoclaveCountForDate,
+  getProducedAutoclaveCountForDate,
 } from './autoclaveScheduleUtils';
 import {
   computeListOfOrderedCakes,
@@ -116,13 +117,28 @@ function ProductionBatchDesignerNew() {
 
     const today = new Date().toISOString().slice(0, 10);
 
+    // produced_autoclave cannot be used here: the designer bumps it when a plan is
+    // saved, while Casting overwrites it with what was actually produced. Count the
+    // two sides separately instead — autoclaves already cast (gone from batchOutside)
+    // plus autoclaves already planned (still in batchOutside).
     const nearest = autoclaveCalendarData
-      .map((x) => ({
-        ...x,
-        qty: Number(x.scheduled_autoclaves ?? 0),
-        done: Number(x.produced_autoclave ?? 0),
-      }))
-      .map((x) => ({ ...x, value: x.qty - x.done }))
+      .map((x) => {
+        const iso = String(x.date).slice(0, 10);
+        const used =
+          getProducedAutoclaveCountForDate(
+            autoclaveCalendarData,
+            iso,
+            CELLS_PER_AUTOCLAVE,
+          ) +
+          getFilledAutoclaveCountForDate(
+            batchOutsideRedux,
+            latestProducts,
+            iso,
+            CELLS_PER_AUTOCLAVE,
+          );
+
+        return { ...x, value: Number(x.scheduled_autoclaves ?? 0) - used };
+      })
       .filter(
         (x) => x.value > 0 && typeof x.date === 'string' && x.date >= today,
       )
@@ -135,7 +151,13 @@ function ProductionBatchDesignerNew() {
       setAutoclaveCount(0);
       setAutoclaveCalendarData(null);
     }
-  }, [targetDate, autoclaveCalendarData]);
+  }, [
+    targetDate,
+    autoclaveCalendarData,
+    batchOutsideRedux,
+    latestProducts,
+    CELLS_PER_AUTOCLAVE,
+  ]);
 
   // Конкретная дата, выбранная в Batch calendar: считаем сколько автоклавов
   // на эту дату ещё пустые (режим заполнения) либо сколько всего карточек
@@ -153,11 +175,19 @@ function ProductionBatchDesignerNew() {
       targetDate,
       CELLS_PER_AUTOCLAVE,
     );
-    const emptyCards = Math.max(0, scheduled - filledCards);
+    // Autoclaves already cast on this date are out of reach: their batchOutside
+    // rows are deleted, so neither filling nor editing may claim their slots.
+    const producedCards = getProducedAutoclaveCountForDate(
+      autoclave_calendar,
+      targetDate,
+      CELLS_PER_AUTOCLAVE,
+    );
+    const editableCards = Math.max(0, scheduled - producedCards);
+    const emptyCards = Math.max(0, editableCards - filledCards);
 
     setIsEditMode(editModeRequested);
     setAutoclaveCount(
-      editModeRequested ? Math.max(filledCards, scheduled) : emptyCards,
+      editModeRequested ? Math.max(filledCards, editableCards) : emptyCards,
     );
 
     if (autoclaveCalendarData?.date !== targetDate) {
@@ -259,63 +289,6 @@ function ProductionBatchDesignerNew() {
 
     return map;
   }, [batchDesigner, latestProducts]);
-
-  useEffect(() => {
-    if (!list_of_orders_to_warehouse) {
-      setFilteredList([]);
-      return;
-    }
-
-    const filtered = list_of_orders_to_warehouse.filter((order) => {
-      const freed = freedPalletsByWarehouseOrder.get(order.id) || 0;
-      const effectiveAllocated = Math.max(
-        0,
-        (Number(order.quantity_allocated) || 0) - freed,
-      );
-
-      return (
-        order.quantity_pallets > order.quantity_produced &&
-        order.quantity_pallets > effectiveAllocated
-      );
-    });
-
-    const regex = /(\d+)\s*x\s*(\d+)\s*x\s*(\d+)/;
-    const filteredWithSize = filtered.reduce((acc, el) => {
-      const product = latestProducts.find(
-        (p) => p.article == el.product_article,
-      );
-
-      // el.description holds the order's title (dimensions already stripped out
-      // when the order was created), so the size must be parsed from the
-      // product's own description instead — see DimensionsTestModal.jsx.
-      const match = product?.description?.match(regex);
-
-      const product_size = match ? `${match[1]}x${match[2]}x${match[3]}` : '';
-
-      const freed = freedPalletsByWarehouseOrder.get(el.id) || 0;
-      const newObj = {
-        ...el,
-        product_size,
-        density: product?.density,
-        quantity_allocated: Math.max(
-          0,
-          (Number(el.quantity_allocated) || 0) - freed,
-        ),
-      };
-      acc.push(newObj);
-      return acc;
-    }, []);
-
-    setFilteredList(filteredWithSize);
-  }, [
-    list_of_orders_to_warehouse,
-    latestProducts,
-    freedPalletsByWarehouseOrder,
-  ]);
-
-  useEffect(() => {
-    dispatch(getOrderToWarehouse());
-  }, []);
 
   useEffect(() => {
     if (!list_of_orders_to_warehouse) {
