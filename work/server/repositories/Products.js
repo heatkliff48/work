@@ -20,6 +20,9 @@ const PRODUCT_ARTICLE_REFERENCES = [
   ['QualityManagement', 'product_article'],
   ['ProductionQualities', 'product_article'],
   ['ProductionBatchLog', 'products_article'],
+  ['OrderDispatches', 'article'],
+  ['RawMatConsumptions', 'batch_article'],
+  ['RawMatConsumptionsCurrentMolds', 'batch_article'],
 ];
 
 class ProductsRepository {
