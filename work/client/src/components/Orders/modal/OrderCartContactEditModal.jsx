@@ -1,6 +1,7 @@
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 import React, { useEffect } from 'react';
 import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo';
@@ -9,6 +10,7 @@ import '#components/Clients/ClientsInfo/clientsDrawer.css';
 import '../ordersView.css';
 
 function OrderContactEditModal({ show, onHide }) {
+  const { t } = useTranslation('orders');
   const { setCurrentClient } = useProjectContext();
   const { orderCartData } = useOrderContext();
   const contactInfo = useSelector((state) => state.contactInfo);
@@ -33,7 +35,7 @@ function OrderContactEditModal({ show, onHide }) {
       <div className="ord-modal-card ord-modal-card--sm">
         <div className="ord-modal-head ord-modal-head--sm">
           <div className="ord-modal-head__title ord-modal-head__title--sm">
-            Choose new contact person
+            {t('editModal.chooseContact')}
           </div>
           <button type="button" className="ord-iconbtn" onClick={onHide}>
             <svg
@@ -55,7 +57,7 @@ function OrderContactEditModal({ show, onHide }) {
         </div>
         <div className="ord-modal-foot ord-modal-foot--sm">
           <button type="button" className="ord-btn ord-btn--ghost" onClick={onHide}>
-            Close
+            {t('close', { ns: 'common' })}
           </button>
         </div>
       </div>
@@ -64,6 +66,7 @@ function OrderContactEditModal({ show, onHide }) {
 }
 
 function ShowOrderContactEditModal() {
+  const { t } = useTranslation('orders');
   const [modalShow, setModalShow] = React.useState(false);
 
   return (
@@ -73,7 +76,7 @@ function ShowOrderContactEditModal() {
         className="ord-btn ord-btn--ghost ord-btn--sm"
         onClick={() => setModalShow(true)}
       >
-        Edit
+        {t('card.edit')}
       </button>
 
       <OrderContactEditModal show={modalShow} onHide={() => setModalShow(false)} />

@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   addChildOrder,
   getUpdateProductInfoOfOrders,
@@ -180,6 +181,7 @@ const consumedFromParent = (row, quantities) => {
 };
 
 function LiberarModal({ show, onHide, orderCartData, productLists }) {
+  const { t, i18n } = useTranslation('orders');
   const { list_of_orders } = useOrderContext();
   const { latestProducts, productVersions } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
@@ -281,8 +283,8 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     const result = {};
     const check = (key, max) => {
       const value = parseFloat(quantities[key]);
-      if (value < 0) result[key] = 'Value cannot be negative';
-      else if (value > max) result[key] = `Maximum allowed is ${max}`;
+      if (value < 0) result[key] = t('liberar.errors.negative');
+      else if (value > max) result[key] = t('liberar.errors.maximum', { max });
     };
 
     for (const row of allProducts) {
@@ -295,7 +297,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       }
     }
     return result;
-  }, [allProducts, quantities]);
+  }, [allProducts, quantities, t]);
 
   // Weight of what the child order ships and the trucks it takes. Catalog
   // weights are per pallet, except tools, which are entered by the unit and
@@ -391,20 +393,18 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
 
   const handleConfirm = () => {
     if (!selectedDate) {
-      alert('Please select a date.');
+      alert(t('liberar.alerts.selectDate'));
       return;
     }
 
     const hasErrors = Object.keys(errors).length > 0;
     if (hasErrors) {
-      alert('Please fix all quantity errors before confirming.');
+      alert(t('liberar.alerts.fixErrors'));
       return;
     }
 
     if (isTotalQuantityFullyLiberated()) {
-      alert(
-        'Cannot create child order: all products are fully liberated. Please leave at least one product with remaining quantity.',
-      );
+      alert(t('liberar.alerts.fullyLiberated'));
       return;
     }
 
@@ -529,7 +529,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       relMats.length;
 
     if (totalProducts === 0) {
-      alert('Please enter at least one product quantity.');
+      alert(t('liberar.alerts.enterQuantity'));
       return;
     }
 
@@ -608,11 +608,9 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       <div className="ord-modal-card ord-modal-card--xl">
         <div className="ord-modal-head">
           <div>
-            <div className="ord-modal-head__title">
-              Liberar — Create child order
-            </div>
+            <div className="ord-modal-head__title">{t('liberar.title')}</div>
             <div className="ord-modal-head__subtitle">
-              from {orderCartData?.article}
+              {t('liberar.from', { article: orderCartData?.article })}
             </div>
           </div>
           <button type="button" className="ord-iconbtn" onClick={onHide}>
@@ -633,20 +631,27 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
         <div className="ord-modal-body">
           <div className="ord-liberar-toprow">
             <div className="ord-field">
-              <label className="ord-field__label">Shipping date</label>
+              <label className="ord-field__label">
+                {t('liberar.shippingDate')}
+              </label>
               <DatePicker
                 className="ord-liberar-date"
                 selected={selectedDate}
                 onChange={handleDateChange}
                 dateFormat="dd.MM.yyyy"
+                locale={i18n.language}
               />
             </div>
             <div className="ord-field ord-liberar-trucks">
-              <label className="ord-field__label">Trucks needed</label>
+              <label className="ord-field__label">
+                {t('liberar.trucksNeeded')}
+              </label>
               <div className="ord-liberar-trucks__value">
                 <span className="ord-liberar-sub">
-                  {shipment.weightKg.toLocaleString('es-ES')} kg /{' '}
-                  {TRUCK_CAPACITY_KG.toLocaleString('es-ES')} kg per truck
+                  {t('liberar.perTruck', {
+                    weight: shipment.weightKg.toLocaleString('es-ES'),
+                    capacity: TRUCK_CAPACITY_KG.toLocaleString('es-ES'),
+                  })}
                 </span>
                 <span className="ord-liberar-trucks__count">
                   {shipment.trucks}
@@ -654,8 +659,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
               </div>
               {shipment.unweighed > 0 && (
                 <div className="ord-liberar-sub">
-                  {shipment.unweighed} selected item(s) have no weight and are
-                  not counted
+                  {t('liberar.unweighed', { count: shipment.unweighed })}
                 </div>
               )}
             </div>
@@ -666,26 +670,30 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
               className="ord-modal-head__title ord-modal-head__title--sm"
               style={{ marginBottom: 10 }}
             >
-              Products (enter quantity in pallets / units)
+              {t('liberar.productsHint')}
             </div>
             {allProducts.length === 0 ? (
               <div className="ord-empty-products">
-                No products in this order.
+                {t('liberar.noProducts')}
               </div>
             ) : (
               <table className="ord-liberar-table">
                 <thead>
                   <tr>
-                    <th>Article</th>
-                    <th>Description</th>
-                    <th>Ship as</th>
+                    <th>{t('liberar.article')}</th>
+                    <th>{t('liberar.description')}</th>
+                    <th>{t('liberar.shipAs')}</th>
                     <th className="ord-liberar-table__num">
-                      Quantity in Main Order
+                      {t('liberar.quantityInMain')}
                     </th>
-                    <th className="ord-liberar-table__num">Liberated</th>
-                    <th className="ord-liberar-table__num">Available</th>
                     <th className="ord-liberar-table__num">
-                      Quantity from Main Order
+                      {t('liberar.liberated')}
+                    </th>
+                    <th className="ord-liberar-table__num">
+                      {t('liberar.available')}
+                    </th>
+                    <th className="ord-liberar-table__num">
+                      {t('liberar.quantityFromMain')}
                     </th>
                   </tr>
                 </thead>
@@ -755,7 +763,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
                                     <button
                                       type="button"
                                       className="ord-iconbtn"
-                                      title="Remove package"
+                                      title={t('liberar.removePackage')}
                                       onClick={() =>
                                         handleRemovePackage(p, line.key)
                                       }
@@ -791,7 +799,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
                                     className="ord-liberar-add"
                                     onClick={() => handleAddPackage(p)}
                                   >
-                                    + Add package
+                                    {t('liberar.addPackage')}
                                   </button>
                                 )}
                               </>
@@ -862,7 +870,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
                                   ),
                                   p._available,
                                 )}{' '}
-                                pal from main
+                                {t('liberar.palFromMain')}
                               </div>
                             )}
                             {errors[line.key] && (
@@ -887,7 +895,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
             onClick={onHide}
             disabled={loading}
           >
-            Cancel
+            {t('liberar.cancel')}
           </button>
           <button
             type="button"
@@ -895,7 +903,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
             onClick={handleConfirm}
             disabled={loading}
           >
-            {loading ? 'Creating...' : 'Confirm Order'}
+            {loading ? t('liberar.creating') : t('liberar.confirm')}
           </button>
         </div>
       </div>

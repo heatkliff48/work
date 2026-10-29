@@ -4,6 +4,8 @@ import { useOrderContext } from '../../../contexts/OrderContext';
 import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { translateColumns } from '../../ordersI18n.js';
 import '#components/Styles/modals.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import { getUpdateAnchorProductOfOrders } from '#components/redux/actions/ordersAction.js';
@@ -21,6 +23,12 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
 
   const { COLUMNS_ANCHOR_PRODUCT, latestAnchors } =
     useProductsTypeJournalContext();
+
+  const { t } = useTranslation('orders');
+  const orderColumns = useMemo(
+    () => translateColumns(t, COLUMNS_ORDER_ANCHOR),
+    [COLUMNS_ORDER_ANCHOR, t],
+  );
 
   const dispatch = useDispatch();
 
@@ -128,7 +136,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
         !productOfOrder?.quantity_real_ud ||
         productOfOrder?.quantity_real_ud == 0
       ) {
-        alert('Cannot add product with 0 quantity!');
+        alert(t('alerts.zeroQuantity'));
         return;
       }
       const newAnchorProductsOfOrder = {
@@ -174,15 +182,15 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
           }}
         >
           {haveProduct ? (
-            <p>Fill in the remaining parameters</p>
+            <p>{t('productModal.fillRemaining')}</p>
           ) : (
-            <p>Select fastener product</p>
+            <p>{t('productModal.selectFastener')}</p>
           )}
         </ModalHeader>
         <ModalBody>
           {haveProduct ? (
             <>
-              {COLUMNS_ORDER_ANCHOR?.map((el) => {
+              {orderColumns.map((el) => {
                 if (el.accessor === 'anchor_id') return null;
                 if (el.accessor === 'anchor_article')
                   return (
@@ -282,7 +290,7 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
                 // userAccess={userAccess}
                 onClickButton={() => {}}
                 buttonText={''}
-                tableName={'Fasteners journal'}
+                tableName={t('productModal.fastenersTable')}
                 handleRowClick={(row) => {
                   handlerAddProductOrder(row);
                 }}
@@ -294,7 +302,9 @@ const AddAnchorProductModal = React.memo(({ isOpen, toggle }) => {
           <></>
         ) : (
           <ModalFooter>
-            <button onClick={addProductOrder}>Add product</button>
+            <button onClick={addProductOrder}>
+              {t('productModal.addProduct')}
+            </button>
           </ModalFooter>
         )}
       </Modal>

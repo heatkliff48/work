@@ -13,6 +13,8 @@ const WMOCTProduct = ({
   handleMinus,
   isDisablePlus,
   isDisableMinus,
+  isLoaded,
+  onDownloadAlbaran,
 }) => {
   const { wmoctProduct, order_dispatch_data } = useWarehouseContext();
   const {
@@ -116,14 +118,16 @@ const WMOCTProduct = ({
                         <div className="wm-prod-table__controls">
                           <button
                             className="wm-round-btn"
-                            disabled={isDisablePlus(product)}
+                            disabled={isLoaded || isDisablePlus(product)}
                             onClick={() => handlePlus(product, 0)}
                           >
                             ＋
                           </button>
                           <button
                             className="wm-round-btn"
-                            disabled={isDisableMinus(product.batches[0])}
+                            disabled={
+                              isLoaded || isDisableMinus(product.batches[0])
+                            }
                             onClick={() => handleMinus(product, 0)}
                           >
                             －
@@ -135,15 +139,17 @@ const WMOCTProduct = ({
                   ) : (
                     <>
                       <td>
-                        <button
-                          className="wm-add-batch-btn"
-                          onClick={() => {
-                            setWmoctModal(!wmoctModal);
-                            handlePlusBatch(product);
-                          }}
-                        >
-                          ＋
-                        </button>
+                        {!isLoaded && (
+                          <button
+                            className="wm-add-batch-btn"
+                            onClick={() => {
+                              setWmoctModal(!wmoctModal);
+                              handlePlusBatch(product);
+                            }}
+                          >
+                            ＋
+                          </button>
+                        )}
                       </td>
                       <td></td>
                       <td></td>
@@ -165,14 +171,14 @@ const WMOCTProduct = ({
                       <div className="wm-prod-table__controls">
                         <button
                           className="wm-round-btn"
-                          disabled={isDisablePlus(product)}
+                          disabled={isLoaded || isDisablePlus(product)}
                           onClick={() => handlePlus(product, batchIndex + 1)}
                         >
                           ＋
                         </button>
                         <button
                           className="wm-round-btn"
-                          disabled={isDisableMinus(batch)}
+                          disabled={isLoaded || isDisableMinus(batch)}
                           onClick={() => handleMinus(product, batchIndex + 1)}
                         >
                           －
@@ -182,7 +188,7 @@ const WMOCTProduct = ({
                     <td>{batch.allocated}</td>
                   </tr>
                 ))}
-                {haveBatches(productIndex) ? (
+                {haveBatches(productIndex) && !isLoaded ? (
                   <tr>
                     <td></td>
                     <td></td>
@@ -216,6 +222,13 @@ const WMOCTProduct = ({
         <div className="wm-prod-card__foot">
           <button className="wm-btn wm-btn--primary" onClick={onSaveHandler}>
             SAVE
+          </button>
+        </div>
+      )}
+      {isLoaded && (
+        <div className="wm-prod-card__foot">
+          <button className="wm-btn wm-btn--primary" onClick={onDownloadAlbaran}>
+            Download albaran
           </button>
         </div>
       )}

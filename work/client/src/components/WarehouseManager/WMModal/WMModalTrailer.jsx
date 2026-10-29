@@ -5,7 +5,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import Table from '#components/Table/Table.jsx';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import '../warehouseManagerView.css';
 
@@ -32,6 +32,17 @@ function WMModalTrailer({ setTrailerOrder }) {
   } = useOrderContext();
 
   const [warehouse_trailer_data, setWarehouseTrailerData] = useState([]);
+
+  // The order number alone doesn't say which order it is: its description
+  // follows it
+  const trailerOrderColumns = useMemo(
+    () => [
+      WAREHOUSE_MANAGER_TRAILER_TABLE[0],
+      { Header: 'Description', accessor: 'description' },
+      ...WAREHOUSE_MANAGER_TRAILER_TABLE.slice(1),
+    ],
+    [WAREHOUSE_MANAGER_TRAILER_TABLE],
+  );
 
   const toggle = () => {
     setwmmodalTrailer(!wmmodalTrailer);
@@ -112,6 +123,7 @@ function WMModalTrailer({ setTrailerOrder }) {
 
         const obj = {
           orders_article: order.article,
+          description: order.description,
           projects_name: del_adr?.project_name,
           fecha: order?.shipping_date,
           orders_products: remaining_quantity_of_pallets,
@@ -248,7 +260,7 @@ function WMModalTrailer({ setTrailerOrder }) {
 
       <ModalBody>
         <Table
-          COLUMN_DATA={WAREHOUSE_MANAGER_TRAILER_TABLE}
+          COLUMN_DATA={trailerOrderColumns}
           dataOfTable={warehouse_trailer_data}
           // userAccess={userAccess}
           onClickButton={() => {}}

@@ -8,6 +8,8 @@ import {
   getUpdateToolProductOfOrders,
 } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { translateColumns } from '../../ordersI18n.js';
 import '#components/Styles/modals.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
@@ -24,6 +26,12 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
 
   const { COLUMNS_TOOLS_PRODUCT, latestTools } =
     useProductsTypeJournalContext();
+
+  const { t } = useTranslation('orders');
+  const orderColumns = useMemo(
+    () => translateColumns(t, COLUMNS_ORDER_TOOL, { total: 'totalUd' }),
+    [COLUMNS_ORDER_TOOL, t],
+  );
 
   const dispatch = useDispatch();
 
@@ -104,7 +112,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
         !productOfOrder?.total ||
         productOfOrder?.total == 0
       ) {
-        alert('Cannot add product with 0 quantity!');
+        alert(t('alerts.zeroQuantity'));
         return;
       }
       const newToolProductsOfOrder = {
@@ -150,15 +158,15 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
           }}
         >
           {haveProduct ? (
-            <p>Fill in the remaining parameters</p>
+            <p>{t('productModal.fillRemaining')}</p>
           ) : (
-            <p>Select tool product</p>
+            <p>{t('productModal.selectTool')}</p>
           )}
         </ModalHeader>
         <ModalBody>
           {haveProduct ? (
             <>
-              {COLUMNS_ORDER_TOOL?.map((el) => {
+              {orderColumns.map((el) => {
                 if (el.accessor === 'tool_id') return null;
                 if (el.accessor === 'tool_article')
                   return (
@@ -232,7 +240,7 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
                 // userAccess={userAccess}
                 onClickButton={() => {}}
                 buttonText={''}
-                tableName={'Tool journal'}
+                tableName={t('productModal.toolsTable')}
                 handleRowClick={(row) => {
                   handlerAddProductOrder(row);
                 }}
@@ -244,7 +252,9 @@ const AddToolProductModal = React.memo(({ isOpen, toggle }) => {
           <></>
         ) : (
           <ModalFooter>
-            <button onClick={addProductOrder}>Add product</button>
+            <button onClick={addProductOrder}>
+              {t('productModal.addProduct')}
+            </button>
           </ModalFooter>
         )}
       </Modal>

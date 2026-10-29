@@ -6,12 +6,15 @@
   "no": "No",
   "pageTitles": {
     "warehouse_raw_materials": "Almacén de materias primas",
-    "cake_fillup": "Colada"
+    "cake_fillup": "Colada",
+    "orders": "Pedidos",
+    "order_card": "Ficha del pedido"
   },
   "table": {
     "globalSearch": "Búsqueda global:",
     "records": "{{count}} registros...",
-    "search": "Buscar..."
+    "search": "Buscar...",
+    "all": "Todos"
   },
   "files": {
     "upload": "Subir",
@@ -23,11 +26,18 @@
     "serverError": "Se ha producido un error en el servidor",
     "downloadError": "Error al descargar el archivo"
   },
+  "validation": {
+    "required": "Este campo no puede estar vacío",
+    "invalidNumber": "Formato de número no válido",
+    "min": "Debe ser mayor que {{value}}",
+    "max": "Debe ser menor que {{value}}"
+  },
   "units": {
     "kg": "kg",
     "pieces": "uds.",
     "l": "L",
-    "t": "t"
+    "t": "t",
+    "pal": "pal."
   },
   "materials": {
     "Sand (dry)": "Arena (seca)",

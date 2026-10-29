@@ -2,6 +2,8 @@ import { useModalContext } from "#components/contexts/ModalContext.js";
 import { useOrderContext } from "#components/contexts/OrderContext.js";
 import { useUsersContext } from "#components/contexts/UserContext.js";
 import { Button } from "reactstrap";
+import { useTranslation } from "react-i18next";
+import { fieldLabel } from "../ordersI18n.js";
 import AddDryMixesProductModal from "../modal/addProductModal/AddDryMixesProductModal";
 import "../ordersView.css";
 
@@ -13,6 +15,7 @@ const DryMixesJournalTableOrder = ({
   deleteHandler,
   displayNames = {},
 }) => {
+  const { t } = useTranslation("orders");
   const { setNewOrder, orderCartData } = useOrderContext();
   const { dryMixedProductModalOrder, setDryMixedProductModalOrder } =
     useModalContext();
@@ -37,16 +40,16 @@ const DryMixesJournalTableOrder = ({
           <span className="ord-badge" style={{ background: "#fdf3e3", color: "#b45309" }}>
             Mezcla seca
           </span>
-          <div className="ord-prod-card__title">Dry mixes</div>
+          <div className="ord-prod-card__title">{t("products.dryMixesTitle")}</div>
         </div>
         <div className="ord-prod-table-wrap">
           <table className="product-table ord-prod-table">
             <thead>
               <tr>
                 {columns.map((key) => (
-                  <th key={key}>{displayNames[key] || key}</th>
+                  <th key={key}>{fieldLabel(t, key, displayNames[key])}</th>
                 ))}
-                <th>Actions</th>
+                <th>{t("products.actions")}</th>
               </tr>
             </thead>
 
@@ -74,7 +77,7 @@ const DryMixesJournalTableOrder = ({
                           className="ord-mini-btn ord-mini-btn--danger ord-btn"
                           onClick={() => deleteHandler(product)}
                         >
-                          Delete
+                          {t("products.delete")}
                         </Button>
                       )}
                     </td>
@@ -99,7 +102,7 @@ const DryMixesJournalTableOrder = ({
                         setDryMixedProductModalOrder(!dryMixedProductModalOrder);
                       }}
                     >
-                      + Add product
+                      {t("products.addProduct")}
                     </Button>
                   </td>
                 </tr>

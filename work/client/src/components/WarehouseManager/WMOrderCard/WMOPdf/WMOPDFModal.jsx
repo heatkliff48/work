@@ -3,7 +3,7 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import WMOPdf from './WMOPdf';
 import '../../warehouseManagerView.css';
 
-const WMOCPDFModal = ({ isOpen, toggle, orderCartData }) => {
+const WMOCPDFModal = ({ isOpen, toggle, orderCartData, reprint }) => {
   if (!isOpen) return null;
 
   return (
@@ -26,7 +26,11 @@ const WMOCPDFModal = ({ isOpen, toggle, orderCartData }) => {
         </ModalHeader>
         <Fragment>
           <ModalBody>
-            <WMOPdf orderCartData={orderCartData} toggle={toggle} />
+            <WMOPdf
+              orderCartData={orderCartData}
+              toggle={toggle}
+              reprint={reprint}
+            />
           </ModalBody>
         </Fragment>
         <ModalFooter></ModalFooter>

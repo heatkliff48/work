@@ -12,6 +12,7 @@ import {
   getUpdateToolProductsInfoOfOrder,
 } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useProjectContext } from '#components/contexts/Context.js';
 import { useState } from 'react';
 import {
@@ -23,6 +24,7 @@ import {
   piecesForLinearMetres,
   piecesPerQuantityUnit,
 } from './packagingUtils.js';
+import { fieldLabel, translateColumns } from '../ordersI18n.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -74,6 +76,12 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   } = useOrderContext();
 
   const { clientPriceInfo } = useProjectContext();
+  const { t } = useTranslation('orders');
+
+  const [pricePieceColumn, quantityPiecesField] = translateColumns(t, [
+    PRICE_PIECE_COLUMN,
+    QUANTITY_PIECES_FIELD,
+  ]);
 
   const dispatch = useDispatch();
 
@@ -137,16 +145,24 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
   }, []);
 
   const COLUMNS_ORDER = useMemo(() => {
-    return orderProductType(selectedProduct?.article) == 'N'
-      ? COLUMNS_ORDER_PRODUCT
-      : orderProductType(selectedProduct?.article) == 'M'
-        ? COLUMNS_ORDER_DRY_MIXES
-        : orderProductType(selectedProduct?.article) == 'P'
-          ? COLUMNS_ORDER_RELATED_MATERIAL
-          : orderProductType(selectedProduct?.article) == 'F'
-            ? COLUMNS_ORDER_ANCHOR
-            : COLUMNS_ORDER_TOOL;
-  }, [selectedProduct]);
+    const type = orderProductType(selectedProduct?.article);
+    const columns =
+      type == 'N'
+        ? COLUMNS_ORDER_PRODUCT
+        : type == 'M'
+          ? COLUMNS_ORDER_DRY_MIXES
+          : type == 'P'
+            ? COLUMNS_ORDER_RELATED_MATERIAL
+            : type == 'F'
+              ? COLUMNS_ORDER_ANCHOR
+              : COLUMNS_ORDER_TOOL;
+    // у инструментов и материалов total — в штуках, а не в кг
+    return translateColumns(
+      t,
+      columns,
+      type == 'T' || type == 'P' ? { total: 'totalUd' } : {},
+    );
+  }, [selectedProduct, t]);
 
   const pieces_per_pallet = selectedProduct?.pieces_per_unit ?? 0;
 
@@ -643,7 +659,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
       <div className="ord-modal-card ord-modal-card--md">
         <div className="ord-modal-head ord-modal-head--sm">
           <div className="ord-modal-head__title ord-modal-head__title--sm">
-            Fill in the remaining parameters
+            {t('productModal.fillRemaining')}
           </div>
           <button type="button" className="ord-iconbtn" onClick={closeHandler}>
             <svg
@@ -733,7 +749,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   <>
                     <ModalBody>
                       {isLinear && el.accessor === 'quantity_real'
-                        ? 'Real quantity, linear metre'
+                        ? fieldLabel(t, 'quantity_real_linear')
                         : el.Header}
                       :
                     </ModalBody>
@@ -753,7 +769,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                       <InputField
                         el={el}
                         uBlockHeader={
-                          isLinear ? 'Price, EURO per linear metre' : ''
+                          isLinear ? fieldLabel(t, 'price_linear') : ''
                         }
                         inputValue={{ price_m2: priceM2Display }}
                         inputValueChange={handlePriceM2Change}
@@ -762,7 +778,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                       />
                       {piecesPerUnit > 0 && (
                         <InputField
-                          el={PRICE_PIECE_COLUMN}
+                          el={pricePieceColumn}
                           inputValue={{ price_piece: pricePieceDisplay }}
                           inputValueChange={handlePricePieceChange}
                           onBlur={handlePricePieceBlur}
@@ -840,7 +856,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                           checked={isReturn}
                           onChange={(e) => setIsReturn(e.target.checked)}
                         />{' '}
-                        Return
+                        {t('productModal.return')}
                       </Label>
                     </FormGroup>
                   </>
@@ -851,7 +867,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                   <React.Fragment key={el.accessor}>
                     <InputField
                       el={el}
-                      uBlockHeader={isLinear ? 'Quantity, linear metre' : ''}
+                      uBlockHeader={isLinear ? fieldLabel(t, 'quantity_linear') : ''}
                       inputValue={productOfOrder}
                       inputValueChange={handleQuantityM2Change}
                       onBlur={handleQuantityM2Blur}
@@ -859,7 +875,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
                     />
                     {isLinear && (
                       <InputField
-                        el={QUANTITY_PIECES_FIELD}
+                        el={quantityPiecesField}
                         inputValue={{ quantity_pcs: quantityPiecesDisplay }}
                         inputValueChange={handleQuantityPiecesChange}
                         onBlur={handleQuantityPiecesBlur}
@@ -887,7 +903,7 @@ const OrderProductCardInfoModal = React.memo(({ isOpen, toggle }) => {
             className="ord-btn ord-btn--primary"
             onClick={addProductOrder}
           >
-            Change product info
+            {t('productModal.changeProductInfo')}
           </button>
         </div>
       </div>

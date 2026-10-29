@@ -1,11 +1,14 @@
 import React from 'react';
 import { ModalBody } from 'reactstrap';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const InputField = React.memo(
   ({ el, uBlockHeader = '', inputValue, inputValueChange, isDisabled, onBlur }) => {
+    const { t } = useTranslation();
     const [inputDirty, setInputDirty] = useState(false);
-    const [inputError, setInputError] = useState("This field can't be empty");
+    // Храним ключ перевода, чтобы текст ошибки менялся вместе с языком
+    const [inputError, setInputError] = useState({ key: 'validation.required' });
 
     const isValid = (value) => value !== '' && value !== '-';
     const [valid, setValid] = useState(
@@ -19,7 +22,7 @@ const InputField = React.memo(
       inputValueChange(e);
 
       if (!rawValue) {
-        setInputError("This field can't be empty");
+        setInputError({ key: 'validation.required' });
         return;
       }
 
@@ -29,13 +32,13 @@ const InputField = React.memo(
       const max = parseFloat(e.target.max);
 
       if (isNaN(parsed)) {
-        setInputError('Invalid number format');
+        setInputError({ key: 'validation.invalidNumber' });
       } else if (parsed < min) {
-        setInputError(`Must be higher than ${e.target.min}`);
+        setInputError({ key: 'validation.min', value: e.target.min });
       } else if (parsed > max) {
-        setInputError(`Must be lower than ${e.target.max}`);
+        setInputError({ key: 'validation.max', value: e.target.max });
       } else {
-        setInputError('');
+        setInputError(null);
       }
     };
 
@@ -50,7 +53,9 @@ const InputField = React.memo(
       <div className="item_topic">
         <ModalBody key={el.id}>{uBlockHeader ? uBlockHeader : el.Header}:</ModalBody>
         {inputDirty && inputError && (
-          <div style={{ color: 'red' }}>{inputError}</div>
+          <div style={{ color: 'red' }}>
+            {t(inputError.key, { value: inputError.value })}
+          </div>
         )}
         <input
           className={valid ? '' : 'invalid'}

@@ -5,6 +5,8 @@ import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
 import { getUpdateRelMatProductOfOrders } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { translateColumns } from '../../ordersI18n.js';
 import '#components/Styles/modals.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
@@ -21,6 +23,12 @@ const AddRelatedMaterialProductModal = React.memo(({ isOpen, toggle }) => {
 
   const { COLUMNS_RELATED_MATERIALS_JOURNAL, latestRelatedMaterials } =
     useProductsTypeJournalContext();
+
+  const { t } = useTranslation('orders');
+  const orderColumns = useMemo(
+    () => translateColumns(t, COLUMNS_ORDER_RELATED_MATERIAL, { total: 'totalUd' }),
+    [COLUMNS_ORDER_RELATED_MATERIAL, t],
+  );
 
   const dispatch = useDispatch();
 
@@ -103,7 +111,7 @@ const AddRelatedMaterialProductModal = React.memo(({ isOpen, toggle }) => {
         !productOfOrder?.total ||
         productOfOrder?.total == 0
       ) {
-        alert('Cannot add product with 0 quantity!');
+        alert(t('alerts.zeroQuantity'));
         return;
       }
       const newRelMatProductsOfOrder = {
@@ -149,15 +157,15 @@ const AddRelatedMaterialProductModal = React.memo(({ isOpen, toggle }) => {
           }}
         >
           {haveProduct ? (
-            <p>Fill in the remaining parameters</p>
+            <p>{t('productModal.fillRemaining')}</p>
           ) : (
-            <p>Select Related Material product</p>
+            <p>{t('productModal.selectRelatedMaterial')}</p>
           )}
         </ModalHeader>
         <ModalBody>
           {haveProduct ? (
             <>
-              {COLUMNS_ORDER_RELATED_MATERIAL?.map((el) => {
+              {orderColumns.map((el) => {
                 if (el.accessor === 'rel_mat_id') return null;
                 if (el.accessor === 'rel_mat_article')
                   return (
@@ -231,7 +239,7 @@ const AddRelatedMaterialProductModal = React.memo(({ isOpen, toggle }) => {
                 // userAccess={userAccess}
                 onClickButton={() => {}}
                 buttonText={''}
-                tableName={'Related Material journal'}
+                tableName={t('productModal.relatedMaterialsTable')}
                 handleRowClick={(row) => {
                   handlerAddProductOrder(row);
                 }}
@@ -243,7 +251,9 @@ const AddRelatedMaterialProductModal = React.memo(({ isOpen, toggle }) => {
           <></>
         ) : (
           <ModalFooter>
-            <button onClick={addProductOrder}>Add product</button>
+            <button onClick={addProductOrder}>
+              {t('productModal.addProduct')}
+            </button>
           </ModalFooter>
         )}
       </Modal>

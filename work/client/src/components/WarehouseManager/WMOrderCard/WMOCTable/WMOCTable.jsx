@@ -28,6 +28,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     tools_warehouse_data,
     related_materials_warehouse_data,
     normalizeProductType,
+    order_dispatch_data,
   } = useWarehouseContext();
 
   // const {
@@ -54,6 +55,8 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   // const { latestProducts } = useProductsContext();
 
   const [selectedProduct, setSelectedProduct] = useState(null);
+  // Saved albaran opened again from a loaded trailer; null while loading
+  const [reprintAlbaran, setReprintAlbaran] = useState(null);
   const currentRecordKey = `${Number(product_list?.order_id || 0)}_${Number(
     product_list?.trailer || 0,
   )}`;
@@ -73,6 +76,38 @@ const WMOCTable = ({ product_list, orderCartData }) => {
   //   tool: [latestTools, toolProductsOfOrders],
   //   relMat: [latestRelatedMaterials, relMatProductsOfOrders],
   // };
+
+  // Loaded trailer (stage 2, or 4 once the whole order is loaded): its
+  // albaran is saved, so the lines can't be edited any more
+  const trailerDispatches = (order_dispatch_data || []).filter(
+    (dispatch) =>
+      Number(dispatch.orderId) === Number(product_list?.order_id) &&
+      Number(dispatch.trailer) === Number(product_list?.trailer),
+  );
+  const isLoaded =
+    trailerDispatches.length > 0 &&
+    trailerDispatches.every((dispatch) =>
+      [2, 4].includes(Number(dispatch.trailer_stage)),
+    );
+
+  const handleDownloadAlbaran = () => {
+    const trailerAlbarans = (aldabaran || []).filter(
+      (item) =>
+        Number(item.order_id) === Number(product_list?.order_id) &&
+        Number(item.trailer) === Number(product_list?.trailer),
+    );
+    const albaran = trailerAlbarans[trailerAlbarans.length - 1];
+
+    if (albaran) {
+      setReprintAlbaran(albaran);
+      setWmoctPdfModal(true);
+      return;
+    }
+
+    // Albarans saved before they were linked to a trailer: the number and
+    // transport data are typed in again
+    setWmoctPdfAddDataModal(true);
+  };
 
   // Lines are told apart by order_dispatch_id: one order can ship the same
   // article on several lines
@@ -399,13 +434,21 @@ const WMOCTable = ({ product_list, orderCartData }) => {
         isOpen={wmoctPdfModal}
         toggle={() => {
           setWmoctPdfModal(!wmoctPdfModal);
+          setReprintAlbaran(null);
         }}
         orderCartData={orderCartData}
+        reprint={reprintAlbaran}
       />
       <WMOCTableDataModal
         isOpen={wmoctPdfAddDataModal}
         toggle={() => {
           setWmoctPdfAddDataModal(!wmoctPdfAddDataModal);
+        }}
+        reprint={isLoaded}
+        onReprint={(albaran) => {
+          setReprintAlbaran(albaran);
+          setWmoctPdfAddDataModal(false);
+          setWmoctPdfModal(true);
         }}
       />
       <WMOCTProduct
@@ -417,6 +460,8 @@ const WMOCTable = ({ product_list, orderCartData }) => {
         handleMinus={handleMinus}
         isDisablePlus={isDisablePlus}
         isDisableMinus={isDisableMinus}
+        isLoaded={isLoaded}
+        onDownloadAlbaran={handleDownloadAlbaran}
       />
     </>
   );

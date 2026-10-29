@@ -5,6 +5,8 @@ import InputField from '#components/InputField/InputField.jsx';
 import Table from '#components/Table/Table.jsx';
 import { getUpdateDryMixedProductOfOrders } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { translateColumns } from '../../ordersI18n.js';
 import '#components/Styles/modals.css';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 
@@ -21,6 +23,12 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
 
   const { COLUMNS_DRY_MIXED_PRODUCT, latestDryMix } =
     useProductsTypeJournalContext();
+
+  const { t } = useTranslation('orders');
+  const orderColumns = useMemo(
+    () => translateColumns(t, COLUMNS_ORDER_DRY_MIXES),
+    [COLUMNS_ORDER_DRY_MIXES, t],
+  );
 
   const dispatch = useDispatch();
 
@@ -148,7 +156,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
         !productOfOrder?.quantity_palet_dry ||
         productOfOrder?.quantity_palet_dry == 0
       ) {
-        alert('Cannot add product with 0 quantity!');
+        alert(t('alerts.zeroQuantity'));
         return;
       }
       const newDryMixedProductsOfOrder = {
@@ -195,15 +203,15 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
           }}
         >
           {haveProduct ? (
-            <p>Fill in the remaining parameters</p>
+            <p>{t('productModal.fillRemaining')}</p>
           ) : (
-            <p>Select dry mixes product</p>
+            <p>{t('productModal.selectDryMix')}</p>
           )}
         </ModalHeader>
         <ModalBody>
           {haveProduct ? (
             <>
-              {COLUMNS_ORDER_DRY_MIXES?.map((el) => {
+              {orderColumns.map((el) => {
                 if (el.accessor === 'dry_mixed_id') return null;
                 if (el.accessor === 'dry_mixed_article')
                   return (
@@ -290,7 +298,7 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
                 // userAccess={userAccess}
                 onClickButton={() => {}}
                 buttonText={''}
-                tableName={'Dry mixes journal'}
+                tableName={t('productModal.dryMixesTable')}
                 handleRowClick={(row) => {
                   handlerAddProductOrder(row);
                 }}
@@ -302,7 +310,9 @@ const AddDryMixesProductModal = React.memo(({ isOpen, toggle }) => {
           <></>
         ) : (
           <ModalFooter>
-            <button onClick={addProductOrder}>Add product</button>
+            <button onClick={addProductOrder}>
+              {t('productModal.addProduct')}
+            </button>
           </ModalFooter>
         )}
       </Modal>

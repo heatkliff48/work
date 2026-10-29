@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import image from './headerPDF.jpg';
@@ -21,6 +22,8 @@ const loadImage = () => {
 };
 
 const PDFGenerator = ({ orderData, productList, vatValue }) => {
+  // Переводится только интерфейс: сам PDF (presupuesto) всегда на испанском
+  const { t } = useTranslation('orders');
   const { productVersions } = useProductsContext();
   const { dryMixesJournal, anchor, tool, relatedMaterialsJournal } =
     useProductsTypeJournalContext();
@@ -1046,7 +1049,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
 
   const sendToBitrix = async () => {
     if (!dealId) {
-      alert('Fill in DEAL_ID before sending to Bitrix24');
+      alert(t('pdf.fillDealId'));
       return;
     }
 
@@ -1073,17 +1076,15 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
         const result = await response.json().catch(() => null);
 
         if (response.ok) {
-          alert('PDF successfully sent to Bitrix24');
+          alert(t('pdf.sent'));
         } else {
           console.error('Ошибка ответа сервера:', result);
-          alert(
-            `Error sending to Bitrix24: ${result?.error ?? response.status}`,
-          );
+          alert(t('pdf.sendError', { error: result?.error ?? response.status }));
         }
       }
     } catch (error) {
       console.error('Error:', error);
-      alert(`Send error: ${error.message}`);
+      alert(t('pdf.sendFailed', { error: error.message }));
     }
   };
 
@@ -1100,7 +1101,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           onChange={(e) => {
             setDealId(e.target.value);
           }}
-          placeholder="Enter DEAL_ID"
+          placeholder={t('pdf.dealIdPlaceholder')}
         />
       </div>
 
@@ -1110,14 +1111,14 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
           className="ord-btn ord-btn--primary ord-btn--sm"
           onClick={downloadPDF}
         >
-          Download PDF
+          {t('pdf.download')}
         </button>
         <button
           type="button"
           className="ord-btn ord-btn--ghost ord-btn--sm"
           onClick={sendToBitrix}
         >
-          Send to Bitrix24
+          {t('pdf.sendToBitrix')}
         </button>
       </div>
     </div>
