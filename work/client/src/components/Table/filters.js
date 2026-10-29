@@ -21,6 +21,7 @@ export function TextSearchFilter({
 export function DropdownFilter({
   column: { filterValue, setFilter, preFilteredRows, id },
 }) {
+  const { t } = useTranslation();
   // Calculate the options for filtering
   // using the preFilteredRows
   const options = React.useMemo(() => {
@@ -39,7 +40,7 @@ export function DropdownFilter({
         setFilter(e.target.value || undefined);
       }}
     >
-      <option value="">All</option>
+      <option value="">{t('table.all')}</option>
       {options.map((option, i) => (
         <option key={i} value={option}>
           {option}

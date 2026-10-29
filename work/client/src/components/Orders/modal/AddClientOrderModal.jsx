@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useOrderContext } from '../../contexts/OrderContext';
 import { useProjectContext } from '#components/contexts/Context.js';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress.js';
@@ -17,6 +18,7 @@ import Table from '#components/Table/Table';
 import '#components/Styles/modals.css';
 import '#components/Clients/ClientsInfo/clientsDrawer.css';
 import '../ordersView.css';
+import { translateColumns } from '../ordersI18n.js';
 
 const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const {
@@ -30,25 +32,36 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   } = useOrderContext();
   const { clientModalOrder, setClientModalOrder } = useModalContext();
   const { setCurrentClient, clients_info_table } = useProjectContext();
+  const { t } = useTranslation('orders');
 
   const regionOptions = [
     {
       value: 'peninsular_spain',
-      label: 'Territorios peninsulares de España',
+      label: t('newOrder.regions.peninsular_spain'),
       vat: '21% IVA',
     },
     {
       value: 'extra_peninsular_spain',
-      label: 'Territorios extrapeninsulares de España',
+      label: t('newOrder.regions.extra_peninsular_spain'),
       vat: '0% IVA',
     },
     {
       value: 'eu_outside_spain',
-      label: 'EU territorios outside Spain',
+      label: t('newOrder.regions.eu_outside_spain'),
       vat: '0% IVA',
     },
-    { value: 'outside_eu', label: 'Territories outside EU', vat: '0% IVA' },
+    {
+      value: 'outside_eu',
+      label: t('newOrder.regions.outside_eu'),
+      vat: '0% IVA',
+    },
   ];
+
+  // Колонки клиентов — те же поля, что в карточке заказа
+  const clientColumns = useMemo(
+    () => translateColumns(t, clients_info_table, { c_name: 'client_name' }),
+    [clients_info_table, t],
+  );
 
   const dispatch = useDispatch();
   const list_of_clients = useSelector((state) => state.clients);
@@ -203,20 +216,24 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
               {haveClient ? (
                 haveAdddress ? (
                   haveContactInfo ? (
-                    <p style={{ margin: 0 }}>Select region</p>
+                    <p style={{ margin: 0 }}>{t('newOrder.selectRegion')}</p>
                   ) : (
-                    <p style={{ margin: 0 }}>Select contact person</p>
+                    <p style={{ margin: 0 }}>
+                      {t('newOrder.selectContactPerson')}
+                    </p>
                   )
                 ) : (
-                  <p style={{ margin: 0 }}>Select delivery address</p>
+                  <p style={{ margin: 0 }}>
+                    {t('newOrder.selectDeliveryAddress')}
+                  </p>
                 )
               ) : (
-                <p style={{ margin: 0 }}>
-                  Select the client who is placing the order
-                </p>
+                <p style={{ margin: 0 }}>{t('newOrder.selectClient')}</p>
               )}
             </div>
-            <div className="ord-modal-head__subtitle">Step {stepNum} of 4</div>
+            <div className="ord-modal-head__subtitle">
+              {t('newOrder.step', { current: stepNum, total: 4 })}
+            </div>
           </div>
           <button type="button" className="ord-iconbtn" onClick={closeHandler}>
             <svg
@@ -309,9 +326,9 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                   <ShowClientsModal />
                 </div> */}
                 <Table
-                  COLUMN_DATA={clients_info_table}
+                  COLUMN_DATA={clientColumns}
                   dataOfTable={listOfClientsFiltered}
-                  tableName={'Clients'}
+                  tableName={t('newOrder.clientsTable')}
                   variant="card"
                   hideTitle
                   handleRowClick={(row) => {
@@ -330,7 +347,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
                 className="ord-btn ord-btn--ghost"
                 onClick={backHanddler}
               >
-                back
+                {t('newOrder.back')}
               </button>
             )}
           </div>

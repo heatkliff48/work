@@ -7,9 +7,11 @@ import { enUS, es as esDateLocale } from 'date-fns/locale';
 import enCommon from './locales/en/common.json';
 import enRawMaterialsWarehouse from './locales/en/rawMaterialsWarehouse.json';
 import enCasting from './locales/en/casting.json';
+import enOrders from './locales/en/orders.json';
 import esCommon from './locales/es/common.json';
 import esRawMaterialsWarehouse from './locales/es/rawMaterialsWarehouse.json';
 import esCasting from './locales/es/casting.json';
+import esOrders from './locales/es/orders.json';
 
 // Языки интерфейса. Чтобы добавить новый — положить переводы в locales/<code>
 // и дописать язык сюда
@@ -34,14 +36,16 @@ i18n
         common: enCommon,
         rawMaterialsWarehouse: enRawMaterialsWarehouse,
         casting: enCasting,
+        orders: enOrders,
       },
       es: {
         common: esCommon,
         rawMaterialsWarehouse: esRawMaterialsWarehouse,
         casting: esCasting,
+        orders: esOrders,
       },
     },
-    ns: ['common', 'rawMaterialsWarehouse', 'casting'],
+    ns: ['common', 'rawMaterialsWarehouse', 'casting', 'orders'],
     defaultNS: 'common',
     fallbackLng: DEFAULT_LANGUAGE,
     supportedLngs: SUPPORTED_LANGUAGES.map((l) => l.code),

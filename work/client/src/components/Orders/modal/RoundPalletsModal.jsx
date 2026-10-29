@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { getUpdateProductInfoOfOrders } from '#components/redux/actions/ordersAction.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import {
@@ -20,6 +21,7 @@ import '../ordersView.css';
 // What was already liberated is a fact and stays untouched; the line's total
 // quantity_palet is what gets adjusted to fit the whole remainder.
 function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
+  const { t } = useTranslation('orders');
   const { latestProducts, productVersions } = useProductsContext();
   const dispatch = useDispatch();
   // Order line id -> catalog id of the package chosen for it.
@@ -75,12 +77,12 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
 
   const errorFor = (row) => {
     const raw = remainderValue(row);
-    if (raw === '') return 'Enter a whole number of pallets';
+    if (raw === '') return t('roundPallets.errors.enterWhole');
 
     const value = Number(raw);
-    if (!Number.isFinite(value)) return 'Not a number';
-    if (!Number.isInteger(value)) return 'Must be a whole number of pallets';
-    if (value <= 0) return 'Must be greater than 0';
+    if (!Number.isFinite(value)) return t('roundPallets.errors.notNumber');
+    if (!Number.isInteger(value)) return t('roundPallets.errors.mustBeWhole');
+    if (value <= 0) return t('roundPallets.errors.mustBePositive');
 
     return '';
   };
@@ -171,10 +173,10 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
         <div className="ord-modal-head">
           <div>
             <div className="ord-modal-head__title">
-              Round pallets before contracting
+              {t('roundPallets.title')}
             </div>
             <div className="ord-modal-head__subtitle">
-              order {orderCartData?.article}
+              {t('roundPallets.order', { article: orderCartData?.article })}
             </div>
           </div>
           <button type="button" className="ord-iconbtn" onClick={onHide}>
@@ -193,23 +195,25 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
           </button>
         </div>
         <div className="ord-modal-body">
-          <div className="ord-status-warn">
-            Liberar leaves these lines with a fractional number of pallets still
-            to ship. Set a whole number for each, or move the line to another
-            package to keep the same m² on whole pallets.
-          </div>
+          <div className="ord-status-warn">{t('roundPallets.warning')}</div>
 
           {rows.length === 0 ? (
-            <div className="ord-empty-products">No blocks in this order.</div>
+            <div className="ord-empty-products">
+              {t('roundPallets.noBlocks')}
+            </div>
           ) : (
             <table className="ord-liberar-table">
               <thead>
                 <tr>
-                  <th>Article</th>
-                  <th>Description</th>
-                  <th>Package</th>
-                  <th className="ord-liberar-table__num">Left to ship</th>
-                  <th className="ord-liberar-table__num">Whole pallets</th>
+                  <th>{t('roundPallets.article')}</th>
+                  <th>{t('roundPallets.description')}</th>
+                  <th>{t('roundPallets.package')}</th>
+                  <th className="ord-liberar-table__num">
+                    {t('roundPallets.leftToShip')}
+                  </th>
+                  <th className="ord-liberar-table__num">
+                    {t('roundPallets.wholePallets')}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -246,12 +250,15 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
                         )}
                       </td>
                       <td className="ord-liberar-table__num">
-                        {row.remaining} pal
+                        {row.remaining} {t('units.pal', { ns: 'common' })}
                         <div className="ord-liberar-sub">
                           {row.remainingM2} m²
                         </div>
                         <div className="ord-liberar-sub">
-                          {row.ordered} ordered − {row.liberated} liberated
+                          {t('roundPallets.orderedLiberated', {
+                            ordered: row.ordered,
+                            liberated: row.liberated,
+                          })}
                         </div>
                       </td>
                       <td className="ord-liberar-table__num">
@@ -266,11 +273,11 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
                           className="ord-liberar-qty"
                         />
                         <div className="ord-liberar-sub">
-                          same m² = {row.equivalent} pal
+                          {t('roundPallets.sameM2', { pallets: row.equivalent })}
                         </div>
                         {!error && (
                           <div className="ord-liberar-sub">
-                            → order total {newTotal} pal
+                            {t('roundPallets.orderTotal', { pallets: newTotal })}
                           </div>
                         )}
                         {error && (
@@ -291,7 +298,7 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
             onClick={onHide}
             disabled={loading}
           >
-            Cancel
+            {t('roundPallets.cancel')}
           </button>
           <button
             type="button"
@@ -299,7 +306,7 @@ function RoundPalletsModal({ show, onHide, orderCartData, blocks, onConfirm }) {
             onClick={handleConfirm}
             disabled={loading || !!blockingError || rows.length === 0}
           >
-            {loading ? 'Saving...' : 'Save and change status'}
+            {loading ? t('roundPallets.saving') : t('roundPallets.submit')}
           </button>
         </div>
       </div>

@@ -42,6 +42,7 @@ import OrderProductCardInfoModal from './modal/OrderProductCardInfoModal.jsx';
 import DatePicker from 'react-datepicker';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Select from 'react-select';
 import ListOfReservedProductsModal from '#components/Warehouse/ListOfReservedProducts/ListOfReservedProductsModal.jsx';
 import BlocksJournalTableOrder from './product_table_order/BlocksJournalTableOrder.jsx';
@@ -66,6 +67,7 @@ import LiberarModal from './modal/LiberarModal.jsx';
 import RoundPalletsModal from './modal/RoundPalletsModal.jsx';
 import { orderProductType } from './modal/packagingUtils.js';
 import { statusThemeFor } from './ordersCells.jsx';
+import { fieldLabel, statusLabel } from './ordersI18n.js';
 import {
   applyConfirmingSurchargeToProductLists,
   calcBlockPriceWithDelivery,
@@ -118,6 +120,7 @@ const OrderCart = React.memo(() => {
     setFilteredWarehouseByProduct,
   } = useWarehouseContext();
 
+  const { t, i18n } = useTranslation('orders');
   const dispatch = useDispatch();
 
   // При открытии карточки перечитываем БД: прямое изменение в DBeaver
@@ -172,11 +175,12 @@ const OrderCart = React.memo(() => {
     () => statusThemeFor(orderCartData?.status),
     [orderCartData?.status],
   );
-  const cardStatusLabel = useMemo(
-    () =>
-      status_list.find((s) => s.accessor === orderCartData?.status)?.Header || '',
-    [status_list, orderCartData?.status],
-  );
+  const cardStatusLabel = useMemo(() => {
+    const header = status_list.find(
+      (s) => s.accessor === orderCartData?.status,
+    )?.Header;
+    return header ? statusLabel(t, orderCartData?.status, header) : '';
+  }, [status_list, orderCartData?.status, t]);
 
   const [currentOrderedProduct, setCurrentOrderedProduct] = useState({});
 
@@ -230,12 +234,12 @@ const OrderCart = React.memo(() => {
           return (
             <div className="data-text" key={key}>
               <p>
-                {displayNames[key] || key}: {displayValue}
+                {fieldLabel(t, key, displayNames[key])}: {displayValue}
               </p>
             </div>
           );
         }),
-    [orderCartData],
+    [orderCartData, t],
   );
 
   const handleDateChange = useCallback((date) => {
@@ -251,7 +255,7 @@ const OrderCart = React.memo(() => {
     selectedDate.setHours(0, 0, 0, 0);
 
     if (selectedDate < currentDate) {
-      alert('The selected date cannot be before than the current date');
+      alert(t('alerts.dateBeforeToday'));
       return;
     }
 
@@ -268,7 +272,7 @@ const OrderCart = React.memo(() => {
 
   const saveShippingDateHandler = () => {
     if (!formatDataValue) {
-      return alert('Please select the shipping date.');
+      return alert(t('alerts.selectShippingDate'));
     }
 
     dispatch(
@@ -576,22 +580,22 @@ const OrderCart = React.memo(() => {
     );
 
     if (currentStatusIndex === -1 || newStatusIndex === -1) {
-      return alert('Unknown order status');
+      return alert(t('alerts.unknownStatus'));
     }
 
     if (newStatusIndex !== currentStatusIndex + 1) {
-      return alert('This status cannot be set');
+      return alert(t('alerts.statusCannotBeSet'));
     }
 
     if (!aproveAccounting) {
-      return alert("Please await accounting's verification");
+      return alert(t('alerts.awaitAccounting'));
     }
 
     const order_id = orderCartData?.id;
     const hasShippingDate = orderCartData?.shipping_date?.length > 0;
 
     if (status.accessor > statusByAccessor[4].accessor && !hasShippingDate) {
-      alert('Please save the shipping date before changing the status.');
+      alert(t('alerts.saveShippingDateFirst'));
       return;
     }
 
@@ -885,9 +889,7 @@ const OrderCart = React.memo(() => {
       (el) => el.orders_products_id === product.id,
     );
     if (res_prod) {
-      const confirmed = window.confirm(
-        'This product is reserved in the warehouse. Delete anyway?',
-      );
+      const confirmed = window.confirm(t('alerts.reservedDeleteConfirm'));
       if (!confirmed) return;
     }
     if (product?.product_article.charAt(0) === 'T') {
@@ -1194,7 +1196,7 @@ const OrderCart = React.memo(() => {
       parseFloat(String(agentCommissionDraft).replace(',', '.')) || 0;
 
     if (agent_commission < 0) {
-      alert('Agent commission cannot be negative');
+      alert(t('alerts.agentCommissionNegative'));
       return;
     }
 
@@ -1379,7 +1381,7 @@ const OrderCart = React.memo(() => {
             <h1 className="ord-card__article">{orderCartData?.article}</h1>
             <div className="ord-card__divider" />
             <div className="ord-card__field">
-              <div className="ord-tile__label">Project name</div>
+              <div className="ord-tile__label">{t('card.projectName')}</div>
               <div className="ord-tile__title">
                 {orderCartData?.deliveryAddress?.project_name}
               </div>
@@ -1389,7 +1391,7 @@ const OrderCart = React.memo(() => {
               <>
                 <div className="ord-card__divider" />
                 <div className="ord-card__field">
-                  <div className="ord-tile__label">Person in charge</div>
+                  <div className="ord-tile__label">{t('card.personInCharge')}</div>
                   <span style={{ minWidth: 200, display: 'inline-block' }}>
                     <Select
                       defaultValue={getSelectedOption(
@@ -1431,7 +1433,7 @@ const OrderCart = React.memo(() => {
                   navigate('/orders');
                 }}
               >
-                Delete order
+                {t('card.deleteOrder')}
               </button>
             )}
             {orderCartData.main_order == null && orderCartData?.status == 4 && (
@@ -1440,7 +1442,7 @@ const OrderCart = React.memo(() => {
                 className="ord-btn ord-btn--ghost"
                 onClick={() => setLiberarModalShow(true)}
               >
-                Liberar
+                {t('card.liberar')}
               </button>
             )}
           </div>
@@ -1449,12 +1451,12 @@ const OrderCart = React.memo(() => {
         <div className="ord-row">
           <div className="ord-tiles">
             <div className="ord-tile">
-              <div className="ord-tile__label">Client information</div>
+              <div className="ord-tile__label">{t('card.clientInformation')}</div>
               {filterAndMapData(orderCartData?.owner, filterKeysOrder)}
             </div>
 
             <div className="ord-tile">
-              <div className="ord-tile__label">Description</div>
+              <div className="ord-tile__label">{t('card.description')}</div>
               {orderCartData?.description && !isEditing ? (
                 <>
                   <div className="ord-tile__body-text">
@@ -1466,13 +1468,13 @@ const OrderCart = React.memo(() => {
                     style={{ marginTop: 10 }}
                     onClick={onEditHandler}
                   >
-                    Edit
+                    {t('card.edit')}
                   </button>
                 </>
               ) : (
                 <div className="ord-desc-edit">
                   <textarea
-                    placeholder="Enter description..."
+                    placeholder={t('card.descriptionPlaceholder')}
                     value={newDescription}
                     disabled={
                       !checkUserAccess(user, roles, 'orders_description_edit')
@@ -1487,14 +1489,14 @@ const OrderCart = React.memo(() => {
                       className="ord-btn ord-btn--primary ord-btn--sm"
                       onClick={() => onSaveDescription(newDescription)}
                     >
-                      Save
+                      {t('card.save')}
                     </button>
                   )}
                 </div>
               )}
 
               <div className="ord-tile__label" style={{ marginTop: 16 }}>
-                Otros
+                {t('card.otros')}
               </div>
               {orderCartData?.otros && !isEditingOtros ? (
                 <>
@@ -1505,13 +1507,13 @@ const OrderCart = React.memo(() => {
                     style={{ marginTop: 10 }}
                     onClick={onEditOtrosHandler}
                   >
-                    Edit
+                    {t('card.edit')}
                   </button>
                 </>
               ) : (
                 <div className="ord-desc-edit">
                   <textarea
-                    placeholder="Enter otros..."
+                    placeholder={t('card.otrosPlaceholder')}
                     value={newOtros}
                     disabled={
                       !checkUserAccess(user, roles, 'orders_description_edit')
@@ -1526,7 +1528,7 @@ const OrderCart = React.memo(() => {
                       className="ord-btn ord-btn--primary ord-btn--sm"
                       onClick={() => onSaveOtros(newOtros)}
                     >
-                      Save
+                      {t('card.save')}
                     </button>
                   )}
                 </div>
@@ -1536,9 +1538,11 @@ const OrderCart = React.memo(() => {
 
           {orderStatusAccess?.canRead && (
             <div className="ord-status-card">
-              <div className="ord-status-card__title">Order status</div>
+              <div className="ord-status-card__title">{t('card.orderStatus')}</div>
               {!aproveAccounting && (
-                <div className="ord-status-warn">Awaiting accounting approval</div>
+                <div className="ord-status-warn">
+                  {t('card.awaitingAccounting')}
+                </div>
               )}
               <div className="ord-steps">
                 {(() => {
@@ -1595,7 +1599,7 @@ const OrderCart = React.memo(() => {
                                   : '')
                           }
                         >
-                          {item.Header}
+                          {statusLabel(t, item.accessor, item.Header)}
                         </div>
                       </div>
                     );
@@ -1610,7 +1614,7 @@ const OrderCart = React.memo(() => {
           <div className="ord-tiles">
             <div className="ord-tile">
               <div className="ord-tile__head">
-                <div className="ord-tile__label">Delivery address</div>
+                <div className="ord-tile__label">{t('card.deliveryAddress')}</div>
                 {userAccess?.canWrite && orderCartData?.status < 3 && (
                   <ShowOrderDeliveryEditModal />
                 )}
@@ -1620,7 +1624,7 @@ const OrderCart = React.memo(() => {
 
             <div className="ord-tile">
               <div className="ord-tile__head">
-                <div className="ord-tile__label">Contact person</div>
+                <div className="ord-tile__label">{t('card.contactPerson')}</div>
                 {userAccess?.canWrite && orderCartData?.status < 3 && (
                   <ShowOrderContactEditModal />
                 )}
@@ -1631,7 +1635,7 @@ const OrderCart = React.memo(() => {
 
           <div className="ord-tile">
             <div className="ord-tile__label" style={{ marginBottom: 10 }}>
-              PDF &amp; Bitrix
+              {t('card.pdfBitrix')}
             </div>
             <PDFgenerate
               orderData={orderCartData}
@@ -1727,23 +1731,28 @@ const OrderCart = React.memo(() => {
         </div> */}
 
         <div className="ord-summary-card ord-summary-card--order">
-          <div className="ord-summary-card__title">Delivery info</div>
+          <div className="ord-summary-card__title">{t('card.deliveryInfo')}</div>
           <div className="ord-summary-rows">
             {orderCartData.status >= 4 ? (
               haveShipDate ? (
                 <div className="ord-tile__body-text">
-                  Shipping date: {haveShipDate} ({handleDayBeforShipping()} days
-                  before shipment)
+                  {t('card.shippingDateInfo', {
+                    date: haveShipDate,
+                    days: handleDayBeforShipping(),
+                  })}
                 </div>
               ) : (
                 <div className="ord-field">
-                  <label className="ord-field__label">Shipping date</label>
+                  <label className="ord-field__label">
+                    {t('card.shippingDate')}
+                  </label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <DatePicker
                       id="data_pcker"
                       selected={dataValue}
                       onChange={(date) => handleDateChange(date)}
                       dateFormat="dd.MM.yyyy"
+                      locale={i18n.language}
                       className="ord-liberar-date"
                     />
                     <button
@@ -1752,7 +1761,7 @@ const OrderCart = React.memo(() => {
                       onClick={saveShippingDateHandler}
                       disabled={!formatDataValue}
                     >
-                      Save
+                      {t('card.save')}
                     </button>
                   </div>
                 </div>
@@ -1760,7 +1769,7 @@ const OrderCart = React.memo(() => {
             ) : null}
             <div className="ord-summary-row">
               <span className="ord-summary-row__label">
-                Coste de envío explicito
+                {t('card.deliveryExplicit')}
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span className="ord-summary-old-value">
@@ -1791,14 +1800,14 @@ const OrderCart = React.memo(() => {
                         deliveryFunc();
                       }}
                     >
-                      Save
+                      {t('card.save')}
                     </button>
                   )}
               </span>
             </div>
             <div className="ord-summary-row">
               <span className="ord-summary-row__label">
-                Coste de envío absorbido
+                {t('card.deliveryAbsorbed')}
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span className="ord-summary-old-value">
@@ -1830,7 +1839,7 @@ const OrderCart = React.memo(() => {
                         deliveryM2Func();
                       }}
                     >
-                      Save
+                      {t('card.save')}
                     </button>
                   )}
               </span>
@@ -1838,16 +1847,22 @@ const OrderCart = React.memo(() => {
           </div>
 
           <div className="ord-summary-block">
-            <div className="ord-summary-card__title">Order summary</div>
+            <div className="ord-summary-card__title">
+              {t('card.orderSummary')}
+            </div>
             <div className="ord-summary-rows">
               <div className="ord-summary-row">
-                <span className="ord-summary-row__label">VAT origin, €</span>
+                <span className="ord-summary-row__label">
+                  {t('card.vatOrigin')}
+                </span>
                 <span className="ord-summary-row__value">
                   {vatValue.vat_euro_origin}
                 </span>
               </div>
               <div className="ord-summary-row">
-                <span className="ord-summary-row__label">VAT, %</span>
+                <span className="ord-summary-row__label">
+                  {t('card.vatPercent')}
+                </span>
                 <span className="ord-summary-row__value">
                   {vatValue.vat_procent}
                 </span>
@@ -1872,11 +1887,15 @@ const OrderCart = React.memo(() => {
                 /> */}
               </div>
               <div className="ord-summary-row">
-                <span className="ord-summary-row__label">VAT, €</span>
+                <span className="ord-summary-row__label">
+                  {t('card.vatEuro')}
+                </span>
                 <span className="ord-summary-row__value">{vatValue.vat_euro}</span>
               </div>
               <div className="ord-summary-row">
-                <span className="ord-summary-row__label">Payment method</span>
+                <span className="ord-summary-row__label">
+                  {t('card.paymentMethod')}
+                </span>
                 <span style={{ minWidth: 220 }}>
                   <Select
                     value={getSelectedPaymentMethodOption(
@@ -1893,7 +1912,7 @@ const OrderCart = React.memo(() => {
               {confirmingSurchargeRate > 0 && (
                 <div className="ord-summary-row">
                   <span className="ord-summary-row__label">
-                    Confirming surcharge
+                    {t('card.confirmingSurcharge')}
                   </span>
                   <label
                     style={{
@@ -1909,12 +1928,16 @@ const OrderCart = React.memo(() => {
                       onChange={handleConfirmingSurchargeChange}
                       disabled={orderCartData?.status >= 5}
                     />
-                    +{confirmingSurchargeRate.toFixed(1)}% to all products
+                    {t('card.confirmingSurchargeToAll', {
+                      rate: confirmingSurchargeRate.toFixed(1),
+                    })}
                   </label>
                 </div>
               )}
               <div className="ord-summary-row">
-                <span className="ord-summary-row__label">Agent commission, %</span>
+                <span className="ord-summary-row__label">
+                  {t('card.agentCommission')}
+                </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <input
                     type="text"
@@ -1936,20 +1959,20 @@ const OrderCart = React.memo(() => {
                       className="ord-btn ord-btn--ghost ord-btn--sm"
                       onClick={agentCommissionFunc}
                     >
-                      Save
+                      {t('card.save')}
                     </button>
                   )}
                 </span>
               </div>
               <div className="ord-summary-divider" />
               <div className="ord-summary-row ord-summary-row--total">
-                <span className="ord-summary-row__label">Result</span>
+                <span className="ord-summary-row__label">{t('card.result')}</span>
                 <span className="ord-summary-row__value">{vatValue.vat_result}</span>
               </div>
               {vatValue.vat_result_del > 0 ? (
                 <div className="ord-summary-row ord-summary-row--total ord-summary-row--accent">
                   <span className="ord-summary-row__label">
-                    Result with delivery
+                    {t('card.resultWithDelivery')}
                   </span>
                   <span className="ord-summary-row__value">
                     {vatValue.vat_result_del}
@@ -1969,7 +1992,7 @@ const OrderCart = React.memo(() => {
             className="ord-btn ord-btn--primary"
             onClick={() => navigate('/orders')}
           >
-            Save and show order list
+            {t('card.saveAndShowList')}
           </button>
         </div>
       </div>

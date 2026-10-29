@@ -2,6 +2,8 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { Button } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
+import { fieldLabel } from '../ordersI18n.js';
 import AddRelatedMaterialProductModal from '../modal/addProductModal/AddRelatedMaterialProductModal';
 import { useState } from 'react';
 import ReturnCheckbox from './ReturnCheckbox';
@@ -16,6 +18,7 @@ const RelatedMaterialJournalTableOrder = ({
   vatValue,
   setVatValue,
 }) => {
+  const { t } = useTranslation('orders');
   const { setNewOrder, orderCartData } = useOrderContext();
   const {
     relatedMaterialProductModalOrder,
@@ -53,17 +56,21 @@ const RelatedMaterialJournalTableOrder = ({
           <span className="ord-badge" style={{ background: '#e9f6ed', color: '#16a34a' }}>
             Consumible
           </span>
-          <div className="ord-prod-card__title">Related Materials</div>
+          <div className="ord-prod-card__title">{t('products.relatedMaterialsTitle')}</div>
         </div>
         <div className="ord-prod-table-wrap">
           <table className="product-table ord-prod-table">
             <thead>
               <tr>
                 {columns.map((key) => (
-                  <th key={key}>{displayNames[key] || key}</th>
+                  <th key={key}>
+                    {key === 'total'
+                      ? fieldLabel(t, 'totalUd')
+                      : fieldLabel(t, key, displayNames[key])}
+                  </th>
                 ))}
-                <th>Return</th>
-                <th>Delete</th>
+                <th>{t('products.return')}</th>
+                <th>{t('products.delete')}</th>
               </tr>
             </thead>
 
@@ -85,9 +92,13 @@ const RelatedMaterialJournalTableOrder = ({
 
                     <td onClick={(e) => e.stopPropagation()}>
                       {product?.final_price < 0 ? (
-                        <span className="ord-return-text ord-return-text--active">Return</span>
+                        <span className="ord-return-text ord-return-text--active">
+                          {t('products.return')}
+                        </span>
                       ) : (
-                        <span className="ord-return-text">No return</span>
+                        <span className="ord-return-text">
+                          {t('products.noReturn')}
+                        </span>
                       )}
                       {/* <ReturnCheckbox
                         product={product}
@@ -106,7 +117,7 @@ const RelatedMaterialJournalTableOrder = ({
                           className="ord-mini-btn ord-mini-btn--danger ord-btn"
                           onClick={() => deleteHandler(product)}
                         >
-                          Delete
+                          {t('products.delete')}
                         </Button>
                       )}
                     </td>
@@ -133,7 +144,7 @@ const RelatedMaterialJournalTableOrder = ({
                         );
                       }}
                     >
-                      + Add product
+                      {t('products.addProduct')}
                     </Button>
                   </td>
                 </tr>

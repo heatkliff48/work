@@ -2,6 +2,8 @@ import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
 import { Button } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
+import { fieldLabel } from '../ordersI18n.js';
 import AddProductOrderModal from '../modal/addProductModal/AddProductOrderModal';
 import { applyDiscount } from '../blockDeliveryPrice.js';
 import '../ordersView.css';
@@ -14,6 +16,7 @@ const BlocksJournalTableOrder = ({
   deleteHandler,
   displayNames = {},
 }) => {
+  const { t } = useTranslation('orders');
   const { setNewOrder, orderCartData } = useOrderContext();
   const { productModalOrder, setProductModalOrder } = useModalContext();
   const { userAccess } = useUsersContext();
@@ -60,16 +63,16 @@ const BlocksJournalTableOrder = ({
           >
             Bloque
           </span>
-          <div className="ord-prod-card__title">HCCA Blocks</div>
+          <div className="ord-prod-card__title">{t('products.blocksTitle')}</div>
         </div>
         <div className="ord-prod-table-wrap">
           <table className="product-table ord-prod-table">
             <thead>
               <tr>
                 {columns.map((key) => (
-                  <th key={key}>{displayNames[key] || key}</th>
+                  <th key={key}>{fieldLabel(t, key, displayNames[key])}</th>
                 ))}
-                <th>Actions</th>
+                <th>{t('products.actions')}</th>
               </tr>
             </thead>
 
@@ -118,7 +121,7 @@ const BlocksJournalTableOrder = ({
                           className="ord-mini-btn ord-btn ord-btn--ghost"
                           onClick={() => productHandler(product)}
                         >
-                          Show batch
+                          {t('products.showBatch')}
                         </Button>
                       ) : (
                         orderCartData?.status < 3 && (
@@ -128,7 +131,7 @@ const BlocksJournalTableOrder = ({
                             className="ord-mini-btn ord-mini-btn--danger ord-btn"
                             onClick={() => deleteHandler(product)}
                           >
-                            Delete
+                            {t('products.delete')}
                           </Button>
                         )
                       )}
@@ -154,7 +157,7 @@ const BlocksJournalTableOrder = ({
                         setProductModalOrder(!productModalOrder);
                       }}
                     >
-                      + Add product
+                      {t('products.addProduct')}
                     </Button>
                   </td>
                 </tr>

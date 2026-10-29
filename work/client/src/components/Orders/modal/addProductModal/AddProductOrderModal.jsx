@@ -8,6 +8,7 @@ import {
   getUpdateProductOfOrders,
 } from '#components/redux/actions/ordersAction.js';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import '#components/Styles/modals.css';
 import { useProjectContext } from '#components/contexts/Context.js';
@@ -20,6 +21,7 @@ import {
   piecesForLinearMetres,
   piecesPerQuantityUnit,
 } from '../packagingUtils.js';
+import { fieldLabel, translateColumns } from '../../ordersI18n.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -72,6 +74,16 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   } = useOrderContext();
   const { COLUMNS, latestProducts } = useProductsContext();
   const { clientPriceInfo } = useProjectContext();
+  const { t } = useTranslation('orders');
+
+  const orderColumns = useMemo(
+    () => translateColumns(t, COLUMNS_ORDER_PRODUCT),
+    [COLUMNS_ORDER_PRODUCT, t],
+  );
+  const [pricePieceColumn, quantityPiecesField] = translateColumns(t, [
+    PRICE_PIECE_COLUMN,
+    QUANTITY_PIECES_FIELD,
+  ]);
 
   const dispatch = useDispatch();
 
@@ -371,7 +383,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     const final_price = parseLocalNumber(productOfOrder.final_price) || 0;
 
     if (!quantityM2 || !quantity_palet || !quantity_real) {
-      alert('Cannot add product with 0 quantity!');
+      alert(t('alerts.zeroQuantity'));
       return;
     }
 
@@ -429,15 +441,15 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
           }}
         >
           {haveProduct ? (
-            <p>Fill in the remaining parameters</p>
+            <p>{t('productModal.fillRemaining')}</p>
           ) : (
-            <p>Select product</p>
+            <p>{t('productModal.selectProduct')}</p>
           )}
         </ModalHeader>
         <ModalBody>
           {haveProduct ? (
             <>
-              {COLUMNS_ORDER_PRODUCT?.map((el) => {
+              {orderColumns.map((el) => {
                 if (el.accessor === 'product_id') return null;
                 if (el.accessor === 'product_title') {
                   return (
@@ -460,7 +472,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                       <InputField
                         el={el}
                         uBlockHeader={
-                          isLinear ? 'Price, EURO per linear metre' : ''
+                          isLinear ? fieldLabel(t, 'price_linear') : ''
                         }
                         inputValue={{ price_m2: priceM2Display }}
                         inputValueChange={handlePriceM2Change}
@@ -469,7 +481,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                       />
                       {piecesPerUnit > 0 && (
                         <InputField
-                          el={PRICE_PIECE_COLUMN}
+                          el={pricePieceColumn}
                           inputValue={{ price_piece: pricePieceDisplay }}
                           inputValueChange={handlePricePieceChange}
                           onBlur={() => setPricePieceDraft(null)}
@@ -499,7 +511,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                   return (
                     <React.Fragment key={el.accessor}>
                       <ModalBody>
-                        {isLinear ? 'Real quantity, linear metre' : el.Header}:
+                        {isLinear ? fieldLabel(t, 'quantity_real_linear') : el.Header}:
                       </ModalBody>
                       <input
                         type="text"
@@ -517,7 +529,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                     <React.Fragment key={el.accessor}>
                       <InputField
                         el={el}
-                        uBlockHeader={isLinear ? 'Quantity, linear metre' : ''}
+                        uBlockHeader={isLinear ? fieldLabel(t, 'quantity_linear') : ''}
                         inputValue={productOfOrder}
                         inputValueChange={handleQuantityM2Change}
                         onBlur={handleQuantityM2Blur}
@@ -525,7 +537,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
                       />
                       {isLinear && (
                         <InputField
-                          el={QUANTITY_PIECES_FIELD}
+                          el={quantityPiecesField}
                           inputValue={{ quantity_pcs: quantityPiecesDisplay }}
                           inputValueChange={handleQuantityPiecesChange}
                           onBlur={handleQuantityPiecesBlur}
@@ -594,7 +606,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
               )}
               onClickButton={() => {}}
               buttonText={''}
-              tableName={'Products'}
+              tableName={t('productModal.productsTable')}
               handleRowClick={(row) => {
                 handlerAddProductOrder(row);
               }}
@@ -605,7 +617,9 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
           <></>
         ) : (
           <ModalFooter>
-            <button onClick={addProductOrder}>Add product</button>
+            <button onClick={addProductOrder}>
+              {t('productModal.addProduct')}
+            </button>
           </ModalFooter>
         )}
       </Modal>

@@ -8,8 +8,10 @@ import AddClientOrderModal from './modal/AddClientOrderModal';
 import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import RandomAhhOrder from './RandomAhhOrder';
 import { ArticleMonoCell, makeStatusPillCell } from './ordersCells';
+import { statusLabel } from './ordersI18n.js';
 import './ordersView.css';
 import {
   getAllClients,
@@ -34,26 +36,56 @@ function OrdersTable() {
   const { roles, checkUserAccess, userAccess, setUserAccess } =
     useUsersContext();
 
+  const { t } = useTranslation('orders');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.user);
 
+  // Статусы с переведённым Header: по нему пилюля находит цвет
+  // в переведённых данных таблицы
+  const translatedStatusList = useMemo(
+    () =>
+      (status_list || []).map((s) => ({
+        ...s,
+        Header: statusLabel(t, s.accessor, s.Header),
+      })),
+    [status_list, t],
+  );
+
   // Только вид: подмешиваем Cell-рендереры поверх уже существующих
   // колонок из контекста (accessor/данные не трогаем).
   const StatusPillCell = useMemo(
-    () => makeStatusPillCell(status_list),
-    [status_list],
+    () => makeStatusPillCell(translatedStatusList),
+    [translatedStatusList],
   );
   const displayColumns = useMemo(
     () =>
       (COLUMNS_ORDERS || []).map((col) => {
+        const Header = t(`columns.${col.accessor}`, { defaultValue: col.Header });
         if (col.accessor === 'article')
-          return { ...col, Cell: ArticleMonoCell };
-        if (col.accessor === 'status') return { ...col, Cell: StatusPillCell };
-        return col;
+          return { ...col, Header, Cell: ArticleMonoCell };
+        if (col.accessor === 'status')
+          return { ...col, Header, Cell: StatusPillCell };
+        return { ...col, Header };
       }),
-    [COLUMNS_ORDERS, StatusPillCell],
+    [COLUMNS_ORDERS, StatusPillCell, t],
+  );
+
+  // В ordersDataList статус — английский Header из status_list (его же
+  // использует Accounting), а ответственного нет — 'None'
+  const tableData = useMemo(
+    () =>
+      (ordersDataList || []).map((o) => {
+        const statusDef = (status_list || []).find((s) => s.Header === o.status);
+        return {
+          ...o,
+          status: statusDef ? statusLabel(t, statusDef.accessor, o.status) : o.status,
+          person_in_charge:
+            o.person_in_charge === 'None' ? t('none') : o.person_in_charge,
+        };
+      }),
+    [ordersDataList, status_list, t],
   );
 
   const totalCount = ordersDataList?.length || 0;
@@ -102,31 +134,31 @@ function OrdersTable() {
       <div className="ord-page">
         <div className="ord-page__head">
           <div>
-            <div className="ord-page__eyebrow">Sales</div>
-            <h1 className="ord-page__title">Orders</h1>
+            <div className="ord-page__eyebrow">{t('eyebrow')}</div>
+            <h1 className="ord-page__title">{t('title')}</h1>
           </div>
           <div className="ord-page__stats">
             <div className="ord-stat">
               <div className="ord-stat__num">{totalCount}</div>
-              <div className="ord-stat__label">Total orders</div>
+              <div className="ord-stat__label">{t('totalOrders')}</div>
             </div>
             <div className="ord-stat__divider" />
             <div className="ord-stat">
               <div className="ord-stat__num">{inProductionCount}</div>
-              <div className="ord-stat__label">In production</div>
+              <div className="ord-stat__label">{t('inProduction')}</div>
             </div>
           </div>
         </div>
 
         <Table
           COLUMN_DATA={displayColumns}
-          dataOfTable={ordersDataList}
+          dataOfTable={tableData}
           userAccess={userAccess}
-          tableName={'Orders'}
+          tableName={t('title')}
           variant="card"
           hideTitle
-          emptyTitle="No orders match your search"
-          emptySubtitle="Try a different order number, client or project name."
+          emptyTitle={t('emptyTitle')}
+          emptySubtitle={t('emptySubtitle')}
           handleRowClick={(row) => {
             console.log('row.original', row.original);
             getCurrentOrderInfoHandler(row.original);
@@ -152,7 +184,7 @@ function OrdersTable() {
                 <input
                   type="text"
                   className="ord-search__input"
-                  placeholder="Search by order, client or project…"
+                  placeholder={t('searchPlaceholder')}
                   value={globalFilter || ''}
                   onChange={(e) => setGlobalFilter(e.target.value || undefined)}
                 />
@@ -179,7 +211,7 @@ function OrdersTable() {
                     <path d="M9 12h6" />
                     <path d="M12 9v6" />
                   </svg>
-                  Add new order
+                  {t('addNewOrder')}
                 </button>
               )}
             </div>

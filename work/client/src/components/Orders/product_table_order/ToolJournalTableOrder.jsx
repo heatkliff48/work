@@ -2,6 +2,8 @@ import { useModalContext } from "#components/contexts/ModalContext.js";
 import { useOrderContext } from "#components/contexts/OrderContext.js";
 import { useUsersContext } from "#components/contexts/UserContext.js";
 import { Button } from "reactstrap";
+import { useTranslation } from "react-i18next";
+import { fieldLabel } from "../ordersI18n.js";
 import AddToolProductModal from "../modal/addProductModal/AddToolProductModal";
 import "../ordersView.css";
 
@@ -12,6 +14,7 @@ const ToolJournalTableOrder = ({
   deleteHandler,
   displayNames = {},
 }) => {
+  const { t } = useTranslation("orders");
   const { setNewOrder, orderCartData } = useOrderContext();
   const { toolProductModalOrder, setToolProductModalOrder } = useModalContext();
   const { userAccess } = useUsersContext();
@@ -33,16 +36,20 @@ const ToolJournalTableOrder = ({
           <span className="ord-badge" style={{ background: "#efe9fb", color: "#7c3aed" }}>
             Herramienta
           </span>
-          <div className="ord-prod-card__title">Tools</div>
+          <div className="ord-prod-card__title">{t("products.toolsTitle")}</div>
         </div>
         <div className="ord-prod-table-wrap">
           <table className="product-table ord-prod-table">
             <thead>
               <tr>
                 {columns.map((key) => (
-                  <th key={key}>{displayNames[key] || key}</th>
+                  <th key={key}>
+                    {key === "total"
+                      ? fieldLabel(t, "totalUd")
+                      : fieldLabel(t, key, displayNames[key])}
+                  </th>
                 ))}
-                <th>Actions</th>
+                <th>{t("products.actions")}</th>
               </tr>
             </thead>
 
@@ -70,7 +77,7 @@ const ToolJournalTableOrder = ({
                           className="ord-mini-btn ord-mini-btn--danger ord-btn"
                           onClick={() => deleteHandler(product)}
                         >
-                          Delete
+                          {t("products.delete")}
                         </Button>
                       )}
                     </td>
@@ -95,7 +102,7 @@ const ToolJournalTableOrder = ({
                         setToolProductModalOrder(!toolProductModalOrder);
                       }}
                     >
-                      + Add product
+                      {t("products.addProduct")}
                     </Button>
                   </td>
                 </tr>

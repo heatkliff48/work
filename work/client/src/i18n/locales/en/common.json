@@ -6,12 +6,15 @@
   "no": "No",
   "pageTitles": {
     "warehouse_raw_materials": "Raw Materials Warehouse",
-    "cake_fillup": "Casting"
+    "cake_fillup": "Casting",
+    "orders": "Orders",
+    "order_card": "Order cart"
   },
   "table": {
     "globalSearch": "Global search:",
     "records": "{{count}} records...",
-    "search": "Search..."
+    "search": "Search...",
+    "all": "All"
   },
   "files": {
     "upload": "Upload",
@@ -23,11 +26,18 @@
     "serverError": "There was a problem with the server",
     "downloadError": "Error downloading the file"
   },
+  "validation": {
+    "required": "This field can't be empty",
+    "invalidNumber": "Invalid number format",
+    "min": "Must be higher than {{value}}",
+    "max": "Must be lower than {{value}}"
+  },
   "units": {
     "kg": "kg",
     "pieces": "pieces",
     "l": "L",
-    "t": "t"
+    "t": "t",
+    "pal": "pal"
   },
   "materials": {
     "Sand (dry)": "Sand (dry)",
