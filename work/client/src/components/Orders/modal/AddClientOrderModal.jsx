@@ -6,14 +6,11 @@ import { useOrderContext } from '../../contexts/OrderContext';
 import { useProjectContext } from '#components/contexts/Context.js';
 import DeliveryAddress from '#components/Clients/DeliveryAddress/DeliveryAddress.js';
 import ClientsContactInfo from '#components/Clients/ClientsContactInfo/ClientsContactInfo.js';
-import {
-  addNewOrder,
-  getOrders,
-} from '#components/redux/actions/ordersAction.js';
+import { createNewOrderRequest } from '#components/redux/actions/ordersAction.js';
+import { errorToText } from '#components/Utils/errorToText.js';
 import ShowClientsModal from '#components/Clients/ClientsInfo/ClientsInfoModal.js';
 import ShowDeliveryAddressModal from '#components/Clients/DeliveryAddress/DeliveryAddressModal';
 import ShowClientsContactInfoModal from '#components/Clients/ClientsContactInfo/ClientsContactInfoModal';
-import { useModalContext } from '#components/contexts/ModalContext.js';
 import Table from '#components/Table/Table';
 import '#components/Styles/modals.css';
 import '#components/Clients/ClientsInfo/clientsDrawer.css';
@@ -25,12 +22,9 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     newOrder,
     setNewOrder,
     status_list,
-    list_of_orders,
-    getCurrentOrderInfoHandler,
     isOrderReady,
     setIsOrderReady,
   } = useOrderContext();
-  const { clientModalOrder, setClientModalOrder } = useModalContext();
   const { setCurrentClient, clients_info_table } = useProjectContext();
   const { t } = useTranslation('orders');
 
@@ -67,12 +61,16 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   const list_of_clients = useSelector((state) => state.clients);
 
   const [searchFilter, setSearchFilter] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  // Текст ошибки висит в модалке до следующей попытки: уведомление в углу
+  // экрана пропадает и его легко не заметить
+  const [createError, setCreateError] = useState(null);
   const [listOfClientsFiltered, setListOfClientsFiltered] =
     useState(list_of_clients);
 
   let haveClient = useMemo(
-    () => newOrder?.article ?? false,
-    [newOrder?.article],
+    () => newOrder?.owner ?? false,
+    [newOrder?.owner],
   );
   let haveAdddress = useMemo(
     () => newOrder?.del_adr_id ?? false,
@@ -87,42 +85,11 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
     console.log(newOrder, 'newOrder AddClientOrderModal.jsx line 53');
   }, [newOrder]);
 
-  const getOrderArticle = () => {
-    let versionNumber = '0001';
-    const year = new Date().getFullYear().toString().slice(-2);
-    const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
-    const day = new Date().getDate().toString().padStart(2, '0');
-
-    const currentDate = `${day}${month}${year}`;
-
-    const ordersWithSameDate = list_of_orders.filter((order) =>
-      order.article?.includes(currentDate),
-    );
-
-    if (ordersWithSameDate.length > 0) {
-      const lastNumbers = ordersWithSameDate.map((order) => {
-        const match = order.article.match(/(\d{8})$/);
-        return match ? parseInt(match[1], 10) : 0;
-      });
-
-      const maxNumber = Math.max(...lastNumbers);
-
-      versionNumber = `0000000${maxNumber + 1}`.slice(-8);
-    } else {
-      versionNumber = `00000001`;
-    }
-
-    const orderArticle = `Z0000${currentDate}${versionNumber}`;
-
-    return orderArticle;
-  };
-
+  // Номер заказа присваивает сервер при создании
   const addClientOrderHendler = async (id) => {
-    const article = getOrderArticle();
     const client = list_of_clients.find((el) => el.id === id);
 
     setNewOrder({
-      article,
       owner: id,
       status: status_list[0].accessor,
       person_in_charge: 0,
@@ -149,6 +116,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   };
 
   const regionHandler = (regionOption) => {
+    if (isCreating) return;
     // setValue(selectedOption.value);
     setNewOrder((prev) => ({ ...prev, region: regionOption }));
   };
@@ -162,17 +130,26 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
   // };
 
   useEffect(() => {
-    if (newOrder?.contact_id && newOrder?.del_adr_id && newOrder?.region) {
-      setIsOrderReady(true);
-      dispatch(addNewOrder(newOrder));
-      dispatch(getOrders());
-      getCurrentOrderInfoHandler(newOrder);
-      setClientModalOrder(!clientModalOrder);
+    if (!(newOrder?.contact_id && newOrder?.del_adr_id && newOrder?.region)) {
       setIsOrderReady(false);
-      toggle();
-    } else {
-      setIsOrderReady(false);
+      return;
     }
+
+    // Закрываем модалку только после ответа сервера: иначе при ошибке
+    // или зависшем запросе пользователь не видит, что заказ не создан
+    const { action, promise } = createNewOrderRequest(newOrder);
+    setIsCreating(true);
+    setCreateError(null);
+    dispatch(action);
+
+    promise
+      .then(() => toggle())
+      .catch((err) => {
+        setIsCreating(false);
+        setCreateError(errorToText(err));
+        // Без сброса повторный клик по тому же региону не запустит создание
+        setNewOrder((prev) => ({ ...prev, region: undefined }));
+      });
   }, [newOrder?.contact_id, newOrder?.del_adr_id, newOrder?.region]);
 
   useEffect(() => {
@@ -255,7 +232,10 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
             {haveClient ? (
               haveAdddress ? (
                 haveContactInfo ? (
-                  <div className="cl-cardlist">
+                  <div
+                    className="cl-cardlist"
+                    style={isCreating ? { opacity: 0.6 } : undefined}
+                  >
                     {regionOptions.map((option) => (
                       <div
                         key={option.value}
@@ -341,7 +321,7 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
         </div>
         <div className="ord-modal-foot ord-modal-foot--between">
           <div>
-            {haveClient && (
+            {haveClient && !isCreating && (
               <button
                 type="button"
                 className="ord-btn ord-btn--ghost"
@@ -351,7 +331,17 @@ const AddClientOrderModal = React.memo(({ isOpen, toggle }) => {
               </button>
             )}
           </div>
-          <div />
+          <div className="ord-modal-head__subtitle">
+            {isCreating && t('newOrder.creating')}
+            {createError && (
+              <div style={{ color: '#c62828' }}>
+                <div>{t('newOrder.createFailed')}</div>
+                <div>
+                  {t('newOrder.createFailedReason', { reason: createError })}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

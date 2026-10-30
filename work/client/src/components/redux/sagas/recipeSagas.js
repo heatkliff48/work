@@ -34,10 +34,12 @@ import {
 } from '../types/socketTypes/socket';
 
 import { getApiUrl } from '#utils/getApiUrl.js';
+import { REQUEST_TIMEOUT } from '#utils/requestTimeout.js';
 
 const url = axios.create({
   baseURL: getApiUrl(),
   withCredentials: true,
+  timeout: REQUEST_TIMEOUT,
 });
 
 const getRecipe = () => {

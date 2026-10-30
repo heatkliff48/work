@@ -48,11 +48,48 @@ export const getOrders = () => {
   };
 };
 
-export const addNewOrder = (order) => {
+export const addNewOrder = (order, requestId = null) => {
   return {
     type: ADD_NEW_ORDER,
     payload: order,
+    ...(requestId ? { meta: { requestId } } : {}),
   };
+};
+
+// Позволяет дождаться ответа сервера на создание заказа: сага по requestId
+// разрешает или отклоняет промис, который получает компонент
+const pendingNewOrderRequests = new Map();
+let newOrderRequestSequence = 0;
+
+export const createNewOrderRequest = (order) => {
+  newOrderRequestSequence += 1;
+
+  const requestId = `new-order-${Date.now()}-${newOrderRequestSequence}`;
+
+  const promise = new Promise((resolve, reject) => {
+    pendingNewOrderRequests.set(requestId, { resolve, reject });
+  });
+
+  return {
+    action: addNewOrder(order, requestId),
+    promise,
+  };
+};
+
+export const resolveNewOrderRequest = (requestId, result) => {
+  const pendingRequest = pendingNewOrderRequests.get(requestId);
+  if (!pendingRequest) return;
+
+  pendingNewOrderRequests.delete(requestId);
+  pendingRequest.resolve(result);
+};
+
+export const rejectNewOrderRequest = (requestId, error) => {
+  const pendingRequest = pendingNewOrderRequests.get(requestId);
+  if (!pendingRequest) return;
+
+  pendingNewOrderRequests.delete(requestId);
+  pendingRequest.reject(error);
 };
 
 export const addChildOrder = (childOrder) => {

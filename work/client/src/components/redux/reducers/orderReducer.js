@@ -1,4 +1,4 @@
-import { ORDERS_LIST } from '../types/ordersTypes';
+import { NEW_ORDER, ORDERS_LIST } from '../types/ordersTypes';
 import {
   ACCOUNTING_APPROVED_SOCKET,
   CHILD_ORDER_SOCKET,
@@ -49,8 +49,14 @@ export const ordersReducer = (orders = [], action) => {
       return Array.isArray(payload) ? payload : orders;
     }
 
+    // Свой новый заказ приходит дважды: ответом на запрос и по WebSocket
+    case NEW_ORDER:
     case NEW_ORDER_SOCKET: {
-      return [...orders, payload];
+      if (payload?.id == null) return orders;
+      const exists = orders.some(
+        (order) => String(order.id) === String(payload.id),
+      );
+      return exists ? orders : [...orders, payload];
     }
 
     case CHILD_ORDER_SOCKET: {

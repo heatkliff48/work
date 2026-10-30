@@ -30,10 +30,12 @@ import {
 } from '../types/productsTypeWarehouseTypes';
 
 import { getApiUrl } from '#utils/getApiUrl.js';
+import { REQUEST_TIMEOUT } from '#utils/requestTimeout.js';
 
 const url = axios.create({
   baseURL: getApiUrl(),
   withCredentials: true,
+  timeout: REQUEST_TIMEOUT,
 });
 
 const getDryMixesWarehouse = () => {

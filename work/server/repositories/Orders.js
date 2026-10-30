@@ -192,6 +192,52 @@ const updateOrderProduct = async (
   return product;
 });
 
+// Номер заказа: Z0000 + дата ДДММГГ + порядковый номер за день из 8 цифр.
+// Раньше номер считал браузер по своему (возможно устаревшему) списку
+// заказов, и два заказа могли получить один номер
+const ORDER_ARTICLE_PREFIX = 'Z0000';
+
+const pad2 = (value) => String(value).padStart(2, '0');
+
+// Дату берём у клиента (ДДММГГ), чтобы номер совпадал с днём пользователя,
+// а не с часовым поясом сервера
+const getArticleDate = (articleDate) => {
+  const match = /^(\d{2})(\d{2})\d{2}$/.exec(articleDate ?? '');
+  if (match && +match[1] >= 1 && +match[1] <= 31 && +match[2] >= 1 && +match[2] <= 12) {
+    return articleDate;
+  }
+  const now = new Date();
+  return `${pad2(now.getDate())}${pad2(now.getMonth() + 1)}${pad2(now.getFullYear() % 100)}`;
+};
+
+// Блокировка до конца транзакции: параллельные создания заказов ждут
+// друг друга и не могут выдать один и тот же номер
+const lockOrderArticles = async (transaction) => {
+  if (Orders.sequelize.getDialect() !== 'postgres') return;
+  await Orders.sequelize.query("SELECT pg_advisory_xact_lock(hashtext('orders.article'))", {
+    transaction,
+  });
+};
+
+const nextOrderArticle = async (articleDate, transaction) => {
+  const prefix = `${ORDER_ARTICLE_PREFIX}${getArticleDate(articleDate)}`;
+  const sameDayOrders = await Orders.findAll({
+    attributes: ['article'],
+    where: { article: { [Op.startsWith]: prefix } },
+    transaction,
+  });
+  const maxNumber = sameDayOrders.reduce((max, { article }) => {
+    const match = /(\d{8})$/.exec(article);
+    return match ? Math.max(max, parseInt(match[1], 10)) : max;
+  }, 0);
+  return `${prefix}${String(maxNumber + 1).padStart(8, '0')}`;
+};
+
+// Ключ попытки создания от клиента: повторная отправка того же заказа
+// (после обрыва связи) возвращает уже созданный заказ, а не дубль
+const getClientRequestId = (value) =>
+  typeof value === 'string' && value.length > 0 && value.length <= 64 ? value : null;
+
 class OrdersRepository {
   static async getOrdersListData() {
     try {
@@ -206,11 +252,34 @@ class OrdersRepository {
     }
   }
 
-  static async addNewOrderData(new_order) {
+  // Возвращает { order, created }: created = false, если заказ с этим
+  // client_request_id уже был создан предыдущей попыткой
+  static async addNewOrderData({ article_date, client_request_id, ...new_order }) {
     try {
-      const order = await Orders.create({ ...new_order, pdf_updated_at: new Date() });
+      const requestId = getClientRequestId(client_request_id);
 
-      return order;
+      return await Orders.sequelize.transaction(async (transaction) => {
+        await lockOrderArticles(transaction);
+
+        if (requestId) {
+          const existingOrder = await Orders.findOne({
+            where: { client_request_id: requestId },
+            transaction,
+          });
+          if (existingOrder) return { order: existingOrder, created: false };
+        }
+
+        const order = await Orders.create(
+          {
+            ...new_order,
+            article: await nextOrderArticle(article_date, transaction),
+            client_request_id: requestId,
+            pdf_updated_at: new Date(),
+          },
+          { transaction },
+        );
+        return { order, created: true };
+      });
     } catch (error) {
       console.log(
         '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
@@ -1202,7 +1271,7 @@ class OrdersRepository {
   }
 
   static async addChildOrder({
-    article,
+    article_date,
     owner,
     del_adr_id,
     contact_id,
@@ -1224,8 +1293,9 @@ class OrdersRepository {
   }) {
     try {
       const { childOrder, createdProducts } = await Orders.sequelize.transaction(async (transaction) => {
+        await lockOrderArticles(transaction);
         const childOrder = await Orders.create({
-          article,
+          article: await nextOrderArticle(article_date, transaction),
           owner,
           del_adr_id,
           contact_id,

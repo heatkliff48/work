@@ -3,10 +3,10 @@
   "eyebrow": "Ventas",
   "totalOrders": "Pedidos totales",
   "inProduction": "En producción",
-  "searchPlaceholder": "Buscar por pedido, cliente o proyecto…",
+  "searchPlaceholder": "Buscar por pedido, cliente, proyecto, contacto o dirección…",
   "addNewOrder": "Nuevo pedido",
   "emptyTitle": "Ningún pedido coincide con la búsqueda",
-  "emptySubtitle": "Prueba con otro número de pedido, cliente o nombre de proyecto.",
+  "emptySubtitle": "Prueba con otro número de pedido, cliente, proyecto, contacto o dirección.",
   "none": "Ninguno",
   "columns": {
     "article": "Número de pedido",
@@ -173,6 +173,9 @@
     "selectRegion": "Selecciona la región",
     "step": "Paso {{current}} de {{total}}",
     "back": "atrás",
+    "creating": "Creando pedido…",
+    "createFailed": "El pedido no se ha creado. Selecciona la región de nuevo para reintentar.",
+    "createFailedReason": "Motivo: {{reason}}",
     "clientsTable": "Clientes",
     "regions": {
       "peninsular_spain": "Territorios peninsulares de España",

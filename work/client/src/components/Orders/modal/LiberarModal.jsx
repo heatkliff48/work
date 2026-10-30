@@ -12,7 +12,6 @@ import {
   getUpdateRelMatProductsInfoOfOrder,
   getUpdateToolProductsInfoOfOrder,
 } from '#components/redux/actions/ordersAction.js';
-import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import {
@@ -182,7 +181,6 @@ const consumedFromParent = (row, quantities) => {
 
 function LiberarModal({ show, onHide, orderCartData, productLists }) {
   const { t, i18n } = useTranslation('orders');
-  const { list_of_orders } = useOrderContext();
   const { latestProducts, productVersions } = useProductsContext();
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
@@ -533,42 +531,8 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       return;
     }
 
-    // const timestamp = Date.now();
-    // const article = `CH-${orderCartData.article}-${timestamp}`;
-    // const article = `${orderCartData.article}`;
-    const getOrderArticle = () => {
-      let versionNumber = '0001';
-      const year = new Date().getFullYear().toString().slice(-2);
-      const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
-      const day = new Date().getDate().toString().padStart(2, '0');
-
-      const currentDate = `${day}${month}${year}`;
-
-      const ordersWithSameDate = list_of_orders.filter((order) =>
-        order.article?.includes(currentDate),
-      );
-
-      if (ordersWithSameDate.length > 0) {
-        const lastNumbers = ordersWithSameDate.map((order) => {
-          const match = order.article.match(/(\d{8})$/);
-          return match ? parseInt(match[1], 10) : 0;
-        });
-
-        const maxNumber = Math.max(...lastNumbers);
-
-        versionNumber = `0000000${maxNumber + 1}`.slice(-8);
-      } else {
-        versionNumber = `00000001`;
-      }
-
-      const orderArticle = `Z0000${currentDate}${versionNumber}`;
-
-      return orderArticle;
-    };
-    const article = getOrderArticle();
-
+    // Номер дочернего заказа присваивает сервер при создании
     const payload = {
-      article: article,
       owner: orderCartData.owner?.id ?? orderCartData.owner,
       del_adr_id: orderCartData?.deliveryAddress?.id,
       contact_id: orderCartData?.contactInfo?.id,

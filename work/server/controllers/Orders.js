@@ -46,8 +46,10 @@ class OrdersController {
   }
 
   static async addNewOrder(req, res) {
+    // Номер заказа (article) присваивает сервер, присланный клиентом не используется
     const {
-      article,
+      article_date,
+      client_request_id,
       del_adr_id,
       contact_id,
       owner,
@@ -58,8 +60,9 @@ class OrdersController {
     } = req.body.order;
 
     try {
-      const newOrder = await OrdersService.addNewOrder({
-        article,
+      const { order: newOrder, created } = await OrdersService.addNewOrder({
+        article_date,
+        client_request_id,
         del_adr_id,
         contact_id,
         owner,
@@ -69,7 +72,8 @@ class OrdersController {
         payment_method,
       });
 
-      myEmitter.emit(ADD_NEW_ORDER_SOCKET, newOrder);
+      // Повторная попытка вернула уже созданный заказ — его уже разослали
+      if (created) myEmitter.emit(ADD_NEW_ORDER_SOCKET, newOrder);
 
       return res.status(200).json(newOrder);
     } catch (err) {
@@ -677,7 +681,7 @@ class OrdersController {
 
   static async addChildOrder(req, res) {
     const {
-      article,
+      article_date,
       owner,
       del_adr_id,
       contact_id,
@@ -700,7 +704,7 @@ class OrdersController {
 
     try {
       const childOrder = await OrdersService.addChildOrder({
-        article,
+        article_date,
         owner,
         del_adr_id,
         contact_id,

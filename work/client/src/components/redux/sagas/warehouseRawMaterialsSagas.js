@@ -116,10 +116,12 @@ import axios from 'axios';
 import { put, call, takeLatest } from 'redux-saga/effects';
 
 import { getApiUrl } from '#utils/getApiUrl.js';
+import { REQUEST_TIMEOUT } from '#utils/requestTimeout.js';
 
 const url = axios.create({
   baseURL: getApiUrl(),
   withCredentials: true,
+  timeout: REQUEST_TIMEOUT,
 });
 
 // Sand API functions
