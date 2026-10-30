@@ -68,6 +68,12 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: false,
       },
       otros: DataTypes.TEXT,
+      // Ключ попытки создания: повторная отправка не создаёт дубль
+      client_request_id: {
+        type: DataTypes.STRING(64),
+        allowNull: true,
+        unique: true,
+      },
       accounting_approved: {
         type: DataTypes.BOOLEAN,
         allowNull: false,

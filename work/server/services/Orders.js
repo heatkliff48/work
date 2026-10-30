@@ -14,7 +14,8 @@ class OrdersService {
   }
 
   static async addNewOrder({
-    article,
+    article_date,
+    client_request_id,
     del_adr_id,
     contact_id,
     owner,
@@ -23,8 +24,10 @@ class OrdersService {
     region,
     payment_method,
   }) {
-    const newOrder = await OrdersRepository.addNewOrderData({
-      article,
+    // { order, created }
+    const result = await OrdersRepository.addNewOrderData({
+      article_date,
+      client_request_id,
       del_adr_id,
       contact_id,
       owner,
@@ -34,7 +37,7 @@ class OrdersService {
       payment_method,
     });
 
-    return newOrder;
+    return result;
   }
 
   static async addDeliveryPrice(data) {

@@ -3,10 +3,10 @@
   "eyebrow": "Sales",
   "totalOrders": "Total orders",
   "inProduction": "In production",
-  "searchPlaceholder": "Search by order, client or project…",
+  "searchPlaceholder": "Search by order, client, project, contact or address…",
   "addNewOrder": "Add new order",
   "emptyTitle": "No orders match your search",
-  "emptySubtitle": "Try a different order number, client or project name.",
+  "emptySubtitle": "Try a different order number, client, project, contact or address.",
   "none": "None",
   "columns": {
     "article": "Order number",
@@ -173,6 +173,9 @@
     "selectRegion": "Select region",
     "step": "Step {{current}} of {{total}}",
     "back": "back",
+    "creating": "Creating order…",
+    "createFailed": "Order was not created. Select the region again to retry.",
+    "createFailedReason": "Reason: {{reason}}",
     "clientsTable": "Clients",
     "regions": {
       "peninsular_spain": "Territorios peninsulares de España",

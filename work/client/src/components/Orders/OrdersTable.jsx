@@ -5,13 +5,19 @@ import { getCurrentProductsOfOrders } from '#components/redux/actions/ordersActi
 import Table from '../Table/Table';
 import { useOrderContext } from '../contexts/OrderContext';
 import AddClientOrderModal from './modal/AddClientOrderModal';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
+import { getApiUrl } from '#utils/getApiUrl.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import RandomAhhOrder from './RandomAhhOrder';
 import { ArticleMonoCell, makeStatusPillCell } from './ordersCells';
 import { statusLabel } from './ordersI18n.js';
+import {
+  buildOrdersSearchIndex,
+  makeOrdersGlobalFilter,
+} from './ordersSearch.js';
 import './ordersView.css';
 import {
   getAllClients,
@@ -30,9 +36,11 @@ function OrdersTable() {
     status_list,
     randomOrderCheck,
     setRandomOrderCheck,
+    list_of_orders,
   } = useOrderContext();
   const { clientModalOrder, setClientModalOrder } = useModalContext();
-  const { setCurrentClient } = useProjectContext();
+  const { setCurrentClient, categoryOptions, priceCategoryOptions } =
+    useProjectContext();
   const { roles, checkUserAccess, userAccess, setUserAccess } =
     useUsersContext();
 
@@ -41,6 +49,36 @@ function OrdersTable() {
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.user);
+  const clients = useSelector((state) => state.clients);
+  const deliveryAddresses = useSelector((state) => state.deliveryAddresses);
+  const contactInfos = useSelector((state) => state.contactInfo);
+
+  // В redux лежит юр. адрес только одного (текущего) клиента,
+  // для поиска берём все — локально, чтобы не перетирать state
+  const [legalAddresses, setLegalAddresses] = useState([]);
+  useEffect(() => {
+    axios
+      .get(`${getApiUrl()}/clientsAddress`, { withCredentials: true })
+      .then((res) => setLegalAddresses(res.data?.legalAddress || []))
+      .catch((err) => console.error(err.message));
+  }, []);
+
+  // Поиск и по данным клиента заказа (клиент, юр. адрес, проект,
+  // контакты), а не только по колонкам таблицы
+  const ordersGlobalFilter = useMemo(
+    () =>
+      makeOrdersGlobalFilter(
+        buildOrdersSearchIndex(list_of_orders, {
+          clients,
+          legalAddresses,
+          deliveryAddresses,
+          contactInfos,
+          categoryOptions,
+          priceCategoryOptions,
+        }),
+      ),
+    [list_of_orders, clients, legalAddresses, deliveryAddresses, contactInfos],
+  );
 
   // Статусы с переведённым Header: по нему пилюля находит цвет
   // в переведённых данных таблицы
@@ -159,6 +197,7 @@ function OrdersTable() {
           hideTitle
           emptyTitle={t('emptyTitle')}
           emptySubtitle={t('emptySubtitle')}
+          globalFilter={ordersGlobalFilter}
           handleRowClick={(row) => {
             console.log('row.original', row.original);
             getCurrentOrderInfoHandler(row.original);

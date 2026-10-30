@@ -79,11 +79,19 @@ import {
   UPDATE_ACCOUNTING_APPROVED,
 } from '../types/ordersTypes';
 
+import {
+  rejectNewOrderRequest,
+  resolveNewOrderRequest,
+} from '../actions/ordersAction';
 import { getApiUrl } from '#utils/getApiUrl.js';
+import { REQUEST_TIMEOUT } from '#utils/requestTimeout.js';
+import { ensureSocketConnected } from '#utils/WebSockeetClient.js';
+import { createClientRequestId, getArticleDate } from '#utils/orderRequest.js';
 
 const url = axios.create({
   baseURL: getApiUrl(),
   withCredentials: true,
+  timeout: REQUEST_TIMEOUT,
 });
 
 const getAllOrders = () => {
@@ -98,17 +106,24 @@ const getAllOrders = () => {
     });
 };
 
+// Без таймаута запрос в оборванное после простоя соединение висит минутами,
+// и до повторной отправки дело не доходит
+const ADD_ORDER_TIMEOUT = 20000;
+const ADD_ORDER_RECONNECT_TIMEOUT = 15000;
+
+// Ошибку показывает addNewOrderWatcher — только если не помог повтор
 const addNewOrder = (order) => {
   return url
-    .post('/orders/add', { order })
+    .post('/orders/add', { order }, { timeout: ADD_ORDER_TIMEOUT })
     .then((res) => {
       return res.data;
-    })
-    .catch((err) => {
-      showMessage(errorToText(err), 'error');
-      throw err;
     });
 };
+
+// Нет ответа (обрыв, таймаут) или сбой сервера — есть смысл повторить.
+// 4xx (неверные данные, нет доступа) повтор не исправит
+const isRetryableError = (err) =>
+  !err?.response || err.response.status >= 500;
 
 const addNewDeliveryPrice = (order) => {
   return url
@@ -552,14 +567,53 @@ function* getOrdersListWatcher() {
   }
 }
 
-function* addNewOrderWatcher(action) {
-  try {
-    const newOrder = yield call(addNewOrder, action.payload);
+// Один повтор после восстановления связи, чтобы пользователю не пришлось
+// проходить шаги заново после простоя
+function* addNewOrderWithRetry(order) {
+  // Обе попытки отправляют один ключ: если первая дошла до сервера, а
+  // потерялся только ответ, сервер вернёт уже созданный заказ, а не дубль
+  const request = {
+    ...order,
+    article_date: getArticleDate(),
+    client_request_id: createClientRequestId(),
+  };
 
+  try {
+    return yield call(addNewOrder, request);
+  } catch (err) {
+    if (!isRetryableError(err)) throw err;
+    console.warn('Order was not created, retrying after reconnect:', err);
+
+    const isConnected = yield call(
+      ensureSocketConnected,
+      ADD_ORDER_RECONNECT_TIMEOUT,
+    );
+    if (!isConnected) throw err;
+
+    return yield call(addNewOrder, request);
+  }
+}
+
+function* addNewOrderWatcher(action) {
+  const requestId = action.meta?.requestId;
+
+  try {
+    const newOrder = yield call(addNewOrderWithRetry, action.payload);
+
+    // Кладём заказ в список сразу, не дожидаясь сообщения по WebSocket:
+    // после простоя соединение может быть ещё не восстановлено
     yield put({ type: NEW_ORDER, payload: newOrder });
+
+    if (requestId) {
+      yield call(resolveNewOrderRequest, requestId, newOrder);
+    }
   } catch (err) {
     console.error(err);
-    yield put({ type: NEW_ORDER, payload: [] });
+    showMessage(errorToText(err), 'error');
+
+    if (requestId) {
+      yield call(rejectNewOrderRequest, requestId, err);
+    }
   }
 }
 
@@ -1000,7 +1054,10 @@ function* addOrderRandomProductsWorker(action) {
 
 function* addChildOrderWatcher(action) {
   try {
-    yield call(addChildOrderApi, action.payload);
+    yield call(addChildOrderApi, {
+      ...action.payload,
+      article_date: getArticleDate(),
+    });
   } catch (err) {
     console.error(err);
   }
@@ -1008,7 +1065,9 @@ function* addChildOrderWatcher(action) {
 
 function* ordersWatcher() {
   yield takeLatest(GET_ORDERS_LIST, getOrdersListWatcher);
-  yield takeLatest(ADD_NEW_ORDER, addNewOrderWatcher);
+  // takeEvery: отменённый takeLatest-воркер оставил бы промис из
+  // createNewOrderRequest неразрешённым, и модалка зависла бы
+  yield takeEvery(ADD_NEW_ORDER, addNewOrderWatcher);
   yield takeLatest(ADD_NEW_DELIVERY_PRICE, addNewDeliveryPriceWatcher);
   yield takeLatest(ADD_DATA_SHIP_ORDER, addDataShipOrderWatcher);
   yield takeLatest(ADD_ORDER_DESCRIPTION, addDescriptionOrderWatcher);

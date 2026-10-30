@@ -19,6 +19,7 @@ function Table({
   emptyTitle = 'No clients match your search',
   emptySubtitle = 'Try a different name, CIF/VAT or category.',
   getRowProps, // (row) => ({ className, style }) — optional per-row view hook, nothing else changes
+  globalFilter, // (rows, columnIds, filterValue) => rows — optional, default: text search by columns
 }) {
   const columns = useMemo(() => {
     return Array.isArray(COLUMN_DATA) ? COLUMN_DATA : [];
@@ -62,6 +63,7 @@ function Table({
       defaultColumn,
       filterTypes,
       sortTypes,
+      globalFilter,
     },
     useGlobalFilter,
     useFilters,
