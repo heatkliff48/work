@@ -97,7 +97,7 @@ export function buildOrdersSearchIndex(
     contactInfos,
     categoryOptions = [],
     priceCategoryOptions = [],
-  },
+  }
 ) {
   const index = new Map();
   if (!Array.isArray(orders)) return index;
@@ -115,15 +115,12 @@ export function buildOrdersSearchIndex(
     pushFields(parts, client, CLIENT_FIELDS);
     if (client) {
       const category = categoryOptions.find(
-        (option) => option.value == client.category,
+        (option) => option.value == client.category
       )?.label;
       const priceCategory = priceCategoryOptions.find(
-        (option) => option.value == client.price_category,
+        (option) => option.value == client.price_category
       )?.label;
-      pushFields(parts, { category, priceCategory }, [
-        'category',
-        'priceCategory',
-      ]);
+      pushFields(parts, { category, priceCategory }, ['category', 'priceCategory']);
     }
 
     pushFields(parts, legalById.get(order.owner), LEGAL_ADDRESS_FIELDS);
@@ -140,7 +137,7 @@ export function buildOrdersSearchIndex(
       pushFields(
         parts,
         contactsById.get(Number(order.secondary_contact)),
-        CONTACT_FIELDS,
+        CONTACT_FIELDS
       );
 
     index.set(order.id, parts.join('\n'));
@@ -156,13 +153,15 @@ export function buildOrdersSearchIndex(
  */
 export function makeOrdersGlobalFilter(searchIndex) {
   return (rows, columnIds, filterValue) => {
+    if (!filterValue) return rows;
+
     const tokens = normalizeSearch(filterValue).split(/\s+/).filter(Boolean);
     if (tokens.length === 0) return rows;
 
     return rows.filter((row) => {
       const haystack = [
         ...columnIds.map((id) => normalizeSearch(row.values[id])),
-        searchIndex.get(row.original.id) || '',
+        searchIndex.get(row.original?.id) || '',
       ].join('\n');
       return tokens.every((token) => {
         if (haystack.includes(token)) return true;

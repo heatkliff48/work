@@ -14,10 +14,7 @@ import { useTranslation } from 'react-i18next';
 import RandomAhhOrder from './RandomAhhOrder';
 import { ArticleMonoCell, makeStatusPillCell } from './ordersCells';
 import { statusLabel } from './ordersI18n.js';
-import {
-  buildOrdersSearchIndex,
-  makeOrdersGlobalFilter,
-} from './ordersSearch.js';
+import { buildOrdersSearchIndex, makeOrdersGlobalFilter } from './ordersSearch.js';
 import './ordersView.css';
 import {
   getAllClients,
@@ -41,8 +38,7 @@ function OrdersTable() {
   const { clientModalOrder, setClientModalOrder } = useModalContext();
   const { setCurrentClient, categoryOptions, priceCategoryOptions } =
     useProjectContext();
-  const { roles, checkUserAccess, userAccess, setUserAccess } =
-    useUsersContext();
+  const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
 
   const { t } = useTranslation('orders');
   const dispatch = useDispatch();
@@ -75,9 +71,9 @@ function OrdersTable() {
           contactInfos,
           categoryOptions,
           priceCategoryOptions,
-        }),
+        })
       ),
-    [list_of_orders, clients, legalAddresses, deliveryAddresses, contactInfos],
+    [list_of_orders, clients, legalAddresses, deliveryAddresses, contactInfos]
   );
 
   // Статусы с переведённым Header: по нему пилюля находит цвет
@@ -88,14 +84,14 @@ function OrdersTable() {
         ...s,
         Header: statusLabel(t, s.accessor, s.Header),
       })),
-    [status_list, t],
+    [status_list, t]
   );
 
   // Только вид: подмешиваем Cell-рендереры поверх уже существующих
   // колонок из контекста (accessor/данные не трогаем).
   const StatusPillCell = useMemo(
     () => makeStatusPillCell(translatedStatusList),
-    [translatedStatusList],
+    [translatedStatusList]
   );
   const displayColumns = useMemo(
     () =>
@@ -107,7 +103,7 @@ function OrdersTable() {
           return { ...col, Header, Cell: StatusPillCell };
         return { ...col, Header };
       }),
-    [COLUMNS_ORDERS, StatusPillCell, t],
+    [COLUMNS_ORDERS, StatusPillCell, t]
   );
 
   // В ordersDataList статус — английский Header из status_list (его же
@@ -118,12 +114,14 @@ function OrdersTable() {
         const statusDef = (status_list || []).find((s) => s.Header === o.status);
         return {
           ...o,
-          status: statusDef ? statusLabel(t, statusDef.accessor, o.status) : o.status,
+          status: statusDef
+            ? statusLabel(t, statusDef.accessor, o.status)
+            : o.status,
           person_in_charge:
             o.person_in_charge === 'None' ? t('none') : o.person_in_charge,
         };
       }),
-    [ordersDataList, status_list, t],
+    [ordersDataList, status_list, t]
   );
 
   const totalCount = ordersDataList?.length || 0;
@@ -155,7 +153,6 @@ function OrdersTable() {
 
   useEffect(() => {
     dispatch(getAllDeliveryAddresses());
-    dispatch(getLegalAddress());
     dispatch(getAllClients());
     dispatch(getAllContactInfo());
   }, []);
