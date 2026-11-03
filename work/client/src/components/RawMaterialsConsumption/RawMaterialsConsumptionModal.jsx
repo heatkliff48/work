@@ -72,7 +72,7 @@ const RawMaterialsConsumptionModal = React.memo(
         { label: 'Aluminum 1', key: 'aluminum_paste' },
         { label: 'Aluminum 2', key: 'aluminum_paste_2' },
       ],
-      [],
+      []
     );
 
     const aluminum1TypeOptions = useMemo(() => {
@@ -136,10 +136,7 @@ const RawMaterialsConsumptionModal = React.memo(
       return map;
     }, [raw_materials_warehouse, warehouseAluminum1]);
 
-    const ALWAYS_VISIBLE = useMemo(
-      () => new Set(['Aluminum 1', 'Aluminum 2']),
-      [],
-    );
+    const ALWAYS_VISIBLE = useMemo(() => new Set(['Aluminum 1', 'Aluminum 2']), []);
 
     const recipeForUI = useMemo(() => selectedRecipe || null, [selectedRecipe]);
 
@@ -220,7 +217,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (product) {
         candidateRecipes = (list_of_recipes || []).filter(
           (r) =>
-            r.density === product.density && r.certificate === product.certificate,
+            r.density === product.density && r.certificate === product.certificate
         );
       }
 
@@ -272,7 +269,7 @@ const RawMaterialsConsumptionModal = React.memo(
       const currentValue = Number(processedValue || 0);
 
       const rawRecord = raw_mat_consumption?.find(
-        (r) => String(r.batch_id) === String(selectedRow?.batch_id),
+        (r) => String(r.batch_id) === String(selectedRow?.batch_id)
       );
 
       if (!rawRecord) {
@@ -298,13 +295,13 @@ const RawMaterialsConsumptionModal = React.memo(
 
     const pvNumber = useMemo(
       () => (productionVolume === '' ? 0 : Number(productionVolume) || 0),
-      [productionVolume],
+      [productionVolume]
     );
 
     const baseByLabel = (label, key) => {
       if (!recipeForUI || !key || !(key in recipeForUI)) return '—';
       const v = recipeForUI[key];
-      return typeof v === 'number' ? v : (v ?? '—');
+      return typeof v === 'number' ? v : v ?? '—';
     };
 
     const logByKey = (key) => {
@@ -366,7 +363,7 @@ const RawMaterialsConsumptionModal = React.memo(
             `Already recorded: ${info.alreadyConsumed}\n` +
             `Current: ${info.current}\n\n` +
             `Over plan: ${info.diff}\n\n` +
-            `Continue?`,
+            `Continue?`
         );
       } else {
         return window.confirm(
@@ -374,7 +371,7 @@ const RawMaterialsConsumptionModal = React.memo(
             `Plan: ${info.planned}\n` +
             `Total to be recorded: ${info.totalAfterSave}\n\n` +
             `Remaining: ${Math.abs(info.diff)}\n\n` +
-            `Continue?`,
+            `Continue?`
         );
       }
     };
@@ -400,7 +397,12 @@ const RawMaterialsConsumptionModal = React.memo(
       const consumed = computeConsumed(key);
       const hasMeaningfulConsumed = consumed !== null && Number(consumed) !== 0;
 
-      return hasMeaningfulBase || hasMeaningfulLog || hasMeaningfulA || hasMeaningfulConsumed;
+      return (
+        hasMeaningfulBase ||
+        hasMeaningfulLog ||
+        hasMeaningfulA ||
+        hasMeaningfulConsumed
+      );
     };
 
     const isRecipeModified = (key) => {
@@ -457,13 +459,13 @@ const RawMaterialsConsumptionModal = React.memo(
       if (govno) {
         const totalConsumedRaw = result_materials
           .filter(
-            (m) => m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)',
+            (m) => m.type !== 'Return slurry (dry)' && m.type !== 'Return (dry)'
           )
           .reduce((sum, m) => sum + (Number(m.quantity) || 0), 0);
 
         if (Number.isFinite(totalConsumedRaw) && totalConsumedRaw > 0) {
           const idx = result_materials.findIndex(
-            (m) => m.type === 'Return slurry (dry)' || m.type === 'Return (dry)',
+            (m) => m.type === 'Return slurry (dry)' || m.type === 'Return (dry)'
           );
 
           if (idx >= 0) {
@@ -484,7 +486,7 @@ const RawMaterialsConsumptionModal = React.memo(
         Number(productionVolume) > 0
       ) {
         const producedReturn = Number(
-          selectedRecipe.produced_return_dry * Number(productionVolume),
+          selectedRecipe.produced_return_dry * Number(productionVolume)
         );
 
         if (Number.isFinite(Number(producedReturn)) && producedReturn > 0) {
@@ -507,19 +509,20 @@ const RawMaterialsConsumptionModal = React.memo(
         (materials.some((m) => m.type === 'Aluminum 2') && !selectedAlu2Type?.value)
       ) {
         alert(
-          'For aluminum, a type must be selected (7040-10/70WB28, 8040-10/70WB28, etc.)',
+          'For aluminum, a type must be selected (7040-10/70WB28, 8040-10/70WB28, etc.)'
         );
         return;
       }
 
       for (const { type, quantity } of materials) {
         if (type.includes('Return')) continue;
+        console.log(type, quantity, '------------------<<<<');
 
         let have;
         if (type.startsWith('Aluminum|') && selectedAlu1Type?.value) {
           console.log(
             'warehouseByType.get(type) RawMaterialsConsumptionModal.jsx line 587',
-            warehouseByType.get(type),
+            warehouseByType.get(type)
           );
           have = warehouseByType.get(type) ?? 0;
         } else if (type.startsWith('Aluminum 2|') && selectedAlu2Type?.value) {
@@ -567,7 +570,7 @@ const RawMaterialsConsumptionModal = React.memo(
           shortages
             .map(
               (s) =>
-                `${s.type}: need ${s.need}, in stock ${s.have} (short by ${s.lack})`,
+                `${s.type}: need ${s.need}, in stock ${s.have} (short by ${s.lack})`
             )
             .join('\n');
         alert(msg);
@@ -603,7 +606,7 @@ const RawMaterialsConsumptionModal = React.memo(
         .filter((el) => el.quantity != 0);
 
       const normMaterials = fixed_materials.filter(
-        (m) => m.type && Number.isFinite(Number(m.quantity)),
+        (m) => m.type && Number.isFinite(Number(m.quantity))
       );
 
       if (normMaterials.length !== 0) {
@@ -613,11 +616,11 @@ const RawMaterialsConsumptionModal = React.memo(
       }
 
       const productDetails = latestProducts.find(
-        (product) => product.article === selectedRow?.batch_article,
+        (product) => product.article === selectedRow?.batch_article
       );
 
       const prodDescription = productDetails.description.match(
-        /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/,
+        /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/
       );
 
       const recipeSnapshot = buildRecipeSnapshot();
@@ -637,7 +640,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       console.log(
         'new_lotestList RawMaterialsConsumptionModal.jsx line 703',
-        new_lotestList,
+        new_lotestList
       );
 
       addProductOrder();
@@ -646,11 +649,11 @@ const RawMaterialsConsumptionModal = React.memo(
         addNewLotesList({
           new_lotestList,
           new_batch: false,
-        }),
+        })
       );
 
       const rawRecord = raw_mat_consumption?.find(
-        (r) => String(r.batch_id) === String(selectedRow?.batch_id),
+        (r) => String(r.batch_id) === String(selectedRow?.batch_id)
       );
 
       const bd_volume = Number(rawRecord.production_volume || 0);
@@ -670,17 +673,17 @@ const RawMaterialsConsumptionModal = React.memo(
           updateRawMatConsumption({
             id: selectedRow?.id,
             consumption_calculated: true,
-          }),
+          })
         );
         if (
           rawMatConsumptionCurrentMolds.find(
-            (r) => String(r.batch_id) === String(selectedRow?.batch_id),
+            (r) => String(r.batch_id) === String(selectedRow?.batch_id)
           )
         ) {
           dispatch(
             deleteRawMatConsumptionCurrentMolds({
               batch_id: selectedRow?.batch_id,
-            }),
+            })
           );
         }
       } else {
@@ -688,7 +691,7 @@ const RawMaterialsConsumptionModal = React.memo(
           addNewRawMatConsumptionCurrentMolds({
             ...newRawMatConsumptionCurrentMold,
             consumed_volume: Number(productionVolume),
-          }),
+          })
         );
       }
 
@@ -720,12 +723,12 @@ const RawMaterialsConsumptionModal = React.memo(
       const { batch_article, date: prodDate } = selectedRow;
 
       const product = latestProducts.find(
-        (p) => String(p.article) === String(batch_article),
+        (p) => String(p.article) === String(batch_article)
       );
       if (!product) return;
 
       const widthInArray = Math.floor(
-        product?.m3InArray / product?.volumeBlockOnPallet,
+        product?.m3InArray / product?.volumeBlockOnPallet
       );
 
       const needRaw = Number(productionVolume) * widthInArray;
@@ -738,7 +741,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (!targetDate6) {
         console.warn(
           'Bad selectedRow.date, cannot match warehouse article date:',
-          prodDate,
+          prodDate
         );
         return;
       }
@@ -799,7 +802,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       console.log(
         'updatedRow RawMaterialsConsumptionModal.jsx line 519',
-        updatedRow,
+        updatedRow
       );
       dispatch(updateRemainingStock(updatedRow));
     };
@@ -897,7 +900,10 @@ const RawMaterialsConsumptionModal = React.memo(
           </ModalHeader>
 
           <Fragment>
-            <ModalBody className="rmc-modal-body" style={{ overflow: 'auto', maxHeight: '70vh' }}>
+            <ModalBody
+              className="rmc-modal-body"
+              style={{ overflow: 'auto', maxHeight: '70vh' }}
+            >
               <div className="rmc-section-title d-md-none">Raw materials</div>
               <table className="table-waste">
                 <thead>
@@ -1048,7 +1054,7 @@ const RawMaterialsConsumptionModal = React.memo(
         </Modal>
       </div>
     );
-  },
+  }
 );
 
 export default RawMaterialsConsumptionModal;

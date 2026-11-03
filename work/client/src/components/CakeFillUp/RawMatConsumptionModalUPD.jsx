@@ -88,7 +88,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (selectedRow?.batch_id == null) return null;
 
       const records = lotesListBatches.filter(
-        (item) => String(item?.batch_id) === String(selectedRow.batch_id),
+        (item) => String(item?.batch_id) === String(selectedRow.batch_id)
       );
 
       if (!records.length) return null;
@@ -135,7 +135,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (!Array.isArray(lotesListCakes) || !batchCakeIdsDesc.length) return '';
 
       const cakesById = new Map(
-        lotesListCakes.map((item) => [Number(item?.id), item]),
+        lotesListCakes.map((item) => [Number(item?.id), item])
       );
 
       for (const id of batchCakeIdsDesc) {
@@ -170,7 +170,7 @@ const RawMaterialsConsumptionModal = React.memo(
       setMoldId(
         previousBatchRecord?.mold_id != null
           ? String(previousBatchRecord.mold_id)
-          : '',
+          : ''
       );
     }, [selectedRow, isOpen, previousBatchRecord]);
 
@@ -196,7 +196,7 @@ const RawMaterialsConsumptionModal = React.memo(
           noWriteOff: true,
         },
       ],
-      [],
+      []
     );
 
     const aluminum1TypeOptions = useMemo(() => {
@@ -224,8 +224,7 @@ const RawMaterialsConsumptionModal = React.memo(
         data.forEach((item) => {
           const subtype = item?.type ? String(item.type).trim() : null;
           const available =
-            (Number(item?.quantity) || 0) -
-            (Number(item?.consumed_quantity) || 0);
+            (Number(item?.quantity) || 0) - (Number(item?.consumed_quantity) || 0);
           if (subtype && available > 0) {
             const key = `${baseName}|${subtype}`;
             map.set(key, (map.get(key) || 0) + available);
@@ -251,21 +250,20 @@ const RawMaterialsConsumptionModal = React.memo(
 
     const ALWAYS_VISIBLE = useMemo(
       () => new Set(['Aluminum 1', 'Aluminum 2', 'Aluminum suspension, kg']),
-      [],
+      []
     );
 
     const recipeForUI = useMemo(() => selectedRecipe || null, [selectedRecipe]);
 
     const currentProductName = useMemo(() => {
       const productDetails = latestProducts.find(
-        (product) =>
-          String(product.article) === String(selectedRow?.batch_article),
+        (product) => String(product.article) === String(selectedRow?.batch_article)
       );
 
       if (!productDetails?.description) return null;
 
       const match = productDetails.description.match(
-        /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/,
+        /BAUBLOCK®\s+([^ ]+(?:\s+[^ ]+)?\s+\d*\.?\d+)/
       );
 
       return match?.[1] || null;
@@ -278,7 +276,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const records = lotesListBatches.filter((item) => {
         const batch_article = batchOutside.find(
-          (b) => b.id === item.batch_id,
+          (b) => b.id === item.batch_id
         )?.product_article;
 
         if (
@@ -306,16 +304,13 @@ const RawMaterialsConsumptionModal = React.memo(
         const next = { ...prev };
         materialsMap.forEach(({ key }) => {
           const rawPrev = prevRecord?.[key];
-          const prevVal =
-            rawPrev == null || rawPrev === '' ? NaN : Number(rawPrev);
+          const prevVal = rawPrev == null || rawPrev === '' ? NaN : Number(rawPrev);
           const baseVal = Number(recipeForUI?.[key]);
 
           if (Number.isFinite(prevVal)) {
             next[`${key}_actual_reciepe`] = prevVal;
           } else {
-            next[`${key}_actual_reciepe`] = Number.isFinite(baseVal)
-              ? baseVal
-              : '';
+            next[`${key}_actual_reciepe`] = Number.isFinite(baseVal) ? baseVal : '';
           }
         });
         return next;
@@ -330,9 +325,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
       const recipeWs = Number(recipeForUI?.water_solids);
       const fromRecipe =
-        recipeForUI?.water_solids != null && recipeWs > 0
-          ? String(recipeWs)
-          : '';
+        recipeForUI?.water_solids != null && recipeWs > 0 ? String(recipeWs) : '';
 
       setWs((seedFromPrevRef.current && previousWs) || fromRecipe);
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -380,8 +373,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (product) {
         candidateRecipes = (list_of_recipes || []).filter(
           (r) =>
-            r.density === product.density &&
-            r.certificate === product.certificate,
+            r.density === product.density && r.certificate === product.certificate
         );
       }
 
@@ -401,8 +393,7 @@ const RawMaterialsConsumptionModal = React.memo(
         : null;
 
       const matched =
-        findByArticle(fromPrevArticle) ||
-        findByArticle(selectedRow?.recipe_article);
+        findByArticle(fromPrevArticle) || findByArticle(selectedRow?.recipe_article);
 
       const recipe = matched || candidateRecipes[0] || null;
 
@@ -423,9 +414,8 @@ const RawMaterialsConsumptionModal = React.memo(
       }
 
       const alu2Type =
-        (seedFromPrevRef.current
-          ? previousBatchRecord?.aluminum_2_type
-          : null) || recipe?.aluminum_2_type;
+        (seedFromPrevRef.current ? previousBatchRecord?.aluminum_2_type : null) ||
+        recipe?.aluminum_2_type;
 
       if (alu2Type) {
         setSelectedAlu2Type({
@@ -435,13 +425,7 @@ const RawMaterialsConsumptionModal = React.memo(
       } else {
         setSelectedAlu2Type(null);
       }
-    }, [
-      isOpen,
-      selectedRow,
-      latestProducts,
-      list_of_recipes,
-      previousBatchRecord,
-    ]);
+    }, [isOpen, selectedRow, latestProducts, list_of_recipes, previousBatchRecord]);
 
     const handleChange = (key) => (e) => {
       let processedValue = e.target.value;
@@ -455,7 +439,7 @@ const RawMaterialsConsumptionModal = React.memo(
     const baseByLabel = (label, key) => {
       if (!recipeForUI || !key || !(key in recipeForUI)) return '—';
       const v = recipeForUI[key];
-      return typeof v === 'number' ? v : (v ?? '—');
+      return typeof v === 'number' ? v : v ?? '—';
     };
 
     const logByKey = (key) => {
@@ -497,7 +481,7 @@ const RawMaterialsConsumptionModal = React.memo(
         const consumed = computeConsumed(key);
         return consumed === null ? sum : sum + Number(consumed);
       },
-      0,
+      0
     );
 
     const shouldShowRow = (label, key) => {
@@ -677,8 +661,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (
         (materials.some((m) => m.type === 'Aluminum 1') &&
           !selectedAlu1Type?.value) ||
-        (materials.some((m) => m.type === 'Aluminum 2') &&
-          !selectedAlu2Type?.value)
+        (materials.some((m) => m.type === 'Aluminum 2') && !selectedAlu2Type?.value)
       ) {
         alert(t('alerts.aluminumTypeRequired'));
         return;
@@ -686,16 +669,18 @@ const RawMaterialsConsumptionModal = React.memo(
 
       for (const { type, quantity } of [...materials, RELEASE_OIL_WRITE_OFF]) {
         if (type.includes('Return')) continue;
+        console.log(quantity, type, '------------------<<<<<<<<<<<');
 
         let have;
         if (type.startsWith('Aluminum|') && selectedAlu1Type?.value) {
+          console.log(warehouseByType.get(type), 'whtype----___--');
           have = warehouseByType.get(type) ?? 0;
         } else if (type.startsWith('Aluminum 2|') && selectedAlu2Type?.value) {
           have = warehouseByType.get(type) ?? 0;
         } else {
           have = warehouseByType.get(type) ?? 0;
         }
-
+        console.log(have, '---------<<<have');
         if (quantity > have) {
           shortages.push({
             type,
@@ -739,7 +724,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 need: s.need,
                 have: s.have,
                 lack: s.lack,
-              }),
+              })
             )
             .join('\n');
         alert(msg);
@@ -764,7 +749,7 @@ const RawMaterialsConsumptionModal = React.memo(
             .map((s) =>
               t('alerts.valueNotSpecified', {
                 material: translateMaterial(t, s.type),
-              }),
+              })
             )
             .join('\n');
         alert(msg);
@@ -781,7 +766,7 @@ const RawMaterialsConsumptionModal = React.memo(
         .filter((el) => el.quantity != 0);
 
       const normMaterials = fixed_materials.filter(
-        (m) => m.type && Number.isFinite(Number(m.quantity)),
+        (m) => m.type && Number.isFinite(Number(m.quantity))
       );
 
       if (normMaterials.length === 0) {
@@ -806,9 +791,7 @@ const RawMaterialsConsumptionModal = React.memo(
           custom_recipe: materialsMap.some(({ key }) => isRecipeModified(key)),
           slurried: false,
           recipe:
-            selectedRecipe?.article ||
-            recipeArticle ||
-            selectedRow?.recipe_article,
+            selectedRecipe?.article || recipeArticle || selectedRow?.recipe_article,
           batch_id: selectedRow?.batch_id,
           aluminum_type: selectedAlu1Type?.value || null,
           aluminum_2_type: selectedAlu2Type?.value || null,
@@ -826,21 +809,19 @@ const RawMaterialsConsumptionModal = React.memo(
           addNewLotesList({
             new_lotestList,
             new_batch: newBatchMode,
-          }),
+          })
         );
 
         if (!newBatchMode) {
           const rawRecord = raw_mat_consumption?.find(
-            (r) => String(r.batch_id) === String(selectedRow?.batch_id),
+            (r) => String(r.batch_id) === String(selectedRow?.batch_id)
           );
 
           if (rawRecord) {
             const bd_volume = Number(rawRecord.production_volume || 0);
 
             const alreadyUsed = (rawMatConsumptionCurrentMolds || [])
-              .filter(
-                (r) => String(r.batch_id) === String(selectedRow?.batch_id),
-              )
+              .filter((r) => String(r.batch_id) === String(selectedRow?.batch_id))
               .reduce((sum, r) => sum + Number(r.consumed_volume || 0), 0);
 
             const { id, ...newRawMatConsumptionCurrentMold } = selectedRow;
@@ -854,18 +835,18 @@ const RawMaterialsConsumptionModal = React.memo(
                 updateRawMatConsumption({
                   id: selectedRow?.id,
                   consumption_calculated: true,
-                }),
+                })
               );
 
               if (
                 rawMatConsumptionCurrentMolds.find(
-                  (r) => String(r.batch_id) === String(selectedRow?.batch_id),
+                  (r) => String(r.batch_id) === String(selectedRow?.batch_id)
                 )
               ) {
                 dispatch(
                   deleteRawMatConsumptionCurrentMolds({
                     batch_id: selectedRow?.batch_id,
-                  }),
+                  })
                 );
               }
             } else {
@@ -873,7 +854,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 addNewRawMatConsumptionCurrentMolds({
                   ...newRawMatConsumptionCurrentMold,
                   consumed_volume: 1,
-                }),
+                })
               );
             }
           }
@@ -920,12 +901,12 @@ const RawMaterialsConsumptionModal = React.memo(
       const { batch_article, date: prodDate } = selectedRow;
 
       const product = latestProducts.find(
-        (p) => String(p.article) === String(batch_article),
+        (p) => String(p.article) === String(batch_article)
       );
       if (!product) return;
 
       const widthInArray = Math.floor(
-        product?.m3InArray / product?.volumeBlockOnPallet,
+        product?.m3InArray / product?.volumeBlockOnPallet
       );
 
       const need = Math.floor(widthInArray);
@@ -936,7 +917,7 @@ const RawMaterialsConsumptionModal = React.memo(
       if (!targetDate6) {
         console.warn(
           'Bad selectedRow.date, cannot match warehouse article date:',
-          prodDate,
+          prodDate
         );
         return;
       }
@@ -1037,9 +1018,7 @@ const RawMaterialsConsumptionModal = React.memo(
           <ModalHeader toggle={toggle} className="rmc-modal-header">
             <div className="rmc-header">
               <div className="rmc-header-field" style={{ minWidth: 220 }}>
-                <span className="rmc-header-label">
-                  {t('modal.recipeArticle')}
-                </span>
+                <span className="rmc-header-label">{t('modal.recipeArticle')}</span>
                 {recipeArticle ? (
                   <b className="rmc-header-value">{recipeArticle || '—'}</b>
                 ) : (
@@ -1099,9 +1078,7 @@ const RawMaterialsConsumptionModal = React.memo(
               className="rmc-modal-body"
               style={{ overflow: 'auto', maxHeight: '70vh' }}
             >
-              <div className="rmc-section-title d-md-none">
-                {t('modal.casting')}
-              </div>
+              <div className="rmc-section-title d-md-none">{t('modal.casting')}</div>
               <div className="rmc-fields">
                 <label className="rmc-field">
                   <span className="rmc-field-label">{t('modal.moldId')}</span>
@@ -1123,7 +1100,7 @@ const RawMaterialsConsumptionModal = React.memo(
                       if (typeof processedValue === 'string') {
                         processedValue = processedValue.replace(
                           /(\d+),(\d*)/g,
-                          '$1.$2',
+                          '$1.$2'
                         );
                       }
                       if (
@@ -1137,9 +1114,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 </label>
 
                 <label className="rmc-field">
-                  <span className="rmc-field-label">
-                    {t('modal.castingTime')}
-                  </span>
+                  <span className="rmc-field-label">{t('modal.castingTime')}</span>
                   <input
                     className="form-control"
                     type="time"
@@ -1156,9 +1131,7 @@ const RawMaterialsConsumptionModal = React.memo(
                 <thead>
                   <tr>
                     <th className="th-raw">{t('modal.rawMaterial')}</th>
-                    <th className="th-mod-recipe">
-                      {t('modal.modifiedRecipe')}
-                    </th>
+                    <th className="th-mod-recipe">{t('modal.modifiedRecipe')}</th>
                     <th className="th-consumed">{t('modal.consumed')}</th>
                   </tr>
                 </thead>
@@ -1180,9 +1153,7 @@ const RawMaterialsConsumptionModal = React.memo(
                             {translateMaterial(t, label)}
                           </div>
                           {key === 'aluminum_paste' && (
-                            <div
-                              style={{ marginTop: '4px', minWidth: '150px' }}
-                            >
+                            <div style={{ marginTop: '4px', minWidth: '150px' }}>
                               <Select
                                 options={aluminum1TypeOptions}
                                 value={selectedAlu1Type}
@@ -1204,9 +1175,7 @@ const RawMaterialsConsumptionModal = React.memo(
                             </div>
                           )}
                           {key === 'aluminum_paste_2' && (
-                            <div
-                              style={{ marginTop: '4px', minWidth: '150px' }}
-                            >
+                            <div style={{ marginTop: '4px', minWidth: '150px' }}>
                               <Select
                                 options={aluminum1TypeOptions}
                                 value={selectedAlu2Type}
@@ -1238,8 +1207,7 @@ const RawMaterialsConsumptionModal = React.memo(
                           <div className="modified-recipe-cell">
                             <input
                               className={
-                                'form-control' +
-                                (modified ? ' is-modified' : '')
+                                'form-control' + (modified ? ' is-modified' : '')
                               }
                               inputMode="decimal"
                               placeholder="0"
@@ -1272,10 +1240,7 @@ const RawMaterialsConsumptionModal = React.memo(
                           </div>
                         </td>
 
-                        <td
-                          className="td-consumed"
-                          data-label={t('modal.consumed')}
-                        >
+                        <td className="td-consumed" data-label={t('modal.consumed')}>
                           {consumed === null ? '—' : consumed}
                         </td>
                       </tr>
@@ -1284,9 +1249,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
                   <tr className="rmc-total-row">
                     <td>
-                      <div className="fw-semibold">
-                        {t('modal.aluminumTotal')}
-                      </div>
+                      <div className="fw-semibold">{t('modal.aluminumTotal')}</div>
                       <div className="text-muted-small">
                         {t('modal.sumOfAluminums')}
                       </div>
@@ -1303,10 +1266,7 @@ const RawMaterialsConsumptionModal = React.memo(
                       </div>
                     </td>
 
-                    <td
-                      className="td-consumed"
-                      data-label={t('modal.consumed')}
-                    >
+                    <td className="td-consumed" data-label={t('modal.consumed')}>
                       {+aluminumTotal.toFixed(2)}
                     </td>
                   </tr>
@@ -1336,7 +1296,7 @@ const RawMaterialsConsumptionModal = React.memo(
         </Modal>
       </div>
     );
-  },
+  }
 );
 
 export default RawMaterialsConsumptionModal;
