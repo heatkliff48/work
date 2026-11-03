@@ -671,6 +671,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       }
 
       let totalAluminumSpent = 0;
+      const updatedAluminumRows = [];
 
       for (const aluminumType of aluminumTypes) {
         const required = round2(materialTotals[aluminumType]);
@@ -702,6 +703,8 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
             },
             { transaction },
           );
+
+          updatedAluminumRows.push(record.toJSON());
 
           remainingToWriteOff = round2(remainingToWriteOff - quantityToWriteOff);
         }
@@ -788,6 +791,7 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
 
       return {
         updatedRecords: updatedRecords.map((record) => record.toJSON()),
+        updatedAluminumRows,
         deletedIds: [],
       };
     });
@@ -796,6 +800,13 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
       UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
       transactionResult.updatedRecords,
     );
+
+    if (transactionResult.updatedAluminumRows.length) {
+      myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM1_SOCKET, [
+        transactionResult.updatedAluminumRows.length,
+        transactionResult.updatedAluminumRows,
+      ]);
+    }
 
     return res.status(200).json(transactionResult);
   } catch (err) {

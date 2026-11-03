@@ -14,7 +14,6 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import AccountingInvoiceModal from './AccountingInvoiceModal.jsx';
 import { makeStatusPillCell } from '#components/Orders/ordersCells';
 import {
-  applyConfirmingSurchargeToLines,
   applyDiscount,
   calcBlockPriceWithDelivery,
   getDeliveryPricePerM2,
@@ -273,23 +272,15 @@ const AccountngOrderCard = React.memo(() => {
     }
   }, [blocksListWithDelivery]);
 
-  // The card only reads the lines, so the confirming surcharge is applied
-  // to their prices right away (blocks get it in calcBlockPriceWithDelivery)
+  // Confirming surcharge applies to HCCA blocks only
+  // (calcBlockPriceWithDelivery). Other lines keep their stored prices.
   const updatedDryMixesListOrder = useMemo(() => {
-    return applyConfirmingSurchargeToLines(
-      addProductArticleToOrderList(
-        dryMixedProductsOfOrders,
-        latestDryMix,
-        'dryMixes',
-      ),
-      confirmingSurcharge,
+    return addProductArticleToOrderList(
+      dryMixedProductsOfOrders,
+      latestDryMix,
+      'dryMixes',
     );
-  }, [
-    dryMixedProductsOfOrders,
-    latestDryMix,
-    addProductArticleToOrderList,
-    confirmingSurcharge,
-  ]);
+  }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedDryMixesListOrder.length > 0) {
@@ -301,20 +292,12 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedDryMixesListOrder]);
 
   const updatedAnchorsListOrder = useMemo(() => {
-    return applyConfirmingSurchargeToLines(
-      addProductArticleToOrderList(
-        anchorProductsOfOrders,
-        latestAnchors,
-        'anchors',
-      ),
-      confirmingSurcharge,
+    return addProductArticleToOrderList(
+      anchorProductsOfOrders,
+      latestAnchors,
+      'anchors',
     );
-  }, [
-    anchorProductsOfOrders,
-    latestAnchors,
-    addProductArticleToOrderList,
-    confirmingSurcharge,
-  ]);
+  }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedAnchorsListOrder.length > 0) {
@@ -326,16 +309,12 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return applyConfirmingSurchargeToLines(
-      addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools'),
-      confirmingSurcharge,
+    return addProductArticleToOrderList(
+      toolProductsOfOrders,
+      latestTools,
+      'tools',
     );
-  }, [
-    toolProductsOfOrders,
-    latestTools,
-    addProductArticleToOrderList,
-    confirmingSurcharge,
-  ]);
+  }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedToolsListOrder.length > 0) {
@@ -347,19 +326,15 @@ const AccountngOrderCard = React.memo(() => {
   }, [updatedToolsListOrder]);
 
   const updatedRelatedMaterialsListOrder = useMemo(() => {
-    return applyConfirmingSurchargeToLines(
-      addProductArticleToOrderList(
-        relMatProductsOfOrders,
-        latestRelatedMaterials,
-        'related_materials',
-      ),
-      confirmingSurcharge,
+    return addProductArticleToOrderList(
+      relMatProductsOfOrders,
+      latestRelatedMaterials,
+      'related_materials',
     );
   }, [
     relMatProductsOfOrders,
     latestRelatedMaterials,
     addProductArticleToOrderList,
-    confirmingSurcharge,
   ]);
 
   useEffect(() => {

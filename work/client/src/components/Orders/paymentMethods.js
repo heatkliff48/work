@@ -1,5 +1,5 @@
 // value сохраняется в Orders.payment_method, поэтому должен быть уникальным.
-// surcharge — надбавка за отсрочку по confirming, % к цене всех товаров
+// surcharge — надбавка за отсрочку по confirming, % только к цене HCCA Blocks
 // заказа; применяется, только если в заказе отмечена галочка
 // Orders.confirming_surcharge.
 export const PAYMENT_METHOD_OPTIONS = [

@@ -139,6 +139,16 @@ function CakeFillUp() {
     dispatch(getWarehouseAluminum2());
   }, [dispatch]);
 
+  // Stock is checked when the consumption modal opens. Receipt edits do not
+  // always push a new summary over the socket, so read the warehouse again.
+  useEffect(() => {
+    if (!rawMaterialConsumptionMadal) return;
+
+    dispatch(getRawMaterialsWarehouse());
+    dispatch(getWarehouseAluminum1());
+    dispatch(getWarehouseAluminum2());
+  }, [dispatch, rawMaterialConsumptionMadal]);
+
   const handleProductionPlanRowClick = (row) => {
     const prodPlanEntry = batchOutside.find((el) => el.id === row.original.id);
     if (!prodPlanEntry) return;
