@@ -69,7 +69,6 @@ import { orderProductType } from './modal/packagingUtils.js';
 import { statusThemeFor } from './ordersCells.jsx';
 import { fieldLabel, statusLabel } from './ordersI18n.js';
 import {
-  applyConfirmingSurchargeToProductLists,
   calcBlockPriceWithDelivery,
   getDeliveryPricePerM2,
 } from './blockDeliveryPrice.js';
@@ -506,34 +505,6 @@ const OrderCart = React.memo(() => {
     }
   }, [updatedRelatedMaterialsListOrder]);
 
-  // Надбавка confirming для остальных товаров: в productLists строки остаются
-  // с ценами из БД, потому что Liberar отправляет их на сервер как есть, а
-  // таблицы, итог и PDF берут цены с надбавкой
-  const linesWithSurcharge = useMemo(
-    () =>
-      applyConfirmingSurchargeToProductLists(
-        {
-          dryMixes: updatedDryMixesListOrder,
-          anchors: updatedAnchorsListOrder,
-          tools: updatedToolsListOrder,
-          related_materials: updatedRelatedMaterialsListOrder,
-        },
-        confirmingSurcharge
-      ),
-    [
-      updatedDryMixesListOrder,
-      updatedAnchorsListOrder,
-      updatedToolsListOrder,
-      updatedRelatedMaterialsListOrder,
-      confirmingSurcharge,
-    ]
-  );
-
-  const pricedProductLists = useMemo(
-    () => applyConfirmingSurchargeToProductLists(productLists, confirmingSurcharge),
-    [productLists, confirmingSurcharge]
-  );
-
   const handleInputChange = (e) => {
     setVatValue((prev) => ({
       ...prev,
@@ -907,11 +878,11 @@ const OrderCart = React.memo(() => {
 
   const final_price_product = useMemo(() => {
     const allProducts = [
-      ...pricedProductLists['products'],
-      ...pricedProductLists['dryMixes'],
-      ...pricedProductLists['anchors'],
-      ...pricedProductLists['tools'],
-      ...pricedProductLists['related_materials'],
+      ...productLists['products'],
+      ...productLists['dryMixes'],
+      ...productLists['anchors'],
+      ...productLists['tools'],
+      ...productLists['related_materials'],
     ];
 
     return allProducts.reduce(
@@ -925,7 +896,7 @@ const OrderCart = React.memo(() => {
           0),
       0,
     );
-  }, [pricedProductLists]);
+  }, [productLists]);
 
   const [deliveryDraft, setDeliveryDraft] = useState(orderCartData?.delivery ?? 0);
   const [deliveryM2Draft, setDeliveryM2Draft] = useState(
@@ -1639,7 +1610,7 @@ const OrderCart = React.memo(() => {
             </div>
             <PDFgenerate
               orderData={orderCartData}
-              productList={pricedProductLists}
+              productList={productLists}
               vatValue={vatValue}
             />
           </div>
@@ -1655,7 +1626,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <DryMixesJournalTableOrder
-          productListOrder={linesWithSurcharge.dryMixes}
+          productListOrder={updatedDryMixesListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1663,7 +1634,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <AnchorJournalTableOrder
-          productListOrder={linesWithSurcharge.anchors}
+          productListOrder={updatedAnchorsListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1671,7 +1642,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <ToolJournalTableOrder
-          productListOrder={linesWithSurcharge.tools}
+          productListOrder={updatedToolsListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1679,7 +1650,7 @@ const OrderCart = React.memo(() => {
           displayNames={displayNames}
         />
         <RelatedMaterialJournalTableOrder
-          productListOrder={linesWithSurcharge.related_materials}
+          productListOrder={updatedRelatedMaterialsListOrder}
           onProductClickHandler={onProductClickHandler}
           filterAndMapData={filterAndMapData}
           filterKeys={filterKeysOrder}
@@ -1928,7 +1899,7 @@ const OrderCart = React.memo(() => {
                       onChange={handleConfirmingSurchargeChange}
                       disabled={orderCartData?.status >= 5}
                     />
-                    {t('card.confirmingSurchargeToAll', {
+                    {t('card.confirmingSurchargeToBlocks', {
                       rate: confirmingSurchargeRate.toFixed(1),
                     })}
                   </label>

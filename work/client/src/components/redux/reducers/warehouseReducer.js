@@ -9,6 +9,7 @@ import {
   ALL_WAREHOUSE,
   RAW_MATERIALS_WAREHOUSE,
   REMAINING_STOCK,
+  UPDATE_RAW_MATERIALS_WAREHOUSE,
   WAREHOSE_QUANTITYS,
 } from '../types/warehouseTypes';
 
@@ -68,18 +69,40 @@ export const rawMaterialsWarehouseReducer = (rawMaterialsWarehouse = [], action)
       return payload;
     }
 
+    case UPDATE_RAW_MATERIALS_WAREHOUSE:
     case NEED_UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET: {
-      const itemsToUpdate = Array.isArray(payload) ? payload : [payload];
+      const source = Array.isArray(payload?.updatedRecords)
+        ? payload.updatedRecords
+        : Array.isArray(payload)
+          ? payload
+          : payload
+            ? [payload]
+            : [];
 
-      let result = [...rawMaterialsWarehouse];
+      if (!source.length || !Array.isArray(rawMaterialsWarehouse)) {
+        return rawMaterialsWarehouse;
+      }
 
-      itemsToUpdate.forEach((item) => {
+      const result = [...rawMaterialsWarehouse];
+
+      source.forEach((item) => {
         const updatedItem = item?.updatedWarehouse || item;
+        if (!updatedItem || typeof updatedItem !== 'object') return;
 
-        const index = result.findIndex((el) => el.id === updatedItem.id);
+        const index = result.findIndex((el) => {
+          if (updatedItem.id != null && el.id != null) {
+            return String(el.id) === String(updatedItem.id);
+          }
+
+          return (
+            updatedItem.material_type != null &&
+            el.material_type === updatedItem.material_type
+          );
+        });
+
         if (index !== -1) {
-          result[index] = updatedItem;
-        } else {
+          result[index] = { ...result[index], ...updatedItem };
+        } else if (updatedItem.id != null || updatedItem.material_type != null) {
           result.push(updatedItem);
         }
       });

@@ -25,51 +25,18 @@ export const applyAgentCommission = (price, agentCommission) =>
   Number(price || 0) * (1 + Number(agentCommission || 0) / 100);
 
 // The confirming surcharge, % (see getOrderConfirmingSurcharge), raises the
-// price of every product of the order, but not the delivery. Like the agent
-// commission it is layered on top of the stored prices at display time.
+// price of HCCA blocks only, not dry mixes, anchors, tools, related materials
+// or delivery. Like the agent commission it is layered on top of the stored
+// block price at display time.
 export const applyConfirmingSurcharge = (price, surcharge) =>
   Number(price || 0) * (1 + Number(surcharge || 0) / 100);
 
 const round2 = (value) => Number(value.toFixed(2));
 
-// Dry mixes, anchors, tools and related materials: pvp and final_price with
-// the surcharge. Only for display — Liberar saves the order's lines back as
-// they are, so the stored prices must stay without it.
-export const applyConfirmingSurchargeToLines = (lines, surcharge) => {
-  if (!Number(surcharge)) return lines;
-
-  return (lines || []).map((line) => ({
-    ...line,
-    pvp:
-      line.pvp == null
-        ? line.pvp
-        : round2(applyConfirmingSurcharge(line.pvp, surcharge)),
-    final_price:
-      line.final_price == null
-        ? line.final_price
-        : round2(applyConfirmingSurcharge(line.final_price, surcharge)),
-  }));
-};
-
-// Blocks get the surcharge in calcBlockPriceWithDelivery
-export const applyConfirmingSurchargeToProductLists = (
-  productLists,
-  surcharge,
-) => ({
-  ...productLists,
-  dryMixes: applyConfirmingSurchargeToLines(productLists.dryMixes, surcharge),
-  anchors: applyConfirmingSurchargeToLines(productLists.anchors, surcharge),
-  tools: applyConfirmingSurchargeToLines(productLists.tools, surcharge),
-  related_materials: applyConfirmingSurchargeToLines(
-    productLists.related_materials,
-    surcharge,
-  ),
-});
-
 // The client pays for the m2 actually shipped (whole pallets), so the line is
 // priced on quantity_real, not on the requested quantity_m2.
 // price_m2_with_markups is the list price_m2 raised by the agent commission
-// and the confirming surcharge, without delivery.
+// and the confirming surcharge (HCCA blocks only), without delivery.
 export const calcBlockPriceWithDelivery = (
   product,
   deliveryPricePerM2,

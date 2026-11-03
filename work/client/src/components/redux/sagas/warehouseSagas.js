@@ -1085,6 +1085,17 @@ function* updateRawMaterialsConsumptionRawMaterialsWarehouseWorker(action) {
       action.payload,
     );
 
+    const updatedRecords = Array.isArray(result?.updatedRecords)
+      ? result.updatedRecords
+      : [];
+
+    if (updatedRecords.length) {
+      yield put({
+        type: UPDATE_RAW_MATERIALS_WAREHOUSE,
+        payload: updatedRecords,
+      });
+    }
+
     if (requestId) {
       yield call(resolveRawMaterialConsumptionRequest, requestId, result);
     }

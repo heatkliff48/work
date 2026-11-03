@@ -59,6 +59,47 @@ import {
 } from '../types/socketTypes/socket';
 import showMessage from '#components/Utils/showMessage.js';
 
+// Sequelize update with returning sends [count, row] or [count, rows].
+// A single row in the second slot has no id when that slot is the whole list,
+// so matching payload[1].id never updates the stored rows.
+const rowsFromUpdatePayload = (payload) => {
+  if (payload == null) return [];
+
+  if (Array.isArray(payload) && typeof payload[0] === 'number') {
+    const rows = payload[1];
+    if (Array.isArray(rows)) return rows.filter((row) => row?.id != null);
+    if (rows?.id != null) return [rows];
+    return [];
+  }
+
+  if (Array.isArray(payload)) return payload.filter((row) => row?.id != null);
+  if (payload.id != null) return [payload];
+  return [];
+};
+
+const mergeWarehouseRows = (rows, payload) => {
+  const incoming = rowsFromUpdatePayload(payload);
+  if (!incoming.length || !Array.isArray(rows)) return rows;
+
+  const byId = new Map(incoming.map((row) => [String(row.id), row]));
+  let changed = false;
+
+  const next = rows.map((row) => {
+    const updated = byId.get(String(row.id));
+    if (!updated) return row;
+    changed = true;
+    byId.delete(String(row.id));
+    return updated;
+  });
+
+  if (byId.size > 0) {
+    changed = true;
+    next.push(...byId.values());
+  }
+
+  return changed ? next : rows;
+};
+
 // Sand
 export const warehouseSandReducer = (warehouseSand = [], action) => {
   const { type, payload } = action;
@@ -74,11 +115,7 @@ export const warehouseSandReducer = (warehouseSand = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_SAND_SOCKET: {
-      const result = warehouseSand.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseSand, payload);
     }
     default:
       return warehouseSand;
@@ -100,11 +137,7 @@ export const warehouseLimeReducer = (warehouseLime = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_LIME_SOCKET: {
-      const result = warehouseLime.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseLime, payload);
     }
     default:
       return warehouseLime;
@@ -126,11 +159,7 @@ export const warehouseCementReducer = (warehouseCement = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_CEMENT_SOCKET: {
-      const result = warehouseCement.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseCement, payload);
     }
     default:
       return warehouseCement;
@@ -152,11 +181,7 @@ export const warehouseGypsumReducer = (warehouseGypsum = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_GYPSUM_SOCKET: {
-      const result = warehouseGypsum.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseGypsum, payload);
     }
     default:
       return warehouseGypsum;
@@ -178,11 +203,7 @@ export const warehouseGypsumStoneReducer = (warehouseGypsumStone = [], action) =
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_GYPSUM_STONE_SOCKET: {
-      const result = warehouseGypsumStone.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseGypsumStone, payload);
     }
     default:
       return warehouseGypsumStone;
@@ -204,11 +225,7 @@ export const warehouseAluminum1Reducer = (warehouseAluminum1 = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_ALUMINUM1_SOCKET: {
-      const result = warehouseAluminum1.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseAluminum1, payload);
     }
     default:
       return warehouseAluminum1;
@@ -230,11 +247,7 @@ export const warehouseAluminum2Reducer = (warehouseAluminum2 = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_ALUMINUM2_SOCKET: {
-      const result = warehouseAluminum2.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseAluminum2, payload);
     }
     default:
       return warehouseAluminum2;
@@ -259,11 +272,7 @@ export const warehouseGrindingBallsReducer = (
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_GRINDING_BALLS_SOCKET: {
-      const result = warehouseGrindingBalls.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseGrindingBalls, payload);
     }
     default:
       return warehouseGrindingBalls;
@@ -285,11 +294,7 @@ export const warehouseAACReducer = (warehouseAAC = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_AAC_SOCKET: {
-      const result = warehouseAAC.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseAAC, payload);
     }
     default:
       return warehouseAAC;
@@ -310,11 +315,7 @@ export const warehouseSandSlurryReducer = (warehouseSandSlurry = [], action) => 
       return [...warehouseSandSlurry, payload];
     }
     case NEED_UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET: {
-      const result = warehouseSandSlurry.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseSandSlurry, payload);
     }
     default:
       return warehouseSandSlurry;
@@ -336,11 +337,7 @@ export const warehousePalletsReducer = (warehousePallets = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_PALLETS_SOCKET: {
-      const result = warehousePallets.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehousePallets, payload);
     }
     default:
       return warehousePallets;
@@ -362,11 +359,7 @@ export const warehousePlasticsReducer = (warehousePlastics = [], action) => {
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_PLASTICS_SOCKET: {
-      const result = warehousePlastics.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehousePlastics, payload);
     }
     default:
       return warehousePlastics;
@@ -388,11 +381,7 @@ export const warehouseSandPowderReducer = (warehouseSandPowder = [], action) => 
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_SAND_POWDER_SOCKET: {
-      const result = warehouseSandPowder.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseSandPowder, payload);
     }
     default:
       return warehouseSandPowder;
@@ -414,11 +403,7 @@ export const warehouseReleaseOilReducer = (warehouseReleaseOil = [], action) => 
       return result;
     }
     case NEED_UPDATE_WAREHOUSE_RELEASE_OIL_SOCKET: {
-      const result = warehouseReleaseOil.map((el) => {
-        if (el.id === payload[1]?.id) return payload[1];
-        return el;
-      });
-      return result;
+      return mergeWarehouseRows(warehouseReleaseOil, payload);
     }
     default:
       return warehouseReleaseOil;
