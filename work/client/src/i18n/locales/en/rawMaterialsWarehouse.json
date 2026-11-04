@@ -1,9 +1,12 @@
 {
   "title": "Raw Materials Warehouse",
+  "editVisibility": "Edit row visibility",
+  "doneVisibility": "Done",
   "columns": {
     "materialType": "Material type",
     "remainingQuantity": "Remaining quantity",
     "lastUpdated": "Last updated",
+    "visible": "Visible",
     "supplier": "Supplier",
     "quantityKg": "Quantity, kg",
     "quantityPieces": "Quantity, pieces",

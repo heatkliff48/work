@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
       consumed_quantity: DataTypes.FLOAT,
       last_updated: DataTypes.STRING,
       used: DataTypes.BOOLEAN,
+      visible: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
     },
     {
       sequelize,

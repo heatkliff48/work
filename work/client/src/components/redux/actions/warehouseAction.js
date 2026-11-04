@@ -38,6 +38,7 @@ import {
   ADD_NEW_AUTOCLAVE_CALENDAR,
   GET_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
+  UPDATE_RAW_MATERIALS_WAREHOUSE_VISIBILITY,
   UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
   GET_ALL_WAREHOUSE_MANAGER_TRAILER,
   ADD_NEW_WAREHOUSE_MANAGER_TRAILER,
@@ -305,6 +306,13 @@ export const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
   return {
     type: UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
     payload: rawMaterialsWarehouse,
+  };
+};
+
+export const updateRawMaterialsWarehouseVisibility = ({ id, visible }) => {
+  return {
+    type: UPDATE_RAW_MATERIALS_WAREHOUSE_VISIBILITY,
+    payload: { id, visible },
   };
 };
 
