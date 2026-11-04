@@ -21,7 +21,8 @@ import { translateMaterial } from '#i18n/index.js';
 import '#components/Styles/table.css';
 
 // Every poured cake uses release oil for its mold, in liters
-const RELEASE_OIL_WRITE_OFF = { type: 'Release oil', quantity: 2 };
+// Updated to reflect new requirement: 3 liters per pour
+const RELEASE_OIL_WRITE_OFF = { type: 'Release oil', quantity: 3 };
 
 const getCurrentTime = () => {
   const now = new Date();
