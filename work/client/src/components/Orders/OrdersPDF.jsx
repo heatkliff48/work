@@ -393,9 +393,18 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       const baseDisponible =
         totalWithoutVat + (hasDelivery ? deliveryPrice : 0);
 
-      const ivaAmount = toNumber(vatValue?.vat_euro);
+      const vatPercent = toNumber(
+        vatValue?.vat_procent ??
+          (orderData?.region === 'peninsular_spain' ? 21 : 0),
+      );
 
-      const totalPresupuesto = baseDisponible + ivaAmount;
+      const totalPresupuesto = toNumber(
+        vatValue?.vat_result_del ||
+          vatValue?.vat_result ||
+          baseDisponible * (1 + vatPercent / 100),
+      );
+
+      const ivaAmount = Math.max(0, totalPresupuesto - baseDisponible);
 
       let transportText = 'Transporte no está incluido en precio';
 
@@ -487,7 +496,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
               colSpan: 2,
             },
             {
-              content: 'IVA 21%:',
+              content: `IVA ${vatPercent}%:`,
               styles: {
                 fontStyle: 'bold',
                 halign: 'right',
@@ -1028,8 +1037,8 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       pdfAnchor,
       pdfTools,
       pdfRelMat,
-      tax: vatValue.vat_procent || 0,
-      finalTotal: vatValue.vat_result || 0,
+      tax: vatValue?.vat_procent || 0,
+      finalTotal: vatValue?.vat_result_del || vatValue?.vat_result || 0,
       terms,
       delivery,
       delivery_m2,
@@ -1038,7 +1047,7 @@ const PDFGenerator = ({ orderData, productList, vatValue }) => {
       otros,
     });
     setPdfUrl(null);
-  }, [orderData, productList]);
+  }, [orderData, productList, vatValue]);
 
   const downloadPDF = async () => {
     const doc = await generatePDF();
