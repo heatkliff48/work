@@ -95,6 +95,43 @@ rawMaterialsWarehouseRouter.get('/', async (req, res) => {
   }
 });
 
+rawMaterialsWarehouseRouter.post('/visibility', async (req, res) => {
+  if (req.session?.user?.role !== 3) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
+  const { id, visible } = req.body;
+  if (id == null || typeof visible !== 'boolean') {
+    return res.status(400).json({
+      error: 'id and visible are required',
+    });
+  }
+
+  try {
+    const [, [updatedRecord]] = await RawMaterialsWarehouse.update(
+      { visible },
+      {
+        where: { id },
+        returning: true,
+      },
+    );
+
+    if (!updatedRecord) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+
+    const plainRecord = updatedRecord.get
+      ? updatedRecord.get({ plain: true })
+      : updatedRecord;
+
+    myEmitter.emit(UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET, plainRecord);
+    return res.status(200).json(plainRecord);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json(err);
+  }
+});
+
 // rawMaterialsWarehouseRouter.post("/update", async (req, res) => {
 //   const { material_type, remaining_quantity, last_updated } = req.body;
 

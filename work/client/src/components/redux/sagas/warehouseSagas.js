@@ -58,6 +58,7 @@ import {
   UPDATE_RAW_MATERIALS_WAREHOUSE,
   GET_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
+  UPDATE_RAW_MATERIALS_WAREHOUSE_VISIBILITY,
   UPDATE_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
   UPDATE_NEW_RAW_MATERIALS_CONSUMPTION_RAW_MATERIALS_WAREHOUSE,
   ALL_WAREHOUSE_MANAGER_TRAILER,
@@ -567,6 +568,18 @@ const getRawMaterialsWarehouse = () => {
     });
 };
 
+const setRawMaterialsWarehouseVisibility = ({ id, visible }) => {
+  return url
+    .post('/rawMaterialsWarehouse/visibility', { id, visible })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 const updateRawMaterialsWarehouse = (rawMaterialsWarehouse) => {
   return url
     .post('/rawMaterialsWarehouse/update', rawMaterialsWarehouse)
@@ -1060,6 +1073,22 @@ function* getRawMaterialsWarehouseWorker() {
   }
 }
 
+function* updateRawMaterialsWarehouseVisibilityWorker(action) {
+  try {
+    const updatedRecord = yield call(
+      setRawMaterialsWarehouseVisibility,
+      action.payload,
+    );
+
+    yield put({
+      type: UPDATE_RAW_MATERIALS_WAREHOUSE,
+      payload: updatedRecord,
+    });
+  } catch (err) {
+    // Error is already shown; keep the current list.
+  }
+}
+
 function* updateNewRawMaterialsWarehouseWorker(action) {
   try {
     const { rawMaterialsWarehouse } = yield call(
@@ -1268,6 +1297,10 @@ function* warehouseWatcher() {
     updListOfOrderedProductionOEMWorker,
   );
   yield takeLatest(GET_RAW_MATERIALS_WAREHOUSE, getRawMaterialsWarehouseWorker);
+  yield takeLatest(
+    UPDATE_RAW_MATERIALS_WAREHOUSE_VISIBILITY,
+    updateRawMaterialsWarehouseVisibilityWorker,
+  );
   yield takeLatest(
     UPDATE_NEW_RAW_MATERIALS_WAREHOUSE,
     updateNewRawMaterialsWarehouseWorker,
