@@ -1,9 +1,12 @@
 {
   "title": "Almacén de materias primas",
+  "editVisibility": "Editar visibilidad de filas",
+  "doneVisibility": "Listo",
   "columns": {
     "materialType": "Tipo de material",
     "remainingQuantity": "Cantidad restante",
     "lastUpdated": "Última actualización",
+    "visible": "Visible",
     "supplier": "Proveedor",
     "quantityKg": "Cantidad, kg",
     "quantityPieces": "Cantidad, uds.",

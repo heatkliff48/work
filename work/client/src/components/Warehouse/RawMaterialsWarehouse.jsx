@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import Form from 'react-bootstrap/Form';
 import Table from '../Table/Table';
 import { materialUnitKey, translateMaterial } from '#i18n/index.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
-import { getRawMaterialsWarehouse } from '#components/redux/actions/warehouseAction.js';
+import {
+  getRawMaterialsWarehouse,
+  updateRawMaterialsWarehouseVisibility,
+} from '#components/redux/actions/warehouseAction.js';
 import RawMaterialsWarehouseInfo from './RawMaterialsWarehouseInfo';
 import {
   getWarehouseAAC,
@@ -42,17 +46,52 @@ function Warehouse() {
 
   const [modalShow, setModalShow] = useState(false);
   const [materialType, setMaterialType] = useState('');
+  const [visibilityEditMode, setVisibilityEditMode] = useState(false);
+  const isAdmin = user?.role === 3;
 
-  const columns = useMemo(
-    () =>
-      COLUMNS_RAW_MATERIALS_WAREHOUSE.map((col) => ({
-        ...col,
-        Header: COLUMN_TITLE_KEYS[col.accessor]
-          ? t(COLUMN_TITLE_KEYS[col.accessor])
-          : col.Header,
-      })),
-    [COLUMNS_RAW_MATERIALS_WAREHOUSE, t],
-  );
+  const columns = useMemo(() => {
+    const baseColumns = COLUMNS_RAW_MATERIALS_WAREHOUSE.map((col) => ({
+      ...col,
+      Header: COLUMN_TITLE_KEYS[col.accessor]
+        ? t(COLUMN_TITLE_KEYS[col.accessor])
+        : col.Header,
+    }));
+
+    if (!visibilityEditMode) return baseColumns;
+
+    return [
+      ...baseColumns,
+      {
+        Header: t('columns.visible'),
+        accessor: 'visible',
+        id: 'visible',
+        disableSortBy: true,
+        disableFilters: true,
+        Cell: ({ row }) => (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <Form.Check
+              type="switch"
+              checked={row.original.visible !== false}
+              aria-label={t('columns.visible')}
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => {
+                e.stopPropagation();
+                dispatch(
+                  updateRawMaterialsWarehouseVisibility({
+                    id: row.original.id,
+                    visible: e.target.checked,
+                  }),
+                );
+              }}
+            />
+          </div>
+        ),
+      },
+    ];
+  }, [COLUMNS_RAW_MATERIALS_WAREHOUSE, t, visibilityEditMode, dispatch]);
 
   const handleRowClick = useCallback((row) => {
     // material_key — исходное (английское) название, material_type — переведённое для отображения
@@ -75,6 +114,12 @@ function Warehouse() {
   }, [user, roles, checkUserAccess, userAccess, setUserAccess]);
 
   useEffect(() => {
+    if (!isAdmin && visibilityEditMode) {
+      setVisibilityEditMode(false);
+    }
+  }, [isAdmin, visibilityEditMode]);
+
+  useEffect(() => {
     dispatch(getRawMaterialsWarehouse());
     dispatch(getWarehouseSand());
     dispatch(getWarehouseLime());
@@ -92,20 +137,41 @@ function Warehouse() {
     dispatch(getWarehouseReleaseOil());
   }, []);
 
-  const modifiedData = raw_materials_warehouse.map((item) => ({
-    ...item,
-    material_key: item.material_type,
-    material_type: `${translateMaterial(t, item.material_type)}, ${t(
-      materialUnitKey(item.material_type),
-      { ns: 'common' },
-    )}`,
-  }));
+  const modifiedData = useMemo(() => {
+    const source = Array.isArray(raw_materials_warehouse)
+      ? raw_materials_warehouse
+      : [];
+    const rows = visibilityEditMode
+      ? source
+      : source.filter((item) => item.visible !== false);
+
+    return rows.map((item) => ({
+      ...item,
+      material_key: item.material_type,
+      material_type: `${translateMaterial(t, item.material_type)}, ${t(
+        materialUnitKey(item.material_type),
+        { ns: 'common' },
+      )}`,
+    }));
+  }, [raw_materials_warehouse, visibilityEditMode, t]);
 
   return (
     <>
       {/* {userAccess?.canWrite && (
         <ShowProductsTypeWarehouseModal target={2} title={'related material'} />
       )} */}
+
+      {isAdmin && (
+        <div>
+          <button
+            type="button"
+            className="table_button"
+            onClick={() => setVisibilityEditMode((on) => !on)}
+          >
+            {visibilityEditMode ? t('doneVisibility') : t('editVisibility')}
+          </button>
+        </div>
+      )}
 
       <Table
         COLUMN_DATA={columns}
