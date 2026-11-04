@@ -9,13 +9,11 @@ import {
   ADD_NEW_RAW_MAT_CONSUMPTION,
   DELETE_RAW_MAT_CONSUMPTION,
   GET_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
-  ADD_NEW_MAIN_RAW_MAT_CONSUMPTION,
-  DELETE_MAIN_RAW_MAT_CONSUMPTION,
   UPDATE_RECIPE,
   UPDATE_RAW_MAT_CONSUMPTION,
   ADD_NEW_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
-  DESTROY_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
   DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS,
+  RECALCULATE_RECIPES,
 } from '../types/recipeTypes';
 
 export const getRecipe = () => {
@@ -35,6 +33,13 @@ export const updateRecipe = (recipe) => {
   return {
     type: UPDATE_RECIPE,
     payload: recipe,
+  };
+};
+
+export const recalculateRecipes = (recipes) => {
+  return {
+    type: RECALCULATE_RECIPES,
+    payload: recipes,
   };
 };
 

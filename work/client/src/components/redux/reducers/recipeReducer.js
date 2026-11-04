@@ -17,11 +17,17 @@ export const recipeReducer = (recipe = [], action) => {
     case UPDATE_NEW_RECIPE_SOCKET: {
       console.log(payload, 'payload recipeReducer.js line 18');
 
-      const recipeUpdate = recipe.map((el) => {
-        if (el.id === payload[1].id) return payload[1];
-        return el;
-      });
-      return recipeUpdate;
+      if (Array.isArray(payload) && payload[1]?.id) {
+        return recipe.map((el) => (el.id === payload[1].id ? payload[1] : el));
+      }
+      if (payload?.id) {
+        return recipe.map((el) => (el.id === payload.id ? payload : el));
+      }
+      if (Array.isArray(payload)) {
+        const map = new Map(payload.map((item) => [item.id, item]));
+        return recipe.map((el) => (map.has(el.id) ? map.get(el.id) : el));
+      }
+      return recipe;
     }
     case NEED_DELETE_RECIPE_SOCKET: {
       const result = recipe.filter((el) => el.id !== payload);

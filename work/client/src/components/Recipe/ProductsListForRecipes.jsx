@@ -7,6 +7,7 @@ import { useUsersContext } from '#components/contexts/UserContext.js';
 import RecipeInfoModal from './RecipeInfoModal';
 import { useRecipeContext } from '#components/contexts/RecipeContext.js';
 import AddNewRecipeModal from './AddNewRecipeModal';
+import RecalculateRecipesModal from './RecalculateRecipesModal';
 
 const ProductsListForRecipes = () => {
   const [modalShow, setModalShow] = useState(false);
@@ -16,6 +17,7 @@ const ProductsListForRecipes = () => {
 
   const user = useSelector((state) => state.user);
   const [newRecipeModalShow, setNewRecipeModalShow] = useState(false);
+  const [recalcModalShow, setRecalcModalShow] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   const navigate = useNavigate();
@@ -41,18 +43,36 @@ const ProductsListForRecipes = () => {
   return (
     <div>
       {userAccess?.canWrite && (
-        <Button
-          onClick={() => {
-            setNewRecipeModalShow(!newRecipeModalShow);
-          }}
-        >
-          Create new recipe
-        </Button>
+        <div className="d-flex gap-2 mb-2">
+          <Button
+            onClick={() => {
+              setNewRecipeModalShow(!newRecipeModalShow);
+            }}
+          >
+            Create new recipe
+          </Button>
+          <Button
+            variant="outline-primary"
+            onClick={() => {
+              setRecalcModalShow(true);
+            }}
+          >
+            Recalculate recipes
+          </Button>
+        </div>
       )}
       {newRecipeModalShow && userAccess?.canWrite && (
         <AddNewRecipeModal
           show={newRecipeModalShow}
           onHide={() => setNewRecipeModalShow(!newRecipeModalShow)}
+        />
+      )}
+
+      {recalcModalShow && (
+        <RecalculateRecipesModal
+          show={recalcModalShow}
+          onHide={() => setRecalcModalShow(false)}
+          recipes={list_of_recipes}
         />
       )}
 
