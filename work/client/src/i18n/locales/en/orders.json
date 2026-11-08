@@ -120,7 +120,7 @@
     "vatEuro": "VAT, €",
     "paymentMethod": "Payment method",
     "confirmingSurcharge": "Confirming surcharge",
-    "confirmingSurchargeToBlocks": "+{{rate}}% to HCCA blocks",
+    "confirmingSurchargeToBlocks": "+{{rate}}% to HCCA price incl. delivery",
     "agentCommission": "Agent commission, %",
     "result": "Result",
     "resultWithDelivery": "Result with delivery",

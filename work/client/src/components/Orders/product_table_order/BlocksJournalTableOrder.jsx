@@ -93,8 +93,8 @@ const BlocksJournalTableOrder = ({
                       if (key === 'discount' && typeof value === 'number') {
                         value = Math.round(value * 100) / 100;
                       }
-                      // Агентское вознаграждение и надбавка confirming заказа
-                      // повышают цену за m2, но в строке хранится цена без них
+                      // Агентское вознаграждение повышает цену за m2, но в строке
+                      // хранится цена без него. Надбавка confirming сюда не входит.
                       if (
                         key === 'price_m2' &&
                         product.price_m2_with_markups != null
