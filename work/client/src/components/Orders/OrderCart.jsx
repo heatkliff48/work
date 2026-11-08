@@ -396,7 +396,7 @@ const OrderCart = React.memo(() => {
       const delivery_m2_share =
         (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
 
-      const { price_m2_with_delivery, final_price } =
+      const { price_m2_with_markups, price_m2_with_delivery, final_price } =
         calcBlockPriceWithDelivery(
           product,
           deliveryPricePerM2,
@@ -416,6 +416,7 @@ const OrderCart = React.memo(() => {
       return {
         ...product,
         quantity_liberated_m2: Number(quantity_liberated_m2.toFixed(2)),
+        price_m2_with_markups,
         price_m2_with_delivery,
         final_price,
         delivery_m2_share: Number(delivery_m2_share.toFixed(2)),

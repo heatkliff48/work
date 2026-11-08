@@ -22,6 +22,7 @@ import {
   palletHeightCm,
   round2,
 } from './packagingUtils.js';
+import { getDeliveryPricePerM2 } from '../blockDeliveryPrice.js';
 import '../ordersView.css';
 
 // Name of the column on the parent order's product row that tracks how much
@@ -443,18 +444,17 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       return lines;
     });
 
-    // "Delivery price for m2 full" для дочернего заказа: доставка на m2
-    // (price_m2_with_delivery - price_m2_with_markups) одинакова для всех
-    // позиций родительского заказа, но кол-во блоков (quantity_m2) в дочернем заказе
-    // у каждой позиции может отличаться — поэтому суммируем долю доставки
-    // по каждой попавшей в дочерний заказ позиции, а не берём одно значение.
+    // Доля delivery_m2 дочернего заказа — часть сохранённой доставки родителя,
+    // без надбавки confirming. Надбавка считается заново на дочернем заказе
+    // поверх цены с доставкой, поэтому вычитать её из price_m2_with_delivery
+    // нельзя: в разнице уже сидит процент и на блок, и на доставку.
+    const deliveryPerM2 = getDeliveryPricePerM2(
+      productLists.products,
+      orderCartData?.delivery_m2,
+    );
     const deliveryM2Full = round2(
       products.reduce(
-        (acc, prod) =>
-          acc +
-          (Number(prod.price_m2_with_delivery || 0) -
-            Number(prod.price_m2_with_markups ?? prod.price_m2 ?? 0)) *
-            Number(prod.quantity_m2 || 0),
+        (acc, prod) => acc + deliveryPerM2 * Number(prod.quantity_m2 || 0),
         0,
       ),
     );
