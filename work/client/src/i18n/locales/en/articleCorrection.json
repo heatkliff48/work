@@ -1,0 +1,31 @@
+{
+  "tableName": "Article correction",
+  "columns": {
+    "date": "Date",
+    "productArticle": "Product article",
+    "recipe": "Recipe",
+    "productionVolume": "Production volume",
+    "batchId": "Batch id",
+    "cakeIdStart": "Cake id start",
+    "used": "Used",
+    "consumptionCalculated": "Consumption calculated",
+    "pallets": "Pallets",
+    "orderedProductId": "Ordered product id",
+    "id": "Id"
+  },
+  "modal": {
+    "title": "Replace product article",
+    "tableName": "Matching blocks",
+    "explanation": "This window lists blocks with the same density, width, form and certificate as the product of the selected consumption row{{article}}. Click a block to overwrite previous product with a new one.",
+    "noProduct": "No product matches article {{article}}. There are no blocks to choose from.",
+    "columns": {
+      "productArticle": "Product article",
+      "description": "Description",
+      "density": "Density, kg/m³",
+      "width": "Width, mm",
+      "form": "Form",
+      "certificate": "Certificate",
+      "packaging": "Packaging"
+    }
+  }
+}

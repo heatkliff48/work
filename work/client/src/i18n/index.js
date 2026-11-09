@@ -8,10 +8,12 @@ import enCommon from './locales/en/common.json';
 import enRawMaterialsWarehouse from './locales/en/rawMaterialsWarehouse.json';
 import enCasting from './locales/en/casting.json';
 import enOrders from './locales/en/orders.json';
+import enArticleCorrection from './locales/en/articleCorrection.json';
 import esCommon from './locales/es/common.json';
 import esRawMaterialsWarehouse from './locales/es/rawMaterialsWarehouse.json';
 import esCasting from './locales/es/casting.json';
 import esOrders from './locales/es/orders.json';
+import esArticleCorrection from './locales/es/articleCorrection.json';
 
 // Языки интерфейса. Чтобы добавить новый — положить переводы в locales/<code>
 // и дописать язык сюда
@@ -37,15 +39,17 @@ i18n
         rawMaterialsWarehouse: enRawMaterialsWarehouse,
         casting: enCasting,
         orders: enOrders,
+        articleCorrection: enArticleCorrection,
       },
       es: {
         common: esCommon,
         rawMaterialsWarehouse: esRawMaterialsWarehouse,
         casting: esCasting,
         orders: esOrders,
+        articleCorrection: esArticleCorrection,
       },
     },
-    ns: ['common', 'rawMaterialsWarehouse', 'casting', 'orders'],
+    ns: ['common', 'rawMaterialsWarehouse', 'casting', 'orders', 'articleCorrection'],
     defaultNS: 'common',
     fallbackLng: DEFAULT_LANGUAGE,
     supportedLngs: SUPPORTED_LANGUAGES.map((l) => l.code),

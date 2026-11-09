@@ -29,6 +29,8 @@ const PAGE_ACCESSORS = [
   { page_name: 'temperature_data_monitoring', inherit: 'recipe_products' },
   // кнопка Raw Materials Warehouse на главной (client/src/components/Main/Main.jsx)
   { page_name: 'main_raw_materials_warehouse_button', inherit: false },
+  // замена артикула строки расхода; пока только System administrator (роль 3)
+  { page_name: 'article_correction', inherit: false },
 ];
 
 const NO_PERMISSION = { read: false, write: false };
