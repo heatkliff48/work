@@ -7,6 +7,7 @@
   "pageTitles": {
     "warehouse_raw_materials": "Almacén de materias primas",
     "cake_fillup": "Colada",
+    "article_correction": "Corrección de artículo",
     "orders": "Pedidos",
     "order_card": "Ficha del pedido"
   },

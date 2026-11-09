@@ -7,6 +7,7 @@
   "pageTitles": {
     "warehouse_raw_materials": "Raw Materials Warehouse",
     "cake_fillup": "Casting",
+    "article_correction": "Article correction",
     "orders": "Orders",
     "order_card": "Order cart"
   },

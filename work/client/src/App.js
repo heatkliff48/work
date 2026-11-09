@@ -44,6 +44,7 @@ import RelatedMaterialsBackorderList from '#components/Warehouse/RelatedMaterial
 import AutoclaveCalendare from '#components/ProductionBatchDesigner/AutoclaveCalendare.jsx';
 import ProductionBatchDesignerNew from '#components/ProductionBatchDesigner/ProductionBatchDesignerNew.jsx';
 import RawMaterialsConsumption from '#components/RawMaterialsConsumption/RawMaterialsConsumption.jsx';
+import ArticleCorrection from '#components/ArticleCorrection/ArticleCorrection.jsx';
 import LotesList from '#components/LotesList/LotesList.jsx';
 import ClientsPriceInfo from '#components/Clients/ClientsPriceInfo/ClientsPriceInfo.jsx';
 import CakeFillUp from '#components/CakeFillUp/CakeFillUp.jsx';
@@ -200,6 +201,7 @@ function App() {
               path="/raw_material_consumption"
               element={<RawMaterialsConsumption />}
             />
+            <Route path="/article_correction" element={<ArticleCorrection />} />
 
             <Route
               path="/related_materials_journal"
