@@ -16,6 +16,7 @@ export const PAYMENT_METHOD_OPTIONS = [
   { value: 'confirming_210', label: 'Confirming 210 dias', surcharge: 4.0 },
   { value: 'confirming_240', label: 'Confirming 240 dias', surcharge: 4.5 },
   { value: 'confirming_without_recourse', label: 'Confirming sin recurso' },
+  { value: 'a_convenir', label: 'A Convenir' },
 ];
 
 // старые заказы сохранены с 'confirming' без срока — в UI они показывались как 30 дней
