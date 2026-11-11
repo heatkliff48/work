@@ -560,6 +560,7 @@ const ProjectContextProvider = ({ children }) => {
     '/quality_management': 'Quality Management',
     '/autoclave_calendar': 'Autoclave calendar',
     '/raw_material_consumption': 'Raw materials consumption',
+    '/article_correction': 'Article correction',
     '/cake_fillup': 'Casting',
   };
 

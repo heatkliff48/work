@@ -24,10 +24,13 @@ export const applyDiscount = (price, discount) =>
 export const applyAgentCommission = (price, agentCommission) =>
   Number(price || 0) * (1 + Number(agentCommission || 0) / 100);
 
-// The confirming surcharge, % (see getOrderConfirmingSurcharge), raises the
-// price of HCCA blocks only, not dry mixes, anchors, tools, related materials
-// or delivery. Like the agent commission it is layered on top of the stored
-// block price at display time.
+// The confirming surcharge, % (see getOrderConfirmingSurcharge), is a payment
+// term markup on HCCA blocks only. It is applied to the price that already
+// includes the delivery share, which is the price used for the line total.
+// The base price per m2 is left unchanged. Dry mixes, anchors, tools, related
+// materials and the separate explicit delivery amount are not affected. Like
+// the agent commission it is layered on at display time and is not stored on
+// the line.
 export const applyConfirmingSurcharge = (price, surcharge) =>
   Number(price || 0) * (1 + Number(surcharge || 0) / 100);
 
@@ -36,21 +39,28 @@ const round2 = (value) => Number(value.toFixed(2));
 // The client pays for the m2 actually shipped (whole pallets), so the line is
 // priced on quantity_real, not on the requested quantity_m2.
 // price_m2_with_markups is the list price_m2 raised by the agent commission
-// and the confirming surcharge (HCCA blocks only), without delivery.
+// only. The confirming surcharge does not change it.
+// price_m2_with_delivery is (block + delivery) raised by the confirming
+// surcharge, and final_price is calculated from that.
 export const calcBlockPriceWithDelivery = (
   product,
   deliveryPricePerM2,
   agentCommission = 0,
   confirmingSurcharge = 0,
 ) => {
-  const price_m2_with_markups = applyConfirmingSurcharge(
-    applyAgentCommission(product?.price_m2, agentCommission),
+  const priceAfterAgent = applyAgentCommission(
+    product?.price_m2,
+    agentCommission,
+  );
+  const delivery = Number(deliveryPricePerM2 || 0);
+  const price_m2_with_markups = priceAfterAgent;
+  const price_m2_with_delivery = applyConfirmingSurcharge(
+    priceAfterAgent + delivery,
     confirmingSurcharge,
   );
   const quantity_real = Number(product?.quantity_real || 0);
   const discount = Number(product?.discount || 0);
 
-  const price_m2_with_delivery = price_m2_with_markups + deliveryPricePerM2;
   const final_price =
     (price_m2_with_delivery * quantity_real * (100 - discount)) / 100;
 

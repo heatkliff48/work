@@ -223,6 +223,11 @@ export default function NavBar() {
             path: '/raw_material_consumption',
             icon: rawMatConsIcon,
           },
+          {
+            title: 'Article correction',
+            path: '/article_correction',
+            icon: rawMatConsIcon,
+          },
           { title: 'Lotes list', path: '/lotes_list', icon: lotesListIcon },
         ],
       },

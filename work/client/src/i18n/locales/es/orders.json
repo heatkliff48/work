@@ -120,7 +120,7 @@
     "vatEuro": "IVA, €",
     "paymentMethod": "Forma de pago",
     "confirmingSurcharge": "Recargo por confirming",
-    "confirmingSurchargeToBlocks": "+{{rate}}% a bloques HCCA",
+    "confirmingSurchargeToBlocks": "+{{rate}}% al precio de bloques HCCA con transporte",
     "agentCommission": "Comisión del agente, %",
     "result": "Total",
     "resultWithDelivery": "Total con transporte",

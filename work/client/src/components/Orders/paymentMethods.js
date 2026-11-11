@@ -1,7 +1,7 @@
 // value сохраняется в Orders.payment_method, поэтому должен быть уникальным.
-// surcharge — надбавка за отсрочку по confirming, % только к цене HCCA Blocks
-// заказа; применяется, только если в заказе отмечена галочка
-// Orders.confirming_surcharge.
+// surcharge — надбавка за отсрочку по confirming, % к цене HCCA Blocks
+// вместе с долей delivery_m2. Применяется, только если в заказе отмечена
+// галочка Orders.confirming_surcharge.
 export const PAYMENT_METHOD_OPTIONS = [
   { value: 'prepayment', label: 'Prepago' },
   { value: 'bank_transfer', label: 'Transferencia bancaria 30 dias' },
@@ -16,6 +16,7 @@ export const PAYMENT_METHOD_OPTIONS = [
   { value: 'confirming_210', label: 'Confirming 210 dias', surcharge: 4.0 },
   { value: 'confirming_240', label: 'Confirming 240 dias', surcharge: 4.5 },
   { value: 'confirming_without_recourse', label: 'Confirming sin recurso' },
+  { value: 'a_convenir', label: 'A Convenir' },
 ];
 
 // старые заказы сохранены с 'confirming' без срока — в UI они показывались как 30 дней

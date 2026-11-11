@@ -1,0 +1,31 @@
+{
+  "tableName": "Corrección de artículo",
+  "columns": {
+    "date": "Fecha",
+    "productArticle": "Artículo del producto",
+    "recipe": "Receta",
+    "productionVolume": "Volumen de producción",
+    "batchId": "Id de lote",
+    "cakeIdStart": "Id inicial de torta",
+    "used": "Usado",
+    "consumptionCalculated": "Consumo calculado",
+    "pallets": "Palés",
+    "orderedProductId": "Id del producto pedido",
+    "id": "Id"
+  },
+  "modal": {
+    "title": "Sustituir artículo del producto",
+    "tableName": "Bloques coincidentes",
+    "explanation": "Esta ventana muestra los bloques con la misma densidad, anchura, forma y certificado que el producto de la fila de consumo seleccionada{{article}}. Haga clic en un bloque para sustituir el producto anterior por uno nuevo.",
+    "noProduct": "Ningún producto coincide con el artículo {{article}}. No hay bloques para elegir.",
+    "columns": {
+      "productArticle": "Artículo del producto",
+      "description": "Descripción",
+      "density": "Densidad, kg/m³",
+      "width": "Anchura, mm",
+      "form": "Forma",
+      "certificate": "Certificado",
+      "packaging": "Embalaje"
+    }
+  }
+}

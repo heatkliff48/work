@@ -27,6 +27,7 @@ export const PAGE_ACCESS = {
   '/technology_calendar': 'technology_calendar',
   '/cake_fillup': 'cake_fillup',
   '/raw_material_consumption': 'raw_material_consumption',
+  '/article_correction': 'article_correction',
   '/lotes_list': 'lotes_list',
 
   '/quality_management': 'quality_management',
