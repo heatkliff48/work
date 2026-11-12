@@ -8,6 +8,17 @@
   "emptyTitle": "No orders match your search",
   "emptySubtitle": "Try a different order number, client, project, contact or address.",
   "none": "None",
+  "filters": {
+    "allStatuses": "All statuses",
+    "inProduction": "In production (all)",
+    "allPersonsInCharge": "All managers",
+    "unassigned": "Unassigned",
+    "allClients": "All clients",
+    "reset": "Reset filters",
+    "showAll": "Show all orders",
+    "noMatchingOrders": "No orders match your filters",
+    "tryResetFilters": "Try changing or resetting your filters to see more orders."
+  },
   "columns": {
     "article": "Order number",
     "description": "Description",

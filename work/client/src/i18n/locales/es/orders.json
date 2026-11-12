@@ -8,6 +8,17 @@
   "emptyTitle": "Ningún pedido coincide con la búsqueda",
   "emptySubtitle": "Prueba con otro número de pedido, cliente, proyecto, contacto o dirección.",
   "none": "Ninguno",
+  "filters": {
+    "allStatuses": "Todos los estados",
+    "inProduction": "En producción (todos)",
+    "allPersonsInCharge": "Todos los responsables",
+    "unassigned": "Sin asignar",
+    "allClients": "Todos los clientes",
+    "reset": "Restablecer filtros",
+    "showAll": "Mostrar todos los pedidos",
+    "noMatchingOrders": "Ningún pedido coincide con los filtros",
+    "tryResetFilters": "Prueba a cambiar o restablecer los filtros para ver más pedidos."
+  },
   "columns": {
     "article": "Número de pedido",
     "description": "Descripción",
