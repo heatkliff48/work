@@ -101,7 +101,8 @@
     "phone_number_mobile": "Phone number mobile",
     "phone_number_messenger": "Phone number messenger",
     "linkedin": "Linkedin",
-    "social": "Social"
+    "social": "Social",
+    "additional_contact_info": "Additional contact info"
   },
   "card": {
     "projectName": "Project name",
@@ -113,6 +114,8 @@
     "descriptionPlaceholder": "Enter description...",
     "otros": "Otros",
     "otrosPlaceholder": "Enter otros...",
+    "additionalContactInfo": "Additional contact info",
+    "additionalContactInfoPlaceholder": "Enter additional contact info...",
     "edit": "Edit",
     "save": "Save",
     "orderStatus": "Order status",

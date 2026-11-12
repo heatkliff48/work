@@ -93,8 +93,8 @@ export const ordersReducer = (orders = [], action) => {
     }
 
     case DESCRIPTIOM_ORDER_SOCKET: {
-      // Приходит либо description, либо otros — второе поле не затираем
-      const { order_id, description, otros } = payload;
+      // Приходит либо description, либо otros, либо additional_contact_info — остальные поля не затираем
+      const { order_id, description, otros, additional_contact_info } = payload;
 
       const result = orders.map((order) => {
         if (order.id === order_id) {
@@ -102,6 +102,9 @@ export const ordersReducer = (orders = [], action) => {
             ...order,
             ...(description !== undefined && { description }),
             ...(otros !== undefined && { otros }),
+            ...(additional_contact_info !== undefined && {
+              additional_contact_info,
+            }),
           };
         }
         return order;

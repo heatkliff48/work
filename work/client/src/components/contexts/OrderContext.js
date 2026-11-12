@@ -523,6 +523,7 @@ const OrderContextProvider = ({ children }) => {
         agent_commission: order?.agent_commission ?? 0,
         confirming_surcharge: Boolean(order?.confirming_surcharge),
         otros: order?.otros ?? '',
+        additional_contact_info: order?.additional_contact_info ?? '',
       };
 
       localStorage.setItem('orderCartData', JSON.stringify(currentOrder));

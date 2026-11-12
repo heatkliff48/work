@@ -101,7 +101,8 @@
     "phone_number_mobile": "Teléfono móvil",
     "phone_number_messenger": "Teléfono de mensajería",
     "linkedin": "LinkedIn",
-    "social": "Redes sociales"
+    "social": "Redes sociales",
+    "additional_contact_info": "Información de contacto adicional"
   },
   "card": {
     "projectName": "Nombre del proyecto",
@@ -113,6 +114,8 @@
     "descriptionPlaceholder": "Introduce una descripción...",
     "otros": "Otros",
     "otrosPlaceholder": "Introduce otros...",
+    "additionalContactInfo": "Información de contacto adicional",
+    "additionalContactInfoPlaceholder": "Introduce información de contacto adicional...",
     "edit": "Editar",
     "save": "Guardar",
     "orderStatus": "Estado del pedido",

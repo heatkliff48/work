@@ -548,6 +548,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       agent_commission: orderCartData?.agent_commission ?? 0,
       confirming_surcharge: Boolean(orderCartData?.confirming_surcharge),
       otros: orderCartData?.otros,
+      additional_contact_info: orderCartData?.additional_contact_info,
       products,
       dryMixes,
       anchors,

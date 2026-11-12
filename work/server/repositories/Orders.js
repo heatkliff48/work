@@ -326,12 +326,20 @@ class OrdersRepository {
     }
   }
 
-  // Сохраняет description и/или otros — обновляется только переданное поле
-  static async addDescriptionOrder({ order_id, description, otros }) {
+  // Сохраняет description, otros и/или additional_contact_info — обновляется только переданное поле
+  static async addDescriptionOrder({
+    order_id,
+    description,
+    otros,
+    additional_contact_info,
+  }) {
     try {
           await updateOrderFields(order_id, {
             ...(description !== undefined && { description }),
             ...(otros !== undefined && { otros }),
+            ...(additional_contact_info !== undefined && {
+              additional_contact_info,
+            }),
           });
 
       const order_desc = await Orders.findOne({ where: { id: order_id } });
@@ -1290,6 +1298,7 @@ class OrdersRepository {
     agent_commission,
     confirming_surcharge,
     otros,
+    additional_contact_info,
   }) {
     try {
       const { childOrder, createdProducts } = await Orders.sequelize.transaction(async (transaction) => {
@@ -1311,6 +1320,7 @@ class OrdersRepository {
           agent_commission: Number(agent_commission) || 0,
           confirming_surcharge: Boolean(confirming_surcharge),
           otros,
+          additional_contact_info,
         }, { transaction });
 
         const order_id = childOrder.id;
