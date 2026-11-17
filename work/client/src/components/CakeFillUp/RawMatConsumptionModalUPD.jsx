@@ -41,6 +41,8 @@ const RawMaterialsConsumptionModal = React.memo(
     newBatchMode = false,
     lotesListBatches = [],
     lotesListCakes = [],
+    defaultAlu1Type = null,
+    defaultAlu2Type = null,
   }) => {
     const {
       list_of_recipes = [],
@@ -189,8 +191,8 @@ const RawMaterialsConsumptionModal = React.memo(
         { label: 'Gypsum', key: 'gypsum_dry' },
         { label: 'Return slurry (dry)', key: 'return_dry' },
         { label: 'Gypsum stone', key: 'gypsum_stone' },
-        { label: 'Aluminum 1', key: 'aluminum_paste' },
-        { label: 'Aluminum 2', key: 'aluminum_paste_2' },
+        { label: 'Aluminum 1', key: 'aluminum_paste', noWriteOff: true },
+        { label: 'Aluminum 2', key: 'aluminum_paste_2', noWriteOff: true },
         {
           label: 'Aluminum suspension, kg',
           key: 'aluminum_suspension',
@@ -402,6 +404,7 @@ const RawMaterialsConsumptionModal = React.memo(
       setRecipeArticle(recipe?.article || '');
 
       const alu1Type =
+        defaultAlu1Type ||
         (seedFromPrevRef.current ? previousBatchRecord?.aluminum_type : null) ||
         recipe?.aluminum_type;
 
@@ -415,6 +418,7 @@ const RawMaterialsConsumptionModal = React.memo(
       }
 
       const alu2Type =
+        defaultAlu2Type ||
         (seedFromPrevRef.current ? previousBatchRecord?.aluminum_2_type : null) ||
         recipe?.aluminum_2_type;
 
@@ -529,7 +533,7 @@ const RawMaterialsConsumptionModal = React.memo(
 
         if (Number.isFinite(actual) && actual > 0) {
           snapshot[key] = +actual.toFixed(5);
-        } else if (noWriteOff) {
+        } else if (noWriteOff && key === 'aluminum_suspension') {
           snapshot[key] = null;
         } else {
           const base = Number(recipeForUI?.[key]);
@@ -584,19 +588,6 @@ const RawMaterialsConsumptionModal = React.memo(
 
       if (newBatchMode && !selectedRecipe) {
         alert(t('alerts.selectRecipe'));
-        return;
-      }
-
-      const aluminum1Consumed = computeConsumed('aluminum_paste');
-      const aluminum2Consumed = computeConsumed('aluminum_paste_2');
-
-      if (Number(aluminum1Consumed) > 0 && !selectedAlu1Type?.value) {
-        alert(t('alerts.selectAlu1Type'));
-        return;
-      }
-
-      if (Number(aluminum2Consumed) > 0 && !selectedAlu2Type?.value) {
-        alert(t('alerts.selectAlu2Type'));
         return;
       }
 

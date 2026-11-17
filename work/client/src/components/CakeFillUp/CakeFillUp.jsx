@@ -5,7 +5,10 @@ import Table from '#components/Table/Table';
 import { TextSearchFilter } from '#components/Table/filters.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
 import { useProjectContext } from '#components/contexts/Context.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
+import axios from 'axios';
+import { getApiUrl } from '#utils/getApiUrl.js';
 import { addNewLotesListCakes } from '#components/redux/actions/lotesListAction.js';
 import {
   deleteBatchOutside,
@@ -57,10 +60,12 @@ function CakeFillUp() {
     useWarehouseContext();
   const { cakeFillUp, setCakeFillUp, lotesListBatches, lotesListCakes } =
     useProjectContext();
-  const { raw_mat_consumption } = useRecipeContext();
+  const { raw_mat_consumption, list_of_recipes = [] } = useRecipeContext();
   const { latestProducts, extractProductTitle } = useProductsContext();
   const { rawMaterialConsumptionMadal, setRawMaterialConsumptionMadal } =
     useModalContext();
+
+  const warehouseAluminum1 = useSelector((state) => state.warehouseAluminum1);
 
   const [activeBatchId, setActiveBatchId] = useState(null);
   const [currentProduct, setCurrentProduct] = useState(null);
@@ -71,6 +76,13 @@ function CakeFillUp() {
   const [cakeCastingTemperatures, setCakeCastingTemperatures] = useState({});
   const [cakeFlowabilities, setCakeFlowabilities] = useState({});
   const [cakeSlurried, setCakeSlurried] = useState({});
+
+  const [alu1Type, setAlu1Type] = useState(null);
+  const [alu1Qty, setAlu1Qty] = useState('');
+  const [alu2Type, setAlu2Type] = useState(null);
+  const [alu2Qty, setAlu2Qty] = useState('');
+  const [isWritingOffAlu, setIsWritingOffAlu] = useState(false);
+  const [batchAluminumConsumptions, setBatchAluminumConsumptions] = useState([]);
 
   const production_plan_table = [
     { Header: t('columns.date'), accessor: 'date', Filter: TextSearchFilter },
@@ -269,6 +281,9 @@ function CakeFillUp() {
     setCakeCastingTemperatures({});
     setCakeFlowabilities({});
     setCakeSlurried({});
+    setAlu1Qty('');
+    setAlu2Qty('');
+    setBatchAluminumConsumptions([]);
   }, []);
 
   useEffect(() => {
@@ -459,6 +474,146 @@ function CakeFillUp() {
     }
   };
 
+  const aluminumOptions = useMemo(() => {
+    if (!Array.isArray(warehouseAluminum1)) return [];
+    const types = [
+      ...new Set(warehouseAluminum1.map((item) => item?.type).filter(Boolean)),
+    ];
+    return types.map((type) => ({ value: type, label: type }));
+  }, [warehouseAluminum1]);
+
+  useEffect(() => {
+    if (!activeBatchId) {
+      setBatchAluminumConsumptions([]);
+      return;
+    }
+
+    let isMounted = true;
+    const fetchConsumptions = async () => {
+      try {
+        const res = await axios.get(
+          `${getApiUrl()}/rawMaterialsWarehouse/batch_aluminum_consumption/${activeBatchId}`,
+          { withCredentials: true }
+        );
+        if (isMounted && Array.isArray(res.data)) {
+          setBatchAluminumConsumptions(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch batch aluminum consumptions:', err);
+      }
+    };
+
+    fetchConsumptions();
+    return () => {
+      isMounted = false;
+    };
+  }, [activeBatchId]);
+
+  useEffect(() => {
+    if (!cakeFillUp?.product_article) return;
+    const product = latestProducts.find(
+      (p) => p.article === cakeFillUp.product_article
+    );
+    const recipe = list_of_recipes.find(
+      (r) =>
+        r.article === product?.recipe ||
+        r.article === cakeFillUp?.recipe_article ||
+        r.product === product?.description
+    );
+
+    if (recipe) {
+      if (recipe.aluminum_type && !alu1Type) {
+        setAlu1Type({ value: recipe.aluminum_type, label: recipe.aluminum_type });
+      }
+      if (recipe.aluminum_2_type && !alu2Type) {
+        setAlu2Type({ value: recipe.aluminum_2_type, label: recipe.aluminum_2_type });
+      }
+    }
+  }, [cakeFillUp?.product_article, latestProducts, list_of_recipes]);
+
+  const totalAluWrittenOff = useMemo(() => {
+    return batchAluminumConsumptions.reduce(
+      (sum, c) => sum + (Number(c.quantity) || 0),
+      0
+    );
+  }, [batchAluminumConsumptions]);
+
+  const handleWriteOffAluminum = async () => {
+    if (!activeBatchId) return;
+
+    const q1 = Number(alu1Qty) || 0;
+    const q2 = Number(alu2Qty) || 0;
+
+    if (q1 <= 0 && q2 <= 0) {
+      alert(t('enterQuantityAlert'));
+      return;
+    }
+
+    if (q1 > 0 && !alu1Type?.value) {
+      alert(t('selectAluTypeAlert'));
+      return;
+    }
+
+    if (q2 > 0 && !alu2Type?.value) {
+      alert(t('selectAluTypeAlert'));
+      return;
+    }
+
+    const items = [];
+    if (q1 > 0 && alu1Type?.value) {
+      items.push({ type: alu1Type.value, quantity: q1 });
+    }
+    if (q2 > 0 && alu2Type?.value) {
+      items.push({ type: alu2Type.value, quantity: q2 });
+    }
+
+    setIsWritingOffAlu(true);
+    try {
+      const res = await axios.post(
+        `${getApiUrl()}/rawMaterialsWarehouse/batch_aluminum_consumption`,
+        {
+          batch_id: activeBatchId,
+          date: batchCalDate || undefined,
+          items,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.data?.newConsumptions) {
+        setBatchAluminumConsumptions((prev) => [
+          ...prev,
+          ...res.data.newConsumptions,
+        ]);
+      }
+
+      dispatch(getWarehouseAluminum1());
+      dispatch(getRawMaterialsWarehouse());
+
+      setAlu1Qty('');
+      setAlu2Qty('');
+      alert(t('writeOffSuccess'));
+    } catch (err) {
+      console.error('Write off error:', err);
+      const message =
+        err.response?.data?.message ||
+        t('alerts.writeOffFailed');
+      const shortageDetails = err.response?.data?.shortageDetails;
+      if (Array.isArray(shortageDetails) && shortageDetails.length) {
+        const details = shortageDetails
+          .map(
+            (s) =>
+              `${s.subtype}: need ${s.required}, available ${s.available}, shortage ${s.shortage}`
+          )
+          .join('\n');
+        alert(`${message}\n\n${details}`);
+      } else {
+        alert(message);
+      }
+    } finally {
+      setIsWritingOffAlu(false);
+    }
+  };
+
   const isFullyAllocated = total_cake > 0 && allocated >= total_cake;
 
   const handleNewBatch = () => {
@@ -599,6 +754,9 @@ function CakeFillUp() {
     setCakeCastingTemperatures({});
     setCakeFlowabilities({});
     setCakeSlurried({});
+    setAlu1Qty('');
+    setAlu2Qty('');
+    setBatchAluminumConsumptions([]);
   };
 
   // Возвращает партию в план (is_prodused = 0), чтобы она больше не
@@ -644,6 +802,8 @@ function CakeFillUp() {
           onSave={handleSave}
           lotesListBatches={lotesListBatches}
           lotesListCakes={lotesListCakes}
+          defaultAlu1Type={alu1Type?.value}
+          defaultAlu2Type={alu2Type?.value}
         />
       )}
 
@@ -667,13 +827,13 @@ function CakeFillUp() {
       )}
 
       {hasCakeFillUp && (
-        <div className="mt-3" style={{ maxWidth: nextProductSummary ? 1500 : 900 }}>
+        <div className="mt-3" style={{ maxWidth: nextProductSummary ? 1600 : 1200 }}>
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: nextProductSummary
-                ? 'repeat(2, minmax(0, 1fr))'
-                : 'minmax(0, 1fr)',
+                ? 'repeat(3, minmax(0, 1fr))'
+                : 'repeat(2, minmax(0, 1fr))',
               gap: 16,
               marginBottom: '20px',
             }}
@@ -759,6 +919,250 @@ function CakeFillUp() {
                   </div>
                   <div style={{ marginTop: 4, fontSize: '1.1rem' }}>
                     {allocated} / {total_cake}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                padding: 16,
+                borderRadius: 14,
+                backgroundColor: '#e9ecef',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '8px 14px',
+                    marginBottom: 10,
+                    borderRadius: 8,
+                    backgroundColor: '#495057',
+                    color: '#fff',
+                    fontWeight: 600,
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.16)',
+                  }}
+                >
+                  <span>{t('aluminumSuspensionTitle')}</span>
+                </div>
+
+                <div
+                  style={{
+                    width: '100%',
+                    border: '1px solid #ced4da',
+                    borderRadius: '10px',
+                    padding: '12px 14px',
+                    backgroundColor: '#fff',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1.2fr 1fr',
+                      gap: 10,
+                      marginBottom: 8,
+                    }}
+                  >
+                    <div>
+                      <label
+                        style={{
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          color: '#6c757d',
+                          marginBottom: 2,
+                          display: 'block',
+                        }}
+                      >
+                        {t('aluminum1')}
+                      </label>
+                      <Select
+                        placeholder={t('modal.selectType')}
+                        options={aluminumOptions}
+                        value={alu1Type}
+                        onChange={setAlu1Type}
+                        isClearable
+                        styles={{
+                          control: (base) => ({ ...base, minHeight: '32px' }),
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        }}
+                        menuPortalTarget={document.body}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        style={{
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          color: '#6c757d',
+                          marginBottom: 2,
+                          display: 'block',
+                        }}
+                      >
+                        {t('qtyKg')}
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        className="form-control form-control-sm"
+                        placeholder="0.00"
+                        value={alu1Qty}
+                        onChange={(e) => setAlu1Qty(e.target.value)}
+                        style={{ height: '38px' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1.2fr 1fr',
+                      gap: 10,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <div>
+                      <label
+                        style={{
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          color: '#6c757d',
+                          marginBottom: 2,
+                          display: 'block',
+                        }}
+                      >
+                        {t('aluminum2')}
+                      </label>
+                      <Select
+                        placeholder={t('modal.selectType')}
+                        options={aluminumOptions}
+                        value={alu2Type}
+                        onChange={setAlu2Type}
+                        isClearable
+                        styles={{
+                          control: (base) => ({ ...base, minHeight: '32px' }),
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        }}
+                        menuPortalTarget={document.body}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        style={{
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          color: '#6c757d',
+                          marginBottom: 2,
+                          display: 'block',
+                        }}
+                      >
+                        {t('qtyKg')}
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        className="form-control form-control-sm"
+                        placeholder="0.00"
+                        value={alu2Qty}
+                        onChange={(e) => setAlu2Qty(e.target.value)}
+                        style={{ height: '38px' }}
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    color="success"
+                    size="sm"
+                    className="w-100"
+                    style={{ fontWeight: 600 }}
+                    onClick={handleWriteOffAluminum}
+                    disabled={isWritingOffAlu}
+                  >
+                    {isWritingOffAlu ? t('modal.saving') : t('writeOffButton')}
+                  </Button>
+                </div>
+
+                <div style={{ marginTop: 10 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: 4,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        color: '#495057',
+                      }}
+                    >
+                      {t('batchWrittenOffTotal')}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '0.95rem',
+                        fontWeight: 700,
+                        color: '#28a745',
+                      }}
+                    >
+                      {totalAluWrittenOff.toFixed(2)} {t('kg')}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      maxHeight: 80,
+                      overflowY: 'auto',
+                      fontSize: '0.8rem',
+                      backgroundColor: '#fff',
+                      border: '1px solid #ced4da',
+                      borderRadius: 8,
+                      padding: '6px 10px',
+                    }}
+                  >
+                    {batchAluminumConsumptions.length === 0 ? (
+                      <div
+                        style={{
+                          color: '#6c757d',
+                          fontStyle: 'italic',
+                          padding: '2px 0',
+                        }}
+                      >
+                        {t('noAluminumWrittenOffYet')}
+                      </div>
+                    ) : (
+                      batchAluminumConsumptions.map((item, idx) => (
+                        <div
+                          key={item.id || idx}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            padding: '3px 0',
+                            borderBottom:
+                              idx < batchAluminumConsumptions.length - 1
+                                ? '1px dashed #dee2e6'
+                                : 'none',
+                          }}
+                        >
+                          <span>
+                            <strong>{item.aluminum_type}</strong>
+                            {item.date ? ` (${item.date})` : ''}
+                          </span>
+                          <span style={{ fontWeight: 600 }}>
+                            {Number(item.quantity).toFixed(2)} {t('kg')}
+                          </span>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
@@ -854,7 +1258,8 @@ function CakeFillUp() {
 
           <div
             style={{
-              width: nextProductSummary ? 'calc(50% - 8px)' : '100%',
+              width: '100%',
+              maxWidth: nextProductSummary ? 1600 : 1200,
             }}
           >
             <div>

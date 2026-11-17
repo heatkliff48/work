@@ -32,6 +32,17 @@
     "areYouSure": "¿Está seguro de que desea continuar?",
     "finishBatch": "¿Desea continuar?"
   },
+  "aluminumSuspensionTitle": "Baja de aluminio (suspensión)",
+  "aluminum1": "Aluminio 1",
+  "aluminum2": "Aluminio 2",
+  "qtyKg": "Cant., kg",
+  "writeOffButton": "Dar de baja del almacén",
+  "batchWrittenOffTotal": "Dado de baja para el lote:",
+  "noAluminumWrittenOffYet": "Aún no se ha dado de baja aluminio para este lote",
+  "enterQuantityAlert": "Introduzca la cantidad de aluminio para dar de baja.",
+  "selectAluTypeAlert": "Seleccione el tipo de aluminio.",
+  "writeOffSuccess": "Aluminio dado de baja con éxito.",
+  "kg": "kg",
   "modal": {
     "recipeArticle": "Referencia de la receta",
     "noRecipes": "No hay recetas",

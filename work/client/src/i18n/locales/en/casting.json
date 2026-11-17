@@ -32,6 +32,17 @@
     "areYouSure": "Are you sure you want to continue?",
     "finishBatch": "Do you want to continue?"
   },
+  "aluminumSuspensionTitle": "Aluminum suspension write-off",
+  "aluminum1": "Aluminum 1",
+  "aluminum2": "Aluminum 2",
+  "qtyKg": "Qty, kg",
+  "writeOffButton": "Write off from warehouse",
+  "batchWrittenOffTotal": "Written off for batch:",
+  "noAluminumWrittenOffYet": "No aluminum written off yet for this batch",
+  "enterQuantityAlert": "Please enter aluminum quantity to write off.",
+  "selectAluTypeAlert": "Please select aluminum type.",
+  "writeOffSuccess": "Aluminum written off successfully.",
+  "kg": "kg",
   "modal": {
     "recipeArticle": "Recipe article",
     "noRecipes": "No recipes",

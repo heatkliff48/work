@@ -15,6 +15,7 @@ const {
   WarehousePlastic,
   WarehouseSandPowder,
   WarehouseReleaseOil,
+  BatchAluminumConsumption,
 } = require('../db/models/index.js');
 const { Sequelize } = require('sequelize');
 
@@ -63,6 +64,7 @@ const {
   DELETE_WAREHOUSE_RELEASE_OIL_SOCKET,
   UPDATE_WAREHOUSE_SAND_SLURRY_SOCKET,
   UPDATE_RAW_MATERIALS_WAREHOUSE_STATUS_SOCKET,
+  ADD_BATCH_ALUMINUM_CONSUMPTION_SOCKET,
 } = require('../src/constants/event.js');
 const { ErrorUtils } = require('../utils/Errors.js');
 const { Op } = require('sequelize');
@@ -82,6 +84,12 @@ const formatDate = (dateString) => {
 
   return `${day}.${month}.${year}`;
 };
+
+if (BatchAluminumConsumption && typeof BatchAluminumConsumption.sync === 'function') {
+  BatchAluminumConsumption.sync().catch((err) => {
+    console.error('Failed to sync BatchAluminumConsumption table:', err.message);
+  });
+}
 
 rawMaterialsWarehouseRouter.get('/', async (req, res) => {
   try {
@@ -867,6 +875,257 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
     return res.status(status).json(response);
   }
 });
+
+rawMaterialsWarehouseRouter.get(
+  '/batch_aluminum_consumption/:batch_id',
+  async (req, res) => {
+    try {
+      const { batch_id } = req.params;
+      const consumptions = await BatchAluminumConsumption.findAll({
+        where: { batch_id: Number(batch_id) },
+        order: [['id', 'ASC']],
+      });
+      return res.status(200).json(consumptions);
+    } catch (err) {
+      console.error('GET /batch_aluminum_consumption/:batch_id error:', err);
+      return res
+        .status(500)
+        .json({ error: 'FAILED_TO_FETCH_BATCH_ALUMINUM_CONSUMPTION' });
+    }
+  },
+);
+
+rawMaterialsWarehouseRouter.post(
+  '/batch_aluminum_consumption',
+  async (req, res) => {
+    const { batch_id, items, date } = req.body;
+
+    const round2 = (value) =>
+      Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+
+    if (!batch_id) {
+      return res.status(400).json({
+        error: 'INVALID_BATCH_ID',
+        message: 'batch_id is required.',
+      });
+    }
+
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        error: 'INVALID_ITEMS',
+        message: 'items array is required.',
+      });
+    }
+
+    const normItems = items
+      .map((item) => ({
+        type: normalizeType(item?.type),
+        quantity: Number.isFinite(Number(item?.quantity))
+          ? round2(item.quantity)
+          : 0,
+      }))
+      .filter((item) => item.type && item.quantity > 0);
+
+    if (normItems.length === 0) {
+      return res.status(400).json({
+        error: 'NO_VALID_ITEMS',
+        message: 'No valid aluminum items to write off.',
+      });
+    }
+
+    const totalsByType = normItems.reduce((acc, item) => {
+      acc[item.type] = round2((acc[item.type] || 0) + item.quantity);
+      return acc;
+    }, {});
+
+    try {
+      const transactionResult = await sequelize.transaction(
+        async (transaction) => {
+          const now = new Date();
+          const day = String(now.getDate()).padStart(2, '0');
+          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const year = now.getFullYear();
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+
+          const currentDate = date || `${day}.${month}.${year}`;
+          const itemDate = `${day}.${month}.${year} ${hours}:${minutes}`;
+
+          const shortageDetails = [];
+          const recordsByType = new Map();
+
+          for (const [subtype, required] of Object.entries(totalsByType)) {
+            const records = await WarehouseAluminum1.findAll({
+              where: { type: subtype },
+              order: [
+                [sequelize.literal(`to_date("date", 'DD.MM.YYYY')`), 'ASC'],
+                ['id', 'ASC'],
+              ],
+              transaction,
+              lock: transaction.LOCK.UPDATE,
+            });
+
+            recordsByType.set(subtype, records);
+
+            const available = round2(
+              records.reduce((total, record) => {
+                const qty = Number(record.quantity) || 0;
+                const consumed = Number(record.consumed_quantity) || 0;
+                return total + Math.max(0, qty - consumed);
+              }, 0),
+            );
+
+            if (available < required) {
+              shortageDetails.push({
+                subtype,
+                available,
+                required,
+                shortage: round2(required - available),
+              });
+            }
+          }
+
+          if (shortageDetails.length > 0) {
+            const err = new Error('Insufficient aluminum stock in warehouse.');
+            err.status = 409;
+            err.code = 'INSUFFICIENT_STOCK';
+            err.shortageDetails = shortageDetails;
+            throw err;
+          }
+
+          let totalAluminumSpent = 0;
+          const updatedAluminumRows = [];
+
+          for (const [subtype, required] of Object.entries(totalsByType)) {
+            const records = recordsByType.get(subtype) || [];
+            let remainingToWriteOff = required;
+
+            for (const record of records) {
+              if (remainingToWriteOff <= 0) break;
+
+              const qty = round2(Number(record.quantity) || 0);
+              const consumed = round2(Number(record.consumed_quantity) || 0);
+              const available = round2(Math.max(0, qty - consumed));
+
+              if (available <= 0) continue;
+
+              const quantityToWriteOff = round2(
+                Math.min(available, remainingToWriteOff),
+              );
+
+              await record.update(
+                {
+                  consumed_quantity: round2(consumed + quantityToWriteOff),
+                },
+                { transaction },
+              );
+
+              updatedAluminumRows.push(record.toJSON());
+              remainingToWriteOff = round2(
+                remainingToWriteOff - quantityToWriteOff,
+              );
+            }
+
+            totalAluminumSpent = round2(totalAluminumSpent + required);
+          }
+
+          const newConsumptions = [];
+          for (const item of normItems) {
+            const created = await BatchAluminumConsumption.create(
+              {
+                batch_id: Number(batch_id),
+                aluminum_type: item.type,
+                quantity: item.quantity,
+                date: itemDate,
+              },
+              { transaction },
+            );
+            newConsumptions.push(created.toJSON());
+          }
+
+          const aluminumSummaryRecord = await RawMaterialsWarehouse.findOne({
+            where: { material_type: 'Aluminum' },
+            transaction,
+            lock: transaction.LOCK.UPDATE,
+          });
+
+          let updatedWarehouseRecords = [];
+          if (aluminumSummaryRecord) {
+            const totalAluminumQuantity =
+              Number(
+                await WarehouseAluminum1.sum('quantity', {
+                  transaction,
+                }),
+              ) || 0;
+
+            const totalAluminumConsumed =
+              Number(
+                await WarehouseAluminum1.sum('consumed_quantity', {
+                  transaction,
+                }),
+              ) || 0;
+
+            const totalAluminumAvailable = round2(
+              totalAluminumQuantity - totalAluminumConsumed,
+            );
+
+            const previousConsumed = round2(
+              Number(aluminumSummaryRecord.consumed_quantity) || 0,
+            );
+
+            await aluminumSummaryRecord.update(
+              {
+                remaining_quantity: totalAluminumAvailable,
+                consumed_quantity: round2(
+                  previousConsumed + totalAluminumSpent,
+                ),
+                last_updated: currentDate,
+                updatedAt: now,
+              },
+              { transaction },
+            );
+
+            updatedWarehouseRecords = [aluminumSummaryRecord.toJSON()];
+          }
+
+          return {
+            newConsumptions,
+            updatedRecords: updatedWarehouseRecords,
+            updatedAluminumRows,
+          };
+        },
+      );
+
+      if (transactionResult.updatedRecords.length) {
+        myEmitter.emit(
+          UPDATE_RAW_MATERIALS_WAREHOUSE_SOCKET,
+          transactionResult.updatedRecords,
+        );
+      }
+
+      if (transactionResult.updatedAluminumRows.length) {
+        myEmitter.emit(UPDATE_WAREHOUSE_ALUMINUM1_SOCKET, [
+          transactionResult.updatedAluminumRows.length,
+          transactionResult.updatedAluminumRows,
+        ]);
+      }
+
+      myEmitter.emit(ADD_BATCH_ALUMINUM_CONSUMPTION_SOCKET, {
+        batch_id: Number(batch_id),
+        consumptions: transactionResult.newConsumptions,
+      });
+
+      return res.status(200).json(transactionResult);
+    } catch (err) {
+      const status = Number(err.status) || 500;
+      return res.status(status).json({
+        error: err.code || 'BATCH_ALUMINUM_WRITE_OFF_FAILED',
+        message: err.message || 'Failed to write off batch aluminum.',
+        shortageDetails: err.shortageDetails,
+      });
+    }
+  },
+);
 
 // Sand
 rawMaterialsWarehouseRouter.get('/sand', async (req, res) => {

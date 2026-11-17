@@ -122,6 +122,7 @@ const {
   DELETE_WAREHOUSE_GYPSUM_STONE_SOCKET,
   ADD_NEW_WAREHOUSE_ALUMINUM1_SOCKET,
   UPDATE_WAREHOUSE_ALUMINUM1_SOCKET,
+  ADD_BATCH_ALUMINUM_CONSUMPTION_SOCKET,
   DELETE_WAREHOUSE_ALUMINUM1_SOCKET,
   ADD_NEW_WAREHOUSE_ALUMINUM2_SOCKET,
   UPDATE_WAREHOUSE_ALUMINUM2_SOCKET,
@@ -1919,6 +1920,17 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_WAREHOUSE_ALUMINUM1_SOCKET,
           payload: warehouseAluminum1,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(ADD_BATCH_ALUMINUM_CONSUMPTION_SOCKET, (data) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_BATCH_ALUMINUM_CONSUMPTION_SOCKET,
+          payload: data,
         }),
       );
     }
