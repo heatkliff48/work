@@ -71,3 +71,13 @@ export const updateDeliveryAddressSocket = (deliveryAddress) => {
     payload: deliveryAddress,
   };
 };
+
+export const addClientProductPriceSocket = (row) => ({
+  type: 'ADD_CLIENT_PRODUCT_PRICE_SOCKET',
+  payload: row,
+});
+
+export const deleteClientProductPriceSocket = (id) => ({
+  type: 'DELETE_CLIENT_PRODUCT_PRICE_SOCKET',
+  payload: id,
+});

@@ -7,7 +7,7 @@ import {
   addOrderRandomProducts,
   getUpdateProductOfOrders,
 } from '#components/redux/actions/ordersAction.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import '#components/Styles/modals.css';
@@ -22,6 +22,7 @@ import {
   piecesPerQuantityUnit,
 } from '../packagingUtils.js';
 import { fieldLabel, translateColumns } from '../../ordersI18n.js';
+import { resolveClientProductPrice } from '#utils/clientProductPrice.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -86,6 +87,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   ]);
 
   const dispatch = useDispatch();
+  const clientProductPrices = useSelector((state) => state.clientProductPrices);
 
   // Что пользователь сейчас набирает в цене за м² / за штуку;
   // null — показываем расчётную
@@ -114,6 +116,15 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   const haveOrderClient = list_of_orders.find(
     (el) => el.article === orderCartData.article,
   );
+
+  const specialPrice = useMemo(() => {
+    if (!selectedProduct?.id || !haveOrderClient?.owner) return null;
+    return resolveClientProductPrice(clientProductPrices, {
+      productId: selectedProduct.id,
+      clientId: haveOrderClient.owner,
+      projectId: haveOrderClient.del_adr_id,
+    });
+  }, [selectedProduct, haveOrderClient, clientProductPrices]);
 
   const handlerAddProductOrder = useCallback(
     (row) => {
@@ -288,9 +299,10 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   // в тех же единицах, что и quantity_m2
   const price_m2_value = useMemo(() => {
     if (!selectedProduct) return '0,00';
-    const result =
+    const catalog =
       (selectedProduct.price * selectedProduct.volumeBlockOnPallet) /
       m2PerPallet(selectedProduct);
+    const result = specialPrice ? specialPrice.price : catalog;
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -298,7 +310,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
 
     return formatFixed(result, 2, ',');
-  }, [selectedProduct]);
+  }, [selectedProduct, specialPrice]);
 
   const listPriceM2 = parseLocalNumber(price_m2_value) || 0;
 
@@ -361,7 +373,10 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   // Клиент платит за реально отгружаемые м² (целые паллеты) — quantity_real
   const final_price_value = useMemo(() => {
     const m2 = parseLocalNumber(quantity_real_value) || 0;
-    const priceM2 = parseLocalNumber(price_m2_value) || 0;
+    const priceM2 =
+      specialPrice?.kind === 'price_with_delivery'
+        ? specialPrice.price
+        : parseLocalNumber(price_m2_value) || 0;
     const discount = discountNum;
     const result = (priceM2 * m2 * (100 - discount)) / 100;
 
@@ -371,7 +386,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
 
     return formatFixed(result, 2, ',');
-  }, [quantity_real_value, price_m2_value, discountNum]);
+  }, [quantity_real_value, price_m2_value, discountNum, specialPrice]);
 
   const addProductOrder = async () => {
     const quantityM2 = parseLocalNumber(productOfOrder.quantity_m2) || 0;

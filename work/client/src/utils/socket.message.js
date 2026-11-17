@@ -179,6 +179,8 @@ import {
   updContactPriceInfoSocket,
   updateContactInfoSocket,
   updateDeliveryAddressSocket,
+  addClientProductPriceSocket,
+  deleteClientProductPriceSocket,
 } from '#components/redux/actions/socketActions/clientsActionSocket.js';
 import {
   addNewBatchOutsideSocket,
@@ -586,6 +588,14 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case NEED_UPD_CONTACT_PRICE_INFO_SOCKET:
       dispatch(updContactPriceInfoSocket(payload));
+      break;
+
+    case 'ADD_CLIENT_PRODUCT_PRICE_SOCKET':
+      dispatch(addClientProductPriceSocket(payload));
+      break;
+
+    case 'DELETE_CLIENT_PRODUCT_PRICE_SOCKET':
+      dispatch(deleteClientProductPriceSocket(payload));
       break;
 
     case ADD_DELIVERY_ADDRESSES_SOCKET:

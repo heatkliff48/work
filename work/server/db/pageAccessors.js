@@ -31,6 +31,7 @@ const PAGE_ACCESSORS = [
   { page_name: 'main_raw_materials_warehouse_button', inherit: false },
   // замена артикула строки расхода; пока только System administrator (роль 3)
   { page_name: 'article_correction', inherit: false },
+  { page_name: 'client_product_prices', inherit: false },
 ];
 
 const NO_PERMISSION = { read: false, write: false };

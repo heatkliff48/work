@@ -47,6 +47,7 @@ import RawMaterialsConsumption from '#components/RawMaterialsConsumption/RawMate
 import ArticleCorrection from '#components/ArticleCorrection/ArticleCorrection.jsx';
 import LotesList from '#components/LotesList/LotesList.jsx';
 import ClientsPriceInfo from '#components/Clients/ClientsPriceInfo/ClientsPriceInfo.jsx';
+import ClientProductPrices from '#components/Clients/ClientProductPrices/ClientProductPrices.jsx';
 import CakeFillUp from '#components/CakeFillUp/CakeFillUp.jsx';
 import TechnologyCalendar from '#components/TechnologyPlanner/TechnologyCalendar.jsx';
 import OrdersToWarehouseTable from '#components/Orders/OrdersToWarehouse/OrdersToWarehouseTable.jsx';
@@ -144,6 +145,10 @@ function App() {
             <Route path="/batch_outside" element={<BatchOutside />} />
             <Route path="/clients" element={<ClientsInfo />} />
             <Route path="/clients_price_info" element={<ClientsPriceInfo />} />
+            <Route
+              path="/client_product_prices"
+              element={<ClientProductPrices />}
+            />
             <Route path="/dry_mixes_journal" element={<DryMixesJournal />} />
 
             <Route
