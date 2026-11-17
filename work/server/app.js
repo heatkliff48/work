@@ -57,6 +57,7 @@ const lotesListRouter = require('./router/loteslist.js');
 const orderToWarehouseRouter = require('./router/orderToWarehouse.js');
 const greenLineMonitoringRouter = require('./router/greenLineMonitoring.js');
 const temperatureDataMonitoringRouter = require('./router/temperatureDataMonitoring.js');
+const clientProductPricesRouter = require('./router/clientProductPrices.js');
 
 const app = express();
 const map = new Map();
@@ -174,6 +175,7 @@ app.use('/lotesList', lotesListRouter);
 app.use('/orderToWarehouse', orderToWarehouseRouter);
 app.use('/greenLineMonitoring', greenLineMonitoringRouter);
 app.use('/temperatureDataMonitoring', temperatureDataMonitoringRouter);
+app.use('/clientProductPrices', clientProductPricesRouter);
 
 // Обработка WebSocket соединений
 server.on('upgrade', function (req, socket, head) {

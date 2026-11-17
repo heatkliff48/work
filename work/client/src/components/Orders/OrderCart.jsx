@@ -415,8 +415,12 @@ const OrderCart = React.memo(() => {
       const quantity_real = Number(product?.quantity_real || 0);
       const discount = Number(product?.discount || 0);
 
-      const delivery_m2_share =
-        (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
+      const hasFixedDeliveryPrice =
+        product?.fixed_price_m2_with_delivery != null &&
+        product?.fixed_price_m2_with_delivery !== '';
+      const delivery_m2_share = hasFixedDeliveryPrice
+        ? 0
+        : (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
 
       const { price_m2_with_markups, price_m2_with_delivery, final_price } =
         calcBlockPriceWithDelivery(

@@ -15,6 +15,7 @@ import {
   contactInfoReducer,
   contactPriceInfoReducer,
 } from './clientsReducer';
+import { clientProductPricesReducer } from './clientProductPricesReducer';
 import { dataFetchedReducer } from './dataFetchedReducer';
 import { filesLotesListReducer } from './filesLotesListReducer';
 import { filesOrderReducer } from './filesOrderReducer';
@@ -162,6 +163,7 @@ const appReducer = combineReducers({
   lotesListBatches: lotesListBatchesReducer,
   lotesListCakes: lotesListCakesReducer,
   contactPriceInfo: contactPriceInfoReducer,
+  clientProductPrices: clientProductPricesReducer,
   orderToWarehouse: orderToWarehouseReducer,
   productionQuality: productionQualityReducer,
   qualityDimensions: dimensionsQualityReducer,

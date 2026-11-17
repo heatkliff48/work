@@ -136,6 +136,11 @@ export default function NavBar() {
         icon: clientsPriceGroupsIcon,
       },
       {
+        title: 'Client product prices',
+        path: '/client_product_prices',
+        icon: clientsPriceGroupsIcon,
+      },
+      {
         type: 'group',
         title: 'Orders catalog',
         icon: prodCatalogIcon,

@@ -7,6 +7,7 @@ const {
   OrderToolProducts,
   OrderRelMatProducts,
 } = require('../db/models');
+const ClientProductPricesRepository = require('./ClientProductPrices.js');
 const myEmitter = require('../src/ee.js');
 const {
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
@@ -408,6 +409,7 @@ class OrdersRepository {
           'quantity_palet',
           'quantity_real',
           'price_m2',
+          'fixed_price_m2_with_delivery',
           'price_m3',
           'discount',
           'final_price',
@@ -541,6 +543,7 @@ class OrdersRepository {
           'quantity_palet',
           'quantity_real',
           'price_m2',
+          'fixed_price_m2_with_delivery',
           'price_m3',
           'discount',
           'final_price',
@@ -575,16 +578,47 @@ class OrdersRepository {
         warehouse_id,
       } = productOfOrder;
 
+      const order = await Orders.findByPk(order_id, {
+        attributes: ['owner', 'del_adr_id'],
+      });
+      const special = order
+        ? await ClientProductPricesRepository.findApplicable({
+            productId: product_id,
+            clientId: order.owner,
+            projectId: order.del_adr_id,
+          })
+        : null;
+
+      const discountNum = Number(discount) || 0;
+      const quantityRealNum = Number(quantity_real) || 0;
+      const lineTotal = (price) =>
+        Number(
+          ((Number(price) * quantityRealNum * (100 - discountNum)) / 100).toFixed(2),
+        );
+
+      let nextPriceM2 = price_m2;
+      let nextFinalPrice = final_price;
+      let fixedPrice = null;
+      if (special?.kind === 'price_m2') {
+        nextPriceM2 = Number(Number(special.price).toFixed(2));
+        nextFinalPrice = lineTotal(nextPriceM2);
+      } else if (special?.kind === 'price_with_delivery') {
+        fixedPrice = Number(Number(special.price).toFixed(2));
+        nextPriceM2 = fixedPrice;
+        nextFinalPrice = lineTotal(fixedPrice);
+      }
+
       const product_of_order = await createOrderProduct(OrdersProducts, {
         order_id,
         product_id,
         quantity_m2,
         quantity_palet,
         quantity_real,
-        price_m2,
+        price_m2: nextPriceM2,
+        fixed_price_m2_with_delivery: fixedPrice,
         price_m3,
         discount,
-        final_price,
+        final_price: nextFinalPrice,
         warehouse_id,
       });
 
@@ -597,6 +631,7 @@ class OrdersRepository {
           'quantity_palet',
           'quantity_real',
           'price_m2',
+          'fixed_price_m2_with_delivery',
           'price_m3',
           'discount',
           'final_price',
@@ -924,6 +959,7 @@ class OrdersRepository {
           'quantity_palet',
           'quantity_real',
           'price_m2',
+          'fixed_price_m2_with_delivery',
           'price_m3',
           'discount',
           'final_price',
@@ -1341,6 +1377,10 @@ class OrdersRepository {
               quantity_m2: p.quantity_m2 || 0,
               quantity_real: p.quantity_real || 0,
               price_m2: p.price_m2 || 0,
+              fixed_price_m2_with_delivery:
+                p.fixed_price_m2_with_delivery == null
+                  ? null
+                  : Number(p.fixed_price_m2_with_delivery),
               price_m3: p.price_m3 || 0,
               discount: p.discount || 0,
               final_price: p.final_price || 0,
