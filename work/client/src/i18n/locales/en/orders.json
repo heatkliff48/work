@@ -8,6 +8,17 @@
   "emptyTitle": "No orders match your search",
   "emptySubtitle": "Try a different order number, client, project, contact or address.",
   "none": "None",
+  "filters": {
+    "allStatuses": "All statuses",
+    "inProduction": "In production (all)",
+    "allPersonsInCharge": "All managers",
+    "unassigned": "Unassigned",
+    "allClients": "All clients",
+    "reset": "Reset filters",
+    "showAll": "Show all orders",
+    "noMatchingOrders": "No orders match your filters",
+    "tryResetFilters": "Try changing or resetting your filters to see more orders."
+  },
   "columns": {
     "article": "Order number",
     "description": "Description",
@@ -90,7 +101,8 @@
     "phone_number_mobile": "Phone number mobile",
     "phone_number_messenger": "Phone number messenger",
     "linkedin": "Linkedin",
-    "social": "Social"
+    "social": "Social",
+    "additional_contact_info": "Additional contact info"
   },
   "card": {
     "projectName": "Project name",
@@ -102,6 +114,8 @@
     "descriptionPlaceholder": "Enter description...",
     "otros": "Otros",
     "otrosPlaceholder": "Enter otros...",
+    "additionalContactInfo": "Additional contact info",
+    "additionalContactInfoPlaceholder": "Enter additional contact info...",
     "edit": "Edit",
     "save": "Save",
     "orderStatus": "Order status",

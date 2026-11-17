@@ -233,17 +233,21 @@ const density_recipe = useMemo(() => {
 
 ```javascript
 const producedReturnDry = useMemo(() => {
-  if (!volume || !solids) return null;
+  if (!density_recipe) return null;
 
-  // Разные формулы для разной ширины продукта
-  if (selectedProduct?.width == 85) {
-    return ((volume - 5.364) * (solids / volume)).toFixed(0);
-  } else if (selectedProduct?.width == 75) {
-    return ((volume - 5.31) * (solids / volume)).toFixed(0);
-  } else {
-    return ((volume - 5.4) * (solids / volume)).toFixed(0);
-  }
-}, [volume, solids]);
+  // --- СТАРАЯ ФОРМУЛА ---
+  // if (!volume || !solids) return null;
+  // if (selectedProduct?.width == 85) {
+  //   return ((volume - 5.364) * (solids / volume)).toFixed(0);
+  // } else if (selectedProduct?.width == 75) {
+  //   return ((volume - 5.31) * (solids / volume)).toFixed(0);
+  // } else {
+  //   return ((volume - 5.4) * (solids / volume)).toFixed(0);
+  // }
+
+  // --- НОВАЯ ФОРМУЛА: Density recipe * 0.93 ---
+  return (parseFloat(density_recipe) * 0.93).toFixed(0);
+}, [density_recipe]);
 ```
 
 #### Расчет Water Total (общее количество воды)
@@ -450,7 +454,7 @@ useEffect(() => {
 | Solids              | `lime + cement + sand + return + aluminum_paste` |
 | Density (recipe)    | `(solids / volume) × 1.06`                       |
 | Water total         | `solids × water_solids`                          |
-| Produced return dry | `(volume - base_volume) × (solids / volume)`     |
+| Produced return dry | `density_recipe × 0.93` (ранее: `(volume - base_volume) × (solids / volume)`) |
 
 ### Базовая высота для Produced Return Dry
 

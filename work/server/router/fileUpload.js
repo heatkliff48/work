@@ -10,7 +10,8 @@ const UPLOADS_DIR = path.resolve(__dirname, '..', 'uploads');
 
 // Абсолютный путь внутри UPLOADS_DIR или null, если путь выходит за её пределы
 function resolveInsideUploads(relativePath) {
-  const resolved = path.resolve(UPLOADS_DIR, relativePath);
+  const cleanRelative = String(relativePath || '').replace(/^[/\\]+/, '');
+  const resolved = path.resolve(UPLOADS_DIR, cleanRelative);
   const isInside =
     resolved === UPLOADS_DIR || resolved.startsWith(UPLOADS_DIR + path.sep);
   return isInside ? resolved : null;
@@ -185,7 +186,7 @@ fileUpload.post('/upload/:filePath', (req, res) => {
 });
 
 // Download endpoint
-fileUpload.get('/download/:filename', (req, res) => {
+fileUpload.get('/download/:filename(*)', (req, res) => {
   console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>fileUpload download/:filename');
 
   const filePath = resolveInsideUploads(req.params.filename);
@@ -198,9 +199,18 @@ fileUpload.get('/download/:filename', (req, res) => {
   }
   res.download(filePath, (err) => {
     if (err) {
-      console.error(`Error downloading file: ${err}`);
+      if (res.headersSent) {
+        // Заголовки уже были отправлены (200 OK), передача файла началась,
+        // но клиент закрыл соединение / отменил загрузку (EPIPE / ECONNRESET).
+        // Попытка отправить новый HTTP-ответ приведет к ошибке ERR_HTTP_HEADERS_SENT и краху процесса.
+        console.error(
+          `Error during file download (client aborted or connection lost): ${err.message}`
+        );
+        return;
+      }
+      console.error(`Error downloading file: ${err.message}`);
       return res.status(500).send({
-        message: 'Could not download the file. ' + err,
+        message: 'Could not download the file. ' + err.message,
       });
     }
   });

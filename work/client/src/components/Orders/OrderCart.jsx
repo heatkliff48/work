@@ -137,6 +137,7 @@ const OrderCart = React.memo(() => {
   const [dataValue, setDataValue] = useState(new Date());
   const [newDescription, setNewDescription] = useState('');
   const [newOtros, setNewOtros] = useState('');
+  const [newAdditionalContactInfo, setNewAdditionalContactInfo] = useState('');
   const [formatDataValue, setFormatDataValue] = useState(() =>
     new Date().toLocaleDateString('ru-RU', {
       year: 'numeric',
@@ -146,6 +147,8 @@ const OrderCart = React.memo(() => {
   );
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingOtros, setIsEditingOtros] = useState(false);
+  const [isEditingAdditionalContactInfo, setIsEditingAdditionalContactInfo] =
+    useState(false);
   const [isAddSecCont, setIsAddSecCont] = useState(false);
   const [aproveAccounting, setAproveAccounting] = useState(false);
   const [reserveModalShow, setReserveModalShow] = useState(false);
@@ -314,6 +317,25 @@ const OrderCart = React.memo(() => {
     setIsEditingOtros(false);
   };
 
+  const onEditAdditionalContactInfoHandler = () => {
+    setNewAdditionalContactInfo(orderCartData?.additional_contact_info || '');
+    setIsEditingAdditionalContactInfo(true);
+  };
+
+  const onSaveAdditionalContactInfo = (str) => {
+    dispatch(
+      addDescription({
+        order_id: orderCartData.id,
+        additional_contact_info: str,
+      }),
+    );
+    setOrderCartData((prev) => ({
+      ...prev,
+      additional_contact_info: str,
+    }));
+    setIsEditingAdditionalContactInfo(false);
+  };
+
   const addSecondaryContactHandler = () => {
     setIsAddSecCont(true);
   };
@@ -393,8 +415,12 @@ const OrderCart = React.memo(() => {
       const quantity_real = Number(product?.quantity_real || 0);
       const discount = Number(product?.discount || 0);
 
-      const delivery_m2_share =
-        (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
+      const hasFixedDeliveryPrice =
+        product?.fixed_price_m2_with_delivery != null &&
+        product?.fixed_price_m2_with_delivery !== '';
+      const delivery_m2_share = hasFixedDeliveryPrice
+        ? 0
+        : (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
 
       const { price_m2_with_markups, price_m2_with_delivery, final_price } =
         calcBlockPriceWithDelivery(
@@ -1064,6 +1090,7 @@ const OrderCart = React.memo(() => {
       ...prev,
       description: updatedOrderCartData?.description,
       otros: updatedOrderCartData?.otros,
+      additional_contact_info: updatedOrderCartData?.additional_contact_info,
       payment_method: updatedOrderCartData?.payment_method,
       agent_commission: updatedOrderCartData?.agent_commission ?? 0,
       confirming_surcharge: Boolean(updatedOrderCartData?.confirming_surcharge),
@@ -1499,6 +1526,52 @@ const OrderCart = React.memo(() => {
                       type="button"
                       className="ord-btn ord-btn--primary ord-btn--sm"
                       onClick={() => onSaveOtros(newOtros)}
+                    >
+                      {t('card.save')}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <div className="ord-tile__label" style={{ marginTop: 16 }}>
+                {t('card.additionalContactInfo')}
+              </div>
+              {orderCartData?.additional_contact_info &&
+              !isEditingAdditionalContactInfo ? (
+                <>
+                  <div className="ord-tile__body-text">
+                    {orderCartData.additional_contact_info}
+                  </div>
+                  <button
+                    type="button"
+                    className="ord-btn ord-btn--ghost ord-btn--sm"
+                    style={{ marginTop: 10 }}
+                    onClick={onEditAdditionalContactInfoHandler}
+                  >
+                    {t('card.edit')}
+                  </button>
+                </>
+              ) : (
+                <div className="ord-desc-edit">
+                  <textarea
+                    placeholder={t('card.additionalContactInfoPlaceholder')}
+                    value={newAdditionalContactInfo}
+                    disabled={
+                      !checkUserAccess(user, roles, 'orders_description_edit')
+                        ?.canWrite
+                    }
+                    onChange={(e) =>
+                      setNewAdditionalContactInfo(e.target.value)
+                    }
+                  />
+                  {checkUserAccess(user, roles, 'orders_description_edit')
+                    ?.canWrite && (
+                    <button
+                      type="button"
+                      className="ord-btn ord-btn--primary ord-btn--sm"
+                      onClick={() =>
+                        onSaveAdditionalContactInfo(newAdditionalContactInfo)
+                      }
                     >
                       {t('card.save')}
                     </button>

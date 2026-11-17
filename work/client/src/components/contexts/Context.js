@@ -531,6 +531,8 @@ const ProjectContextProvider = ({ children }) => {
     '/tools': 'Tools',
     '/products/edit': 'Edit',
     '/clients': 'Clients',
+    '/clients_price_info': 'Clients price groups',
+    '/client_product_prices': 'Client product prices',
     '/users_info': 'Users Info',
     '/warehouse_manager': 'Order dispatch',
     '/factura_manager': ' Logistics planner',

@@ -57,12 +57,21 @@ function calcProductFields(orderRow, newPalets, catalog) {
   if (!catalog) return null;
 
   const discount = parseFloat(orderRow.discount) || 0;
-  const price_m2 = Number(orderRow.price_m2) || 0;
+  const fixedDeliveryPrice =
+    orderRow.fixed_price_m2_with_delivery == null
+      ? null
+      : Number(orderRow.fixed_price_m2_with_delivery);
+  const price_m2 =
+    fixedDeliveryPrice == null ? Number(orderRow.price_m2) || 0 : fixedDeliveryPrice;
   const price_m3 = Number(orderRow.price_m3) || 0;
-  const price_m2_with_markups = Number(
-    orderRow.price_m2_with_markups ?? price_m2,
-  );
-  const price_m2_with_delivery = Number(orderRow.price_m2_with_delivery) || 0;
+  const price_m2_with_markups =
+    fixedDeliveryPrice == null
+      ? Number(orderRow.price_m2_with_markups ?? price_m2)
+      : fixedDeliveryPrice;
+  const price_m2_with_delivery =
+    fixedDeliveryPrice == null
+      ? Number(orderRow.price_m2_with_delivery) || 0
+      : fixedDeliveryPrice;
   const quantity_m2 = round2(newPalets * m2PerPallet(catalog));
 
   const final_price_with_delivery =
@@ -75,6 +84,10 @@ function calcProductFields(orderRow, newPalets, catalog) {
     price_m3,
     price_m2_with_markups,
     price_m2_with_delivery,
+    fixed_price_m2_with_delivery:
+      orderRow.fixed_price_m2_with_delivery == null
+        ? null
+        : Number(orderRow.fixed_price_m2_with_delivery),
     discount,
     final_price: round2(final_price_with_delivery),
   };
@@ -548,6 +561,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
       agent_commission: orderCartData?.agent_commission ?? 0,
       confirming_surcharge: Boolean(orderCartData?.confirming_surcharge),
       otros: orderCartData?.otros,
+      additional_contact_info: orderCartData?.additional_contact_info,
       products,
       dryMixes,
       anchors,

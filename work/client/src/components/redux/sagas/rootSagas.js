@@ -11,6 +11,7 @@ import orderToWarehouseWatcher from './orderToWarehouseSagas';
 import pagesWatcher from './pagesSagas';
 import productionBatchLogWatcher from './productionBatchLogSagas';
 import productionQualityWatcher from './productionQualitySagas';
+import clientProductPricesWatcher from './clientProductPricesSagas';
 import productsWatcher from './productsSagas';
 import productsTypeJournalWatcher from './productsTypeJournalSagas';
 import productsTypeWarehouseWatcher from './productsTypeWarehouseSagas';
@@ -52,5 +53,6 @@ export default function* rootSaga() {
     lotesListWatcher(),
     orderToWarehouseWatcher(),
     productionQualityWatcher(),
+    clientProductPricesWatcher(),
   ]);
 }

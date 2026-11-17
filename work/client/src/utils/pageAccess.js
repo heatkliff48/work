@@ -11,6 +11,7 @@ export const PAGE_ACCESS = {
 
   '/clients': 'Clients',
   '/clients_price_info': 'clients_price_info',
+  '/client_product_prices': 'client_product_prices',
 
   '/orders': 'Orders',
   '/orders_to_warehouse': 'orders_to_warehouse',

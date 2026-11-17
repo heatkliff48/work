@@ -8,6 +8,7 @@ const initState = {
   deliveryAddresses: [],
   contactInfo: [],
   contactPriceInfo: [],
+  clientProductPrices: [],
   roles: [],
   pages: [],
   orders: [],

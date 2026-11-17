@@ -24,6 +24,7 @@ import {
   UPDATE_NEW_RECIPE,
   UPDATE_RAW_MAT_CONSUMPTION,
   UPDATE_RECIPE,
+  RECALCULATE_RECIPES,
 } from '../types/recipeTypes';
 import {
   DELETE_RAW_MAT_CONSUMPTION_CURRENT_MOLDS_SOCKET,
@@ -70,6 +71,19 @@ const updateRecipe = (recipe) => {
   return url
     .post('/recipe/update', recipe)
     .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
+const recalculateRecipes = (recipes) => {
+  return url
+    .post('/recipe/recalculate', { recipes })
+    .then((res) => {
+      showMessage('Recipes successfully recalculated', 'success');
       return res.data;
     })
     .catch((err) => {
@@ -243,6 +257,16 @@ function* updateRecipeWorker(action) {
   }
 }
 
+function* recalculateRecipesWorker(action) {
+  try {
+    yield call(recalculateRecipes, action.payload);
+    const { recipe } = yield call(getRecipe);
+    yield put({ type: FULL_RECIPE, payload: recipe });
+  } catch (err) {
+    console.error('Error in recalculateRecipesWorker:', err);
+  }
+}
+
 function* deleteRecipeWorker(action) {
   try {
     const { payload } = action;
@@ -354,6 +378,7 @@ function* recipeWatcher() {
   yield takeLatest(GET_FULL_RECIPE, getRecipeWorker);
   yield takeLatest(ADD_NEW_RECIPE, addNewRecipeWorker);
   yield takeLatest(UPDATE_RECIPE, updateRecipeWorker);
+  yield takeLatest(RECALCULATE_RECIPES, recalculateRecipesWorker);
   yield takeLatest(DELETE_RECIPE, deleteRecipeWorker);
 
   yield takeLatest(SAVE_MATERIAL_PLAN, saveMaterialPlanWatcher);

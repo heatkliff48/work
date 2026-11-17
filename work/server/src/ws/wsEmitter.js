@@ -135,6 +135,8 @@ const {
   DELETE_OLD_RAW_MAT_CONSUMPTION_SOCKET,
   ADD_NEW_LOTES_LIST_SOCKET,
   NEED_UPD_CONTACT_PRICE_INFO_SOCKET,
+  ADD_CLIENT_PRODUCT_PRICE_SOCKET,
+  DELETE_CLIENT_PRODUCT_PRICE_SOCKET,
   UPDATE_CONTACT_INFO_SOCKET,
   UPDATE_DELIVERY_ADDRESSES_SOCKET,
   UPDATE_LOTES_LIST_SOCKET,
@@ -742,6 +744,28 @@ function registerWsEmitter(map) {
         JSON.stringify({
           type: UPDATE_CONTACT_INFO_SOCKET,
           payload: contactInfo,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(ADD_CLIENT_PRODUCT_PRICE_SOCKET, (row) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: ADD_CLIENT_PRODUCT_PRICE_SOCKET,
+          payload: row,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(DELETE_CLIENT_PRODUCT_PRICE_SOCKET, (priceId) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: DELETE_CLIENT_PRODUCT_PRICE_SOCKET,
+          payload: priceId,
         }),
       );
     }

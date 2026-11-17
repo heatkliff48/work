@@ -161,16 +161,23 @@ function AddNewRecipeModal({ show, onHide }) {
   }, [volume, solids]);
 
   const producedReturnDry = useMemo(() => {
-    if (!volume || !solids) {
+    if (!density_recipe) {
       return null;
     }
 
-    return selectedProduct?.width == 85
-      ? ((volume - 5.364) * (solids / volume)).toFixed(0)
-      : selectedProduct?.width == 75
-        ? ((volume - 5.31) * (solids / volume)).toFixed(0)
-        : ((volume - 5.4) * (solids / volume)).toFixed(0);
-  }, [volume, solids]);
+    // --- OLD FORMULA ---
+    // if (!volume || !solids) {
+    //   return null;
+    // }
+    // return selectedProduct?.width == 85
+    //   ? ((volume - 5.364) * (solids / volume)).toFixed(0)
+    //   : selectedProduct?.width == 75
+    //     ? ((volume - 5.31) * (solids / volume)).toFixed(0)
+    //     : ((volume - 5.4) * (solids / volume)).toFixed(0);
+
+    // --- NEW FORMULA: Density recipe * 0.93 ---
+    return (parseFloat(density_recipe) * 0.93).toFixed(0);
+  }, [density_recipe]);
 
   const water_total = useMemo(() => {
     if (!recipeInput.water_solids || !solids) {

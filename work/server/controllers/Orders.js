@@ -700,6 +700,7 @@ class OrdersController {
       agent_commission,
       confirming_surcharge,
       otros,
+      additional_contact_info,
     } = req.body;
 
     try {
@@ -723,6 +724,7 @@ class OrdersController {
         agent_commission,
         confirming_surcharge,
         otros,
+        additional_contact_info,
       });
 
       myEmitter.emit(ADD_CHILD_ORDER_SOCKET, childOrder);

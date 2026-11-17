@@ -48,6 +48,21 @@ export const calcBlockPriceWithDelivery = (
   agentCommission = 0,
   confirmingSurcharge = 0,
 ) => {
+  const fixedDeliveryPrice = product?.fixed_price_m2_with_delivery;
+  if (fixedDeliveryPrice != null && fixedDeliveryPrice !== '') {
+    // Цена из записи с проектом уже включает доставку. Комиссия агента,
+    // доля delivery_m2 и confirming surcharge её не меняют.
+    const price = round2(Number(fixedDeliveryPrice));
+    const quantity_real = Number(product?.quantity_real || 0);
+    const discount = Number(product?.discount || 0);
+    const final_price = (price * quantity_real * (100 - discount)) / 100;
+    return {
+      price_m2_with_markups: price,
+      price_m2_with_delivery: price,
+      final_price: round2(final_price),
+    };
+  }
+
   const priceAfterAgent = applyAgentCommission(
     product?.price_m2,
     agentCommission,
