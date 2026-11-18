@@ -11,7 +11,7 @@ import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useProductsTypeJournalContext } from '#components/contexts/ProductsTypeJournalContext.js';
 import { useDispatch, useSelector } from 'react-redux';
 import AccountingInvoiceModal from '../AccountingInvoiceModal';
-import { changeStatusWarehouseManagerTrailer } from '#components/redux/actions/warehouseAction.js';
+import { changeFacturaStatusWarehouseManagerTrailer } from '#components/redux/actions/warehouseAction.js';
 import { useNavigate } from 'react-router-dom';
 
 function formatDate(value) {
@@ -50,7 +50,7 @@ const FacturaOrderCard = React.memo(() => {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [ordersStatus, setOrdersStatus] = useState([]);
   const [checkboxStatus, setCheckboxStatus] = useState(
-    selectedOrder?.trailer_stage || 0,
+    Boolean(selectedOrder?.factura_ready),
   );
   const [productLists, setProductLists] = useState({
     products: [],
@@ -299,15 +299,18 @@ const FacturaOrderCard = React.memo(() => {
   }, [list_of_orders]);
 
   const statusChangeHandler = () => {
-    const status = !checkboxStatus ? 1 : 0;
-    setCheckboxStatus(!checkboxStatus);
+    const nextStatus = !checkboxStatus;
+    setCheckboxStatus(nextStatus);
     dispatch(
-      changeStatusWarehouseManagerTrailer({
-        status,
+      changeFacturaStatusWarehouseManagerTrailer({
+        factura_ready: nextStatus,
         orderId: orderCartData?.id,
-        trailer: selectedOrder.trailer,
+        trailer: selectedOrder?.trailer,
       }),
     );
+    if (nextStatus) {
+      navigate('/factura_manager');
+    }
   };
 
   return (

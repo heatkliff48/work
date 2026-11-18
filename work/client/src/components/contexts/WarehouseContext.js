@@ -947,16 +947,6 @@ const WarehouseContextProvider = ({ children }) => {
       allTrailerReserved,
     });
 
-    if (allTrailerReserved) {
-      await dispatch(
-        changeStatusWarehouseManagerTrailer({
-          orderId,
-          trailer,
-          status: 2,
-        }),
-      );
-    }
-
     const dispatchRowsForOrder = (order_dispatch_data || []).filter(
       (item) => Number(item.orderId) === Number(orderId) && isShippableDispatchRow(item),
     );
@@ -1055,6 +1045,14 @@ const WarehouseContextProvider = ({ children }) => {
 
         return false;
       }
+    } else if (allTrailerReserved) {
+      await dispatch(
+        changeStatusWarehouseManagerTrailer({
+          orderId,
+          trailer,
+          status: 2,
+        }),
+      );
     }
 
     return true;

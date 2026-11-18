@@ -54,7 +54,7 @@ function ProductsSummaryCell({ value }) {
 }
 
 function ReadyPillCell({ value }) {
-  const isReady = (value || 0) >= 1;
+  const isReady = Boolean(value);
   const theme = isReady
     ? { bg: '#e9f6ed', color: '#15803d', dot: '#16a34a', label: 'Ready' }
     : { bg: '#fdf3e3', color: '#b45309', dot: '#d97706', label: 'Pending' };
@@ -313,6 +313,7 @@ function FacturaManager() {
     useProductsTypeJournalContext();
 
   const [facturaData, setFacturaData] = useState([]);
+  const [showInvoiced, setShowInvoiced] = useState(false);
   const [vatValue, setVatValue] = useState({
     vat_procent: 21, // Значение по умолчанию, можно взять из контекста
     vat_euro_origin: 0,
@@ -352,6 +353,7 @@ function FacturaManager() {
       return;
     }
     const filteredDispatchData = order_dispatch_data.filter((item) => {
+      if (!showInvoiced && item.factura_ready) return false;
       const order = list_of_orders.find((o) => o.id === item.orderId);
       return order && (order.status || 0) >= 8 && (order.status || 0) < 10;
     });
@@ -375,6 +377,7 @@ function FacturaManager() {
           productDetails: [],
           rawProductsData: [],
           trailer_stage: item?.trailer_stage || 0,
+          factura_ready: Boolean(item?.factura_ready),
         };
       }
 
@@ -422,6 +425,7 @@ function FacturaManager() {
         vatData: vatData,
         rawProductsData: group.rawProductsData,
         trailer_stage: group.trailer_stage,
+        factura_ready: group.factura_ready,
       };
     });
 
@@ -429,6 +433,7 @@ function FacturaManager() {
     setWmoctProductShippedBD([]);
   }, [
     order_dispatch_data,
+    showInvoiced,
     list_of_orders,
     deliveryAddresses,
     clients,
@@ -441,7 +446,7 @@ function FacturaManager() {
   ]);
 
   const readyToInvoiceCount = useMemo(
-    () => facturaData.filter((row) => (row.trailer_stage || 0) >= 1).length,
+    () => facturaData.filter((row) => !row.factura_ready).length,
     [facturaData],
   );
 
@@ -482,7 +487,7 @@ function FacturaManager() {
       },
       {
         Header: 'Status',
-        accessor: 'trailer_stage',
+        accessor: 'factura_ready',
         disableSortBy: true,
         Cell: ReadyPillCell,
       },
@@ -500,7 +505,7 @@ function FacturaManager() {
         <div className="fac-page__stats">
           <div className="fac-stat">
             <div className="fac-stat__num">{readyToInvoiceCount}</div>
-            <div className="fac-stat__label">Ready to invoice</div>
+            <div className="fac-stat__label">To invoice</div>
           </div>
         </div>
       </div>
@@ -546,6 +551,22 @@ function FacturaManager() {
               />
             </div>
             <div className="fac-toolbar__spacer" />
+            <div className="fac-toggle">
+              <span className="fac-toggle__label">Show invoiced</span>
+              <button
+                type="button"
+                className={`fac-toggle__switch${
+                  showInvoiced ? ' fac-toggle__switch--on' : ''
+                }`}
+                onClick={() => setShowInvoiced((prev) => !prev)}
+              >
+                <span
+                  className={`fac-toggle__knob${
+                    showInvoiced ? ' fac-toggle__knob--on' : ''
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         )}
       />

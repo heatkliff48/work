@@ -193,6 +193,18 @@ const WMOrderCard = React.memo(() => {
       <div className="wm-card-page__head">
         <h4 className="wm-card-page__title wm-mono">
           Order number: {orderCartData?.article}
+          {orderCartData?.description && (
+            <span
+              style={{
+                fontWeight: 500,
+                fontSize: '0.9em',
+                marginLeft: 10,
+                color: 'var(--wm-text-2)',
+              }}
+            >
+              ({orderCartData.description})
+            </span>
+          )}
         </h4>
         <button
           type="button"

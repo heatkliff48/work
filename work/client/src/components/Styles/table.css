@@ -694,7 +694,16 @@
 .wm-modal-card .tbl-card table.tbl > tbody > tr:nth-child(even) {
   background: #fff !important;
 }
-.wm-page .tbl-card table.tbl > tbody > tr > td,
+.wm-page .tbl-card table.tbl > tbody > tr > td {
+  padding: 13px 18px !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #171a1f !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  vertical-align: middle !important;
+  background: transparent !important;
+}
 .wm-modal-card .tbl-card table.tbl > tbody > tr > td {
   padding: 13px 18px !important;
   border: 0 !important;

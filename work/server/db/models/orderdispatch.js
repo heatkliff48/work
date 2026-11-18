@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       orderId: DataTypes.INTEGER,
       quantity: DataTypes.INTEGER,
       trailer_stage: DataTypes.INTEGER,
+      factura_ready: DataTypes.BOOLEAN,
     },
     {
       sequelize,

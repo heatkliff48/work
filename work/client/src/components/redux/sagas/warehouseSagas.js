@@ -66,6 +66,7 @@ import {
   ADD_NEW_WAREHOUSE_MANAGER_TRAILER,
   DELETE_WAREHOUSE_MANAGER_TRAILER,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER,
+  CHANGE_FACTURA_STATUS_WAREHOUSE_MANAGER_TRAILER,
 } from '../types/warehouseTypes';
 import {
   rejectRawMaterialConsumptionRequest,
@@ -645,6 +646,18 @@ const changeStatusWarehouseManagerTrailer = (new_status_trailer) => {
     });
 };
 
+const changeFacturaStatusWarehouseManagerTrailer = (payload) => {
+  return url
+    .post('/warehouse/order_dispatch/factura_status', payload)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+};
+
 const deleteWarehouseManagerTrailer = (wh_trailer_id) => {
   console.log('wh_trailer_id warehouseSagas.js line 614', wh_trailer_id);
   return url
@@ -1182,6 +1195,14 @@ function* changeStatusWarehouseManagerTrailerWatcher(action) {
   }
 }
 
+function* changeFacturaStatusWarehouseManagerTrailerWatcher(action) {
+  try {
+    yield call(changeFacturaStatusWarehouseManagerTrailer, action.payload);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 function* deleteWarehouseManagerTrailerWatcher(action) {
   try {
     yield call(deleteWarehouseManagerTrailer, action.payload);
@@ -1320,6 +1341,10 @@ function* warehouseWatcher() {
   yield takeLatest(
     CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER,
     changeStatusWarehouseManagerTrailerWatcher,
+  );
+  yield takeLatest(
+    CHANGE_FACTURA_STATUS_WAREHOUSE_MANAGER_TRAILER,
+    changeFacturaStatusWarehouseManagerTrailerWatcher,
   );
   yield takeLatest(
     DELETE_WAREHOUSE_MANAGER_TRAILER,

@@ -701,7 +701,23 @@ class WarehouseController {
 
       myEmitter.emit(CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET, wh_trailer);
 
-      return res.status(200);
+      return res.status(200).json(wh_trailer);
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return ErrorUtils.catchError(error);
+    }
+  }
+
+  static async changeFacturaStatusWarehouseManagerTrailer(req, res) {
+    const payload = req.body;
+
+    try {
+      const wh_trailer =
+        await WarehouseService.changeFacturaStatusWarehouseManagerTrailer(payload);
+
+      myEmitter.emit(CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET, wh_trailer);
+
+      return res.status(200).json(wh_trailer);
     } catch (error) {
       console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
       return ErrorUtils.catchError(error);

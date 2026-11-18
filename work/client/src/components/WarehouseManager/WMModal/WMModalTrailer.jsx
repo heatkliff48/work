@@ -36,11 +36,14 @@ function WMModalTrailer({ setTrailerOrder }) {
   // The order number alone doesn't say which order it is: its description
   // follows it
   const trailerOrderColumns = useMemo(
-    () => [
-      WAREHOUSE_MANAGER_TRAILER_TABLE[0],
-      { Header: 'Description', accessor: 'description' },
-      ...WAREHOUSE_MANAGER_TRAILER_TABLE.slice(1),
-    ],
+    () =>
+      WAREHOUSE_MANAGER_TRAILER_TABLE.some((c) => c.accessor === 'description')
+        ? WAREHOUSE_MANAGER_TRAILER_TABLE
+        : [
+            WAREHOUSE_MANAGER_TRAILER_TABLE[0],
+            { Header: 'Description', accessor: 'description' },
+            ...WAREHOUSE_MANAGER_TRAILER_TABLE.slice(1),
+          ],
     [WAREHOUSE_MANAGER_TRAILER_TABLE],
   );
 

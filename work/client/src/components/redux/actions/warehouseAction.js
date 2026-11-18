@@ -44,6 +44,7 @@ import {
   ADD_NEW_WAREHOUSE_MANAGER_TRAILER,
   DELETE_WAREHOUSE_MANAGER_TRAILER,
   CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER,
+  CHANGE_FACTURA_STATUS_WAREHOUSE_MANAGER_TRAILER,
 } from '../types/warehouseTypes';
 
 export const getAllWarehouse = () => {
@@ -393,6 +394,13 @@ export const changeStatusWarehouseManagerTrailer = (new_status_trailer) => {
   return {
     type: CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER,
     payload: new_status_trailer,
+  };
+};
+
+export const changeFacturaStatusWarehouseManagerTrailer = (payload) => {
+  return {
+    type: CHANGE_FACTURA_STATUS_WAREHOUSE_MANAGER_TRAILER,
+    payload,
   };
 };
 

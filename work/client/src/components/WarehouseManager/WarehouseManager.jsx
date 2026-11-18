@@ -37,11 +37,11 @@ import { useNavigate } from 'react-router-dom';
 // Row tint by trailer_stage (0-4). The stage value itself is never shown as
 // text/label anywhere — only used to color the row background.
 const STAGE_ROW_BG = {
-  0: '#f3f4f6',
-  1: '#eaf7ee',
-  2: '#fef6e0',
-  3: '#fdeaea',
-  4: '#f2eafb',
+  0: '#e2e8f0',
+  1: '#bbf7d0',
+  2: '#fde68a',
+  3: '#fecaca',
+  4: '#ddd6fe',
 };
 
 function WarehouseManager() {
@@ -173,6 +173,7 @@ function WarehouseManager() {
       return {
         order_id: group.orderId,
         orders_article: order?.article || '',
+        description: order?.description || '',
         projects_name: delivery?.project_name || '',
         fecha: group.fecha || order?.due_date || '',
         orders_products: group.products,

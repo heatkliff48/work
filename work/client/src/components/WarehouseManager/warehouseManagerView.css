@@ -123,7 +123,7 @@
 
 /* row tint by trailer_stage (0-4) — background only, value never rendered as text */
 .wm-page .tbl-card table.tbl > tbody > tr:hover > td {
-  filter: brightness(0.97);
+  filter: brightness(0.93);
 }
 
 /* ---------- buttons ---------- */

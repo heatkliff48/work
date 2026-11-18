@@ -292,6 +292,19 @@ class WarehouseService {
     }
   }
 
+  static async changeFacturaStatusWarehouseManagerTrailer(payload) {
+    try {
+      const status_trailer =
+        await WarehouseRepository.changeFacturaStatusWarehouseManagerTrailer(
+          payload,
+        );
+      return status_trailer;
+    } catch (error) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', error);
+      return error;
+    }
+  }
+
   static async deleteWarehouseManagerTrailer(order_id) {
     try {
       const wh_trailer = await WarehouseRepository.deleteWarehouseManagerTrailer(

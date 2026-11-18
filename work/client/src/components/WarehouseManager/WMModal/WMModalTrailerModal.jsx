@@ -317,7 +317,21 @@ function WMModalTrailerModal({ trailer_order }) {
       <ModalHeader toggle={toggle}>Plan nuevo trailer</ModalHeader>
 
       <ModalBody>
-        <h4 className="wm-mono">Order number: {orderCartData?.article}</h4>
+        <h4 className="wm-mono">
+          Order number: {orderCartData?.article}
+          {orderCartData?.description && (
+            <span
+              style={{
+                fontWeight: 500,
+                fontSize: '0.9em',
+                marginLeft: 10,
+                color: 'var(--wm-text-2)',
+              }}
+            >
+              ({orderCartData.description})
+            </span>
+          )}
+        </h4>
 
         <div className="wm-tiles">
           <div className="wm-tile">

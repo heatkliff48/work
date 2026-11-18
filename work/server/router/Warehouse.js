@@ -109,6 +109,10 @@ router.post(
   '/order_dispatch/status',
   WarehouseController.changeStatusWarehouseManagerTrailer,
 );
+router.post(
+  '/order_dispatch/factura_status',
+  WarehouseController.changeFacturaStatusWarehouseManagerTrailer,
+);
 router.delete(
   '/order_dispatch/delete',
   WarehouseController.deleteWarehouseManagerTrailer,

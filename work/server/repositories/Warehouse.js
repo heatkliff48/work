@@ -1574,6 +1574,38 @@ class WarehouseRepository {
     }
   }
 
+  static async changeFacturaStatusWarehouseManagerTrailer(payload) {
+    const { status, orderId, trailer, factura_ready } = payload;
+    const isReady =
+      factura_ready !== undefined
+        ? Boolean(factura_ready)
+        : status !== undefined
+        ? Boolean(status)
+        : true;
+
+    try {
+      const where = { orderId };
+      if (trailer !== undefined && trailer !== null) {
+        where.trailer = trailer;
+      }
+
+      const [count, updatedRows] = await OrderDispatches.update(
+        {
+          factura_ready: isReady,
+        },
+        {
+          where,
+          returning: true,
+        },
+      );
+
+      return updatedRows;
+    } catch (error) {
+      console.error('changeFacturaStatusWarehouseManagerTrailer error:', error);
+      throw error;
+    }
+  }
+
   static async deleteWarehouseManagerTrailer(order_id) {
     try {
       await OrderDispatches.destroy({ where: { orderId: order_id } });

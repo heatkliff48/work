@@ -398,6 +398,10 @@ const ProjectContextProvider = ({ children }) => {
       accessor: 'orders_article',
     },
     {
+      Header: 'Description',
+      accessor: 'description',
+    },
+    {
       Header: 'Project name',
       accessor: 'projects_name',
     },

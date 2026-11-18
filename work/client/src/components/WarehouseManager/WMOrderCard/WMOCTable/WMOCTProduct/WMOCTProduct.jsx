@@ -40,9 +40,7 @@ const WMOCTProduct = ({
       return false;
     }
 
-    return currentTrailerDispatches.every(
-      (dispatch) => Number(dispatch.trailer_stage) === 1,
-    );
+    return true;
   };
 
   const onSaveHandler = () => {
