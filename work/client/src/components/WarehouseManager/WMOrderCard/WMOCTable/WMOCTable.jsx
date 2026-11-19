@@ -454,6 +454,7 @@ const WMOCTable = ({ product_list, orderCartData }) => {
       <WMOCTProduct
         orderId={product_list?.order_id}
         trailer={product_list?.trailer}
+        orderCartData={orderCartData}
         haveBatches={haveBatches}
         handlePlusBatch={handlePlusBatch}
         handlePlus={handlePlus}

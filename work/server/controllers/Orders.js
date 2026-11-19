@@ -1,5 +1,6 @@
 const { ErrorUtils } = require('../utils/Errors.js');
 const OrdersService = require('../services/Orders.js');
+const { OrderDispatches } = require('../db/models');
 const myEmitter = require('../src/ee.js');
 const {
   ADD_NEW_ORDER_SOCKET,
@@ -32,6 +33,7 @@ const {
   UPDATE_PAYMENT_METHOD_SOCKET,
   UPDATE_AGENT_COMMISSION_SOCKET,
   UPDATE_ACCOUNTING_APPROVED_SOCKET,
+  CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
 } = require('../src/constants/event.js');
 
 class OrdersController {
@@ -576,6 +578,30 @@ class OrdersController {
 
       if (accountingReset) {
         myEmitter.emit(UPDATE_ACCOUNTING_APPROVED_SOCKET, accountingReset);
+      }
+
+      if (Number(status) === 8) {
+        const [count, updatedDispatches] = await OrderDispatches.update(
+          { trailer_stage: 1 },
+          { where: { orderId: order_id, trailer_stage: 0 }, returning: true },
+        );
+        if (count > 0) {
+          myEmitter.emit(
+            CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+            updatedDispatches,
+          );
+        }
+      } else if (Number(status) < 8) {
+        const [count, updatedDispatches] = await OrderDispatches.update(
+          { trailer_stage: 0 },
+          { where: { orderId: order_id, trailer_stage: 1 }, returning: true },
+        );
+        if (count > 0) {
+          myEmitter.emit(
+            CHANGE_STATUS_WAREHOUSE_MANAGER_TRAILER_SOCKET,
+            updatedDispatches,
+          );
+        }
       }
 
       return res.json({ status, order_id }).status(200);

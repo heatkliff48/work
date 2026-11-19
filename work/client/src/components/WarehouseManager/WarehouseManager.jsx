@@ -170,6 +170,11 @@ function WarehouseManager() {
         (item) => Number(item.id) === Number(order?.del_adr_id),
       );
 
+      let trailer_stage = Number(group.trailer_stage || 0);
+      if (Number(order?.status) === 8 && trailer_stage === 0) {
+        trailer_stage = 1;
+      }
+
       return {
         order_id: group.orderId,
         orders_article: order?.article || '',
@@ -180,7 +185,7 @@ function WarehouseManager() {
         orders_products_articles: group.articles,
         trailer: group.trailer,
         dispatchItems: group.dispatchItems,
-        trailer_stage: group.trailer_stage,
+        trailer_stage,
       };
     });
 

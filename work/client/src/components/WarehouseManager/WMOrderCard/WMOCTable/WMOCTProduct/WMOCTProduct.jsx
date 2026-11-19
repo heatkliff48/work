@@ -1,5 +1,6 @@
 import { useModalContext } from '#components/contexts/ModalContext.js';
 import { useWarehouseContext } from '#components/contexts/WarehouseContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
 import { Fragment } from 'react';
 import { useLineDescription } from '../../useLineDescription.js';
 import '../../../warehouseManagerView.css';
@@ -7,6 +8,7 @@ import '../../../warehouseManagerView.css';
 const WMOCTProduct = ({
   orderId,
   trailer,
+  orderCartData,
   haveBatches,
   handlePlusBatch,
   handlePlus,
@@ -17,6 +19,7 @@ const WMOCTProduct = ({
   onDownloadAlbaran,
 }) => {
   const { wmoctProduct, order_dispatch_data } = useWarehouseContext();
+  const { list_of_orders } = useOrderContext();
   const {
     wmoctModal,
     setWmoctModal,
@@ -40,7 +43,12 @@ const WMOCTProduct = ({
       return false;
     }
 
-    return true;
+    const currentOrder =
+      orderCartData && Number(orderCartData.id) === Number(orderId)
+        ? orderCartData
+        : list_of_orders?.find((o) => Number(o.id) === Number(orderId));
+
+    return Number(currentOrder?.status) === 8;
   };
 
   const onSaveHandler = () => {
