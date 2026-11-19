@@ -412,28 +412,15 @@ class WarehouseRepository {
               if (deltaOrdered < 0) {
                 const deficit = Math.abs(deltaOrdered);
 
-                if (record.current_free >= deficit) {
-                  record.new_ordered = 0;
-                  record.new_free = record.current_free - deficit;
-                  record.new_total = record.new_free + record.new_ordered;
+                record.new_ordered = 0;
+                record.new_free = Math.max(0, record.current_free - deficit);
+                record.new_total = record.new_free + record.new_ordered;
 
-                  itemsToRedistribute.push({
-                    source_warehouse_id: warehouse_id,
-                    deficit: deficit,
-                    record: record,
-                  });
-                } else {
-                  const remainingDeficit = deficit - record.current_free;
-                  record.new_ordered = 0;
-                  record.new_free = 0;
-                  record.new_total = 0;
-
-                  itemsToRedistribute.push({
-                    source_warehouse_id: warehouse_id,
-                    deficit: remainingDeficit,
-                    record: record,
-                  });
-                }
+                itemsToRedistribute.push({
+                  source_warehouse_id: warehouse_id,
+                  deficit: deficit,
+                  record: record,
+                });
               } else {
                 record.new_ordered = deltaOrdered;
 
@@ -471,35 +458,6 @@ class WarehouseRepository {
               }
 
               if (remainingDeficit > 0) {
-                const otherRecords = Array.from(recordsMap.values())
-                  .filter((r) => r.id !== source_warehouse_id && r.new_free > 0)
-                  .sort((a, b) => b.new_free - a.new_free);
-
-                for (const targetRecord of otherRecords) {
-                  if (remainingDeficit <= 0) break;
-
-                  const availableFree = targetRecord.new_free;
-                  const transfer = Math.min(availableFree, remainingDeficit);
-
-                  if (transfer > 0) {
-                    targetRecord.new_free -= transfer;
-                    targetRecord.new_total =
-                      targetRecord.new_free + targetRecord.new_ordered;
-                    targetRecord.updated = true;
-
-                    sourceRecord.new_free += transfer;
-                    sourceRecord.new_total =
-                      sourceRecord.new_free + sourceRecord.new_ordered;
-
-                    remainingDeficit -= transfer;
-                  }
-                }
-              }
-
-              if (remainingDeficit === 0) {
-                sourceRecord.new_total =
-                  sourceRecord.new_free + sourceRecord.new_ordered;
-              } else {
                 console.warn(
                   `Not enough deficit ${deficit} for warehouse_id=${source_warehouse_id}, remaining: ${remainingDeficit}`,
                 );

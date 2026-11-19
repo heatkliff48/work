@@ -872,10 +872,8 @@ const WarehouseContextProvider = ({ children }) => {
           Number(warehouseItem.total_quantity || 0) - delta,
           0,
         ),
-        ordered_quantity: Math.max(
+        ordered_quantity:
           Number(warehouseItem.ordered_quantity || 0) - delta,
-          0,
-        ),
         type,
       }),
     );
