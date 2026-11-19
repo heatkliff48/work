@@ -420,14 +420,15 @@ const OrderCart = React.memo(() => {
         product?.fixed_price_m2_with_delivery !== '';
       const delivery_m2_share = hasFixedDeliveryPrice
         ? 0
-        : (deliveryPricePerM2 * quantity_real * (100 - discount)) / 100;
+        : deliveryPricePerM2 * quantity_real;
 
       const { price_m2_with_markups, price_m2_with_delivery, final_price } =
         calcBlockPriceWithDelivery(
           product,
           deliveryPricePerM2,
           orderCartData?.agent_commission,
-          confirmingSurcharge
+          confirmingSurcharge,
+          orderCartData?.delivery_m2,
         );
 
       // Liberar debits this line by area, so quantity_liberated can hold

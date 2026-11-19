@@ -102,10 +102,11 @@ const BlocksJournalTableOrder = ({
                         value = product.price_m2_with_markups;
                       }
                       // В строке хранится прайсовая цена, а скидка применяется
-                      // только в итоге — показываем цену, которую платит клиент
+                      // только в итоге — показываем цену, которую платит клиент.
+                      // price_m2_with_delivery уже рассчитана с учетом скидки на блок
+                      // (без применения скидки к доставке).
                       if (
-                        (key === 'price_m2' ||
-                          key === 'price_m2_with_delivery') &&
+                        key === 'price_m2' &&
                         value != null &&
                         value !== ''
                       ) {

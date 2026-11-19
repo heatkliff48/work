@@ -40,8 +40,7 @@ const BLOCK_COLUMNS = [
   {
     key: 'price_m2_with_delivery',
     label: 'Price incl. delivery, €/m²',
-    // Stored as list price; the discount is applied only to the total
-    render: (row) => applyDiscount(row.price_m2_with_delivery, row.discount),
+    render: (row) => row.price_m2_with_delivery,
   },
   { key: 'final_price', label: 'Total, €' },
 ];
@@ -252,6 +251,7 @@ const AccountngOrderCard = React.memo(() => {
           deliveryPricePerM2,
           agentCommission,
           confirmingSurcharge,
+          deliveryM2,
         ),
       };
     });

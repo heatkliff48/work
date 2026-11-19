@@ -75,7 +75,9 @@ function calcProductFields(orderRow, newPalets, catalog) {
   const quantity_m2 = round2(newPalets * m2PerPallet(catalog));
 
   const final_price_with_delivery =
-    (price_m2_with_delivery * quantity_m2 * (100 - discount)) / 100;
+    fixedDeliveryPrice == null
+      ? price_m2_with_delivery * quantity_m2
+      : (price_m2_with_delivery * quantity_m2 * (100 - discount)) / 100;
 
   return {
     quantity_m2,

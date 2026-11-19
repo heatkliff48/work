@@ -40,13 +40,15 @@ const round2 = (value) => Number(value.toFixed(2));
 // priced on quantity_real, not on the requested quantity_m2.
 // price_m2_with_markups is the list price_m2 raised by the agent commission
 // only. The confirming surcharge does not change it.
-// price_m2_with_delivery is (block + delivery) raised by the confirming
-// surcharge, and final_price is calculated from that.
+// Скидка клиента применяется ТОЛЬКО к цене блока и НЕ влияет на доставку.
+// price_m2_with_delivery — цена за м² с доставкой, которую платит клиент
+// (цена блока со скидкой + доставка за 1 м²).
 export const calcBlockPriceWithDelivery = (
   product,
   deliveryPricePerM2,
   agentCommission = 0,
   confirmingSurcharge = 0,
+  orderDeliveryM2 = null,
 ) => {
   const fixedDeliveryPrice = product?.fixed_price_m2_with_delivery;
   if (fixedDeliveryPrice != null && fixedDeliveryPrice !== '') {
@@ -55,29 +57,81 @@ export const calcBlockPriceWithDelivery = (
     const price = round2(Number(fixedDeliveryPrice));
     const quantity_real = Number(product?.quantity_real || 0);
     const discount = Number(product?.discount || 0);
-    const final_price = (price * quantity_real * (100 - discount)) / 100;
+    const netPrice = (price * (100 - discount)) / 100;
+    const final_price = netPrice * quantity_real;
+
+    // Вывод в консоль для фиксированной проектной цены
+    console.log('[price_m2_with_delivery (фиксированная)]', {
+      product: product?.name || product?.product_article || product?.id,
+      priceAfterAgent: price,
+      deliveryPricePerM2: Number(deliveryPricePerM2) ? round2(deliveryPricePerM2) : 0,
+      'order.delivery_m2': orderDeliveryM2,
+      quantity_real,
+      agent_commission: agentCommission,
+      priceWithDeliveryBase: price,
+      price_m2_with_delivery: round2(netPrice),
+      surcharge: confirmingSurcharge,
+    });
+
     return {
       price_m2_with_markups: price,
-      price_m2_with_delivery: price,
+      price_m2_with_delivery: round2(netPrice),
       final_price: round2(final_price),
     };
   }
 
+  // 1. priceAfterAgent: цена за м² с учетом комиссии агента (agent_commission, %)
   const priceAfterAgent = applyAgentCommission(
     product?.price_m2,
     agentCommission,
   );
+
+  // 2. deliveryPricePerM2: доля стоимости доставки на 1 м²
   const delivery = Number(deliveryPricePerM2 || 0);
-  const price_m2_with_markups = priceAfterAgent;
-  const price_m2_with_delivery = applyConfirmingSurcharge(
-    priceAfterAgent + delivery,
+
+  // 3. priceWithDeliveryBase: базовая цена м² с доставкой (цена после агента + доставка)
+  const priceWithDeliveryBase = priceAfterAgent + delivery;
+
+  // Надбавка confirming на цену блока и доставку
+  const blockPriceWithSurcharge = applyConfirmingSurcharge(
+    priceAfterAgent,
     confirmingSurcharge,
   );
+  const deliveryWithSurcharge = applyConfirmingSurcharge(
+    delivery,
+    confirmingSurcharge,
+  );
+
+  const price_m2_with_markups = priceAfterAgent;
   const quantity_real = Number(product?.quantity_real || 0);
   const discount = Number(product?.discount || 0);
 
-  const final_price =
-    (price_m2_with_delivery * quantity_real * (100 - discount)) / 100;
+  // 4. Скидка применяется ТОЛЬКО к цене блока, НЕ к доставке
+  const blockNetPriceM2 = (blockPriceWithSurcharge * (100 - discount)) / 100;
+  const blockTotal = blockNetPriceM2 * quantity_real;
+
+  // 5. Стоимость доставки без применения скидки
+  const deliveryTotal = deliveryWithSurcharge * quantity_real;
+
+  // 6. Итоговая сумма по строке (блок со скидкой + доставка)
+  const final_price = blockTotal + deliveryTotal;
+
+  // 7. Итоговая цена за м² с доставкой, которую платит клиент:
+  // цена блока со скидкой + доставка за 1 м²
+  const price_m2_with_delivery = blockNetPriceM2 + deliveryWithSurcharge;
+
+  // Вывод параметров расчета в консоль браузера
+  console.log('[price_m2_with_delivery]', {
+    product: product?.name || product?.product_article || product?.id,
+    priceAfterAgent: round2(priceAfterAgent),
+    deliveryPricePerM2: Number(deliveryPricePerM2) ? round2(deliveryPricePerM2) : 0,
+    'order.delivery_m2': orderDeliveryM2,
+    quantity_real,
+    agent_commission: agentCommission,
+    priceWithDeliveryBase: round2(priceWithDeliveryBase),
+    price_m2_with_delivery: round2(price_m2_with_delivery),
+    surcharge: confirmingSurcharge,
+  });
 
   return {
     price_m2_with_markups: round2(price_m2_with_markups),
