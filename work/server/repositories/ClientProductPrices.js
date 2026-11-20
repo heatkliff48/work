@@ -1,5 +1,6 @@
 'use strict';
 
+const { Op } = require('sequelize');
 const {
   ClientProductPrices,
   Products,
@@ -7,7 +8,7 @@ const {
   DeliveryAddresses,
 } = require('../db/models');
 const { BadRequest, NotFound } = require('../utils/Errors.js');
-const { resolveClientProductPrice } = require('../services/clientProductPriceLookup.js');
+const { resolveOrderLinePrices } = require('../services/clientProductPriceLookup.js');
 
 const priceNumber = (value) => {
   const num = Number(String(value ?? '').replace(',', '.'));
@@ -29,7 +30,7 @@ class ClientProductPricesRepository {
         client_id: clientId,
       },
     });
-    return resolveClientProductPrice(rows, { productId, clientId, projectId });
+    return resolveOrderLinePrices(rows, { productId, clientId, projectId });
   }
 
   static async create({ product_id, client_id, delivery_address_id, price }) {
@@ -60,6 +61,18 @@ class ClientProductPricesRepository {
       if (!project || Number(project.client_id) !== clientId) {
         throw new BadRequest('Project is invalid');
       }
+      const basePrice = await ClientProductPrices.findOne({
+        where: {
+          product_id: productId,
+          client_id: clientId,
+          delivery_address_id: null,
+        },
+      });
+      if (!basePrice) {
+        throw new BadRequest(
+          'Add a price for this client and product without a project first',
+        );
+      }
     }
 
     return ClientProductPrices.create({
@@ -75,6 +88,20 @@ class ClientProductPricesRepository {
     if (!Number.isInteger(rowId) || rowId <= 0) throw new NotFound('Price not found');
     const row = await ClientProductPrices.findByPk(rowId);
     if (!row) throw new NotFound('Price not found');
+    if (row.delivery_address_id == null) {
+      const projectPrice = await ClientProductPrices.findOne({
+        where: {
+          product_id: row.product_id,
+          client_id: row.client_id,
+          delivery_address_id: { [Op.ne]: null },
+        },
+      });
+      if (projectPrice) {
+        throw new BadRequest(
+          'Remove the project prices for this client and product first',
+        );
+      }
+    }
     await row.destroy();
     return rowId;
   }

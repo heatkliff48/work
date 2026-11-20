@@ -1,7 +1,16 @@
+import { orderLineHasClientPrice } from '#utils/clientProductPrice.js';
+
 // delivery_m2 is the order's delivery cost for all HCCA blocks. It is spread
 // evenly over the blocks' real m2 and added to each line's price per m2.
-// Shared by the order card and the accounting card so both show the same
-// prices and totals.
+// Lines whose product and client are in the client price table are left out:
+// that delivery does not apply to them. Shared by the order card and the
+// accounting card so both show the same prices and totals.
+
+export const blockGetsOrderDelivery = (product, clientPrices, clientId) =>
+  !orderLineHasClientPrice(clientPrices, {
+    productId: product?.product_id,
+    clientId,
+  });
 
 export const getDeliveryPricePerM2 = (blocks, deliveryM2Total) => {
   const totalRealM2 = (blocks || []).reduce(
@@ -50,15 +59,19 @@ export const calcBlockPriceWithDelivery = (
 ) => {
   const fixedDeliveryPrice = product?.fixed_price_m2_with_delivery;
   if (fixedDeliveryPrice != null && fixedDeliveryPrice !== '') {
-    // Цена из записи с проектом уже включает доставку. Комиссия агента,
-    // доля delivery_m2 и confirming surcharge её не меняют.
-    const price = round2(Number(fixedDeliveryPrice));
+    // Цена с проектом — это сама Price with delivery. Цена за м² остаётся
+    // ценой клиента без проекта, и к ней по-прежнему добавляется комиссия агента.
+    const price_m2_with_delivery = round2(Number(fixedDeliveryPrice));
+    const price_m2_with_markups = round2(
+      applyAgentCommission(product?.price_m2, agentCommission),
+    );
     const quantity_real = Number(product?.quantity_real || 0);
     const discount = Number(product?.discount || 0);
-    const final_price = (price * quantity_real * (100 - discount)) / 100;
+    const final_price =
+      (price_m2_with_delivery * quantity_real * (100 - discount)) / 100;
     return {
-      price_m2_with_markups: price,
-      price_m2_with_delivery: price,
+      price_m2_with_markups,
+      price_m2_with_delivery,
       final_price: round2(final_price),
     };
   }

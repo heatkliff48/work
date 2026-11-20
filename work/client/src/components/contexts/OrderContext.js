@@ -515,6 +515,7 @@ const OrderContextProvider = ({ children }) => {
         person_in_charge: order?.person_in_charge,
         delivery: order?.delivery,
         delivery_m2: order?.delivery_m2,
+        delivery_m2_locked: Boolean(order?.delivery_m2_locked),
         pdf_updated_at: order?.pdf_updated_at ?? null,
         pdf_version: order?.pdf_version ?? null,
         main_order: order?.main_order ?? null,
