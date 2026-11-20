@@ -8,12 +8,14 @@ const {
   OrderRelMatProducts,
 } = require('../db/models');
 const ClientProductPricesRepository = require('./ClientProductPrices.js');
+const { BadRequest } = require('../utils/Errors.js');
 const myEmitter = require('../src/ee.js');
 const {
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_ANCHOR_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_TOOL_PRODUCT_OF_ORDER_SOCKET,
   UPDATE_REL_MAT_PRODUCT_OF_ORDER_SOCKET,
+  ADD_NEW_DELIVERY_PRICE_SOCKET,
 } = require('../src/constants/event');
 
 // Имя нового события одинаково в репозитории, wsEmitter и клиентском обработчике.
@@ -303,7 +305,20 @@ class OrdersRepository {
 
   static async addDeliveryM2Price({ delivery_m2, order_id }) {
     try {
-      await updateOrderFields(order_id, { delivery_m2 });
+      const order = await Orders.findByPk(order_id, {
+        attributes: ['delivery_m2', 'delivery_m2_locked'],
+      });
+      const nextDelivery = Number(delivery_m2);
+      const savedDelivery = Number(order?.delivery_m2 || 0);
+      if (
+        order?.delivery_m2_locked &&
+        Math.round(nextDelivery * 100) < Math.round(savedDelivery * 100)
+      ) {
+        throw new BadRequest(
+          'Delivery cost cannot be lower than the current amount',
+        );
+      }
+      await updateOrderFields(order_id, { delivery_m2: nextDelivery });
     } catch (error) {
       console.log(
         '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
@@ -581,7 +596,7 @@ class OrdersRepository {
       const order = await Orders.findByPk(order_id, {
         attributes: ['owner', 'del_adr_id'],
       });
-      const special = order
+      const prices = order
         ? await ClientProductPricesRepository.findApplicable({
             productId: product_id,
             clientId: order.owner,
@@ -599,13 +614,17 @@ class OrdersRepository {
       let nextPriceM2 = price_m2;
       let nextFinalPrice = final_price;
       let fixedPrice = null;
-      if (special?.kind === 'price_m2') {
-        nextPriceM2 = Number(Number(special.price).toFixed(2));
+      let transport = null;
+      if (prices?.priceM2 != null) {
+        nextPriceM2 = Number(Number(prices.priceM2).toFixed(2));
         nextFinalPrice = lineTotal(nextPriceM2);
-      } else if (special?.kind === 'price_with_delivery') {
-        fixedPrice = Number(Number(special.price).toFixed(2));
-        nextPriceM2 = fixedPrice;
+      }
+      if (prices?.projectPrice != null && prices?.priceM2 != null) {
+        fixedPrice = Number(Number(prices.projectPrice).toFixed(2));
         nextFinalPrice = lineTotal(fixedPrice);
+        transport = Number(
+          ((fixedPrice - Number(prices.priceM2)) * quantityRealNum).toFixed(2),
+        );
       }
 
       const product_of_order = await createOrderProduct(OrdersProducts, {
@@ -640,6 +659,31 @@ class OrdersRepository {
       });
 
       const tid = allOrdrProd[allOrdrProd.length - 1].id;
+
+      if (fixedPrice != null) {
+        const delivery_m2 = await Orders.sequelize.transaction(async (transaction) => {
+          const locked = await lockOrder(order_id, transaction);
+          const nextDelivery = Number(
+            ((Number(locked.delivery_m2) || 0) + transport).toFixed(2),
+          );
+          await locked.update(
+            {
+              delivery_m2: nextDelivery,
+              delivery_m2_locked: true,
+              ...nextPdfRevision(locked),
+            },
+            { transaction },
+          );
+          await notifyPdfDateAfterCommit(locked, transaction);
+          return nextDelivery;
+        });
+        myEmitter.emit(ADD_NEW_DELIVERY_PRICE_SOCKET, {
+          order_id: Number(order_id),
+          delivery_m2,
+          delivery_m2_locked: true,
+        });
+      }
+
       return { id: tid, ...product_of_order.toJSON() };
     } catch (error) {
       console.log(
