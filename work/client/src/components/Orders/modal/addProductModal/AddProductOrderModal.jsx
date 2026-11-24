@@ -22,7 +22,7 @@ import {
   piecesPerQuantityUnit,
 } from '../packagingUtils.js';
 import { fieldLabel, translateColumns } from '../../ordersI18n.js';
-import { resolveClientProductPrice } from '#utils/clientProductPrice.js';
+import { resolveBaseClientPrice } from '#utils/clientProductPrice.js';
 
 const limitDecimalInput = (value, maxDecimals = 2) => {
   if (value === '' || value === null || value === undefined) return '';
@@ -117,12 +117,11 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     (el) => el.article === orderCartData.article,
   );
 
-  const specialPrice = useMemo(() => {
+  const baseClientPrice = useMemo(() => {
     if (!selectedProduct?.id || !haveOrderClient?.owner) return null;
-    return resolveClientProductPrice(clientProductPrices, {
+    return resolveBaseClientPrice(clientProductPrices, {
       productId: selectedProduct.id,
       clientId: haveOrderClient.owner,
-      projectId: haveOrderClient.del_adr_id,
     });
   }, [selectedProduct, haveOrderClient, clientProductPrices]);
 
@@ -302,7 +301,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     const catalog =
       (selectedProduct.price * selectedProduct.volumeBlockOnPallet) /
       m2PerPallet(selectedProduct);
-    const result = specialPrice ? specialPrice.price : catalog;
+    const result = baseClientPrice != null ? baseClientPrice : catalog;
 
     setProductOfOrder((prev) => ({
       ...prev,
@@ -310,7 +309,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
 
     return formatFixed(result, 2, ',');
-  }, [selectedProduct, specialPrice]);
+  }, [selectedProduct, baseClientPrice]);
 
   const listPriceM2 = parseLocalNumber(price_m2_value) || 0;
 
@@ -373,10 +372,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
   // Клиент платит за реально отгружаемые м² (целые паллеты) — quantity_real
   const final_price_value = useMemo(() => {
     const m2 = parseLocalNumber(quantity_real_value) || 0;
-    const priceM2 =
-      specialPrice?.kind === 'price_with_delivery'
-        ? specialPrice.price
-        : parseLocalNumber(price_m2_value) || 0;
+    const priceM2 = parseLocalNumber(price_m2_value) || 0;
     const discount = discountNum;
     const result = (priceM2 * m2 * (100 - discount)) / 100;
 
@@ -386,7 +382,7 @@ const AddProductOrderModal = React.memo(({ isOpen, toggle }) => {
     }));
 
     return formatFixed(result, 2, ',');
-  }, [quantity_real_value, price_m2_value, discountNum, specialPrice]);
+  }, [quantity_real_value, price_m2_value, discountNum]);
 
   const addProductOrder = async () => {
     const quantityM2 = parseLocalNumber(productOfOrder.quantity_m2) || 0;

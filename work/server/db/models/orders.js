@@ -52,6 +52,11 @@ module.exports = (sequelize, DataTypes) => {
       description: DataTypes.STRING,
       delivery: DataTypes.FLOAT,
       delivery_m2: DataTypes.FLOAT,
+      delivery_m2_locked: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       main_order: DataTypes.STRING,
       deal_id: DataTypes.INTEGER,
       uf_number_offer: DataTypes.INTEGER,

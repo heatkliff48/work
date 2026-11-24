@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -22,7 +22,10 @@ import {
   palletHeightCm,
   round2,
 } from './packagingUtils.js';
-import { getDeliveryPricePerM2 } from '../blockDeliveryPrice.js';
+import {
+  blockGetsOrderDelivery,
+  getDeliveryPricePerM2,
+} from '../blockDeliveryPrice.js';
 import '../ordersView.css';
 
 // Name of the column on the parent order's product row that tracks how much
@@ -61,13 +64,11 @@ function calcProductFields(orderRow, newPalets, catalog) {
     orderRow.fixed_price_m2_with_delivery == null
       ? null
       : Number(orderRow.fixed_price_m2_with_delivery);
-  const price_m2 =
-    fixedDeliveryPrice == null ? Number(orderRow.price_m2) || 0 : fixedDeliveryPrice;
+  const price_m2 = Number(orderRow.price_m2) || 0;
   const price_m3 = Number(orderRow.price_m3) || 0;
-  const price_m2_with_markups =
-    fixedDeliveryPrice == null
-      ? Number(orderRow.price_m2_with_markups ?? price_m2)
-      : fixedDeliveryPrice;
+  const price_m2_with_markups = Number(
+    orderRow.price_m2_with_markups ?? price_m2,
+  );
   const price_m2_with_delivery =
     fixedDeliveryPrice == null
       ? Number(orderRow.price_m2_with_delivery) || 0
@@ -201,6 +202,7 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
   const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
     useProductsTypeJournalContext();
   const dispatch = useDispatch();
+  const clientProductPrices = useSelector((state) => state.clientProductPrices);
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
   // Line key -> quantity as typed. A block row has one line per package it
@@ -463,15 +465,20 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
     // без надбавки confirming. Надбавка считается заново на дочернем заказе
     // поверх цены с доставкой, поэтому вычитать её из price_m2_with_delivery
     // нельзя: в разнице уже сидит процент и на блок, и на доставку.
+    const orderClientId = orderCartData?.owner?.id ?? orderCartData?.owner;
     const deliveryPerM2 = getDeliveryPricePerM2(
-      productLists.products,
+      (productLists.products || []).filter((product) =>
+        blockGetsOrderDelivery(product, clientProductPrices, orderClientId),
+      ),
       orderCartData?.delivery_m2,
     );
     const deliveryM2Full = round2(
-      products.reduce(
-        (acc, prod) => acc + deliveryPerM2 * Number(prod.quantity_m2 || 0),
-        0,
-      ),
+      products.reduce((acc, prod) => {
+        if (!blockGetsOrderDelivery(prod, clientProductPrices, orderClientId)) {
+          return acc;
+        }
+        return acc + deliveryPerM2 * Number(prod.quantity_m2 || 0);
+      }, 0),
     );
 
     const dryMixes = (productLists.dryMixes || [])

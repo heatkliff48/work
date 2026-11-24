@@ -1,7 +1,21 @@
+import { orderLineHasClientPrice } from '#utils/clientProductPrice.js';
+
 // delivery_m2 is the order's delivery cost for all HCCA blocks. It is spread
 // evenly over the blocks' real m2 and added to each line's price per m2.
-// Shared by the order card and the accounting card so both show the same
-// prices and totals.
+// Lines whose product and client are in the client price table are left out:
+// that delivery does not apply to them. Shared by the order card and the
+// accounting card so both show the same prices and totals.
+
+export const blockGetsOrderDelivery = (product, clientPrices, clientId) => {
+  const hasFixedDeliveryPrice =
+    product?.fixed_price_m2_with_delivery != null &&
+    product?.fixed_price_m2_with_delivery !== '';
+  if (hasFixedDeliveryPrice) return false;
+  return !orderLineHasClientPrice(clientPrices, {
+    productId: product?.product_id,
+    clientId,
+  });
+};
 
 export const getDeliveryPricePerM2 = (blocks, deliveryM2Total) => {
   const totalRealM2 = (blocks || []).reduce(
@@ -52,29 +66,32 @@ export const calcBlockPriceWithDelivery = (
 ) => {
   const fixedDeliveryPrice = product?.fixed_price_m2_with_delivery;
   if (fixedDeliveryPrice != null && fixedDeliveryPrice !== '') {
-    // Цена из записи с проектом уже включает доставку. Комиссия агента,
-    // доля delivery_m2 и confirming surcharge её не меняют.
-    const price = round2(Number(fixedDeliveryPrice));
+    // Цена с проектом — это сама Price with delivery. Цена за м² остаётся
+    // ценой клиента без проекта, и к ней по-прежнему добавляется комиссия агента.
+    const price_m2_with_delivery = round2(Number(fixedDeliveryPrice));
+    const price_m2_with_markups = round2(
+      applyAgentCommission(product?.price_m2, agentCommission),
+    );
     const quantity_real = Number(product?.quantity_real || 0);
     const discount = Number(product?.discount || 0);
-    const netPrice = (price * (100 - discount)) / 100;
+    const netPrice = (price_m2_with_delivery * (100 - discount)) / 100;
     const final_price = netPrice * quantity_real;
 
     // Вывод в консоль для фиксированной проектной цены
     console.log('[price_m2_with_delivery (фиксированная)]', {
       product: product?.name || product?.product_article || product?.id,
-      priceAfterAgent: price,
+      priceAfterAgent: price_m2_with_markups,
       deliveryPricePerM2: Number(deliveryPricePerM2) ? round2(deliveryPricePerM2) : 0,
       'order.delivery_m2': orderDeliveryM2,
       quantity_real,
       agent_commission: agentCommission,
-      priceWithDeliveryBase: price,
+      priceWithDeliveryBase: price_m2_with_delivery,
       price_m2_with_delivery: round2(netPrice),
       surcharge: confirmingSurcharge,
     });
 
     return {
-      price_m2_with_markups: price,
+      price_m2_with_markups,
       price_m2_with_delivery: round2(netPrice),
       final_price: round2(final_price),
     };

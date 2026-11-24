@@ -69,9 +69,11 @@ import { orderProductType } from './modal/packagingUtils.js';
 import { statusThemeFor } from './ordersCells.jsx';
 import { fieldLabel, statusLabel } from './ordersI18n.js';
 import {
+  blockGetsOrderDelivery,
   calcBlockPriceWithDelivery,
   getDeliveryPricePerM2,
 } from './blockDeliveryPrice.js';
+import showMessage from '#components/Utils/showMessage.js';
 
 import '#components/Styles/order-card.css';
 import './ordersView.css';
@@ -132,6 +134,7 @@ const OrderCart = React.memo(() => {
   const navigate = useNavigate();
 
   const reservedProducts = useSelector((state) => state.reservedProducts);
+  const clientProductPrices = useSelector((state) => state.clientProductPrices);
 
   const [selectedPersonInCharge, setSelectedPersonInCharge] = useState();
   const [dataValue, setDataValue] = useState(new Date());
@@ -402,9 +405,21 @@ const OrderCart = React.memo(() => {
     );
   }, [productsOfOrders, productVersions, addProductArticleToOrderList]);
 
+  const orderClientId = orderCartData?.owner?.id ?? orderCartData?.owner;
   const deliveryPricePerM2 = useMemo(
-    () => getDeliveryPricePerM2(updatedProductListOrder, orderCartData?.delivery_m2),
-    [updatedProductListOrder, orderCartData?.delivery_m2]
+    () =>
+      getDeliveryPricePerM2(
+        (updatedProductListOrder || []).filter((product) =>
+          blockGetsOrderDelivery(product, clientProductPrices, orderClientId),
+        ),
+        orderCartData?.delivery_m2,
+      ),
+    [
+      updatedProductListOrder,
+      orderCartData?.delivery_m2,
+      clientProductPrices,
+      orderClientId,
+    ],
   );
 
   const confirmingSurcharge = getOrderConfirmingSurcharge(orderCartData);
@@ -413,19 +428,20 @@ const OrderCart = React.memo(() => {
     return (updatedProductListOrder || []).map((product) => {
       const quantity_m2 = Number(product?.quantity_m2 || 0);
       const quantity_real = Number(product?.quantity_real || 0);
-      const discount = Number(product?.discount || 0);
 
-      const hasFixedDeliveryPrice =
-        product?.fixed_price_m2_with_delivery != null &&
-        product?.fixed_price_m2_with_delivery !== '';
-      const delivery_m2_share = hasFixedDeliveryPrice
-        ? 0
-        : deliveryPricePerM2 * quantity_real;
+      const getsOrderDelivery = blockGetsOrderDelivery(
+        product,
+        clientProductPrices,
+        orderClientId,
+      );
+      const delivery_m2_share = getsOrderDelivery
+        ? deliveryPricePerM2 * quantity_real
+        : 0;
 
       const { price_m2_with_markups, price_m2_with_delivery, final_price } =
         calcBlockPriceWithDelivery(
           product,
-          deliveryPricePerM2,
+          getsOrderDelivery ? deliveryPricePerM2 : 0,
           orderCartData?.agent_commission,
           confirmingSurcharge,
           orderCartData?.delivery_m2,
@@ -457,6 +473,8 @@ const OrderCart = React.memo(() => {
     deliveryPricePerM2,
     orderCartData?.agent_commission,
     confirmingSurcharge,
+    clientProductPrices,
+    orderClientId,
   ]);
 
   useEffect(() => {
@@ -1001,6 +1019,18 @@ const OrderCart = React.memo(() => {
 
   const deliveryM2Func = async () => {
     const delivery_m2 = Number(deliveryM2Draft || 0);
+    const savedDelivery = Number(orderCartData?.delivery_m2 || 0);
+    if (
+      orderCartData?.delivery_m2_locked &&
+      Math.round(delivery_m2 * 100) < Math.round(savedDelivery * 100)
+    ) {
+      setDeliveryM2Draft(savedDelivery);
+      showMessage(
+        'Delivery cost cannot be lower than the current amount',
+        'warning',
+      );
+      return;
+    }
 
     dispatch(
       addNewDeliveryPrice({
@@ -1074,6 +1104,7 @@ const OrderCart = React.memo(() => {
       setOrderCartData((prev) => ({
         ...prev,
         delivery_m2: updatedOrderCartData.delivery_m2,
+        delivery_m2_locked: Boolean(updatedOrderCartData.delivery_m2_locked),
       }));
     }
 
@@ -1868,7 +1899,7 @@ const OrderCart = React.memo(() => {
                   onChange={(e) => {
                     setDeliveryM2Draft(e.target.value);
                   }}
-                  readOnly={orderCartData?.status < 5 ? false : true}
+                  readOnly={orderCartData?.status >= 5}
                   disabled={
                     orderCartData?.main_order ||
                     !checkUserAccess(user, roles, 'orders_save_delivery_price')

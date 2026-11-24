@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
 import Table from '#components/Table/Table.jsx';
 import { useProductsContext } from '#components/contexts/ProductContext.js';
 import { useUsersContext } from '#components/contexts/UserContext.js';
@@ -8,6 +9,10 @@ import {
   deleteClientProductPrice,
 } from '#components/redux/actions/clientProductPricesAction.js';
 import './ClientProductPrices.css';
+
+const selectStyles = {
+  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+};
 
 const productLabel = (product) => {
   if (!product) return '';
@@ -51,6 +56,19 @@ export default function ClientProductPrices() {
       ),
     [deliveryAddresses, clientId],
   );
+  const hasBasePrice = useMemo(() => {
+    if (!productId || !clientId) return false;
+    return (rows || []).some(
+      (row) =>
+        Number(row.product_id) === Number(productId) &&
+        Number(row.client_id) === Number(clientId) &&
+        row.delivery_address_id == null,
+    );
+  }, [rows, productId, clientId]);
+
+  useEffect(() => {
+    if (projectId && !hasBasePrice) setProjectId('');
+  }, [projectId, hasBasePrice]);
 
   const productById = useMemo(() => {
     const map = new Map();
@@ -111,6 +129,31 @@ export default function ClientProductPrices() {
     [access.canWrite, dispatch],
   );
 
+  const productOptions = useMemo(
+    () =>
+      products.map((product) => ({
+        value: product.id,
+        label: productLabel(product),
+      })),
+    [products],
+  );
+  const clientOptions = useMemo(
+    () =>
+      clientList.map((client) => ({
+        value: client.id,
+        label: client.c_name || String(client.id),
+      })),
+    [clientList],
+  );
+  const projectOptions = useMemo(
+    () =>
+      projects.map((project) => ({
+        value: project.id,
+        label: project.project_name || project.street || String(project.id),
+      })),
+    [projects],
+  );
+
   const onClientChange = (value) => {
     setClientId(value);
     setProjectId('');
@@ -122,6 +165,7 @@ export default function ClientProductPrices() {
     if (!productId || !clientId || !Number.isFinite(priceNumber) || priceNumber < 0) {
       return;
     }
+    if (projectId && !hasBasePrice) return;
     dispatch(
       addClientProductPrice({
         product_id: Number(productId),
@@ -139,51 +183,46 @@ export default function ClientProductPrices() {
         <form className="cpp-form" onSubmit={onSubmit}>
           <div className="cpp-field">
             <label htmlFor="cpp-product">Product</label>
-            <select
-              id="cpp-product"
-              value={productId}
-              required
-              onChange={(event) => setProductId(event.target.value)}
-            >
-              <option value="">Select product</option>
-              {products.map((product) => (
-                <option key={product.id} value={product.id}>
-                  {productLabel(product)}
-                </option>
-              ))}
-            </select>
+            <Select
+              inputId="cpp-product"
+              options={productOptions}
+              value={productOptions.find((option) => option.value === productId) || null}
+              onChange={(option) => setProductId(option?.value || '')}
+              placeholder="Select product"
+              isSearchable
+              isClearable
+              menuPortalTarget={document.body}
+              styles={selectStyles}
+            />
           </div>
           <div className="cpp-field">
             <label htmlFor="cpp-client">Client</label>
-            <select
-              id="cpp-client"
-              value={clientId}
-              required
-              onChange={(event) => onClientChange(event.target.value)}
-            >
-              <option value="">Select client</option>
-              {clientList.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {client.c_name}
-                </option>
-              ))}
-            </select>
+            <Select
+              inputId="cpp-client"
+              options={clientOptions}
+              value={clientOptions.find((option) => option.value === clientId) || null}
+              onChange={(option) => onClientChange(option?.value || '')}
+              placeholder="Select client"
+              isSearchable
+              isClearable
+              menuPortalTarget={document.body}
+              styles={selectStyles}
+            />
           </div>
           <div className="cpp-field">
             <label htmlFor="cpp-project">Project</label>
-            <select
-              id="cpp-project"
-              value={projectId}
-              onChange={(event) => setProjectId(event.target.value)}
-              disabled={!clientId}
-            >
-              <option value="">No project</option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.project_name || project.street || project.id}
-                </option>
-              ))}
-            </select>
+            <Select
+              inputId="cpp-project"
+              options={projectOptions}
+              value={projectOptions.find((option) => option.value === projectId) || null}
+              onChange={(option) => setProjectId(option?.value || '')}
+              placeholder={hasBasePrice ? 'No project' : 'Price without project is required'}
+              isSearchable
+              isClearable
+              isDisabled={!clientId || !hasBasePrice}
+              menuPortalTarget={document.body}
+              styles={selectStyles}
+            />
           </div>
           <div className="cpp-field">
             <label htmlFor="cpp-price">Price</label>

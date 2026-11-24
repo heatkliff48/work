@@ -15,6 +15,7 @@ import AccountingInvoiceModal from './AccountingInvoiceModal.jsx';
 import { makeStatusPillCell } from '#components/Orders/ordersCells';
 import {
   applyDiscount,
+  blockGetsOrderDelivery,
   calcBlockPriceWithDelivery,
   getDeliveryPricePerM2,
 } from '#components/Orders/blockDeliveryPrice.js';
@@ -222,6 +223,7 @@ const AccountngOrderCard = React.memo(() => {
     () => list_of_orders?.find((order) => order.id === orderCartData?.id),
     [list_of_orders, orderCartData?.id],
   );
+  const clientProductPrices = useSelector((state) => state.clientProductPrices);
   const deliveryM2 = currentOrder?.delivery_m2;
   const agentCommission = currentOrder?.agent_commission;
   const confirmingSurcharge = getOrderConfirmingSurcharge(currentOrder);
@@ -229,14 +231,22 @@ const AccountngOrderCard = React.memo(() => {
   // Blocks are priced with the order's delivery_m2 spread over their m2, the
   // same way the order card does, so the VAT summary and the factura include it.
   const blocksListWithDelivery = useMemo(() => {
+    const clientId = currentOrder?.owner;
     const deliveryPricePerM2 = getDeliveryPricePerM2(
-      updatedProductListOrder,
+      (updatedProductListOrder || []).filter((product) =>
+        blockGetsOrderDelivery(product, clientProductPrices, clientId),
+      ),
       deliveryM2,
     );
 
     return updatedProductListOrder.map((product) => {
       const catalog = productVersions?.find((p) => p.id === product.product_id);
       const blocksPerPallet = Number(catalog?.quantityBlockOnPallet) || 0;
+      const getsOrderDelivery = blockGetsOrderDelivery(
+        product,
+        clientProductPrices,
+        clientId,
+      );
 
       return {
         ...product,
@@ -248,7 +258,7 @@ const AccountngOrderCard = React.memo(() => {
           : null,
         ...calcBlockPriceWithDelivery(
           product,
-          deliveryPricePerM2,
+          getsOrderDelivery ? deliveryPricePerM2 : 0,
           agentCommission,
           confirmingSurcharge,
           deliveryM2,
@@ -261,6 +271,8 @@ const AccountngOrderCard = React.memo(() => {
     deliveryM2,
     agentCommission,
     confirmingSurcharge,
+    clientProductPrices,
+    currentOrder?.owner,
   ]);
 
   useEffect(() => {

@@ -8,28 +8,42 @@ const projectIdOf = (projectId) => {
 const latest = (rows) =>
   rows.reduce((best, row) => (Number(row.id) > Number(best.id) ? row : best));
 
-export function resolveClientProductPrice(rows, { productId, clientId, projectId }) {
+const matchingRows = (rows, productId, clientId) => {
   const product = Number(productId);
   const client = Number(clientId);
-  const project = projectIdOf(projectId);
-  const matches = (rows || []).filter(
+  return (rows || []).filter(
     (row) => Number(row.product_id) === product && Number(row.client_id) === client,
   );
-  if (!matches.length) return null;
+};
 
-  if (project != null) {
+export function orderLineHasClientPrice(rows, { productId, clientId }) {
+  const product = Number(productId);
+  const client = Number(clientId);
+  if (!product || !client) return false;
+  return (rows || []).some(
+    (row) => Number(row.product_id) === product && Number(row.client_id) === client,
+  );
+}
+
+export function resolveBaseClientPrice(rows, { productId, clientId }) {
+  const withoutProject = matchingRows(rows, productId, clientId).filter(
+    (row) => row.delivery_address_id == null,
+  );
+  if (!withoutProject.length) return null;
+  return Number(latest(withoutProject).price);
+}
+
+export function resolveOrderLinePrices(rows, { productId, clientId, projectId }) {
+  const matches = matchingRows(rows, productId, clientId);
+  const withoutProject = matches.filter((row) => row.delivery_address_id == null);
+  const priceM2 = withoutProject.length ? Number(latest(withoutProject).price) : null;
+  const project = projectIdOf(projectId);
+  let projectPrice = null;
+  if (project != null && priceM2 != null) {
     const withProject = matches.filter(
       (row) => Number(row.delivery_address_id) === project,
     );
-    if (withProject.length) {
-      return {
-        kind: 'price_with_delivery',
-        price: Number(latest(withProject).price),
-      };
-    }
+    if (withProject.length) projectPrice = Number(latest(withProject).price);
   }
-
-  const withoutProject = matches.filter((row) => row.delivery_address_id == null);
-  if (!withoutProject.length) return null;
-  return { kind: 'price_m2', price: Number(latest(withoutProject).price) };
+  return { priceM2, projectPrice };
 }

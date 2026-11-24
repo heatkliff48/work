@@ -71,7 +71,13 @@ export const ordersReducer = (orders = [], action) => {
           if (delivery || delivery == 0) {
             return { ...order, delivery };
           } else {
-            return { ...order, delivery_m2 };
+            return {
+              ...order,
+              delivery_m2,
+              ...(payload.delivery_m2_locked != null
+                ? { delivery_m2_locked: payload.delivery_m2_locked }
+                : {}),
+            };
           }
         }
         return order;
