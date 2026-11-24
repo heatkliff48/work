@@ -115,8 +115,16 @@ const AccountngOrderCard = React.memo(() => {
   } = useOrderContext();
   const { displayNames } = useProjectContext();
   const { latestProducts, productVersions } = useProductsContext();
-  const { latestDryMix, latestRelatedMaterials, latestAnchors, latestTools } =
-    useProductsTypeJournalContext();
+  const {
+    latestDryMix,
+    latestRelatedMaterials,
+    latestAnchors,
+    latestTools,
+    dryMixesJournal,
+    anchor,
+    tool,
+    relatedMaterialsJournal,
+  } = useProductsTypeJournalContext();
   const { userAccess } = useUsersContext();
   const productListOrder = useSelector((state) => state.productsOfOrders);
   const dispatch = useDispatch();
@@ -178,13 +186,8 @@ const AccountngOrderCard = React.memo(() => {
   );
 
   const addProductArticleToOrderList = useCallback(
-    (productsOfOrders, productsTable, arrayName) => {
-      if (
-        !productsOfOrders ||
-        !productsTable ||
-        !arrayName ||
-        !orderCartData?.id
-      )
+    (productsOfOrders, productsTable, arrayName, fullCatalog = []) => {
+      if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
         return [];
 
       const updatedOrderProducts = productsOfOrders
@@ -192,9 +195,9 @@ const AccountngOrderCard = React.memo(() => {
         .map((orderProduct) => {
           const id = getCorrectProductId(arrayName);
 
-          const product = productsTable.find(
-            (p) => p.id === orderProduct?.[id],
-          );
+          const product =
+            productsTable?.find((p) => p.id == orderProduct?.[id]) ||
+            fullCatalog?.find((p) => p.id == orderProduct?.[id]);
 
           return product
             ? {
@@ -252,8 +255,7 @@ const AccountngOrderCard = React.memo(() => {
       return {
         ...product,
         // Trademark with size, as in the technology calendar: "TERMECO 36.5".
-        trademark:
-          extractProductTitle(catalog?.description) || catalog?.tradingMark,
+        trademark: extractProductTitle(catalog?.description) || catalog?.tradingMark,
         quantity_pcs: blocksPerPallet
           ? Math.round(Number(product.quantity_palet || 0) * blocksPerPallet)
           : null,
@@ -292,8 +294,14 @@ const AccountngOrderCard = React.memo(() => {
       dryMixedProductsOfOrders,
       latestDryMix,
       'dryMixes',
+      dryMixesJournal,
     );
-  }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
+  }, [
+    dryMixedProductsOfOrders,
+    latestDryMix,
+    dryMixesJournal,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedDryMixesListOrder.length > 0) {
@@ -309,8 +317,14 @@ const AccountngOrderCard = React.memo(() => {
       anchorProductsOfOrders,
       latestAnchors,
       'anchors',
+      anchor,
     );
-  }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
+  }, [
+    anchorProductsOfOrders,
+    latestAnchors,
+    anchor,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedAnchorsListOrder.length > 0) {
@@ -326,8 +340,9 @@ const AccountngOrderCard = React.memo(() => {
       toolProductsOfOrders,
       latestTools,
       'tools',
+      tool,
     );
-  }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
+  }, [toolProductsOfOrders, latestTools, tool, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedToolsListOrder.length > 0) {
@@ -343,10 +358,12 @@ const AccountngOrderCard = React.memo(() => {
       relMatProductsOfOrders,
       latestRelatedMaterials,
       'related_materials',
+      relatedMaterialsJournal,
     );
   }, [
     relMatProductsOfOrders,
     latestRelatedMaterials,
+    relatedMaterialsJournal,
     addProductArticleToOrderList,
   ]);
 
@@ -368,10 +385,7 @@ const AccountngOrderCard = React.memo(() => {
       (el) => el.accessor == newStatus,
     );
 
-    if (
-      new_status_index < status_index ||
-      new_status_index - status_index != 1
-    ) {
+    if (new_status_index < status_index || new_status_index - status_index != 1) {
       alert('Choose another status');
       return;
     }
@@ -422,14 +436,11 @@ const AccountngOrderCard = React.memo(() => {
         vat_result: 0,
       }));
     } else {
-      const vat_euro = (
-        (vatValue.vat_procent * final_price_product) /
-        100
-      ).toFixed(2);
-
-      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(
+      const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
         2,
       );
+
+      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
 
       setVatValue((prev) => ({
         ...prev,
@@ -475,9 +486,7 @@ const AccountngOrderCard = React.memo(() => {
 
         <div className="ord-card__head">
           <div className="ord-card__head-left">
-            <h1 className="ord-card__article ord-mono">
-              {orderCartData?.article}
-            </h1>
+            <h1 className="ord-card__article ord-mono">{orderCartData?.article}</h1>
             <StatusPillCell value={storedData?.orders_status} />
           </div>
           <div className="ord-card__actions">
@@ -554,9 +563,7 @@ const AccountngOrderCard = React.memo(() => {
                 </div>
                 <div className="ord-summary-row">
                   <span className="ord-summary-row__label">VAT, €</span>
-                  <span className="ord-summary-row__value">
-                    {vatValue.vat_euro}
-                  </span>
+                  <span className="ord-summary-row__value">{vatValue.vat_euro}</span>
                 </div>
                 <div className="ord-summary-divider" />
                 <div className="ord-summary-row ord-summary-row--total ord-summary-row--accent">
@@ -579,8 +586,7 @@ const AccountngOrderCard = React.memo(() => {
                   return accountingStatusList.map((item, idx) => {
                     const isDone = item.accessor < status;
                     const isCurrent = item.accessor == status;
-                    const isNext =
-                      status != null && idx === currentStatusIndex + 1;
+                    const isNext = status != null && idx === currentStatusIndex + 1;
                     return (
                       <div key={item.accessor} className="ord-step">
                         <div className="ord-step__rail">

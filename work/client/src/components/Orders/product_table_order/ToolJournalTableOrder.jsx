@@ -1,11 +1,11 @@
-import { useModalContext } from "#components/contexts/ModalContext.js";
-import { useOrderContext } from "#components/contexts/OrderContext.js";
-import { useUsersContext } from "#components/contexts/UserContext.js";
-import { Button } from "reactstrap";
-import { useTranslation } from "react-i18next";
-import { fieldLabel } from "../ordersI18n.js";
-import AddToolProductModal from "../modal/addProductModal/AddToolProductModal";
-import "../ordersView.css";
+import { useModalContext } from '#components/contexts/ModalContext.js';
+import { useOrderContext } from '#components/contexts/OrderContext.js';
+import { useUsersContext } from '#components/contexts/UserContext.js';
+import { Button } from 'reactstrap';
+import { useTranslation } from 'react-i18next';
+import { fieldLabel } from '../ordersI18n.js';
+import AddToolProductModal from '../modal/addProductModal/AddToolProductModal';
+import '../ordersView.css';
 
 const ToolJournalTableOrder = ({
   productListOrder,
@@ -14,14 +14,25 @@ const ToolJournalTableOrder = ({
   deleteHandler,
   displayNames = {},
 }) => {
-  const { t } = useTranslation("orders");
+  const { t } = useTranslation('orders');
   const { setNewOrder, orderCartData } = useOrderContext();
   const { toolProductModalOrder, setToolProductModalOrder } = useModalContext();
   const { userAccess } = useUsersContext();
 
-  const columns = Object.keys(productListOrder?.[0] || {}).filter(
-    (key) => !filterKeys.includes(key) && key !== "warehouse_id" && key
-  );
+  const allColumns = [
+    'product_article',
+    'description',
+    'quantity_ud',
+    'total',
+    'discount',
+    'pvp',
+    'final_price',
+    'quantity_liberated',
+  ];
+
+  const columns = orderCartData?.main_order
+    ? allColumns.filter((col) => col !== 'quantity_liberated')
+    : allColumns;
 
   return (
     <>
@@ -30,13 +41,16 @@ const ToolJournalTableOrder = ({
           isOpen={toolProductModalOrder}
           toggle={() => setToolProductModalOrder(!toolProductModalOrder)}
         />
-      )}{" "}
+      )}{' '}
       <div className="ord-prod-card">
         <div className="ord-prod-card__head">
-          <span className="ord-badge" style={{ background: "#efe9fb", color: "#7c3aed" }}>
+          <span
+            className="ord-badge"
+            style={{ background: '#efe9fb', color: '#7c3aed' }}
+          >
             Herramienta
           </span>
-          <div className="ord-prod-card__title">{t("products.toolsTitle")}</div>
+          <div className="ord-prod-card__title">{t('products.toolsTitle')}</div>
         </div>
         <div className="ord-prod-table-wrap">
           <table className="product-table ord-prod-table">
@@ -44,12 +58,12 @@ const ToolJournalTableOrder = ({
               <tr>
                 {columns.map((key) => (
                   <th key={key}>
-                    {key === "total"
-                      ? fieldLabel(t, "totalUd")
+                    {key === 'total'
+                      ? fieldLabel(t, 'totalUd')
                       : fieldLabel(t, key, displayNames[key])}
                   </th>
                 ))}
-                <th>{t("products.actions")}</th>
+                <th>{t('products.actions')}</th>
               </tr>
             </thead>
 
@@ -59,14 +73,14 @@ const ToolJournalTableOrder = ({
                   <tr
                     key={product?.id || Math.random()}
                     onClick={() => onProductClickHandler(product)}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: 'pointer' }}
                   >
                     {columns.map((key) => {
                       let value = product[key];
-                      if (value && typeof value === "object") {
+                      if (value && typeof value === 'object') {
                         value = JSON.stringify(value);
                       }
-                      return <td key={key}>{value ?? ""}</td>;
+                      return <td key={key}>{value ?? ''}</td>;
                     })}
 
                     <td onClick={(e) => e.stopPropagation()}>
@@ -77,7 +91,7 @@ const ToolJournalTableOrder = ({
                           className="ord-mini-btn ord-mini-btn--danger ord-btn"
                           onClick={() => deleteHandler(product)}
                         >
-                          {t("products.delete")}
+                          {t('products.delete')}
                         </Button>
                       )}
                     </td>
@@ -102,7 +116,7 @@ const ToolJournalTableOrder = ({
                         setToolProductModalOrder(!toolProductModalOrder);
                       }}
                     >
-                      {t("products.addProduct")}
+                      {t('products.addProduct')}
                     </Button>
                   </td>
                 </tr>

@@ -108,8 +108,16 @@ const OrderCart = React.memo(() => {
 
   const { roles, checkUserAccess, userAccess, setUserAccess } = useUsersContext();
   const { productVersions } = useProductsContext();
-  const { latestDryMix, latestAnchors, latestTools, latestRelatedMaterials } =
-    useProductsTypeJournalContext();
+  const {
+    latestDryMix,
+    latestAnchors,
+    latestTools,
+    latestRelatedMaterials,
+    dryMixesJournal,
+    anchor,
+    tool,
+    relatedMaterialsJournal,
+  } = useProductsTypeJournalContext();
   const {
     warehouse_data,
     dry_mixes_warehouse_data,
@@ -359,7 +367,7 @@ const OrderCart = React.memo(() => {
   };
 
   const addProductArticleToOrderList = useCallback(
-    (productsOfOrders, productsTable, arrayName) => {
+    (productsOfOrders, productsTable, arrayName, fullCatalog = []) => {
       if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
         return [];
 
@@ -372,7 +380,23 @@ const OrderCart = React.memo(() => {
           //   (el) => el.client_id == orderCartData.owner.id
           // );
 
-          const product = productsTable.find((p) => p.id === orderProduct?.[id]);
+          const product =
+            productsTable?.find((p) => p.id == orderProduct?.[id]) ||
+            fullCatalog?.find((p) => p.id == orderProduct?.[id]) ||
+            productsTable?.find(
+              (p) =>
+                (orderProduct?.product_article &&
+                  p.article === orderProduct?.product_article) ||
+                (orderProduct?.dry_mixed_article &&
+                  p.article === orderProduct?.dry_mixed_article),
+            ) ||
+            fullCatalog?.find(
+              (p) =>
+                (orderProduct?.product_article &&
+                  p.article === orderProduct?.product_article) ||
+                (orderProduct?.dry_mixed_article &&
+                  p.article === orderProduct?.dry_mixed_article),
+            );
 
           return product
             ? {
@@ -385,10 +409,21 @@ const OrderCart = React.memo(() => {
                       ? `${product?.name}`
                       : arrayName == 'anchors'
                         ? `${product?.name} Sacos de ${product?.pallet_weight}kg`
-                        : `${product?.name} BAUBLOCK Sacos de ${product?.pallet_weight}kg`,
+                        : product?.description ||
+                          `${product?.name} BAUBLOCK Sacos de ${product?.pallet_weight}kg`,
                 ...orderProduct,
               }
-            : { ...orderProduct, product_article: 'Unknown' };
+            : {
+                ...orderProduct,
+                product_article:
+                  orderProduct?.product_article ||
+                  orderProduct?.dry_mixed_article ||
+                  'Unknown',
+                description:
+                  orderProduct?.description ||
+                  orderProduct?.name ||
+                  '-',
+              };
         });
 
       return updatedOrderProducts;
@@ -401,7 +436,7 @@ const OrderCart = React.memo(() => {
     return addProductArticleToOrderList(
       productsOfOrders,
       productVersions,
-      'products'
+      'products',
     );
   }, [productsOfOrders, productVersions, addProductArticleToOrderList]);
 
@@ -490,8 +525,14 @@ const OrderCart = React.memo(() => {
       dryMixedProductsOfOrders,
       latestDryMix,
       'dryMixes',
+      dryMixesJournal,
     );
-  }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
+  }, [
+    dryMixedProductsOfOrders,
+    latestDryMix,
+    dryMixesJournal,
+    addProductArticleToOrderList,
+  ]);
 
   // Обновляем состояние отдельно
   useEffect(() => {
@@ -508,8 +549,14 @@ const OrderCart = React.memo(() => {
       anchorProductsOfOrders,
       latestAnchors,
       'anchors',
+      anchor,
     );
-  }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
+  }, [
+    anchorProductsOfOrders,
+    latestAnchors,
+    anchor,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedAnchorsListOrder.length > 0) {
@@ -521,8 +568,13 @@ const OrderCart = React.memo(() => {
   }, [updatedAnchorsListOrder]);
 
   const updatedToolsListOrder = useMemo(() => {
-    return addProductArticleToOrderList(toolProductsOfOrders, latestTools, 'tools');
-  }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
+    return addProductArticleToOrderList(
+      toolProductsOfOrders,
+      latestTools,
+      'tools',
+      tool,
+    );
+  }, [toolProductsOfOrders, latestTools, tool, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedToolsListOrder.length > 0) {
@@ -538,8 +590,14 @@ const OrderCart = React.memo(() => {
       relMatProductsOfOrders,
       latestRelatedMaterials,
       'related_materials',
+      relatedMaterialsJournal,
     );
-  }, [relMatProductsOfOrders, latestRelatedMaterials, addProductArticleToOrderList]);
+  }, [
+    relMatProductsOfOrders,
+    latestRelatedMaterials,
+    relatedMaterialsJournal,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedRelatedMaterialsListOrder.length > 0) {
@@ -565,14 +623,14 @@ const OrderCart = React.memo(() => {
         orderProductType(sel_prod.product_article) == 'N'
           ? productVersions.find((el) => el.id === sel_prod.product_id)
           : orderProductType(sel_prod.product_article) == 'M'
-          ? latestDryMix.find((el) => el.article === sel_prod.product_article)
-          : orderProductType(sel_prod.product_article) == 'P'
-          ? latestRelatedMaterials.find(
-              (el) => el.article === sel_prod.product_article
-            )
-          : orderProductType(sel_prod.product_article) == 'F'
-          ? latestAnchors.find((el) => el.article === sel_prod.product_article)
-          : latestTools.find((el) => el.article === sel_prod.product_article);
+            ? latestDryMix.find((el) => el.article === sel_prod.product_article)
+            : orderProductType(sel_prod.product_article) == 'P'
+              ? latestRelatedMaterials.find(
+                  (el) => el.article === sel_prod.product_article,
+                )
+              : orderProductType(sel_prod.product_article) == 'F'
+                ? latestAnchors.find((el) => el.article === sel_prod.product_article)
+                : latestTools.find((el) => el.article === sel_prod.product_article);
 
       setSelectedProduct(product);
       setProductOfOrder({ ...sel_prod, product_id: product?.id });
@@ -637,7 +695,7 @@ const OrderCart = React.memo(() => {
     // blocks
     updatedProductListOrder?.forEach((product) => {
       const loc = productVersions.find(
-        (el) => el.id === product.product_id
+        (el) => el.id === product.product_id,
       )?.placeOfProduction;
 
       const haveProductReserve = list_of_reserved_products.find(
@@ -1178,7 +1236,7 @@ const OrderCart = React.memo(() => {
   };
 
   const confirmingSurchargeRate = getConfirmingSurchargeRate(
-    orderCartData?.payment_method
+    orderCartData?.payment_method,
   );
 
   // Галочка надбавки confirming сохраняется вместе со способом оплаты
@@ -1194,7 +1252,7 @@ const OrderCart = React.memo(() => {
         order_id: orderCartData?.id,
         payment_method,
         confirming_surcharge,
-      })
+      }),
     );
   };
 
@@ -1204,7 +1262,7 @@ const OrderCart = React.memo(() => {
     savePaymentMethod(
       selectedOption.value,
       Boolean(orderCartData?.confirming_surcharge) &&
-        getConfirmingSurchargeRate(selectedOption.value) > 0
+        getConfirmingSurchargeRate(selectedOption.value) > 0,
     );
   };
 
@@ -1213,7 +1271,7 @@ const OrderCart = React.memo(() => {
   };
 
   const [agentCommissionDraft, setAgentCommissionDraft] = useState(
-    orderCartData?.agent_commission ?? 0
+    orderCartData?.agent_commission ?? 0,
   );
 
   useEffect(() => {
@@ -1234,7 +1292,7 @@ const OrderCart = React.memo(() => {
       updateAgentCommission({
         order_id: orderCartData?.id,
         agent_commission,
-      })
+      }),
     );
 
     setOrderCartData((prev) => ({ ...prev, agent_commission }));
@@ -1591,9 +1649,7 @@ const OrderCart = React.memo(() => {
                       !checkUserAccess(user, roles, 'orders_description_edit')
                         ?.canWrite
                     }
-                    onChange={(e) =>
-                      setNewAdditionalContactInfo(e.target.value)
-                    }
+                    onChange={(e) => setNewAdditionalContactInfo(e.target.value)}
                   />
                   {checkUserAccess(user, roles, 'orders_description_edit')
                     ?.canWrite && (
@@ -1616,9 +1672,7 @@ const OrderCart = React.memo(() => {
             <div className="ord-status-card">
               <div className="ord-status-card__title">{t('card.orderStatus')}</div>
               {!aproveAccounting && (
-                <div className="ord-status-warn">
-                  {t('card.awaitingAccounting')}
-                </div>
+                <div className="ord-status-warn">{t('card.awaitingAccounting')}</div>
               )}
               <div className="ord-steps">
                 {(() => {
@@ -1923,14 +1977,10 @@ const OrderCart = React.memo(() => {
           </div>
 
           <div className="ord-summary-block">
-            <div className="ord-summary-card__title">
-              {t('card.orderSummary')}
-            </div>
+            <div className="ord-summary-card__title">{t('card.orderSummary')}</div>
             <div className="ord-summary-rows">
               <div className="ord-summary-row">
-                <span className="ord-summary-row__label">
-                  {t('card.vatOrigin')}
-                </span>
+                <span className="ord-summary-row__label">{t('card.vatOrigin')}</span>
                 <span className="ord-summary-row__value">
                   {vatValue.vat_euro_origin}
                 </span>
@@ -1963,9 +2013,7 @@ const OrderCart = React.memo(() => {
                 /> */}
               </div>
               <div className="ord-summary-row">
-                <span className="ord-summary-row__label">
-                  {t('card.vatEuro')}
-                </span>
+                <span className="ord-summary-row__label">{t('card.vatEuro')}</span>
                 <span className="ord-summary-row__value">{vatValue.vat_euro}</span>
               </div>
               <div className="ord-summary-row">
@@ -2024,7 +2072,7 @@ const OrderCart = React.memo(() => {
                     value={agentCommissionDraft}
                     onChange={(e) => {
                       setAgentCommissionDraft(
-                        e.target.value.replace(/[^\d.,]/g, '')
+                        e.target.value.replace(/[^\d.,]/g, ''),
                       );
                     }}
                     disabled={orderCartData?.status >= 5}

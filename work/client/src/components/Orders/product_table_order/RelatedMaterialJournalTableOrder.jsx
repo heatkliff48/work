@@ -20,10 +20,8 @@ const RelatedMaterialJournalTableOrder = ({
 }) => {
   const { t } = useTranslation('orders');
   const { setNewOrder, orderCartData } = useOrderContext();
-  const {
-    relatedMaterialProductModalOrder,
-    setRelatedMaterialProductModalOrder,
-  } = useModalContext();
+  const { relatedMaterialProductModalOrder, setRelatedMaterialProductModalOrder } =
+    useModalContext();
   const { userAccess } = useUsersContext();
 
   const [returnCheckedProducts, setReturnCheckedProducts] = useState({});
@@ -35,9 +33,20 @@ const RelatedMaterialJournalTableOrder = ({
     }));
   };
 
-  const columns = Object.keys(productListOrder?.[0] || {}).filter(
-    (key) => !filterKeys.includes(key) && key !== 'warehouse_id' && key,
-  );
+  const allColumns = [
+    'product_article',
+    'description',
+    'quantity_ud',
+    'total',
+    'discount',
+    'pvp',
+    'final_price',
+    'quantity_liberated',
+  ];
+
+  const columns = orderCartData?.main_order
+    ? allColumns.filter((col) => col !== 'quantity_liberated')
+    : allColumns;
 
   return (
     <>
@@ -45,18 +54,21 @@ const RelatedMaterialJournalTableOrder = ({
         <AddRelatedMaterialProductModal
           isOpen={relatedMaterialProductModalOrder}
           toggle={() =>
-            setRelatedMaterialProductModalOrder(
-              !relatedMaterialProductModalOrder,
-            )
+            setRelatedMaterialProductModalOrder(!relatedMaterialProductModalOrder)
           }
         />
       )}{' '}
       <div className="ord-prod-card">
         <div className="ord-prod-card__head">
-          <span className="ord-badge" style={{ background: '#e9f6ed', color: '#16a34a' }}>
+          <span
+            className="ord-badge"
+            style={{ background: '#e9f6ed', color: '#16a34a' }}
+          >
             Consumible
           </span>
-          <div className="ord-prod-card__title">{t('products.relatedMaterialsTitle')}</div>
+          <div className="ord-prod-card__title">
+            {t('products.relatedMaterialsTitle')}
+          </div>
         </div>
         <div className="ord-prod-table-wrap">
           <table className="product-table ord-prod-table">

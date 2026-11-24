@@ -39,8 +39,16 @@ const FacturaOrderCard = React.memo(() => {
   } = useOrderContext();
 
   const { latestProducts, productVersions } = useProductsContext();
-  const { latestDryMix, latestRelatedMaterials, latestAnchors, latestTools } =
-    useProductsTypeJournalContext();
+  const {
+    latestDryMix,
+    latestRelatedMaterials,
+    latestAnchors,
+    latestTools,
+    dryMixesJournal,
+    anchor,
+    tool,
+    relatedMaterialsJournal,
+  } = useProductsTypeJournalContext();
 
   const { displayNames } = useProjectContext();
 
@@ -118,13 +126,8 @@ const FacturaOrderCard = React.memo(() => {
   };
 
   const addProductArticleToOrderList = useCallback(
-    (productsOfOrders, productsTable, arrayName) => {
-      if (
-        !productsOfOrders ||
-        !productsTable ||
-        !arrayName ||
-        !orderCartData?.id
-      )
+    (productsOfOrders, productsTable, arrayName, fullCatalog = []) => {
+      if (!productsOfOrders || !productsTable || !arrayName || !orderCartData?.id)
         return [];
 
       const updatedOrderProducts = productsOfOrders
@@ -132,9 +135,9 @@ const FacturaOrderCard = React.memo(() => {
         .map((orderProduct) => {
           const id = getCorrectProductId(arrayName);
 
-          const product = productsTable.find(
-            (p) => p.id === orderProduct?.[id],
-          );
+          const product =
+            productsTable?.find((p) => p.id == orderProduct?.[id]) ||
+            fullCatalog?.find((p) => p.id == orderProduct?.[id]);
 
           return product
             ? { product_article: product.article, ...orderProduct }
@@ -168,8 +171,14 @@ const FacturaOrderCard = React.memo(() => {
       dryMixedProductsOfOrders,
       latestDryMix,
       'dryMixes',
+      dryMixesJournal,
     );
-  }, [dryMixedProductsOfOrders, latestDryMix, addProductArticleToOrderList]);
+  }, [
+    dryMixedProductsOfOrders,
+    latestDryMix,
+    dryMixesJournal,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedDryMixesListOrder.length > 0) {
@@ -185,8 +194,14 @@ const FacturaOrderCard = React.memo(() => {
       anchorProductsOfOrders,
       latestAnchors,
       'anchors',
+      anchor,
     );
-  }, [anchorProductsOfOrders, latestAnchors, addProductArticleToOrderList]);
+  }, [
+    anchorProductsOfOrders,
+    latestAnchors,
+    anchor,
+    addProductArticleToOrderList,
+  ]);
 
   useEffect(() => {
     if (updatedAnchorsListOrder.length > 0) {
@@ -202,8 +217,9 @@ const FacturaOrderCard = React.memo(() => {
       toolProductsOfOrders,
       latestTools,
       'tools',
+      tool,
     );
-  }, [toolProductsOfOrders, latestTools, addProductArticleToOrderList]);
+  }, [toolProductsOfOrders, latestTools, tool, addProductArticleToOrderList]);
 
   useEffect(() => {
     if (updatedToolsListOrder.length > 0) {
@@ -219,10 +235,12 @@ const FacturaOrderCard = React.memo(() => {
       relMatProductsOfOrders,
       latestRelatedMaterials,
       'related_materials',
+      relatedMaterialsJournal,
     );
   }, [
     relMatProductsOfOrders,
     latestRelatedMaterials,
+    relatedMaterialsJournal,
     addProductArticleToOrderList,
   ]);
 
@@ -262,14 +280,11 @@ const FacturaOrderCard = React.memo(() => {
         vat_result: 0,
       }));
     } else {
-      const vat_euro = (
-        (vatValue.vat_procent * final_price_product) /
-        100
-      ).toFixed(2);
-
-      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(
+      const vat_euro = ((vatValue.vat_procent * final_price_product) / 100).toFixed(
         2,
       );
+
+      const vat_result = Number(final_price_product + Number(vat_euro)).toFixed(2);
 
       setVatValue((prev) => ({
         ...prev,
@@ -337,9 +352,7 @@ const FacturaOrderCard = React.memo(() => {
 
       <div className="ord-card__head">
         <div className="ord-card__head-left">
-          <h1 className="ord-card__article ord-mono">
-            {orderCartData?.article}
-          </h1>
+          <h1 className="ord-card__article ord-mono">{orderCartData?.article}</h1>
           <span className="ord-muted">Trailer {selectedOrder?.trailer}</span>
         </div>
         <div className="ord-card__actions">
@@ -391,10 +404,7 @@ const FacturaOrderCard = React.memo(() => {
           <div className="ord-prod-card__head">
             <span className="ord-prod-card__title">Dispatched products</span>
           </div>
-          <FacturaTable
-            product_list={selectedOrder}
-            orderCartData={orderCartData}
-          />
+          <FacturaTable product_list={selectedOrder} orderCartData={orderCartData} />
         </div>
 
         <div>
@@ -430,13 +440,11 @@ const FacturaOrderCard = React.memo(() => {
           </div>
 
           <div className="ord-summary-card">
-            <div className="ord-summary-card__title">
-              Ready for invoicing
-            </div>
+            <div className="ord-summary-card__title">Ready for invoicing</div>
             <div className="ord-tile__sub">
-              Mark this trailer as ready once all products have been verified
-              against the delivery note. Generating the factura PDF will use
-              this dispatch&apos;s confirmed quantities.
+              Mark this trailer as ready once all products have been verified against
+              the delivery note. Generating the factura PDF will use this
+              dispatch&apos;s confirmed quantities.
             </div>
           </div>
         </div>
