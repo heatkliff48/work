@@ -11,6 +11,10 @@ class ClientProductPricesService {
     return ClientProductPricesRepository.create(body);
   }
 
+  static update(id, body) {
+    return ClientProductPricesRepository.update(id, body);
+  }
+
   static remove(id) {
     return ClientProductPricesRepository.remove(id);
   }

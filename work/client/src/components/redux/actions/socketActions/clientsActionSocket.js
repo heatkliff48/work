@@ -77,6 +77,11 @@ export const addClientProductPriceSocket = (row) => ({
   payload: row,
 });
 
+export const updateClientProductPriceSocket = (row) => ({
+  type: 'UPDATE_CLIENT_PRODUCT_PRICE_SOCKET',
+  payload: row,
+});
+
 export const deleteClientProductPriceSocket = (id) => ({
   type: 'DELETE_CLIENT_PRODUCT_PRICE_SOCKET',
   payload: id,

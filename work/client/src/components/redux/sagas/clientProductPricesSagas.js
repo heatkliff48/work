@@ -9,6 +9,7 @@ import {
   ALL_CLIENT_PRODUCT_PRICES,
   DELETE_CLIENT_PRODUCT_PRICE,
   GET_CLIENT_PRODUCT_PRICES,
+  UPDATE_CLIENT_PRODUCT_PRICE,
 } from '../types/clientProductPricesTypes';
 
 const url = axios.create({
@@ -30,6 +31,18 @@ const createRow = (row) =>
   url
     .post('/clientProductPrices', row)
     .then((res) => res.data)
+    .catch((err) => {
+      showMessage(errorToText(err), 'error');
+      throw err;
+    });
+
+const updateRow = ({ id, price }) =>
+  url
+    .put(`/clientProductPrices/${id}`, { price })
+    .then((res) => {
+      showMessage('Price updated successfully', 'success');
+      return res.data;
+    })
     .catch((err) => {
       showMessage(errorToText(err), 'error');
       throw err;
@@ -61,6 +74,14 @@ function* createWorker(action) {
   }
 }
 
+function* updateWorker(action) {
+  try {
+    yield call(updateRow, action.payload);
+  } catch (err) {
+    // сообщение уже показано, список обновит вебсокет
+  }
+}
+
 function* removeWorker(action) {
   try {
     yield call(removeRow, action.payload);
@@ -72,6 +93,7 @@ function* removeWorker(action) {
 function* clientProductPricesWatcher() {
   yield takeLatest(GET_CLIENT_PRODUCT_PRICES, getAllWorker);
   yield takeLatest(ADD_CLIENT_PRODUCT_PRICE, createWorker);
+  yield takeLatest(UPDATE_CLIENT_PRODUCT_PRICE, updateWorker);
   yield takeLatest(DELETE_CLIENT_PRODUCT_PRICE, removeWorker);
 }
 

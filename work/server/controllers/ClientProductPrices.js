@@ -5,6 +5,7 @@ const { ErrorUtils } = require('../utils/Errors.js');
 const myEmitter = require('../src/ee.js');
 const {
   ADD_CLIENT_PRODUCT_PRICE_SOCKET,
+  UPDATE_CLIENT_PRODUCT_PRICE_SOCKET,
   DELETE_CLIENT_PRODUCT_PRICE_SOCKET,
 } = require('../src/constants/event.js');
 
@@ -22,6 +23,16 @@ class ClientProductPricesController {
     try {
       const row = await ClientProductPricesService.create(req.body);
       myEmitter.emit(ADD_CLIENT_PRODUCT_PRICE_SOCKET, row);
+      return res.status(200).json({ clientProductPrice: row });
+    } catch (err) {
+      return ErrorUtils.catchError(res, err);
+    }
+  }
+
+  static async update(req, res) {
+    try {
+      const row = await ClientProductPricesService.update(req.params.id, req.body);
+      myEmitter.emit(UPDATE_CLIENT_PRODUCT_PRICE_SOCKET, row);
       return res.status(200).json({ clientProductPrice: row });
     } catch (err) {
       return ErrorUtils.catchError(res, err);

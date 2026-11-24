@@ -137,6 +137,7 @@ const {
   ADD_NEW_LOTES_LIST_SOCKET,
   NEED_UPD_CONTACT_PRICE_INFO_SOCKET,
   ADD_CLIENT_PRODUCT_PRICE_SOCKET,
+  UPDATE_CLIENT_PRODUCT_PRICE_SOCKET,
   DELETE_CLIENT_PRODUCT_PRICE_SOCKET,
   UPDATE_CONTACT_INFO_SOCKET,
   UPDATE_DELIVERY_ADDRESSES_SOCKET,
@@ -755,6 +756,17 @@ function registerWsEmitter(map) {
       userConnect.send(
         JSON.stringify({
           type: ADD_CLIENT_PRODUCT_PRICE_SOCKET,
+          payload: row,
+        }),
+      );
+    }
+  });
+
+  myEmitter.on(UPDATE_CLIENT_PRODUCT_PRICE_SOCKET, (row) => {
+    for (let [id, userConnect] of map) {
+      userConnect.send(
+        JSON.stringify({
+          type: UPDATE_CLIENT_PRODUCT_PRICE_SOCKET,
           payload: row,
         }),
       );

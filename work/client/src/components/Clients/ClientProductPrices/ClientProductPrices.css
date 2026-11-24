@@ -1,29 +1,576 @@
-.cpp-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px 16px;
-  align-items: end;
-  margin: 0 0 16px;
-  padding: 16px;
+/* =====================================================================
+   Client Product Prices (BAUBLOCK ERP design system)
+   ===================================================================== */
+
+.cpp-page {
+  font-family: Lato, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--cl-text, #171a1f);
+  padding: 26px 36px 48px;
+  background: var(--cl-bg, #fafafb);
+  min-height: calc(100vh - 60px);
 }
 
-.cpp-field {
+/* ---------- Head & Eyebrow ---------- */
+.cpp-page .cl-page__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.cpp-page .cl-page__eyebrow {
+  font-size: 13px;
+  color: var(--cl-muted, #9aa0ac);
+  font-weight: 600;
+  margin-bottom: 4px;
+  letter-spacing: 0.3px;
+}
+
+.cpp-page .cl-page__title {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--cl-text, #171a1f);
+}
+
+/* ---------- Stats / KPI Cards ---------- */
+.cpp-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #ffffff;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--cl-border, #e4e6eb);
+  box-shadow: 0 1px 3px rgba(20, 23, 33, 0.04);
+}
+
+.cpp-stat-item {
+  text-align: right;
+  min-width: 70px;
+}
+
+.cpp-stat-item__num {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--cl-text, #171a1f);
+  line-height: 1.1;
+  font-family: var(--cl-mono, 'Roboto Mono', monospace);
+}
+
+.cpp-stat-item__label {
+  font-size: 11px;
+  color: var(--cl-muted, #9aa0ac);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-top: 2px;
+}
+
+.cpp-stat-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--cl-border, #e4e6eb);
+}
+
+/* ---------- Toolbar ---------- */
+.cpp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.cpp-search {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 340px;
+}
+
+.cpp-search__ic {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--cl-muted, #9aa0ac);
+  pointer-events: none;
+}
+
+.cpp-search__input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--cl-border-2, #dee1e6);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 32px 0 38px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--cl-text, #171a1f);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.cpp-search__input:focus {
+  border-color: var(--cl-red, #bc1212);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+
+.cpp-search-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  color: #9aa0ac;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.cpp-search-clear:hover {
+  color: #171a1f;
+}
+
+.cpp-select {
+  height: 40px;
+  border: 1px solid var(--cl-border-2, #dee1e6);
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--cl-text, #171a1f);
+  cursor: pointer;
+  outline: none;
+  min-width: 160px;
+  max-width: 220px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.cpp-select:focus {
+  border-color: var(--cl-red, #bc1212);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+
+.cpp-reset-btn {
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--cl-border-2, #dee1e6);
+  background: #fff;
+  color: var(--cl-text-2, #565d6d);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.12s;
+}
+
+.cpp-reset-btn:hover {
+  background: #f6f7fa;
+  color: var(--cl-text, #171a1f);
+}
+
+/* ---------- Table Content Elements ---------- */
+.cpp-cell-product {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
-.cpp-field label {
+.cpp-art {
+  font-family: var(--cl-mono, 'Roboto Mono', monospace);
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--cl-text, #171a1f);
+}
+
+.cpp-desc {
+  font-size: 12px;
+  color: var(--cl-text-2, #565d6d);
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cpp-cell-client {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cpp-client-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--cl-text, #171a1f);
+}
+
+.cpp-sub {
+  font-size: 11.5px;
+  color: var(--cl-muted, #9aa0ac);
+}
+
+.cpp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.cpp-badge--base {
+  background: #f0f4f9;
+  color: #1e4a8a;
+  border: 1px solid #d8e3f2;
+}
+
+.cpp-badge--project {
+  background: #edf8f1;
+  color: #127238;
+  border: 1px solid #c8ecd4;
+}
+
+.cpp-cell-price {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.cpp-price-val {
+  font-family: var(--cl-mono, 'Roboto Mono', monospace);
+  font-weight: 700;
+  font-size: 14.5px;
+  color: var(--cl-text, #171a1f);
+}
+
+.cpp-catalog-price {
+  font-family: var(--cl-mono, 'Roboto Mono', monospace);
   font-size: 13px;
+  color: var(--cl-text-2, #565d6d);
+}
+
+/* Pills for delta delivery & discount */
+.cpp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--cl-mono, 'Roboto Mono', monospace);
+  white-space: nowrap;
+}
+
+.cpp-pill--delivery {
+  background: #fef7ec;
+  color: #a0630b;
+  border: 1px solid #fae2b6;
+}
+
+.cpp-pill--discount {
+  background: #eaf8ee;
+  color: #147a3c;
+  border: 1px solid #c4eccd;
+}
+
+.cpp-pill--markup {
+  background: #fdf0f0;
+  color: #c01b1b;
+  border: 1px solid #f9d3d3;
+}
+
+/* Action buttons */
+.cpp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.cpp-btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  border: 1px solid var(--cl-border-2, #dee1e6);
+  background: #ffffff;
+  color: var(--cl-text-2, #565d6d);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+  padding: 0;
+}
+
+.cpp-btn-action:hover:not(:disabled) {
+  background: #f6f7fa;
+  color: var(--cl-text, #171a1f);
+  border-color: #c4c8d0;
+}
+
+.cpp-btn-action--delete:hover:not(:disabled) {
+  background: var(--cl-red-soft, #fbe9e9);
+  color: var(--cl-red, #bc1212);
+  border-color: #f7cece;
+}
+
+.cpp-btn-action:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+/* ---------- Modals ---------- */
+.cpp-modal .modal-content {
+  border-radius: 14px;
+  border: 0;
+  box-shadow: 0 10px 40px rgba(20, 23, 33, 0.18);
+  overflow: hidden;
+}
+
+.cpp-modal-header {
+  padding: 20px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--cl-border, #e4e6eb);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cpp-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--cl-text, #171a1f);
+}
+
+.cpp-modal-subtitle {
+  font-size: 12.5px;
+  color: var(--cl-muted, #9aa0ac);
+  margin-top: 2px;
+}
+
+.cpp-modal-body {
+  padding: 24px;
+  background: #ffffff;
+}
+
+.cpp-modal-footer {
+  padding: 16px 24px;
+  background: #fafafb;
+  border-top: 1px solid var(--cl-border, #e4e6eb);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Modal Form Controls */
+.cpp-form-group {
+  margin-bottom: 18px;
+}
+
+.cpp-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.cpp-form-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cl-text, #171a1f);
+  margin-bottom: 6px;
+}
+
+.cpp-form-hint {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--cl-muted, #9aa0ac);
+}
+
+/* Scope Toggle Pills */
+.cpp-scope-toggle {
+  display: flex;
+  background: #f0f2f5;
+  padding: 3px;
+  border-radius: 9px;
+  margin-bottom: 8px;
+}
+
+.cpp-scope-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 0;
+  background: transparent;
+  color: var(--cl-text-2, #565d6d);
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.12s;
+}
+
+.cpp-scope-btn.active {
+  background: #ffffff;
+  color: var(--cl-text, #171a1f);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Currency input addon */
+.cpp-input-addon-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--cl-border-2, #dee1e6);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.cpp-input-addon-wrap:focus-within {
+  border-color: var(--cl-red, #bc1212);
+  box-shadow: 0 0 0 3px rgba(188, 18, 18, 0.1);
+}
+
+.cpp-modal-input {
+  flex: 1;
+  height: 42px;
+  border: 0;
+  padding: 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--cl-mono, 'Roboto Mono', monospace);
+  color: var(--cl-text, #171a1f);
+  outline: none;
+}
+
+.cpp-addon {
+  padding: 0 14px;
+  background: #f6f7fa;
+  border-left: 1px solid var(--cl-border-2, #dee1e6);
+  color: var(--cl-text-2, #565d6d);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 42px;
+  user-select: none;
+}
+
+/* Calculation summary box */
+.cpp-calc-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  font-size: 12.5px;
+}
+
+.cpp-calc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.cpp-calc-row:last-child {
+  margin-bottom: 0;
+  padding-top: 6px;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.cpp-calc-label {
+  color: var(--cl-text-2, #565d6d);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cpp-calc-val {
+  font-family: var(--cl-mono, 'Roboto Mono', monospace);
+  font-weight: 700;
+  color: var(--cl-text, #171a1f);
+}
+
+/* Alert / warning banners */
+.cpp-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  margin-top: 8px;
+}
+
+.cpp-alert--warning {
+  background: #fef8ee;
+  border: 1px solid #fae2b6;
+  color: #92400e;
+}
+
+.cpp-alert--info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+
+.cpp-alert--danger {
+  background: #fdf2f2;
+  border: 1px solid #f8b4b4;
+  color: #991b1b;
+}
+
+/* Summary item in edit/delete modal */
+.cpp-summary-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.cpp-summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.cpp-summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.cpp-summary-label {
+  color: var(--cl-muted, #9aa0ac);
   font-weight: 600;
 }
 
-.cpp-field select,
-.cpp-field input {
-  height: 36px;
-  padding: 4px 8px;
-}
-
-.cpp-submit {
-  height: 36px;
+.cpp-summary-val {
+  font-weight: 700;
+  color: var(--cl-text, #171a1f);
 }

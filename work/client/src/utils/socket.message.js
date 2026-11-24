@@ -180,6 +180,7 @@ import {
   updateContactInfoSocket,
   updateDeliveryAddressSocket,
   addClientProductPriceSocket,
+  updateClientProductPriceSocket,
   deleteClientProductPriceSocket,
 } from '#components/redux/actions/socketActions/clientsActionSocket.js';
 import {
@@ -592,6 +593,10 @@ export const createSocketOnMessage = (dispatch) => (event) => {
 
     case 'ADD_CLIENT_PRODUCT_PRICE_SOCKET':
       dispatch(addClientProductPriceSocket(payload));
+      break;
+
+    case 'UPDATE_CLIENT_PRODUCT_PRICE_SOCKET':
+      dispatch(updateClientProductPriceSocket(payload));
       break;
 
     case 'DELETE_CLIENT_PRODUCT_PRICE_SOCKET':

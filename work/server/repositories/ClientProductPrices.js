@@ -83,6 +83,15 @@ class ClientProductPricesRepository {
     });
   }
 
+  static async update(id, { price }) {
+    const rowId = Number(id);
+    if (!Number.isInteger(rowId) || rowId <= 0) throw new NotFound('Price not found');
+    const row = await ClientProductPrices.findByPk(rowId);
+    if (!row) throw new NotFound('Price not found');
+    await row.update({ price: priceNumber(price) });
+    return row;
+  }
+
   static async remove(id) {
     const rowId = Number(id);
     if (!Number.isInteger(rowId) || rowId <= 0) throw new NotFound('Price not found');
