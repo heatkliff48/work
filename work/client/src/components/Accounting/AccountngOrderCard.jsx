@@ -237,6 +237,7 @@ const AccountngOrderCard = React.memo(() => {
         blockGetsOrderDelivery(product, clientProductPrices, clientId),
       ),
       deliveryM2,
+      updatedProductListOrder,
     );
 
     return updatedProductListOrder.map((product) => {

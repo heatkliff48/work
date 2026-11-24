@@ -5,6 +5,11 @@ import { orderLineHasClientPrice } from '#utils/clientProductPrice.js';
 // Lines whose product and client are in the client price table are left out:
 // that delivery does not apply to them. Shared by the order card and the
 // accounting card so both show the same prices and totals.
+//
+// When an order has lines with a fixed price with delivery (fixed_price_m2_with_delivery),
+// the transport cost embedded in those lines ((fixed - base) * qty) is already
+// included in their line price. Only delivery exceeding that fixed sum should
+// be spread over the remaining lines.
 
 export const blockGetsOrderDelivery = (product, clientPrices, clientId) => {
   const hasFixedDeliveryPrice =
@@ -17,14 +22,42 @@ export const blockGetsOrderDelivery = (product, clientPrices, clientId) => {
   });
 };
 
-export const getDeliveryPricePerM2 = (blocks, deliveryM2Total) => {
+export const getFixedDeliveryTotal = (blocks) => {
+  return (blocks || []).reduce((acc, el) => {
+    const fixedPrice = el?.fixed_price_m2_with_delivery;
+    if (fixedPrice != null && fixedPrice !== '') {
+      const fixed = Number(fixedPrice);
+      const base = Number(el?.price_m2 || 0);
+      const qty = Number(el?.quantity_real ?? el?.quantity_m2 ?? 0);
+      if (fixed > base && qty > 0) {
+        return acc + Number(((fixed - base) * qty).toFixed(2));
+      }
+    }
+    return acc;
+  }, 0);
+};
+
+export const getDeliveryPricePerM2 = (
+  blocks,
+  deliveryM2Total,
+  allBlocks = null,
+) => {
   const totalRealM2 = (blocks || []).reduce(
     (acc, el) => acc + (Number(el?.quantity_real) || 0),
     0,
   );
   const delivery = Number(deliveryM2Total || 0);
   if (!delivery || !totalRealM2) return 0;
-  return delivery / totalRealM2;
+
+  const blocksForFixed = allBlocks || blocks;
+  const fixedDelivery = getFixedDeliveryTotal(blocksForFixed);
+  const remainingDelivery = Math.max(
+    0,
+    Number((delivery - fixedDelivery).toFixed(2)),
+  );
+
+  if (!remainingDelivery) return 0;
+  return remainingDelivery / totalRealM2;
 };
 
 // price_m2 and price_m2_with_delivery are list prices: the line's discount is

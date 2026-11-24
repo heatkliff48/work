@@ -413,6 +413,7 @@ const OrderCart = React.memo(() => {
           blockGetsOrderDelivery(product, clientProductPrices, orderClientId),
         ),
         orderCartData?.delivery_m2,
+        updatedProductListOrder,
       ),
     [
       updatedProductListOrder,
@@ -463,9 +464,7 @@ const OrderCart = React.memo(() => {
         price_m2_with_delivery,
         final_price,
         delivery_m2_share: Number(delivery_m2_share.toFixed(2)),
-        final_price_with_delivery: Number(
-          (final_price + delivery_m2_share).toFixed(2),
-        ),
+        final_price_with_delivery: Number(final_price.toFixed(2)),
       };
     });
   }, [

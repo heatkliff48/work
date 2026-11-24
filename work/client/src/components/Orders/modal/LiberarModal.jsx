@@ -471,11 +471,22 @@ function LiberarModal({ show, onHide, orderCartData, productLists }) {
         blockGetsOrderDelivery(product, clientProductPrices, orderClientId),
       ),
       orderCartData?.delivery_m2,
+      productLists.products,
     );
     const deliveryM2Full = round2(
       products.reduce((acc, prod) => {
+        const fixedDelivery =
+          prod.fixed_price_m2_with_delivery != null &&
+          prod.fixed_price_m2_with_delivery !== ''
+            ? Math.max(
+                0,
+                (Number(prod.fixed_price_m2_with_delivery) -
+                  Number(prod.price_m2 || 0)) *
+                  Number(prod.quantity_m2 || 0),
+              )
+            : 0;
         if (!blockGetsOrderDelivery(prod, clientProductPrices, orderClientId)) {
-          return acc;
+          return acc + fixedDelivery;
         }
         return acc + deliveryPerM2 * Number(prod.quantity_m2 || 0);
       }, 0),
