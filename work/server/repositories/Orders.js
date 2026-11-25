@@ -326,14 +326,35 @@ class OrdersRepository {
         attributes: ['delivery_m2', 'delivery_m2_locked'],
       });
       const nextDelivery = Number(delivery_m2);
-      const savedDelivery = Number(order?.delivery_m2 || 0);
-      if (
-        order?.delivery_m2_locked &&
-        Math.round(nextDelivery * 100) < Math.round(savedDelivery * 100)
-      ) {
-        throw new BadRequest(
-          'Delivery cost cannot be lower than the current amount',
-        );
+      if (order?.delivery_m2_locked) {
+        const orderProducts = await OrdersProducts.findAll({
+          where: { order_id },
+          attributes: [
+            'price_m2',
+            'fixed_price_m2_with_delivery',
+            'quantity_real',
+            'quantity_m2',
+          ],
+        });
+        const minDelivery = orderProducts.reduce((acc, el) => {
+          const fixedPrice = el?.fixed_price_m2_with_delivery;
+          if (fixedPrice != null && fixedPrice !== '') {
+            const fixed = Number(fixedPrice);
+            const base = Number(el?.price_m2 || 0);
+            const qty = Number(el?.quantity_real ?? el?.quantity_m2 ?? 0);
+            if (fixed > base && qty > 0) {
+              return Number(
+                (acc + Number(((fixed - base) * qty).toFixed(2))).toFixed(2),
+              );
+            }
+          }
+          return acc;
+        }, 0);
+        if (Math.round(nextDelivery * 100) < Math.round(minDelivery * 100)) {
+          throw new BadRequest(
+            `Delivery cost cannot be lower than ${minDelivery}`,
+          );
+        }
       }
       await updateOrderFields(order_id, { delivery_m2: nextDelivery });
     } catch (error) {

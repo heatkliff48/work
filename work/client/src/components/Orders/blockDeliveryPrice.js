@@ -30,7 +30,9 @@ export const getFixedDeliveryTotal = (blocks) => {
       const base = Number(el?.price_m2 || 0);
       const qty = Number(el?.quantity_real ?? el?.quantity_m2 ?? 0);
       if (fixed > base && qty > 0) {
-        return acc + Number(((fixed - base) * qty).toFixed(2));
+        return Number(
+          (acc + Number(((fixed - base) * qty).toFixed(2))).toFixed(2),
+        );
       }
     }
     return acc;

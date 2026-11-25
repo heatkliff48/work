@@ -72,6 +72,7 @@ import {
   blockGetsOrderDelivery,
   calcBlockPriceWithDelivery,
   getDeliveryPricePerM2,
+  getFixedDeliveryTotal,
 } from './blockDeliveryPrice.js';
 import showMessage from '#components/Utils/showMessage.js';
 
@@ -1080,18 +1081,18 @@ const OrderCart = React.memo(() => {
   };
 
   const deliveryM2Func = async () => {
-    const delivery_m2 = Number(deliveryM2Draft || 0);
-    const savedDelivery = Number(orderCartData?.delivery_m2 || 0);
+    let delivery_m2 = Number(deliveryM2Draft || 0);
+    const minDelivery = getFixedDeliveryTotal(updatedProductListOrder);
     if (
       orderCartData?.delivery_m2_locked &&
-      Math.round(delivery_m2 * 100) < Math.round(savedDelivery * 100)
+      Math.round(delivery_m2 * 100) < Math.round(minDelivery * 100)
     ) {
-      setDeliveryM2Draft(savedDelivery);
+      delivery_m2 = minDelivery;
+      setDeliveryM2Draft(minDelivery);
       showMessage(
-        'Delivery cost cannot be lower than the current amount',
+        `Delivery cost cannot be lower than ${minDelivery}. Set to ${minDelivery}`,
         'warning',
       );
-      return;
     }
 
     dispatch(
