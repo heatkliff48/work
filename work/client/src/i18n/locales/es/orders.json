@@ -148,6 +148,7 @@
     "awaitAccounting": "Espera la verificación de contabilidad",
     "saveShippingDateFirst": "Guarda la fecha de envío antes de cambiar el estado.",
     "reservedDeleteConfirm": "Este producto está reservado en el almacén. ¿Eliminarlo de todos modos?",
+    "deleteOrderConfirm": "¿Estás seguro de que quieres eliminar el pedido {{article}}? Se eliminarán todas las reservas y registros relacionados (incluido Order Dispatch).",
     "agentCommissionNegative": "La comisión del agente no puede ser negativa",
     "zeroQuantity": "¡No se puede añadir un producto con cantidad 0!"
   },

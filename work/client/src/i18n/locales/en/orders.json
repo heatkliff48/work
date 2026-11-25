@@ -148,6 +148,7 @@
     "awaitAccounting": "Please await accounting's verification",
     "saveShippingDateFirst": "Please save the shipping date before changing the status.",
     "reservedDeleteConfirm": "This product is reserved in the warehouse. Delete anyway?",
+    "deleteOrderConfirm": "Are you sure you want to delete order {{article}}? All reservations and related records (including Order Dispatch) will be removed.",
     "agentCommissionNegative": "Agent commission cannot be negative",
     "zeroQuantity": "Cannot add product with 0 quantity!"
   },

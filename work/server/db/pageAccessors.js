@@ -32,6 +32,7 @@ const PAGE_ACCESSORS = [
   // замена артикула строки расхода; пока только System administrator (роль 3)
   { page_name: 'article_correction', inherit: false },
   { page_name: 'client_product_prices', inherit: false },
+  { page_name: 'orders_delete_before_shipped', inherit: false },
 ];
 
 const NO_PERMISSION = { read: false, write: false };

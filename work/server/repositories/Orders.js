@@ -6,9 +6,26 @@ const {
   OrderAnchorProducts,
   OrderToolProducts,
   OrderRelMatProducts,
+  ReservedProducts,
+  ReservedDryMixes,
+  ReservedAnchors,
+  ReservedTools,
+  ReservedRelatedMaterials,
+  Warehouses,
+  DryMixesWarehouse,
+  AnchorsWarehouse,
+  ToolsWarehouse,
+  RelatedMaterialsWarehouse,
+  OrderDispatches,
+  ListOfOrderedProductions,
+  ListOfOrderedProductionOEMs,
+  RelatedMaterialsBackorderList,
+  BatchOutside,
+  FilesOrder,
+  Aldabarans,
 } = require('../db/models');
 const ClientProductPricesRepository = require('./ClientProductPrices.js');
-const { BadRequest } = require('../utils/Errors.js');
+const { BadRequest, Conflict } = require('../utils/Errors.js');
 const myEmitter = require('../src/ee.js');
 const {
   UPDATE_DRY_MIXED_PRODUCT_OF_ORDER_SOCKET,
@@ -1344,18 +1361,253 @@ class OrdersRepository {
   }
 
   static async getDeleteOrder({ order_id }) {
-    try {
-      await OrdersProducts.destroy({ where: { order_id } });
-      await Orders.destroy({ where: { id: order_id } });
+    const orderId = getOrderId(order_id);
 
-      return;
-    } catch (error) {
-      console.log(
-        '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.error',
-        error,
-      );
-      return error;
-    }
+    await Orders.sequelize.transaction(async (transaction) => {
+      const order = await Orders.findByPk(orderId, {
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+      if (!order) return;
+
+      if (Number(order.status) >= 9) {
+        throw new Conflict('Cannot delete an order that has already been shipped');
+      }
+
+      const dispatchRows = await OrderDispatches.findAll({
+        where: { orderId },
+        attributes: ['id'],
+        transaction,
+      });
+      const dispatchIds = dispatchRows.map((d) => d.id);
+
+      const productWarehouseGroups = [
+        {
+          OrderProductModel: OrdersProducts,
+          ReservedModel: ReservedProducts,
+          WarehouseModel: Warehouses,
+        },
+        {
+          OrderProductModel: OrderDryMixedProducts,
+          ReservedModel: ReservedDryMixes,
+          WarehouseModel: DryMixesWarehouse,
+        },
+        {
+          OrderProductModel: OrderAnchorProducts,
+          ReservedModel: ReservedAnchors,
+          WarehouseModel: AnchorsWarehouse,
+        },
+        {
+          OrderProductModel: OrderToolProducts,
+          ReservedModel: ReservedTools,
+          WarehouseModel: ToolsWarehouse,
+        },
+        {
+          OrderProductModel: OrderRelMatProducts,
+          ReservedModel: ReservedRelatedMaterials,
+          WarehouseModel: RelatedMaterialsWarehouse,
+        },
+      ];
+
+      const dispatchedQtyByArticle = new Map();
+
+      for (const {
+        OrderProductModel,
+        ReservedModel,
+        WarehouseModel,
+      } of productWarehouseGroups) {
+        const orderProducts = await OrderProductModel.findAll({
+          where: { order_id: orderId },
+          attributes: ['id'],
+          transaction,
+        });
+        const orderProductIds = orderProducts.map((p) => p.id);
+
+        const orConditions = [];
+        if (orderProductIds.length > 0) {
+          orConditions.push({ orders_products_id: { [Op.in]: orderProductIds } });
+        }
+        if (dispatchIds.length > 0) {
+          orConditions.push({ order_dispatch_id: { [Op.in]: dispatchIds } });
+        }
+        if (orConditions.length === 0) continue;
+
+        const reservedRows = await ReservedModel.findAll({
+          where: { [Op.or]: orConditions },
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        });
+        if (reservedRows.length === 0) continue;
+
+        const warehouseAdjustments = new Map();
+        for (const row of reservedRows) {
+          const qty = Number(row.quantity || 0);
+          if (qty <= 0 || !row.warehouse_id) continue;
+
+          const current = warehouseAdjustments.get(row.warehouse_id) || {
+            freeDelta: 0,
+            totalDelta: 0,
+            dispatchedQty: 0,
+          };
+          current.freeDelta += qty;
+          if (row.order_dispatch_id != null) {
+            current.totalDelta += qty;
+            current.dispatchedQty += qty;
+          }
+          warehouseAdjustments.set(row.warehouse_id, current);
+        }
+
+        if (warehouseAdjustments.size > 0) {
+          const warehouseRows = await WarehouseModel.findAll({
+            where: { id: { [Op.in]: [...warehouseAdjustments.keys()] } },
+            transaction,
+            lock: transaction.LOCK.UPDATE,
+          });
+          for (const wh of warehouseRows) {
+            const adj = warehouseAdjustments.get(wh.id);
+            if (!adj) continue;
+
+            const nextFree = Number(wh.free_quantity_remaining || 0) + adj.freeDelta;
+            const ordered = Number(wh.ordered_quantity || 0);
+            const nextTotal = Math.max(
+              Number(wh.total_quantity || 0) + adj.totalDelta,
+              nextFree + ordered,
+            );
+
+            await wh.update(
+              {
+                free_quantity_remaining: nextFree,
+                total_quantity: nextTotal,
+              },
+              { transaction },
+            );
+
+            if (adj.dispatchedQty > 0 && wh.product_article) {
+              dispatchedQtyByArticle.set(
+                wh.product_article,
+                (dispatchedQtyByArticle.get(wh.product_article) || 0) + adj.dispatchedQty,
+              );
+            }
+          }
+        }
+
+        await ReservedModel.destroy({
+          where: { id: { [Op.in]: reservedRows.map((r) => r.id) } },
+          transaction,
+        });
+      }
+
+      const releaseOrderedQty = async (WarehouseModel, productArticle, qty) => {
+        let remaining = Number(qty || 0);
+        if (remaining <= 0 || !productArticle) return;
+
+        const whRows = await WarehouseModel.findAll({
+          where: {
+            product_article: productArticle,
+            ordered_quantity: { [Op.gt]: 0 },
+          },
+          order: [['id', 'ASC']],
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        });
+
+        for (const wh of whRows) {
+          if (remaining <= 0) break;
+          const ordered = Number(wh.ordered_quantity || 0);
+          const release = Math.min(ordered, remaining);
+          if (release <= 0) continue;
+
+          await wh.update(
+            {
+              ordered_quantity: ordered - release,
+              free_quantity_remaining:
+                Number(wh.free_quantity_remaining || 0) + release,
+            },
+            { transaction },
+          );
+          remaining -= release;
+        }
+      };
+
+      if (order.article) {
+        const orderedProductions = await ListOfOrderedProductions.findAll({
+          where: { order_article: order.article },
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        });
+
+        for (const prod of orderedProductions) {
+          const inWh = Number(prod.quantity_in_warehouse || 0);
+          const alreadyDispatched = dispatchedQtyByArticle.get(prod.product_article) || 0;
+          const used = Math.min(inWh, alreadyDispatched);
+          dispatchedQtyByArticle.set(prod.product_article, alreadyDispatched - used);
+          const toRelease = inWh - used;
+          await releaseOrderedQty(Warehouses, prod.product_article, toRelease);
+        }
+
+        const orderedProdIds = orderedProductions.map((p) => p.id);
+        if (orderedProdIds.length > 0) {
+          await BatchOutside.update(
+            { id_list_of_ordered_production: null },
+            {
+              where: { id_list_of_ordered_production: { [Op.in]: orderedProdIds } },
+              transaction,
+            },
+          );
+        }
+
+        const backorderRows = await RelatedMaterialsBackorderList.findAll({
+          where: { order_article: order.article },
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        });
+
+        for (const row of backorderRows) {
+          const inWh = Number(row.quantity_in_warehouse || 0);
+          const alreadyDispatched = dispatchedQtyByArticle.get(row.product_article) || 0;
+          const used = Math.min(inWh, alreadyDispatched);
+          dispatchedQtyByArticle.set(row.product_article, alreadyDispatched - used);
+          let toRelease = inWh - used;
+
+          for (const Model of [DryMixesWarehouse, AnchorsWarehouse, ToolsWarehouse]) {
+            if (toRelease <= 0) break;
+            const before = await Model.sum('ordered_quantity', {
+              where: { product_article: row.product_article },
+              transaction,
+            });
+            const available = Number(before || 0);
+            if (available > 0) {
+              const releaseHere = Math.min(available, toRelease);
+              await releaseOrderedQty(Model, row.product_article, releaseHere);
+              toRelease -= releaseHere;
+            }
+          }
+        }
+
+        await ListOfOrderedProductions.destroy({
+          where: { order_article: order.article },
+          transaction,
+        });
+        await ListOfOrderedProductionOEMs.destroy({
+          where: { order_article: order.article },
+          transaction,
+        });
+        await RelatedMaterialsBackorderList.destroy({
+          where: { order_article: order.article },
+          transaction,
+        });
+      }
+
+      await OrderDispatches.destroy({ where: { orderId }, transaction });
+      await FilesOrder.destroy({ where: { order_id: orderId }, transaction });
+      await Aldabarans.destroy({ where: { order_id: orderId }, transaction });
+
+      for (const { OrderProductModel } of productWarehouseGroups) {
+        await OrderProductModel.destroy({ where: { order_id: orderId }, transaction });
+      }
+
+      await Orders.destroy({ where: { id: orderId }, transaction });
+    });
   }
 
   static async addChildOrder({

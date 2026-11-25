@@ -176,6 +176,11 @@ const OrderCart = React.memo(() => {
     canRead: true,
     canWrite: false,
   });
+  const [deleteOrderBeforeShippedAccess, setDeleteOrderBeforeShippedAccess] =
+    useState({
+      canRead: false,
+      canWrite: false,
+    });
   const [vatValue, setVatValue] = useState({
     vat_euro_origin: 0,
     vat_procent: orderCartData?.region == 'peninsular_spain' ? 21 : 0,
@@ -1206,6 +1211,13 @@ const OrderCart = React.memo(() => {
       const deleteAccess = checkUserAccess(user, roles, 'Del_orders');
       setDeleteOrderAccess(deleteAccess);
 
+      const deleteBeforeShippedAccess = checkUserAccess(
+        user,
+        roles,
+        'orders_delete_before_shipped',
+      );
+      setDeleteOrderBeforeShippedAccess(deleteBeforeShippedAccess);
+
       if (!access?.canRead) {
         navigate('/');
       }
@@ -1512,18 +1524,41 @@ const OrderCart = React.memo(() => {
                 {cardStatusLabel}
               </span>
             )}
-            {deleteOrderAccess?.canWrite && orderCartData?.status < 3 && (
-              <button
-                type="button"
-                className="ord-btn ord-btn--danger-outline"
-                onClick={() => {
-                  dispatch(deleteOrder(orderCartData?.id));
-                  navigate('/orders');
-                }}
-              >
-                {t('card.deleteOrder')}
-              </button>
-            )}
+            {deleteOrderBeforeShippedAccess?.canWrite &&
+              Number(orderCartData?.status) < 9 && (
+                <button
+                  type="button"
+                  className="ord-btn ord-btn--danger-outline"
+                  onClick={() => {
+                    const confirmed = window.confirm(
+                      t('alerts.deleteOrderConfirm', {
+                        article: orderCartData?.article || '',
+                      }),
+                    );
+                    if (!confirmed) return;
+                    dispatch(deleteOrder(orderCartData?.id));
+                    localStorage.removeItem('orderCartData');
+                    navigate('/orders');
+                  }}
+                >
+                  {t('card.deleteOrder')}
+                </button>
+              )}
+            {!deleteOrderBeforeShippedAccess?.canWrite &&
+              deleteOrderAccess?.canWrite &&
+              orderCartData?.status < 3 && (
+                <button
+                  type="button"
+                  className="ord-btn ord-btn--danger-outline"
+                  onClick={() => {
+                    dispatch(deleteOrder(orderCartData?.id));
+                    localStorage.removeItem('orderCartData');
+                    navigate('/orders');
+                  }}
+                >
+                  {t('card.deleteOrder')}
+                </button>
+              )}
             {orderCartData.main_order == null && orderCartData?.status == 4 && (
               <button
                 type="button"
