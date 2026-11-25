@@ -30,6 +30,7 @@ export const PAGE_ACCESS = {
   '/raw_material_consumption': 'raw_material_consumption',
   '/article_correction': 'article_correction',
   '/lotes_list': 'lotes_list',
+  '/aluminum_comparison': 'lotes_list',
 
   '/quality_management': 'quality_management',
   '/warehouse_products_type': 'Warehouse',

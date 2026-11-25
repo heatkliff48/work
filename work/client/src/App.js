@@ -46,6 +46,7 @@ import ProductionBatchDesignerNew from '#components/ProductionBatchDesigner/Prod
 import RawMaterialsConsumption from '#components/RawMaterialsConsumption/RawMaterialsConsumption.jsx';
 import ArticleCorrection from '#components/ArticleCorrection/ArticleCorrection.jsx';
 import LotesList from '#components/LotesList/LotesList.jsx';
+import AluminumComparison from '#components/AluminumComparison/AluminumComparison.jsx';
 import ClientsPriceInfo from '#components/Clients/ClientsPriceInfo/ClientsPriceInfo.jsx';
 import ClientProductPrices from '#components/Clients/ClientProductPrices/ClientProductPrices.jsx';
 import CakeFillUp from '#components/CakeFillUp/CakeFillUp.jsx';
@@ -251,6 +252,10 @@ function App() {
             />
 
             <Route path="/lotes_list" element={<LotesList />} />
+            <Route
+              path="/aluminum_comparison"
+              element={<AluminumComparison />}
+            />
             <Route path="/task_board" element={<TaskBoard />} />
             <Route
               path="/green_line_monitoring"

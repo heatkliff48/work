@@ -568,6 +568,7 @@ const ProjectContextProvider = ({ children }) => {
     '/raw_material_consumption': 'Raw materials consumption',
     '/article_correction': 'Article correction',
     '/cake_fillup': 'Casting',
+    '/aluminum_comparison': 'Aluminum comparison',
   };
 
   function getPageTitleByPath(pathname = window.location.pathname) {

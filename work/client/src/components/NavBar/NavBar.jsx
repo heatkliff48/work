@@ -234,6 +234,11 @@ export default function NavBar() {
             icon: rawMatConsIcon,
           },
           { title: 'Lotes list', path: '/lotes_list', icon: lotesListIcon },
+          {
+            title: 'Aluminum comparison',
+            path: '/aluminum_comparison',
+            icon: rawMatConsIcon,
+          },
         ],
       },
       {

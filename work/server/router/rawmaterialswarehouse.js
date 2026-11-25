@@ -877,6 +877,26 @@ rawMaterialsWarehouseRouter.post('/raw_mat_con/update', async (req, res) => {
 });
 
 rawMaterialsWarehouseRouter.get(
+  '/batch_aluminum_consumption',
+  async (req, res) => {
+    try {
+      const consumptions = await BatchAluminumConsumption.findAll({
+        order: [
+          ['batch_id', 'DESC'],
+          ['id', 'ASC'],
+        ],
+      });
+      return res.status(200).json(consumptions);
+    } catch (err) {
+      console.error('GET /batch_aluminum_consumption error:', err);
+      return res
+        .status(500)
+        .json({ error: 'FAILED_TO_FETCH_BATCH_ALUMINUM_CONSUMPTION' });
+    }
+  },
+);
+
+rawMaterialsWarehouseRouter.get(
   '/batch_aluminum_consumption/:batch_id',
   async (req, res) => {
     try {
