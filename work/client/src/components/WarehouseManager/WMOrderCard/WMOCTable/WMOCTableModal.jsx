@@ -26,6 +26,9 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
   const onClickHandler = (batch) => {
     setWmoctProduct((prev) => {
       const remainingInBatch = Number(batch.total_quantity || 0);
+      const baseRemainingInBatch = Number(
+        batch.base_total_quantity ?? batch.total_quantity ?? 0,
+      );
 
       return prev.map((product) => {
         if (product.order_dispatch_id !== selectedProduct) {
@@ -39,7 +42,7 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
             {
               batchId: batch.batch_article,
 
-              baseRemainingInBatch: remainingInBatch,
+              baseRemainingInBatch,
               remainingInBatch,
 
               allocated: 0,
@@ -67,16 +70,29 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
     const type = line.product_type;
     const wh_arr = warehouseMap[type] || [];
 
-    // A batch already taken by a line is matched by its warehouse row, not by
-    // article: articles of auxiliary warehouses aren't unique, and ids only
-    // mean something within one warehouse type.
-    const takenWarehouseIds = new Set(
-      wmoctProduct
-        .filter((product) => product.product_type === type)
-        .flatMap((product) =>
-          (product.batches || []).map((batch) => Number(batch.warehouseId)),
-        ),
+    // Only exclude batches already added to the current line; different lines
+    // (e.g. same product at different prices) can share the same warehouse batch
+    // up to its remaining unallocated quantity.
+    const lineWarehouseIds = new Set(
+      (line.batches || []).map((batch) => Number(batch.warehouseId)),
     );
+
+    const sessionDeltaByWarehouseId = new Map();
+    wmoctProduct
+      .filter((product) => product.product_type === type)
+      .forEach((product) => {
+        (product.batches || []).forEach((batch) => {
+          const whId = Number(batch.warehouseId);
+          const delta = Math.max(
+            Number(batch.allocated || 0) - Number(batch.minAllocated || 0),
+            0,
+          );
+          sessionDeltaByWarehouseId.set(
+            whId,
+            (sessionDeltaByWarehouseId.get(whId) || 0) + delta,
+          );
+        });
+      });
 
     const result = wh_arr
       .filter((el) => {
@@ -88,18 +104,36 @@ const WMOCTableModal = ({ isOpen, toggle, selectedProduct }) => {
           el.rel_mat_article;
         return product_article == line.article;
       })
-      .filter((warehouseItem) => !takenWarehouseIds.has(Number(warehouseItem.id)))
-      .filter((el) => el.ordered_quantity > 0 || el.free_quantity_remaining > 0)
-      .map((el) => ({
-        warehouse_id: el.id,
-        batch_article: el.article,
-        // Only block batches have a batch_id; the other warehouses show
-        // their article
-        batch_id: el.batch_id ?? el.article,
-        free_quantity_remaining: el.free_quantity_remaining,
-        quantity: el.ordered_quantity,
-        total_quantity: el.total_quantity,
-      }));
+      .filter((warehouseItem) => !lineWarehouseIds.has(Number(warehouseItem.id)))
+      .map((el) => {
+        const usedInSession = sessionDeltaByWarehouseId.get(Number(el.id)) || 0;
+        const baseTotalQuantity = Number(el.total_quantity || 0);
+        const availableTotal = Math.max(baseTotalQuantity - usedInSession, 0);
+        const availableFree = Math.max(
+          Number(el.free_quantity_remaining || 0) - usedInSession,
+          0,
+        );
+        const availableOrdered = Math.max(
+          Number(el.ordered_quantity || 0) - usedInSession,
+          0,
+        );
+
+        return {
+          warehouse_id: el.id,
+          batch_article: el.article,
+          // Only block batches have a batch_id; the other warehouses show
+          // their article
+          batch_id: el.batch_id ?? el.article,
+          free_quantity_remaining: availableFree,
+          quantity: availableOrdered,
+          total_quantity: availableTotal,
+          base_total_quantity: baseTotalQuantity,
+          has_stock:
+            availableTotal > 0 &&
+            (el.ordered_quantity > 0 || el.free_quantity_remaining > 0),
+        };
+      })
+      .filter((el) => el.has_stock);
     setWmoctModalData(result);
   }, [selectedProduct, wmoctProduct]);
 

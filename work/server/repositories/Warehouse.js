@@ -1078,12 +1078,14 @@ class WarehouseRepository {
 
   static async updReservedProducts(reserved_product) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedProducts');
-    const { warehouse_id, orders_products_id, quantity } = reserved_product;
+    const { warehouse_id, orders_products_id, order_dispatch_id, quantity } =
+      reserved_product;
+    const whereClause = { warehouse_id, orders_products_id };
+    if (order_dispatch_id != null) {
+      whereClause.order_dispatch_id = order_dispatch_id;
+    }
     try {
-      await ReservedProducts.update(
-        { quantity },
-        { where: { warehouse_id, orders_products_id } },
-      );
+      await ReservedProducts.update({ quantity }, { where: whereClause });
 
       return;
     } catch (error) {
@@ -1170,12 +1172,14 @@ class WarehouseRepository {
 
   static async updReservedDryMixedProducts(reserved_product) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedDryMixedProducts');
-    const { warehouse_id, orders_products_id, quantity } = reserved_product;
+    const { warehouse_id, orders_products_id, order_dispatch_id, quantity } =
+      reserved_product;
+    const whereClause = { warehouse_id, orders_products_id };
+    if (order_dispatch_id != null) {
+      whereClause.order_dispatch_id = order_dispatch_id;
+    }
     try {
-      await ReservedDryMixes.update(
-        { quantity },
-        { where: { warehouse_id, orders_products_id } },
-      );
+      await ReservedDryMixes.update({ quantity }, { where: whereClause });
 
       return;
     } catch (error) {
@@ -1257,12 +1261,14 @@ class WarehouseRepository {
 
   static async updReservedAnchorProducts(reserved_product) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedAnchorProducts');
-    const { warehouse_id, orders_products_id, quantity } = reserved_product;
+    const { warehouse_id, orders_products_id, order_dispatch_id, quantity } =
+      reserved_product;
+    const whereClause = { warehouse_id, orders_products_id };
+    if (order_dispatch_id != null) {
+      whereClause.order_dispatch_id = order_dispatch_id;
+    }
     try {
-      await ReservedAnchors.update(
-        { quantity },
-        { where: { warehouse_id, orders_products_id } },
-      );
+      await ReservedAnchors.update({ quantity }, { where: whereClause });
 
       return;
     } catch (error) {
@@ -1342,12 +1348,14 @@ class WarehouseRepository {
 
   static async updReservedToolProducts(reserved_product) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedToolProducts');
-    const { warehouse_id, orders_products_id, quantity } = reserved_product;
+    const { warehouse_id, orders_products_id, order_dispatch_id, quantity } =
+      reserved_product;
+    const whereClause = { warehouse_id, orders_products_id };
+    if (order_dispatch_id != null) {
+      whereClause.order_dispatch_id = order_dispatch_id;
+    }
     try {
-      await ReservedTools.update(
-        { quantity },
-        { where: { warehouse_id, orders_products_id } },
-      );
+      await ReservedTools.update({ quantity }, { where: whereClause });
 
       return;
     } catch (error) {
@@ -1437,12 +1445,14 @@ class WarehouseRepository {
 
   static async updReservedRelMatProducts(reserved_product) {
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>updReservedRelMatProducts');
-    const { warehouse_id, orders_products_id, quantity } = reserved_product;
+    const { warehouse_id, orders_products_id, order_dispatch_id, quantity } =
+      reserved_product;
+    const whereClause = { warehouse_id, orders_products_id };
+    if (order_dispatch_id != null) {
+      whereClause.order_dispatch_id = order_dispatch_id;
+    }
     try {
-      await ReservedRelatedMaterials.update(
-        { quantity },
-        { where: { warehouse_id, orders_products_id } },
-      );
+      await ReservedRelatedMaterials.update({ quantity }, { where: whereClause });
 
       return;
     } catch (error) {

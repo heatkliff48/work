@@ -116,85 +116,109 @@ const WMOCTable = ({ product_list, orderCartData }) => {
     setWmoctModal(true);
   };
 
-  const handlePlus = (productObj, batchIndex) => {
-    setWmoctProduct((prev) =>
-      prev.map((wmoctItem) => {
-        if (wmoctItem.order_dispatch_id === productObj.order_dispatch_id) {
-          let { shipped, qty_rem, qty_total } = wmoctItem;
+  const getSessionDeltaForBatch = (items, productType, warehouseId) =>
+    items
+      .filter((item) => item.product_type === productType)
+      .reduce(
+        (sum, item) =>
+          sum +
+          (item.batches || []).reduce((batchSum, batch) => {
+            if (Number(batch.warehouseId) !== Number(warehouseId)) return batchSum;
+            return (
+              batchSum +
+              Math.max(
+                Number(batch.allocated || 0) - Number(batch.minAllocated || 0),
+                0,
+              )
+            );
+          }, 0),
+        0,
+      );
 
-          const newBatches = wmoctItem.batches.map((el, i) => {
-            if (i === batchIndex) {
-              const { allocated, baseRemainingInBatch, minAllocated = 0 } = el;
+  const updateBatchAllocation = (productObj, batchIndex, deltaStep) => {
+    setWmoctProduct((prev) => {
+      const targetLine = prev.find(
+        (item) => item.order_dispatch_id === productObj.order_dispatch_id,
+      );
+      const targetBatch = targetLine?.batches?.[batchIndex];
+      if (!targetLine || !targetBatch) return prev;
 
-              const allocatedNum = Number(allocated || 0);
-              const minNum = Number(minAllocated || 0);
-              const baseNum = Number(baseRemainingInBatch || 0);
+      const targetWarehouseId = Number(targetBatch.warehouseId);
+      const allocatedNum = Number(targetBatch.allocated || 0);
+      const minNum = Number(targetBatch.minAllocated || 0);
+      const baseNum = Number(targetBatch.baseRemainingInBatch || 0);
+      const usedInSession = getSessionDeltaForBatch(
+        prev,
+        targetLine.product_type,
+        targetWarehouseId,
+      );
+      const sharedRemaining = Math.max(baseNum - usedInSession, 0);
 
-              const delta = allocatedNum - minNum;
+      if (deltaStep > 0) {
+        if (
+          sharedRemaining <= 0 ||
+          targetLine.qty_rem <= 0 ||
+          targetLine.shipped >= targetLine.qty_total
+        ) {
+          return prev;
+        }
+      } else if (allocatedNum <= minNum) {
+        return prev;
+      }
 
-              const canPlus = delta < baseNum && qty_rem > 0 && shipped < qty_total;
+      const nextSharedRemaining = Math.max(
+        baseNum - Math.max(usedInSession + deltaStep, 0),
+        0,
+      );
 
-              if (!canPlus) return el;
-
-              const newAllocated = allocatedNum + 1;
-              const newDelta = newAllocated - minNum;
-              const newRemainingInBatch = Math.max(baseNum - newDelta, 0);
-
-              shipped += 1;
-              qty_rem -= 1;
-
-              return {
-                ...el,
-                allocated: newAllocated,
-                remainingInBatch: newRemainingInBatch,
-              };
-            }
-
-            return el;
-          });
-
-          return { ...wmoctItem, shipped, qty_rem, batches: newBatches };
+      return prev.map((wmoctItem) => {
+        if (wmoctItem.product_type !== targetLine.product_type) {
+          return wmoctItem;
         }
 
-        return wmoctItem;
-      }),
-    );
-  };
+        const isTargetLine =
+          wmoctItem.order_dispatch_id === productObj.order_dispatch_id;
+        let changed = false;
 
-  const handleMinus = (productObj, batchIndex) => {
-    setWmoctProduct((prev) =>
-      prev.map((wmoctItem) => {
-        if (wmoctItem.order_dispatch_id !== productObj.order_dispatch_id)
-          return wmoctItem;
+        const newBatches = (wmoctItem.batches || []).map((el, i) => {
+          const isSameBatch = Number(el.warehouseId) === targetWarehouseId;
+          if (!isSameBatch) return el;
 
-        let { shipped, qty_rem } = wmoctItem;
-
-        const newBatches = wmoctItem.batches.map((el, i) => {
-          if (i !== batchIndex) return el;
-
-          const allocatedNum = Number(el.allocated || 0);
-          const minNum = Number(el.minAllocated || 0);
-          const baseNum = Number(el.baseRemainingInBatch || 0);
-
-          if (allocatedNum <= minNum) return el;
-
-          const newAllocated = allocatedNum - 1;
-          const newDelta = newAllocated - minNum;
-          const newRemainingInBatch = Math.max(baseNum - newDelta, 0);
-
-          shipped -= 1;
-          qty_rem += 1;
+          changed = true;
+          if (isTargetLine && i === batchIndex) {
+            return {
+              ...el,
+              allocated: Number(el.allocated || 0) + deltaStep,
+              remainingInBatch: nextSharedRemaining,
+            };
+          }
 
           return {
             ...el,
-            allocated: newAllocated,
-            remainingInBatch: newRemainingInBatch,
+            remainingInBatch: nextSharedRemaining,
           };
         });
 
-        return { ...wmoctItem, shipped, qty_rem, batches: newBatches };
-      }),
-    );
+        if (!changed && !isTargetLine) return wmoctItem;
+
+        return isTargetLine
+          ? {
+              ...wmoctItem,
+              shipped: wmoctItem.shipped + deltaStep,
+              qty_rem: wmoctItem.qty_rem - deltaStep,
+              batches: newBatches,
+            }
+          : { ...wmoctItem, batches: newBatches };
+      });
+    });
+  };
+
+  const handlePlus = (productObj, batchIndex) => {
+    updateBatchAllocation(productObj, batchIndex, 1);
+  };
+
+  const handleMinus = (productObj, batchIndex) => {
+    updateBatchAllocation(productObj, batchIndex, -1);
   };
 
   const haveBatches = (i) => {
